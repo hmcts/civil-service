@@ -367,15 +367,15 @@ public class SdoGeneratorService {
             );
 
         sdoDocumentFormBuilder.hearingLocation(
-            locationHelper.getHearingLocation(
-                Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
-                    .map(DynamicList::getValue)
-                    .map(DynamicListElement::getLabel)
-                    .orElse(null),
-                caseData,
-                authorisation
-            ));
-            sdoDocumentFormBuilder.caseManagementLocation(
+                locationHelper.getHearingLocation(
+                    Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
+                        .map(DynamicList::getValue)
+                        .map(DynamicListElement::getLabel)
+                        .orElse(null),
+                    caseData,
+                    authorisation
+                ))
+            .caseManagementLocation(
                 locationHelper.getHearingLocation(null, caseData, authorisation));
 
         return sdoDocumentFormBuilder
