@@ -76,7 +76,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
-//            assertThat(response.getState()).isEqualTo("JUDICIAL_REFERRAL");
         }
 
         @Test
