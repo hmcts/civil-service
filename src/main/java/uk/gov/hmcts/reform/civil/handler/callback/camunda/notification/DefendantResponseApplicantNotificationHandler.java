@@ -29,10 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.toStringValueForEmail;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -156,7 +153,15 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         } else if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)) {
-            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+
+            if (MultiPartyScenario.getMultiPartyScenario(caseData)
+                .equals(ONE_V_ONE)) {
+                // new email template
+                emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            } else {
+                emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            }
+
             if (caseData.getRespondent1ResponseDate() == null || !MultiPartyScenario.getMultiPartyScenario(caseData)
                 .equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                 notificationService.sendMail(
@@ -166,9 +171,16 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                     String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
                 );
             }
-
         } else {
-            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+
+            if (MultiPartyScenario.getMultiPartyScenario(caseData)
+                .equals(ONE_V_ONE)) {
+                // new email template
+                emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            } else {
+                emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            }
+
             notificationService.sendMail(
                 recipient,
                 emailTemplate,
