@@ -72,7 +72,7 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
             sb.append(" can:")
                 .append("<ul>");
         }
-            sb.append("<li>request a county court judgment against you</li>")
+        sb.append("<li>request a county court judgment against you</li>")
             .append("</ul>")
 
             .append("<h3 class=\"govuk-heading-m\">If ")
