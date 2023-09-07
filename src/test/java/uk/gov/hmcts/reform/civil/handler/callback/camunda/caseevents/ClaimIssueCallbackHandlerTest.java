@@ -69,7 +69,9 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldClearOrganisationId_whenClaimIsIssued() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
-            .build();
+            .build().toBuilder()
+            .respondent1OrganisationIDCopy("")
+            .build();;
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -86,6 +88,8 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldClearOrganisationIdTwoDefendants_whenClaimIsIssued() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
             .multiPartyClaimTwoDefendantSolicitors()
+            .build().toBuilder()
+            .respondent1OrganisationIDCopy("")
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
