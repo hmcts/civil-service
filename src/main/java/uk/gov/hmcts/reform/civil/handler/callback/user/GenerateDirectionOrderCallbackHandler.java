@@ -85,8 +85,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String NOT_ALLOWED_DATE = "The date in %s may not be later than the established date";
     public static final String NOT_ALLOWED_DATE_RANGE = "The date range in %s may not have a 'from date', that is after the 'date to'";
     public static final String NOT_ALLOWED_DATE_PAST = "The date in %s may not be before the established date";
-    public static String DEFENDANT_TWO_PARTY_NAME = null;
-    public static String CLAIMANT_TWO_PARTY_NAME = null;
+    public String DEFENDANT_TWO_PARTY_NAME;
+    public String CLAIMANT_TWO_PARTY_NAME;
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
@@ -192,6 +192,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CaseData.CaseDataBuilder<?, ?> populateFields(
         CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations, CaseData caseData, String authToken) {
         LocalDate advancedDate = LocalDate.now().plusDays(14);
+
         populateClaimant2Defendant2PartyNames(caseData);
         return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders
                                                                                .builder().singleDate(LocalDate.now())
@@ -236,6 +237,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
+        CLAIMANT_TWO_PARTY_NAME = null;
+        DEFENDANT_TWO_PARTY_NAME = null;
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
         if (scenario == ONE_V_TWO_ONE_LEGAL_REP || scenario == ONE_V_TWO_TWO_LEGAL_REP) {
             DEFENDANT_TWO_PARTY_NAME = caseData.getRespondent2().getPartyName();
