@@ -601,7 +601,7 @@ public class BundleRequestMapper {
                                                                                       PartyType party) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (evidenceUploadDocList != null) {
-            if (documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name())) {
+            if (documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name()) || documentType.equals(EvidenceUploadFiles.SKELETON_ARGUMENT.name())) {
                 sortEvidenceUploadByDate(evidenceUploadDocList, true);
             } else {
                 sortEvidenceUploadByDate(evidenceUploadDocList, false);
@@ -635,7 +635,7 @@ public class BundleRequestMapper {
                 partyName = partyName.concat(" counter");
             }
             return generateDocName(fileNamePrefix, partyName, null,
-                            documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name())
+                            documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name()) || documentType.equals(EvidenceUploadFiles.SKELETON_ARGUMENT.name())
                                 ? uploadEvidence.getValue().getCreatedDatetime().toLocalDate() :
                                 uploadEvidence.getValue().getDocumentIssuedDate());
         }
