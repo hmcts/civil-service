@@ -38,6 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -439,6 +440,21 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
             verify(civilDocumentStitchingService).bundle(eq(documents), anyString(), anyString(), anyString(),
                                                          eq(caseData)
             );
+        }
+
+        @Test
+        void shouldNotGenerateClaimForm_whenLipvLipFlagIsOn() {
+            given(toggleService.isLipVLipEnabled()).willReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssuedUnrepresentedDefendant().build().toBuilder()
+                .specRespondent1Represented(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).isNull();
+
         }
     }
 
