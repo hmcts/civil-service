@@ -25,7 +25,7 @@ public class FeatureToggleService {
     }
 
     public boolean isNoticeOfChangeEnabled() {
-        return true;
+        return false;
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -41,7 +41,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCertificateOfServiceEnabled() {
-        return true;
+        return false;
     }
 
     public boolean isRPAEmailEnabled() {
