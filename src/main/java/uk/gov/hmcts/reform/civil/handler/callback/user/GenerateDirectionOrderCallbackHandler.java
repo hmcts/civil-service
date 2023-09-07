@@ -85,8 +85,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String NOT_ALLOWED_DATE = "The date in %s may not be later than the established date";
     public static final String NOT_ALLOWED_DATE_RANGE = "The date range in %s may not have a 'from date', that is after the 'date to'";
     public static final String NOT_ALLOWED_DATE_PAST = "The date in %s may not be before the established date";
-    public String DEFENDANT_TWO_PARTY_NAME;
-    public String CLAIMANT_TWO_PARTY_NAME;
+    public String defendantTwoPartyName;
+    public String claimantTwoPartyName;
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
@@ -202,8 +202,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                                          .builder()
                                                                          .typeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName())
                                                                          .typeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName())
-                                                                         .typeRepresentationDefendantTwoDynamic(DEFENDANT_TWO_PARTY_NAME)
-                                                                         .typeRepresentationClaimantTwoDynamic(CLAIMANT_TWO_PARTY_NAME)
+                                                                         .typeRepresentationDefendantTwoDynamic(defendantTwoPartyName)
+                                                                         .typeRepresentationClaimantTwoDynamic(claimantTwoPartyName)
                                                                          .build()).build())
             .finalOrderFurtherHearingComplex(
                 FinalOrderFurtherHearing.builder()
@@ -237,14 +237,14 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
-        CLAIMANT_TWO_PARTY_NAME = null;
-        DEFENDANT_TWO_PARTY_NAME = null;
+        claimantTwoPartyName = null;
+        defendantTwoPartyName = null;
         MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
         if (scenario == ONE_V_TWO_ONE_LEGAL_REP || scenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            DEFENDANT_TWO_PARTY_NAME = caseData.getRespondent2().getPartyName();
+            defendantTwoPartyName = caseData.getRespondent2().getPartyName();
         }
         if (scenario == TWO_V_ONE) {
-            CLAIMANT_TWO_PARTY_NAME = caseData.getApplicant2().getPartyName();
+            claimantTwoPartyName = caseData.getApplicant2().getPartyName();
         }
     }
 
