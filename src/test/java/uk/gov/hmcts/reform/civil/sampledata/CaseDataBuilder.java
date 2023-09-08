@@ -2161,6 +2161,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimSubmittedSmallClaim() {
+        atStateClaimDraft();
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        allocatedTrack = SMALL_CLAIM;
+        ccdState = PENDING_CASE_ISSUED;
+        ccdCaseReference = CASE_ID;
+        submittedDate = SUBMITTED_DATE_TIME;
+        totalClaimAmount = BigDecimal.valueOf(800);
+        claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmittedMultiClaim() {
         atStateClaimDraft();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
@@ -5403,6 +5415,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addApplicant1ExpertsAndWitnesses() {
         this.applicant1DQ = applicant1DQ.toBuilder()
             .applicant1DQExperts(Experts.builder()
+                                     .expertRequired(YES)
                                      .details(wrapElements(
                                          Expert.builder()
                                              .firstName("Applicant")
@@ -5411,6 +5424,7 @@ public class CaseDataBuilder {
                                      ))
                                      .build())
             .applicant1DQWitnesses(Witnesses.builder()
+                                       .witnessesToAppear(YES)
                                        .details(wrapElements(
                                            Witness.builder()
                                                .firstName("Applicant")
@@ -5435,6 +5449,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addApplicant2ExpertsAndWitnesses() {
         this.applicant2DQ = applicant2DQ.toBuilder()
             .applicant2DQExperts(Experts.builder()
+                                     .expertRequired(YES)
                                      .details(wrapElements(
                                          Expert.builder()
                                              .firstName("Applicant Two")
@@ -5443,6 +5458,7 @@ public class CaseDataBuilder {
                                      ))
                                      .build())
             .applicant2DQWitnesses(Witnesses.builder()
+                                       .witnessesToAppear(YES)
                                        .details(wrapElements(
                                            Witness.builder()
                                                .firstName("Applicant Two")
@@ -5467,6 +5483,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addRespondent1ExpertsAndWitnesses() {
         this.respondent1DQ = respondent1DQ.toBuilder()
             .respondent1DQExperts(Experts.builder()
+                                      .expertRequired(YES)
                                       .details(wrapElements(
                                           Expert.builder()
                                               .firstName("Respondent")
@@ -5475,6 +5492,7 @@ public class CaseDataBuilder {
                                       ))
                                       .build())
             .respondent1DQWitnesses(Witnesses.builder()
+                                        .witnessesToAppear(YES)
                                         .details(wrapElements(
                                             Witness.builder()
                                                 .firstName("Respondent")
@@ -5499,6 +5517,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addRespondent2ExpertsAndWitnesses() {
         this.respondent2DQ = respondent2DQ.toBuilder()
             .respondent2DQExperts(Experts.builder()
+                                      .expertRequired(YES)
                                       .details(wrapElements(
                                           Expert.builder()
                                               .firstName("Respondent Two")
@@ -5507,6 +5526,7 @@ public class CaseDataBuilder {
                                       ))
                                       .build())
             .respondent2DQWitnesses(Witnesses.builder()
+                                        .witnessesToAppear(YES)
                                         .details(wrapElements(
                                             Witness.builder()
                                                 .firstName("Respondent Two")
