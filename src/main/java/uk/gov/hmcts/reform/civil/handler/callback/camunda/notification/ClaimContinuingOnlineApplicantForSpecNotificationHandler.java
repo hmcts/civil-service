@@ -62,6 +62,10 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandler extends Ca
 
         CaseData caseData = callbackParams.getCaseData();
 
+        if (caseData.isApplicantNotRepresented()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
+
         String emailTemplateID = caseData.getRespondent2() != null
             ? notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()
             : notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec();

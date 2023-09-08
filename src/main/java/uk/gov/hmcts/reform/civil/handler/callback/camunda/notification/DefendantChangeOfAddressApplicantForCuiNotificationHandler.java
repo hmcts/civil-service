@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -37,6 +38,7 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final PinInPostConfiguration pipInPostConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -57,15 +59,26 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
 
     private CallbackResponse notifySolicitorsForContactDetailsChange(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        boolean isLiPClaimant = caseData.isApplicantNotRepresented();
 
         notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getRespondentChangeOfAddressNotificationTemplate(),
-            addProperties(caseData),
+            isLiPClaimant ? caseData.getApplicant1Email() : caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            getEmailTemplate(caseData, isLiPClaimant),
+            isLiPClaimant ? addPropertiesForLiPClaimant(caseData) : addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private Map<String, String> addPropertiesForLiPClaimant(CaseData caseData) {
+        return Map.of(
+            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl(),
+            EXTERNAL_ID, caseData.getCcdCaseReference().toString()
+        );
     }
 
     @Override
@@ -82,5 +95,15 @@ public class DefendantChangeOfAddressApplicantForCuiNotificationHandler
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    }
+
+    public String getEmailTemplate(CaseData caseData, boolean isLiPClaimant) {
+        String emailTemplate;
+        if (isLiPClaimant) {
+            emailTemplate = notificationsProperties.getNotifyLiPClaimantDefendantChangedContactDetails();
+        } else {
+            emailTemplate =  notificationsProperties.getRespondentChangeOfAddressNotificationTemplate();
+        }
+        return emailTemplate;
     }
 }
