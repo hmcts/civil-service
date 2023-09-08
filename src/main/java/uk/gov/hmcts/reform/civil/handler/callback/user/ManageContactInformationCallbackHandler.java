@@ -15,14 +15,19 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
+import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import static java.lang.String.format;
@@ -35,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORM
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ID;
@@ -48,6 +54,9 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addD
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendant2Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendantOptions1v2SameSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.appendUserAndType;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapDQExpertsToPartyExperts;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapExpertsToUpdatePartyDetailsForm;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
@@ -102,14 +111,11 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             partyChosenType = appendUserAndType(partyChosen, oldCaseData, isAdmin);
         }
 
-//        prepareExperts(partyChosen, caseData);
-//        prepareWitnesses(partyChosen, caseData);
-
         UpdateDetailsForm.UpdateDetailsFormBuilder formBuilder = caseData.getUpdateDetailsForm().toBuilder()
             .partyChosenId(partyChosen)
             .partyChosenType(partyChosenType)
-//            .updateExpertsDetailsForm(caseData.getUpdateDetailsForm().getUpdateExpertsDetailsForm())
-//            .updateWitnessesDetailsForm(caseData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm())
+            .updateExpertsDetailsForm(prepareExperts(partyChosen, caseData))
+            .updateWitnessesDetailsForm(prepareWitnesses(partyChosen, caseData))
             .build().toBuilder();
 
         builder.updateDetailsForm(formBuilder.build());
@@ -194,23 +200,30 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private void prepareExperts(String partyId, CaseData caseData) {
+    private List<Element<UpdatePartyDetailsForm>> prepareExperts(String partyId, CaseData caseData) {
         if (partyId.equals(CLAIMANT_ONE_EXPERTS_ID)) {
-            caseData.getUpdateDetailsForm().setExperts(caseData.getApplicant1DQ().getExperts().getDetails());
+            return mapExpertsToUpdatePartyDetailsForm(caseData.getApplicant1DQ().getExperts().getDetails());
         } else if (partyId.equals(DEFENDANT_ONE_EXPERTS_ID)) {
-            caseData.getUpdateDetailsForm().setExperts(caseData.getRespondent1DQ().getExperts().getDetails());
+            return mapExpertsToUpdatePartyDetailsForm(caseData.getRespondent1DQ().getExperts().getDetails());
         } else if (partyId.equals(DEFENDANT_TWO_EXPERTS_ID)) {
-            caseData.getUpdateDetailsForm().setExperts(caseData.getRespondent2DQ().getExperts().getDetails());
+            return mapExpertsToUpdatePartyDetailsForm(caseData.getRespondent2DQ().getExperts().getDetails());
         }
+        return Collections.emptyList();
     }
 
-    private void prepareWitnesses(String partyId, CaseData caseData) {
-        //add something here
+    private List<Element<UpdatePartyDetailsForm>> prepareWitnesses(String partyId, CaseData caseData) {
+//        if (partyId.equals(CLAIMANT_ONE_EXPERTS_ID)) {
+//        } else if (partyId.equals(DEFENDANT_ONE_EXPERTS_ID)) {
+//        } else if (partyId.equals(DEFENDANT_TWO_EXPERTS_ID)) {
+//        }
+        return Collections.emptyList();
     }
 
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
+
+//        updateExperts(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
 
         // clear updateDetailsForm
         builder.updateDetailsForm(null);
@@ -219,6 +232,48 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .data(builder.build().toMap(objectMapper))
             .build();
     }
+
+    // wip can't be tested yet because need to get ids from new ticket: CIV-10382
+
+//    private void updateExperts(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+//        if (partyId.equals(CLAIMANT_ONE_EXPERTS_ID)) {
+//            builder.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
+//                                     .applicant1DQExperts(
+//                                         caseData.getApplicant1DQ().getApplicant1DQExperts().toBuilder()
+//                                             .details(getDQExperts(caseData))
+//                                             .build())
+//                                     .build())
+//                .applicantExperts(getPartyExperts(caseData));
+//        } else if (partyId.equals(DEFENDANT_ONE_EXPERTS_ID)) {
+//            builder.respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+//                                     .respondent1DQExperts(
+//                                         caseData.getRespondent1DQ().getRespondent1DQExperts().toBuilder()
+//                                             .details(getDQExperts(caseData))
+//                                             .build())
+//                                     .build())
+//                .respondent1Experts(getPartyExperts(caseData));
+//        } else if (partyId.equals(DEFENDANT_TWO_EXPERTS_ID)) {
+//            builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
+//                                     .respondent2DQExperts(
+//                                         caseData.getRespondent2DQ().getRespondent2DQExperts().toBuilder()
+//                                             .details(getDQExperts(caseData))
+//                                             .build())
+//                                     .build())
+//                .respondent2Experts(getPartyExperts(caseData));
+//        }
+//    }
+//
+//    private List<Element<Expert>> getDQExperts(CaseData caseData){
+//        return mapUpdatePartyDetailsFormToDQExperts(
+//            caseData.getApplicant1DQ().getExperts().getDetails(),
+//            caseData.getUpdateDetailsForm().getUpdateExpertsDetailsForm());
+//    }
+//
+//    private List<Element<PartyFlagStructure>> getPartyExperts(CaseData caseData){
+//        return mapDQExpertsToPartyExperts(
+//            caseData.getApplicant1DQ().getExperts().getDetails(),
+//            caseData.getApplicantExperts());
+//    }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()

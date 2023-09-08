@@ -25,44 +25,5 @@ public class UpdateDetailsForm {
     private List<Element<UnavailableDate>> additionalUnavailableDates;
     private List<Element<UpdatePartyDetailsForm>> updateExpertsDetailsForm;
     private List<Element<UpdatePartyDetailsForm>> updateWitnessesDetailsForm;
-
-
-    public List<Element<Expert>> getExperts() {
-        List<Element<Expert>> newExperts = new ArrayList<>();
-
-        if (updateExpertsDetailsForm.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        for (Element<UpdatePartyDetailsForm> party : updateExpertsDetailsForm) {
-            UpdatePartyDetailsForm expert = party.getValue();
-            newExperts.addAll(wrapElements(Expert.builder()
-                                               .firstName(expert.getFirstName())
-                                               .lastName(expert.getLastName())
-                                               .emailAddress(expert.getEmailAddress())
-                                               .phoneNumber(expert.getPhoneNumber())
-                                               .fieldOfExpertise(expert.getFieldOfExpertise())
-                                               .build()));
-        }
-
-        return newExperts;
-    }
-
-    public void setExperts(List<Element<Expert>> experts) {
-        this.updateExpertsDetailsForm = new ArrayList<>();
-
-        if (!updateExpertsDetailsForm.isEmpty()) {
-            for (Element<Expert> party : experts) {
-                Expert expert = party.getValue();
-                this.updateExpertsDetailsForm.addAll(wrapElements(UpdatePartyDetailsForm.builder()
-                                                                      .firstName(expert.getFirstName())
-                                                                      .lastName(expert.getLastName())
-                                                                      .emailAddress(expert.getEmailAddress())
-                                                                      .phoneNumber(expert.getPhoneNumber())
-                                                                      .fieldOfExpertise(expert.getFieldOfExpertise())
-                                                                      .build()));
-            }
-        }
-    }
 }
 

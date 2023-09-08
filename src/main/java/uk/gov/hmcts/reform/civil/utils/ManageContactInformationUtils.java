@@ -2,17 +2,21 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-
+import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
-
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 public class ManageContactInformationUtils {
 
     private ManageContactInformationUtils() {
@@ -115,6 +119,42 @@ public class ManageContactInformationUtils {
                 throw new IllegalArgumentException("Manage Contact Information party chosen ID does not exist");
             }
         }
+    }
+
+    public static List<Element<UpdatePartyDetailsForm>> mapExpertsToUpdatePartyDetailsForm(List<Element<Expert>> experts) {
+        List<Element<UpdatePartyDetailsForm>> newExperts = new ArrayList<>();
+
+        if (!experts.isEmpty()) {
+            for (Element<Expert> party : experts) {
+                Expert expert = party.getValue();
+                newExperts.addAll(wrapElements(UpdatePartyDetailsForm.builder()
+                                                   .firstName(expert.getFirstName())
+                                                   .lastName(expert.getLastName())
+                                                   .emailAddress(expert.getEmailAddress())
+                                                   .phoneNumber(expert.getPhoneNumber())
+                                                   .fieldOfExpertise(expert.getFieldOfExpertise())
+                                                   .partyId(null) //this will need to be added in new ticket
+                                                   .build()));
+            }
+        }
+        return newExperts;
+    }
+
+    public static List<Element<Expert>> mapUpdatePartyDetailsFormToDQExperts (List<Element<Expert>> oldExperts, List<Element<UpdatePartyDetailsForm>> newExperts) {
+        // compare party ids
+        // if existing party ids, update the fields
+        // if new, add the fields
+
+        // be careful not to overwrite the experts
+        return oldExperts;
+    }
+
+    public static List<Element<PartyFlagStructure>> mapDQExpertsToPartyExperts (List<Element<Expert>> dqExperts, List<Element<PartyFlagStructure>> partyExperts) {
+        // compare party ids
+        // if existing party ids, update the fields
+        // if new, add the fields
+        // be careful not to overwrite the flags
+        return partyExperts;
     }
 
     private static String formatId(String partyChosen, String isAdmin, Party party) {
