@@ -115,6 +115,7 @@ class CaseEventTaskHandlerTest {
         when(mockTask.getTopicName()).thenReturn("test");
         when(mockTask.getWorkerId()).thenReturn("worker");
         when(mockTask.getActivityId()).thenReturn("activityId");
+        when(mockTask.getProcessInstanceId()).thenReturn("task-process-instance-id");
     }
 
     @Nested
@@ -129,13 +130,63 @@ class CaseEventTaskHandlerTest {
 
             when(mockTask.getAllVariables()).thenReturn(variables);
             when(mockTask.getVariable(FLOW_STATE)).thenReturn(PENDING_CLAIM_ISSUED.fullName());
-            when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
+            when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
         }
 
         @Test
-        void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
+        void shouldTriggerCCDEvent_whenHandlerIsExecuted_withoutExistingBusinessProcessId() {
             CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        @Test
+        void shouldTriggerCCDEvent_whenHandlerIsExecuted_withDifferentBusinessProcessId() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(
+                    BusinessProcess.builder().processInstanceId("new-process-id")
+                                     .status(BusinessProcessStatus.READY).build())
+                .build();
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
+
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(coreCaseDataService.startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE))
+                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
+
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+
+            caseEventTaskHandler.execute(mockTask, externalTaskService);
+
+            verify(coreCaseDataService).startUpdate(CASE_ID, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_ISSUE);
+            verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
+            verify(externalTaskService).complete(mockTask, variables);
+        }
+
+        @Test
+        void shouldTriggerCCDEvent_whenHandlerIsExecuted_withSameBusinessProcessId() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+                .businessProcess(
+                    BusinessProcess.builder().processInstanceId(mockTask.getProcessInstanceId())
+                        .status(BusinessProcessStatus.READY).build())
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
