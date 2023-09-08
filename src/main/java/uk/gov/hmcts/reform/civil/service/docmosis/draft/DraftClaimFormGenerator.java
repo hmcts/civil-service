@@ -31,7 +31,7 @@ public class DraftClaimFormGenerator implements TemplateDataGenerator<DraftClaim
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(String.format(DRAFT_CLAIM_FORM.getDocumentTitle(), caseData.getLegacyCaseReference()), docmosisDocument.getBytes(),
-                    DocumentType.SEALED_CLAIM
+                    DocumentType.DRAFT_CLAIM_FORM
             )
         );
     }
