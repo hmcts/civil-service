@@ -211,6 +211,7 @@ notifications:
   claimantSolicitorDefendantResponseForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
   claimantSolicitorDefendantResponse1v2DSForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
   claimantSolicitorImmediatelyDefendantResponseForSpec: "263d7737-933d-4d0b-9f08-23847613f6a4"
+  respondentSolicitorDefendantResponseForSpec1v1: "efbd38e8-3fe7-4db6-ad55-b751b96477b1"
   respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
   respondentDefendantResponseForSpec: "94c71894-9590-4995-aae0-edea94fc4594"
   sdoOrdered: "90667080-6b20-48f2-b9ea-349fa8ec78e4"

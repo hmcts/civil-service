@@ -156,7 +156,12 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         } else if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)) {
-            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+                // new email template
+                emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec1v1();
+            } else {
+                emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            }
             if (caseData.getRespondent1ResponseDate() == null || !MultiPartyScenario.getMultiPartyScenario(caseData)
                 .equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                 notificationService.sendMail(
@@ -168,7 +173,12 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             }
 
         } else {
-            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+                // new email template
+                emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec1v1();
+            } else {
+                emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            }
             notificationService.sendMail(
                 recipient,
                 emailTemplate,
