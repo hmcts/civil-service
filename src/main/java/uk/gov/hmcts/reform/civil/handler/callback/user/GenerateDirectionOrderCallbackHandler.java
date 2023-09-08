@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -204,45 +206,78 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                   .build())
             .publicFundingCostsProtection(YesOrNo.NO)
             .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                         .appealGranted(
-                AppealGrantedRefused.builder().appealDate(LocalDate.now().plusDays(21)).build())
-                                         .appealRefused(
-                AppealGrantedRefused.builder().refusedText("[name] court")
-                    .appealDate(LocalDate.now().plusDays(21)).build()).build());
+                                         .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                                           .appealChoiceSecondDropdownA(
+                                                                               AppealChoiceSecondDropdown.builder()
+                                                                                   .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                   .build())
+                                                                           .appealChoiceSecondDropdownB(
+                                                                               AppealChoiceSecondDropdown.builder()
+                                                                                   .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                   .build())
+                                                                           .build()).build());
+    }
+
+    private void validateDate(LocalDate date, String dateDescription, String errorMessage, List<String> errors, Boolean pastDate) {
+        if (pastDate) {
+            if (nonNull(date) && date.isBefore(LocalDate.now())) {
+                errors.add(String.format(errorMessage, dateDescription));
+            }
+        } else if (nonNull(date) && date.isAfter(LocalDate.now())) {
+            errors.add(String.format(errorMessage, dateDescription));
+        }
     }
 
     private void checkFieldDate(CaseData caseData, List<String> errors) {
         // validate order made dates
+        validateDate(Optional.ofNullable(caseData.getFinalOrderDateHeardComplex())
+                         .map(OrderMade::getSingleDateSelection)
+                         .map(DatesFinalOrders::getSingleDate).orElse(null),
+                     "Order made", NOT_ALLOWED_DATE, errors, false);
+
+        validateDate(Optional.ofNullable(caseData.getFinalOrderDateHeardComplex())
+                         .map(OrderMade::getDateRangeSelection)
+                         .map(DatesFinalOrders::getDateRangeFrom).orElse(null),
+                     "Order made 'date from'", NOT_ALLOWED_DATE, errors, false);
+
+        validateDate(Optional.ofNullable(caseData.getFinalOrderDateHeardComplex())
+                         .map(OrderMade::getDateRangeSelection)
+                         .map(DatesFinalOrders::getDateRangeTo).orElse(null),
+                     "Order made 'date to'", NOT_ALLOWED_DATE, errors, false);
+
         if (nonNull(caseData.getFinalOrderDateHeardComplex())) {
-            if (nonNull(caseData.getFinalOrderDateHeardComplex().getSingleDateSelection())
-                && caseData.getFinalOrderDateHeardComplex().getSingleDateSelection().getSingleDate().isAfter(LocalDate.now())) {
-                errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
-            }
             if (nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
-                && (caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom().isAfter(LocalDate.now())
-                || caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo().isAfter(LocalDate.now()))) {
-                errors.add(String.format(NOT_ALLOWED_DATE, "Order Made"));
-            } else if (nonNull(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection())
                 && caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom()
                 .isAfter(caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo())) {
-                errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Order Made"));
+                errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Order made"));
             }
         }
-        //validate further hearing dates
-        if (nonNull(caseData.getFinalOrderFurtherHearingComplex())
-            && (nonNull(caseData.getFinalOrderFurtherHearingComplex().getDatesToAvoidDateDropdown())
-                && caseData.getFinalOrderFurtherHearingComplex().getDatesToAvoidDateDropdown().getDatesToAvoidDates()
-                .isBefore(LocalDate.now()))) {
-            errors.add(String.format(NOT_ALLOWED_DATE_PAST, "Further hearing"));
-        }
-        //validate make an order for costs dates
-        if (nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
-            && ((nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownDate())
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownDate().isBefore(LocalDate.now()))
-            || (nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate())
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate().isBefore(LocalDate.now())))) {
-            errors.add(String.format(NOT_ALLOWED_DATE_PAST, "Make an order for detailed/summary costs"));
-        }
+
+        validateDate(Optional.ofNullable(caseData.getFinalOrderFurtherHearingComplex())
+                         .map(FinalOrderFurtherHearing::getDatesToAvoidDateDropdown)
+                         .map(DatesFinalOrders::getDatesToAvoidDates).orElse(null),
+                     "Further hearing", NOT_ALLOWED_DATE_PAST, errors, true);
+
+        validateDate(Optional.ofNullable(caseData.getAssistedOrderMakeAnOrderForCosts())
+                         .map(AssistedOrderCostDetails::getAssistedOrderCostsFirstDropdownDate).orElse(null),
+                     "Make an order for detailed/summary costs", NOT_ALLOWED_DATE_PAST, errors, true);
+
+        validateDate(Optional.ofNullable(caseData.getAssistedOrderMakeAnOrderForCosts())
+                         .map(AssistedOrderCostDetails::getAssistedOrderAssessmentThirdDropdownDate).orElse(null),
+                     "Make an order for detailed/summary costs", NOT_ALLOWED_DATE_PAST, errors, true);
+
+        validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
+                         .map(FinalOrderAppeal::getAppealGrantedRefusedDropdown)
+                         .map(AppealGrantedRefused::getAppealChoiceSecondDropdownA)
+                         .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
+                     "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
+
+        validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
+                         .map(FinalOrderAppeal::getAppealGrantedRefusedDropdown)
+                         .map(AppealGrantedRefused::getAppealChoiceSecondDropdownB)
+                         .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
+                     "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
+
     }
 
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
