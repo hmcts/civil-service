@@ -173,7 +173,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .appealGranted(nonNull(caseData.getFinalOrderAppealComplex()) && nonNull(caseData.getFinalOrderAppealComplex().getApplicationList())
                                ?
                                caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name()) : false)
-            .appealReason(getAppealReason(caseData))
             .orderWithoutNotice(caseData.getOrderMadeOnDetailsList().name())
             .orderInitiativeOrWithoutNoticeDate(getOrderInitiativeOrWithoutNoticeDate(caseData))
             .isReason(caseData.getFinalOrderGiveReasonsYesNo())
@@ -266,23 +265,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes() + " minutes");
                 }
                 return otherLength.toString();
-            }
-        }
-        return "";
-    }
-
-    public String getAppealReason(CaseData caseData) {
-        boolean isAppeal = false;
-        if (caseData.getFinalOrderAppealToggle() != null) {
-            isAppeal =
-                caseData.getFinalOrderAppealToggle().stream().anyMatch(finalOrderToggle -> finalOrderToggle.equals(
-                    FinalOrderToggle.SHOW));
-        }
-        if (isAppeal) {
-            if (caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name())) {
-                return caseData.getFinalOrderAppealComplex().getAppealGranted().getReasonsText();
-            } else {
-                return caseData.getFinalOrderAppealComplex().getAppealRefused().getRefusedText();
             }
         }
         return "";
