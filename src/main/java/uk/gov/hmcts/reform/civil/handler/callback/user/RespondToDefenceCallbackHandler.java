@@ -277,7 +277,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
      */
     public static boolean shouldMoveToJudicialReferral(CaseData caseData) {
         if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
+            return caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES || caseData.getApplicant1ProceedWithClaimSpec2v1() == YesOrNo.YES;
         } else {
             AllocatedTrack allocatedTrack =
                 getAllocatedTrack(
