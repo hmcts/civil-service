@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AppealList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
@@ -32,7 +31,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 
-import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.CaseHearingLengthElement;
@@ -289,8 +287,6 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderRecitalsRecorded(FinalOrderRecitalsRecorded.builder().text("Test").build())
             .assistedOrderCostsReserved(AssistedOrderCostDetails.builder().detailsRepresentationText("Test").build())
             .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().alternativeHearingList(dynamicList).build())
-            .finalOrderAppealComplex(FinalOrderAppeal.builder().applicationList(ApplicationAppealList.GRANTED)
-                                         .appealGranted(AppealGrantedRefused.builder().reasonsText("Test").build()).build())
             .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("Test").build())
             .assistedOrderCostsBespoke(AssistedOrderCostDetails.builder().besPokeCostDetailsText("Test").build())
             .finalOrderAppealToggle(toggleList)
@@ -433,30 +429,6 @@ public class JudgeFinalOrderGeneratorTest {
                     break;
             }
         }
-    }
-
-    @Test
-    void testGetAppealReasonGranted() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderRecitals(null)
-            .finalOrderAppealToggle(toggleList)
-            .finalOrderAppealComplex(FinalOrderAppeal.builder().applicationList(ApplicationAppealList.GRANTED).appealGranted(
-                AppealGrantedRefused.builder().reasonsText("test").build()).build())
-            .build();
-        String response = generator.getAppealReason(caseData);
-        assertEquals("test", response);
-    }
-
-    @Test
-    void testGetAppealReasonNotGranted() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderRecitals(null)
-            .finalOrderAppealToggle(toggleList)
-            .finalOrderAppealComplex(FinalOrderAppeal.builder().applicationList(ApplicationAppealList.REFUSED).appealRefused(
-                AppealGrantedRefused.builder().refusedText("test").build()).build())
-            .build();
-        String response = generator.getAppealReason(caseData);
-        assertEquals("test", response);
     }
 
     @Test
