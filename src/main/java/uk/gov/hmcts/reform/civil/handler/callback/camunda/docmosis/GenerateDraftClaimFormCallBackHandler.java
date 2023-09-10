@@ -26,7 +26,7 @@ public class GenerateDraftClaimFormCallBackHandler extends CallbackHandler {
     private static List<CaseEvent> EVENTS = List.of(GENERATE_DRAFT_FORM);
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateDraftPdfForm);
     private final ObjectMapper objectMapper;
-    private DraftClaimFormGenerator draftClaimFormGenerator;
+    private final DraftClaimFormGenerator draftClaimFormGenerator;
 
     @Override
     protected Map<String, Callback> callbacks() {
