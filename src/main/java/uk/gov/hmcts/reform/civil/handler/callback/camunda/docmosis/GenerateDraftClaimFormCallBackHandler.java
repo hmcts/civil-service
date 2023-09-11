@@ -45,7 +45,6 @@ public class GenerateDraftClaimFormCallBackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseDocument sealedForm = draftClaimFormGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         CaseData updatedCaseData = caseData.toBuilder()
-            .respondent1ClaimResponseDocumentSpec(sealedForm)
             .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                 sealedForm,
                 caseData
