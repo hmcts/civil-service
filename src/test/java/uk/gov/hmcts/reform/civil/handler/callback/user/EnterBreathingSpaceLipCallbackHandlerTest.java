@@ -13,13 +13,13 @@ import uk.gov.hmcts.reform.civil.service.Time;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_CUI;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_LIP;
 
-public class EnterBreathingSpaceCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
+public class EnterBreathingSpaceLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final EnterBreathingSpaceCuiCallbackHandler callbackHandler
-        = new EnterBreathingSpaceCuiCallbackHandler(objectMapper);
+    private final EnterBreathingSpaceLipCallbackHandler callbackHandler
+        = new EnterBreathingSpaceLipCallbackHandler(objectMapper);
 
     @MockBean
     private Time time;
@@ -37,7 +37,7 @@ public class EnterBreathingSpaceCuiCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent", "status")
-                .containsOnly(ENTER_BREATHING_SPACE_CUI.name(), "READY");
+                .containsOnly(ENTER_BREATHING_SPACE_LIP.name(), "READY");
         }
     }
 }

@@ -19,13 +19,13 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_CUI;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_LIP;
 
 @Service
 @RequiredArgsConstructor
-public class EnterBreathingSpaceCuiCallbackHandler extends CallbackHandler {
+public class EnterBreathingSpaceLipCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.ENTER_BREATHING_SPACE_CUI);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(CaseEvent.ENTER_BREATHING_SPACE_LIP);
 
     private final ObjectMapper objectMapper;
 
@@ -47,7 +47,7 @@ public class EnterBreathingSpaceCuiCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
-            .businessProcess(BusinessProcess.ready(ENTER_BREATHING_SPACE_CUI));
+            .businessProcess(BusinessProcess.ready(ENTER_BREATHING_SPACE_LIP));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
