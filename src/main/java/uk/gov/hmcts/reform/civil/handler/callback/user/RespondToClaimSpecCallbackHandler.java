@@ -131,7 +131,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDEN
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Service
@@ -1460,6 +1460,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             addEventAndDateAddedToRespondentWitnesses(updatedData);
         }
 
+        populateDQPartyIds(updatedData);
+
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE_SPEC, updatedData);
 
         if (toggleService.isCaseFileViewEnabled()) {
@@ -1474,11 +1476,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                                            .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
                 updatedData.respondent2DocumentGeneration("userRespondent2");
             }
-        }
-
-        if (toggleService.isHmcEnabled()) {
-            populateWithPartyIds(updatedData);
-
         }
 
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
