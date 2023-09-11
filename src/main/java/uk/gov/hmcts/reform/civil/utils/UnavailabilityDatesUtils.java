@@ -344,4 +344,35 @@ public class UnavailabilityDatesUtils {
             .respondent2(caseData.getRespondent2().toBuilder().unavailableDates(dates).build())
             .respondent2UnavailableDatesForTab(dates);
     }
+
+    public static void updateMissingUnavailableDatesForApplicants(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
+                                                                  boolean updateDetailsEnabled) {
+        if (isClaimantIntentionEvent(caseData)) {
+            rollUpUnavailabilityDatesForApplicant(builder, updateDetailsEnabled);
+        } else {
+            rollUpUnavailabilityDatesForApplicantDJ(builder, updateDetailsEnabled);
+        }
+    }
+
+    public static boolean shouldUpdateApplicant1UnavailableDates(CaseData caseData) {
+        return caseData.getApplicant1().getUnavailableDates() != null
+            && caseData.getApplicant1().getUnavailableDates().get(0).getValue().getDateAdded() == null;
+    }
+
+    public static boolean shouldUpdateApplicant2UnavailableDates(CaseData caseData) {
+        return caseData.getApplicant2() != null
+            && caseData.getApplicant2().getUnavailableDates() != null
+            && caseData.getApplicant2().getUnavailableDates().get(0).getValue().getDateAdded() == null;
+    }
+
+    public static boolean shouldUpdateRespondent1UnavailableDates(CaseData caseData) {
+        return caseData.getRespondent1().getUnavailableDates() != null
+            && caseData.getRespondent1().getUnavailableDates().get(0).getValue().getDateAdded() == null;
+    }
+
+    public static boolean shouldUpdateRespondent2UnavailableDates(CaseData caseData) {
+        return caseData.getRespondent2() != null
+            && caseData.getRespondent2().getUnavailableDates() != null
+            && caseData.getRespondent2().getUnavailableDates().get(0).getValue().getDateAdded() == null;
+    }
 }

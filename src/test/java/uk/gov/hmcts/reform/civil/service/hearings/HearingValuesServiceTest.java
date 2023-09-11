@@ -26,11 +26,14 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.PartyIdsUpdatedException;
+import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.CaseCategoryModel;
@@ -48,6 +51,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -67,11 +71,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
 import static uk.gov.hmcts.reform.civil.enums.hearing.HMCLocationType.COURT;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.IND;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.ORG;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsMapper.getCaseFlags;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ScreenFlowMapper.getScreenFlow;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -93,6 +99,8 @@ public class HearingValuesServiceTest {
     private CategoryService categoryService;
     @Mock
     private OrganisationService organisationService;
+    @Mock
+    private CaseFlagsInitialiser caseFlagsInitialiser;
     @Autowired
     private ObjectMapper mapper;
 
@@ -125,6 +133,10 @@ public class HearingValuesServiceTest {
             .applicant1DQ(applicant1DQ)
             .respondent1DQ(respondent1DQ)
             .build();
+        caseData = caseData.toBuilder()
+            .applicant1(caseData.getApplicant1().toBuilder()
+                            .flags(Flags.builder().partyName("party name").build())
+                            .build()).build();
         Long caseId = 1L;
         CaseDetails caseDetails = CaseDetails.builder()
             .data(caseData.toMap(mapper))
@@ -203,23 +215,19 @@ public class HearingValuesServiceTest {
 
     @SneakyThrows
     @Test
-    void shouldTriggerEventAndThrowPartyFlagsUpdatedExceptionIfPartyIdMissingFromApplicant1() throws Exception {
+    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfPartyIdMissingFromApplicant1() throws Exception {
         Long caseId = 1L;
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build())
+            .applicant1(PartyBuilder.builder().individual().build().toBuilder()
+                            .flags(Flags.builder().partyName("party name").build()).build())
             .respondent1(PartyBuilder.builder().company().build())
             .respondent2(PartyBuilder.builder().company().build())
+            .multiPartyClaimTwoDefendantSolicitors()
             .caseAccessCategory(UNSPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
                                         .region(WELSH_REGION_ID).build())
-            .applicant1DQ(applicant1DQ)
-            .respondent1DQ(respondent1DQ)
             .build();
         CaseDetails caseDetails = CaseDetails.builder()
             .data(caseData.toMap(mapper))
@@ -238,20 +246,116 @@ public class HearingValuesServiceTest {
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        assertThrows(PartyIdsUpdatedException.class, () -> {
+        assertThrows(MissingFieldsUpdatedException.class, () -> {
             hearingValuesService.getValues(caseId, "8AB87C89", "auth");
         });
 
-        verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_PARTY_IDS), any());
+        verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfCaseFlagsMissingFromApplicant1() throws Exception {
+        Long caseId = 1L;
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseReference(caseId)
+            .applicant1(PartyBuilder.builder().individual().build())
+            .respondent1(PartyBuilder.builder().company().build())
+            .respondent2(PartyBuilder.builder().company().build())
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                        .region(WELSH_REGION_ID).build())
+            .build();
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(caseData.toMap(mapper))
+            .id(caseId).build();
+
+        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+        when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
+            .thenReturn(Optional.of(Organisation.builder()
+                                        .name(APPLICANT_LR_ORG_NAME)
+                                        .build()));
+        when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
+            .thenReturn(Optional.of(Organisation.builder()
+                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
+                                        .build()));
+        given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
+        given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
+
+        assertThrows(MissingFieldsUpdatedException.class, () -> {
+            hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+        });
+
+        verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldTriggerEventAndThrowMissingFieldsUpdatedExceptionIfUnavailableDatesMissingFromApplicant1() throws Exception {
+        Long caseId = 1L;
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimIssued()
+            .caseReference(caseId)
+            .applicant1(PartyBuilder.builder().individual().build().toBuilder()
+                            .partyID("party-id")
+                            .flags(Flags.builder().partyName("party name").build())
+                            .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
+                                                                       .unavailableDateType(SINGLE_DATE)
+                                                                       .date(LocalDate.of(2023, 10, 5))
+                                                                       .build())))
+                            .build())
+            .respondent1(PartyBuilder.builder().company().build())
+            .respondent2(PartyBuilder.builder().company().build())
+            .multiPartyClaimTwoDefendantSolicitors()
+            .caseAccessCategory(UNSPEC_CLAIM)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                        .region(WELSH_REGION_ID).build())
+            .build();
+        CaseDetails caseDetails = CaseDetails.builder()
+            .data(caseData.toMap(mapper))
+            .id(caseId).build();
+
+        when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+        when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
+            .thenReturn(Optional.of(Organisation.builder()
+                                        .name(APPLICANT_LR_ORG_NAME)
+                                        .build()));
+        when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
+            .thenReturn(Optional.of(Organisation.builder()
+                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
+                                        .build()));
+        given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
+        given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
+
+        assertThrows(MissingFieldsUpdatedException.class, () -> {
+            hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+        });
+
+        verify(caseDataService).triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
     }
 
     @Test
-    void shouldNotTriggerEventIfPartyIdExistsForApplicant1() throws Exception {
+    void shouldNotTriggerEventIfPartyIdCaseFlagsUnavailableDatesExistsForApplicant1() throws Exception {
         Long caseId = 1L;
         Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build())
+            .applicant1DQHearing(Hearing.builder()
+                                     .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
+                                                                                .unavailableDateType(SINGLE_DATE)
+                                                                                .date(LocalDate.of(2023, 10, 20))
+                                                                                .build()))).build())
+            .build();
         Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+            WelshLanguageRequirements.builder().court(Language.WELSH).build())
+            .respondent1DQHearing(Hearing.builder()
+                                     .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
+                                                                                .unavailableDateType(SINGLE_DATE)
+                                                                                .date(LocalDate.of(2023, 10, 20))
+                                                                                .build()))).build())
+            .build();
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .applicant1(PartyBuilder.builder().build()
@@ -261,7 +365,6 @@ public class HearingValuesServiceTest {
             .caseReference(caseId)
             .applicant1(PartyBuilder.builder().individual().build())
             .respondent1(PartyBuilder.builder().company().build())
-            .respondent2(PartyBuilder.builder().company().build())
             .caseAccessCategory(UNSPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
                                         .region(WELSH_REGION_ID).build())
@@ -286,7 +389,7 @@ public class HearingValuesServiceTest {
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
         verify(caseDataService, times(0))
-            .triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_PARTY_IDS), any());
+            .triggerEvent(eq(caseId), eq(CaseEvent.UPDATE_MISSING_FIELDS), any());
     }
 
     @SneakyThrows
