@@ -83,7 +83,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
         when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
-
+        when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec1v1()).thenReturn("spec-1v1-template-id");
     }
 
     @Nested
@@ -318,7 +318,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
-                    "spec-respondent-template-id",
+                    "spec-1v1-template-id",
                     getNotificationDataMapSpec(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
@@ -341,7 +341,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
-                    "spec-respondent-template-id",
+                    "spec-1v1-template-id",
                     getNotificationDataMapSpec(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );

@@ -141,8 +141,8 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
             if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
                 && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                    || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-                        caseData.getRespondent2ClaimResponseTypeForSpec()))
+                || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+                caseData.getRespondent2ClaimResponseTypeForSpec()))
             ) {
                 emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
             } else {
@@ -157,7 +157,6 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             );
         } else if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)) {
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
-                // new email template
                 emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec1v1();
             } else {
                 emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
@@ -174,7 +173,6 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
         } else {
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
-                // new email template
                 emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec1v1();
             } else {
                 emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();

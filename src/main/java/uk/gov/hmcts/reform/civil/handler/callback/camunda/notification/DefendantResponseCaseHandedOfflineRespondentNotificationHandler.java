@@ -93,7 +93,6 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
                 templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
             } else {
                 if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
-                    // new email template
                     templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec1v1();
                 } else {
                     templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
