@@ -138,7 +138,15 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .orderMadeDate(nonNull(caseData.getFinalOrderDateHeardComplex())
                                ? orderMadeDateBuilder(caseData) : null)
             .courtLocation(LocationRefDataService.getDisplayEntry(locationRefData))
-            .judgeNameTitle(userDetails.getFullName());
+            .judgeNameTitle(userDetails.getFullName())
+            .recordedToggle(nonNull(caseData.getFinalOrderRecitals()) && caseData.getFinalOrderRecitals().stream().anyMatch(
+                finalOrderToggle -> finalOrderToggle.equals(
+                    FinalOrderToggle.SHOW)))
+            .recordedText(nonNull(caseData.getFinalOrderRecitalsRecorded())
+                              ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
+            .orderedText(caseData.getFinalOrderOrderedThatText());
+
+
 //            .caseName(caseData.getCaseNameHmctsInternal())
 //            .claimantReference(nonNull(caseData.getSolicitorReferences())
 //                                   ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
