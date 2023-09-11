@@ -146,6 +146,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private String regionId;
     @Value("${court-location.unspecified-claim.epimms-id}")
     private String epimmsId;
+    @Value("${wa.featureToggle}")
+    private String featureToggle;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -181,6 +183,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         caseDataBuilder
             .claimStarted(YES)
+            .featureToggleWA(featureToggle)
             .courtLocation(CourtLocation.builder()
                                .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
                                .build());
