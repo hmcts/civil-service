@@ -103,18 +103,17 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
             .append(" disagrees that you only owe &#163;")
             .append(admitOwed)
             .append("</h3>");
-            if (caseData.hasDefendantAgreedToFreeMediation()) {
-                sb.append("<p>We'll ask if they want to try mediation. ")
-                    .append("If they agree we'll contact you to arrange a call with the mediator.</p>")
-                    .append(
+        if (caseData.hasDefendantAgreedToFreeMediation()) {
+            sb.append("<p>We'll ask if they want to try mediation. ")
+              .append("If they agree we'll contact you to arrange a call with the mediator.</p>")
+              .append(
                         "<p>If they do not want to try mediation the court will review the case for the full amount of &#163;")
                     .append(totalClaimAmount).append(".</p>");
-            }
-            else {
-                sb.append("<p>The court will review the case for the full amount of &#163;")
-                    .append(totalClaimAmount).append(".</p>");
-            }
-          sb.append("<h3 class=\"govuk-heading-m\">If ")
+        } else {
+            sb.append("<p>The court will review the case for the full amount of &#163;")
+              .append(totalClaimAmount).append(".</p>");
+        }
+        sb.append("<h3 class=\"govuk-heading-m\">If ")
             .append(applicantName)
             .append(" rejects your offer to pay by ")
             .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE))
