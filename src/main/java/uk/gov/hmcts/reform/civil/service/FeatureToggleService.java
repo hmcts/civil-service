@@ -25,7 +25,7 @@ public class FeatureToggleService {
     }
 
     public boolean isNoticeOfChangeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("notice-of-change");
+        return true;
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -37,7 +37,7 @@ public class FeatureToggleService {
     }
 
     public boolean isPbaV3Enabled() {
-        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        return true;
     }
 
     public boolean isCertificateOfServiceEnabled() {

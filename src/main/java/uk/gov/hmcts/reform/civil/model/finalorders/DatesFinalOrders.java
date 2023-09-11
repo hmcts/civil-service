@@ -17,5 +17,6 @@ public class DatesFinalOrders {
     private LocalDate dateRangeFrom;
     private LocalDate dateRangeTo;
     private LocalDate datesToAvoidDates;
+    private String bespokeRangeTextArea;
 }
 
