@@ -76,6 +76,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
     @BeforeEach
     void setup() {
         when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
+        when(notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec())
+            .thenReturn("spec-claimant-1v2DS-template-id");
         when(notificationsProperties.getClaimantSolicitorDefendantResponseForSpec())
             .thenReturn("spec-claimant-template-id");
         when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
