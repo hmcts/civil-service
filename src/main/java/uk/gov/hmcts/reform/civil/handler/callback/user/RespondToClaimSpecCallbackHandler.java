@@ -1510,6 +1510,8 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         }
 
+        updateCorrespondenceAddress(callbackParams, updatedData, caseData);
+
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_TWO_LEGAL_REP
             && isAwaitingAnotherDefendantResponse(caseData)) {
 
@@ -1537,7 +1539,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .build();
         }
         assembleResponseDocumentsSpec(caseData, updatedData);
-        updateCorrespondenceAddress(callbackParams, updatedData, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -1560,9 +1561,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                              CaseData caseData) {
         if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORONE)
             && caseData.getSpecAoSRespondentCorrespondenceAddressRequired() == YesOrNo.NO) {
-            updatedCaseData.specRespondentCorrespondenceAddressdetails(
-                    caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
+            Address newAddress = caseData.getSpecAoSRespondentCorrespondenceAddressdetails();
+            updatedCaseData.specRespondentCorrespondenceAddressdetails(newAddress)
                 .specAoSRespondentCorrespondenceAddressdetails(Address.builder().build());
+            if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP) {
+                // to keep with heading tab
+                updatedCaseData.specRespondent2CorrespondenceAddressdetails(newAddress);
+            }
         } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)
             && caseData.getSpecAoSRespondent2CorrespondenceAddressRequired() == YesOrNo.NO) {
             updatedCaseData.specRespondent2CorrespondenceAddressdetails(
