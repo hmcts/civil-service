@@ -288,7 +288,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                     && YES.equals(caseData.getRespondentResponseIsSame());
                 case ONE_V_TWO_TWO_LEGAL_REP -> addRespondent2
                     && caseData.getRespondentResponseIsSame() == null;
-                default -> false;
             };
         } else {
             AllocatedTrack allocatedTrack =
