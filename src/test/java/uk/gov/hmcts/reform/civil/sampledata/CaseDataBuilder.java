@@ -2161,6 +2161,18 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimSubmittedSmallClaim() {
+        atStateClaimDraft();
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        allocatedTrack = SMALL_CLAIM;
+        ccdState = PENDING_CASE_ISSUED;
+        ccdCaseReference = CASE_ID;
+        submittedDate = SUBMITTED_DATE_TIME;
+        totalClaimAmount = BigDecimal.valueOf(800);
+        claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmittedMultiClaim() {
         atStateClaimDraft();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
