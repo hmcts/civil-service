@@ -46,5 +46,9 @@ public class DraftClaimForm implements MappableObject {
     private final String interestAmount;
     private final String claimFee;
     private final String totalAmountOfClaim;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate generationDate;
+
 
 }

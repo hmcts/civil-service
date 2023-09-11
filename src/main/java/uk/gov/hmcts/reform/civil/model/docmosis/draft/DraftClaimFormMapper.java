@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Component
 @RequiredArgsConstructor
@@ -52,6 +53,7 @@ public class DraftClaimFormMapper {
             .descriptionOfClaim(caseData.getDetailsOfClaim())
             .claimant(LipFormParty.toLipFormParty(caseData.getApplicant1(), null, null))
             .defendant(LipFormParty.toLipFormParty(caseData.getRespondent1(), null, null))
+            .generationDate(LocalDate.now())
             .build();
     }
 }
