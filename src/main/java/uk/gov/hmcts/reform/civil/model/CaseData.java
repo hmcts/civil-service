@@ -1014,4 +1014,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .orElse(Collections.emptyList());
 
     }
+
+    @JsonIgnore
+    public BigDecimal getCalculatedClaimFeeInPence(){
+        return Optional.ofNullable(getClaimFee())
+            .map(Fee::getCalculatedAmountInPence)
+            .orElse(BigDecimal.ZERO);
+    }
 }
