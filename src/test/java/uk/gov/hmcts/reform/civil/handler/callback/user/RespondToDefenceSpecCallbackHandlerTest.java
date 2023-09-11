@@ -1044,7 +1044,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseStateToJudicialReferral_ONE_V_TWO_ONE_LEGAL_REP() {
+        void shouldChangeCaseStateToJudicialReferral_ONE_V_TWO_ONE_REP() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -1065,7 +1065,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseStateToJudicialReferral_ONE_V_TWO_TWO_LEGAL_REP() {
+        void shouldChangeCaseStateToJudicialReferral_ONE_V_TWO_TWO_REP() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
