@@ -9,7 +9,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.draft.DraftClaimFormGenerator;
 
 import java.util.List;
@@ -27,6 +29,7 @@ public class GenerateDraftClaimFormCallBackHandler extends CallbackHandler {
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateDraftPdfForm);
     private final ObjectMapper objectMapper;
     private final DraftClaimFormGenerator draftClaimFormGenerator;
+    private final SystemGeneratedDocumentService systemGeneratedDocumentService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -40,9 +43,16 @@ public class GenerateDraftClaimFormCallBackHandler extends CallbackHandler {
 
     private CallbackResponse generateDraftPdfForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        draftClaimFormGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        CaseDocument sealedForm = draftClaimFormGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        CaseData updatedCaseData = caseData.toBuilder()
+            .respondent1ClaimResponseDocumentSpec(sealedForm)
+            .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+                sealedForm,
+                caseData
+            ))
+            .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
+            .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 

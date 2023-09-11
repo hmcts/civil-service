@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
