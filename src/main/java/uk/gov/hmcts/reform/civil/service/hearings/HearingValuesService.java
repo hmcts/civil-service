@@ -49,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearings
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearingsCaseLevelMapper.getPublicCaseName;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.VocabularyMapper.getVocabulary;
 import static uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils.getHmctsServiceID;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
 @Slf4j
@@ -136,6 +137,7 @@ public class HearingValuesService {
             // and litfriends, witnesses and experts do it's still safe to call populateWithPartyFlags
             // as it was created to not overwrite partyId fields if they exist.
             populateWithPartyIds(builder);
+            populateDQPartyIds(builder);
 
             try {
                 caseDataService.triggerEvent(
