@@ -91,12 +91,8 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
 
             .append("<p>Because you've said you will not pay immediately, ")
             .append(applicantName)
-            .append(" can either:</p>")
-            .append("<ul>")
-            .append("<li>ask you to sign a settlement agreement to formalise the repayment plan</li>")
-            .append("<li>request a county court judgment against you for &#163;")
-            .append(admitOwed).append("</li>")
-            .append("</ul>")
+            .append(" can request a county court judgment against you for &#163;")
+            .append(admitOwed).append(".</p>")
 
             .append("<h3 class=\"govuk-heading-m\">If ")
             .append(applicantName)
