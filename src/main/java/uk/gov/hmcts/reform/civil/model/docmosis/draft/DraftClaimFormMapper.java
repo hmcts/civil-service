@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.civil.model.docmosis.draft;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -40,7 +42,9 @@ public class DraftClaimFormMapper {
             .totalClaimAmount(caseData.getTotalClaimAmount() + "")
             .interestAmount(interest != null ? interest.toString() : null)
             .claimAmount(caseData.getClaimAmountBreakupDetails())
-            .claimFee(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
+            .claimFee(MonetaryConversions.penniesToPounds(Optional.ofNullable(caseData.getClaimFee())
+                                                              .map(Fee::getCalculatedAmountInPence)
+                                                              .orElse(BigDecimal.ZERO))
                           .toString())
             // Claim amount + interest + claim fees
             .totalAmountOfClaim(interest != null ? caseData.getTotalClaimAmount()
