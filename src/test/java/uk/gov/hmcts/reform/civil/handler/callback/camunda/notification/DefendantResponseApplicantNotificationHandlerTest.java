@@ -350,6 +350,29 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
             }
 
             @Test
+            void sendNotificationToSolicitorSpec_shouldNotifyRespondentSolicitorSpecDef1v1() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged().build();
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+                    .respondent1DQ(Respondent1DQ.builder().build())
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                            .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "spec-1v1-template-id",
+                    getNotificationDataMapSpec(caseData),
+                    "defendant-response-applicant-notification-000DC001"
+                );
+            }
+
+            @Test
             void shouldNotifyRespondentSolicitorSpecDef1SecondScenerio_whenInvokedWithCcEvent() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
