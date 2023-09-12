@@ -173,7 +173,7 @@ public class HearingValuesService {
      * First the unavailable dates fields are checked if date added exists before
      * overwriting with the event and date added fields
      *
-     * @throws MissingFieldsUpdatedException If party ids have been updated, to force the consumer to request
+     * @throws MissingFieldsUpdatedException If unavailable dates have been updated, to force the consumer to request
      *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
@@ -196,7 +196,7 @@ public class HearingValuesService {
      * First the applicant is checked for the flags field as it's the first one
      * to get initialised on claim creation
      *
-     * @throws MissingFieldsUpdatedException If party ids have been updated, to force the consumer to request
+     * @throws MissingFieldsUpdatedException If case flags have been re-initialised, to force the consumer to request
      *                                  the hearing values endpoint again.
      * @throws FeignException If an error is returned from case data service when triggering the event.
      */
