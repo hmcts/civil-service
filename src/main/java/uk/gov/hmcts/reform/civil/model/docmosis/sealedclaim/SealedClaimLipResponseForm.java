@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -48,10 +49,9 @@ import java.util.stream.Stream;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
 
 @Getter
-@Builder
-@AllArgsConstructor
+@SuperBuilder
 @EqualsAndHashCode
-public class SealedClaimLipResponseForm implements MappableObject {
+public class SealedClaimLipResponseForm extends SealedClaimResponseForm implements MappableObject {
 
     private final String claimReferenceNumber;
     private final String claimantReferenceNumber;
@@ -59,29 +59,10 @@ public class SealedClaimLipResponseForm implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate generationDate;
-    private final String amountToPay;
-    private final String howMuchWasPaid;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate paymentDate;
-    private final String paymentHow;
-    private final RespondentResponsePartAdmissionPaymentTimeLRspec howToPay;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate payBy;
-    private final String whyNotPayImmediately;
-    private final RepaymentPlanTemplateData repaymentPlan;
-    private final RespondentResponseTypeSpec responseType;
-    private final String whyReject;
     private final String freeTextWhyReject;
     private final LipFormParty claimant1;
     private final LipFormParty defendant1;
     private final LipFormParty defendant2;
-    private final List<EventTemplateData> timelineEventList;
-    private final String timelineComments;
-    private final List<EvidenceTemplateData> evidenceList;
-    private final String evidenceComments;
-    private final boolean mediation;
     private final AccommodationTemplate whereTheyLive;
     private final PartnerAndDependentsLRspec partnerAndDependent;
     private final List<EmployerDetailsLRspec> employerDetails;
@@ -92,8 +73,74 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final List<ReasonMoneyTemplateData> incomeList;
     private final List<ReasonMoneyTemplateData> expenseList;
 
-    public String getResponseTypeDisplay() {
-        return responseType.getDisplayedValue();
+    public SealedClaimLipResponseForm(
+        String amountToPay,
+        String howMuchWasPaid,
+        LocalDate paymentDate,
+        String paymentHow,
+        LocalDate payBy,
+        String whyNotPayImmediately,
+        RepaymentPlanTemplateData repaymentPlan,
+        RespondentResponseTypeSpec responseType,
+        String whyReject,
+        List<EventTemplateData> timelineEventList,
+        String timelineComments,
+        List<EvidenceTemplateData> evidenceList,
+        String evidenceComments,
+        boolean mediation,
+        RespondentResponsePartAdmissionPaymentTimeLRspec howToPay,
+        String claimReferenceNumber,
+        String claimantReferenceNumber,
+        String defendantReferenceNumber,
+        LocalDate generationDate,
+        String freeTextWhyReject,
+        LipFormParty claimant1,
+        LipFormParty defendant1,
+        LipFormParty defendant2,
+        AccommodationTemplate whereTheyLive,
+        PartnerAndDependentsLRspec partnerAndDependent,
+        List<EmployerDetailsLRspec> employerDetails,
+        Respondent1SelfEmploymentLRspec selfEmployment,
+        List<AccountSimpleTemplateData> bankAccountList,
+        List<Respondent1CourtOrderDetails> courtOrderDetails,
+        List<DebtTemplateData> debtList,
+        List<ReasonMoneyTemplateData> incomeList,
+        List<ReasonMoneyTemplateData> expenseList)
+    {
+        super(
+            amountToPay,
+            howMuchWasPaid,
+            paymentDate,
+            paymentHow,
+            payBy,
+            whyNotPayImmediately,
+            repaymentPlan,
+            responseType,
+            whyReject,
+            timelineEventList,
+            timelineComments,
+            evidenceList,
+            evidenceComments,
+            mediation,
+            howToPay
+        );
+        this.claimReferenceNumber = claimReferenceNumber;
+        this.claimantReferenceNumber = claimantReferenceNumber;
+        this.defendantReferenceNumber = defendantReferenceNumber;
+        this.generationDate = generationDate;
+        this.freeTextWhyReject = freeTextWhyReject;
+        this.claimant1 = claimant1;
+        this.defendant1 = defendant1;
+        this.defendant2 = defendant2;
+        this.whereTheyLive = whereTheyLive;
+        this.partnerAndDependent = partnerAndDependent;
+        this.employerDetails = employerDetails;
+        this.selfEmployment = selfEmployment;
+        this.bankAccountList = bankAccountList;
+        this.courtOrderDetails = courtOrderDetails;
+        this.debtList = debtList;
+        this.incomeList = incomeList;
+        this.expenseList = expenseList;
     }
 
     public boolean isCurrentlyWorking() {
@@ -155,31 +202,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .map(ElementUtils::unwrapElements)
             .ifPresent(builder::employerDetails);
 
-    }
-
-    private static void addPayBySetDate(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
-        builder.payBy(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
-            .amountToPay(totalClaimAmount + "")
-            .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-    }
-
-    private static void addPayByDatePayImmediately(SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
-        builder.payBy(LocalDate.now()
-                          .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
-            .amountToPay(totalClaimAmount + "");
-    }
-
-    private static void addRepaymentPlan(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
-        if (caseData.getRespondent1RepaymentPlan() != null) {
-            builder.repaymentPlan(RepaymentPlanTemplateData.builder()
-                                      .paymentFrequencyDisplay(caseData.getRespondent1RepaymentPlan().getPaymentFrequencyDisplay())
-                                      .firstRepaymentDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
-                                      .paymentAmount(MonetaryConversions.penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()))
-                                      .build())
-                .payBy(caseData.getRespondent1RepaymentPlan()
-                           .finalPaymentBy(totalClaimAmount))
-                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
-        }
     }
 
     private static void alreadyPaid(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
