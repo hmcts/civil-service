@@ -528,7 +528,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2());
         }
 
-        populateDQPartyIds(updatedData);
+        if (toggleService.isHmcEnabled()) {
+            populateDQPartyIds(updatedData);
+        }
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 

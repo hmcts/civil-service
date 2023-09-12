@@ -246,7 +246,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             addEventAndDateAddedToApplicantWitnesses(builder);
         }
 
-        populateDQPartyIds(builder);
+        if (featureToggleService.isHmcEnabled()) {
+            populateDQPartyIds(builder);
+        }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 

@@ -334,7 +334,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             addEventAndDateAddedToApplicantWitnesses(builder);
         }
 
-        populateDQPartyIds(builder);
+        if (featureToggleService.isHmcEnabled()) {
+            populateDQPartyIds(builder);
+        }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
 
