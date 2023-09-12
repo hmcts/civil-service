@@ -329,4 +329,48 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
         return claim;
     }
+
+    @Test
+    void given_SDOBeenDrawn_whenGetStatus_sdoOrderCreatedRequired() {
+        Element<CaseDocument> document = new Element<>(
+            UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+            CaseDocument.builder()
+                .documentType(DocumentType.SDO_ORDER)
+                .build()
+        );
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .systemGeneratedCaseDocuments(List.of(document))
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .build();
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+                claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.SDO_ORDER_CREATED);
+    }
+
+    @Test
+    void given_claimantNotRespondedWithInDeadLine_whenGetStatus_claimEnded() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now().minusDays(2))
+            .applicant1ResponseDeadline(LocalDateTime.now().minusDays(1))
+            .build();
+        DashboardClaimStatus status =
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+                claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
+    }
+
+    @Test
+    void given_claimantRejectsDefendantsPaymentPlan() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
+    }
 }

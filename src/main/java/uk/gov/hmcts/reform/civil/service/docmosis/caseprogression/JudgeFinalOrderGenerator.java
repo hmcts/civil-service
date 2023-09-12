@@ -6,25 +6,30 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
@@ -38,9 +43,12 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final IdamClient idamClient;
+    private final LocationRefDataService locationRefDataService;
+    private final DocumentHearingLocationHelper locationHelper;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        JudgeFinalOrderForm templateData = getFinalOrderType(caseData);
+        JudgeFinalOrderForm templateData = getFinalOrderType(caseData, authorisation);
         DocmosisTemplates docmosisTemplate = null;
         if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
             docmosisTemplate = FREE_FORM_ORDER_PDF;
@@ -63,14 +71,27 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return String.format(docmosisTemplate.getDocumentTitle(), LocalDate.now());
     }
 
-    private JudgeFinalOrderForm getFinalOrderType(CaseData caseData) {
-        return caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER) ? getFreeFormOrder(caseData) : getAssistedOrder(
+    private JudgeFinalOrderForm getFinalOrderType(CaseData caseData, String authorisation) {
+        return caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER) ? getFreeFormOrder(caseData, authorisation) : getAssistedOrder(
             caseData);
     }
 
-    private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData) {
+    private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
+        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        LocationRefData locationRefData;
+
+        if (hasSDOBeenMade(caseData.getCcdState())) {
+            locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
+        } else {
+            locationRefData = locationRefDataService.getCcmccLocation(authorisation);
+        }
+
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
+            .claimant1Name(caseData.getApplicant1().getPartyName())
+            .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
+            .defendant1Name(caseData.getRespondent1().getPartyName())
+            .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
             .caseName(caseData.getCaseNameHmctsInternal())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
@@ -86,7 +107,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .withoutNoticeSelectionText(nonNull(caseData.getOrderWithoutNotice())
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionTextArea() : null)
             .withoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
-                                            ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null);
+                                            ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
+            .judgeNameTitle(userDetails.getFullName())
+            .courtName(locationRefData.getVenueName())
+            .courtLocation(LocationRefDataService.getDisplayEntry(locationRefData));
         return freeFormOrderBuilder.build();
     }
 
@@ -100,7 +124,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                     ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
             .finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
             .finalOrderHeardDate(nonNull(caseData.getFinalOrderDateHeardComplex())
-                                     ? caseData.getFinalOrderDateHeardComplex().getDate() : null)
+                                     && nonNull(caseData.getFinalOrderDateHeardComplex().getSingleDateSelection())
+                                     ? caseData.getFinalOrderDateHeardComplex().getSingleDateSelection().getSingleDate() : null)
             .finalOrderRepresented(nonNull(caseData.getFinalOrderRepresentation())
                                       ? caseData.getFinalOrderRepresentation().getTypeRepresentationList().name() : "")
             .defendantAttended(getIfAttended(caseData, true))
@@ -126,9 +151,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .costReservedText(nonNull(caseData.getAssistedOrderCostsReserved())
                                   ?
                                   caseData.getAssistedOrderCostsReserved().getDetailsRepresentationText() : "")
-            .paidByDate(getPaidByDate(caseData))
-            .costProtection(getCostProtection(caseData))
-            .costAmount(getCostAmount(caseData))
             .bespokeText(nonNull(caseData.getAssistedOrderCostsBespoke())
                              ? caseData.getAssistedOrderCostsBespoke().getBesPokeCostDetailsText() : "")
             .furtherHearingToggle(nonNull(caseData.getFinalOrderFurtherHearingToggle())
@@ -151,7 +173,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .appealGranted(nonNull(caseData.getFinalOrderAppealComplex()) && nonNull(caseData.getFinalOrderAppealComplex().getApplicationList())
                                ?
                                caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name()) : false)
-            .appealReason(getAppealReason(caseData))
             .orderWithoutNotice(caseData.getOrderMadeOnDetailsList().name())
             .orderInitiativeOrWithoutNoticeDate(getOrderInitiativeOrWithoutNoticeDate(caseData))
             .isReason(caseData.getFinalOrderGiveReasonsYesNo())
@@ -247,65 +268,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             }
         }
         return "";
-    }
-
-    public String getAppealReason(CaseData caseData) {
-        boolean isAppeal = false;
-        if (caseData.getFinalOrderAppealToggle() != null) {
-            isAppeal =
-                caseData.getFinalOrderAppealToggle().stream().anyMatch(finalOrderToggle -> finalOrderToggle.equals(
-                    FinalOrderToggle.SHOW));
-        }
-        if (isAppeal) {
-            if (caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name())) {
-                return caseData.getFinalOrderAppealComplex().getAppealGranted().getReasonsText();
-            } else {
-                return caseData.getFinalOrderAppealComplex().getAppealRefused().getRefusedText();
-            }
-        }
-        return "";
-    }
-
-    public LocalDate getPaidByDate(CaseData caseData) {
-        if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)) {
-            return caseData.getAssistedOrderCostsDefendantPaySub().getDefendantCostStandardDate();
-        } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
-            return caseData.getAssistedOrderCostsClaimantPaySub().getClaimantCostStandardDate();
-        } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_SUMMARILY_BASE)) {
-            return caseData.getAssistedOrderCostsDefendantSum().getDefendantCostSummarilyDate();
-        } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)) {
-            return caseData.getAssistedOrderCostsClaimantSum().getClaimantCostSummarilyDate();
-        } else {
-            return null;
-        }
-    }
-
-    public YesOrNo getCostProtection(CaseData caseData) {
-        if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)) {
-            return caseData.getAssistedOrderCostsDefendantPaySub().getDefendantCostStandardProtectionOption();
-        } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
-            return caseData.getAssistedOrderCostsClaimantPaySub().getClaimantCostStandardProtectionOption();
-        } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_SUMMARILY_BASE)) {
-            return caseData.getAssistedOrderCostsDefendantSum().getDefendantCostSummarilyProtectionOption();
-        } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)) {
-            return caseData.getAssistedOrderCostsClaimantSum().getClaimantCostSummarilyProtectionOption();
-        } else {
-            return null;
-        }
-    }
-
-    public String getCostAmount(CaseData caseData) {
-        if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)) {
-            return caseData.getAssistedOrderCostsDefendantPaySub().getDefendantCostStandardText();
-        } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
-            return caseData.getAssistedOrderCostsClaimantPaySub().getClaimantCostStandardText();
-        } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.DEFENDANT_COST_SUMMARILY_BASE)) {
-            return caseData.getAssistedOrderCostsDefendantSum().getDefendantCostSummarilyText();
-        } else if (caseData.getAssistedOrderCostList().equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)) {
-            return caseData.getAssistedOrderCostsClaimantSum().getClaimantCostSummarilyText();
-        } else {
-            return null;
-        }
     }
 
     private String getNotAttendedText(CaseData caseData, String party) {
@@ -408,6 +370,11 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             }
         }
         return "";
+    }
+
+    private boolean hasSDOBeenMade(CaseState state) {
+
+        return !JUDICIAL_REFERRAL.equals(state);
     }
 }
 

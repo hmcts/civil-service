@@ -22,6 +22,7 @@ import java.util.List;
 public class Respondent2DQ implements DQ {
 
     private FileDirectionsQuestionnaire respondent2DQFileDirectionsQuestionnaire;
+    private FixedRecoverableCosts respondent2DQFixedRecoverableCosts;
     private DisclosureOfElectronicDocuments respondent2DQDisclosureOfElectronicDocuments;
     private DisclosureOfNonElectronicDocuments respondent2DQDisclosureOfNonElectronicDocuments;
     private DisclosureReport respondent2DQDisclosureReport;
@@ -32,6 +33,7 @@ public class Respondent2DQ implements DQ {
     private SmallClaimHearing respondent2DQHearingSmallClaim;
     private Document respondent2DQDraftDirections;
     private RequestedCourt respondent2DQRequestedCourt;
+    private RemoteHearingLRspec respondent2DQRemoteHearingLRspec;
     private HearingSupport respondent2DQHearingSupport;
     private YesOrNo respondent2DQCarerAllowanceCredit;
     private FurtherInformation respondent2DQFurtherInformation;
@@ -51,6 +53,12 @@ public class Respondent2DQ implements DQ {
     @JsonProperty("respondent2DQFileDirectionsQuestionnaire")
     public FileDirectionsQuestionnaire getFileDirectionQuestionnaire() {
         return respondent2DQFileDirectionsQuestionnaire;
+    }
+
+    @Override
+    @JsonProperty("respondent2DQFixedRecoverableCosts")
+    public FixedRecoverableCosts getFixedRecoverableCosts() {
+        return respondent2DQFixedRecoverableCosts;
     }
 
     @Override
@@ -123,6 +131,12 @@ public class Respondent2DQ implements DQ {
     @JsonProperty("respondent2DQRequestedCourt")
     public RequestedCourt getRequestedCourt() {
         return respondent2DQRequestedCourt;
+    }
+
+    @Override
+    @JsonProperty("respondent2DQRemoteHearingLRspec")
+    public RemoteHearingLRspec getRemoteHearingLRspec() {
+        return respondent2DQRemoteHearingLRspec;
     }
 
     @Override
