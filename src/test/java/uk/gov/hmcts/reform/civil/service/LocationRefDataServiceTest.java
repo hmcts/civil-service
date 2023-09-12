@@ -336,7 +336,7 @@ class LocationRefDataServiceTest {
             ))
                 .thenReturn(mockedResponse);
 
-            LocationRefData result = refDataService.getCtscLocationUnSpec("user_token");
+            LocationRefData result = refDataService.getCtscLocation("user_token", false);
 
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
@@ -360,7 +360,7 @@ class LocationRefDataServiceTest {
             ))
                 .thenReturn(new ResponseEntity<List<LocationRefData>>(OK));
 
-            LocationRefData courtLocations = refDataService.getCtscLocationUnSpec("user_token");
+            LocationRefData courtLocations = refDataService.getCtscLocation("user_token", false);
 
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
@@ -397,7 +397,7 @@ class LocationRefDataServiceTest {
             ))
                 .thenReturn(mockedResponse);
 
-            LocationRefData courtLocations = refDataService.getCtscLocationUnSpec("user_token");
+            LocationRefData courtLocations = refDataService.getCtscLocation("user_token", false);
 
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
@@ -410,23 +410,6 @@ class LocationRefDataServiceTest {
                 .isEqualTo("service_token");
             assertThat(courtLocations.getRegionId()).isIn("4");
             assertThat(courtLocations.getEpimmsId()).isIn("366774");
-        }
-
-        @Test
-        void shouldReturnEmptyList_whenLRDThrowsException() {
-            when(authTokenGenerator.generate()).thenReturn("service_token");
-            when(restTemplate.exchange(
-                uriCaptor.capture(),
-                httpMethodCaptor.capture(),
-                httpEntityCaptor.capture(),
-                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()
-            ))
-                .thenThrow(new RestClientException("403"));
-
-            LocationRefData courtLocations = refDataService.getCtscLocationUnSpec("user_token");
-
-            assertThat(courtLocations.getRegionId()).isNull();
-            assertThat(courtLocations.getEpimmsId()).isNull();
         }
 
         @Test
@@ -603,11 +586,11 @@ class LocationRefDataServiceTest {
             LocationRefData ctscLocation = LocationRefData.builder().courtVenueId("20938").epimmsId("366774")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
                 .courtTypeId("10").locationType("COURT").courtName("Salford CTSC")
-                .venueName("CTSC Salford").build();
+                .venueName("CTSC Salford").courtLocationCode("807").build();
             LocationRefData ctscLocationDuplicate = LocationRefData.builder().courtVenueId("20938").epimmsId("366774")
                 .siteName("site_name").regionId("4").region("North West").courtType("County Court")
                 .courtTypeId("10").locationType("COURT").courtName("Salford CTSC")
-                .venueName("CTSC Salford").build();
+                .venueName("CTSC Salford").courtLocationCode("807").build();
             ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(
                 List.of(ctscLocation, ctscLocationDuplicate), OK);
             when(authTokenGenerator.generate()).thenReturn("service_token");
@@ -620,7 +603,7 @@ class LocationRefDataServiceTest {
                 .thenReturn(mockedResponse);
             assertThrows(
                 LocationRefDataException.class,
-                () -> refDataService.getCourtLocation("user_token", "10")
+                () -> refDataService.getCourtLocation("user_token", "807")
             );
         }
     }

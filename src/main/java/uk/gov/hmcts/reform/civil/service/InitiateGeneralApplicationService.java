@@ -365,9 +365,9 @@ public class InitiateGeneralApplicationService {
         } else {
             LocationRefData ctscLocation;
             if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                ctscLocation = locationRefDataService.getCtscLocationSpec(authToken);
+                ctscLocation = locationRefDataService.getCtscLocation(authToken, true);
             } else {
-                ctscLocation = locationRefDataService.getCtscLocationUnSpec(authToken);
+                ctscLocation = locationRefDataService.getCtscLocation(authToken, false);
             }
 
             CaseLocationCivil courtLocation = CaseLocationCivil.builder()
