@@ -100,7 +100,6 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "writtenRepConcurrent");
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "consentOrder");
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, gaDraft);
-            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaResp");
             updateDocCollection(output, generalAppCaseData, "gaRespondDoc", civilCaseData, "gaRespondDoc");
 
         } catch (Exception e) {
