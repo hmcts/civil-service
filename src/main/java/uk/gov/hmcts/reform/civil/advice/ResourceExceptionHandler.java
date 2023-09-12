@@ -85,6 +85,14 @@ public class ResourceExceptionHandler {
         );
     }
 
+    @ExceptionHandler({FeignException.BadGateway.class})
+    public ResponseEntity<String> handleFeignExceptionBadGateway(Exception exception) {
+        log.debug(exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(),
+                                    new HttpHeaders(), HttpStatus.BAD_GATEWAY
+        );
+    }
+
     @ExceptionHandler(NotificationClientException.class)
     public ResponseEntity<Object> handleNotificationClientException(NotificationClientException exception) {
         log.debug(exception.getMessage(), exception);

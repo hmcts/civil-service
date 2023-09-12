@@ -146,6 +146,21 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
+    public void testFeignExceptionBadGateway() {
+        testTemplate(
+            "bad gateway message",
+            str -> new FeignException.GatewayTimeout(
+                "bad gateway message",
+                Mockito.mock(feign.Request.class),
+                new byte[]{},
+                Collections.emptyMap()
+            ),
+            handler::handleFeignExceptionBadGateway,
+            HttpStatus.BAD_GATEWAY
+        );
+    }
+
+    @Test
     public void testHandleNotificationClientException() {
         testTemplate(
             "expected exception from notification api",
