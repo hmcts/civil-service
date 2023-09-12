@@ -74,7 +74,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
             when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate())
                 .thenReturn(templateId);
             when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
-            given(toggleConfiguration.getFeatureToggle()).willReturn("WA 3.5");
+            given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
         }
 
         @Test

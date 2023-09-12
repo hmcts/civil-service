@@ -117,7 +117,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     ValidationAutoConfiguration.class,
     ValidateEmailService.class,
     OrganisationService.class,
-    AssignCategoryId.class},
+    AssignCategoryId.class,
+    ToggleConfiguration.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -462,6 +463,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventStartClaimCallback {
 
         private static final String PAGE_ID = "start-claim";
+
+        @BeforeEach
+        void setup() {
+            given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
+        }
 
         @Test
         void shouldAddClaimStartedFlagToData_whenInvoked() {
