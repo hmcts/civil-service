@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -41,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGeneratorWithAuth<SealedClaimResponseFormForSpec> {
 
     private final RepresentativeService representativeService;
@@ -210,13 +212,13 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         } else {
             docmosisTemplate = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v1;
         }
-
+        log.info("docmosisTemplate id ----{}", docmosisTemplate.getDocumentTitle());
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
             docmosisTemplate
         );
         String fileName = String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
-
+        log.info("docmosis fileName ----{}", fileName);
         return documentManagementService.uploadDocument(
             authorization,
             new PDF(fileName, docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)
