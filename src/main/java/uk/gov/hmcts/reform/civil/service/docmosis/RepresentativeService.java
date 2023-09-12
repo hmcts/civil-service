@@ -77,6 +77,9 @@ public class RepresentativeService {
     }
 
     public Representative getApplicantRepresentative(CaseData caseData) {
+        if (caseData.isApplicantNotRepresented()) {
+            return Representative.builder().build();
+        }
         // all applicants share solicitor
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
