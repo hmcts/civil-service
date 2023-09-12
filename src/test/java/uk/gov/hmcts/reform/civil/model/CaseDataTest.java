@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
+import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
@@ -17,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
@@ -71,6 +71,27 @@ public class CaseDataTest {
         boolean result = caseData.hasClaimantAgreedToFreeMediation();
         //Then
         assertThat(result).isTrue();
+    }
+
+    @Test
+    void givenApplicantCorrespondenceAddressDefined() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1AdditionalLipPartyDetails(AdditionalLipPartyDetails.builder()
+                                                                      .correspondenceAddress(Address.builder()
+                                                                                                 .build())
+                                                                      .contactPerson("Jane Doe")
+                                                                      .build())
+                             .build())
+            .build();
+        //When
+        //Then
+        assertThat(caseData.getCaseDataLiP().getApplicant1AdditionalLipPartyDetails()).isNotNull();
+        assertThat(caseData.getCaseDataLiP().getApplicant1AdditionalLipPartyDetails()
+                       .getCorrespondenceAddress()).isNotNull();
+        assertThat(caseData.getCaseDataLiP().getApplicant1AdditionalLipPartyDetails()
+                       .getContactPerson()).isEqualTo("Jane Doe");
     }
 
     @Test
