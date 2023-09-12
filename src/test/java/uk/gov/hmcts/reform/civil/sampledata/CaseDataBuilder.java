@@ -4059,6 +4059,23 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTrialReadyCheckLiP(boolean hasEmailAddress) {
+        atStateHearingFeeDuePaid().setClaimTypeToSpecClaim();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        if (!hasEmailAddress) {
+            respondent1 = respondent1.toBuilder().partyEmail("").build();
+            respondent2 = respondent2.toBuilder().partyEmail("").build();
+        }
+        legacyCaseReference = "000MC001";
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        hearingDuration = MINUTES_120;
+        applicant1Represented = NO;
+        respondent1Represented = NO;
+        respondent2Represented = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStateTrialReadyApplicant() {
         atStateTrialReadyCheck();
         trialReadyApplicant = YES;
@@ -5902,6 +5919,7 @@ public class CaseDataBuilder {
             .claimFee(claimFee)
             .applicant1(applicant1)
             .applicant2(applicant2)
+            .applicant1Represented(applicant1Represented)
             .respondent1(respondent1)
             .respondent2(respondent2)
             .respondent1Represented(respondent1Represented)
