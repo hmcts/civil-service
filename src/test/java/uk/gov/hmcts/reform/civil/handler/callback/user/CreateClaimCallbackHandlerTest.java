@@ -117,8 +117,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     ValidationAutoConfiguration.class,
     ValidateEmailService.class,
     OrganisationService.class,
-    AssignCategoryId.class,
-    ToggleConfiguration.class},
+    AssignCategoryId.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -172,9 +171,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
-
-    @Value("${wa.featureToggle}")
-    private String featureToggle;
 
     @MockBean
     private ToggleConfiguration toggleConfiguration;
@@ -466,11 +462,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventStartClaimCallback {
 
         private static final String PAGE_ID = "start-claim";
-
-        @BeforeEach
-        void setup() {
-            given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
-        }
 
         @Test
         void shouldAddClaimStartedFlagToData_whenInvoked() {
