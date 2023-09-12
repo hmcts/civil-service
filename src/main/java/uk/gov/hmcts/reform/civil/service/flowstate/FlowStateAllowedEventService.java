@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIM_SETTLED_CUI;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
@@ -452,6 +452,7 @@ public class FlowStateAllowedEventService {
             PART_ADMISSION.fullName(),
             List.of(
                 WITHDRAW_CLAIM,
+                CLAIMANT_RESPONSE_CUI,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
@@ -839,7 +840,6 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 BUNDLE_CREATION_NOTIFICATION,
-                CLAIM_SETTLED_CUI
                 CHANGE_SOLICITOR_EMAIL
             )
         ),
@@ -971,6 +971,7 @@ public class FlowStateAllowedEventService {
             PART_ADMISSION.fullName(),
             List.of(
                 CLAIMANT_RESPONSE_SPEC,
+                CLAIMANT_RESPONSE_CUI,
                 ENTER_BREATHING_SPACE_SPEC,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
