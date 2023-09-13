@@ -210,11 +210,13 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         } else {
             docmosisTemplate = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v1;
         }
+
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
             docmosisTemplate
         );
         String fileName = String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
+
         return documentManagementService.uploadDocument(
             authorization,
             new PDF(fileName, docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)

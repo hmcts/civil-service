@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +81,6 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         log.info("stitchedDocument response DocumentFileName ---------{}", document.getDocumentFileName());
         log.info("stitchedDocument response DocumentUrl----------{}", document.getDocumentUrl());
         log.info("stitchedDocument response DocumentBinaryUrl----------{}", document.getDocumentBinaryUrl());
-
 
         CaseDocument doc =  CaseDocument.builder()
             .documentLink(Document.builder().documentUrl(documentUrl).documentBinaryUrl(documentBinaryUrl).documentFileName(document.getDocumentFileName()).build())
