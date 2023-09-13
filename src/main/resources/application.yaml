@@ -299,8 +299,6 @@ notifications:
   notifyLiPClaimantDefendantResponded: "4b1325dd-51ed-4dc2-bcc6-d9afb01a3f29"
   notifyLiPClaimantDefendantChangedContactDetails: "72a14146-c897-4fc6-be4f-474266da7398"
 
-  notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"
-
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 

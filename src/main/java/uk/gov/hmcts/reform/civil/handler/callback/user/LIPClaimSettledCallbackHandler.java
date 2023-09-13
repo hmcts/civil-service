@@ -19,12 +19,11 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIM_SETTLED_CUI;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 
 @Service
 @RequiredArgsConstructor
-public class ClaimSettledCUICallbackHandler extends CallbackHandler {
+public class LIPClaimSettledCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
 
     @Override
@@ -38,17 +37,16 @@ public class ClaimSettledCUICallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return Collections.singletonList(
-            CLAIM_SETTLED_CUI
+            LIP_CLAIM_SETTLED
         );
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-            .businessProcess(BusinessProcess.ready(CLAIM_SETTLED_CUI))
+            .businessProcess(BusinessProcess.ready(LIP_CLAIM_SETTLED))
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
-            .state(CASE_SETTLED.name())
             .build();
     }
 }
