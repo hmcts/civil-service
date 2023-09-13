@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -24,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -191,9 +194,69 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertEquals(null, response.getData().get("isApplicant1"), "isApplicant1");
-            assertEquals(null, response.getData().get("isRespondent1"), "isRespondent1");
-            assertEquals(null, response.getData().get("isRespondent2"), "isRespondent2");
+            assertNull(response.getData().get("isApplicant1"), "isApplicant1");
+            assertNull(response.getData().get("isRespondent1"), "isRespondent1");
+            assertNull(response.getData().get("isRespondent2"), "isRespondent2");
+        }
+
+        @Test
+        void shouldUpdateReferenceApplicant1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData = caseData.toBuilder()
+                .isApplicant1(YesOrNo.YES)
+                .applicant1OrganisationPolicy(caseData.getApplicant1OrganisationPolicy().toBuilder()
+                                                  .orgPolicyReference("new reference")
+                                                  .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //noinspection unchecked
+            Assertions.assertThat(response.getData().get("solicitorReferences"))
+                    .extracting("applicantSolicitor1Reference")
+                        .isEqualTo("new reference");
+        }
+
+        @Test
+        void shouldUpdateReferenceRespondent1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData = caseData.toBuilder()
+                .isRespondent1(YesOrNo.YES)
+                .respondent1OrganisationPolicy(caseData.getRespondent1OrganisationPolicy().toBuilder()
+                                                  .orgPolicyReference("new reference")
+                                                  .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //noinspection unchecked
+            Assertions.assertThat(response.getData().get("solicitorReferences"))
+                    .extracting("respondentSolicitor1Reference")
+                        .isEqualTo("new reference");
+        }
+
+        @Test
+        void shouldUpdateReferenceRespondent2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData = caseData.toBuilder()
+                .isRespondent2(YesOrNo.YES)
+                .respondent2OrganisationPolicy(caseData.getRespondent2OrganisationPolicy().toBuilder()
+                                                  .orgPolicyReference("new reference")
+                                                  .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //noinspection unchecked
+            Assertions.assertThat(response.getData().get("solicitorReferences"))
+                    .extracting("respondentSolicitor2Reference")
+                        .isEqualTo("new reference");
         }
     }
 
