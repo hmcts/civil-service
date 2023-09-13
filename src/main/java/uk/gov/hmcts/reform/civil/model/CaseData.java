@@ -81,6 +81,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgementonline.JudgementDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
@@ -604,6 +605,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String bulkCustomerId;
     private final String sdtRequestIdFromSdt;
     private final List<Element<String>> sdtRequestId;
+
+    //Judgements Online
+    private final List<JudgementDetails> judgementDetails;
+    private final boolean isLiveJudgementExists;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
