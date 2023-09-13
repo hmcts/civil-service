@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 @Service
 @RequiredArgsConstructor
 public class LIPClaimSettledCallbackHandler extends CallbackHandler {
+
     private final ObjectMapper objectMapper;
 
     @Override
