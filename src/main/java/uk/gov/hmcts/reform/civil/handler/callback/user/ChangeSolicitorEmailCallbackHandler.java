@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -71,7 +72,6 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-
         boolean isApplicant1 = userRoles.contains(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
         boolean isRespondent1 = userRoles.contains(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
         boolean isRespondent2 = userRoles.contains(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
@@ -88,9 +88,42 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 .build()
         );
 
+        prepareSpecCorrespondenceAddresses(caseData, caseDataBuilder);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    /**
+     * If spec, copy spec correspondence address info over to unspec's fields (which are not used) so that
+     * screen is easier.
+     *
+     * @param caseData        original case data
+     * @param caseDataBuilder updated case data
+     */
+    private static void prepareSpecCorrespondenceAddresses(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
+            caseDataBuilder
+                .applicantSolicitor1ServiceAddressRequired(
+                    caseData.getSpecApplicantCorrespondenceAddressRequired()
+                )
+                .applicantSolicitor1ServiceAddress(
+                    caseData.getSpecApplicantCorrespondenceAddressdetails()
+                )
+                .respondentSolicitor1ServiceAddressRequired(
+                    caseData.getSpecRespondentCorrespondenceAddressRequired()
+                )
+                .respondentSolicitor1ServiceAddress(
+                    caseData.getSpecRespondentCorrespondenceAddressdetails()
+                )
+                .respondentSolicitor2ServiceAddressRequired(
+                    caseData.getSpecRespondent2CorrespondenceAddressRequired()
+                )
+                .respondentSolicitor2ServiceAddress(
+                    caseData.getSpecRespondent2CorrespondenceAddressdetails()
+                );
+        }
     }
 
     @Nullable
@@ -105,11 +138,42 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseBuilder = caseData.toBuilder();
 
         updateSolicitorReferences(caseData, caseBuilder);
+        updateSpecCorrespondenceAddresses(caseData, caseBuilder);
         clearPartyFlags(caseBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    /**
+     * If spec, copy modified correspondence address info back to spec's fields.
+     *
+     * @param caseData        original case data
+     * @param caseDataBuilder updated case data
+     */
+    private static void updateSpecCorrespondenceAddresses(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
+            caseDataBuilder
+                .specApplicantCorrespondenceAddressRequired(
+                    caseData.getApplicantSolicitor1ServiceAddressRequired()
+                )
+                .specApplicantCorrespondenceAddressdetails(
+                    caseData.getApplicantSolicitor1ServiceAddress()
+                )
+                .specRespondentCorrespondenceAddressRequired(
+                    caseData.getRespondentSolicitor1ServiceAddressRequired()
+                )
+                .specRespondentCorrespondenceAddressdetails(
+                    caseData.getRespondentSolicitor1ServiceAddress()
+                )
+                .specRespondent2CorrespondenceAddressRequired(
+                    caseData.getRespondentSolicitor2ServiceAddressRequired()
+                )
+                .specRespondent2CorrespondenceAddressdetails(
+                    caseData.getRespondentSolicitor2ServiceAddress()
+                );
+        }
     }
 
     /**
