@@ -27,12 +27,14 @@ public class LIPClaimSettledCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
 
+    private final Map<String, Callback> callbackMap = Map.of(
+        callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+        callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
+
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
+        return callbackMap;
     }
 
     @Override

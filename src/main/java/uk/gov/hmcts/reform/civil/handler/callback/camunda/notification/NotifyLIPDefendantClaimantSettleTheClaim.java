@@ -19,7 +19,6 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_CLAIMANT_SETTLE_THE_CLAIM;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -29,12 +28,13 @@ public class NotifyLIPDefendantClaimantSettleTheClaim extends CallbackHandler im
     private final NotificationsProperties notificationsProperties;
     private static final String REFERENCE_TEMPLATE = "notify-defendant-claimant-settle-the-claim-notification-%s";
     public static final String TASK_ID = "NotifyDefendantClaimantSettleTheClaim";
+    private final Map<String, Callback> callbackMap = Map.of(
+        callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantLIP
+    );
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantLIP
-        );
+        return callbackMap;
     }
 
     @Override
@@ -66,9 +66,9 @@ public class NotifyLIPDefendantClaimantSettleTheClaim extends CallbackHandler im
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         );
     }
 }
