@@ -327,7 +327,7 @@ class DraftClaimFormMapperTest {
     }
 
     @Test
-    void shouldReturnZeroForTotalClaimAmount_whenTotalClaimAmountIsNull(){
+    void shouldReturnZeroForTotalClaimAmount_whenTotalClaimAmountIsNull() {
         //Given
         CaseData caseData = CASE_DATA.toBuilder().totalClaimAmount(null).build();
         //When
