@@ -6,8 +6,11 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNameInternal;
 
 class CaseNameUtilsTest {
 
@@ -212,6 +215,45 @@ class CaseNameUtilsTest {
             assertEquals("'Applicant One' represented by 'ApplicantOne LitigationFriend' (litigation friend), " +
                              "'Applicant Two' represented by 'ApplicantTwo LitigationFriend' (litigation friend) " +
                              "v 'Respondent One'", actual);
+        }
+    }
+
+    @Nested
+    class BuildCaseNameInternal {
+
+        @Test
+        void shouldReturnCaseName_when1v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+
+            String actual = buildCaseNameInternal(caseData);
+
+            assertThat(actual).isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+        }
+
+        @Test
+        void shouldReturnCaseName_when1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+
+            String actual = buildCaseNameInternal(caseData);
+
+            assertThat(actual).isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+        }
+
+        @Test
+        void shouldReturnCaseName_when2v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoApplicants()
+                .build();
+
+            String actual = buildCaseNameInternal(caseData);
+
+            assertThat(actual).isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
         }
     }
 }

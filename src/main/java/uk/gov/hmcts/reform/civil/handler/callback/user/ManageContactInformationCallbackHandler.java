@@ -15,13 +15,11 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -40,6 +38,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORM
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNameInternal;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNamePublic;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
@@ -54,9 +54,7 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addD
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendant2Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendantOptions1v2SameSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.appendUserAndType;
-import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapDQExpertsToPartyExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapExpertsToUpdatePartyDetailsForm;
-import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
@@ -102,10 +100,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
         String partyChosenType = null;
 
-        if (CLAIMANT_ONE_ID.equals(partyChosen)
-            || CLAIMANT_TWO_ID.equals(partyChosen)
-            || DEFENDANT_ONE_ID.equals(partyChosen)
-            || DEFENDANT_TWO_ID.equals(partyChosen)) {
+        if (claimantOrDefendantUpdated(partyChosen)) {
             // Party fields are empty in this mid event, this is a workaround
             CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
             partyChosenType = appendUserAndType(partyChosen, oldCaseData, isAdmin);
@@ -222,8 +217,15 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
 
 //        updateExperts(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
+
+        if (claimantOrDefendantUpdated(partyChosen)) {
+            // update case name for hmc if applicant/respondent was updated
+            builder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
+            builder.caseNamePublic(buildCaseNamePublic(caseData));
+        }
 
         // clear updateDetailsForm
         builder.updateDetailsForm(null);
@@ -289,5 +291,12 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private boolean isAdmin(String userAuthToken) {
     return userService.getUserInfo(userAuthToken).getRoles()
         .stream().anyMatch(ADMIN_ROLES::contains);
+    }
+
+    private boolean claimantOrDefendantUpdated(String partyChosen) {
+        return CLAIMANT_ONE_ID.equals(partyChosen)
+            || CLAIMANT_TWO_ID.equals(partyChosen)
+            || DEFENDANT_ONE_ID.equals(partyChosen)
+            || DEFENDANT_TWO_ID.equals(partyChosen);
     }
 }
