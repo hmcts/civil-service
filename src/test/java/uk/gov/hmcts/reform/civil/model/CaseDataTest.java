@@ -21,10 +21,12 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import java.util.List;
 
+import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -40,6 +42,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseDataTest {
+
+    private static final BigDecimal CLAIM_FEE = new BigDecimal(2000);
 
     @Test
     public void applicant1Proceed_when1v1() {
@@ -605,6 +609,28 @@ public class CaseDataTest {
         //When
         //Then
         assertTrue(caseData.getApplicant1ResponseDeadlinePassed());
+    }
+
+    @Test
+    void shouldReturnClaimFeeInPence_whenClaimFeeExists() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE).build())
+            .build();
+        //When
+        BigDecimal fee = caseData.getCalculatedClaimFeeInPence();
+        //Then
+        assertThat(fee).isEqualTo(CLAIM_FEE);
+    }
+
+    @Test
+    void shouldReturnZero_whenClaimFeeIsNull() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        BigDecimal fee = caseData.getCalculatedClaimFeeInPence();
+        //Then
+        assertThat(fee).isEqualTo(ZERO);
     }
 }
 

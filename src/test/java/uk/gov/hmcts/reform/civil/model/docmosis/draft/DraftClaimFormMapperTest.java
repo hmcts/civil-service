@@ -6,13 +6,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -35,12 +39,16 @@ class DraftClaimFormMapperTest {
     private static final String ORGANISATION = "organisation";
     private static final BigDecimal INTEREST = new BigDecimal(23);
     private static final BigDecimal TOTAL_CLAIM_AMOUNT = new BigDecimal(150000);
+    private static final BigDecimal CLAIM_FEE = new BigDecimal(2000);
     private static final CaseData CASE_DATA = getCaseData();
-    private static final String STANDART_INTEREST_RATE = "8";
+    private static final String STANDARD_INTEREST_RATE = "8";
+    private static final String DIFFERENT_RATE_EXPLANATION = "something different";
+    private static final LocalDate INTEREST_FROM_SPECIFIC_DATE = LocalDate.now();
+    private static final LocalDateTime SUBMITTED_DATE = LocalDateTime.of(2023, 6, 1, 0, 0, 0);
 
     @Test
     void should_displayIndividualName_whenPartiesIndividual() {
-      //Given
+        //Given
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .individualLastName(INDIVIDUAL_LAST_NAME)
@@ -50,12 +58,12 @@ class DraftClaimFormMapperTest {
                             .type(Party.Type.INDIVIDUAL)
                             .build())
             .respondent1(Party.builder()
-                            .individualLastName(INDIVIDUAL_LAST_NAME)
-                            .individualFirstName(INDIVIDUAL_FIRST_NAME)
-                            .individualTitle(INDIVIDUAL_TITLE)
-                            .partyEmail(EMAIL)
-                            .type(Party.Type.INDIVIDUAL)
-                            .build())
+                             .individualLastName(INDIVIDUAL_LAST_NAME)
+                             .individualFirstName(INDIVIDUAL_FIRST_NAME)
+                             .individualTitle(INDIVIDUAL_TITLE)
+                             .partyEmail(EMAIL)
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
             .build();
         //When
         DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
@@ -66,6 +74,7 @@ class DraftClaimFormMapperTest {
 
     @Test
     void shouldDisplay_soleTraderInformation_whenPartiesAreSoleTrader() {
+        //Given
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
                             .soleTraderLastName(INDIVIDUAL_LAST_NAME)
@@ -120,12 +129,12 @@ class DraftClaimFormMapperTest {
         //Given
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
-                            .companyName(ORGANISATION)
+                            .organisationName(ORGANISATION)
                             .partyEmail(EMAIL)
                             .type(Party.Type.ORGANISATION)
                             .build())
             .respondent1(Party.builder()
-                             .companyName(ORGANISATION)
+                             .organisationName(ORGANISATION)
                              .partyEmail(EMAIL)
                              .type(Party.Type.ORGANISATION)
                              .build())
@@ -202,7 +211,152 @@ class DraftClaimFormMapperTest {
         //When
         DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
         //Then
-        assertThat(form.getInterestRate()).isEqualTo(STANDART_INTEREST_RATE);
+        assertThat(form.getInterestRate()).isEqualTo(STANDARD_INTEREST_RATE);
+    }
+
+    @Test
+    void shouldReturnNull_whenSameInterestSelectionIsNull() {
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        //Then
+        assertThat(form.getInterestRate()).isNull();
+    }
+
+    @Test
+    void shouldReturnStandardExplanationText_whenNoDifferentRateReason() {
+        //Given
+        CaseData caseData = getCaseData().toBuilder()
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .build())
+            .build();
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        //Then
+        assertThat(form.getInterestExplanationText()).isEqualTo(DraftClaimFormMapper.EXPLANATION_OF_INTEREST_RATE);
+    }
+
+    @Test
+    void shouldReturnDifferentExplanationText_whenDifferentRateReasonExists() {
+        //Given
+        CaseData caseData = getCaseData().toBuilder()
+            .sameRateInterestSelection(SameRateInterestSelection.builder()
+                                           .differentRateReason(DIFFERENT_RATE_EXPLANATION)
+                                           .build())
+            .build();
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        //Then
+        assertThat(form.getInterestExplanationText()).isEqualTo(DIFFERENT_RATE_EXPLANATION);
+    }
+
+    @Test
+    void shouldReturnNullForInterestExplanation_whenNoInterestRateSelection() {
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        //Then
+        assertThat(form.getInterestExplanationText()).isNull();
+    }
+
+    @Test
+    void shouldReturnInterestFromSpecificDate_whenInterestFromSpecificDateExists() {
+        //Given
+        CaseData caseData = getCaseData().toBuilder()
+            .interestFromSpecificDate(INTEREST_FROM_SPECIFIC_DATE)
+            .build();
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        //Then
+        assertThat(form.getInterestFromDate()).isEqualTo(INTEREST_FROM_SPECIFIC_DATE);
+    }
+
+    @Test
+    void shouldReturnInterestFromClaimIssueDate_whenInterestFromSpecificDateIsNull() {
+        //Given
+        CaseData caseData = getCaseData().toBuilder()
+            .submittedDate(SUBMITTED_DATE)
+            .build();
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        //Then
+        assertThat(form.getInterestFromDate()).isEqualTo(SUBMITTED_DATE.toLocalDate());
+    }
+
+    @Test
+    void shouldReturnNullForInterestFromDate_whenSubmittedDateIsNull() {
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        //Then
+        assertThat(form.getInterestFromDate()).isNull();
+    }
+
+    @Test
+    void shouldReturnNullForWhenAreYouPlanningInterestFrom_whenInterestFromIsNull() {
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        //Then
+        assertThat(form.getWhenAreYouClaimingInterestFrom()).isNull();
+    }
+
+    @Test
+    void shouldReturnInterestStartFromClaimIssue_whenInterestClaimFromTypeIsFromClaimSubmitted() {
+        //Given
+        CaseData caseData = getCaseData().toBuilder()
+            .submittedDate(SUBMITTED_DATE)
+            .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
+            .build();
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        //Then
+        assertThat(form.getWhenAreYouClaimingInterestFrom())
+            .isEqualTo(DraftClaimFormMapper.INTEREST_START_FROM_CLAIM_ISSUED_DATE);
+    }
+
+    @Test
+    void shouldReturnSpecificDescriptionForWhenAreYouPlanningInterestFrom_whenInterestClaimFromTypeIsNotFromClaimSubmitted() {
+        //Given
+        CaseData caseData = getCaseData().toBuilder()
+            .submittedDate(SUBMITTED_DATE)
+            .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
+            .interestFromSpecificDateDescription(DIFFERENT_RATE_EXPLANATION)
+            .build();
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        //Then
+        assertThat(form.getWhenAreYouClaimingInterestFrom())
+            .isEqualTo(caseData.getInterestFromSpecificDateDescription());
+    }
+
+    @Test
+    void shouldReturnZeroForTotalClaimAmount_whenTotalClaimAmountIsNull(){
+        //Given
+        CaseData caseData = CASE_DATA.toBuilder().totalClaimAmount(null).build();
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        //Then
+        assertThat(form.getTotalClaimAmount()).isEqualTo("0");
+    }
+
+    @Test
+    void shouldReturnTotalClaimAmount_whenTotalClaimAmountExists() {
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        //Then
+        assertThat(form.getTotalClaimAmount()).isEqualTo(TOTAL_CLAIM_AMOUNT.toString());
+    }
+
+    @Test
+    void shouldReturnTotalAmountOfClaimWithInterest_whenInterestIsNotNull() {
+        //Given
+        CaseData caseData = getCaseData().toBuilder()
+            .submittedDate(SUBMITTED_DATE)
+            .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE).build())
+            .build();
+        given(interestCalculator.calculateInterest(caseData)).willReturn(INTEREST);
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        //Then
+        assertThat(form.getTotalAmountOfClaim())
+            .isEqualTo(INTEREST.add(TOTAL_CLAIM_AMOUNT).add(MonetaryConversions.penniesToPounds(CLAIM_FEE)).toString());
     }
 
     private static CaseData getCaseData() {
