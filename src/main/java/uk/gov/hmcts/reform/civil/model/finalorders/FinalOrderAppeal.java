@@ -16,5 +16,6 @@ public class FinalOrderAppeal {
     private AppealList list;
     private String otherText;
     private ApplicationAppealList applicationList;
-    private AppealGrantedRefused appealGrantedRefusedDropdown;
+    private AppealGrantedRefused appealGrantedDropdown;
+    private AppealGrantedRefused appealRefusedDropdown;
 }
