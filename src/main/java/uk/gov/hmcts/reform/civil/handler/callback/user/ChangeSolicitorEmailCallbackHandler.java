@@ -91,7 +91,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
 
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(
-                String.format("# You have updated a %s's legal representative's email address", partyType))
+                String.format("# You have updated a %s's legal representative's information", partyType))
             .confirmationBody("<br />")
             .build();
     }

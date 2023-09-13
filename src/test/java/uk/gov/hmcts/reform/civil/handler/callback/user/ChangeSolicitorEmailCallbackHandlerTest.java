@@ -284,7 +284,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertEquals("# You have updated a claimant's legal representative's email address",
+            assertEquals("# You have updated a claimant's legal representative's information",
                          response.getConfirmationHeader(), "confirmationHeader");
             assertEquals("<br />",
                          response.getConfirmationBody(), "confirmationBody");
@@ -299,7 +299,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertEquals("# You have updated a defendant's legal representative's email address",
+            assertEquals("# You have updated a defendant's legal representative's information",
                          response.getConfirmationHeader(), "confirmationHeader");
             assertEquals("<br />",
                          response.getConfirmationBody(), "confirmationBody");
@@ -314,7 +314,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertEquals("# You have updated a defendant's legal representative's email address",
+            assertEquals("# You have updated a defendant's legal representative's information",
                          response.getConfirmationHeader(), "confirmationHeader");
             assertEquals("<br />",
                          response.getConfirmationBody(), "confirmationBody");
@@ -330,7 +330,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertEquals("# You have updated a defendant's legal representative's email address",
+            assertEquals("# You have updated a defendant's legal representative's information",
                          response.getConfirmationHeader(), "confirmationHeader");
             assertEquals("<br />",
                          response.getConfirmationBody(), "confirmationBody");
