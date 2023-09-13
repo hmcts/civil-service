@@ -142,8 +142,7 @@ public class RoboticsDataMapperForSpec {
             );
         organisationId
             .flatMap(organisationService::findOrganisationById)
-            .ifPresent(buildOrganisation(solicitorBuilder,
-                                         caseData.getRespondent1CorrespondanceAddress()));
+            .ifPresent(buildOrganisation(solicitorBuilder, caseData.getSpecRespondentCorrespondenceAddressdetails()));
 
         organisationDetails.ifPresent(buildOrganisationDetails(solicitorBuilder));
 
