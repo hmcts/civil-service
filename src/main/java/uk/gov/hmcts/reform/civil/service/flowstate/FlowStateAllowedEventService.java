@@ -630,7 +630,6 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 migrateCase,
                 CREATE_SDO,
-                migrateCase,
                 NotSuitable_SDO
             )
         ),
