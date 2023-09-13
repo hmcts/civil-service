@@ -57,7 +57,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         Optional<Document> stitchedDocument = caseDataFromBundlePayload.getCaseBundles().get(0).getValue().getStitchedDocument();
 
         log.info("stitchedDocument.isPresent() {}, legacy case reference {}",  stitchedDocument.isPresent(), caseData.getLegacyCaseReference());
-        return retrieveCaseDocument(stitchedDocument);
+        return retrieveCaseDocument(stitchedDocument, caseData);
 
     }
 
@@ -70,7 +70,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         }
     }
 
-    private CaseDocument retrieveCaseDocument(Optional<Document> stitchedDocument) {
+    private CaseDocument retrieveCaseDocument(Optional<Document> stitchedDocument, CaseData caseData) {
         if (stitchedDocument.isEmpty()) {
             log.info("stitchedDocument is not present----------");
             return null;
@@ -79,11 +79,17 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         String documentUrl = document.getDocumentUrl();
         String documentBinaryUrl = document.getDocumentBinaryUrl();
 
+        log.info("stitchedDocument response DocumentFileName ---------{}", document.getDocumentFileName());
+        log.info("stitchedDocument response DocumentUrl----------{}", document.getDocumentUrl());
+        log.info("stitchedDocument response DocumentBinaryUrl----------{}", document.getDocumentBinaryUrl());
+
+
         CaseDocument doc =  CaseDocument.builder()
             .documentLink(Document.builder().documentUrl(documentUrl).documentBinaryUrl(documentBinaryUrl).documentFileName(document.getDocumentFileName()).build())
             .documentName("Stitched document")
             .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
+            .createdDatetime(caseData.getRespondent1ResponseDate())
+            //.createdDatetime(LocalDateTime.now())
             .createdBy(CREATED_BY)
             .build();
         log.info("stitchedDocument response doc filename ---------{}", doc.getDocumentName());
