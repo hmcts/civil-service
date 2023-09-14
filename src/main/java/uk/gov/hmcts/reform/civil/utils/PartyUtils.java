@@ -415,7 +415,7 @@ public class PartyUtils {
         return applicant1DQ != null ? applicant1DQ.toBuilder()
             .applicant1DQExperts(appendWithNewPartyIds(applicant1DQ.getApplicant1DQExperts()))
             .applicant1RespondToClaimExperts(appendWithNewPartyIds(applicant1DQ.getApplicant1RespondToClaimExperts()))
-            .applicant1DQWitnesses(appendWithNewPartyIds(appendWithNewPartyIds(applicant1DQ.getApplicant1DQWitnesses())))
+            .applicant1DQWitnesses(appendWithNewPartyIds(applicant1DQ.getApplicant1DQWitnesses()))
             .build() : null;
     }
 
