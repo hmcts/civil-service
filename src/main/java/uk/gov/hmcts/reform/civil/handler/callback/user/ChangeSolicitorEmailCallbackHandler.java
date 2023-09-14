@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import okhttp3.Call;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -205,7 +204,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
             return YES;
         }
         return Optional.ofNullable(address).map(Address::getPostCode).map(StringUtils::isNotBlank)
-            .orElse(false)? YES : NO;
+            .orElse(false) ? YES : NO;
     }
 
     /**
