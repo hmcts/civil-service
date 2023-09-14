@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.draft;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.getRequiredDateBeforeFourPm;
 
 @Component
 @RequiredArgsConstructor
@@ -40,6 +42,11 @@ public class DraftClaimFormMapper {
             .interestFromDate(Optional.ofNullable(caseData.getInterestFromSpecificDate())
                                   .orElse(Optional.ofNullable(caseData.getSubmittedDate())
                                               .map(LocalDateTime::toLocalDate).orElse(null)))
+            .interestEndDate(StringUtils.isBlank(caseData.getBreakDownInterestDescription())?
+                                 getRequiredDateBeforeFourPm(LocalDateTime.now())
+                : null)
+            .interestEndDateDescription(Optional.ofNullable(caseData.getBreakDownInterestDescription())
+                                            .orElse(null))
             .whenAreYouClaimingInterestFrom(generateWhenAreYouPlanningInterestFrom(caseData))
             .totalClaimAmount(Optional.ofNullable(caseData.getTotalClaimAmount())
                                   .map(BigDecimal::toString)

@@ -53,6 +53,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1_LIP;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.isAfterFourPM;
 
 @Service
 @RequiredArgsConstructor
@@ -150,14 +151,14 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                 + "Section 69 of the County Courts Act 1984" : null)
             .interestFromDate(caseData.getInterestFromSpecificDate() != null
                                   ? caseData.getInterestFromSpecificDate() :
-                                  (isAfterFourPM()
+                                  (isAfterFourPM(localDateTime)
                                       ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate()))
             .whenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom() != null
                                                 ? caseData.getInterestClaimFrom().name()
                 .equals("FROM_CLAIM_SUBMIT_DATE")
                 ? "From the date the claim was issued"
                 : caseData.getInterestFromSpecificDateDescription() : null)
-            .interestEndDate(isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate())
+            .interestEndDate(isAfterFourPM(localDateTime) ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate())
             .interestEndDateDescription(caseData.getBreakDownInterestDescription() != null
                                             ? caseData.getBreakDownInterestDescription() + "" : null)
             .totalClaimAmount(caseData.getTotalClaimAmount() + "")
@@ -187,7 +188,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         deadlinesCalculator.calculateFirstWorkingDay(date.plusDays(29));
         var notificationDeadline = formatLocalDate(
             deadlinesCalculator
-                .calculateFirstWorkingDay(isAfterFourPM() ? date.plusDays(29) : date.plusDays(28)),
+                .calculateFirstWorkingDay(isAfterFourPM(localDateTime) ? date.plusDays(29) : date.plusDays(28)),
             DATE
         );
         return END_OF_BUSINESS_DAY + notificationDeadline;
@@ -278,8 +279,5 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .build();
     }
 
-    private boolean isAfterFourPM() {
-        LocalTime localTime = localDateTime.toLocalTime();
-        return localTime.getHour() > 15;
-    }
+
 }
