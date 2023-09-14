@@ -89,14 +89,14 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
             }
         } else {
             //Use Multiparty Template as there are 2 defendant responses
-            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
+                if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
                 && !RespondentResponseTypeSpec.COUNTER_CLAIM.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
                 && !RespondentResponseTypeSpec.COUNTER_CLAIM
                 .equals(caseData.getRespondent2ClaimResponseTypeForSpec())
                 && SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
             } else {
-                templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+                templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
             }
             if (isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE)) {
                 recipient = caseData.getRespondentSolicitor1EmailAddress();
