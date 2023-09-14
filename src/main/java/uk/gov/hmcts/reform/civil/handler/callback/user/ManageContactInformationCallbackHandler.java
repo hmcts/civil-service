@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.ArrayList;
@@ -77,6 +78,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private final UserService userService;
     private final ObjectMapper objectMapper;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -224,6 +226,9 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
 
 //        updateExperts(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
+
+        // last step before clearing update details form
+        caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, builder);
 
         // clear updateDetailsForm
         builder.updateDetailsForm(null);

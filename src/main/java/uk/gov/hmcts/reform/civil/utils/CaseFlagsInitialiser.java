@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addApplicantExpertAndWitnessFlagsStructure;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addRespondentDQPartiesFlagStructure;
+import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.createOrUpdateFlags;
 
 @Component
 @AllArgsConstructor
@@ -57,6 +58,10 @@ public class CaseFlagsInitialiser {
             case CLAIMANT_RESPONSE:
             case CLAIMANT_RESPONSE_SPEC: {
                 addApplicantExpertAndWitnessFlagsStructure(dataBuilder, caseData);
+                break;
+            }
+            case MANAGE_CONTACT_INFORMATION: {
+                createOrUpdateFlags(dataBuilder, caseData);
                 break;
             }
             default:

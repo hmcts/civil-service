@@ -22,6 +22,28 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LITIGATION_FRIEND_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ORG_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_WITNESSES_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_LITIGATION_FRIEND_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ORG_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_EXPERTS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LITIGATION_FRIEND_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ORG_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_WITNESSES_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_EXPERTS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LITIGATION_FRIEND_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ORG_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_WITNESSES_ID;
 
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -170,6 +192,143 @@ public class CaseFlagUtils {
         }
     }
 
+    public static void createOrUpdateFlags(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
+        String partyChosen = caseData.getUpdateDetailsForm().getPartyChosenId();
+        // claimant/defendant
+        updatePartyFlags(builder, caseData, partyChosen);
+        // litigation friend
+        updateLitigationFriendFlags(builder, caseData, partyChosen);
+        // attending for org/company
+        updateOrgIndividualsFlags(builder, caseData, partyChosen);
+        // attending for legal rep
+        updateLRIndividualsFlags(builder, caseData, partyChosen);
+        // experts
+        updateExpertFlags(builder, caseData, partyChosen);
+        // witnesses
+        updateWitnessFlags(builder, caseData, partyChosen);
+    }
+
+    private static void updateExpertFlags(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData, String partyChosen) {
+        if ((CLAIMANT_ONE_EXPERTS_ID).equals(partyChosen)) {
+            builder.applicantExperts(updatePartyNameForPartyFlagStructures(caseData.getApplicantExperts(), APPLICANT_SOLICITOR_EXPERT));
+        }
+        if ((DEFENDANT_ONE_EXPERTS_ID).equals(partyChosen)) {
+            builder.respondent1Experts(updatePartyNameForPartyFlagStructures(caseData.getRespondent1Experts(), RESPONDENT_SOLICITOR_ONE_EXPERT));
+        }
+        if ((DEFENDANT_TWO_EXPERTS_ID).equals(partyChosen)) {
+            builder.respondent2Experts(updatePartyNameForPartyFlagStructures(caseData.getRespondent2Experts(), RESPONDENT_SOLICITOR_TWO_EXPERT));
+        }
+    }
+
+    private static void updateWitnessFlags(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData, String partyChosen) {
+        if ((CLAIMANT_ONE_WITNESSES_ID).equals(partyChosen)) {
+            builder.applicantWitnesses(updatePartyNameForPartyFlagStructures(caseData.getApplicantWitnesses(), APPLICANT_SOLICITOR_WITNESS));
+        }
+        if ((DEFENDANT_ONE_WITNESSES_ID).equals(partyChosen)) {
+            builder.respondent1Witnesses(updatePartyNameForPartyFlagStructures(caseData.getRespondent1Witnesses(), RESPONDENT_SOLICITOR_ONE_WITNESS));
+        }
+        if ((DEFENDANT_TWO_WITNESSES_ID).equals(partyChosen)) {
+            builder.respondent2Witnesses(updatePartyNameForPartyFlagStructures(caseData.getRespondent2Witnesses(), RESPONDENT_SOLICITOR_TWO_WITNESS));
+        }
+    }
+
+    private static void updateLRIndividualsFlags(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData, String partyChosen) {
+        if ((CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID).equals(partyChosen)) {
+            builder.applicant1LRIndividuals(updatePartyNameForPartyFlagStructures(caseData.getApplicant1LRIndividuals(), "Role on case"));
+        }
+        if ((DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID).equals(partyChosen)) {
+            builder.respondent1LRIndividuals(updatePartyNameForPartyFlagStructures(caseData.getRespondent1LRIndividuals(), "Role on case"));
+        }
+        if ((DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID).equals(partyChosen)) {
+            builder.respondent2LRIndividuals(updatePartyNameForPartyFlagStructures(caseData.getRespondent2LRIndividuals(), "Role on case"));
+        }
+    }
+
+    private static void updateOrgIndividualsFlags(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData, String partyChosen) {
+        if ((CLAIMANT_ONE_ORG_INDIVIDUALS_ID).equals(partyChosen)) {
+            builder.applicant1OrgIndividuals(updatePartyNameForPartyFlagStructures(caseData.getApplicant1OrgIndividuals(), "Role on case"));
+        }
+        if ((CLAIMANT_TWO_ORG_INDIVIDUALS_ID).equals(partyChosen)) {
+            builder.applicant2OrgIndividuals(updatePartyNameForPartyFlagStructures(caseData.getApplicant2OrgIndividuals(), "Role on case"));
+        }
+        if ((DEFENDANT_ONE_ORG_INDIVIDUALS_ID).equals(partyChosen)) {
+            builder.respondent1OrgIndividuals(updatePartyNameForPartyFlagStructures(caseData.getRespondent1OrgIndividuals(), "Role on case"));
+        }
+        if ((DEFENDANT_TWO_ORG_INDIVIDUALS_ID).equals(partyChosen)) {
+            builder.respondent2OrgIndividuals(updatePartyNameForPartyFlagStructures(caseData.getRespondent2OrgIndividuals(), "Role on case"));
+        }
+    }
+
+    private static void updateLitigationFriendFlags(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData, String partyChosen) {
+        if ((CLAIMANT_ONE_LITIGATION_FRIEND_ID).equals(partyChosen)) {
+            builder.applicant1LitigationFriend(updatePartyNameForLitigationFriendFlags(caseData.getApplicant1LitigationFriend()));
+        }
+        if ((CLAIMANT_TWO_LITIGATION_FRIEND_ID).equals(partyChosen)) {
+            builder.applicant2LitigationFriend(updatePartyNameForLitigationFriendFlags(caseData.getApplicant2LitigationFriend()));
+        }
+        if ((DEFENDANT_ONE_LITIGATION_FRIEND_ID).equals(partyChosen)) {
+            builder.respondent1LitigationFriend(updatePartyNameForLitigationFriendFlags(caseData.getRespondent1LitigationFriend()));
+        }
+        if ((DEFENDANT_TWO_LITIGATION_FRIEND_ID).equals(partyChosen)) {
+            builder.respondent2LitigationFriend(updatePartyNameForLitigationFriendFlags(caseData.getRespondent2LitigationFriend()));
+        }
+    }
+
+    private static void updatePartyFlags(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData, String partyChosen) {
+        if ((CLAIMANT_ONE_ID).equals(partyChosen)) {
+            builder.applicant1(updatePartyNameForFlags(caseData.getApplicant1()));
+        }
+        if ((CLAIMANT_TWO_ID).equals(partyChosen)) {
+            builder.applicant2(updatePartyNameForFlags(caseData.getApplicant2()));
+        }
+        if ((DEFENDANT_ONE_ID).equals(partyChosen)) {
+            builder.respondent1(updatePartyNameForFlags(caseData.getRespondent1()));
+        }
+        if ((DEFENDANT_TWO_ID).equals(partyChosen)) {
+            builder.respondent2(updatePartyNameForFlags(caseData.getRespondent2()));
+        }
+    }
+
+    private static List<Element<PartyFlagStructure>> updatePartyNameForPartyFlagStructures(List<Element<PartyFlagStructure>> individuals, String roleOnCase) {
+        if (individuals != null && !individuals.isEmpty()) {
+            List<PartyFlagStructure> partyFlagStructures = unwrapElements(individuals);
+            List<PartyFlagStructure> updatedList = new ArrayList<>();
+            for (PartyFlagStructure partyFlagStructure : partyFlagStructures) {
+                String formattedPartyNameForFlags = formattedPartyNameForFlags(partyFlagStructure.getFirstName(), partyFlagStructure.getLastName());
+                if (partyFlagStructure.getFlags() == null) {
+                    // new party so initialise flags
+                    updatedList.add(partyFlagStructure.toBuilder().flags(Flags.builder()
+                                                                             .partyName(formattedPartyNameForFlags)
+                                                                             .roleOnCase(roleOnCase)
+                                                                             .details(List.of())
+                                                                             .build()).build());
+                } else {
+                    // existing party with flags so just update the name
+                    updatedList.add(partyFlagStructure.toBuilder().flags(partyFlagStructure.getFlags().toBuilder()
+                                                                             .partyName(formattedPartyNameForFlags)
+                                                                             .build()).build());
+                }
+            }
+            return wrapElements(updatedList);
+        }
+        return null;
+    }
+
+    private static Party updatePartyNameForFlags(Party party) {
+        return party.toBuilder().flags(party.getFlags().toBuilder()
+                                           .partyName(party.getPartyName())
+                                           .details(List.of())
+                                           .build()).build();
+    }
+
+    private static LitigationFriend updatePartyNameForLitigationFriendFlags(LitigationFriend litigationFriend) {
+        return litigationFriend.toBuilder()
+            .flags(litigationFriend.getFlags().toBuilder()
+                       .partyName(litigationFriend.getFullName() != null ? litigationFriend.getFullName()
+                                      : formattedPartyNameForFlags(litigationFriend.getFirstName(), litigationFriend.getLastName()))
+                       .details(List.of()).build()).build();
+    }
+
     public static List<FlagDetail> getAllCaseFlags(CaseData caseData) {
         var flagCollection = new ArrayList<FlagDetail>();
         flagCollection.addAll(getFlagDetails(caseData.getCaseFlags()));
@@ -220,5 +379,9 @@ public class CaseFlagUtils {
         return flagDetails.stream()
             .filter(List.of(predicates).stream().reduce(Predicate::and).orElse(x -> true))
             .collect(Collectors.toList());
+    }
+
+    private static String formattedPartyNameForFlags(String firstName, String lastName) {
+        return String.format("%s %s", firstName, lastName);
     }
 }
