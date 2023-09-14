@@ -73,13 +73,12 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
             @Test
             void shouldNotifyDefendantSolicitor1_when1v1Case() {
-                when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
-                    .thenReturn("template-id");
+                when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec1v1())
+                    .thenReturn("spec-1v1-template-id");
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateRespondentCounterClaim()
                     .build();
-
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .request(CallbackRequest.builder()
@@ -91,7 +90,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
-                    "template-id",
+                    "spec-1v1-template-id",
                     getNotificationDataMap(caseData),
                     "defendant-response-case-handed-offline-respondent-notification-000DC001"
                 );
