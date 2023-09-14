@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -185,6 +186,15 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 caseData.getRespondentSolicitor2ServiceAddressRequired(),
                 caseData.getRespondentSolicitor2ServiceAddress()
             ));
+        if (MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
+            // copy 1 into 2
+            CaseData temp = caseBuilder.build();
+            caseBuilder
+                .respondentSolicitor2ServiceAddressRequired(temp.getRespondentSolicitor1ServiceAddressRequired())
+                .respondentSolicitor2ServiceAddress(temp.getRespondentSolicitor2ServiceAddress())
+                .respondentSolicitor2EmailAddress(temp.getRespondentSolicitor1EmailAddress())
+                .respondent2OrganisationPolicy(temp.getRespondent1OrganisationPolicy());
+        }
         // because we'll use the fields above
         caseData = caseBuilder.build();
 

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -201,6 +202,28 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals("respondent1solicitor@gmail.com",
                          response.getData().get("respondentSolicitor1EmailAddress"),
                 "respondentSolicitor1EmailAddress");
+        }
+
+        @Test
+        void shouldReturnResponse1and2_when1v2ss() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .respondentSolicitor1EmailAddress("respondent1solicitor@gmail.com")
+                .build().toBuilder()
+                .respondent2(Party.builder()
+                                 .companyName("c3")
+                                 .type(Party.Type.COMPANY)
+                                 .build())
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertEquals("respondent1solicitor@gmail.com",
+                         response.getData().get("respondentSolicitor2EmailAddress"),
+                         "respondentSolicitor2EmailAddress");
         }
 
         @Test
