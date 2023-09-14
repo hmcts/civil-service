@@ -170,14 +170,16 @@ public class SealedClaimLipResponseForm implements MappableObject {
     }
 
     private static void addRepaymentPlan(CaseData caseData, SealedClaimLipResponseFormBuilder builder, BigDecimal totalClaimAmount) {
-        builder.repaymentPlan(RepaymentPlanTemplateData.builder()
-                                  .paymentFrequencyDisplay(caseData.getRespondent1RepaymentPlan().getPaymentFrequencyDisplay())
-                                  .firstRepaymentDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
-                                  .paymentAmount(MonetaryConversions.penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()))
-                                  .build())
-            .payBy(caseData.getRespondent1RepaymentPlan()
-                       .finalPaymentBy(totalClaimAmount))
-            .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+        if (caseData.getRespondent1RepaymentPlan() != null) {
+            builder.repaymentPlan(RepaymentPlanTemplateData.builder()
+                                      .paymentFrequencyDisplay(caseData.getRespondent1RepaymentPlan().getPaymentFrequencyDisplay())
+                                      .firstRepaymentDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
+                                      .paymentAmount(MonetaryConversions.penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()))
+                                      .build())
+                .payBy(caseData.getRespondent1RepaymentPlan()
+                           .finalPaymentBy(totalClaimAmount))
+                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+        }
     }
 
     private static void alreadyPaid(CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
@@ -225,7 +227,11 @@ public class SealedClaimLipResponseForm implements MappableObject {
         if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
             alreadyPaid(caseData, builder);
         } else {
-            addRepaymentMethod(caseData, builder, MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount()));
+            addRepaymentMethod(
+                caseData,
+                builder,
+                MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount())
+            );
         }
     }
 
@@ -234,9 +240,11 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .ifPresent(selfEmployDetails ->
                            builder.selfEmployment(Respondent1SelfEmploymentLRspec.builder()
                                                       .amountOwed(selfEmployDetails.getAmountOwed() != null
-                                                                      ? MonetaryConversions.penniesToPounds(selfEmployDetails.getAmountOwed())
+                                                                      ? MonetaryConversions.penniesToPounds(
+                                                          selfEmployDetails.getAmountOwed())
                                                                       : null)
-                                                      .annualTurnover(MonetaryConversions.penniesToPounds(selfEmployDetails.getAnnualTurnover()))
+                                                      .annualTurnover(MonetaryConversions.penniesToPounds(
+                                                          selfEmployDetails.getAnnualTurnover()))
                                                       .jobTitle(selfEmployDetails.getJobTitle())
                                                       .reason(selfEmployDetails.getReason())
                                                       .build())
@@ -301,12 +309,12 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private static void addCourtOrderDetails(final CaseData caseData, SealedClaimLipResponseFormBuilder builder) {
         builder.courtOrderDetails(
             Optional.ofNullable(caseData.getRespondent1CourtOrderDetails()).map(Collection::stream)
-            .orElseGet(Stream::empty)
-            .map(courtOrderDetails -> Respondent1CourtOrderDetails.builder()
-                .claimNumberText(courtOrderDetails.getValue().getClaimNumberText())
-                .amountOwed(MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getAmountOwed()))
-                .monthlyInstalmentAmount(MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getMonthlyInstalmentAmount()))
-                .build())
+                .orElseGet(Stream::empty)
+                .map(courtOrderDetails -> Respondent1CourtOrderDetails.builder()
+                    .claimNumberText(courtOrderDetails.getValue().getClaimNumberText())
+                    .amountOwed(MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getAmountOwed()))
+                    .monthlyInstalmentAmount(MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getMonthlyInstalmentAmount()))
+                    .build())
                 .toList()
         );
     }

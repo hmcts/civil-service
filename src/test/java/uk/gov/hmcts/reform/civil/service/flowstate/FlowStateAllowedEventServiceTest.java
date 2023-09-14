@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIF
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
@@ -59,6 +60,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
@@ -482,6 +484,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     PART_ADMISSION,
                     new CaseEvent[]{
+                        CLAIMANT_RESPONSE_CUI,
                         WITHDRAW_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         DISCONTINUE_CLAIM,
@@ -649,7 +652,8 @@ class FlowStateAllowedEventServiceTest {
                     PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA,
                     new CaseEvent[]{
                         DISMISS_CLAIM,
-                        migrateCase
+                        migrateCase,
+                        CREATE_SDO
                     }
                 ),
                 of(
@@ -1060,6 +1064,15 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
             .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, NOTIFY_HEARING_PARTIES))
+            .isEqualTo(true);
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseEventIsManageContactInformation() {
+        CaseDetails caseDetails =
+            CaseDetailsBuilder.builder()
+                .atStateAwaitingCaseDetailsNotification().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, MANAGE_CONTACT_INFORMATION))
             .isEqualTo(true);
     }
 }

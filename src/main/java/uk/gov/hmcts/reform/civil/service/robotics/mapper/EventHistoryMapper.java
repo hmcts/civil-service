@@ -470,7 +470,7 @@ public class EventHistoryMapper {
             builder.miscellaneous((Event.builder()
                 .eventSequence(prepareEventSequence(builder.build()))
                 .eventCode(MISCELLANEOUS.getCode())
-                .dateReceived(LocalDateTime.now())
+                .dateReceived(setApplicant1ResponseDate(caseData))
                 .eventDetailsText(RPA_REASON_JUDGMENT_BY_ADMISSION)
                 .eventDetails(EventDetails.builder()
                                   .miscText(RPA_REASON_JUDGMENT_BY_ADMISSION)
@@ -501,7 +501,7 @@ public class EventHistoryMapper {
             .firstInstallmentDate(caseData.isPayByInstallment()
                                       ? caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate()
                                       : null)
-            .dateOfJudgment(LocalDateTime.now())
+            .dateOfJudgment(setApplicant1ResponseDate(caseData))
             .jointJudgment(false)
             .judgmentToBeRegistered(true)
             .miscText("")
@@ -511,7 +511,7 @@ public class EventHistoryMapper {
             .eventSequence(prepareEventSequence(builder.build()))
             .eventCode(JUDGEMENT_BY_ADMISSION.getCode())
             .litigiousPartyID(APPLICANT_ID)
-            .dateReceived(LocalDateTime.now())
+            .dateReceived(setApplicant1ResponseDate(caseData))
             .eventDetails(judgmentByAdmissionEvent)
             .eventDetailsText("")
             .build()));
@@ -1106,6 +1106,22 @@ public class EventHistoryMapper {
             ));
     }
 
+    private void buildTakenOfflineMultitrackUnspec(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+        if (AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
+            String miscText = "RPA Reason:Multitrack Unspec going offline.";
+            builder.miscellaneous(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(MISCELLANEOUS.getCode())
+                        .dateReceived(caseData.getApplicant1ResponseDate())
+                        .eventDetailsText(miscText)
+                        .eventDetails(EventDetails.builder()
+                                          .miscText(miscText)
+                                          .build())
+                        .build());
+        }
+    }
+
     private void buildFullDefenceProceed(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
         List<String> miscEventText = prepMultipartyProceedMiscText(caseData);
@@ -1210,6 +1226,7 @@ public class EventHistoryMapper {
                     applicantProceedsText.add("Claimant proceeds.");
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                 }
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
@@ -1233,6 +1250,7 @@ public class EventHistoryMapper {
                     applicantProceedsText.add("Claimant proceeds.");
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                 }
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
@@ -1259,6 +1277,7 @@ public class EventHistoryMapper {
                     applicantProceedsText.add("Claimant proceeds.");
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                 }
                 break;
             case TWO_V_ONE:
@@ -1282,6 +1301,7 @@ public class EventHistoryMapper {
                     applicantProceedsText.add("Claimants proceed.");
                     List<Event> miscText = prepareMiscEventList(builder, caseData, applicantProceedsText);
                     builder.miscellaneous(miscText);
+                    buildTakenOfflineMultitrackUnspec(builder, caseData);
                 }
                 break;
             default:
@@ -2262,7 +2282,7 @@ public class EventHistoryMapper {
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(LocalDateTime.now())
+                    .dateReceived(setApplicant1ResponseDate(caseData))
                     .eventDetailsText(RPA_REASON_MANUAL_DETERMINATION)
                     .eventDetails(EventDetails.builder()
                                       .miscText(RPA_REASON_MANUAL_DETERMINATION)
@@ -2282,7 +2302,7 @@ public class EventHistoryMapper {
                 Event.builder()
                     .eventSequence(prepareEventSequence(builder.build()))
                     .eventCode(MISCELLANEOUS.getCode())
-                    .dateReceived(LocalDateTime.now())
+                    .dateReceived(setApplicant1ResponseDate(caseData))
                     .eventDetailsText(RPA_IN_MEDIATION)
                     .eventDetails(EventDetails.builder()
                                       .miscText(RPA_IN_MEDIATION)
@@ -2341,5 +2361,13 @@ public class EventHistoryMapper {
                     false
                 ));
         }
+    }
+
+    private LocalDateTime setApplicant1ResponseDate(CaseData caseData) {
+        LocalDateTime applicant1ResponseDate = caseData.getApplicant1ResponseDate();
+        if (applicant1ResponseDate == null) {
+            applicant1ResponseDate = LocalDateTime.now();
+        }
+        return applicant1ResponseDate;
     }
 }
