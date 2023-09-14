@@ -674,6 +674,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
         }
+        // these documents are added to defendantUploads, if we do not remove/null the original,
+        // case file view will show duplicate documents
+        if (toggleService.isCaseFileViewEnabled()) {
+            updatedCaseData.respondent1ClaimResponseDocument(null);
+            updatedCaseData.respondent2ClaimResponseDocument(null);
+            updatedCaseData.respondent1DQ(Respondent1DQ.builder().respondent1DQDraftDirections(null).build());
+            updatedCaseData.respondent2DQ(Respondent2DQ.builder().respondent2DQDraftDirections(null).build());
+        }
     }
 
     private boolean applicant2Present(CaseData caseData) {

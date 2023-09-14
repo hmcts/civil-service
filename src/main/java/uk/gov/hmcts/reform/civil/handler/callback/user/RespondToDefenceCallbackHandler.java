@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -109,9 +110,19 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         updatedData.claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
 
-        if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
-            updatedData.respondentSharedClaimResponseDocument(caseData.getRespondent1ClaimResponseDocument());
-        }
+        // add document from defendant response documents, to placeholder field for preview during event.
+        caseData.getDefendantResponseDocuments().forEach(document -> {
+            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)) {
+                updatedData.respondent1ClaimResponseDocument(ResponseDocument.builder()
+                                                                      .file(document.getValue().getDocumentLink())
+                                                                      .build());
+                if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
+                    updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
+                                                                     .file(document.getValue().getDocumentLink())
+                                                                     .build());
+                }
+            }
+        });
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -258,6 +269,16 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
+
+        // null/delete the document used for preview, otherwise it will show as duplicate within case file view
+        // and documents are added to claimantUploads, if we do not remove/null the original,
+        if (featureToggleService.isCaseFileViewEnabled()) {
+            builder.applicant1DefenceResponseDocument(null);
+            builder.respondent1ClaimResponseDocument(null);
+            builder.respondentSharedClaimResponseDocument(null);
+            builder.applicant1DQ(Applicant1DQ.builder().applicant1DQDraftDirections(null).build());
+            builder.applicant2DQ(Applicant2DQ.builder().applicant2DQDraftDirections(null).build());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
