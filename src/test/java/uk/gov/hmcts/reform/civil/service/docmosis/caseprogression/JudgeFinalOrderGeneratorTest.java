@@ -13,10 +13,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementS
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AppealList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
@@ -33,12 +31,11 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 
-import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.CaseHearingLengthElement;
 import uk.gov.hmcts.reform.civil.model.finalorders.ClaimantAndDefendantHeard;
-import uk.gov.hmcts.reform.civil.model.finalorders.DateHeardFinalOrders;
+import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
@@ -221,7 +218,7 @@ public class JudgeFinalOrderGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .solicitorReferences(null)
-            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
+            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
@@ -248,7 +245,7 @@ public class JudgeFinalOrderGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderRecitals(null)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
+            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
             .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
             .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
@@ -282,7 +279,7 @@ public class JudgeFinalOrderGeneratorTest {
             .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
             .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
-            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DateHeardFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
+            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
             .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(finalOrdersJudgePapersList)
                                           .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT).typeRepresentationOtherComplex(
                 ClaimantAndDefendantHeard.builder().detailsRepresentationText("Test").build()).build())
@@ -290,8 +287,6 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderRecitalsRecorded(FinalOrderRecitalsRecorded.builder().text("Test").build())
             .assistedOrderCostsReserved(AssistedOrderCostDetails.builder().detailsRepresentationText("Test").build())
             .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().alternativeHearingList(dynamicList).build())
-            .finalOrderAppealComplex(FinalOrderAppeal.builder().applicationList(ApplicationAppealList.GRANTED)
-                                         .appealGranted(AppealGrantedRefused.builder().reasonsText("Test").build()).build())
             .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("Test").build())
             .assistedOrderCostsBespoke(AssistedOrderCostDetails.builder().besPokeCostDetailsText("Test").build())
             .finalOrderAppealToggle(toggleList)
@@ -434,101 +429,6 @@ public class JudgeFinalOrderGeneratorTest {
                     break;
             }
         }
-    }
-
-    @Test
-    void testGetCostAmount() {
-        for (AssistedCostTypesList assistedCostTypesList : List.of(AssistedCostTypesList.values())) {
-            if (assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)
-                || assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_SUMMARILY_BASE)
-                || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)
-                || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
-                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderRecitals(null)
-                    .assistedOrderCostList(assistedCostTypesList)
-                    .assistedOrderCostsClaimantPaySub(AssistedOrderCostDetails.builder().claimantCostStandardText(
-                        "12.12").claimantCostStandardDate(LocalDate.of(2022, 1, 1)).build())
-                    .assistedOrderCostsClaimantSum(AssistedOrderCostDetails.builder().claimantCostSummarilyText("12.12").build())
-                    .assistedOrderCostsDefendantSum(AssistedOrderCostDetails.builder().defendantCostSummarilyText(
-                        "12.12").build())
-                    .assistedOrderCostsDefendantPaySub(AssistedOrderCostDetails.builder().defendantCostStandardText(
-                        "12.12").build()).build();
-                String response = generator.getCostAmount(caseData);
-                assertEquals("12.12", response);
-            }
-        }
-    }
-
-    @Test
-    void testGetCostProtection() {
-        for (AssistedCostTypesList assistedCostTypesList : List.of(AssistedCostTypesList.values())) {
-            if (assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)
-                || assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_SUMMARILY_BASE)
-                || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)
-                || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
-                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderRecitals(null)
-                    .assistedOrderCostList(assistedCostTypesList)
-                    .assistedOrderCostsClaimantPaySub(AssistedOrderCostDetails.builder().claimantCostStandardProtectionOption(
-                        YesOrNo.NO).claimantCostStandardDate(LocalDate.of(2022, 1, 1)).build())
-                    .assistedOrderCostsClaimantSum(AssistedOrderCostDetails.builder().claimantCostSummarilyProtectionOption(
-                        YesOrNo.NO).build())
-                    .assistedOrderCostsDefendantSum(AssistedOrderCostDetails.builder().defendantCostSummarilyProtectionOption(
-                        YesOrNo.NO).build())
-                    .assistedOrderCostsDefendantPaySub(AssistedOrderCostDetails.builder().defendantCostStandardProtectionOption(
-                        YesOrNo.NO).build()).build();
-                YesOrNo response = generator.getCostProtection(caseData);
-                assertEquals(YesOrNo.NO, response);
-            }
-        }
-    }
-
-    @Test
-    void testGetPaidByDate() {
-        for (AssistedCostTypesList assistedCostTypesList : List.of(AssistedCostTypesList.values())) {
-            if (assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_STANDARD_BASE)
-                || assistedCostTypesList.equals(AssistedCostTypesList.DEFENDANT_COST_SUMMARILY_BASE)
-                || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_SUMMARILY_BASE)
-                || assistedCostTypesList.equals(AssistedCostTypesList.CLAIMANT_COST_STANDARD_BASE)) {
-                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderRecitals(null)
-                    .assistedOrderCostList(assistedCostTypesList)
-                    .assistedOrderCostsClaimantPaySub(AssistedOrderCostDetails.builder().claimantCostStandardDate(
-                        LocalDate.of(2022, 1, 1)).build())
-                    .assistedOrderCostsClaimantSum(AssistedOrderCostDetails.builder().claimantCostSummarilyDate(
-                        LocalDate.of(2022, 1, 1)).build())
-                    .assistedOrderCostsDefendantSum(AssistedOrderCostDetails.builder().defendantCostSummarilyDate(
-                        LocalDate.of(2022, 1, 1)).build())
-                    .assistedOrderCostsDefendantPaySub(AssistedOrderCostDetails.builder().defendantCostStandardDate(
-                        LocalDate.of(2022, 1, 1)).build()).build();
-                LocalDate response = generator.getPaidByDate(caseData);
-                assertEquals(LocalDate.of(2022, 1, 1), response);
-            }
-        }
-    }
-
-    @Test
-    void testGetAppealReasonGranted() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderRecitals(null)
-            .finalOrderAppealToggle(toggleList)
-            .finalOrderAppealComplex(FinalOrderAppeal.builder().applicationList(ApplicationAppealList.GRANTED).appealGranted(
-                AppealGrantedRefused.builder().reasonsText("test").build()).build())
-            .build();
-        String response = generator.getAppealReason(caseData);
-        assertEquals("test", response);
-    }
-
-    @Test
-    void testGetAppealReasonNotGranted() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderRecitals(null)
-            .finalOrderAppealToggle(toggleList)
-            .finalOrderAppealComplex(FinalOrderAppeal.builder().applicationList(ApplicationAppealList.REFUSED).appealRefused(
-                AppealGrantedRefused.builder().refusedText("test").build()).build())
-            .build();
-        String response = generator.getAppealReason(caseData);
-        assertEquals("test", response);
     }
 
     @Test
