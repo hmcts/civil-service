@@ -12,7 +12,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.judgementonline.RePaymentPlanSelection;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,6 +58,15 @@ public class RecordJudgementCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateFields(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        if (callbackParams.getCaseData().getJoOrderMadeDate().isAfter(today)) {
+            errors.add("Date must be in the past");
+        }
+        if (callbackParams.getCaseData().getJoRePaymentPlanSelection().equals(RePaymentPlanSelection.PAY_IMMEDIATELY)) {
+            if (callbackParams.getCaseData().getJoJudgementPaymentDetails().getFirstInstallmentDate().isAfter(today)) {
+
+            }
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
@@ -63,6 +74,6 @@ public class RecordJudgementCallbackHandler extends CallbackHandler {
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return null;
+        return EVENTS;
     }
 }
