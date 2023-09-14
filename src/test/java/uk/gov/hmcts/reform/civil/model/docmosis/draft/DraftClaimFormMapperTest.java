@@ -359,6 +359,52 @@ class DraftClaimFormMapperTest {
             .isEqualTo(INTEREST.add(TOTAL_CLAIM_AMOUNT).add(MonetaryConversions.penniesToPounds(CLAIM_FEE)).toString());
     }
 
+    @Test
+    void shouldReturnEndInterestDate_whenEndDateDescritptionIsNull() {
+        //Given
+        CaseData caseData = getCaseData().toBuilder()
+            .submittedDate(SUBMITTED_DATE)
+            .build();
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        //Then
+        assertThat(form.getInterestEndDate()).isNotNull();
+    }
+
+    @Test
+    void shouldReturnNullForEndInterestDate_whenEndDateDescriptionExists() {
+        //Given
+        CaseData caseData = getCaseData().toBuilder()
+            .submittedDate(SUBMITTED_DATE)
+            .breakDownInterestDescription(DIFFERENT_RATE_EXPLANATION)
+            .build();
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        //Then
+        assertThat(form.getInterestEndDate()).isNull();
+    }
+
+    @Test
+    void shouldReturnInterestEndDateDescription_whenBreakDownInterestDescriptionExists() {
+        //Given
+        CaseData caseData = getCaseData().toBuilder()
+            .submittedDate(SUBMITTED_DATE)
+            .breakDownInterestDescription(DIFFERENT_RATE_EXPLANATION)
+            .build();
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        //Then
+        assertThat(form.getInterestEndDateDescription()).isEqualTo(DIFFERENT_RATE_EXPLANATION);
+    }
+
+    @Test
+    void shouldReturnNullForInterestEndDateDescription_whenBreakDownInterestDescriptionIsNull() {
+        //When
+        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        //Then
+        assertThat(form.getInterestEndDateDescription()).isNull();
+    }
+
     private static CaseData getCaseData() {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
