@@ -182,7 +182,7 @@ notifications:
   respondentSolicitorClaimIssueMultipartyEmailTemplate: "6e63242f-a26a-442e-ad2c-f201072195e2"
   respondentSolicitorClaimDetailsEmailTemplate: "f6cfc731-e891-4fe2-b974-31e8fabd4d28"
   solicitorDefendantResponseCaseTakenOffline: "d67b7c10-8cde-4bfe-946b-7e99867694cd"
-  claimantSolicitorDefendantResponseFullDefence: "9a31a29f-85cf-4402-b188-e65cf628fff2"
+  claimantSolicitorDefendantResponseFullDefence: "84f0955b-a542-42d0-9825-a845c4f9799e"
   solicitorDefendantResponseCaseTakenOfflineMultiparty: "19bd6722-7c58-484e-b5a0-264ba66ad55e"
   respondentSolicitorAcknowledgeClaim: "b7ade9ca-da8b-4605-a296-ccee3d7d7a93"
   failedPayment: "b7b98d09-6794-4d8d-8550-cc219c91ee8c"
@@ -208,7 +208,8 @@ notifications:
   respondentSolicitorAcknowledgeClaimForSpec: "16b86d3b-f370-4dc1-b25b-871e7470ebf1"
   claimantSolicitorAgreedExtensionDateForSpec: "5b6d65ea-a3b5-4e40-94e0-69dc7100c982"
   respondentSolicitorAgreedExtensionDateForSpec: "fbf3ed5e-3726-4009-8561-f856fb5dbda0"
-  claimantSolicitorDefendantResponseForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
+  claimantSolicitorDefendantResponse1v2DSForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
+  claimantSolicitorDefendantResponseForSpec: "28ea1d53-93b1-4e48-a7e5-7a876f910f86"
   claimantSolicitorImmediatelyDefendantResponseForSpec: "263d7737-933d-4d0b-9f08-23847613f6a4"
   respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
   respondentDefendantResponseForSpec: "94c71894-9590-4995-aae0-edea94fc4594"
@@ -260,6 +261,7 @@ notifications:
   noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"
   noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
   evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
+  evidenceUploadLipTemplate: "3495a863-338f-49cf-99e8-b94bc457a9d4"
   bundleCreationTemplate: "0280b3c7-ad4e-4c43-8974-72b5a5501b02"
   generateOrderNotificationTemplate: "78532d45-aadf-4223-89fd-4932b4cbe411"
 
@@ -293,6 +295,9 @@ notifications:
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
+
+  notifyLiPClaimantDefendantResponded: "4b1325dd-51ed-4dc2-bcc6-d9afb01a3f29"
+  notifyLiPClaimantDefendantChangedContactDetails: "72a14146-c897-4fc6-be4f-474266da7398"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}

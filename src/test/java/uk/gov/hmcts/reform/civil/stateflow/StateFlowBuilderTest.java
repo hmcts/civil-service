@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
@@ -383,6 +384,64 @@ class StateFlowBuilderTest {
 
             assertThat(stateFlow.getFlags())
                 .contains(entry("FIRST_FLAG", true));
+        }
+
+        @Test
+        void shouldEvaluateStateAndFlagsDynamicTrue() {
+            CaseData caseData = CaseData.builder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .build();
+
+            StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
+                .initial(FlowState.STATE_1)
+                .transitionTo(FlowState.STATE_2)
+                .onlyIf(c -> true)
+                .set((c, flags) -> flags.put("FIRST_FLAG", CaseCategory.UNSPEC_CLAIM.equals(c.getCaseAccessCategory())))
+                .state(FlowState.STATE_2)
+                .build();
+
+            stateFlow.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isEqualTo("FLOW.STATE_2");
+
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly("FLOW.STATE_1", "FLOW.STATE_2");
+
+            assertThat(stateFlow.getFlags())
+                .contains(entry("FIRST_FLAG", true));
+        }
+
+        @Test
+        void shouldEvaluateStateAndFlagsDynamicFalse() {
+            CaseData caseData = CaseData.builder()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .build();
+
+            StateFlow stateFlow = StateFlowBuilder.<FlowState>flow("FLOW")
+                .initial(FlowState.STATE_1)
+                .transitionTo(FlowState.STATE_2)
+                .onlyIf(c -> true)
+                .set((c, flags) -> flags.put("FIRST_FLAG", CaseCategory.SPEC_CLAIM.equals(c.getCaseAccessCategory())))
+                .state(FlowState.STATE_2)
+                .build();
+
+            stateFlow.evaluate(caseData);
+
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isEqualTo("FLOW.STATE_2");
+
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(2)
+                .extracting(State::getName)
+                .containsExactly("FLOW.STATE_1", "FLOW.STATE_2");
+
+            assertThat(stateFlow.getFlags())
+                .contains(entry("FIRST_FLAG", false));
         }
 
         @Test
