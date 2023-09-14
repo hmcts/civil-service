@@ -233,7 +233,11 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldCopyBack_whenSpec() {
+        void shouldCopyBack_whenSpecApp1() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[APPLICANTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
                 .toBuilder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -253,6 +257,64 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("AddressLine1")
                 .isEqualTo("mail line 1");
             Assertions.assertThat(response.getData().get("specApplicantCorrespondenceAddressdetails"))
+                .extracting("PostCode")
+                .isEqualTo("mail post code");
+        }
+
+        @Test
+        void shouldCopyBack_whenSpecDef1() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
+                .toBuilder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondentSolicitor1ServiceAddressRequired(YesOrNo.YES)
+                .respondentSolicitor1ServiceAddress(Address.builder()
+                                                       .addressLine1("mail line 1")
+                                                       .postCode("mail post code")
+                                                       .build()
+                )
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
+                .extracting("AddressLine1")
+                .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
+                .extracting("PostCode")
+                .isEqualTo("mail post code");
+        }
+
+        @Test
+        void shouldCopyBack_whenSpecDef2() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
+                .toBuilder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondentSolicitor2ServiceAddressRequired(YesOrNo.YES)
+                .respondentSolicitor2ServiceAddress(Address.builder()
+                                                       .addressLine1("mail line 1")
+                                                       .postCode("mail post code")
+                                                       .build()
+                )
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+                .extracting("AddressLine1")
+                .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
                 .extracting("PostCode")
                 .isEqualTo("mail post code");
         }
