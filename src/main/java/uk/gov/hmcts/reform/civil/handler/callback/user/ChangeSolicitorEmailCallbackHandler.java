@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
@@ -172,7 +173,11 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 )
                 .specRespondent2CorrespondenceAddressdetails(
                     caseData.getRespondentSolicitor2ServiceAddress()
-                );
+                )
+                .applicantSolicitor1ServiceAddress(Address.builder().build())
+                .respondentSolicitor1ServiceAddress(Address.builder().build())
+                .respondentSolicitor2ServiceAddress(Address.builder().build());
+
         }
     }
 
