@@ -191,7 +191,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
             CaseData temp = caseBuilder.build();
             caseBuilder
                 .respondentSolicitor2ServiceAddressRequired(temp.getRespondentSolicitor1ServiceAddressRequired())
-                .respondentSolicitor2ServiceAddress(temp.getRespondentSolicitor2ServiceAddress())
+                .respondentSolicitor2ServiceAddress(temp.getRespondentSolicitor1ServiceAddress())
                 .respondentSolicitor2EmailAddress(temp.getRespondentSolicitor1EmailAddress())
                 .respondent2OrganisationPolicy(temp.getRespondent1OrganisationPolicy());
         }
