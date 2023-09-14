@@ -177,7 +177,6 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 .applicantSolicitor1ServiceAddress(Address.builder().build())
                 .respondentSolicitor1ServiceAddress(Address.builder().build())
                 .respondentSolicitor2ServiceAddress(Address.builder().build());
-
         }
     }
 
