@@ -1007,7 +1007,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(Collection::stream)
             .map(claimAmountBreakupStream -> claimAmountBreakupStream
                 .map(item -> new ClaimAmountBreakupDetails(
-                    MonetaryConversions.penniesToPounds(item.getValue().getClaimAmount()),
+                    item.getValue().getClaimAmount(),
                     item.getValue().getClaimReason()
                 ))
                 .toList())
