@@ -241,7 +241,10 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                         caseData.getRespondentSolicitor2ServiceAddress()
                     );
             }
-
+            if (MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
+                caseDataBuilder
+                    .specRespondent2CorrespondenceAddressdetails(caseData.getRespondentSolicitor1ServiceAddress());
+            }
             caseDataBuilder
                 .applicantSolicitor1ServiceAddress(Address.builder().build())
                 .respondentSolicitor1ServiceAddress(Address.builder().build())
