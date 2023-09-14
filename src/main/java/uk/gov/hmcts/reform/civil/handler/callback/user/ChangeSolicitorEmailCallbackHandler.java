@@ -20,9 +20,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,6 +52,8 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
     private final CoreCaseUserService coreCaseUserService;
 
     private final ObjectMapper objectMapper;
+
+    private final PostcodeValidator postcodeValidator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -258,24 +262,42 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse validateApplicant1SolicitorEmail(CallbackParams callbackParams) {
+        List<String> errors = new ArrayList<>(validateEmailService.validate(
+            callbackParams.getCaseData().getApplicantSolicitor1UserDetails().getEmail()));
+        Optional.ofNullable(callbackParams.getCaseData().getApplicantSolicitor1ServiceAddress())
+            .map(Address::getPostCode)
+            .map(postcodeValidator::validate)
+            .ifPresent(errors::addAll);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(validateEmailService.validate(
-                callbackParams.getCaseData().getApplicantSolicitor1UserDetails().getEmail())).build();
+            .errors(errors).build();
     }
 
     private CallbackResponse validateRespondent1SolicitorEmail(CallbackParams callbackParams) {
+        List<String> errors = new ArrayList<>(validateEmailService.validate(
+            callbackParams.getCaseData().getRespondentSolicitor1EmailAddress()));
+        Optional.ofNullable(callbackParams.getCaseData().getRespondentSolicitor1ServiceAddress())
+            .map(Address::getPostCode)
+            .map(postcodeValidator::validate)
+            .ifPresent(errors::addAll);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(validateEmailService.validate(
-                callbackParams.getCaseData().getRespondentSolicitor1EmailAddress())).build();
+            .errors(errors).build();
     }
 
     private CallbackResponse validateRespondent2SolicitorEmail(CallbackParams callbackParams) {
+        List<String> errors = new ArrayList<>(validateEmailService.validate(
+            callbackParams.getCaseData().getRespondentSolicitor2EmailAddress()));
+        Optional.ofNullable(callbackParams.getCaseData().getRespondentSolicitor2ServiceAddress())
+            .map(Address::getPostCode)
+            .map(postcodeValidator::validate)
+            .ifPresent(errors::addAll);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(validateEmailService.validate(
-                callbackParams.getCaseData().getRespondentSolicitor2EmailAddress())).build();
+            .errors(errors).build();
     }
 
-    private void clearPartyFlags(CaseData.CaseDataBuilder caseDataBuilder) {
+    private void clearPartyFlags(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         caseDataBuilder.isApplicant1(null)
             .isRespondent1(null)
             .isRespondent2(null);
