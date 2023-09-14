@@ -82,7 +82,11 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         //Use 1v1 Template
         if (is1v1Or2v1Case(caseData)) {
             recipient = caseData.getRespondentSolicitor1EmailAddress();
-            templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
+            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
+                templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec1v1();
+            } else {
+                templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
+            }
         } else {
             //Use Multiparty Template as there are 2 defendant responses
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
@@ -92,11 +96,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
                 && SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
                 templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
             } else {
-                if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
-                    templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec1v1();
-                } else {
-                    templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
-                }
+                templateID = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
             }
             if (isRespondent1(callbackParams, NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE)) {
                 recipient = caseData.getRespondentSolicitor1EmailAddress();
