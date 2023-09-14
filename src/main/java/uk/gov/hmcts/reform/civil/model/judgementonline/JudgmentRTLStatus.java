@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.judgementonline;
 
-public enum JudgementRTLStatus {
+public enum JudgmentRTLStatus {
     REGISTRATION("R"),
     Cancellation("C"),
     Satisfaction("S"),
@@ -8,7 +8,7 @@ public enum JudgementRTLStatus {
 
     private String rtlState;
 
-    JudgementRTLStatus(String rtlState) {
+    JudgmentRTLStatus(String rtlState) {
         this.rtlState = rtlState;
     }
 }

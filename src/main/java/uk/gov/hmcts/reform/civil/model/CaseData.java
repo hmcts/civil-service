@@ -81,7 +81,9 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
-import uk.gov.hmcts.reform.civil.model.judgementonline.JudgementDetails;
+import uk.gov.hmcts.reform.civil.model.judgementonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgementonline.JudgmentStatus;
+import uk.gov.hmcts.reform.civil.model.judgementonline.RePaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
@@ -607,8 +609,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<String>> sdtRequestId;
 
     //Judgements Online
-    private final List<JudgementDetails> judgementDetails;
-    private final boolean isLiveJudgementExists;
+    private JudgmentRecordedReason joWhyJudgementRecorded;
+    private JudgmentStatus joJudgementStatus;
+    private String joRtlState;
+    private LocalDate joJudgementRequestedDate;
+    private LocalDate joJudgementIssuedDate;
+    private LocalDate joOrderMadeDate;
+    private LocalDateTime joLastUpdatedDate;
+    private LocalDate joSetAsideDate;
+    private boolean joIsJointJudgement;
+    private String joAmountOrdered;
+    private String joAmmountCostOrdered;
+    private boolean joIsRegisteredWithRTL;
+    private RePaymentPlanSelection joRePaymentPlanSelection;
+    private final boolean joIsLiveJudgementExists;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
