@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -86,13 +87,40 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
             .isRespondent2(isRespondent2 ? YES : NO);
 
         // depending on flags, keep the current reference so we know if it was changed
+        String applicantReference = getSolicitorReference(
+            caseData.getApplicant1OrganisationPolicy(),
+            Optional.ofNullable(caseData.getSolicitorReferences())
+                .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                .orElse(null)
+        );
+        String respondent1Reference = getSolicitorReference(
+            caseData.getRespondent1OrganisationPolicy(),
+            Optional.ofNullable(caseData.getSolicitorReferences())
+                .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                .orElse(null)
+        );
+        String respondent2Reference = getSolicitorReference(
+            caseData.getRespondent2OrganisationPolicy(),
+            Optional.ofNullable(caseData.getSolicitorReferences())
+                .map(SolicitorReferences::getRespondentSolicitor2Reference)
+                .orElse(null)
+        );
         caseDataBuilder.solicitorReferencesCopy(
             SolicitorReferences.builder()
-                .applicantSolicitor1Reference(getSolicitorReference(caseData.getApplicant1OrganisationPolicy()))
-                .respondentSolicitor1Reference(getSolicitorReference(caseData.getRespondent1OrganisationPolicy()))
-                .respondentSolicitor2Reference(getSolicitorReference(caseData.getRespondent2OrganisationPolicy()))
+                .applicantSolicitor1Reference(applicantReference)
+                .respondentSolicitor1Reference(respondent1Reference)
+                .respondentSolicitor2Reference(respondent2Reference)
                 .build()
         );
+        Optional.ofNullable(caseData.getApplicant1OrganisationPolicy())
+                .map(op -> op.toBuilder().orgPolicyReference(applicantReference).build())
+                    .ifPresent(caseDataBuilder::applicant1OrganisationPolicy);
+        Optional.ofNullable(caseData.getRespondent1OrganisationPolicy())
+                .map(op -> op.toBuilder().orgPolicyReference(respondent1Reference).build())
+                    .ifPresent(caseDataBuilder::respondent1OrganisationPolicy);
+        Optional.ofNullable(caseData.getRespondent2OrganisationPolicy())
+                .map(op -> op.toBuilder().orgPolicyReference(respondent2Reference).build())
+                    .ifPresent(caseDataBuilder::respondent2OrganisationPolicy);
 
         prepareSpecCorrespondenceAddresses(caseData, caseDataBuilder);
 
@@ -133,10 +161,13 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
     }
 
     @Nullable
-    private static String getSolicitorReference(OrganisationPolicy policy) {
-        return Optional.ofNullable(policy)
-            .map(OrganisationPolicy::getOrgPolicyReference)
-            .orElse(null);
+    private static String getSolicitorReference(OrganisationPolicy policy, String fromForm) {
+        return Stream.of(
+            Optional.ofNullable(policy)
+                .map(OrganisationPolicy::getOrgPolicyReference)
+                .orElse(null),
+            fromForm
+        ).filter(StringUtils::isNotBlank).findFirst().orElse(null);
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
