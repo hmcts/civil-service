@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
@@ -38,6 +39,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v2;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @Service
@@ -48,6 +52,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final LocationRefDataService locationRefDataService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
@@ -205,14 +210,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
 
     public CaseDocument generate(CaseData caseData, String authorization) {
         SealedClaimResponseFormForSpec templateData = getTemplateData(caseData, authorization);
-
-        DocmosisTemplates docmosisTemplate;
-        if (caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
-            docmosisTemplate = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v2;
-        } else {
-            docmosisTemplate = DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v1;
-        }
-
+        DocmosisTemplates docmosisTemplate = getTemplate(caseData);
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
             docmosisTemplate
@@ -223,5 +221,19 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             authorization,
             new PDF(fileName, docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)
         );
+    }
+
+    private DocmosisTemplates getTemplate(CaseData caseData) {
+        if (caseData.getRespondent2() != null && YesOrNo.YES.equals(caseData.getRespondentResponseIsSame())) {
+            return DEFENDANT_RESPONSE_SPEC_SEALED_1v2;
+        }
+        return getDocmosisTemplateForSingleParty();
+    }
+
+    private DocmosisTemplates getDocmosisTemplateForSingleParty() {
+        if(featureToggleService.isPinInPostEnabled()) {
+            return DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
+        }
+        return DEFENDANT_RESPONSE_SPEC_SEALED_1v1;
     }
 }
