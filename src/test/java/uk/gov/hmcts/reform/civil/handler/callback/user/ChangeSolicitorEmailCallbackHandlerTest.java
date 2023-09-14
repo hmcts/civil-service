@@ -8,11 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.CaseAccessApi;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -100,6 +103,33 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals("No", response.getData().get("isApplicant1"), "isApplicant1");
             assertEquals("Yes", response.getData().get("isRespondent1"), "isRespondent1");
             assertEquals("No", response.getData().get("isRespondent2"), "isRespondent2");
+        }
+
+        @Test
+        void shouldSetServiceAddress_whenSpec() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build().toBuilder()
+                .specRespondentCorrespondenceAddressRequired(YesOrNo.YES)
+                .specRespondentCorrespondenceAddressdetails(Address.builder()
+                                                                .postCode("mail post code")
+                                                                .addressLine1("mail line 1")
+                                                                .build())
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("respondentSolicitor1ServiceAddressRequired"))
+                    .isEqualTo("Yes");
+            Assertions.assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
+                .extracting("AddressLine1")
+                    .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
+                .extracting("PostCode")
+                    .isEqualTo("mail post code");
         }
 
         @Test
@@ -197,6 +227,31 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertNull(response.getData().get("isApplicant1"), "isApplicant1");
             assertNull(response.getData().get("isRespondent1"), "isRespondent1");
             assertNull(response.getData().get("isRespondent2"), "isRespondent2");
+        }
+
+        @Test
+        void shouldCopyBack_whenSpec() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
+                .toBuilder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .applicantSolicitor1ServiceAddressRequired(YesOrNo.YES)
+                .applicantSolicitor1ServiceAddress(Address.builder()
+                                                       .addressLine1("mail line 1")
+                                                       .postCode("mail post code")
+                                                       .build()
+                )
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("specApplicantCorrespondenceAddressdetails"))
+                .extracting("AddressLine1")
+                .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("specApplicantCorrespondenceAddressdetails"))
+                .extracting("PostCode")
+                .isEqualTo("mail post code");
         }
 
         @Test
