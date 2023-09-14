@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -61,7 +60,7 @@ public class SealedClaimResponseForm {
         return responseType.getDisplayedValue();
     }
 
-    public static SealedClaimResponseForm toSealClaimResponseCommonContent(CaseData caseData) {
+    public static SealedClaimResponseForm toSealedClaimResponseCommonContent(CaseData caseData) {
         SealedClaimResponseForm.SealedClaimResponseFormBuilder builder = SealedClaimResponseForm.builder();
 
         if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {

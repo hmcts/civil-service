@@ -78,7 +78,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .whyDisputeTheClaim(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
             .hearingCourtLocation(hearingCourtLocation)
             .statementOfTruth(statementOfTruth)
-            .commonDetails(SealedClaimResponseForm.toSealClaimResponseCommonContent(caseData));
+            .commonDetails(SealedClaimResponseForm.toSealedClaimResponseCommonContent(caseData));
 
         if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
             builder.respondent1(getDefendant1v2ds(caseData));

@@ -84,7 +84,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .defendant2(LipFormParty.toLipDefenceParty(caseData.getRespondent2()))
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
-            .commonDetails(SealedClaimResponseForm.toSealClaimResponseCommonContent(caseData));
+            .commonDetails(SealedClaimResponseForm.toSealedClaimResponseCommonContent(caseData));
         addSolicitorDetails(caseData, builder);
         addEmployeeDetails(caseData, builder);
         addFinancialDetails(caseData, builder);
