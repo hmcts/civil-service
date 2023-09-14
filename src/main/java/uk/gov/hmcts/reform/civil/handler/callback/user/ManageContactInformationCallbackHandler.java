@@ -43,11 +43,15 @@ import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNamePublic;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicant1Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicantOptions2v1;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendant1Options;
@@ -221,8 +225,9 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
 //        updateExperts(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
 
-        if (claimantOrDefendantUpdated(partyChosen)) {
-            // update case name for hmc if applicant/respondent was updated
+        if (claimantOrDefendantUpdated(partyChosen)
+            || litigationFriendUpdated(partyChosen)) {
+            // update case name for hmc if applicant/respondent/litigation friend was updated
             builder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
             builder.caseNamePublic(buildCaseNamePublic(caseData));
         }
@@ -298,5 +303,12 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             || CLAIMANT_TWO_ID.equals(partyChosen)
             || DEFENDANT_ONE_ID.equals(partyChosen)
             || DEFENDANT_TWO_ID.equals(partyChosen);
+    }
+
+    private boolean litigationFriendUpdated(String partyChosen) {
+        return CLAIMANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || CLAIMANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || DEFENDANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen);
     }
 }
