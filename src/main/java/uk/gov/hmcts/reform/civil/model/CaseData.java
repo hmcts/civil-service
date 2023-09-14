@@ -81,6 +81,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgementonline.JudgementPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgementonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgementonline.JudgmentStatus;
 import uk.gov.hmcts.reform.civil.model.judgementonline.RePaymentPlanSelection;
@@ -623,6 +624,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private boolean joIsRegisteredWithRTL;
     private RePaymentPlanSelection joRePaymentPlanSelection;
     private final boolean joIsLiveJudgementExists;
+    private JudgementPaidInFull joJudgementPaidInFull;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
