@@ -259,6 +259,10 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateReferenceApplicant1() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[APPLICANTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData = caseData.toBuilder()
                 .isApplicant1(YesOrNo.YES)
@@ -279,6 +283,10 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateReferenceRespondent1() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData = caseData.toBuilder()
                 .isRespondent1(YesOrNo.YES)
@@ -299,6 +307,10 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateReferenceRespondent2() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData = caseData.toBuilder()
                 .isRespondent2(YesOrNo.YES)

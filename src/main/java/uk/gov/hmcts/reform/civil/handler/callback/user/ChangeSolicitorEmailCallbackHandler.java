@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import okhttp3.Call;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -140,9 +142,23 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseBuilder = caseData.toBuilder()
+            .applicantSolicitor1ServiceAddressRequired(getAddressRequired(
+                caseData.getApplicantSolicitor1ServiceAddressRequired(),
+                caseData.getApplicantSolicitor1ServiceAddress()
+            ))
+            .respondentSolicitor1ServiceAddressRequired(getAddressRequired(
+                caseData.getRespondentSolicitor1ServiceAddressRequired(),
+                caseData.getRespondentSolicitor1ServiceAddress()
+            ))
+            .respondentSolicitor2ServiceAddressRequired(getAddressRequired(
+                caseData.getRespondentSolicitor2ServiceAddressRequired(),
+                caseData.getRespondentSolicitor2ServiceAddress()
+            ));
+        // because we'll use the fields above
+        caseData = caseBuilder.build();
 
-        updateSolicitorReferences(caseData, caseBuilder);
+        updateSolicitorReferences(callbackParams, caseData, caseBuilder);
         updateSpecCorrespondenceAddresses(caseData, caseBuilder);
         clearPartyFlags(caseBuilder);
 
@@ -184,6 +200,14 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
         }
     }
 
+    private static YesOrNo getAddressRequired(YesOrNo fromForm, Address address) {
+        if (fromForm == YES) {
+            return YES;
+        }
+        return Optional.ofNullable(address).map(Address::getPostCode).map(StringUtils::isNotBlank)
+            .orElse(false)? YES : NO;
+    }
+
     /**
      * Solicitor references appear twice with two different names (solicitorReferences,
      * XXXOrganisationPolicy_OrgPolicyReference, respondentSolicitor2Reference...).
@@ -194,8 +218,9 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
      * @param caseData    original case data
      * @param caseBuilder case data being updated
      */
-    private static void updateSolicitorReferences(CaseData caseData, CaseData.CaseDataBuilder caseBuilder) {
-        if (caseData.getIsApplicant1() == YES) {
+    private void updateSolicitorReferences(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder caseBuilder) {
+        List<String> userRoles = getUserRoles(callbackParams);
+        if (userRoles.contains(CaseRole.APPLICANTSOLICITORONE.getFormattedName())) {
             updateReference(
                 Optional.ofNullable(caseData.getSolicitorReferencesCopy())
                     .map(SolicitorReferences::getApplicantSolicitor1Reference)
@@ -208,7 +233,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                     caseBuilder.solicitorReferences(references);
                 }
             );
-        } else if (caseData.getIsRespondent1() == YES) {
+        } else if (userRoles.contains(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
             updateReference(
                 Optional.ofNullable(caseData.getSolicitorReferencesCopy())
                     .map(SolicitorReferences::getRespondentSolicitor1Reference)
@@ -221,7 +246,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                     caseBuilder.solicitorReferences(references);
                 }
             );
-        } else if (caseData.getIsRespondent2() == YES) {
+        } else if (userRoles.contains(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
             updateReference(
                 Optional.ofNullable(caseData.getSolicitorReferencesCopy())
                     .map(SolicitorReferences::getRespondentSolicitor2Reference)
