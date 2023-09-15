@@ -290,7 +290,10 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
             }
             if (MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
                 caseDataBuilder
-                    .specRespondent2CorrespondenceAddressdetails(caseData.getRespondentSolicitor1ServiceAddress());
+                    .specRespondent2CorrespondenceAddressdetails(
+                        caseData.getRespondentSolicitor1ServiceAddress())
+                    .specRespondent2CorrespondenceAddressRequired(
+                        caseData.getSpecRespondentCorrespondenceAddressRequired());
             }
             caseDataBuilder
                 .applicantSolicitor1ServiceAddress(Address.builder().build())

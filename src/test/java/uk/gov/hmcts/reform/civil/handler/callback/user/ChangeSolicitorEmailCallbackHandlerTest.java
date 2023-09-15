@@ -372,6 +372,40 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldBackUp_whenNewRequiredIsNo1v2ss() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
+                .toBuilder()
+                .respondent2(Party.builder()
+                                 .type(Party.Type.COMPANY)
+                                 .companyName("c3")
+                                 .build())
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+                .respondentSolicitor1ServiceAddress(null)
+                .specRespondentCorrespondenceAddressdetails(Address.builder()
+                                                                 .addressLine1("mail line 1")
+                                                                 .postCode("mail post code")
+                                                                 .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+                .extracting("AddressLine1")
+                .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+                .extracting("PostCode")
+                .isEqualTo("mail post code");
+        }
+
+        @Test
         void shouldUpdateReferenceApplicant1() {
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[APPLICANTSOLICITORONE]");
