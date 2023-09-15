@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
@@ -29,9 +30,12 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             callbackParams);
         CaseData updatedCaseData = callbackParams.getCaseData().toBuilder().systemGeneratedCaseDocuments(
                 updatedDocumentList)
+            .caseDataLiP(CaseDataLiP
+                             .builder()
+                             .translatedDocument(null)
+                             .build())
             .businessProcess(BusinessProcess.ready(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT)).build();
-        // null/remove preview Translated document List, as un-necessary to store two copies of same documents
-        updatedCaseData.getTranslatedDocument().clear();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
