@@ -254,6 +254,41 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS);
     }
 
+    @Test
+    void shouldSelectTemplateWithoutRepaymentPlan_whenPinAndPostDisabled() {
+        //Given
+        DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
+        given(featureToggleService.isPinInPostEnabled()).willReturn(false);
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
+            .willReturn(docmosisDocument);
+        //When
+        generator.generate(CASE_DATA_WITH_RESPONDENT1, BEARER_TOKEN);
+        //Then
+        verify(documentGeneratorService).generateDocmosisDocument(templateDataCaptor.capture(), docmosisTemplatesArgumentCaptor.capture());
+        assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v1);
+    }
+
+    @Test
+    void shouldSelectMultipartyTemplate_whenMultipartyCase() {
+        //Given
+        DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
+            .willReturn(docmosisDocument);
+        CaseData multipartyCaseData = CASE_DATA_WITH_RESPONDENT1.toBuilder()
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("defendant2 name")
+                             .build())
+            .respondentResponseIsSame(YesOrNo.YES)
+            .build();
+        //When
+        generator.generate(multipartyCaseData, BEARER_TOKEN);
+        //Then
+        verify(documentGeneratorService).generateDocmosisDocument(templateDataCaptor.capture(), docmosisTemplatesArgumentCaptor.capture());
+        assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v2);
+    }
+
+
     private static CaseData getCaseDataWithRespondent1Data() {
         return CaseData.builder()
             .legacyCaseReference("case reference")
