@@ -200,7 +200,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
 
         updateSolicitorReferences(callbackParams, caseData, caseBuilder);
         updateSpecCorrespondenceAddresses(callbackParams, caseData, caseBuilder);
-        clearPartyFlags(caseBuilder);
+        clearTempInfo(caseBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseBuilder.build().toMap(objectMapper))
@@ -414,10 +414,19 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
             .errors(errors).build();
     }
 
-    private void clearPartyFlags(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private void clearTempInfo(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData) {
         caseDataBuilder.isApplicant1(null)
             .isRespondent1(null)
             .isRespondent2(null);
+        if (caseData.getCaseAccessCategory() != CaseCategory.SPEC_CLAIM) {
+            caseDataBuilder
+                .specApplicantCorrespondenceAddressRequired(NO)
+                .specApplicantCorrespondenceAddressdetails(Address.builder().build())
+                .specRespondentCorrespondenceAddressRequired(NO)
+                .specRespondentCorrespondenceAddressdetails(Address.builder().build())
+                .specRespondent2CorrespondenceAddressRequired(NO)
+                .specRespondent2CorrespondenceAddressdetails(Address.builder().build());
+        }
     }
 
     private List<String> getUserRoles(CallbackParams callbackParams) {
