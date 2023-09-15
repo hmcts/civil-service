@@ -41,6 +41,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseDataTest {
 
+    private static final String FILE_NAME_1 = "Some file 1";
+
     @Test
     public void applicant1Proceed_when1v1() {
         CaseData caseData = CaseData.builder()
@@ -438,14 +440,19 @@ public class CaseDataTest {
     @Test
     void isTranslatedDocumentUploaded_thenTrue() {
         //Given
+        TranslatedDocument translatedDocument1 = TranslatedDocument
+            .builder()
+            .documentType(DEFENDANT_RESPONSE)
+            .file(Document.builder().documentFileName(FILE_NAME_1).build())
+            .build();
+
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1));
+
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP
                              .builder()
-                             .translatedDocument(TranslatedDocument
-                                                     .builder()
-                                                     .documentType(DEFENDANT_RESPONSE)
-                                                     .file(Document.builder().build())
-                                                     .build())
+                             .translatedDocument(translatedDocument)
                              .build())
             .build();
         //When

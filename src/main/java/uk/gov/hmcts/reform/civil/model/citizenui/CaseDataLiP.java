@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 
+import java.util.List;
 import java.util.Optional;
 
 @Data
@@ -17,7 +19,9 @@ public class CaseDataLiP {
 
     @JsonProperty("respondent1LiPResponse")
     private RespondentLiPResponse respondent1LiPResponse;
-    private TranslatedDocument translatedDocument;
+    @JsonProperty("applicant1LiPResponse")
+    private ClaimantLiPResponse applicant1LiPResponse;
+    private List<Element<TranslatedDocument>> translatedDocument;
     @JsonProperty("respondent1LiPFinancialDetails")
     private FinancialDetailsLiP respondent1LiPFinancialDetails;
     @JsonProperty("applicant1ClaimMediationSpecRequiredLip")

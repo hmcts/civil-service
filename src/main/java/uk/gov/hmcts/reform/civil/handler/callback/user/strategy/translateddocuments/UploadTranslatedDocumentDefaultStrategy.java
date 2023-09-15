@@ -15,9 +15,6 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 
 import java.util.List;
-import java.util.Optional;
-
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 
 @Component
 @RequiredArgsConstructor
@@ -31,30 +28,18 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocument(
             callbackParams);
         CaseData updatedCaseData = callbackParams.getCaseData().toBuilder().systemGeneratedCaseDocuments(
-            updatedDocumentList)
-            .respondent1ClaimResponseDocumentSpec(getTranslatedDocumentAsCaseDocument(callbackParams))
+                updatedDocumentList)
             .businessProcess(BusinessProcess.ready(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT)).build();
+        // null/remove preview Translated document List, as un-necessary to store two copies of same documents
+        updatedCaseData.getTranslatedDocument().clear();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(AWAITING_APPLICANT_INTENTION.name())
             .data(updatedCaseData.toMap(objectMapper))
             .build();
     }
 
     private List<Element<CaseDocument>> updateSystemGeneratedDocumentsWithTranslationDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Optional<TranslatedDocument> translatedDocument = caseData.getTranslatedDocument();
-        return translatedDocument.map(document -> systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-            document.getFile(),
-            document.getCorrespondingDocumentType(),
-            callbackParams
-        )).orElse(caseData.getSystemGeneratedCaseDocuments());
-    }
-
-    private CaseDocument getTranslatedDocumentAsCaseDocument(CallbackParams callbackParams) {
-        Optional<TranslatedDocument> translatedDocument = callbackParams.getCaseData().getTranslatedDocument();
-        return translatedDocument.map(document -> CaseDocument.toCaseDocument(
-            document.getFile(),
-            document.getCorrespondingDocumentType()
-        )).orElse(null);
+        List<Element<TranslatedDocument>> translatedDocument = caseData.getTranslatedDocument();
+        return systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(translatedDocument, callbackParams);
     }
 }

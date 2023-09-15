@@ -747,8 +747,10 @@ public class CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public Optional<TranslatedDocument> getTranslatedDocument() {
-        return Optional.ofNullable(getCaseDataLiP()).map(CaseDataLiP::getTranslatedDocument);
+    public List<Element<TranslatedDocument>> getTranslatedDocument() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getTranslatedDocument)
+            .orElse(null);
     }
 
     @JsonIgnore
