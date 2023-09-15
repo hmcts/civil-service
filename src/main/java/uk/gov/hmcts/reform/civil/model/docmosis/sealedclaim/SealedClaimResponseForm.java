@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER
 @AllArgsConstructor
 @EqualsAndHashCode
 public class SealedClaimResponseForm {
+
     private final String amountToPay;
     private final String howMuchWasPaid;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")

@@ -231,7 +231,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private DocmosisTemplates getDocmosisTemplateForSingleParty() {
-        if(featureToggleService.isPinInPostEnabled()) {
+        if (featureToggleService.isPinInPostEnabled()) {
             return DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
         }
         return DEFENDANT_RESPONSE_SPEC_SEALED_1v1;
