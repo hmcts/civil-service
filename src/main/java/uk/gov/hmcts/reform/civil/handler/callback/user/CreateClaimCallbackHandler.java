@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -478,6 +479,13 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
 
         dataBuilder.ccdState(CaseState.PENDING_CASE_ISSUED);
+
+        //add litigation friend full name
+        if (YES.equals(caseData.getApplicant1LitigationFriendRequired())) {
+            dataBuilder.applicant1LitigationFriend(LitigationFriend.builder()
+                                                       .fullName(caseData.getApplicant1LitigationFriend().getFirstName() +
+                                                                     " " + caseData.getApplicant1LitigationFriend().getLastName()).build());
+        }
 
         if (toggleService.isHmcEnabled()) {
             populateWithPartyIds(dataBuilder);
