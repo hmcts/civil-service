@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.judgementonline;
+package uk.gov.hmcts.reform.civil.model.judgmentonline;
 
 public enum RePaymentPlanSelection {
     PAY_IN_INSTALLMENT,
