@@ -67,10 +67,13 @@ public class RecordJudgementCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveJudgementDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        caseData.setJoJudgementStatusDetails(JudgmentStatusDetails.builder()
-                                                 .judgmentStatusTypes(JudgmentStatusType.ISSUED)
-                                                 .joRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED))
-                                                 .lastUpdatedDate(LocalDateTime.now()).build());
+        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
+            .judgmentStatusTypes(JudgmentStatusType.ISSUED)
+            .lastUpdatedDate(LocalDateTime.now()).build();
+        if (caseData.isJoIsRegisteredWithRTL()) {
+            judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED));
+        }
+        caseData.setJoJudgementStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgementExists(true);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
