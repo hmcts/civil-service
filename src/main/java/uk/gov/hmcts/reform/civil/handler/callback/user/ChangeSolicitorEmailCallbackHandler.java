@@ -200,7 +200,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
 
         updateSolicitorReferences(callbackParams, caseData, caseBuilder);
         updateSpecCorrespondenceAddresses(callbackParams, caseData, caseBuilder);
-        clearTempInfo(caseBuilder);
+        clearTempInfo(caseBuilder, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseBuilder.build().toMap(objectMapper))
