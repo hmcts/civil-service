@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -12,12 +11,10 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
-import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
@@ -29,13 +26,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -429,9 +426,7 @@ public class CaseDataTest {
     void isTranslatedDocumentUploaded_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .build())
-            .build();
+            .systemGeneratedCaseDocuments(null).build();
         //When
         //Then
         assertFalse(caseData.isTranslatedDocumentUploaded());
@@ -440,21 +435,8 @@ public class CaseDataTest {
     @Test
     void isTranslatedDocumentUploaded_thenTrue() {
         //Given
-        TranslatedDocument translatedDocument1 = TranslatedDocument
-            .builder()
-            .documentType(DEFENDANT_RESPONSE)
-            .file(Document.builder().documentFileName(FILE_NAME_1).build())
-            .build();
-
-        List<Element<TranslatedDocument>> translatedDocument = List.of(
-            element(translatedDocument1));
-
         CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocuments(translatedDocument)
-                             .build())
-            .build();
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DEFENCE_TRANSLATED_DOCUMENT).build())).build();
         //When
         //Then
         assertTrue(caseData.isTranslatedDocumentUploaded());

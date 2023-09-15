@@ -1000,4 +1000,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public String getApplicant1Email() {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
+
+    @JsonIgnore
+    public boolean isTranslatedDocumentUploaded() {
+        if (getSystemGeneratedCaseDocuments() != null) {
+            return getSystemGeneratedCaseDocuments().stream()
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
+        }
+        return false;
+    }
 }
