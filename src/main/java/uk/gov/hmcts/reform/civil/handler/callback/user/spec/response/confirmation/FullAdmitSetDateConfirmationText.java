@@ -63,7 +63,7 @@ public class FullAdmitSetDateConfirmationText implements RespondToClaimConfirmat
         }
         sb.append(" legal representative if you need details on how to pay.</p>")
             .append("<p>If you do not pay immediately, ").append(applicantName);
-        if (caseData.getRespondent2() != null) {
+        if (caseData.getRespondent2() != null || caseData.getApplicant2() != null) {
             sb.append(" can either:</p>")
                 .append("<ul>")
                 .append("<li>ask you to sign a settlement agreement to formalise the repayment plan</li>");
