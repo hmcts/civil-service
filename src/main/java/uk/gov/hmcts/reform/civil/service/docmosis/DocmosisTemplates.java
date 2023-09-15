@@ -25,7 +25,7 @@ public enum DocmosisTemplates {
     SDO_DISPOSAL("CV-UNS-STD-ENG-01324.docx", "disposal_hearing_sdo_%s.pdf"),
     DJ_SDO_DISPOSAL("CV-UNS-DEC-ENG-01323.docx", "Order_disposal_%s.pdf"),
     DJ_SDO_TRIAL("CV-UNS-DEC-ENG-01322.docx", "Order_trial_%s.pdf"),
-    SDO_SMALL("CV-UNS-STD-ENG-01325.docx", "small_claims_sdo_%s.pdf"),
+    SDO_SMALL("CV-UNS-STD-ENG-01362.docx", "small_claims_sdo_%s.pdf"),
     SDO_FAST("CV-UNS-STD-ENG-01326.docx", "fast_track_sdo_%s.pdf"),
     SDO_FAST_FAST_TRACK_INT("CV-UNS-STD-ENG-01308.docx", "fast_track_sdo_%s.pdf"),
     DEFENDANT_RESPONSE_LIP_SPEC("CV-SPC-CLM-ENG-01064-LIP.docx", "response_sealed_form_%s.pdf"),
