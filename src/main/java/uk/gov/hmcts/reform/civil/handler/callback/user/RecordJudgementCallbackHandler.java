@@ -40,7 +40,7 @@ public class RecordJudgementCallbackHandler extends CallbackHandler {
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::clearAllFields)
-            .put(callbackKey(MID, "validate-amount-paid"), this::validateFields)
+            .put(callbackKey(MID, "validate"), this::validateFields)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::saveJudgementDetails)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
