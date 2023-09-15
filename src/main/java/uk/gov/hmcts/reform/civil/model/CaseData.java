@@ -617,13 +617,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDate joJudgementIssuedDate;
     private LocalDate joOrderMadeDate;
     private LocalDate joSetAsideDate;
-    private boolean joIsJointJudgement;
+   // private boolean joIsJointJudgement;
     private String joAmountOrdered;
     private String joAmountCostOrdered;
-    private boolean joIsRegisteredWithRTL;
+    //private boolean joIsRegisteredWithRTL;
     private RePaymentPlanSelection joRePaymentPlanSelection;
     private JudgmentPaymentDetails joJudgementPaymentDetails;
-    private boolean joIsLiveJudgementExists;
+    //private boolean joIsLiveJudgementExists;
     private JudgmentPaidInFull joJudgmentPaidInFull;
 
     /**

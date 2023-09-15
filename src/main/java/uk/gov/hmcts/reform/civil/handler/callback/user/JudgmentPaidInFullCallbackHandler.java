@@ -37,13 +37,22 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::resetPageData)
             .put(callbackKey(MID, "validate-payment-date"), this::validatePaymentDate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::saveJudgmentPaidInFullDetails)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
+    private CallbackResponse resetPageData(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(null);
+        caseData.getJoJudgmentPaidInFull().setConfirmFullPaymentMade(null);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader())
