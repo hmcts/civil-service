@@ -420,8 +420,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
-                RECORD_JUDGEMENT,
-                JUDGEMENT_PAID_IN_FULL
+                RECORD_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL
             )
         ),
 
@@ -944,8 +944,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                RECORD_JUDGEMENT,
-                JUDGEMENT_PAID_IN_FULL
+                RECORD_JUDGMENT,
+                JUDGMENT_PAID_IN_FULL
             )
         ),
 
