@@ -672,6 +672,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
         }
+
         @Test
         void shouldThrowErrorWhenEnteringNegativeNumberOfWitness() {
 
