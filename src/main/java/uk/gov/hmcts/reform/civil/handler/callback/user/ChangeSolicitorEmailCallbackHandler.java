@@ -293,7 +293,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                     .specRespondent2CorrespondenceAddressdetails(
                         caseData.getRespondentSolicitor1ServiceAddress())
                     .specRespondent2CorrespondenceAddressRequired(
-                        caseData.getSpecRespondentCorrespondenceAddressRequired());
+                        caseData.getRespondentSolicitor1ServiceAddressRequired());
             }
             caseDataBuilder
                 .applicantSolicitor1ServiceAddress(Address.builder().build())
