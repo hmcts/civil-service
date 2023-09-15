@@ -288,7 +288,6 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         assertThat(docmosisTemplatesArgumentCaptor.getValue()).isEqualTo(DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v2);
     }
 
-
     private static CaseData getCaseDataWithRespondent1Data() {
         return CaseData.builder()
             .legacyCaseReference("case reference")
