@@ -280,6 +280,13 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                     .specRespondentCorrespondenceAddressdetails(
                         caseData.getRespondentSolicitor1ServiceAddress()
                     );
+                if (MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
+                    caseDataBuilder
+                        .specRespondent2CorrespondenceAddressdetails(
+                            caseData.getRespondentSolicitor1ServiceAddress())
+                        .specRespondent2CorrespondenceAddressRequired(
+                            caseData.getRespondentSolicitor1ServiceAddressRequired());
+                }
             } else if (userRoles.contains(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
                 caseDataBuilder.specRespondent2CorrespondenceAddressRequired(
                         caseData.getRespondentSolicitor2ServiceAddressRequired()
@@ -288,13 +295,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                         caseData.getRespondentSolicitor2ServiceAddress()
                     );
             }
-            if (MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
-                caseDataBuilder
-                    .specRespondent2CorrespondenceAddressdetails(
-                        caseData.getRespondentSolicitor1ServiceAddress())
-                    .specRespondent2CorrespondenceAddressRequired(
-                        caseData.getRespondentSolicitor1ServiceAddressRequired());
-            }
+
             caseDataBuilder
                 .applicantSolicitor1ServiceAddress(Address.builder().build())
                 .respondentSolicitor1ServiceAddress(Address.builder().build())
