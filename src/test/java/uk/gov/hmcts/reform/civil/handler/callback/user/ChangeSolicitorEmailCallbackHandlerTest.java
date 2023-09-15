@@ -343,6 +343,35 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldBackUp_whenNewRequiredIsNo() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
+                .toBuilder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondentSolicitor2ServiceAddressRequired(YesOrNo.NO)
+                .respondentSolicitor2ServiceAddress(null)
+                .specRespondent2CorrespondenceAddressdetails(Address.builder()
+                                                                 .addressLine1("mail line 1")
+                                                                 .postCode("mail post code")
+                                                                 .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+                .extracting("AddressLine1")
+                .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+                .extracting("PostCode")
+                .isEqualTo("mail post code");
+        }
+
+        @Test
         void shouldUpdateReferenceApplicant1() {
             List<String> caseRoles = new ArrayList<>();
             caseRoles.add("[APPLICANTSOLICITORONE]");

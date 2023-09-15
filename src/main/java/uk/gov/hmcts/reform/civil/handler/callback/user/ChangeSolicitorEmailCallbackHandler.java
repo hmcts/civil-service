@@ -123,7 +123,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
             .map(op -> op.toBuilder().orgPolicyReference(respondent2Reference).build())
             .ifPresent(caseDataBuilder::respondent2OrganisationPolicy);
 
-        prepareSpecCorrespondenceAddresses(caseData, caseDataBuilder);
+        prepareCorrespondenceAddresses(caseData, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -131,13 +131,14 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
     }
 
     /**
-     * If spec, copy spec correspondence address info over to unspec's fields (which are not used) so that
-     * screen is easier.
+     * We want to send only serviceAddress, but if user says "no" to correspondence address, instead of removing
+     * what we have, we have to keep it. However, in that case, serviceAddress come as null. So, in spec cases,
+     * we copy spec's addresses over to serviceAddress, and in unspec we use the spec fields as a backup holder.
      *
      * @param caseData        original case data
      * @param caseDataBuilder updated case data
      */
-    private static void prepareSpecCorrespondenceAddresses(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+    private static void prepareCorrespondenceAddresses(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
             caseDataBuilder
                 .applicantSolicitor1ServiceAddressRequired(
@@ -158,6 +159,26 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
                 .respondentSolicitor2ServiceAddress(
                     caseData.getSpecRespondent2CorrespondenceAddressdetails()
                 );
+        } else {
+            caseDataBuilder
+                .specApplicantCorrespondenceAddressRequired(
+                    caseData.getApplicantSolicitor1ServiceAddressRequired()
+                )
+                .specApplicantCorrespondenceAddressdetails(
+                    caseData.getApplicantSolicitor1ServiceAddress()
+                )
+                .specRespondentCorrespondenceAddressRequired(
+                    caseData.getRespondentSolicitor1ServiceAddressRequired()
+                )
+                .specRespondentCorrespondenceAddressdetails(
+                    caseData.getRespondentSolicitor1ServiceAddress()
+                )
+                .specRespondent2CorrespondenceAddressRequired(
+                    caseData.getRespondentSolicitor2ServiceAddressRequired()
+                )
+                .specRespondent2CorrespondenceAddressdetails(
+                    caseData.getRespondentSolicitor2ServiceAddress()
+                );
         }
     }
 
@@ -173,28 +194,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseBuilder = caseData.toBuilder()
-            .applicantSolicitor1ServiceAddressRequired(getAddressRequired(
-                caseData.getApplicantSolicitor1ServiceAddressRequired(),
-                caseData.getApplicantSolicitor1ServiceAddress()
-            ))
-            .respondentSolicitor1ServiceAddressRequired(getAddressRequired(
-                caseData.getRespondentSolicitor1ServiceAddressRequired(),
-                caseData.getRespondentSolicitor1ServiceAddress()
-            ))
-            .respondentSolicitor2ServiceAddressRequired(getAddressRequired(
-                caseData.getRespondentSolicitor2ServiceAddressRequired(),
-                caseData.getRespondentSolicitor2ServiceAddress()
-            ));
-        if (MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
-            // copy 1 into 2
-            CaseData temp = caseBuilder.build();
-            caseBuilder
-                .respondentSolicitor2ServiceAddressRequired(temp.getRespondentSolicitor1ServiceAddressRequired())
-                .respondentSolicitor2ServiceAddress(temp.getRespondentSolicitor1ServiceAddress())
-                .respondentSolicitor2EmailAddress(temp.getRespondentSolicitor1EmailAddress())
-                .respondent2OrganisationPolicy(temp.getRespondent1OrganisationPolicy());
-        }
+        CaseData.CaseDataBuilder<?, ?> caseBuilder = prepareForSubmit(caseData);
         // because we'll use the fields above
         caseData = caseBuilder.build();
 
@@ -205,6 +205,53 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private CaseData.CaseDataBuilder<?, ?> prepareForSubmit(CaseData caseData) {
+        CaseData.CaseDataBuilder<?, ?> caseBuilder = caseData.toBuilder();
+        prepareAddress(
+            caseData.getApplicantSolicitor1ServiceAddressRequired(),
+            caseData.getSpecApplicantCorrespondenceAddressdetails(),
+            caseBuilder::applicantSolicitor1ServiceAddressRequired,
+            caseBuilder::applicantSolicitor1ServiceAddress
+        );
+        prepareAddress(
+            caseData.getRespondentSolicitor1ServiceAddressRequired(),
+            caseData.getSpecRespondentCorrespondenceAddressdetails(),
+            caseBuilder::respondentSolicitor1ServiceAddressRequired,
+            caseBuilder::respondentSolicitor1ServiceAddress
+        );
+        prepareAddress(
+            caseData.getRespondentSolicitor2ServiceAddressRequired(),
+            caseData.getSpecRespondent2CorrespondenceAddressdetails(),
+            caseBuilder::respondentSolicitor2ServiceAddressRequired,
+            caseBuilder::respondentSolicitor2ServiceAddress
+        );
+        if (MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP == MultiPartyScenario.getMultiPartyScenario(caseData)) {
+            // copy 1 into 2
+            CaseData temp = caseBuilder.build();
+            caseBuilder
+                .respondentSolicitor2ServiceAddressRequired(temp.getRespondentSolicitor1ServiceAddressRequired())
+                .respondentSolicitor2ServiceAddress(temp.getRespondentSolicitor1ServiceAddress())
+                .respondentSolicitor2EmailAddress(temp.getRespondentSolicitor1EmailAddress())
+                .respondent2OrganisationPolicy(temp.getRespondent1OrganisationPolicy());
+        }
+        return caseBuilder;
+    }
+
+    private void prepareAddress(YesOrNo requiredFromForm,
+                                Address oldAddress,
+                                Consumer<YesOrNo> setterYesNo,
+                                Consumer<Address> setterAddress) {
+        // if requiredFromForm = Yes assume serviceAddress was populated in the form
+        if (requiredFromForm == NO) {
+            Optional.ofNullable(oldAddress)
+                .map(Address::getPostCode).filter(StringUtils::isNotBlank)
+                .ifPresent(a -> {
+                    setterYesNo.accept(YES);
+                    setterAddress.accept(oldAddress);
+                });
+        }
     }
 
     /**
@@ -252,14 +299,6 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
         }
     }
 
-    private static YesOrNo getAddressRequired(YesOrNo fromForm, Address address) {
-        if (fromForm == YES) {
-            return YES;
-        }
-        return Optional.ofNullable(address).map(Address::getPostCode).map(StringUtils::isNotBlank)
-            .orElse(false) ? YES : NO;
-    }
-
     /**
      * Solicitor references appear twice with two different names (solicitorReferences,
      * XXXOrganisationPolicy_OrgPolicyReference, respondentSolicitor2Reference...).
@@ -270,7 +309,8 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
      * @param caseData    original case data
      * @param caseBuilder case data being updated
      */
-    private void updateSolicitorReferences(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder caseBuilder) {
+    private void updateSolicitorReferences(CallbackParams callbackParams, CaseData caseData,
+                                           CaseData.CaseDataBuilder<?, ?> caseBuilder) {
         List<String> userRoles = getUserRoles(callbackParams);
         if (userRoles.contains(CaseRole.APPLICANTSOLICITORONE.getFormattedName())) {
             updateReference(
