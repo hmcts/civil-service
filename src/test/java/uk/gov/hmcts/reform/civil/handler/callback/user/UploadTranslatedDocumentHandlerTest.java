@@ -81,7 +81,7 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
                 .systemGeneratedCaseDocuments(new ArrayList<>())
                 .caseDataLiP(CaseDataLiP
                                  .builder()
-                                 .translatedDocument(translatedDocument)
+                                 .translatedDocuments(translatedDocument)
                                  .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

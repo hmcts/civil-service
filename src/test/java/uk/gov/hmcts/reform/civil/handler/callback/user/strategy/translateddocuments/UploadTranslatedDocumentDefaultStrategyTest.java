@@ -68,7 +68,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .builder()
             .caseDataLiP(CaseDataLiP
                              .builder()
-                             .translatedDocument(translatedDocument)
+                             .translatedDocuments(translatedDocument)
                              .build())
             .build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();

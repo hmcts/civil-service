@@ -26,14 +26,11 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
     @Override
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
-        List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocument(
+        List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocuments(
             callbackParams);
         CaseData updatedCaseData = callbackParams.getCaseData().toBuilder().systemGeneratedCaseDocuments(
                 updatedDocumentList)
-            .caseDataLiP(CaseDataLiP
-                             .builder()
-                             .translatedDocument(null)
-                             .build())
+            .caseDataLiP(CaseDataLiP.builder().translatedDocuments(null).build())
             .businessProcess(BusinessProcess.ready(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT)).build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -41,9 +38,9 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
             .build();
     }
 
-    private List<Element<CaseDocument>> updateSystemGeneratedDocumentsWithTranslationDocument(CallbackParams callbackParams) {
+    private List<Element<CaseDocument>> updateSystemGeneratedDocumentsWithTranslationDocuments(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<Element<TranslatedDocument>> translatedDocument = caseData.getTranslatedDocument();
-        return systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(translatedDocument, callbackParams);
+        List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
+        return systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(translatedDocuments, callbackParams);
     }
 }

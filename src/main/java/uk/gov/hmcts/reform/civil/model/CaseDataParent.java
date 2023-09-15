@@ -145,6 +145,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -747,10 +748,10 @@ public class CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public List<Element<TranslatedDocument>> getTranslatedDocument() {
+    public List<Element<TranslatedDocument>> getTranslatedDocuments() {
         return Optional.ofNullable(getCaseDataLiP())
-            .map(CaseDataLiP::getTranslatedDocument)
-            .orElse(null);
+            .map(CaseDataLiP::getTranslatedDocuments)
+            .orElse(Collections.emptyList());
     }
 
     @JsonIgnore
@@ -762,6 +763,6 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isTranslatedDocumentUploaded() {
-        return getCaseDataLiP() != null && getCaseDataLiP().getTranslatedDocument() != null;
+        return getCaseDataLiP() != null && !getCaseDataLiP().getTranslatedDocuments().isEmpty();
     }
 }

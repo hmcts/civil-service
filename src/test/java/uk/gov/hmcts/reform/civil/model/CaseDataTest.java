@@ -452,7 +452,7 @@ public class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .caseDataLiP(CaseDataLiP
                              .builder()
-                             .translatedDocument(translatedDocument)
+                             .translatedDocuments(translatedDocument)
                              .build())
             .build();
         //When

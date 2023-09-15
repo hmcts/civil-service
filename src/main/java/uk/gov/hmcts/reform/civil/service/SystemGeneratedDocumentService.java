@@ -24,13 +24,13 @@ public class SystemGeneratedDocumentService {
         return systemGeneratedDocuments;
     }
 
-    public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocument, CallbackParams callbackParams) {
+    public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
         List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-        if (Objects.nonNull(translatedDocument)) {
-            for (Element<TranslatedDocument> document : translatedDocument) {
-                CaseDocument caseDocument = CaseDocument.toCaseDocument(document.getValue().getFile(), document.getValue().getCorrespondingDocumentType());
+        if (Objects.nonNull(translatedDocuments)) {
+            for (Element<TranslatedDocument> translateDocument : translatedDocuments) {
+                CaseDocument caseDocument = CaseDocument.toCaseDocument(translateDocument.getValue().getFile(), translateDocument.getValue().getCorrespondingDocumentType());
                 systemGeneratedDocuments.add(element(caseDocument));
             }
         }
