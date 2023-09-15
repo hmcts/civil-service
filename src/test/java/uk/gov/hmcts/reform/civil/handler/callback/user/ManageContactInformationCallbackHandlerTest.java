@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
@@ -46,6 +48,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Autowired
     private ObjectMapper mapper;
+
+    @MockBean
+    private CaseFlagsInitialiser caseFlagInitialiser;
 
     @MockBean
     private CoreCaseUserService coreCaseUserService;
@@ -673,7 +678,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertEquals(AboutToStartOrSubmitCallbackResponse.builder().build(), response);
+            assertEquals(AboutToStartOrSubmitCallbackResponse.builder()
+                             .data(caseData.toMap(mapper))
+                             .build(), response);
         }
     }
 
@@ -685,10 +692,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);
 
-            assertEquals(AboutToStartOrSubmitCallbackResponse.builder().build(), response);
+            assertEquals(SubmittedCallbackResponse.builder()
+                             .confirmationHeader("# Contact information changed")
+                             .confirmationBody("### What happens next\n" +
+                                                   "Any changes made to contact details have been updated in the Claim Details tab.")
+                             .build(), response);
         }
     }
 }
