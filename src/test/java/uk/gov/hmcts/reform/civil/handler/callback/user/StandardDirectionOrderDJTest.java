@@ -672,6 +672,20 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("orderSDODocumentDJ").isNotNull();
         }
+        @Test
+        void shouldThrowErrorWhenEnteringNegativeNumberOfWitness() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atTrialHearingWitnessOfFactWithNegativeInputs()
+                .build()
+                .toBuilder()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
+        }
 
     }
 
@@ -776,26 +790,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                     .confirmationHeader(format(header))
                     .confirmationBody(format(body))
                     .build());
-        }
-    }
-
-    @Nested
-    class MidEventNegativeNumberOfWitness {
-        private static final String PAGE_ID = "validateInputValue";
-
-        @Test
-        void shouldThrowErrorWhenEnteringNegativeNumberOfWitness() {
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atTrialHearingWitnessOfFactWithNegativeInputs()
-                .build()
-                .toBuilder()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
         }
     }
 }
