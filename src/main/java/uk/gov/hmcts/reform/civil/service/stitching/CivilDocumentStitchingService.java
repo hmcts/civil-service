@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.stitching;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,8 +17,10 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,14 +36,9 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
     private final ObjectMapper objectMapper;
     private final StitchingConfiguration stitchingConfiguration;
 
-    public CaseDocument bundle(List<DocumentMetaData> documents, String authorisation, String bundleTitle, String bundleFilename, CaseData caseData)  {
+    public CaseDocument bundle(List<DocumentMetaData> documents, String authorisation, String bundleTitle, String bundleFilename, CaseData caseData) {
         CaseDetails payload = createBundlePayload(documents, bundleTitle, bundleFilename, caseData);
         log.info("Calling stitching api end point for {}", caseData.getLegacyCaseReference());
-
-        convertToJson(payload);
-        log.info("Calling stitching api bundleTitle  {}", bundleTitle);
-        log.info("Calling stitching api bundleFilename  {}", bundleFilename);
-
         CaseData caseDataFromBundlePayload = bundleRequestExecutor.post(
             BundleRequest.builder().caseDetails(payload).build(),
             stitchingConfiguration.getStitchingUrl(),
@@ -60,15 +56,6 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
 
     }
 
-    private void convertToJson(CaseDetails payload) {
-        try {
-            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            log.info("Calling stitching api CaseDetails payload {}", ow.writeValueAsString(payload));
-        } catch (Exception ex) {
-            log.info("json convert");
-        }
-    }
-
     private CaseDocument retrieveCaseDocument(Optional<Document> stitchedDocument, CaseData caseData) {
         if (stitchedDocument.isEmpty()) {
             log.info("stitchedDocument is not present----------");
@@ -78,22 +65,20 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         String documentUrl = document.getDocumentUrl();
         String documentBinaryUrl = document.getDocumentBinaryUrl();
 
-        log.info("stitchedDocument response DocumentFileName ---------{}", document.getDocumentFileName());
-        log.info("stitchedDocument response DocumentUrl----------{}", document.getDocumentUrl());
-        log.info("stitchedDocument response DocumentBinaryUrl----------{}", document.getDocumentBinaryUrl());
+        LocalDateTime responseDate = null;
+        if (Objects.nonNull(caseData.getRespondent1ResponseDate())) {
+            responseDate = caseData.getRespondent1ResponseDate();
+        } else if (Objects.nonNull(caseData.getRespondent2ResponseDate())) {
+            responseDate = caseData.getRespondent2ResponseDate();
+        }
 
-        CaseDocument doc =  CaseDocument.builder()
+        return CaseDocument.builder()
             .documentLink(Document.builder().documentUrl(documentUrl).documentBinaryUrl(documentBinaryUrl).documentFileName(document.getDocumentFileName()).build())
             .documentName("Stitched document")
             .documentType(SEALED_CLAIM)
-            .createdDatetime(caseData.getRespondent1ResponseDate())
-            //.createdDatetime(LocalDateTime.now())
+            .createdDatetime(responseDate)
             .createdBy(CREATED_BY)
             .build();
-        log.info("stitchedDocument response doc filename ---------{}", doc.getDocumentName());
-        log.info("stitchedDocument response createdDateTime----------{}", doc.getCreatedDatetime());
-        log.info("stitchedDocument response doc type----------{}", doc.getDocumentType());
-        return doc;
     }
 
     private CaseDetails createBundlePayload(List<DocumentMetaData> documents, String bundleTitle, String bundleFilename, CaseData caseData) {
@@ -136,4 +121,3 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         return bundleDocuments;
     }
 }
-
