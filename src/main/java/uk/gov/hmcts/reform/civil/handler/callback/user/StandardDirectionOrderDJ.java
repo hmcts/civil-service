@@ -676,6 +676,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
+        var response = (AboutToStartOrSubmitCallbackResponse) validateInputValue(callbackParams);
+        if (response.getErrors() != null) {
+            return response;
+        }
         CaseData caseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
             : callbackParams.getCaseData();
@@ -684,30 +688,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
-        String inputValue1 = caseData.getTrialHearingWitnessOfFactDJ().getInput2();
-        String inputValue2 = caseData.getTrialHearingWitnessOfFactDJ().getInput3();
-        List<String> errors = new ArrayList<>();
-        if (inputValue1 != null && inputValue2 != null) {
-            int number1 = Integer.parseInt(inputValue1);
-            int number2 = Integer.parseInt(inputValue2);
-            if (number1 < 0 || number2 < 0) {
-                errors.add("The number entered cannot be less than zero");
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
-            }
-        } else {
-            List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-            systemGeneratedCaseDocuments.add(element(document));
-            caseDataBuilder.orderSDODocumentDJCollection(systemGeneratedCaseDocuments);
-            caseDataBuilder.disposalHearingMethodInPersonDJ(deleteLocationList(
-                caseData.getDisposalHearingMethodInPersonDJ()));
-            caseDataBuilder.trialHearingMethodInPersonDJ(deleteLocationList(
-                caseData.getTrialHearingMethodInPersonDJ()));
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataBuilder.build().toMap(objectMapper))
-                .build();
-        }
+
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        systemGeneratedCaseDocuments.add(element(document));
+        caseDataBuilder.orderSDODocumentDJCollection(systemGeneratedCaseDocuments);
+        caseDataBuilder.disposalHearingMethodInPersonDJ(deleteLocationList(
+            caseData.getDisposalHearingMethodInPersonDJ()));
+        caseDataBuilder.trialHearingMethodInPersonDJ(deleteLocationList(
+            caseData.getTrialHearingMethodInPersonDJ()));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -818,5 +806,26 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         } else {
             return null;
         }
+    }
+
+    private CallbackResponse validateInputValue(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        String inputValue1 = caseData.getTrialHearingWitnessOfFactDJ().getInput2();
+        String inputValue2 = caseData.getTrialHearingWitnessOfFactDJ().getInput3();
+        List<String> errors = new ArrayList<>();
+        if (inputValue1 != null && inputValue2 != null) {
+            int number1 = Integer.parseInt(inputValue1);
+            int number2 = Integer.parseInt(inputValue2);
+            if (number1 < 0 || number2 < 0) {
+                errors.add("The number entered cannot be less than zero");
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            }
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 }
