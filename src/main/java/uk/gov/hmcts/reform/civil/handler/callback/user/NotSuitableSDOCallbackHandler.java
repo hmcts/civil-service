@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.service.Time;
 
@@ -65,7 +66,12 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
             .reasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput())
             .build();
 
-        dataBuilder.otherDetails(tempOtherDetails).build();
+        dataBuilder.otherDetails(tempOtherDetails)
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation("229786")
+                                        .region("1")
+                                        .build())
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
