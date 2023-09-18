@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
@@ -179,16 +179,17 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnClaimsForClaimantSuccessfully() {
-        when(dashboardClaimInfoService.getClaimsForClaimant(any(), any())).thenReturn(claimResults);
+        var dashBoardResponse = DashboardResponse.builder().totalPages(1).claims(claimResults).build();
+        when(dashboardClaimInfoService.getDashboardClaimantResponse(any(), any(), eq(1))).thenReturn(dashBoardResponse);
         doGet(BEARER_TOKEN, CLAIMANT_CLAIMS_URL, "123")
-            .andExpect(content().json(toJson(claimResults)))
+            .andExpect(content().json(toJson(dashBoardResponse)))
             .andExpect(status().isOk());
     }
 
     @Test
     @SneakyThrows
     void shouldReturnClaimsForDefendantSuccessfully() {
-        var dashBoardResponse = DashboardDefendantResponse.builder().totalPages(1).claims(claimResults).build();
+        var dashBoardResponse = DashboardResponse.builder().totalPages(1).claims(claimResults).build();
         when(dashboardClaimInfoService.getDashboardDefendantResponse(
             any(),
             any(),
@@ -279,12 +280,12 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .thenThrow(CaseDataInvalidException.class);
 
         doPost(
-             BEARER_TOKEN,
-             CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
-             CASEWORKER_SUBMIT_EVENT_URL,
-             "userId",
-             "jurisdictionId",
-             "caseTypeId"
+            BEARER_TOKEN,
+            CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
+            CASEWORKER_SUBMIT_EVENT_URL,
+            "userId",
+            "jurisdictionId",
+            "caseTypeId"
         )
             .andExpect(status().isUnprocessableEntity())
             .andExpect(content().string("Submit claim unsuccessful, Invalid Case data"))

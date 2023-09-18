@@ -1000,6 +1000,89 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getState())
                 .isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
         }
+
+        @Test
+        void shouldChangeCaseStateToJudicialReferral_ONE_V_ONE() {
+            CaseData caseData = CaseData.builder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .applicant1ProceedWithClaim(YES)
+                .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
+                    ExpertDetails.builder().build()).build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+        }
+
+        @Test
+        void shouldChangeCaseStateToJudicialReferral_TWO_V_ONE() {
+            CaseData caseData = CaseData.builder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .applicant2(Party.builder()
+                                .individualTitle("Mr")
+                                .individualFirstName("Test")
+                                .individualLastName("Test")
+                                .individualDateOfBirth(LocalDate.now().minusYears(18))
+                                .type(Party.Type.INDIVIDUAL)
+                                .build())
+                .addApplicant2(YES)
+                .applicant1ProceedWithClaimSpec2v1(YES)
+                .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
+                    ExpertDetails.builder().build()).build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+        }
+
+        @Test
+        void shouldChangeCaseStateToJudicialReferral_ONE_V_TWO_ONE_REP() {
+            CaseData caseData = CaseData.builder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .respondent2(PartyBuilder.builder().company().build())
+                .respondent2SameLegalRepresentative(YES)
+                .addRespondent2(YES)
+                .respondentResponseIsSame(YES)
+                .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
+                    ExpertDetails.builder().build()).build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+        }
+
+        @Test
+        void shouldChangeCaseStateToJudicialReferral_ONE_V_TWO_TWO_REP() {
+            CaseData caseData = CaseData.builder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .respondent2(PartyBuilder.builder().company().build())
+                .respondent2SameLegalRepresentative(NO)
+                .addRespondent2(YES)
+                .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
+                    ExpertDetails.builder().build()).build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
+            CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getState())
+                .isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+        }
     }
 
     @Nested
