@@ -21,10 +21,8 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
 
@@ -132,9 +130,8 @@ public class SealedClaimResponseForm {
             .timelineEventList(EventTemplateData.toEventTemplateDataList(caseData.getSpecResponseTimelineOfEvents()))
             .evidenceComments(caseDataLiPOptional.map(CaseDataLiP::getEvidenceComment).orElse(
                 ""))
-            .evidenceList(EvidenceTemplateData.toEvidenceTamplateDataList(caseData.getSpecResponselistYourEvidenceList()));
+            .evidenceList(EvidenceTemplateData.toEvidenceTemplateDataList(caseData.getSpecResponselistYourEvidenceList()));
     }
-
 
     private static void fullDefenceData(CaseData caseData, SealedClaimResponseForm.SealedClaimResponseFormBuilder builder) {
         addDetailsOnWhyClaimIsRejected(caseData, builder);

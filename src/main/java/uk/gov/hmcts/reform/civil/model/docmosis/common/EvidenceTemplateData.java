@@ -26,7 +26,7 @@ public class EvidenceTemplateData {
     }
 
     @JsonIgnore
-    public static List<EvidenceTemplateData> toEvidenceTamplateDataList(List<Evidence> evidenceList) {
+    public static List<EvidenceTemplateData> toEvidenceTemplateDataList(List<Evidence> evidenceList) {
         return Optional.ofNullable(evidenceList).map(Collection::stream)
             .orElseGet(Stream::empty)
             .map(evidence -> EvidenceTemplateData.toEvidenceTemplateData(evidence))
