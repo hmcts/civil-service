@@ -23,7 +23,7 @@ public class EventTemplateData {
     private String explanation;
 
     @JsonIgnore
-    public static List<EventTemplateData> toEventTemplateDataList(List<TimelineOfEvents> timelineOfEvents ) {
+    public static List<EventTemplateData> toEventTemplateDataList(List<TimelineOfEvents> timelineOfEvents) {
         return Optional.ofNullable(timelineOfEvents).map(Collection::stream)
             .orElseGet(Stream::empty)
             .map(event ->
