@@ -61,7 +61,7 @@ def publishRpaContract() {
 }
 
 def checkForEnableHelmLabel(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
+   return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
 }
 
 withPipeline(type, product, component) {
