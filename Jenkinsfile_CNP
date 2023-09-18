@@ -70,9 +70,6 @@ withPipeline(type, product, component) {
     env.ENVIRONMENT = "preview"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     loadVaultSecrets(secrets)
-    if (!checkForEnableHelmLabel(env.BRANCH_NAME)) {
-      enableCleanupOfHelmReleaseAlways();
-    }
   }
   onMaster {
     loadVaultSecrets(secrets)
