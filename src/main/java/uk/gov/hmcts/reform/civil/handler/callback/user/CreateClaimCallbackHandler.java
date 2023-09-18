@@ -484,6 +484,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (YES.equals(caseData.getApplicant1LitigationFriendRequired())) {
             LitigationFriend.LitigationFriendBuilder litigationFriendBuilder = LitigationFriend.builder()
                 .firstName(caseData.getApplicant1LitigationFriend().getFirstName())
+                .lastName(caseData.getApplicant1LitigationFriend().getLastName())
                 .fullName(caseData.getApplicant1LitigationFriend().getFirstName() +
                               " " + caseData.getApplicant1LitigationFriend().getLastName())
                 .hasSameAddressAsLitigant(caseData.getApplicant1LitigationFriend().getHasSameAddressAsLitigant())
