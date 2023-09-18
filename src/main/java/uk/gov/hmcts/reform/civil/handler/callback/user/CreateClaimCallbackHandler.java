@@ -482,10 +482,27 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         //add litigation friend full name
         if (YES.equals(caseData.getApplicant1LitigationFriendRequired())) {
-            dataBuilder.applicant1LitigationFriend(LitigationFriend.builder()
-                                                       .fullName(caseData.getApplicant1LitigationFriend().getFirstName() +
-                                                                     " " + caseData.getApplicant1LitigationFriend().getLastName()).build());
+            LitigationFriend.LitigationFriendBuilder litigationFriendBuilder = LitigationFriend.builder()
+                .firstName(caseData.getApplicant1LitigationFriend().getFirstName())
+                .fullName(caseData.getApplicant1LitigationFriend().getFirstName() +
+                              " " + caseData.getApplicant1LitigationFriend().getLastName())
+                .hasSameAddressAsLitigant(caseData.getApplicant1LitigationFriend().getHasSameAddressAsLitigant())
+                .primaryAddress(caseData.getApplicant1LitigationFriend().getPrimaryAddress())
+                .certificateOfSuitability(caseData.getApplicant1LitigationFriend().getCertificateOfSuitability());
+
+            // Add email address if not null
+            if (caseData.getApplicant1LitigationFriend().getEmailAddress() != null) {
+                litigationFriendBuilder.emailAddress(caseData.getApplicant1LitigationFriend().getEmailAddress());
+            }
+
+            // Add phone number if not null
+            if (caseData.getApplicant1LitigationFriend().getPhoneNumber() != null) {
+                litigationFriendBuilder.phoneNumber(caseData.getApplicant1LitigationFriend().getPhoneNumber());
+            }
+
+            dataBuilder.applicant1LitigationFriend(litigationFriendBuilder.build());
         }
+
 
         if (toggleService.isHmcEnabled()) {
             populateWithPartyIds(dataBuilder);

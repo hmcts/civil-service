@@ -148,7 +148,6 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
         var applicant = caseData.getApplicant1();
         var applicantRepresentative = representativeService.getApplicantRepresentative(caseData);
         var litigationFriend1 = caseData.getApplicant1LitigationFriend();
-        log.info("LitigationFriend: " + litigationFriend1);
         var applicantParties = new ArrayList<>(List.of(
             Party.builder()
                 .type(applicant.getType().getDisplayValue())
