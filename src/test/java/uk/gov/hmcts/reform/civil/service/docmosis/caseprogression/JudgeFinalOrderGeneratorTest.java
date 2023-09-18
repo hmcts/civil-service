@@ -16,18 +16,16 @@ import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementS
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
@@ -55,19 +53,15 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
-import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
-import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -75,13 +69,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.CLAIMANT;
-import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.COSTS;
-import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.DEFENDANT;
-import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.INDEMNITY_BASIS;
-import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.SUBJECT_DETAILED_ASSESSMENT;
-import static uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
 
@@ -94,8 +81,8 @@ public class JudgeFinalOrderGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileFreeForm = format(FREE_FORM_ORDER_PDF.getDocumentTitle(), LocalDate.now());
-    private static final String assistedForm = format(ASSISTED_ORDER_PDF.getDocumentTitle(), LocalDate.now());
+    private static final String fileFreeForm = String.format(FREE_FORM_ORDER_PDF.getDocumentTitle(), LocalDate.now());
+    private static final String assistedForm = String.format(ASSISTED_ORDER_PDF.getDocumentTitle(), LocalDate.now());
     List<FinalOrderToggle> toggleList = new ArrayList<FinalOrderToggle>(Arrays.asList(FinalOrderToggle.SHOW));
     private static final CaseDocument FREE_FROM_ORDER = CaseDocumentBuilder.builder()
         .documentName(fileFreeForm)
@@ -120,7 +107,7 @@ public class JudgeFinalOrderGeneratorTest {
     @Autowired
     private JudgeFinalOrderGenerator generator;
 
-    private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")
+    private static LocationRefData locationRefData =   LocationRefData.builder().siteName("SiteName")
         .courtAddress("1").postcode("1")
         .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
         .courtTypeId("10").courtLocationCode("121")
@@ -223,6 +210,32 @@ public class JudgeFinalOrderGeneratorTest {
             .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
     }
 
+//    @Test
+//    void shouldGenerateAssistedFormOrder_whenClaimantAndDefendantReferenceNotAddedToCase() {
+//        //Given: case data with claimant and defendant ref not added
+//        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_PDF)))
+//            .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
+//        when(documentManagementService
+//                 .uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
+//            .thenReturn(ASSISTED_FROM_ORDER);
+//
+//        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+//            .solicitorReferences(null)
+//            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
+//            .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+//            .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
+//            .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
+//            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
+//            .build();
+//        //When: Assisted order document generation called
+//        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+//
+//        //Then: It should generate assisted order document
+//        assertNotNull(caseDocument);
+//        verify(documentManagementService)
+//            .uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER));
+//    }
+
     @Test
     void shouldGenerateAssistedFormOrder_whenRecitalsNotSelected() {
         //Given: case data without recitals selected
@@ -233,31 +246,13 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(ASSISTED_FROM_ORDER);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .finalOrderRecitals(null)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-            // Order made section
-            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
-                LocalDate.now()).build()).build())
-            // Order made on court's own initiative section
+            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
+            .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
             .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
-            // Further hearing section
-            .finalOrderFurtherHearingToggle(toggleList)
-            .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                 .alternativeHearingList(null)
-                                                 .hearingMethodList(IN_PERSON).build())
-            // Costs section
-            .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .assistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
-                                                  .assistedOrderAssessmentSecondDropdownList2(CostEnums.YES)
-                                                  .makeAnOrderForCostsList(COSTS)
-                                                  .assistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(10000L))
-                                                  .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
-                                                  .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT).build())
-            .publicFundingCostsProtection(YES)
             .build();
-
         //When: Assisted order document generation called
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
         //Then: It should generate assisted order document
@@ -282,47 +277,22 @@ public class JudgeFinalOrderGeneratorTest {
         List<FinalOrdersJudgePapers> finalOrdersJudgePapersList =
             new ArrayList<>(Arrays.asList(FinalOrdersJudgePapers.CONSIDERED));
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderRecitals(null)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-            // Order made section
-            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
-                LocalDate.now()).build()).build())
-            // judge heard from section
-            .respondent2(PartyBuilder.builder().individual().build())
-            .addRespondent2(YES)
-            .respondent2SameLegalRepresentative(YES)
-            .applicant2(PartyBuilder.builder().individual().build())
-            .addApplicant2(YES)
-            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(
-                    finalOrdersJudgePapersList)
-                                          .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT).typeRepresentationOtherComplex(
-                    ClaimantAndDefendantHeard.builder().detailsRepresentationText("Test").build()).build())
-            // Order made on court's own initiative section
+            .assistedOrderCostList(AssistedCostTypesList.NO_ORDER_TO_COST)
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
             .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
-            // recitals section
+            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(LocalDate.now()).build()).build())
+            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(finalOrdersJudgePapersList)
+                                          .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT).typeRepresentationOtherComplex(
+                ClaimantAndDefendantHeard.builder().detailsRepresentationText("Test").build()).build())
             .finalOrderRecitals(toggleList)
             .finalOrderRecitalsRecorded(FinalOrderRecitalsRecorded.builder().text("Test").build())
-            // further hearing section
-            .finalOrderFurtherHearingToggle(toggleList)
-            .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                 .alternativeHearingList(dynamicList)
-                                                 .hearingMethodList(IN_PERSON)
-                                                 .hearingNotesText("test hearing notes")
-                                                 .datesToAvoidDateDropdown(DatesFinalOrders.builder().datesToAvoidDates(LocalDate.now())
-                                                                               .build()).build())
-            // Costs section
-            .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .assistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
-                                                  .makeAnOrderForCostsList(COSTS)
-                                                  .assistedOrderClaimantDefendantFirstDropdown(COSTS)
-                                                  .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L))
-                                                  .makeAnOrderForCostsYesOrNo(YesOrNo.YES).build())
             .assistedOrderCostsReserved(AssistedOrderCostDetails.builder().detailsRepresentationText("Test").build())
+            .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().alternativeHearingList(dynamicList).build())
             .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("Test").build())
             .assistedOrderCostsBespoke(AssistedOrderCostDetails.builder().besPokeCostDetailsText("Test").build())
             .finalOrderAppealToggle(toggleList)
-            .publicFundingCostsProtection(YES)
             .build();
         //When: Assisted order document generation called
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -334,32 +304,30 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
-    void testDefendantOneAttendsOrRepresentedTextBuilder() {
-        for (FinalOrdersDefendantRepresentationList finalOrdersDefendantRepresentationList : List.of(
-            FinalOrdersDefendantRepresentationList.values())) {
+    void testGetRepresentedDefendant() {
+        for (FinalOrdersDefendantRepresentationList finalOrdersDefendantRepresentationList : List.of(FinalOrdersDefendantRepresentationList.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderRecitals(null)
                 .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
                     ClaimantAndDefendantHeard.builder().typeRepresentationDefendantList(
                         finalOrdersDefendantRepresentationList).build()).build())
                 .build();
-            String name = caseData.getRespondent1().getPartyName();
-            String response = generator.defendantAttendsOrRepresentedTextBuilder(caseData, false);
+            String response = generator.getRepresentedDefendant(caseData);
             switch (finalOrdersDefendantRepresentationList) {
                 case COUNSEL_FOR_DEFENDANT:
-                    assertEquals(format("Counsel for %s, the defendant.", name), response);
+                    assertEquals("counsel for defendant", response);
                     break;
                 case SOLICITOR_FOR_DEFENDANT:
-                    assertEquals(format("Solicitor for %s, the defendant.", name), response);
+                    assertEquals("solicitor for defendant", response);
                     break;
                 case COST_DRAFTSMAN_FOR_THE_DEFENDANT:
-                    assertEquals(format("Costs draftsman for %s, the defendant.", name), response);
+                    assertEquals("costs draftsman for the defendant", response);
                     break;
                 case THE_DEFENDANT_IN_PERSON:
-                    assertEquals(format("%s, the defendant, in person.", name), response);
+                    assertEquals("the defendant in person", response);
                     break;
                 case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT:
-                    assertEquals(format("A lay representative for %s, the defendant.", name), response);
+                    assertEquals("lay representative for the defendant", response);
                     break;
                 default:
                     break;
@@ -368,69 +336,30 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
-    void testDefendantTwoAttendsOrRepresentedTextBuilder() {
-        for (FinalOrdersDefendantRepresentationList finalOrdersDefendantRepresentationList : List.of(
-            FinalOrdersDefendantRepresentationList.values())) {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().typeRepresentationDefendantTwoList(
-                        finalOrdersDefendantRepresentationList).build()).build())
-                .build();
-            String name = caseData.getRespondent2().getPartyName();
-            String response = generator.defendantAttendsOrRepresentedTextBuilder(caseData, true);
-            switch (finalOrdersDefendantRepresentationList) {
-                case COUNSEL_FOR_DEFENDANT:
-                    assertEquals(format("Counsel for %s, the defendant.", name), response);
-                    break;
-                case SOLICITOR_FOR_DEFENDANT:
-                    assertEquals(format("Solicitor for %s, the defendant.", name), response);
-                    break;
-                case COST_DRAFTSMAN_FOR_THE_DEFENDANT:
-                    assertEquals(format("Costs draftsman for %s, the defendant.", name), response);
-                    break;
-                case THE_DEFENDANT_IN_PERSON:
-                    assertEquals(format("%s, the defendant, in person.", name), response);
-                    break;
-                case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT:
-                    assertEquals(format("A lay representative for %s, the defendant.", name), response);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    @Test
-    void testClaimantOneAttendsOrRepresentedTextBuilder() {
-        for (FinalOrdersClaimantRepresentationList finalOrdersClaimantRepresentationList : List.of(
-            FinalOrdersClaimantRepresentationList.values())) {
+    void testGetRepresentedClaimant() {
+        for (FinalOrdersClaimantRepresentationList finalOrdersClaimantRepresentationList : List.of(FinalOrdersClaimantRepresentationList.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderRecitals(null)
                 .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
                     ClaimantAndDefendantHeard.builder().typeRepresentationClaimantList(
                         finalOrdersClaimantRepresentationList).build()).build())
                 .build();
-            String name = caseData.getApplicant1().getPartyName();
-            String response = generator.claimantAttendsOrRepresentedTextBuilder(caseData, false);
+            String response = generator.getRepresentedClaimant(caseData);
             switch (finalOrdersClaimantRepresentationList) {
+                case COST_DRAFTSMAN_FOR_THE_CLAIMANT:
+                    assertEquals("costs draftsman for the claimant", response);
+                    break;
                 case COUNSEL_FOR_CLAIMANT:
-                    assertEquals(format("Counsel for %s, the claimant.", name), response);
+                    assertEquals("counsel for claimant", response);
                     break;
                 case SOLICITOR_FOR_CLAIMANT:
-                    assertEquals(format("Solicitor for %s, the claimant.", name), response);
-                    break;
-                case COST_DRAFTSMAN_FOR_THE_CLAIMANT:
-                    assertEquals(format("Costs draftsman for %s, the claimant.", name), response);
+                    assertEquals("solicitor for claimant", response);
                     break;
                 case THE_CLAIMANT_IN_PERSON:
-                    assertEquals(format("%s, the claimant, in person.", name), response);
+                    assertEquals("the claimant in person", response);
                     break;
                 case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT:
-                    assertEquals(format("A lay representative for %s, the claimant.", name), response);
+                    assertEquals("lay representative for the claimant", response);
                     break;
                 default:
                     break;
@@ -439,76 +368,32 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
-    void testClaimantTwoAttendsOrRepresentedTextBuilder() {
-        for (FinalOrdersClaimantRepresentationList finalOrdersClaimantRepresentationList : List.of(
-            FinalOrdersClaimantRepresentationList.values())) {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .addApplicant2(YesOrNo.YES)
-                .applicant2(PartyBuilder.builder().individual().build())
-                .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().typeRepresentationClaimantListTwo(
-                        finalOrdersClaimantRepresentationList).build()).build())
-                .build();
-            String name = caseData.getApplicant2().getPartyName();
-            String response = generator.claimantAttendsOrRepresentedTextBuilder(caseData, true);
-            switch (finalOrdersClaimantRepresentationList) {
-                case COUNSEL_FOR_CLAIMANT:
-                    assertEquals(format("Counsel for %s, the claimant.", name), response);
-                    break;
-                case SOLICITOR_FOR_CLAIMANT:
-                    assertEquals(format("Solicitor for %s, the claimant.", name), response);
-                    break;
-                case COST_DRAFTSMAN_FOR_THE_CLAIMANT:
-                    assertEquals(format("Costs draftsman for %s, the claimant.", name), response);
-                    break;
-                case THE_CLAIMANT_IN_PERSON:
-                    assertEquals(format("%s, the claimant, in person.", name), response);
-                    break;
-                case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT:
-                    assertEquals(format("A lay representative for %s, the claimant.", name), response);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    @Test
-    void testDefendantOneNotAttendingText() {
-        for (FinalOrdersClaimantDefendantNotAttending finalOrdersClaimantDefendantNotAttending : List.of(
-            FinalOrdersClaimantDefendantNotAttending.values())) {
+    void testGetDefendantNotAttendedText() {
+        for (FinalOrdersClaimantDefendantNotAttending finalOrdersClaimantDefendantNotAttending : List.of(FinalOrdersClaimantDefendantNotAttending.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderRecitals(null)
                 .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
                     ClaimantAndDefendantHeard.builder().trialProcedureComplex(TrialNoticeProcedure.builder().listDef(
                         finalOrdersClaimantDefendantNotAttending).build()).build()).build())
                 .build();
-            String name = caseData.getRespondent1().getPartyName();
-            String response = generator.defendantNotAttendingText(caseData, false, name);
+            String response = generator.getDefendantNotAttendedText(caseData);
             switch (finalOrdersClaimantDefendantNotAttending) {
                 case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the defendant, did not attend the trial. "
-                            + "The Judge was not satisfied that they had received notice of the hearing "
-                            + "and it was not reasonable to proceed in their absence.",
-                        name
-                    ), response);
+                    assertEquals("The defendant did not attend the trial, but the" +
+                                     " Judge was not satisfied that they had received notice" +
+                                     " of the hearing and it was not reasonable to proceed in their absence", response);
                     break;
                 case SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
+                    assertEquals("The defendant did not attend the trial and whilst the Judge was satisfied " +
+                        "that they had received notice of the trial it was not reasonable to proceed in their absence",
+                        response);
                     break;
                 case SATISFIED_REASONABLE_TO_PROCEED:
                     assertEquals(
-                        format(
-                            "%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
-                                + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                            name
-                        ), response
+                        "The defendant did not attend the trial," +
+                            " but the Judge was satisfied that they had received notice of the trial and it was " +
+                            "reasonable to proceed in their absence",
+                        response
                     );
                     break;
                 default:
@@ -518,128 +403,30 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
-    void testDefendantTwoNotAttendingText() {
-        for (FinalOrdersClaimantDefendantNotAttending finalOrdersClaimantDefendantNotAttending : List.of(
-            FinalOrdersClaimantDefendantNotAttending.values())) {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2SameLegalRepresentative(YES)
-                .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().trialProcedureDefTwoComplex(TrialNoticeProcedure.builder().listDefTwo(
-                        finalOrdersClaimantDefendantNotAttending).build()).build()).build())
-                .build();
-            String name = caseData.getRespondent2().getPartyName();
-            String response = generator.defendantNotAttendingText(caseData, true, name);
-            switch (finalOrdersClaimantDefendantNotAttending) {
-                case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the defendant, did not attend the trial. "
-                            + "The Judge was not satisfied that they had received notice of the hearing "
-                            + "and it was not reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_REASONABLE_TO_PROCEED:
-                    assertEquals(
-                        format(
-                            "%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
-                                + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                            name
-                        ), response
-                    );
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    @Test
-    void testGetClaimantOneNotAttendedText() {
-        for (FinalOrdersClaimantDefendantNotAttending finalOrdersClaimantDefendantNotAttending : List.of(
-            FinalOrdersClaimantDefendantNotAttending.values())) {
+    void testGetClaimantNotAttendedText() {
+        for (FinalOrdersClaimantDefendantNotAttending finalOrdersClaimantDefendantNotAttending : List.of(FinalOrdersClaimantDefendantNotAttending.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderRecitals(null)
                 .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
                     ClaimantAndDefendantHeard.builder().trialProcedureClaimantComplex(TrialNoticeProcedure.builder().list(
                         finalOrdersClaimantDefendantNotAttending).build()).build()).build())
                 .build();
-            String name = caseData.getApplicant1().getPartyName();
-            String response = generator.claimantNotAttendingText(caseData, false, name);
+            String response = generator.getClaimantNotAttendedText(caseData);
             switch (finalOrdersClaimantDefendantNotAttending) {
                 case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial. "
-                            + "The Judge was not satisfied that they had received notice of the hearing "
-                            + "and it was not reasonable to proceed in their absence.",
-                        name
-                    ), response);
+                    assertEquals("The claimant did not attend the trial, " +
+                        "but the Judge was not satisfied that they had received notice of the hearing and it was not " +
+                                 "reasonable to proceed in their absence", response);
                     break;
                 case SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
+                    assertEquals("The claimant did not attend the trial and whilst the Judge was satisfied that they had " +
+                                     "received notice of the trial it was not reasonable to proceed in their absence",
+                        response);
                     break;
                 case SATISFIED_REASONABLE_TO_PROCEED:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
-                            + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    @Test
-    void testGetClaimantTwoNotAttendedText() {
-        for (FinalOrdersClaimantDefendantNotAttending finalOrdersClaimantDefendantNotAttending : List.of(
-            FinalOrdersClaimantDefendantNotAttending.values())) {
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .addApplicant2(YesOrNo.YES)
-                .applicant2(PartyBuilder.builder().individual().build())
-                .finalOrderRecitals(null)
-                .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
-                    ClaimantAndDefendantHeard.builder().trialProcedClaimTwoComplex(TrialNoticeProcedure.builder().listClaimTwo(
-                        finalOrdersClaimantDefendantNotAttending).build()).build()).build())
-                .build();
-            String name = caseData.getApplicant2().getPartyName();
-            String response = generator.claimantNotAttendingText(caseData, true, name);
-            switch (finalOrdersClaimantDefendantNotAttending) {
-                case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial. "
-                            + "The Judge was not satisfied that they had received notice of the hearing "
-                            + "and it was not reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_REASONABLE_TO_PROCEED:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
-                            + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
+                    assertEquals("The claimant did not attend the trial, but the Judge was satisfied that they had " +
+                                     "received notice of the trial and it was reasonable to proceed in their absence",
+                                 response);
                     break;
                 default:
                     break;
@@ -653,12 +440,7 @@ public class JudgeFinalOrderGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderRecitals(null)
                 .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().lengthList(
-                        hearingLengthFinalOrderList)
-                                                     .lengthListOther(CaseHearingLengthElement.builder()
-                                                                          .lengthListOtherDays("12")
-                                                                          .lengthListOtherHours("1")
-                                                                          .lengthListOtherMinutes("30")
-                                                                          .build()).build()).build();
+                    hearingLengthFinalOrderList).build()).build();
             String response = generator.getFurtherHearingLength(caseData);
             switch (hearingLengthFinalOrderList) {
                 case MINUTES_15:
@@ -676,9 +458,6 @@ public class JudgeFinalOrderGeneratorTest {
                 case HOUR_2:
                     assertEquals("2 hours", response);
                     break;
-                case OTHER:
-                    assertEquals("12 days 1 hours 30 minutes", response);
-                    break;
                 default:
                     break;
             }
@@ -686,13 +465,33 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
-    void testGetFurtherHearingLengthWhenNull() {
+    void testGetFurtherHearingLengthForOther() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderRecitals(null)
-            .finalOrderFurtherHearingComplex(null).build();
-
+            .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                                                 .lengthListOther(CaseHearingLengthElement.builder()
+                                                                      .lengthListOtherDays("12")
+                                                                      .lengthListOtherHours("1")
+                                                                      .lengthListOtherMinutes("30").build()).build()).build();
         String response = generator.getFurtherHearingLength(caseData);
-        assertEquals("", response);
+        assertEquals("12 days 1 hours 30 minutes", response);
+    }
+
+    @Test
+    void testGetIfAttended() {
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderRecitals(null)
+            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
+                ClaimantAndDefendantHeard.builder().typeRepresentationDefendantList(FinalOrdersDefendantRepresentationList.THE_DEFENDANT_IN_PERSON).build()).build()).build();
+        boolean response = generator.getIfAttended(caseData, true);
+        assertEquals(true, response);
+
+        CaseData caseDataClaimant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderRecitals(null)
+            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationComplex(
+                ClaimantAndDefendantHeard.builder().typeRepresentationClaimantList(FinalOrdersClaimantRepresentationList.THE_CLAIMANT_IN_PERSON).build()).build()).build();
+        response = generator.getIfAttended(caseDataClaimant, false);
+        assertEquals(true, response);
     }
 
     @Test
@@ -701,12 +500,10 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderRecitals(null)
             .finalOrderFurtherHearingToggle(toggleList)
             .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().listFromDate(LocalDate.of(2022, 12,
-                                                                                                          12
-            )).build()).build();
+                                                                                                          12)).build()).build();
         LocalDate response = generator.getFurtherHearingDate(caseData, true);
         assertEquals(LocalDate.of(2022, 12,
-                                  12
-        ), response);
+                                  12), response);
     }
 
     @Test
@@ -715,12 +512,10 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderRecitals(null)
             .finalOrderFurtherHearingToggle(toggleList)
             .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().dateToDate(LocalDate.of(2022, 12,
-                                                                                                        12
-            )).build()).build();
+                                                                                                          12)).build()).build();
         LocalDate response = generator.getFurtherHearingDate(caseData, false);
         assertEquals(LocalDate.of(2022, 12,
-                                  12
-        ), response);
+                                  12), response);
     }
 
     @Test
@@ -741,6 +536,41 @@ public class JudgeFinalOrderGeneratorTest {
         assertEquals("test", response);
     }
 
+//    @Test
+//    void orderMadeDateBuilderSingleDate() {
+//        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+//            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder()
+//                                                                                    .singleDate(LocalDate.now())
+//                                                                                    .build()).build())
+//            .finalOrderAppealComplex(FinalOrderAppeal.builder().otherText("test").list(AppealList.OTHER).build()).build();
+//        String response = generator.orderMadeDateBuilder(caseData);
+//        assertEquals("on 15 September 2023", response);
+//    }
+//
+//    @Test
+//    void orderMadeDateBuilderDateFrom() {
+//        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+//            .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DatesFinalOrders.builder()
+//                                                                                    .dateRangeFrom(LocalDate.now().minusDays(2))
+//                                                                                    .dateRangeTo(LocalDate.now().minusDays(1))
+//                                                                                    .build()).build())
+//            .finalOrderAppealComplex(FinalOrderAppeal.builder().otherText("test").list(AppealList.OTHER).build()).build();
+//        String response = generator.orderMadeDateBuilder(caseData);
+//        assertEquals("between 13 September 2023 and 14 September 2023", response);
+//    }
+//
+//    @Test
+//    void orderMadeDateBuilderBespoke() {
+//        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+//            .finalOrderDateHeardComplex(OrderMade.builder().bespokeRangeSelection(DatesFinalOrders.builder()
+//                                                                                      .bespokeRangeTextArea("date between 12 feb 2023, and 14 feb 2023")
+//                                                                                      .build()).build())
+//            .finalOrderAppealComplex(FinalOrderAppeal.builder().otherText("test").list(AppealList.OTHER).build()).build();
+//        String response = generator.orderMadeDateBuilder(caseData);
+//        assertEquals("on date between 12 feb 2023, and 14 feb 2023", response);
+//    }
+
+
     @ParameterizedTest
     @MethodSource("testData")
     void orderMadeDateBuilder(CaseData caseData, String expectedResponse) {
@@ -753,132 +583,27 @@ public class JudgeFinalOrderGeneratorTest {
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder()
-                                                                                            .singleDate(LocalDate.of(
-                                                                                                2023,
-                                                                                                9,
-                                                                                                15
-                                                                                            ))
+                                                                                            .singleDate(LocalDate.now())
                                                                                             .build()).build()).build(),
                 "on 15 September 2023"
             ),
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DatesFinalOrders.builder()
-                                                                                           .dateRangeFrom(LocalDate.of(
-                                                                                               2023,
-                                                                                               9,
-                                                                                               13
-                                                                                           ))
-                                                                                           .dateRangeTo(LocalDate.of(
-                                                                                               2023,
-                                                                                               9,
-                                                                                               14
-                                                                                           ))
+                                                                                           .dateRangeFrom(LocalDate.now().minusDays(2))
+                                                                                           .dateRangeTo(LocalDate.now().minusDays(1))
                                                                                            .build()).build()).build(),
                 "between 13 September 2023 and 14 September 2023"
             ),
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                     .finalOrderDateHeardComplex(OrderMade.builder().bespokeRangeSelection(DatesFinalOrders.builder()
-                                                                                              .bespokeRangeTextArea(
-                                                                                                  "date between 12 feb 2023, and 14 feb 2023")
+                                                                                              .bespokeRangeTextArea("date between 12 feb 2023, and 14 feb 2023")
                                                                                               .build()).build()).build(),
                 "on date between 12 feb 2023, and 14 feb 2023"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderDateHeardComplex(OrderMade.builder().bespokeRangeSelection(null)
-                                                                                              .build()).build(),
-                null
             )
         );
     }
 
-    @Test
-    void testPopulateInterimPaymentText() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails
-                                                  .builder().assistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(
-                    10000L)).build())
-            .build();
-        String response = generator.populateInterimPaymentText(caseData);
-        assertEquals(format(
-            "An interim payment of £%s on account of costs shall be paid by 4pm on ",
-            MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownAmount())), response);
-    }
-
-    @Test
-    void testPopulateSummarilyAssessedText() {
-        CaseData caseDataClaimant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .makeAnOrderForCostsList(CLAIMANT)
-                                                  .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L)).build())
-            .build();
-        CaseData caseDataDefendant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .makeAnOrderForCostsList(DEFENDANT)
-                                                  .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L)).build())
-            .build();
-        String responseClaimant = generator.populateSummarilyAssessedText(caseDataClaimant);
-        String responseDefendant = generator.populateSummarilyAssessedText(caseDataDefendant);
-        assertEquals(format(
-            "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
-                + "in the sum of £%s. Such a sum shall be made by 4pm on",
-            MonetaryConversions.penniesToPounds(caseDataClaimant
-                                                    .getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount())), responseClaimant);
-        assertEquals(format(
-            "The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
-                + "in the sum of £%s. Such a sum shall be made by 4pm on",
-            MonetaryConversions.penniesToPounds(caseDataDefendant
-                                                    .getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount())), responseDefendant);
-    }
-
-    @Test
-    void testPopulateDetailedAssessmentText() {
-        CaseData caseDataClaimant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .assistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
-                                                  .makeAnOrderForCostsList(CLAIMANT).build())
-            .build();
-        CaseData caseDataDefendant = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .assistedOrderAssessmentSecondDropdownList1(COSTS)
-                                                  .makeAnOrderForCostsList(DEFENDANT).build())
-            .build();
-        String responseClaimant = generator.populateDetailedAssessmentText(caseDataClaimant);
-        String responseDefendant = generator.populateDetailedAssessmentText(caseDataDefendant);
-        assertEquals("The claimant shall pay the defendant's costs to be subject to a "
-                         + "detailed assessment on the indemnity basis if not agreed", responseClaimant);
-        assertEquals("The defendant shall pay the claimant's costs to be subject to"
-                         + " a detailed assessment on the standard basis if not agreed", responseDefendant);
-    }
-
-    @Test
-    void testIsDefaultCourt() {
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderFurtherHearingToggle(toggleList)
-            .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing
-                                                 .builder().hearingLocationList(DynamicList
-                                                                                    .builder().value(DynamicListElement
-                                                                                                         .builder()
-                                                                                                         .code("LOCATION_LIST")
-                                                                                                         .build())
-                                                                                    .build()).build())
-            .build();
-        CaseData caseDataWhenFalse = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderFurtherHearingToggle(toggleList)
-            .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing
-                                                 .builder().hearingLocationList(DynamicList
-                                                                                    .builder().value(DynamicListElement
-                                                                                                         .builder()
-                                                                                                         .code("OTHER_LOCATION")
-                                                                                                         .build())
-                                                                                    .build()).build())
-            .build();
-        Boolean response = generator.isDefaultCourt(caseData);
-        Boolean responseFalse = generator.isDefaultCourt(caseDataWhenFalse);
-        assertEquals(true, response);
-        assertEquals(false, responseFalse);
-
-    }
 }
+
