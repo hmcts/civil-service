@@ -121,7 +121,6 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             "Sealed Claim form",
             LocalDate.now().toString()
         ));
-
         if (caseData.getSpecResponseTimelineDocumentFiles() != null) {
             documents.add(new DocumentMetaData(
                 caseData.getSpecResponseTimelineDocumentFiles().getFile(),
