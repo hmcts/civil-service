@@ -20,4 +20,5 @@ public class RespondentLiPResponse {
     private DQExtraDetailsLip respondent1DQExtraDetails;
     private HearingSupportLip respondent1DQHearingSupportLip;
     private String respondent1ResponseLanguage;
+    private String helpWithFeesReferenceNumberLip;
 }
