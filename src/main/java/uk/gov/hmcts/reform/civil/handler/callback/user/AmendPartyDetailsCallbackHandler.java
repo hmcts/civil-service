@@ -88,7 +88,7 @@ public class AmendPartyDetailsCallbackHandler extends CallbackHandler {
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader("# You have updated a legal representative's email address")
+            .confirmationHeader("# You have updated a legal representative's information")
             .confirmationBody("<br />")
             .build();
     }
