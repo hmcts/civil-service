@@ -621,9 +621,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String joAmountOrdered;
     private String joAmountCostOrdered;
     private boolean joIsRegisteredWithRTL;
-    private RePaymentPlanSelection joRePaymentPlanSelection;
-    private JudgmentPaymentDetails joJudgementPaymentDetails;
+    private PaymentPlanSelection joRePaymentPlanSelection;
+    private JudgmentInstalmentDetails joJudgementPaymentDetails;
     private boolean joIsLiveJudgementExists;
+    private JudgmentPaidInFull joJudgmentPaidInFull;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

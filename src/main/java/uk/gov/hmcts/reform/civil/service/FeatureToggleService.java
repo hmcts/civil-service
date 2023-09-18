@@ -33,11 +33,13 @@ public class FeatureToggleService {
     }
 
     public boolean isPinInPostEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
+        //return this.featureToggleApi.isFeatureEnabled("pin-in-post");
+        return true;
     }
 
     public boolean isPbaV3Enabled() {
-        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        //return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        return false;
     }
 
     public boolean isCertificateOfServiceEnabled() {
@@ -49,7 +51,8 @@ public class FeatureToggleService {
     }
 
     public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
+        ///return this.featureToggleApi.isFeatureEnabled("hmc");
+        return false;
     }
 
     public boolean isCaseFileViewEnabled() {
