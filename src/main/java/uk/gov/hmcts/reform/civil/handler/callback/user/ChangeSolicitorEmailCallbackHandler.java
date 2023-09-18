@@ -382,13 +382,17 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private List<String> validateAddress(Address address) {
+        String postCode = Optional.ofNullable(address)
+            .map(Address::getPostCode)
+            .orElse(null);
+        return postcodeValidator.validate(postCode);
+    }
+
     private CallbackResponse validateApplicant1SolicitorEmail(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>(validateEmailService.validate(
             callbackParams.getCaseData().getApplicantSolicitor1UserDetails().getEmail()));
-        Optional.ofNullable(callbackParams.getCaseData().getApplicantSolicitor1ServiceAddress())
-            .map(Address::getPostCode)
-            .map(postcodeValidator::validate)
-            .ifPresent(errors::addAll);
+        errors.addAll(validateAddress(callbackParams.getCaseData().getApplicantSolicitor1ServiceAddress()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors).build();
@@ -397,10 +401,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
     private CallbackResponse validateRespondent1SolicitorEmail(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>(validateEmailService.validate(
             callbackParams.getCaseData().getRespondentSolicitor1EmailAddress()));
-        Optional.ofNullable(callbackParams.getCaseData().getRespondentSolicitor1ServiceAddress())
-            .map(Address::getPostCode)
-            .map(postcodeValidator::validate)
-            .ifPresent(errors::addAll);
+        errors.addAll(validateAddress(callbackParams.getCaseData().getRespondentSolicitor1ServiceAddress()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors).build();
@@ -409,10 +410,7 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
     private CallbackResponse validateRespondent2SolicitorEmail(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>(validateEmailService.validate(
             callbackParams.getCaseData().getRespondentSolicitor2EmailAddress()));
-        Optional.ofNullable(callbackParams.getCaseData().getRespondentSolicitor2ServiceAddress())
-            .map(Address::getPostCode)
-            .map(postcodeValidator::validate)
-            .ifPresent(errors::addAll);
+        errors.addAll(validateAddress(callbackParams.getCaseData().getRespondentSolicitor2ServiceAddress()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors).build();
