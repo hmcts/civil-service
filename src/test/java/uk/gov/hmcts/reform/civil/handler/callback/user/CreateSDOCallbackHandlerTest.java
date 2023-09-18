@@ -1480,4 +1480,76 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(CREATE_SDO);
     }
+
+    @Nested
+    class MidEventNegativeNumberOfWitness {
+        private static final String PAGE_ID = "validateInputValue";
+
+        @Test
+        void shouldThrowErrorWhenEnteringNegativeNumberOfWitnessSmallClaim() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atSmallClaimsWitnessStatementWithNegativeInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
+        }
+
+        @Test
+        void shouldThrowErrorWhenEnteringNegativeNumberOfWitnessFastTrack() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atFastTrackWitnessOfFactWithNegativeInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
+        }
+
+        @Test
+        void shouldNotThrowErrorWhenEnteringPositiveNumberOfWitnessSmallClaim() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atSmallClaimsWitnessStatementWithPositiveInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowErrorWhenEnteringPositiveNumberOfWitnessFastTrack() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atFastTrackWitnessOfFactWithPositiveInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+        }
+    }
 }
