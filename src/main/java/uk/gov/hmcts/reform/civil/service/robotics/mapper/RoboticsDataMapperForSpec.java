@@ -107,7 +107,8 @@ public class RoboticsDataMapperForSpec {
 
     private List<Solicitor> buildSolicitors(CaseData caseData) {
         List<Solicitor> solicitorsList = new ArrayList<>();
-        solicitorsList.add(buildApplicantSolicitor(caseData, APPLICANT_SOLICITOR_ID));
+        ofNullable(buildApplicantSolicitor(caseData, APPLICANT_SOLICITOR_ID))
+            .ifPresent(solicitorsList::add);
         ofNullable(buildRespondentSolicitor(caseData, RESPONDENT_SOLICITOR_ID))
             .ifPresent(solicitorsList::add);
 
@@ -221,12 +222,14 @@ public class RoboticsDataMapperForSpec {
 
     private Solicitor buildApplicantSolicitor(CaseData caseData, String id) {
         Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());
-        var providedServiceAddress = caseData.getApplicantSolicitor1ServiceAddress();
+        var applicantEmail = ofNullable(caseData.getApplicantSolicitor1UserDetails())
+            .flatMap(userDetails -> ofNullable(userDetails.getEmail()))
+            .orElse(null);
         Solicitor.SolicitorBuilder solicitorBuilder = Solicitor.builder()
             .id(id)
             .isPayee(true)
             .organisationId(organisationId.orElse(null))
-            .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
+            .contactEmailAddress(applicantEmail)
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
                            .orElse(null)
