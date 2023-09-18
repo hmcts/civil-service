@@ -120,7 +120,9 @@ public class SealedClaimResponseForm {
     private static void alreadyPaid(CaseData caseData, SealedClaimResponseForm.SealedClaimResponseFormBuilder builder) {
         RespondToClaim respondToClaim = caseData.getResponseToClaim();
         builder.whyReject("ALREADY_PAID")
-            .howMuchWasPaid(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "")
+            .howMuchWasPaid(Optional.ofNullable(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()))
+                                .map(BigDecimal::toString)
+                                .orElse(""))
             .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
             .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
                             ? respondToClaim.getHowWasThisAmountPaidOther()
