@@ -60,6 +60,10 @@ def publishRpaContract() {
   sh """ ./gradlew pactPublish """
 }
 
+def checkForEnableHelmLabel(branch_name) {
+  return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
+}
+
 withPipeline(type, product, component) {
 
   onPR {
@@ -92,6 +96,9 @@ withPipeline(type, product, component) {
 
   afterAlways('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
+    if (checkForEnableHelmLabel(env.BRANCH_NAME)) {
+      error "The 'pr-values: enableHelm' label is active on the PR. The build will be interrupted to avoid wasting build time needlessly."
+    }
   }
 
   before('functionalTest:preview') {
