@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class JudgmentPaymentDetails {
+public class JudgmentInstalmentDetails {
 
     private String installmentAmount;
     private PaymentFrequency paymentFrequency;
