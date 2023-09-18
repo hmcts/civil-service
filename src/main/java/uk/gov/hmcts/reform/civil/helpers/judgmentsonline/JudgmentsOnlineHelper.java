@@ -21,12 +21,11 @@ public class JudgmentsOnlineHelper {
         }
     }
 
-    public static String validateIfFutureDates(LocalDate joOrderMadeDate) {
+    public static boolean validateIfFutureDate(LocalDate joOrderMadeDate) {
         LocalDate today = LocalDate.now();
         if (joOrderMadeDate.isAfter(today)) {
-            return "Date must be in the past";
-        } else {
-            return null;
+            return true;
         }
+        return false;
     }
 }

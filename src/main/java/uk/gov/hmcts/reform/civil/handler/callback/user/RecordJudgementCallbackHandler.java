@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.RePaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,23 +35,53 @@ public class RecordJudgementCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(RECORD_JUDGMENT);
     protected final ObjectMapper objectMapper;
+    private static final String ERROR_MESSAGE_DATE_MUST_BE_IN_FUTURE = "The Date must be in future";
+    private static final String ERROR_MESSAGE_DATE_MUST_BE_IN_PAST = "The Date must be in past";
 
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::clearAllFields)
-            .put(callbackKey(MID, "validate"), this::validateFields)
+            .put(callbackKey(MID, "validateDates"), this::validateDates)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::saveJudgementDetails)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .build();
+    }
+
+    private CallbackResponse validateDates(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        List<String> errors = new ArrayList<>();
+        boolean isOrderMadeFutureDate =
+            JudgmentsOnlineHelper.validateIfFutureDate(callbackParams.getCaseData().getJoOrderMadeDate());
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        if (isOrderMadeFutureDate) {
+            errors.add(ERROR_MESSAGE_DATE_MUST_BE_IN_PAST);
+        }
+        if (callbackParams.getCaseData().getJoPaymentPlanSelection().equals(PaymentPlanSelection.PAY_BY_DATE)) {
+            boolean isFutureDate =
+                JudgmentsOnlineHelper.validateIfFutureDate(callbackParams.getCaseData().getJoPaymentToBeMadeByDate());
+            if (!isFutureDate) {
+                errors.add(ERROR_MESSAGE_DATE_MUST_BE_IN_FUTURE);
+            }
+        } else if (callbackParams.getCaseData().getJoPaymentPlanSelection().equals(PaymentPlanSelection.PAY_IN_INSTALLMENT)) {
+            boolean isFutureDate =
+                JudgmentsOnlineHelper.validateIfFutureDate(callbackParams.getCaseData().getJoJudgmentInstalmentDetails().getFirstInstallmentDate());
+            if (!isFutureDate) {
+                errors.add(ERROR_MESSAGE_DATE_MUST_BE_IN_FUTURE);
+            }
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
     private CallbackResponse clearAllFields(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData.setJoOrderMadeDate(null);
-        caseData.setJoJudgementStatusDetails(null);
-        caseData.setJoRePaymentPlanSelection(null);
-        caseData.setJoJudgementPaymentDetails(null);
+        //caseData.setJoJudgementStatusDetails(null);
+        //caseData.setJoPaymentPlanSelection(null);
+        //caseData.setJoJudgmentInstalmentDetails(null);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -70,35 +100,16 @@ public class RecordJudgementCallbackHandler extends CallbackHandler {
         JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
             .judgmentStatusTypes(JudgmentStatusType.ISSUED)
             .lastUpdatedDate(LocalDateTime.now()).build();
-        if (caseData.isJoIsRegisteredWithRTL()) {
+        /*if (caseData.isJoIsRegisteredWithRTL()) {
             judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED));
-        }
+        }*/
         caseData.setJoJudgementStatusDetails(judgmentStatusDetails);
-        caseData.setJoIsLiveJudgementExists(true);
+        //caseData.setJoIsLiveJudgementExists(true);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
-
-    private CallbackResponse validateFields(CallbackParams callbackParams) {
-        List<String> errorList = new ArrayList<>();
-        String errorMessage = JudgmentsOnlineHelper.validateIfFutureDates(callbackParams.getCaseData().getJoOrderMadeDate());
-        if (errorMessage != null) {
-            errorList.add(errorMessage);
-        }
-        if (callbackParams.getCaseData().getJoRePaymentPlanSelection().equals(RePaymentPlanSelection.PAY_IMMEDIATELY)) {
-            String errorMsg =
-                JudgmentsOnlineHelper.validateIfFutureDates(callbackParams.getCaseData().getJoJudgementPaymentDetails().getFirstInstallmentDate());
-            if (errorMsg != null) {
-                errorList.add(errorMsg);
-            }
-        }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errorList)
-            .build();
-    }
-
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
