@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -63,10 +64,14 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         var hearingDueDate = paymentFailed ? HearingFeeUtils
             .calculateHearingDueDate(LocalDate.now(), HmcDataUtils.getHearingStartDay(hearing)
                 .getHearingStartDateTime().toLocalDate()) : null;
-        var hearingLocation = getHearingLocation(HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(), bearerToken);
+        LocationRefData hearingLocation = getLocationRefData(
+            HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(),
+            bearerToken);
+        LocationRefData caseManagementLocation =
+            getLocationRefData(caseData.getCaseManagementLocation().getBaseLocation(), bearerToken);
 
         return HearingNoticeHmc.builder()
-            .hearingSiteName(nonNull(hearingLocation) ? hearingLocation.getSiteName() : null)
+            .hearingSiteName(nonNull(caseManagementLocation) ? caseManagementLocation.getSiteName() : null)
             .hearingLocation(LocationRefDataService.getDisplayEntry(hearingLocation))
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
@@ -97,7 +102,8 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return HEARING_NOTICE_HMC;
     }
 
-    private LocationRefData getHearingLocation(String venueId, String bearerToken) {
+    @Nullable
+    private LocationRefData getLocationRefData(String venueId, String bearerToken) {
         List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(bearerToken);
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
         return matchedLocations.size() > 0 ? matchedLocations.get(0) : null;
