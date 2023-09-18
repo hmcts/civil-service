@@ -36,6 +36,8 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -67,6 +69,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -1729,6 +1732,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                 .primaryAddress(AddressBuilder.defaults().build())
                                                 .hasSameAddressAsLitigant(YES)
                                                 .certificateOfSuitability(List.of())
+                                                .flags(Flags.builder()
+                                                           .partyName("Party Name")
+                                                           .roleOnCase("Role on Case")
+                                                           .build())
                                                 .build())
                 .build();
             // When
@@ -1742,6 +1749,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getApplicant1LitigationFriend().getEmailAddress()).isEqualTo("applicant@litigation.com");
             assertThat(updatedData.getApplicant1LitigationFriend().getPhoneNumber()).isEqualTo("01482764322");
             assertThat(updatedData.getApplicant1LitigationFriend().getHasSameAddressAsLitigant()).isEqualTo(YES);
+
+            // Check Flags and details
+            assertThat(updatedData.getApplicant1LitigationFriend().getFlags().getPartyName()).isEqualTo("Party Name");
+            assertThat(updatedData.getApplicant1LitigationFriend().getFlags().getRoleOnCase()).isEqualTo("Role on Case");
         }
     }
 

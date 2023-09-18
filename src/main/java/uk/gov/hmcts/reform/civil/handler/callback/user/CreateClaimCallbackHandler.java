@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -482,14 +483,18 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         //add litigation friend full name
         if (YES.equals(caseData.getApplicant1LitigationFriendRequired())) {
+            var applicant1LitigationFriend = caseData.getApplicant1LitigationFriend();
             LitigationFriend.LitigationFriendBuilder litigationFriendBuilder = LitigationFriend.builder()
-                .firstName(caseData.getApplicant1LitigationFriend().getFirstName())
-                .lastName(caseData.getApplicant1LitigationFriend().getLastName())
-                .fullName(caseData.getApplicant1LitigationFriend().getFirstName() +
-                              " " + caseData.getApplicant1LitigationFriend().getLastName())
-                .hasSameAddressAsLitigant(caseData.getApplicant1LitigationFriend().getHasSameAddressAsLitigant())
-                .primaryAddress(caseData.getApplicant1LitigationFriend().getPrimaryAddress())
-                .certificateOfSuitability(caseData.getApplicant1LitigationFriend().getCertificateOfSuitability());
+                .firstName(applicant1LitigationFriend.getFirstName())
+                .lastName(applicant1LitigationFriend.getLastName())
+                .fullName(applicant1LitigationFriend.getFirstName() +
+                              " " + applicant1LitigationFriend.getLastName())
+                .hasSameAddressAsLitigant(applicant1LitigationFriend.getHasSameAddressAsLitigant())
+                .primaryAddress(applicant1LitigationFriend.getPrimaryAddress())
+                .certificateOfSuitability(applicant1LitigationFriend.getCertificateOfSuitability())
+                .flags(Flags.builder()
+                           .partyName(applicant1LitigationFriend.getFlags().getPartyName())
+                           .roleOnCase(applicant1LitigationFriend.getFlags().getRoleOnCase()).build());
 
             // Add email address if not null
             if (caseData.getApplicant1LitigationFriend().getEmailAddress() != null) {
