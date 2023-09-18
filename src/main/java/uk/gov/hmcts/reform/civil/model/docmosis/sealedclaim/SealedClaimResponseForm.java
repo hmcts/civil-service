@@ -110,8 +110,7 @@ public class SealedClaimResponseForm {
                                       .firstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
                                       .paymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount()))
                                       .build())
-                .payBy(caseData.getRespondent1RepaymentPlan()
-                           .finalPaymentBy(totalClaimAmount))
+                .payBy(repaymentPlan.finalPaymentBy(totalClaimAmount))
                 .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
         }
     }
