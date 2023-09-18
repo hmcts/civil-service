@@ -5,7 +5,7 @@ import uk.gov.hmcts.contino.AppPipelineDsl
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "master"
+def ccdBranch = "CIV-0000-SNI-4613-fix-litigation-friend"
 def camundaBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
