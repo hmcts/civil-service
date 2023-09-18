@@ -503,7 +503,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             dataBuilder.applicant1LitigationFriend(litigationFriendBuilder.build());
         }
 
-
         if (toggleService.isHmcEnabled()) {
             populateWithPartyIds(dataBuilder);
         }
