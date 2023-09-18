@@ -28,12 +28,13 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     private static final String REFERENCE_TEMPLATE = "claim-submitted-notification-%s";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final Map<String, Callback> callBackMap = Map.of(
+        callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForClaimSubmitted
+    );
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForClaimSubmitted
-        );
+        return callBackMap;
     }
 
     @Override
