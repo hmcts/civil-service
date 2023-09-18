@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL;
 
@@ -147,6 +148,7 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
         var applicant = caseData.getApplicant1();
         var applicantRepresentative = representativeService.getApplicantRepresentative(caseData);
         var litigationFriend1 = caseData.getApplicant1LitigationFriend();
+        log.info("LitigationFriend: " + litigationFriend1);
         var applicantParties = new ArrayList<>(List.of(
             Party.builder()
                 .type(applicant.getType().getDisplayValue())
