@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadWitness;
@@ -635,6 +636,22 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryIdAndRenameDoc(caseData.getDocumentCostsApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_COSTS);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE);
         }
+
+        // null the values of the lists, so that on future retriggers of the event, they are blank
+        caseDataBuilder.disclosureSelectionEvidence(null);
+        caseDataBuilder.disclosureSelectionEvidenceRes(null);
+        caseDataBuilder.witnessSelectionEvidence(null);
+        caseDataBuilder.witnessSelectionEvidenceSmallClaim(null);
+        caseDataBuilder.witnessSelectionEvidenceRes(null);
+        caseDataBuilder.witnessSelectionEvidenceSmallClaimRes(null);
+        caseDataBuilder.expertSelectionEvidenceRes(null);
+        caseDataBuilder.expertSelectionEvidence(null);
+        caseDataBuilder.expertSelectionEvidenceSmallClaim(null);
+        caseDataBuilder.expertSelectionEvidenceSmallClaimRes(null);
+        caseDataBuilder.trialSelectionEvidence(null);
+        caseDataBuilder.trialSelectionEvidenceSmallClaim(null);
+        caseDataBuilder.trialSelectionEvidenceRes(null);
+        caseDataBuilder.trialSelectionEvidenceSmallClaimRes(null);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
