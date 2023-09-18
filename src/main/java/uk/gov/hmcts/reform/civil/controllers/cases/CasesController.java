@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.controllers.cases;
 
-import feign.FeignException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -24,22 +23,26 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
+import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseWorkerSearchCaseParams;
 import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService;
 import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerEventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
+import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
+import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Collections.emptyList;
 
@@ -57,8 +60,11 @@ public class CasesController {
     private final CoreCaseDataService coreCaseDataService;
     private final DashboardClaimInfoService dashboardClaimInfoService;
     private final CaseEventService caseEventService;
+    private final CaseSdtRequestSearchService caseSdtRequestSearchService;
     private final CaseworkerCaseEventService caseworkerCaseEventService;
     private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
+    private final PostcodeValidator postcodeValidator;
+    private final UserInformationService userInformationService;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -107,25 +113,27 @@ public class CasesController {
 
     @GetMapping(path = "/claimant/{submitterId}")
     @Operation(summary = "Gets basic claim information for claimant")
-    public ResponseEntity<List<DashboardClaimInfo>> getClaimsForClaimant(
-        @PathVariable("submitterId") String submitterId,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
-    ) {
-        List<DashboardClaimInfo> ocmcClaims = dashboardClaimInfoService.getClaimsForClaimant(
-            authorization,
-            submitterId
-        );
-        return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/defendant/{submitterId}")
-    @Operation(summary = "Gets basic claim information for defendant")
-    public ResponseEntity<DashboardDefendantResponse> getClaimsForDefendant(
+    public ResponseEntity<DashboardResponse> getClaimsForClaimant(
         @PathVariable("submitterId") String submitterId,
         @RequestParam(value = "page", defaultValue = "1") int currentPage,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
     ) {
-        DashboardDefendantResponse defendantClaims = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimantClaims = dashboardClaimInfoService.getDashboardClaimantResponse(
+            authorization,
+            submitterId,
+            currentPage
+        );
+        return new ResponseEntity<>(claimantClaims, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/defendant/{submitterId}")
+    @Operation(summary = "Gets basic claim information for defendant")
+    public ResponseEntity<DashboardResponse> getClaimsForDefendant(
+        @PathVariable("submitterId") String submitterId,
+        @RequestParam(value = "page", defaultValue = "1") int currentPage,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
+    ) {
+        DashboardResponse defendantClaims = dashboardClaimInfoService.getDashboardDefendantResponse(
             authorization,
             submitterId,
             currentPage
@@ -178,7 +186,7 @@ public class CasesController {
         return new ResponseEntity<>(deadlineAgreedDate, HttpStatus.OK);
     }
 
-    @PostMapping(path = "/caseworkers/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases/{userId}")
+    @PostMapping(path = "/caseworkers/create-case/{userId}")
     @Operation(summary = "Submits event for new case, for caseworker")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Created"),
@@ -199,9 +207,53 @@ public class CasesController {
             log.info("Updated case data:  " + submitEventDto.getData().toString());
             CaseDetails caseDetails = caseworkerCaseEventService.submitEventForNewClaimCaseWorker(params);
             return new ResponseEntity<>(caseDetails, HttpStatus.CREATED);
-        } catch (FeignException.UnprocessableEntity ex) {
+        } catch (Exception ex) {
+            log.error("Case  creation unsuccessful:  " + ex.getMessage());
             throw new CaseDataInvalidException();
         }
+    }
+
+    @GetMapping(path = "/caseworker/searchCaseForSDT/{userId}")
+    @Operation(summary = "SQL Search for a case, for caseworker")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "List of cases for the given search criteria")})
+    public Boolean caseworkerSearchCase(
+        @PathVariable("userId") String userId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+        @RequestParam(name = "sdtRequestId") String searchParam
+    ) {
+        CaseWorkerSearchCaseParams params = CaseWorkerSearchCaseParams.builder()
+            .authorisation(authorization)
+            .userId(userId)
+            .searchCriteria(Map.of("case.sdtRequestIdFromSdt", searchParam)).build();
+        List<CaseDetails> caseDetails = caseSdtRequestSearchService.searchCaseForSdtRequest(params);
+
+        if (caseDetails.size() < 1 && caseDetails.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    @GetMapping(path = "/caseworker/validatePin")
+    @Operation(summary = "Validate address - PostCode")
+    public List<String> validatePostCode(
+        @RequestParam(name = "postCode") String postCode
+    ) {
+        List<String> errors =  postcodeValidator.validate(postCode);
+        return errors;
+    }
+
+    @GetMapping(path = "/{caseId}/userCaseRoles")
+    @Operation(summary = "Get user Roles for a case")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "400", description = "Bad request for caseId"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "404", description = "User not found on case")})
+    public ResponseEntity<List<String>> getUserInfo(
+        @PathVariable("caseId") String caseId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        return ResponseEntity.ok(userInformationService.getUserCaseRoles(caseId, authorization));
     }
 
 }
