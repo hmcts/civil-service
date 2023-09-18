@@ -150,22 +150,42 @@ public class RoboticsNotificationService {
     private String getSubjectForSpec(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject;
         if (caseData.isRespondent1NotRepresented()) {
-            if (nonNull(caseData.getPaymentTypeSelection())) {
-                subject = String.format(
-                    "LR v LiP Default Judgement Case Data for %s",
-                    caseData.getLegacyCaseReference()
-                );
-            } else if (caseData.isCcjRequestJudgmentByAdmission()) {
-                subject = String.format(
-                    "LR v LiP Judgement by Admission Case Data for %s",
-                    caseData.getLegacyCaseReference()
-                );
-            } else {
-                subject = String.format(
-                    "LR v LiP Case Data for %s",
-                    caseData.getLegacyCaseReference()
-                );
+            if(caseData.isLipvLipOneVOne()){
+                if (nonNull(caseData.getPaymentTypeSelection())) {
+                    subject = String.format(
+                        "LiP v LiP Default Judgement Case Data for %s",
+                        caseData.getLegacyCaseReference()
+                    );
+                } else if (caseData.isCcjRequestJudgmentByAdmission()) {
+                    subject = String.format(
+                        "LiP v LiP Judgement by Admission Case Data for %s",
+                        caseData.getLegacyCaseReference()
+                    );
+                } else {
+                    subject = String.format(
+                        "LiP v LiP Case Data for %s",
+                        caseData.getLegacyCaseReference()
+                    );
+                }
+            }else{
+                if (nonNull(caseData.getPaymentTypeSelection())) {
+                    subject = String.format(
+                        "LR v LiP Default Judgement Case Data for %s",
+                        caseData.getLegacyCaseReference()
+                    );
+                } else if (caseData.isCcjRequestJudgmentByAdmission()) {
+                    subject = String.format(
+                        "LR v LiP Judgement by Admission Case Data for %s",
+                        caseData.getLegacyCaseReference()
+                    );
+                } else {
+                    subject = String.format(
+                        "LR v LiP Case Data for %s",
+                        caseData.getLegacyCaseReference()
+                    );
+                }
             }
+
         } else if (isMultiParty) {
             subject = String.format("Multiparty LR v LR Case Data for %s - %s - %s",
                                     caseData.getLegacyCaseReference(),
