@@ -145,7 +145,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
                             .partyEmail(partyEmail)
-                             .build())
+                            .build())
             .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                              .build())
             .claimDetailsNotificationDate(LocalDateTime.now())
