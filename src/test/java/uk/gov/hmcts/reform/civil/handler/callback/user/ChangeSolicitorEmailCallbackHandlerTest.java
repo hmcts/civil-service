@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -10,12 +11,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -24,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -51,6 +58,9 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private CoreCaseUserService coreCaseUserService;
+
+    @MockBean
+    private PostcodeValidator postcodeValidator;
 
     @BeforeEach
     void setupTest() {
@@ -97,6 +107,33 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals("No", response.getData().get("isApplicant1"), "isApplicant1");
             assertEquals("Yes", response.getData().get("isRespondent1"), "isRespondent1");
             assertEquals("No", response.getData().get("isRespondent2"), "isRespondent2");
+        }
+
+        @Test
+        void shouldSetServiceAddress_whenSpec() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build().toBuilder()
+                .specRespondentCorrespondenceAddressRequired(YesOrNo.YES)
+                .specRespondentCorrespondenceAddressdetails(Address.builder()
+                                                                .postCode("mail post code")
+                                                                .addressLine1("mail line 1")
+                                                                .build())
+                .build();
+            params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("respondentSolicitor1ServiceAddressRequired"))
+                    .isEqualTo("Yes");
+            Assertions.assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
+                .extracting("AddressLine1")
+                    .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
+                .extracting("PostCode")
+                    .isEqualTo("mail post code");
         }
 
         @Test
@@ -168,6 +205,28 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldReturnResponse1and2_when1v2ss() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .respondentSolicitor1EmailAddress("respondent1solicitor@gmail.com")
+                .build().toBuilder()
+                .respondent2(Party.builder()
+                                 .companyName("c3")
+                                 .type(Party.Type.COMPANY)
+                                 .build())
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertEquals("respondent1solicitor@gmail.com",
+                         response.getData().get("respondentSolicitor2EmailAddress"),
+                         "respondentSolicitor2EmailAddress");
+        }
+
+        @Test
         void shouldReturnResponse_WithRespondent2SolicitorEmail() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
@@ -191,9 +250,231 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertEquals(null, response.getData().get("isApplicant1"), "isApplicant1");
-            assertEquals(null, response.getData().get("isRespondent1"), "isRespondent1");
-            assertEquals(null, response.getData().get("isRespondent2"), "isRespondent2");
+            assertNull(response.getData().get("isApplicant1"), "isApplicant1");
+            assertNull(response.getData().get("isRespondent1"), "isRespondent1");
+            assertNull(response.getData().get("isRespondent2"), "isRespondent2");
+        }
+
+        @Test
+        void shouldCopyBack_whenSpecApp1() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[APPLICANTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
+                .toBuilder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .applicantSolicitor1ServiceAddressRequired(YesOrNo.YES)
+                .applicantSolicitor1ServiceAddress(Address.builder()
+                                                       .addressLine1("mail line 1")
+                                                       .postCode("mail post code")
+                                                       .build()
+                )
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("specApplicantCorrespondenceAddressdetails"))
+                .extracting("AddressLine1")
+                .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("specApplicantCorrespondenceAddressdetails"))
+                .extracting("PostCode")
+                .isEqualTo("mail post code");
+        }
+
+        @Test
+        void shouldCopyBack_whenSpecDef1() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
+                .toBuilder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondentSolicitor1ServiceAddressRequired(YesOrNo.YES)
+                .respondentSolicitor1ServiceAddress(Address.builder()
+                                                       .addressLine1("mail line 1")
+                                                       .postCode("mail post code")
+                                                       .build()
+                )
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
+                .extracting("AddressLine1")
+                .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
+                .extracting("PostCode")
+                .isEqualTo("mail post code");
+        }
+
+        @Test
+        void shouldCopyBack_whenSpecDef2() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
+                .toBuilder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondentSolicitor2ServiceAddressRequired(YesOrNo.YES)
+                .respondentSolicitor2ServiceAddress(Address.builder()
+                                                       .addressLine1("mail line 1")
+                                                       .postCode("mail post code")
+                                                       .build()
+                )
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+                .extracting("AddressLine1")
+                .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+                .extracting("PostCode")
+                .isEqualTo("mail post code");
+        }
+
+        @Test
+        void shouldBackUp_whenNewRequiredIsNo() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
+                .toBuilder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondentSolicitor2ServiceAddressRequired(YesOrNo.NO)
+                .respondentSolicitor2ServiceAddress(null)
+                .specRespondent2CorrespondenceAddressdetails(Address.builder()
+                                                                 .addressLine1("mail line 1")
+                                                                 .postCode("mail post code")
+                                                                 .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+                .extracting("AddressLine1")
+                .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+                .extracting("PostCode")
+                .isEqualTo("mail post code");
+        }
+
+        @Test
+        void shouldBackUp_whenNewRequiredIsNo1v2ss() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build()
+                .toBuilder()
+                .respondent2(Party.builder()
+                                 .type(Party.Type.COMPANY)
+                                 .companyName("c3")
+                                 .build())
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+                .respondentSolicitor1ServiceAddress(null)
+                .specRespondentCorrespondenceAddressdetails(Address.builder()
+                                                                 .addressLine1("mail line 1")
+                                                                 .postCode("mail post code")
+                                                                 .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+                .extracting("AddressLine1")
+                .isEqualTo("mail line 1");
+            Assertions.assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
+                .extracting("PostCode")
+                .isEqualTo("mail post code");
+        }
+
+        @Test
+        void shouldUpdateReferenceApplicant1() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[APPLICANTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData = caseData.toBuilder()
+                .isApplicant1(YesOrNo.YES)
+                .applicant1OrganisationPolicy(caseData.getApplicant1OrganisationPolicy().toBuilder()
+                                                  .orgPolicyReference("new reference")
+                                                  .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //noinspection unchecked
+            Assertions.assertThat(response.getData().get("solicitorReferences"))
+                    .extracting("applicantSolicitor1Reference")
+                        .isEqualTo("new reference");
+        }
+
+        @Test
+        void shouldUpdateReferenceRespondent1() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData = caseData.toBuilder()
+                .isRespondent1(YesOrNo.YES)
+                .respondent1OrganisationPolicy(caseData.getRespondent1OrganisationPolicy().toBuilder()
+                                                  .orgPolicyReference("new reference")
+                                                  .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //noinspection unchecked
+            Assertions.assertThat(response.getData().get("solicitorReferences"))
+                    .extracting("respondentSolicitor1Reference")
+                        .isEqualTo("new reference");
+        }
+
+        @Test
+        void shouldUpdateReferenceRespondent2() {
+            List<String> caseRoles = new ArrayList<>();
+            caseRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData = caseData.toBuilder()
+                .isRespondent2(YesOrNo.YES)
+                .respondent2OrganisationPolicy(caseData.getRespondent2OrganisationPolicy().toBuilder()
+                                                  .orgPolicyReference("new reference")
+                                                  .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //noinspection unchecked
+            Assertions.assertThat(response.getData().get("solicitorReferences"))
+                    .extracting("respondentSolicitor2Reference")
+                        .isEqualTo("new reference");
         }
     }
 
@@ -284,7 +565,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertEquals("# You have updated a claimant's legal representative's email address",
+            assertEquals("# You have updated a claimant's legal representative's information",
                          response.getConfirmationHeader(), "confirmationHeader");
             assertEquals("<br />",
                          response.getConfirmationBody(), "confirmationBody");
@@ -299,7 +580,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertEquals("# You have updated a defendant's legal representative's email address",
+            assertEquals("# You have updated a defendant's legal representative's information",
                          response.getConfirmationHeader(), "confirmationHeader");
             assertEquals("<br />",
                          response.getConfirmationBody(), "confirmationBody");
@@ -314,7 +595,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertEquals("# You have updated a defendant's legal representative's email address",
+            assertEquals("# You have updated a defendant's legal representative's information",
                          response.getConfirmationHeader(), "confirmationHeader");
             assertEquals("<br />",
                          response.getConfirmationBody(), "confirmationBody");
@@ -330,7 +611,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            assertEquals("# You have updated a defendant's legal representative's email address",
+            assertEquals("# You have updated a defendant's legal representative's information",
                          response.getConfirmationHeader(), "confirmationHeader");
             assertEquals("<br />",
                          response.getConfirmationBody(), "confirmationBody");
