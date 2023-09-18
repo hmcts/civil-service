@@ -68,8 +68,8 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.otherDetails(tempOtherDetails)
             .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("229786")
-                                        .region("1")
+                                        .baseLocation("192280")
+                                        .region("4")
                                         .build())
             .build();
 
