@@ -146,6 +146,7 @@ public class RoboticsDataMapper {
             .contactEmailAddress(caseData.getRespondentSolicitor1EmailAddress())
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                           .map(s -> s.substring(0, Math.min(s.length(), 24)))
                            .orElse(null)
             );
 
@@ -216,6 +217,7 @@ public class RoboticsDataMapper {
             .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                           .map(s -> s.substring(0, Math.min(s.length(), 24)))
                            .orElse(null)
             );
 
@@ -333,7 +335,11 @@ public class RoboticsDataMapper {
             .isPayee(false)
             .organisationId(organisationId)
             .contactEmailAddress(caseData.getRespondentSolicitor2EmailAddress())
-            .reference(caseData.getRespondentSolicitor2Reference());
+            .reference(ofNullable(caseData.getSolicitorReferences())
+                           .map(SolicitorReferences::getRespondentSolicitor2Reference)
+                           .map(s -> s.substring(0, Math.min(s.length(), 24)))
+                           .orElse(null)
+            );
 
         if (organisationId != null) {
             organisationService.findOrganisationById(organisationId)
