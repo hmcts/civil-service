@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.PaymentMethod;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
@@ -25,7 +24,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.COUNTER_CLAIM;
@@ -105,11 +103,12 @@ public class SealedClaimResponseForm {
     }
 
     private static void addRepaymentPlan(CaseData caseData, SealedClaimResponseForm.SealedClaimResponseFormBuilder builder, BigDecimal totalClaimAmount) {
-        if (caseData.getRespondent1RepaymentPlan() != null) {
+        RepaymentPlanLRspec repaymentPlan = caseData.getRespondent1RepaymentPlan();
+        if (repaymentPlan != null) {
             builder.repaymentPlan(RepaymentPlanTemplateData.builder()
-                                      .paymentFrequencyDisplay(caseData.getRespondent1RepaymentPlan().getPaymentFrequencyDisplay())
-                                      .firstRepaymentDate(caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate())
-                                      .paymentAmount(MonetaryConversions.penniesToPounds(caseData.getRespondent1RepaymentPlan().getPaymentAmount()))
+                                      .paymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay())
+                                      .firstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
+                                      .paymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount()))
                                       .build())
                 .payBy(caseData.getRespondent1RepaymentPlan()
                            .finalPaymentBy(totalClaimAmount))
@@ -119,35 +118,24 @@ public class SealedClaimResponseForm {
 
     private static void alreadyPaid(CaseData caseData, SealedClaimResponseForm.SealedClaimResponseFormBuilder builder) {
         RespondToClaim respondToClaim = caseData.getResponseToClaim();
+        String howMuchWasPaidAsString = MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()) + "";
         builder.whyReject("ALREADY_PAID")
-            .howMuchWasPaid(Optional.ofNullable(MonetaryConversions.penniesToPounds(respondToClaim.getHowMuchWasPaid()))
-                                .map(BigDecimal::toString)
-                                .orElse(""))
+            .howMuchWasPaid(howMuchWasPaidAsString)
             .paymentDate(respondToClaim.getWhenWasThisAmountPaid())
-            .paymentHow(respondToClaim.getHowWasThisAmountPaid() == PaymentMethod.OTHER
-                            ? respondToClaim.getHowWasThisAmountPaidOther()
-                            : respondToClaim.getHowWasThisAmountPaid()
-                .getHumanFriendly());
+            .paymentHow(respondToClaim.getExplanationOnHowTheAmountWasPaid());
     }
 
     private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, SealedClaimResponseForm.SealedClaimResponseFormBuilder builder) {
+        Optional<CaseDataLiP> caseDataLiPOptional = Optional.ofNullable(caseData.getCaseDataLiP());
         builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
-            .timelineComments(Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getTimeLineComment).orElse(
+            .timelineComments(caseDataLiPOptional.map(CaseDataLiP::getTimeLineComment).orElse(
                 ""))
-            .timelineEventList(Optional.ofNullable(caseData.getSpecResponseTimelineOfEvents()).map(Collection::stream)
-                                   .orElseGet(Stream::empty)
-                                   .map(event ->
-                                            EventTemplateData.builder()
-                                                .date(event.getValue().getTimelineDate())
-                                                .explanation(event.getValue().getTimelineDescription())
-                                                .build()).collect(Collectors.toList()))
-            .evidenceComments(Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getEvidenceComment).orElse(
+            .timelineEventList(EventTemplateData.toEventTemplateDataList(caseData.getSpecResponseTimelineOfEvents()))
+            .evidenceComments(caseDataLiPOptional.map(CaseDataLiP::getEvidenceComment).orElse(
                 ""))
-            .evidenceList(Optional.ofNullable(caseData.getSpecResponselistYourEvidenceList()).map(Collection::stream)
-                              .orElseGet(Stream::empty)
-                              .map(evidence -> EvidenceTemplateData.toEvidenceTemplateData(evidence))
-                              .toList());
+            .evidenceList(EvidenceTemplateData.toEvidenceTamplateDataList(caseData.getSpecResponselistYourEvidenceList()));
     }
+
 
     private static void fullDefenceData(CaseData caseData, SealedClaimResponseForm.SealedClaimResponseFormBuilder builder) {
         addDetailsOnWhyClaimIsRejected(caseData, builder);
@@ -158,7 +146,6 @@ public class SealedClaimResponseForm {
         }
     }
 
-    @JsonIgnore
     private static void partAdmissionData(CaseData caseData, SealedClaimResponseForm.SealedClaimResponseFormBuilder builder) {
         addDetailsOnWhyClaimIsRejected(caseData, builder);
         if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
