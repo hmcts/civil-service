@@ -153,9 +153,34 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .judgeConsideredPapers(nonNull(caseData.getFinalOrderRepresentation()) && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList())
                                    ? caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList()
                                        .stream().anyMatch(finalOrdersJudgePapers -> finalOrdersJudgePapers.equals(
-                FinalOrdersJudgePapers.CONSIDERED)) : false);
+                FinalOrdersJudgePapers.CONSIDERED)) : false)
+            .furtherHearingToggle(nonNull(caseData.getFinalOrderFurtherHearingToggle())
+                                      ?
+                                      caseData.getFinalOrderFurtherHearingToggle().stream().anyMatch(finalOrderToggle -> finalOrderToggle.name().equals(
+                                          FinalOrderToggle.SHOW.name())) : false)
+            .furtherHearingToToggle(nonNull(getFurtherHearingDate(caseData, false)))
+            .furtherHearingFromDate(getFurtherHearingDate(caseData, true))
+            .furtherHearingToDate(getFurtherHearingDate(caseData, false))
+            .furtherHearingLength(getFurtherHearingLength(caseData))
+            .showFurtherHearingLocationAlt(nonNull(caseData.getFinalOrderFurtherHearingComplex())
+                                               ? isDefaultCourt(caseData) : null)
+            .furtherHearingLocationDefault(LocationRefDataService.getDisplayEntry(locationRefData))
+            .furtherHearingLocationAlt(nonNull(caseData.getFinalOrderFurtherHearingToggle())
+                                           && nonNull(caseData.getFinalOrderFurtherHearingComplex())
+                                           && nonNull(caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList())
+                                           ? caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList().getValue().getLabel() : null )
+            .furtherHearingMethod(nonNull(caseData.getFinalOrderFurtherHearingComplex()) && nonNull(caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList())
+                                      ? caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList().name() : "");
 
         return assistedFormOrderBuilder.build();
+    }
+
+    public Boolean isDefaultCourt(CaseData caseData) {
+        if (caseData.getFinalOrderFurtherHearingToggle() != null && caseData.getFinalOrderFurtherHearingComplex() != null) {
+            return caseData.getFinalOrderFurtherHearingComplex()
+                .getHearingLocationList().getValue().getCode().equals("LOCATION_LIST");
+        }
+        return null;
     }
 
     public String getAppealFor(CaseData caseData) {
@@ -196,22 +221,22 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                         return "1.5 hours";
                     case HOUR_2:
                         return "2 hours";
+                    case OTHER:
+                        StringBuilder otherLength = new StringBuilder();
+                        if (caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays() != null) {
+                            otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays() + " days ");
+                        }
+                        if (caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours() != null) {
+                            otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours() +
+                                                   " hours ");
+                        }
+                        if (caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes() != null) {
+                            otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes() + " minutes");
+                        }
+                        return otherLength.toString();
                     default:
                         return "";
                 }
-            } else if (caseData.getFinalOrderFurtherHearingComplex().getLengthListOther() != null) {
-                StringBuilder otherLength = new StringBuilder();
-                if (caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays() != null) {
-                    otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays() + " days ");
-                }
-                if (caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours() != null) {
-                    otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours() +
-                                           " hours ");
-                }
-                if (caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes() != null) {
-                    otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes() + " minutes");
-                }
-                return otherLength.toString();
             }
         }
         return "";
