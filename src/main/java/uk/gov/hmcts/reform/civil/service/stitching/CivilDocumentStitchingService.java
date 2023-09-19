@@ -17,10 +17,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -66,18 +64,11 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         String documentUrl = document.getDocumentUrl();
         String documentBinaryUrl = document.getDocumentBinaryUrl();
 
-        LocalDateTime responseDate = null;
-        if (Objects.nonNull(caseData.getRespondent1ResponseDate())) {
-            responseDate = caseData.getRespondent1ResponseDate();
-        } else if (Objects.nonNull(caseData.getRespondent2ResponseDate())) {
-            responseDate = caseData.getRespondent2ResponseDate();
-        }
-
         return CaseDocument.builder()
             .documentLink(Document.builder().documentUrl(documentUrl).documentBinaryUrl(documentBinaryUrl).documentFileName(document.getDocumentFileName()).build())
             .documentName("Stitched document")
             .documentType(SEALED_CLAIM)
-            .createdDatetime(caseData.getCreatedResponseDate(responseDate))
+            .createdDatetime(caseData.getRespondentResponseDate())
             .createdBy(CREATED_BY)
             .build();
     }
