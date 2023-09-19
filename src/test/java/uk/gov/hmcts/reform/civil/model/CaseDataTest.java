@@ -255,25 +255,25 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenRApplicantUnrepresented_whenIsApplicant1NotRepresented_thenTrue() {
+    public void givenApplicantUnrepresented_whenIsApplicant1NotRepresented_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
             .applicant1Represented(YesOrNo.NO)
             .applicant1(Party.builder().build())
             .build();
         //Then
-        assertTrue(caseData.isRespondent1NotRepresented());
+        assertTrue(caseData.isApplicant1NotRepresented());
     }
 
     @Test
-    public void givenRApplicantRepresented_whenIsApplicant1NotRepresented_thenFalse() {
+    public void givenApplicantRepresented_whenIsApplicant1NotRepresented_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
             .applicant1Represented(YesOrNo.YES)
             .applicant1(Party.builder().build())
             .build();
         //Then
-        assertTrue(caseData.isRespondent1NotRepresented());
+        assertFalse(caseData.isApplicant1NotRepresented());
     }
 
     @Test
