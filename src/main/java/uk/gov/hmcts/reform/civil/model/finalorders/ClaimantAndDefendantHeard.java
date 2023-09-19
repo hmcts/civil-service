@@ -18,4 +18,8 @@ public class ClaimantAndDefendantHeard {
     private FinalOrdersDefendantRepresentationList typeRepresentationDefendantList;
     private TrialNoticeProcedure trialProcedureComplex;
     private String detailsRepresentationText;
+    private String typeRepresentationClaimantOneDynamic;
+    private String typeRepresentationClaimantTwoDynamic;
+    private String typeRepresentationDefendantOneDynamic;
+    private String typeRepresentationDefendantTwoDynamic;
 }
