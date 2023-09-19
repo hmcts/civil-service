@@ -48,10 +48,13 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final String costAmount;
     private final String bespokeText;
     private final boolean furtherHearingToggle;
+    private final boolean furtherHearingToToggle;
     private final LocalDate furtherHearingFromDate;
     private final LocalDate furtherHearingToDate;
     private final String furtherHearingLength;
-    private final String furtherHearingLocation;
+    private final String furtherHearingLocationDefault;
+    private final Boolean showFurtherHearingLocationAlt;
+    private final String furtherHearingLocationAlt;
     private final String furtherHearingMethod;
     private final boolean appealToggle;
     private final String appealFor;
