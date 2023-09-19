@@ -77,7 +77,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         }
         if (ofNullable(caseData.getRespondent2()).isEmpty()
             && caseData.isLipvLipOneVOne()
-            && toggleService.isPinInPostEnabled()) {
+            && toggleService.isLipVLipEnabled()) {
             template = notificationsProperties.getApplicantLiPDefaultJudgmentRequested();
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
@@ -125,7 +125,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         }
 
         if (caseData.isLipvLipOneVOne()
-            && toggleService.isPinInPostEnabled()
+            && toggleService.isLipVLipEnabled()
             && ofNullable(caseData.getRespondent2()).isEmpty()) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
