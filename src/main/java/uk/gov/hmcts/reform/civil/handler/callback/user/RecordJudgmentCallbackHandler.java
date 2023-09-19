@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
@@ -83,6 +84,10 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         caseData.setJoJudgmentStatusDetails(null);
         caseData.setJoPaymentPlanSelection(null);
         caseData.setJoJudgmentInstalmentDetails(null);
+        caseData.setJoJudgmentRecordReason(null);
+        caseData.setJoAmountOrdered(null);
+        caseData.setJoAmountCostOrdered(null);
+        caseData.setJoIsRegisteredWithRTL(null);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -101,11 +106,11 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
             .judgmentStatusTypes(JudgmentStatusType.ISSUED)
             .lastUpdatedDate(LocalDateTime.now()).build();
-        /*if (caseData.isJoIsRegisteredWithRTL()) {
+        if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
             judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED));
-        }*/
+        }
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
-        //caseData.setJoIsLiveJudgmentExists(true);
+        caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
