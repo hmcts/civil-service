@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.dto.RoboticsCaseDataDTO;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.RoboticsDataException;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapper;
@@ -45,6 +46,7 @@ public class RoboticsNotificationService {
     private final RoboticsEmailConfiguration roboticsEmailConfiguration;
     private final RoboticsDataMapper roboticsDataMapper;
     private final RoboticsDataMapperForSpec roboticsDataMapperForSpec;
+    private final FeatureToggleService toggleService;
 
     public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty, String authToken) {
         requireNonNull(caseData);
@@ -150,7 +152,7 @@ public class RoboticsNotificationService {
     private String getSubjectForSpec(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject;
         if (caseData.isRespondent1NotRepresented()) {
-            if(caseData.isLipvLipOneVOne()){
+            if(caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()){
                 if (nonNull(caseData.getPaymentTypeSelection())) {
                     subject = String.format(
                         "LiP v LiP Default Judgement Case Data for %s",
