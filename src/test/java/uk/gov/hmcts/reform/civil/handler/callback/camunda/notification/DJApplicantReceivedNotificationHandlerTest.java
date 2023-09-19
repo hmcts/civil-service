@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
@@ -53,6 +54,8 @@ public class DJApplicantReceivedNotificationHandlerTest {
     private OrganisationService organisationService;
     @Autowired
     private DJApplicantReceivedNotificationHandler handler;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -65,6 +68,8 @@ public class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn("test-template-requested-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+            when(featureToggleService.isLipVLipEnabled())
+                .thenReturn(false);
         }
 
         @Test
