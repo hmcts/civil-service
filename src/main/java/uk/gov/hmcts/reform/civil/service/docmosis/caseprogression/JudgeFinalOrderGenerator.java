@@ -146,23 +146,16 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                               ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
             .orderedText(caseData.getFinalOrderOrderedThatText())
             .claimantAttendsOrRepresented(claimantAttendsOrRepresentedTextBuilder(caseData))
-            .defendantAttendsOrRepresented(defendantAttendsOrRepresentedTextBuilder(caseData));
+            .defendantAttendsOrRepresented(defendantAttendsOrRepresentedTextBuilder(caseData))
+            .otherRepresentedText(nonNull(caseData.getFinalOrderRepresentation())
+                                      && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex())
+                                      ? caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex().getDetailsRepresentationText() : "")
+            .judgeConsideredPapers(nonNull(caseData.getFinalOrderRepresentation()) && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList())
+                                   ? caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList()
+                                       .stream().anyMatch(finalOrdersJudgePapers -> finalOrdersJudgePapers.equals(
+                FinalOrdersJudgePapers.CONSIDERED)) : false);
 
         return assistedFormOrderBuilder.build();
-    }
-
-    private LocalDate getOrderInitiativeOrWithoutNoticeDate(CaseData caseData) {
-        if (caseData.getOrderMadeOnDetailsList() != null) {
-            if (caseData.getOrderMadeOnDetailsList().name().equals(OrderMadeOnTypes.COURTS_INITIATIVE.name())) {
-                return caseData.getOrderMadeOnDetailsOrderCourt().getOwnInitiativeDate();
-            } else if (caseData.getOrderMadeOnDetailsList().name().equals(OrderMadeOnTypes.WITHOUT_NOTICE.name())) {
-                return caseData.getOrderMadeOnDetailsOrderWithoutNotice().getWithOutNoticeDate();
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
     }
 
     public String getAppealFor(CaseData caseData) {
@@ -188,21 +181,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         }
         return null;
     }
-
-//    public boolean getIfAttended(CaseData caseData, boolean isDefendant) {
-//        if (caseData.getFinalOrderRepresentation() != null && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null) {
-//            if (isDefendant) {
-//                return (!(caseData.getFinalOrderRepresentation().getTypeRepresentationComplex()
-//                    .getTypeRepresentationDefendantList()
-//                    .equals(DEFENDANT_NOT_ATTENDING)));
-//            } else {
-//                return (!(caseData.getFinalOrderRepresentation().getTypeRepresentationComplex()
-//                    .getTypeRepresentationClaimantList()
-//                    .equals(CLAIMANT_NOT_ATTENDING)));
-//            }
-//        }
-//        return false;
-//    }
 
     public String getFurtherHearingLength(CaseData caseData) {
         if (caseData.getFinalOrderFurtherHearingComplex() != null) {
@@ -239,113 +217,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return "";
     }
 
-//    private String getNotAttendedText(CaseData caseData, String party) {
-//        if (caseData.getFinalOrderRepresentation() == null) {
-//            return "";
-//        }
-//        if (party.equals("DEFENDANT")) {
-//            return getDefendantNotAttendedText(caseData);
-//        } else {
-//            return getClaimantNotAttendedText(caseData);
-//        }
-//    }
-
-//    public String getClaimantNotAttendedText(CaseData caseData) {
-//        if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-//            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex() != null
-//                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList() != null) {
-//            FinalOrdersClaimantDefendantNotAttending notAttendingType =
-//                    caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList();
-//            switch (notAttendingType) {
-//                case NOT_SATISFIED_NOTICE_OF_TRIAL:
-//                    return "The claimant did not attend the trial, " +
-//                        "but the Judge was not satisfied that they had received notice of the hearing and it was not reasonable to proceed in their absence";
-//                case SATISFIED_NOTICE_OF_TRIAL:
-//                    return "The claimant did not attend the trial and whilst the Judge was satisfied that they had " +
-//                        "received notice of the trial it was not reasonable to proceed in their absence";
-//                case SATISFIED_REASONABLE_TO_PROCEED:
-//                    return "The claimant did not attend the trial, but the Judge was satisfied that they had received" +
-//                        " notice" +
-//                        " of the trial and it was reasonable to proceed in their absence";
-//                default:
-//                    return "";
-//            }
-//        }
-//        return "";
-//    }
-
-//    public String getDefendantNotAttendedText(CaseData caseData) {
-//        if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-//            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex() != null
-//                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef() != null) {
-//            FinalOrdersClaimantDefendantNotAttending notAttendingType =
-//                    caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef();
-//            switch (notAttendingType) {
-//                case NOT_SATISFIED_NOTICE_OF_TRIAL:
-//                    return "The defendant did not attend the trial," +
-//                        " but the Judge was not satisfied that they had received notice of the hearing and it was not reasonable to proceed in their absence";
-//                case SATISFIED_NOTICE_OF_TRIAL:
-//                    return "The defendant did not attend the trial and whilst the Judge was satisfied " +
-//                        "that they had received notice of the trial it was not reasonable to proceed in their absence";
-//                case SATISFIED_REASONABLE_TO_PROCEED:
-//                    return "The defendant did not attend the trial," +
-//                        " but the Judge was satisfied that they had received notice of the trial and it was reasonable to proceed in their absence";
-//                default:
-//                    return "";
-//            }
-//        }
-//        return "";
-//    }
-
-//    public String getRepresentedClaimant(CaseData caseData) {
-//        if (caseData.getFinalOrderRepresentation() != null && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-//            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantList() != null) {
-//            FinalOrdersClaimantRepresentationList type =
-//                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantList();
-//            switch (type) {
-//                case COUNSEL_FOR_CLAIMANT:
-//                    return "counsel for claimant";
-//                case SOLICITOR_FOR_CLAIMANT:
-//                    return "solicitor for claimant";
-//                case COST_DRAFTSMAN_FOR_THE_CLAIMANT:
-//                    return "costs draftsman for the claimant";
-//                case THE_CLAIMANT_IN_PERSON:
-//                    return "the claimant in person";
-//                case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT:
-//                    return "lay representative for the claimant";
-//                default: return "";
-//            }
-//        }
-//        return "";
-//    }
-
-//    public String getRepresentedDefendant(CaseData caseData) {
-//        if (caseData.getFinalOrderRepresentation() != null && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-//            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationDefendantList() != null) {
-//            FinalOrdersDefendantRepresentationList type =
-//                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationDefendantList();
-//            switch (type) {
-//                case COUNSEL_FOR_DEFENDANT:
-//                    return "counsel for defendant";
-//                case SOLICITOR_FOR_DEFENDANT:
-//                    return "solicitor for defendant";
-//                case COST_DRAFTSMAN_FOR_THE_DEFENDANT:
-//                    return "costs draftsman for the defendant";
-//                case THE_DEFENDANT_IN_PERSON:
-//                    return "the defendant in person";
-//                case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT:
-//                    return "lay representative for the defendant";
-//                default: return "";
-//            }
-//        }
-//        return "";
-//    }
-
     private boolean hasSDOBeenMade(CaseState state) {
 
         return !JUDICIAL_REFERRAL.equals(state);
     }
-
 
     public String orderMadeDateBuilder(CaseData caseData) {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -387,11 +262,11 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantList();
             switch (type) {
                 case COUNSEL_FOR_CLAIMANT:
-                    return format("Council for %s, the claimant.", caseData.getApplicant1().getPartyName());
+                    return format("Counsel for %s, the claimant.", caseData.getApplicant1().getPartyName());
                 case SOLICITOR_FOR_CLAIMANT:
-                    return format("Solicitor for %s, claimant.", caseData.getApplicant1().getPartyName());
+                    return format("Solicitor for %s, the claimant.", caseData.getApplicant1().getPartyName());
                 case COST_DRAFTSMAN_FOR_THE_CLAIMANT:
-                    return format("Costs draftsman for %s, claimant.", caseData.getApplicant1().getPartyName());
+                    return format("Costs draftsman for %s, the claimant.", caseData.getApplicant1().getPartyName());
                 case THE_CLAIMANT_IN_PERSON:
                     return format("%s, the claimant, in person.", caseData.getApplicant1().getPartyName());
                 case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT:
@@ -412,11 +287,11 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationDefendantList();
             switch (type) {
                 case COUNSEL_FOR_DEFENDANT:
-                    return format("Council for %s, the defendant.", caseData.getRespondent1().getPartyName());
+                    return format("Counsel for %s, the defendant.", caseData.getRespondent1().getPartyName());
                 case SOLICITOR_FOR_DEFENDANT:
-                    return format("Solicitor for %s, defendant.", caseData.getRespondent1().getPartyName());
+                    return format("Solicitor for %s, the defendant.", caseData.getRespondent1().getPartyName());
                 case COST_DRAFTSMAN_FOR_THE_DEFENDANT:
-                    return format("Costs draftsman for %s, defendant.", caseData.getRespondent1().getPartyName());
+                    return format("Costs draftsman for %s, the defendant.", caseData.getRespondent1().getPartyName());
                 case THE_DEFENDANT_IN_PERSON:
                     return format("%s, the defendant, in person.", caseData.getRespondent1().getPartyName());
                 case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT:
@@ -437,17 +312,18 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList();
             switch (notAttendingType) {
                 case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                    return format("The %s did not attend the trial, " +
+                    return format("%s, the claimant, did not attend the trial, " +
                         "but the Judge was not satisfied that they had received notice of the hearing and it was not reasonable to proceed in their absence",
                                   caseData.getApplicant1().getPartyName());
                 case SATISFIED_NOTICE_OF_TRIAL:
-                    return format("The %s did not attend the trial and whilst the Judge was satisfied that they had " +
+                    return format("%s, the claimant, did not attend the trial and whilst the Judge was satisfied that they had " +
                         "received notice of the trial it was not reasonable to proceed in their absence",
                                   caseData.getApplicant1().getPartyName());
                 case SATISFIED_REASONABLE_TO_PROCEED:
-                    return format("The %s did not attend the trial, but the Judge was satisfied that they had received" +
+                    return format("%s, the claimant, did not attend the trial, but the Judge was satisfied that they had received" +
                         " notice" +
-                        " of the trial and it was reasonable to proceed in their absence", caseData.getApplicant1().getPartyName());
+                        " of the trial and it was reasonable to proceed in their absence",
+                                  caseData.getApplicant1().getPartyName());
                 default:
                     return "";
             }
@@ -458,22 +334,23 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     public String defendantNotAttendingText(CaseData caseData) {
         if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
             && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex() != null
-            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getList() != null) {
+            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef() != null) {
             FinalOrdersClaimantDefendantNotAttending notAttendingType =
-                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getList();
+                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef();
             switch (notAttendingType) {
                 case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                    return format("The %s did not attend the trial, " +
+                    return format("%s, the defendant, did not attend the trial, " +
                                       "but the Judge was not satisfied that they had received notice of the hearing and it was not reasonable to proceed in their absence",
                                   caseData.getRespondent1().getPartyName());
                 case SATISFIED_NOTICE_OF_TRIAL:
-                    return format("The %s did not attend the trial and whilst the Judge was satisfied that they had " +
+                    return format("%s, the defendant, did not attend the trial and whilst the Judge was satisfied that they had " +
                                       "received notice of the trial it was not reasonable to proceed in their absence",
                                   caseData.getRespondent1().getPartyName());
                 case SATISFIED_REASONABLE_TO_PROCEED:
-                    return format("The %s did not attend the trial, but the Judge was satisfied that they had received" +
+                    return format("%s, the defendant, did not attend the trial, but the Judge was satisfied that they had received" +
                                       " notice" +
-                                      " of the trial and it was reasonable to proceed in their absence", caseData.getRespondent1().getPartyName());
+                                      " of the trial and it was reasonable to proceed in their absence",
+                                  caseData.getRespondent1().getPartyName());
                 default:
                     return "";
             }
