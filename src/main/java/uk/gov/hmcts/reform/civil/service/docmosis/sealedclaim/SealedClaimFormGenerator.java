@@ -155,7 +155,7 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
                 .primaryAddress(applicant.getPrimaryAddress())
                 .litigationFriendName(
                     ofNullable(caseData.getApplicant1LitigationFriend())
-                        .map(LitigationFriend::getFullName)
+                        .map(lf -> lf.getFirstName() + " " + lf.getLastName())
                         .orElse(""))
                 .representative(applicantRepresentative)
                 .build()));
