@@ -4,9 +4,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +23,7 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ID;
@@ -28,8 +33,10 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addA
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendant1Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendant2Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addDefendantOptions1v2SameSolicitor;
-import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.appendUserAndType;
+
 class ManageContactInformationUtilsTest {
+
+    private ManageContactInformationUtils manageContactInformationUtils;
 
     @Test
     void shouldAddCorrectOptions_forClaimant1AsLegalRep() {
@@ -253,53 +260,191 @@ class ManageContactInformationUtilsTest {
         assertThat(options).isEqualTo(expectedDefendants1v2SameSolicitorOptions(true, true));
     }
 
+    @Test
+    void shouldMapExpertsToUpdatePartyDetailsForm() {
+        Expert expert1 = Expert.builder().firstName("First").lastName("Name").partyID("id").eventAdded("event").build();
+        Expert expert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
+            .phoneNumber("1").emailAddress("email").partyID("id2").build();
+        UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
+            .partyId("id").build();
+        UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("expert")
+            .fieldOfExpertise("field").phoneNumber("1").emailAddress("email").partyId("id2").build();
+
+        assertThat(manageContactInformationUtils.mapExpertsToUpdatePartyDetailsForm(wrapElements(expert1, expert2)))
+            .isEqualTo(wrapElements(party, party2));
+    }
+
+    @Test
+    void shouldMapExpertsToUpdatePartyDetailsForm_ifEmpty() {
+        assertThat(manageContactInformationUtils.mapExpertsToUpdatePartyDetailsForm(null)).isEqualTo(new ArrayList<>());
+    }
+
+    @Nested
+    class MapToDQExperts {
+        UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("Lewis").lastName("John")
+            .partyId("id").build();
+        UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("expert")
+            .fieldOfExpertise("field").phoneNumber("1").emailAddress("expertemail").partyId("id2").build();
+
+        LocalDate date = LocalDate.of(2020, 3, 20);
+
+        Expert expert1 = Expert.builder().firstName("First").lastName("Name").partyID("id").eventAdded("event")
+            .dateAdded(date).estimatedCost(BigDecimal.valueOf(10000)).build();
+        Expert expert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
+            .eventAdded("event").dateAdded(date).phoneNumber("1").emailAddress("email").partyID("id2").build();
+
+        @Test
+        void shouldEditExperts() {
+            Expert expectedExpert1 = Expert.builder().firstName("Lewis").lastName("John").partyID("id")
+                .eventAdded("event").dateAdded(date).estimatedCost(BigDecimal.valueOf(10000)).build();
+            Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
+                .eventAdded("event").dateAdded(date).phoneNumber("1").emailAddress("expertemail").partyID("id2").build();
+
+            assertThat(manageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts(wrapElements(expert1, expert2), wrapElements(party, party2)))
+                .isEqualTo(wrapElements(expectedExpert1, expectedExpert2));
+        }
+
+        @Test
+        void shouldAddExperts() {
+            Expert expectedExpert1 = Expert.builder().firstName("Lewis").lastName("John")
+                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
+                .partyID(null) //change this for CIV-10382
+                .build();
+            Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
+                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
+                .emailAddress("expertemail")
+                .partyID(null) //change this for CIV-10382
+                .build();
+
+            assertThat(manageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts(null, wrapElements(party, party2)))
+                .isEqualTo(wrapElements(expectedExpert1, expectedExpert2));
+        }
+
+        @Test
+        void shouldAddExpertsWithExistingExperts() {
+            Expert expectedExpert1 = Expert.builder().firstName("Lewis").lastName("John").partyID("id")
+                .eventAdded("event").dateAdded(date).estimatedCost(BigDecimal.valueOf(10000)).build();
+            Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
+                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
+                .emailAddress("expertemail")
+                .partyID(null) //change this for CIV-10382
+                .build();
+
+            assertThat(manageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts(wrapElements(expert1), wrapElements(party, party2)))
+                .isEqualTo(wrapElements(expectedExpert1, expectedExpert2));
+        }
+    }
+
+    @Nested
+    class MapToDQWitnesses {
+        UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("Lewis").lastName("John")
+            .partyId("id").build();
+        UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("witness")
+            .phoneNumber("1").emailAddress("witnessemail").partyId("id2").build();
+
+        LocalDate date = LocalDate.of(2020, 3, 20);
+
+        Witness witness1 = Witness.builder().firstName("First").lastName("Name").partyID("id").eventAdded("event")
+            .dateAdded(date).reasonForWitness("reason").build();
+        Witness witness2 = Witness.builder().firstName("Second").lastName("expert").eventAdded("event")
+            .dateAdded(date).phoneNumber("1").emailAddress("email").partyID("id2").build();
+
+        @Test
+        void shouldEditWitnesses() {
+            Witness expectedWitness1 = Witness.builder().firstName("Lewis").lastName("John")
+                .eventAdded("event").dateAdded(date).reasonForWitness("reason").partyID("id").build();
+
+            Witness expectedWitness2 = Witness.builder().firstName("Second").lastName("witness")
+                .eventAdded("event").dateAdded(date).phoneNumber("1").emailAddress("witnessemail")
+                .partyID("id2").build();
+
+            assertThat(manageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses(wrapElements(witness1, witness2), wrapElements(party, party2)))
+                .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
+        }
+
+        @Test
+        void shouldAddWitnesses() {
+            Witness expectedWitness1 = Witness.builder().firstName("Lewis").lastName("John")
+                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
+                .partyID(null).build(); // CIV-10382
+            Witness expectedWitness2 = Witness.builder().firstName("Second").lastName("witness")
+                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
+                .emailAddress("witnessemail")
+                .partyID(null).build(); // CIV-10382
+
+            assertThat(manageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses(null, wrapElements(party, party2)))
+                .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
+        }
+
+        @Test
+        void shouldRemoveWitnesses() {
+            assertThat(manageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses(wrapElements(witness1, witness2), null))
+                .isEmpty();
+        }
+
+        @Test
+        void shouldAddWitnessesWithExistingWitnesses() {
+            Witness expectedWitness1 = Witness.builder().firstName("Lewis").lastName("John").partyID("id")
+                .reasonForWitness("reason").eventAdded("event").dateAdded(date).build();
+            Witness expectedWitness2 = Witness.builder().firstName("Second").lastName("witness")
+                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
+                .emailAddress("witnessemail")
+                .partyID(null) //change this for CIV-10382
+                .build();
+
+            assertThat(manageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses(wrapElements(witness1), wrapElements(party, party2)))
+                .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
+        }
+    }
+
     @Nested
     class AppendCorrectUserAndType {
         @Test
-        void shouldHaveCorrectID_CLAIMANT_1_ADMIN_INDIVIDUAL() {
+        void shouldHaveCorrectID_ClaimantOneAdminIndividual() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().type(INDIVIDUAL).build()).build();
 
-            String result = appendUserAndType(CLAIMANT_ONE_ID, caseData, true);
+            String result = manageContactInformationUtils.appendUserAndType(CLAIMANT_ONE_ID, caseData, true);
 
             assertThat(result).isEqualTo("CLAIMANT_1_ADMIN_INDIVIDUAL");
         }
 
         @Test
-        void shouldHaveCorrectID_CLAIMANT_2_ADMIN_SOLE_TRADER() {
+        void shouldHaveCorrectID_ClaimantTwoAdminSoleTrader() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant2(Party.builder().type(SOLE_TRADER).build()).build();
 
-            String result = appendUserAndType(CLAIMANT_TWO_ID, caseData, true);
+            String result = manageContactInformationUtils.appendUserAndType(CLAIMANT_TWO_ID, caseData, true);
 
             assertThat(result).isEqualTo("CLAIMANT_2_ADMIN_SOLE_TRADER");
         }
 
         @Test
-        void shouldHaveCorrectID_DEFENDANT_1_ADMIN_ORGANISATION() {
+        void shouldHaveCorrectID_DefendantOneAdminOrganisation() {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1(Party.builder().type(ORGANISATION).build()).build();
 
-            String result = appendUserAndType(DEFENDANT_ONE_ID, caseData, true);
+            String result = manageContactInformationUtils.appendUserAndType(DEFENDANT_ONE_ID, caseData, true);
 
             assertThat(result).isEqualTo("DEFENDANT_1_ADMIN_ORGANISATION");
         }
 
         @Test
-        void shouldHaveCorrectID_DEFENDANT_2_ADMIN_COMPANY() {
+        void shouldHaveCorrectID_DefendantTwoAdminCompany() {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent2(Party.builder().type(COMPANY).build()).build();
 
-            String result = appendUserAndType(DEFENDANT_TWO_ID, caseData, true);
+            String result = manageContactInformationUtils.appendUserAndType(DEFENDANT_TWO_ID, caseData, true);
 
             assertThat(result).isEqualTo("DEFENDANT_2_ADMIN_COMPANY");
         }
+
         @Test
-        void shouldHaveCorrectID_DEFENDANT_2_LR_INDIVIDUAL() {
+        void shouldHaveCorrectID_DefendantTwoLegalRepIndividual() {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent2(Party.builder().type(INDIVIDUAL).build()).build();
 
-            String result = appendUserAndType(DEFENDANT_TWO_ID, caseData, false);
+            String result = manageContactInformationUtils.appendUserAndType(DEFENDANT_TWO_ID, caseData, false);
 
             assertThat(result).isEqualTo("DEFENDANT_2_LR_INDIVIDUAL");
         }

@@ -5859,8 +5859,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder updateDetailsForm(UpdateDetailsForm additionalDates) {
-        this.updateDetailsForm = additionalDates;
+    public CaseDataBuilder updateDetailsForm(UpdateDetailsForm form) {
+        this.updateDetailsForm = form;
         return this;
     }
 

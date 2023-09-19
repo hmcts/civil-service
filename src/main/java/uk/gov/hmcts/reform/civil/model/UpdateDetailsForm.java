@@ -7,11 +7,8 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.dq.Expert;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor

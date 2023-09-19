@@ -2,21 +2,23 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+
 public class ManageContactInformationUtils {
 
     private ManageContactInformationUtils() {
@@ -99,7 +101,7 @@ public class ManageContactInformationUtils {
         addDefendant2ExpertsAndWitnesses(list, caseData, isAdmin);
     }
 
-    public static String appendUserAndType(String partyChosen, CaseData caseData, boolean isAdmin) {
+    public String appendUserAndType(String partyChosen, CaseData caseData, boolean isAdmin) {
         String user = isAdmin ? "ADMIN" : "LR";
 
         switch (partyChosen) {
@@ -121,10 +123,10 @@ public class ManageContactInformationUtils {
         }
     }
 
-    public static List<Element<UpdatePartyDetailsForm>> mapExpertsToUpdatePartyDetailsForm(List<Element<Expert>> experts) {
+    public List<Element<UpdatePartyDetailsForm>> mapExpertsToUpdatePartyDetailsForm(List<Element<Expert>> experts) {
         List<Element<UpdatePartyDetailsForm>> newExperts = new ArrayList<>();
 
-        if (!experts.isEmpty()) {
+        if (experts != null) {
             for (Element<Expert> party : experts) {
                 Expert expert = party.getValue();
                 newExperts.addAll(wrapElements(UpdatePartyDetailsForm.builder()
@@ -133,28 +135,128 @@ public class ManageContactInformationUtils {
                                                    .emailAddress(expert.getEmailAddress())
                                                    .phoneNumber(expert.getPhoneNumber())
                                                    .fieldOfExpertise(expert.getFieldOfExpertise())
-                                                   .partyId(null) //this will need to be added in new ticket
+                                                   .partyId(expert.getPartyID()) //this will need to be added in new ticket
                                                    .build()));
             }
         }
         return newExperts;
     }
 
-    public static List<Element<Expert>> mapUpdatePartyDetailsFormToDQExperts (List<Element<Expert>> oldExperts, List<Element<UpdatePartyDetailsForm>> newExperts) {
-        // compare party ids
-        // if existing party ids, update the fields
-        // if new, add the fields
+    public List<Element<Expert>> mapUpdatePartyDetailsFormToDQExperts(List<Element<Expert>> existingDQExperts, List<Element<UpdatePartyDetailsForm>> formExperts) {
+        List<Element<Expert>> newExperts = new ArrayList<>();
+        List<Expert> experts = unwrapElements(existingDQExperts);
 
-        // be careful not to overwrite the experts
-        return oldExperts;
+        if (formExperts != null) {
+            for (Element<UpdatePartyDetailsForm> form : formExperts) {
+                UpdatePartyDetailsForm formExpert = form.getValue();
+
+                Expert dqExpert = experts.stream()
+                    .filter(e -> e.getPartyID().equals(formExpert.getPartyId()))
+                    .findFirst()
+                    .orElse(null);
+
+                if (dqExpert != null && dqExpert.getPartyID() != null) {
+                    // if id already exists in dq
+                    newExperts.addAll(wrapElements(dqExpert.toBuilder()
+                                                       .firstName(formExpert.getFirstName())
+                                                       .lastName(formExpert.getLastName())
+                                                       .emailAddress(formExpert.getEmailAddress())
+                                                       .phoneNumber(formExpert.getPhoneNumber())
+                                                       .fieldOfExpertise(formExpert.getFieldOfExpertise())
+                                                       .build()));
+                } else {
+                    // if id doesn't exist in dq means it is a newly added expert
+                    newExperts.addAll(wrapElements(Expert.builder()
+                                                       .firstName(formExpert.getFirstName())
+                                                       .lastName(formExpert.getLastName())
+                                                       .emailAddress(formExpert.getEmailAddress())
+                                                       .phoneNumber(formExpert.getPhoneNumber())
+                                                       .fieldOfExpertise(formExpert.getFieldOfExpertise())
+                                                       .dateAdded(LocalDate.now())
+                                                       .eventAdded("Manage Contact Information Event")
+                                                       .partyID(null) //CIV-10382
+                                                       .build()));
+                    // Replace above to this in CIV-10382
+                    // newExperts.addAll(wrapElements(appendWithNewPartyIds(Expert.builder()
+                    //                                   .firstName(formExpert.getFirstName())
+                    //                                  .lastName(formExpert.getLastName())
+                    //                                  .emailAddress(formExpert.getEmailAddress())
+                    //                                  .phoneNumber(formExpert.getPhoneNumber())
+                    //                                  .fieldOfExpertise(formExpert.getFieldOfExpertise())
+                    //                                  .dateAdded(LocalDate.now())
+                    //                                  .eventAdded("Manage Contact Information Event")
+                    //                                  .build())));
+                }
+            }
+        }
+
+        return newExperts;
     }
 
-    public static List<Element<PartyFlagStructure>> mapDQExpertsToPartyExperts (List<Element<Expert>> dqExperts, List<Element<PartyFlagStructure>> partyExperts) {
-        // compare party ids
-        // if existing party ids, update the fields
-        // if new, add the fields
-        // be careful not to overwrite the flags
-        return partyExperts;
+    public List<Element<UpdatePartyDetailsForm>> mapWitnessesToUpdatePartyDetailsForm(List<Element<Witness>> witnesses) {
+        List<Element<UpdatePartyDetailsForm>> newWitnesses = new ArrayList<>();
+
+        if (witnesses != null) {
+            for (Element<Witness> party : witnesses) {
+                Witness witness = party.getValue();
+                newWitnesses.addAll(wrapElements(UpdatePartyDetailsForm.builder()
+                                                   .firstName(witness.getFirstName())
+                                                   .lastName(witness.getLastName())
+                                                   .emailAddress(witness.getEmailAddress())
+                                                   .phoneNumber(witness.getPhoneNumber())
+                                                   .partyId(witness.getPartyID())
+                                                   .build()));
+            }
+        }
+        return newWitnesses;
+    }
+
+    public List<Element<Witness>> mapUpdatePartyDetailsFormToDQWitnesses(List<Element<Witness>> existingDQWitnesses, List<Element<UpdatePartyDetailsForm>> formWitnesses) {
+        List<Element<Witness>> newWitnesses = new ArrayList<>();
+        List<Witness> witnesses = unwrapElements(existingDQWitnesses);
+
+        if (formWitnesses != null) {
+            for (Element<UpdatePartyDetailsForm> form : formWitnesses) {
+                UpdatePartyDetailsForm formWitness = form.getValue();
+
+                Witness dqWitness = witnesses.stream()
+                    .filter(w -> w.getPartyID().equals(formWitness.getPartyId()))
+                    .findFirst()
+                    .orElse(null);
+
+                // if id already exists in dq
+                if (dqWitness != null && dqWitness.getPartyID() != null) {
+                    newWitnesses.addAll(wrapElements(dqWitness.toBuilder()
+                                                       .firstName(formWitness.getFirstName())
+                                                       .lastName(formWitness.getLastName())
+                                                       .emailAddress(formWitness.getEmailAddress())
+                                                       .phoneNumber(formWitness.getPhoneNumber())
+                                                       .build()));
+                } else {
+                    // if id doesn't exist in dq means it is a newly added witness
+                    newWitnesses.addAll(wrapElements(Witness.builder()
+                                                       .firstName(formWitness.getFirstName())
+                                                       .lastName(formWitness.getLastName())
+                                                       .emailAddress(formWitness.getEmailAddress())
+                                                       .phoneNumber(formWitness.getPhoneNumber())
+                                                       .dateAdded(LocalDate.now())
+                                                       .eventAdded("Manage Contact Information Event")
+                                                       .partyID(null) //CIV-10382
+                                                       .build()));
+                    // Replace above to this in CIV-10382
+                    // newWitnesses.addAll(wrapElements(appendWithNewPartyIds(Witness.builder()
+                    //                                  .firstName(formWitness.getFirstName())
+                    //                                  .lastName(formWitness.getLastName())
+                    //                                  .emailAddress(formWitness.getEmailAddress())
+                    //                                  .phoneNumber(formWitness.getPhoneNumber())
+                    //                                  .dateAdded(LocalDate.now())
+                    //                                  .eventAdded("Manage Contact Information Event")
+                    //                                   .build())));
+                }
+            }
+        }
+
+        return newWitnesses;
     }
 
     private static String formatId(String partyChosen, String isAdmin, Party party) {
@@ -305,6 +407,7 @@ public class ManageContactInformationUtils {
             }
         }
     }
+
     private static boolean shouldAddExperts(Experts experts) {
         return YES.equals(experts.getExpertRequired())
             && experts.getDetails() != null

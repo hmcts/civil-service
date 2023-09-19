@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 public class Expert {
 
+    private final String partyID;
     private final String name;
     private final String firstName;
     private final String lastName;
