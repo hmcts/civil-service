@@ -258,6 +258,18 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
     }
 
+    private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
+        claimantTwoPartyName = null;
+        defendantTwoPartyName = null;
+        MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
+        if (scenario == ONE_V_TWO_ONE_LEGAL_REP || scenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            defendantTwoPartyName = caseData.getRespondent2().getPartyName();
+        }
+        if (scenario == TWO_V_ONE) {
+            claimantTwoPartyName = caseData.getApplicant2().getPartyName();
+        }
+    }
+
     private void validateDate(LocalDate date, String dateDescription, String errorMessage, List<String> errors, Boolean pastDate) {
         if (pastDate) {
             if (nonNull(date) && date.isBefore(LocalDate.now())) {
