@@ -221,15 +221,18 @@ public class RoboticsDataMapperForSpec {
     }
 
     private Solicitor buildApplicantSolicitor(CaseData caseData, String id) {
+        System.out.println("-----------------------------------------");
+        System.out.println(featureToggleService.isLipVLipEnabled());
+        System.out.println(caseData.isLipvLipOneVOne());
+        if(featureToggleService.isLipVLipEnabled() && caseData.isLipvLipOneVOne()){
+            return null;
+        }
         Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());
-        var applicantEmail = ofNullable(caseData.getApplicantSolicitor1UserDetails())
-            .flatMap(userDetails -> ofNullable(userDetails.getEmail()))
-            .orElse(null);
         Solicitor.SolicitorBuilder solicitorBuilder = Solicitor.builder()
             .id(id)
             .isPayee(true)
             .organisationId(organisationId.orElse(null))
-            .contactEmailAddress(applicantEmail)
+            .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
                            .orElse(null)
