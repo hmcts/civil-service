@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class JudgmentInstalmentDetails {
 
-    private String installmentAmount;
+    private String instalmentAmount;
     private PaymentFrequency paymentFrequency;
-    private LocalDate firstInstallmentDate;
+    private LocalDate firstInstalmentDate;
 }

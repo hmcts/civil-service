@@ -610,18 +610,18 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<String>> sdtRequestId;
 
     //Judgements Online
-    private JudgmentRecordedReason joJudgementRecordReason;
-    private JudgmentStatusDetails joJudgementStatusDetails;
-    private LocalDate joJudgementRequestedDate;
-    private LocalDate joJudgementIssuedDate;
+    private JudgmentRecordedReason joJudgmentRecordReason;
+    private JudgmentStatusDetails joJudgmentStatusDetails;
+    private LocalDate joJudgmentRequestedDate;
+    private LocalDate joJudgmentIssuedDate;
     private LocalDate joOrderMadeDate;
     private String joAmountOrdered;
     private String joAmountCostOrdered;
-    private boolean joIsRegisteredWithRTL;
+    private YesOrNo joIsRegisteredWithRTL;
     private PaymentPlanSelection joPaymentPlanSelection;
     private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
     private LocalDate joPaymentToBeMadeByDate;
-    private YesOrNo joIsLiveJudgementExists;
+    private YesOrNo joIsLiveJudgmentExists;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
