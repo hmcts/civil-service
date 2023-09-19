@@ -170,7 +170,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                            && nonNull(caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList())
                                            ? caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList().getValue().getLabel() : null )
             .furtherHearingMethod(nonNull(caseData.getFinalOrderFurtherHearingComplex()) && nonNull(caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList())
-                                      ? caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList().name() : "");
+                                      ? caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList().name() : "")
+            .costSelection(caseData.getAssistedOrderCostList().name());
 
         return assistedFormOrderBuilder.build();
     }
