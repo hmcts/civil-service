@@ -318,12 +318,54 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldReturnConfirmationScreen_when1v1ReadySubmitted_Claimant() {
+            //given: claimant selects Ready
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.CLAIMANT)))
+                .thenReturn(true);
+
+            //when: Event is submitted
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            //then: header + body for the ready status get used in the confirmation
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(READY_HEADER)
+                    .confirmationBody(READY_BODY)
+                    .build()
+            );
+        }
+
+        @Test
         void shouldReturnConfirmationScreen_when1v1NotReadySubmitted_ApplicantSolicitor() {
             //given: applicant solicitor selects Not Ready
             CaseData caseData = CaseDataBuilder.builder().atStateTrialNotReadyApplicant().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.APPLICANTSOLICITORONE)))
+                .thenReturn(true);
+
+            //when: Event is submitted
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            //then: header + body for the not ready status get used in the confirmation
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(NOT_READY_HEADER)
+                    .confirmationBody(NOT_READY_BODY)
+                    .build()
+            );
+        }
+
+        @Test
+        void shouldReturnConfirmationScreen_when1v1NotReadySubmitted_Claimant() {
+            //given: claimant selects Not Ready
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialNotReadyApplicant().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.CLAIMANT)))
                 .thenReturn(true);
 
             //when: Event is submitted
@@ -360,12 +402,54 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldReturnConfirmationScreen_when1v1ReadySubmitted_Defendant() {
+            //given: defendant selects Ready
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyRespondent1().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.DEFENDANT)))
+                .thenReturn(true);
+
+            //when: Event is submitted
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            //then: header + body for the ready status get used in the confirmation
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(READY_HEADER)
+                    .confirmationBody(READY_BODY)
+                    .build()
+            );
+        }
+
+        @Test
         void shouldReturnConfirmationScreen_when1v1NotReadySubmitted_Respondent1Solicitor() {
             //given: respondent 1 solicitor selects Not Ready
             CaseData caseData = CaseDataBuilder.builder().atStateTrialNotReadyRespondent1().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORONE)))
+                .thenReturn(true);
+
+            //when: Event is submitted
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            //then: header + body for the not ready status get used in the confirmation
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(NOT_READY_HEADER)
+                    .confirmationBody(NOT_READY_BODY)
+                    .build()
+            );
+        }
+
+        @Test
+        void shouldReturnConfirmationScreen_when1v1NotReadySubmitted_Defendant() {
+            //given: defendant selects Not Ready
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialNotReadyRespondent1().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.DEFENDANT)))
                 .thenReturn(true);
 
             //when: Event is submitted
