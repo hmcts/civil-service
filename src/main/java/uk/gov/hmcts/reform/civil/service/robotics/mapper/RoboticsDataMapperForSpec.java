@@ -228,14 +228,10 @@ public class RoboticsDataMapperForSpec {
     }
 
     private Solicitor buildApplicantSolicitor(CaseData caseData) {
-        System.out.println("-----------------------------------------");
-        System.out.println(featureToggleService.isLipVLipEnabled());
-        System.out.println(caseData.isLipvLipOneVOne());
         if(featureToggleService.isLipVLipEnabled() && caseData.isLipvLipOneVOne()){
             return null;
         }
         Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());
-        var providedServiceAddress = caseData.getSpecApplicantCorrespondenceAddressdetails();
         Solicitor.SolicitorBuilder<?, ?> solicitorBuilder = Solicitor.builder()
             .id(RoboticsDataUtil.APPLICANT_SOLICITOR_ID)
             .isPayee(true)
