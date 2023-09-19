@@ -101,7 +101,7 @@ public class ManageContactInformationUtils {
         addDefendant2ExpertsAndWitnesses(list, caseData, isAdmin);
     }
 
-    public String appendUserAndType(String partyChosen, CaseData caseData, boolean isAdmin) {
+    public static String appendUserAndType(String partyChosen, CaseData caseData, boolean isAdmin) {
         String user = isAdmin ? "ADMIN" : "LR";
 
         switch (partyChosen) {
@@ -123,7 +123,7 @@ public class ManageContactInformationUtils {
         }
     }
 
-    public List<Element<UpdatePartyDetailsForm>> mapExpertsToUpdatePartyDetailsForm(List<Element<Expert>> experts) {
+    public static List<Element<UpdatePartyDetailsForm>> mapExpertsToUpdatePartyDetailsForm(List<Element<Expert>> experts) {
         List<Element<UpdatePartyDetailsForm>> newExperts = new ArrayList<>();
 
         if (experts != null) {
@@ -142,7 +142,7 @@ public class ManageContactInformationUtils {
         return newExperts;
     }
 
-    public List<Element<Expert>> mapUpdatePartyDetailsFormToDQExperts(List<Element<Expert>> existingDQExperts, List<Element<UpdatePartyDetailsForm>> formExperts) {
+    public static List<Element<Expert>> mapUpdatePartyDetailsFormToDQExperts(List<Element<Expert>> existingDQExperts, List<Element<UpdatePartyDetailsForm>> formExperts) {
         List<Element<Expert>> newExperts = new ArrayList<>();
         List<Expert> experts = unwrapElements(existingDQExperts);
 
@@ -193,7 +193,7 @@ public class ManageContactInformationUtils {
         return newExperts;
     }
 
-    public List<Element<UpdatePartyDetailsForm>> mapWitnessesToUpdatePartyDetailsForm(List<Element<Witness>> witnesses) {
+    public static List<Element<UpdatePartyDetailsForm>> mapWitnessesToUpdatePartyDetailsForm(List<Element<Witness>> witnesses) {
         List<Element<UpdatePartyDetailsForm>> newWitnesses = new ArrayList<>();
 
         if (witnesses != null) {
@@ -211,7 +211,7 @@ public class ManageContactInformationUtils {
         return newWitnesses;
     }
 
-    public List<Element<Witness>> mapUpdatePartyDetailsFormToDQWitnesses(List<Element<Witness>> existingDQWitnesses, List<Element<UpdatePartyDetailsForm>> formWitnesses) {
+    public static List<Element<Witness>> mapUpdatePartyDetailsFormToDQWitnesses(List<Element<Witness>> existingDQWitnesses, List<Element<UpdatePartyDetailsForm>> formWitnesses) {
         List<Element<Witness>> newWitnesses = new ArrayList<>();
         List<Witness> witnesses = unwrapElements(existingDQWitnesses);
 
