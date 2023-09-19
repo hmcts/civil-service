@@ -169,9 +169,9 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .build();
 
-            Expert expert1 = Expert.builder().firstName("First").lastName("Name").build();
-            Expert expert2 = Expert.builder().firstName("Second").lastName("expert").build();
-            Expert expert3 = Expert.builder().firstName("Third").lastName("experto").build();
+            Expert expert1 = Expert.builder().partyID("partyId1").firstName("First").lastName("Name").build();
+            Expert expert2 = Expert.builder().partyID("partyId2").firstName("Second").lastName("expert").build();
+            Expert expert3 = Expert.builder().partyID("partyId3").firstName("Third").lastName("experto").build();
 
             CaseData updatedCaseData = caseData.toBuilder()
                 .respondent1DQ(Respondent1DQ.builder()
@@ -214,10 +214,12 @@ class CaseFlagUtilsTest {
             assertThat(respondent1ExpertsWithFlags).hasSize(2);
 
             assertThat(respondent1ExpertsWithFlags.get(0).getValue().getFlags()).isEqualTo(expectedExpert1Flags);
+            assertThat(respondent1ExpertsWithFlags.get(0).getValue().getPartyID()).isEqualTo("partyId1");
             assertThat(respondent1ExpertsWithFlags.get(0).getValue().getFirstName()).isEqualTo("First");
             assertThat(respondent1ExpertsWithFlags.get(0).getValue().getLastName()).isEqualTo("Name");
 
             assertThat(respondent1ExpertsWithFlags.get(1).getValue().getFlags()).isEqualTo(expectedExpert2Flags);
+            assertThat(respondent1ExpertsWithFlags.get(1).getValue().getPartyID()).isEqualTo("partyId2");
             assertThat(respondent1ExpertsWithFlags.get(1).getValue().getFirstName()).isEqualTo("Second");
             assertThat(respondent1ExpertsWithFlags.get(1).getValue().getLastName()).isEqualTo("expert");
 
@@ -225,6 +227,7 @@ class CaseFlagUtilsTest {
             assertThat(respondent2ExpertsWithFlags).hasSize(1);
 
             assertThat(respondent2ExpertsWithFlags.get(0).getValue().getFlags()).isEqualTo(expectedExpert3Flags);
+            assertThat(respondent2ExpertsWithFlags.get(0).getValue().getPartyID()).isEqualTo("partyId3");
             assertThat(respondent2ExpertsWithFlags.get(0).getValue().getFirstName()).isEqualTo("Third");
             assertThat(respondent2ExpertsWithFlags.get(0).getValue().getLastName()).isEqualTo("experto");
         }
@@ -236,9 +239,9 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoDefendantSolicitors()
                 .build();
 
-            Witness witness1 = Witness.builder().firstName("First").lastName("Name").build();
-            Witness witness2 = Witness.builder().firstName("Second").lastName("witness").build();
-            Witness witness3 = Witness.builder().firstName("Third").lastName("witnessy").build();
+            Witness witness1 = Witness.builder().partyID("partyId1").firstName("First").lastName("Name").build();
+            Witness witness2 = Witness.builder().partyID("partyId2").firstName("Second").lastName("witness").build();
+            Witness witness3 = Witness.builder().partyID("partyId3").firstName("Third").lastName("witnessy").build();
 
             CaseData updatedCaseData = caseData.toBuilder()
                 .respondent1DQ(Respondent1DQ.builder()
@@ -282,10 +285,12 @@ class CaseFlagUtilsTest {
             assertThat(respondent1WitnessWithFlags).hasSize(2);
 
             assertThat(respondent1WitnessWithFlags.get(0).getValue().getFlags()).isEqualTo(expectedWitness1Flags);
+            assertThat(respondent1WitnessWithFlags.get(0).getValue().getPartyID()).isEqualTo("partyId1");
             assertThat(respondent1WitnessWithFlags.get(0).getValue().getFirstName()).isEqualTo("First");
             assertThat(respondent1WitnessWithFlags.get(0).getValue().getLastName()).isEqualTo("Name");
 
             assertThat(respondent1WitnessWithFlags.get(1).getValue().getFlags()).isEqualTo(expectedWitness2Flags);
+            assertThat(respondent1WitnessWithFlags.get(1).getValue().getPartyID()).isEqualTo("partyId2");
             assertThat(respondent1WitnessWithFlags.get(1).getValue().getFirstName()).isEqualTo("Second");
             assertThat(respondent1WitnessWithFlags.get(1).getValue().getLastName()).isEqualTo("witness");
 
@@ -293,6 +298,7 @@ class CaseFlagUtilsTest {
             assertThat(respondent2WitnessWithFlags).hasSize(1);
 
             assertThat(respondent2WitnessWithFlags.get(0).getValue().getFlags()).isEqualTo(expectedWitness3Flags);
+            assertThat(respondent2WitnessWithFlags.get(0).getValue().getPartyID()).isEqualTo("partyId3");
             assertThat(respondent2WitnessWithFlags.get(0).getValue().getFirstName()).isEqualTo("Third");
             assertThat(respondent2WitnessWithFlags.get(0).getValue().getLastName()).isEqualTo("witnessy");
         }
@@ -304,9 +310,9 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoApplicants()
                 .build();
 
-            Witness witness1 = Witness.builder().firstName("First").lastName("Name").build();
-            Witness witness2 = Witness.builder().firstName("Second").lastName("witness").build();
-            Witness witness3 = Witness.builder().firstName("Third").lastName("witnessy").build();
+            Witness witness1 = Witness.builder().partyID("partyId1").firstName("First").lastName("Name").build();
+            Witness witness2 = Witness.builder().partyID("partyId2").firstName("Second").lastName("witness").build();
+            Witness witness3 = Witness.builder().partyID("partyId3").firstName("Third").lastName("witnessy").build();
 
             CaseData updatedCaseData = caseData.toBuilder()
                 .applicant1DQ(Applicant1DQ.builder()
@@ -349,14 +355,17 @@ class CaseFlagUtilsTest {
             assertThat(applicantWitnesses).hasSize(3);
 
             assertThat(applicantWitnesses.get(0).getValue().getFlags()).isEqualTo(expectedWitness1Flags);
+            assertThat(applicantWitnesses.get(0).getValue().getPartyID()).isEqualTo("partyId1");
             assertThat(applicantWitnesses.get(0).getValue().getFirstName()).isEqualTo("First");
             assertThat(applicantWitnesses.get(0).getValue().getLastName()).isEqualTo("Name");
 
             assertThat(applicantWitnesses.get(1).getValue().getFlags()).isEqualTo(expectedWitness2Flags);
+            assertThat(applicantWitnesses.get(1).getValue().getPartyID()).isEqualTo("partyId2");
             assertThat(applicantWitnesses.get(1).getValue().getFirstName()).isEqualTo("Second");
             assertThat(applicantWitnesses.get(1).getValue().getLastName()).isEqualTo("witness");
 
             assertThat(applicantWitnesses.get(2).getValue().getFlags()).isEqualTo(expectedWitness3Flags);
+            assertThat(applicantWitnesses.get(2).getValue().getPartyID()).isEqualTo("partyId3");
             assertThat(applicantWitnesses.get(2).getValue().getFirstName()).isEqualTo("Third");
             assertThat(applicantWitnesses.get(2).getValue().getLastName()).isEqualTo("witnessy");
         }
@@ -368,9 +377,9 @@ class CaseFlagUtilsTest {
                 .multiPartyClaimTwoApplicants()
                 .build();
 
-            Expert expert1 = Expert.builder().firstName("First").lastName("Name").build();
-            Expert expert2 = Expert.builder().firstName("Second").lastName("expert").build();
-            Expert expert3 = Expert.builder().firstName("Third").lastName("expert").build();
+            Expert expert1 = Expert.builder().partyID("partyId1").firstName("First").lastName("Name").build();
+            Expert expert2 = Expert.builder().partyID("partyId2").firstName("Second").lastName("expert").build();
+            Expert expert3 = Expert.builder().partyID("partyId3").firstName("Third").lastName("expert").build();
 
             CaseData updatedCaseData = caseData.toBuilder()
                 .applicant1DQ(Applicant1DQ.builder()
@@ -412,14 +421,17 @@ class CaseFlagUtilsTest {
             assertThat(applicantExperts).hasSize(3);
 
             assertThat(applicantExperts.get(0).getValue().getFlags()).isEqualTo(expectedExpert1Flags);
+            assertThat(applicantExperts.get(0).getValue().getPartyID()).isEqualTo("partyId1");
             assertThat(applicantExperts.get(0).getValue().getFirstName()).isEqualTo("First");
             assertThat(applicantExperts.get(0).getValue().getLastName()).isEqualTo("Name");
 
             assertThat(applicantExperts.get(1).getValue().getFlags()).isEqualTo(expectedExpert2Flags);
+            assertThat(applicantExperts.get(1).getValue().getPartyID()).isEqualTo("partyId2");
             assertThat(applicantExperts.get(1).getValue().getFirstName()).isEqualTo("Second");
             assertThat(applicantExperts.get(1).getValue().getLastName()).isEqualTo("expert");
 
             assertThat(applicantExperts.get(2).getValue().getFlags()).isEqualTo(expectedExpert3Flags);
+            assertThat(applicantExperts.get(2).getValue().getPartyID()).isEqualTo("partyId3");
             assertThat(applicantExperts.get(2).getValue().getFirstName()).isEqualTo("Third");
             assertThat(applicantExperts.get(2).getValue().getLastName()).isEqualTo("expert");
         }

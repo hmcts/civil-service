@@ -80,10 +80,11 @@ public class CaseFlagUtils {
             .build();
     }
 
-    private static PartyFlagStructure createPartiesCaseFlagsField(String firstName, String lastName,
+    private static PartyFlagStructure createPartiesCaseFlagsField(String partyId, String firstName, String lastName,
                                                                   String email, String phone, String roleOnCase) {
         String partyName = formattedPartyNameForFlags(firstName, lastName);
         return PartyFlagStructure.builder()
+            .partyID(partyId)
             .firstName(firstName)
             .lastName(lastName)
             .email(email)
@@ -113,7 +114,7 @@ public class CaseFlagUtils {
         String roleOnCase) {
         List<Element<PartyFlagStructure>> list = new ArrayList<>();
         for (Witness witness : witnessList) {
-            PartyFlagStructure build = createPartiesCaseFlagsField(witness.getFirstName(), witness.getLastName(),
+            PartyFlagStructure build = createPartiesCaseFlagsField(witness.getPartyID(), witness.getFirstName(), witness.getLastName(),
                                                                    witness.getEmailAddress(), witness.getPhoneNumber(),
                                                                    roleOnCase);
             list.add(element(build));
@@ -126,7 +127,7 @@ public class CaseFlagUtils {
         String roleOnCase) {
         List<Element<PartyFlagStructure>> list = new ArrayList<>();
         for (Expert expert : expertList) {
-            PartyFlagStructure build = createPartiesCaseFlagsField(expert.getFirstName(), expert.getLastName(),
+            PartyFlagStructure build = createPartiesCaseFlagsField(expert.getPartyID(), expert.getFirstName(), expert.getLastName(),
                                                                    expert.getEmailAddress(), expert.getPhoneNumber(),
                                                                    roleOnCase);
             list.add(element(build));
