@@ -64,7 +64,7 @@ public class DJRespondentReceivedNotificationHandler extends CallbackHandler imp
 
     private EmailTemplateReference identifyTemplate(CaseData caseData) {
         EmailTemplateReference emailTemplate = new EmailTemplateReference();
-        if (caseData.isLRvLipOneVOne() || (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled())){
+        if (caseData.isLRvLipOneVOne() || (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled())) {
             emailTemplate.template = notificationsProperties.getRespondent1DefaultJudgmentRequestedTemplate();
             emailTemplate.templateReference = REFERENCE_TEMPLATE_REQUESTED;
             return emailTemplate;

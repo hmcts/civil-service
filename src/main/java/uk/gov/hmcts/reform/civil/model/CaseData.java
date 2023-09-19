@@ -841,7 +841,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && isOneVOne(this);
     }
 
-
     @JsonIgnore
     public boolean isJudgementDateNotPermitted() {
         return nonNull(getRespondent1ResponseDate())

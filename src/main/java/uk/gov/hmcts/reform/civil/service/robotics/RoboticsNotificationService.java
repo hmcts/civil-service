@@ -152,7 +152,7 @@ public class RoboticsNotificationService {
     private String getSubjectForSpec(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject;
         if (caseData.isRespondent1NotRepresented()) {
-            if(caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()){
+            if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
                 if (nonNull(caseData.getPaymentTypeSelection())) {
                     subject = String.format(
                         "LiP v LiP Default Judgement Case Data for %s",
@@ -169,7 +169,7 @@ public class RoboticsNotificationService {
                         caseData.getLegacyCaseReference()
                     );
                 }
-            }else{
+            } else {
                 if (nonNull(caseData.getPaymentTypeSelection())) {
                     subject = String.format(
                         "LR v LiP Default Judgement Case Data for %s",
