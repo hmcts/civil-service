@@ -8322,6 +8322,7 @@ class EventHistoryMapperTest {
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
                 .respondToClaimAdmitPartLRspec(paymentDetails)
+                .applicant1ResponseDate(LocalDateTime.now())
                 .totalInterest(BigDecimal.ZERO)
                 .build();
 
@@ -8420,6 +8421,7 @@ class EventHistoryMapperTest {
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                 .respondToClaimAdmitPartLRspec(paymentDetails)
                 .totalInterest(BigDecimal.ZERO)
+                .applicant1ResponseDate(LocalDateTime.now())
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);

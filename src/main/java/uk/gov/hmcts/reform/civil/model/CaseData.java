@@ -1003,12 +1003,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public LocalDateTime getRespondentResponseDate() {
-        LocalDateTime responseDate = null;
-        if (nonNull(getRespondent1ResponseDate())) {
-            responseDate = getRespondent1ResponseDate();
-        } else if (nonNull(getRespondent2ResponseDate())) {
-            responseDate = getRespondent2ResponseDate();
-        }
-        return LocalDateTime.now().isBefore(responseDate) ? responseDate : LocalDateTime.now();
+        LocalDateTime responseDate = null != getRespondent1ResponseDate() ? getRespondent1ResponseDate() : getRespondent2ResponseDate();
+        return responseDate.isBefore(LocalDateTime.now()) ? LocalDateTime.now() : responseDate;
     }
+
 }
