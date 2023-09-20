@@ -607,18 +607,18 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<String>> sdtRequestId;
 
     //Judgements Online
-    private JudgmentRecordedReason joJudgementRecordReason;
-    private JudgmentStatusDetails joJudgementStatusDetails;
-    private LocalDate joJudgementRequestedDate;
-    private LocalDate joJudgementIssuedDate;
+    private JudgmentRecordedReason joJudgmentRecordReason;
+    private JudgmentStatusDetails joJudgmentStatusDetails;
+    private LocalDate joJudgmentRequestedDate;
+    private LocalDate joJudgmentIssuedDate;
     private LocalDate joOrderMadeDate;
     private String joAmountOrdered;
     private String joAmountCostOrdered;
-    //private boolean joIsRegisteredWithRTL;
+    private YesOrNo joIsRegisteredWithRTL;
     private PaymentPlanSelection joPaymentPlanSelection;
     private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
     private LocalDate joPaymentToBeMadeByDate;
-    private YesOrNo joIsLiveJudgementExists;
+    private YesOrNo joIsLiveJudgmentExists;
     private JudgmentPaidInFull joJudgmentPaidInFull;
 
     /**
@@ -961,8 +961,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public Optional<Element<CaseDocument>> getSDODocument() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                    .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
+                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                   .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
         }
         return Optional.empty();
     }
