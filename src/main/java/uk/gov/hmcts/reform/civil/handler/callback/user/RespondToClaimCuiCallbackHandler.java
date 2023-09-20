@@ -69,10 +69,10 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
     private CaseData getUpdatedCaseData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null);
+        CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
-        CaseData updatedData = caseData.toBuilder()
+        return caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(DEFENDANT_RESPONSE_CUI))
             .respondent1ResponseDate(responseDate)
             .respondent1GeneratedResponseDocument(dummyDocument)
@@ -82,6 +82,5 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
                 allocatedTrack
             ))
             .build();
-        return updatedData;
     }
 }
