@@ -19,6 +19,8 @@ public class ClaimantAndDefendantHeard {
     private FinalOrdersDefendantRepresentationList typeRepresentationDefendantList;
     private FinalOrdersDefendantRepresentationList typeRepresentationDefendantTwoList;
     private TrialNoticeProcedure trialProcedureComplex;
+    private TrialNoticeProcedure trialProcedureDefTwoComplex;
+    private TrialNoticeProcedure trialProcedClaimTwoComplex;
     private String detailsRepresentationText;
     private String typeRepresentationClaimantOneDynamic;
     private String typeRepresentationClaimantTwoDynamic;

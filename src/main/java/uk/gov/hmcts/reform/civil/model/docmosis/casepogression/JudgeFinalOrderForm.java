@@ -75,5 +75,5 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final String claimantAttendsOrRepresented;
     private final String claimantTwoAttendsOrRepresented;
     private final String defendantAttendsOrRepresented;
-    private final String defendantTwoTwoAttendsOrRepresented;
+    private final String defendantTwoAttendsOrRepresented;
 }
