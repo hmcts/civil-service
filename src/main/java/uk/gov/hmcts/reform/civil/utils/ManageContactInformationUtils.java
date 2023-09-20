@@ -117,6 +117,12 @@ public class ManageContactInformationUtils {
             case(DEFENDANT_TWO_ID): {
                 return formatId(partyChosen, user, caseData.getRespondent2());
             }
+            case(CLAIMANT_ONE_LITIGATION_FRIEND_ID):
+            case(CLAIMANT_TWO_LITIGATION_FRIEND_ID):
+            case(DEFENDANT_ONE_LITIGATION_FRIEND_ID):
+            case(DEFENDANT_TWO_LITIGATION_FRIEND_ID): {
+                return formatId(partyChosen, user);
+            }
             default: {
                 throw new IllegalArgumentException("Manage Contact Information party chosen ID does not exist");
             }
@@ -261,6 +267,9 @@ public class ManageContactInformationUtils {
 
     private static String formatId(String partyChosen, String isAdmin, Party party) {
         return String.format("%s_%s_%s", partyChosen, isAdmin, party.getType().toString());
+    }
+    private static String formatId(String partyChosen, String isAdmin) {
+        return String.format("%s_%s", partyChosen, isAdmin);
     }
 
     private static void addApplicant1PartyOptions(List<DynamicListElement> list, CaseData caseData) {
