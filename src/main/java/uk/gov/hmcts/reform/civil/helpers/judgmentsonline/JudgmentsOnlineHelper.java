@@ -22,9 +22,9 @@ public class JudgmentsOnlineHelper {
         }
     }
 
-    public static boolean validateIfFutureDate(LocalDate joOrderMadeDate) {
+    public static boolean validateIfFutureDate(LocalDate date) {
         LocalDate today = LocalDate.now();
-        if (joOrderMadeDate.isAfter(today)) {
+        if (date.isAfter(today)) {
             return true;
         }
         return false;
