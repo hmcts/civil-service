@@ -42,6 +42,7 @@ java:
     DOCUMENT_MANAGEMENT_SECURED: true
     STITCHING_API_ENABLED: true
     RELEASE_REVISION: "{{ .Release.Revision }}"
+    ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
   postgresql:
     enabled: true
