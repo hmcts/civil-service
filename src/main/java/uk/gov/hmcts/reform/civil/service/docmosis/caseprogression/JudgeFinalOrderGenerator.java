@@ -7,13 +7,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
-import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
+import uk.gov.hmcts.reform.civil.enums.finalorders.*;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
@@ -35,6 +29,7 @@ import java.util.Date;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
@@ -175,9 +170,70 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                            ? caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList().getValue().getLabel() : null )
             .furtherHearingMethod(nonNull(caseData.getFinalOrderFurtherHearingComplex()) && nonNull(caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList())
                                       ? caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList().name() : "")
-            .costSelection(caseData.getAssistedOrderCostList().name());
+            .costSelection(caseData.getAssistedOrderCostList().name())
+            .costsReservedText(nonNull(caseData.getAssistedOrderCostsReserved())
+                                   ? caseData.getAssistedOrderCostsReserved().getDetailsRepresentationText() : null)
+            .bespokeCostText(nonNull(caseData.getAssistedOrderCostsBespoke())
+                                  ? caseData.getAssistedOrderCostsBespoke().getBesPokeCostDetailsText() : null)
+            .summarilyAssessed(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+                                   && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
+                                   && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(CostEnums.COSTS)
+                                   ? populateSummarilyAssessedText(caseData) : null)
+            .summarilyAssessedDate(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+                                       && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
+                                       && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(CostEnums.COSTS)
+                                       ? caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownDate() : null)
+            .detailedAssessment(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+                                   && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
+                                   && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(CostEnums.SUBJECT_DETAILED_ASSESSMENT)
+                                   ? populateDetailedAssessmentText(caseData) : null)
+            .interimPayment(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+                                && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
+                                && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(CostEnums.SUBJECT_DETAILED_ASSESSMENT)
+                                && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList2().equals(CostEnums.YES)
+                                ? populateInterimPaymentText(caseData) : null)
+            .interimPaymentDate(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+                                    && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
+                                    && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(CostEnums.SUBJECT_DETAILED_ASSESSMENT)
+                                    ? caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate() : null)
+            .qcosProtection(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
+                            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo())
+                            &&caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo().equals(YES) ? "true" : null)
+            .costsProtection(caseData.getPublicFundingCostsProtection().equals(YES) ? "true" : null);
 
         return assistedFormOrderBuilder.build();
+    }
+
+    public String populateInterimPaymentText(CaseData caseData) {
+        return format("An interim payment of %s on account of costs shall be paid by 4pm on ", caseData.getAssistedOrderMakeAnOrderForCosts()
+                          .getAssistedOrderAssessmentThirdDropdownAmount());
+    }
+
+    public String populateSummarilyAssessedText(CaseData caseData) {
+        if (caseData.getAssistedOrderMakeAnOrderForCosts() != null
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
+            return format("The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
+                              + "in the sum of £%s. Such a sum shall be made by 4pm on", caseData.getAssistedOrderMakeAnOrderForCosts()
+                .getAssistedOrderCostsFirstDropdownAmount());
+        } else return format("The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
+                                + "in the sum of £%s. Such a sum shall be made by 4pm on", caseData.getAssistedOrderMakeAnOrderForCosts()
+                                                    .getAssistedOrderCostsFirstDropdownAmount());
+
+    }
+
+    public String populateDetailedAssessmentText(CaseData caseData) {
+        String standardOrIndemnity;
+        if (caseData.getAssistedOrderMakeAnOrderForCosts() != null
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList1().equals(CostEnums.INDEMNITY_BASIS)) {
+            standardOrIndemnity = "on the indemnity basis if not agreed";
+        } else standardOrIndemnity = "on the standard basis if not agreed";
+
+        if (caseData.getAssistedOrderMakeAnOrderForCosts() != null
+            && caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
+            return format("The claimant shall pay the defendant's costs to be subject to a detailed assessment %s",
+                          standardOrIndemnity);
+        }  return format("The defendant shall pay the claimant's costs to be subject to a detailed assessment %s",
+                             standardOrIndemnity);
     }
 
     public Boolean isDefaultCourt(CaseData caseData) {
