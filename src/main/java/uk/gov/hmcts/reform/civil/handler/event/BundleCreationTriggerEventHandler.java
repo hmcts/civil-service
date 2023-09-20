@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -40,6 +41,8 @@ public class BundleCreationTriggerEventHandler {
     private BundleCreationService bundleCreationService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+
+    private final Time time;
 
 
     /**
@@ -73,7 +76,7 @@ public class BundleCreationTriggerEventHandler {
             .description(null != bundle.getValue().getDescription()
                              ? Optional.of(bundle.getValue().getDescription()).get() : "")
             .stitchStatus(Optional.ofNullable(bundle.getValue().getStitchStatus()))
-            .createdOn(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
+            .createdOn(Optional.of(time.now()))
             .id(bundle.getValue().getId()).build();
         return new IdValue<>(result.getId(), result);
     }
