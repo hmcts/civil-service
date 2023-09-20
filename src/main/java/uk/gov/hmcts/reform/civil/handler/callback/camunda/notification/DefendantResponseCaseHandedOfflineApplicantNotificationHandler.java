@@ -71,7 +71,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
         } else {
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)
                 && SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-                templateID = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+                templateID = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
             } else {
                 templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty();
             }
@@ -116,7 +116,7 @@ public class DefendantResponseCaseHandedOfflineApplicantNotificationHandler exte
     }
 
     private void sendNotificationToSolicitorSpec(CaseData caseData, String recipient) {
-        String emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+        String emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
         notificationService.sendMail(
             recipient,
             emailTemplate,

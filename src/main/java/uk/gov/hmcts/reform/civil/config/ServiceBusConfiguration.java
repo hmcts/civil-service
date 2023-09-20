@@ -29,6 +29,8 @@ import uk.gov.hmcts.reform.civil.handler.ReviewHearingExceptionHandler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 
+import static java.util.Optional.ofNullable;
+
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
@@ -95,9 +97,11 @@ public class ServiceBusConfiguration {
 
                         HmcMessage hmcMessage = objectMapper.readValue(body.get(0), HmcMessage.class);
                         log.info(
-                            "Hearing requested for case {}, hearing id {}",
-                            hmcMessage.getCaseId(),
-                            hmcMessage.getHearingId()
+                                "HMC Message for case {}, hearing id {} with status {}",
+                                hmcMessage.getCaseId(),
+                                hmcMessage.getHearingId(),
+                                ofNullable(hmcMessage.getHearingUpdate()).map(update -> update.getHmcStatus().name())
+                                        .orElse("-")
                         );
                         exceptionEventTriggered = handler.handleExceptionEvent(hmcMessage);
                         if (exceptionEventTriggered) {
