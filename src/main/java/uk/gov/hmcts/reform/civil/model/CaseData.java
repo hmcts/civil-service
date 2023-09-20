@@ -81,11 +81,7 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.*;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
@@ -616,14 +612,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private LocalDate joJudgementRequestedDate;
     private LocalDate joJudgementIssuedDate;
     private LocalDate joOrderMadeDate;
-    private LocalDate joSetAsideDate;
-    private boolean joIsJointJudgement;
     private String joAmountOrdered;
     private String joAmountCostOrdered;
-    private boolean joIsRegisteredWithRTL;
-    private PaymentPlanSelection joRePaymentPlanSelection;
-    private JudgmentInstalmentDetails joJudgementPaymentDetails;
-    private boolean joIsLiveJudgementExists;
+    //private boolean joIsRegisteredWithRTL;
+    private PaymentPlanSelection joPaymentPlanSelection;
+    private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
+    private LocalDate joPaymentToBeMadeByDate;
+    private YesOrNo joIsLiveJudgementExists;
     private JudgmentPaidInFull joJudgmentPaidInFull;
 
     /**
@@ -966,8 +961,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public Optional<Element<CaseDocument>> getSDODocument() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                   .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
         }
         return Optional.empty();
     }

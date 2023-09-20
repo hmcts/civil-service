@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 
@@ -33,6 +34,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(JUDGMENT_PAID_IN_FULL);
     protected final ObjectMapper objectMapper;
+    private static final String ERROR_MESSAGE_DATE_MUST_BE_IN_PAST = "Date must be in past";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -101,8 +103,9 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
         LocalDate dateOfPaymentMade = caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade();
-        if (nonNull(dateOfPaymentMade) && dateOfPaymentMade.isAfter(LocalDate.now())) {
-            errors.add(String.format("The date entered cannot be in future", "The date entered cannot be in future"));
+
+        if (JudgmentsOnlineHelper.validateIfFutureDate(dateOfPaymentMade)) {
+            errors.add(String.format(ERROR_MESSAGE_DATE_MUST_BE_IN_PAST, ERROR_MESSAGE_DATE_MUST_BE_IN_PAST));
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)

@@ -5893,6 +5893,9 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateAllFinalOrdersIssued(){
+        return this;
+    }
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
