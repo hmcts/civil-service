@@ -1880,8 +1880,8 @@ public class EventHistoryMapper {
                             .build()));
     }
 
-    private void buildRespondentResponseText(EventHistory.EventHistoryBuilder builder, CaseData caseData, String miscText, LocalDateTime respondentResponseDate){
-        if(!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+    private void buildRespondentResponseText(EventHistory.EventHistoryBuilder builder, CaseData caseData, String miscText, LocalDateTime respondentResponseDate) {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             builder.miscellaneous(Event.builder()
                                       .eventSequence(prepareEventSequence(builder.build()))
                                       .eventCode(MISCELLANEOUS.getCode())
@@ -1894,6 +1894,7 @@ public class EventHistoryMapper {
         }
 
     }
+
     private void buildRespondentFullAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String miscText;
         if (defendant1ResponseExists.test(caseData)) {
@@ -1939,7 +1940,7 @@ public class EventHistoryMapper {
         List<Event> directionsQuestionnaireFiledEvents = new ArrayList<>();
         boolean isRespondent1;
         if (defendant1ResponseExists.test(caseData)) {
-            Party respondent1 = caseData.getRespondent1();
+            final Party respondent1 = caseData.getRespondent1();
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
@@ -1961,8 +1962,8 @@ public class EventHistoryMapper {
                                                        true
                 ));
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                Party respondent2 = caseData.getRespondent2();
-                Respondent1DQ respondent2DQ = caseData.getRespondent1DQ();
+                final Party respondent2 = caseData.getRespondent2();
+                final Respondent1DQ respondent2DQ = caseData.getRespondent1DQ();
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
