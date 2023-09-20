@@ -76,7 +76,7 @@ public class BundleCreationTriggerEventHandler {
             .description(null != bundle.getValue().getDescription()
                              ? Optional.of(bundle.getValue().getDescription()).get() : "")
             .stitchStatus(Optional.ofNullable(bundle.getValue().getStitchStatus()))
-            .createdOn(Optional.of(time.now()))
+            .createdOn(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
             .id(bundle.getValue().getId()).build();
         return new IdValue<>(result.getId(), result);
     }
