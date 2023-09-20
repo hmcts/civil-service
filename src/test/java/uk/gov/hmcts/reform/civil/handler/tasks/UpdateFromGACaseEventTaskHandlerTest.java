@@ -520,6 +520,50 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         verify(externalTaskService).complete(mockExternalTask);
     }
 
+    @Test
+    void shouldNotAddgaResponseDocument() {
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        String uid1 = "f000aa01-0451-4000-b000-000000000111";
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+        CaseData updatedCaseData = caseData.toBuilder()
+            .directionOrderDocument(singletonList(Element.<CaseDocument>builder()
+                                                      .id(UUID.fromString(uid))
+                                                      .value(pdfDocument).build())).build();
+        CaseData updatedCaseData1 = caseData.toBuilder()
+            .gaRespDocStaff(singletonList(Element.<Document>builder().id(UUID.fromString(uid1))
+                                              .value(pdfDocument1).build()))
+            .gaRespDocClaimant(singletonList(Element.<Document>builder().id(UUID.fromString(uid1))
+                                           .value(pdfDocument1).build())).build();
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(updatedCaseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDirectionResponseDocument(CaseData.builder().build());
+
+        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+            .thenReturn(generalCaseData);
+
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(updatedCaseData);
+
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class)))
+            .thenReturn(updatedCaseData1);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        assertThat(updatedCaseData1.getGaRespDocClaimant().size())
+            .isEqualTo(generalCaseData.getGaRespDocument().size());
+        assertThat(updatedCaseData1.getGaRespDocStaff().size())
+            .isEqualTo(generalCaseData.getGaRespDocument().size());
+
+        verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask);
+    }
+
     @Nested
     class NotRetryableFailureTest {
         @Test
@@ -620,5 +664,11 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                           .documentFileName("file-name")
                           .documentBinaryUrl("binary-url")
                           .build())
+        .build();
+
+    public final Document pdfDocument1 = Document.builder()
+        .documentUrl("fake-url")
+        .documentFileName("file-name")
+        .documentBinaryUrl("binary-url")
         .build();
 }

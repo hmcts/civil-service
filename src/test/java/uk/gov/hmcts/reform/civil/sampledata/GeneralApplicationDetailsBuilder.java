@@ -1411,6 +1411,22 @@ public class GeneralApplicationDetailsBuilder {
             .build();
     }
 
+    public CaseData getTestCaseDataWithDirectionResponseDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+            .generalOrderDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid))
+                                                    .value(pdfDocument).build()))
+            .gaRespDocument(singletonList(Element.<Document>builder().id(UUID.fromString(uid1))
+                                                      .value(pdfDocument1).build()))
+            .build();
+    }
+
     public CaseData getTestCaseDataWithConsentOrderPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
@@ -1662,5 +1678,11 @@ public class GeneralApplicationDetailsBuilder {
                           .documentFileName("file-name")
                           .documentBinaryUrl("binary-url")
                           .build())
+        .build();
+
+    public final Document pdfDocument1 = Document.builder()
+        .documentUrl("fake-url")
+        .documentFileName("file-name")
+        .documentBinaryUrl("binary-url")
         .build();
 }
