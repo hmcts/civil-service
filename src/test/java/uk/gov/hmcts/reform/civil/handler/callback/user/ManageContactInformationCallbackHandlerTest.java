@@ -698,16 +698,25 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Nested
     class AboutToSubmit {
-        UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").build();
-        Expert dqExpert = Expert.builder().partyID("id").firstName("dq").lastName("dq").build();
-        Expert expectedExpert1 = dqExpert.builder().firstName("First").lastName("Name")
-            .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-            .partyID(null) //change this for CIV-10382
-            .build();
-        Witness dqWitness = Witness.builder().firstName("dq").lastName("dq").partyID("identification").build();
-        Witness expectedWitness1 = Witness.builder().firstName("First").lastName("Name")
-            .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-            .partyID(null).build(); // CIV-10382
+        UpdatePartyDetailsForm party;
+        Expert dqExpert;
+        Expert expectedExpert1;
+        Witness dqWitness;
+        Witness expectedWitness1;
+
+        @BeforeEach
+        void setup() {
+            party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").build();
+            dqExpert = Expert.builder().partyID("id").firstName("dq").lastName("dq").build();
+            expectedExpert1 = dqExpert.builder().firstName("First").lastName("Name")
+                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
+                .partyID(null) //change this for CIV-10382
+                .build();
+            dqWitness = Witness.builder().firstName("dq").lastName("dq").partyID("id").build();
+            expectedWitness1 = Witness.builder().firstName("First").lastName("Name")
+                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
+                .partyID(null).build(); // CIV-10382
+        }
 
         @Test
         void shouldUpdateApplicantOneExperts() {
@@ -794,7 +803,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                    .build())
                                                         .build())
                                        .partyChosenId(CLAIMANT_ONE_WITNESSES_ID)
-                                       .updateExpertsDetailsForm(wrapElements(party))
+                                       .updateWitnessesDetailsForm(wrapElements(party))
                                        .build())
                 .applicant1DQ(Applicant1DQ.builder()
                                   .applicant1DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
@@ -811,10 +820,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldUpdateDefendantOneWitnesses() {
-            UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
-                .partyId("id").build();
-            Witness dqWitness = Witness.builder().firstName("dq").lastName("dq").partyID("identification").build();
-
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
@@ -823,7 +828,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                    .build())
                                                         .build())
                                        .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
-                                       .updateExpertsDetailsForm(wrapElements(party))
+                                       .updateWitnessesDetailsForm(wrapElements(party))
                                        .build())
                 .respondent1DQ(Respondent1DQ.builder()
                                    .respondent1DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
@@ -840,10 +845,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
         @Test
         void shouldUpdateDefendantTwoWitnesses() {
-            UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
-                .partyId("id").build();
-            Witness dqWitness = Witness.builder().firstName("dq").lastName("dq").partyID("identification").build();
-
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
@@ -852,7 +853,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                    .build())
                                                         .build())
                                        .partyChosenId(DEFENDANT_TWO_WITNESSES_ID)
-                                       .updateExpertsDetailsForm(wrapElements(party))
+                                       .updateWitnessesDetailsForm(wrapElements(party))
                                        .build())
                 .respondent2DQ(Respondent2DQ.builder()
                                    .respondent2DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
