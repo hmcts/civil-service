@@ -230,7 +230,7 @@ public class RoboticsDataMapper {
             /* CIV-10011 organisationId is not null (if it were, the call to findOrganisationById would not have
              been done, so the FeignException would not have been thrown */
             log.error("Error recovering org id " + organisationId.orElse(null)
-                +" for case id " + caseData.getLegacyCaseReference(), e);
+                + " for case id " + caseData.getLegacyCaseReference(), e);
         }
 
         return solicitorBuilder.build();
