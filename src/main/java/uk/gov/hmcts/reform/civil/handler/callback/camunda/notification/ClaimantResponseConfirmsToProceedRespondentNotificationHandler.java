@@ -44,6 +44,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     public static final String Task_ID_RESPONDENT_SOL2 = "ClaimantConfirmsToProceedNotifyRespondentSolicitor2";
     public static final String TASK_ID_CC = "ClaimantConfirmsToProceedNotifyApplicantSolicitor1CC";
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-respondent-notification-%s";
+    private static final String REFERENCE_TEMPLATE_APPLICANT = "claimant-confirms-to-proceed-applicant-notification-%s";
     private static final String NP_PROCEED_REFERENCE_TEMPLATE
         = "claimant-confirms-not-to-proceed-respondent-notification-%s";
 
@@ -94,19 +95,6 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             }
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
-
-        if (isLiPClaimant(callbackParams)) {
-            if (caseData.getRespondent1().getPartyEmail() != null) {
-                notificationService.sendMail(
-                    caseData.getApplicant1().getPartyEmail(),
-                    notificationsProperties.getClaimantLipClaimUpdatedTemplate(),
-                    addPropertiesForLiPClaimant(caseData),
-                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-                );
-            }
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
-
         if ((isRespondentSolicitor2Notification(callbackParams)
             && NO.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()))
             || (!isRespondentSolicitor2Notification(callbackParams)
@@ -164,12 +152,6 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         );
     }
 
-    public Map<String, String> addPropertiesForLiPClaimant(CaseData caseData) {
-        return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
-        );
-    }
     private boolean isCcNotification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC.name());
@@ -200,12 +182,5 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && caseData.isLRvLipOneVOne()
             && !isCcNotification(callbackParams);
-    }
-
-    private boolean isLiPClaimant(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && caseData.isLRvLipOneVOne()
-            && isCcNotification(callbackParams);
     }
 }
