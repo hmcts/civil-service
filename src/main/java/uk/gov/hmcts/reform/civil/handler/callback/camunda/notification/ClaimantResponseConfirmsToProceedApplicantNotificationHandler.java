@@ -32,11 +32,14 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
 
+    private final Map<String, Callback> callbackMap = Map.of(
+        callbackKey(ABOUT_TO_SUBMIT),
+        this::notifyApplicantForClaimantConfirmsToProceed
+    );
+
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForClaimantConfirmsToProceed
-        );
+        return callbackMap;
     }
 
     @Override
