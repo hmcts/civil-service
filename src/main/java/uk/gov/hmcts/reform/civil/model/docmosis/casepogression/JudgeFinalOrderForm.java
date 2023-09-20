@@ -42,11 +42,10 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final String recordedText;
     private final String orderedText;
     private final String costSelection;
-    private final String costReservedText;
+    private final String costsReservedText;
     private final LocalDate paidByDate;
-    private final YesOrNo costProtection;
     private final String costAmount;
-    private final String bespokeText;
+    private final String bespokeCostText;
     private final boolean furtherHearingToggle;
     private final boolean furtherHearingToToggle;
     private final LocalDate furtherHearingFromDate;
@@ -76,4 +75,11 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final String claimantTwoAttendsOrRepresented;
     private final String defendantAttendsOrRepresented;
     private final String defendantTwoAttendsOrRepresented;
+    private final String summarilyAssessed;
+    private final LocalDate summarilyAssessedDate;
+    private final String detailedAssessment;
+    private final String interimPayment;
+    private final LocalDate interimPaymentDate;
+    private final String qcosProtection;
+    private final String costsProtection;
 }
