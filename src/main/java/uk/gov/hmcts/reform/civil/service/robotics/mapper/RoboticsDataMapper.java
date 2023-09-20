@@ -152,8 +152,13 @@ public class RoboticsDataMapper {
             );
 
         if (organisationId != null) {
+            try {
             organisationService.findOrganisationById(organisationId)
                 .ifPresent(buildOrganisation(solicitorBuilder, caseData.getRespondentSolicitor1ServiceAddress()));
+            } catch (FeignException e) {
+                log.error("Error recovering org id " + organisationId
+                              + " for case id " + caseData.getLegacyCaseReference(), e);
+            }
         }
         organisationDetails.ifPresent(buildOrganisationDetails(solicitorBuilder));
 
