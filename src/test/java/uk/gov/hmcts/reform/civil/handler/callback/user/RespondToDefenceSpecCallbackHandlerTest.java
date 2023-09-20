@@ -988,7 +988,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldChangeCaseState_WhenApplicant1NotAcceptPartAdmitAmountWithFastTrackAndFlagV2() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
-                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .responseClaimTrack(FAST_CLAIM.name())
                 .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
@@ -1237,7 +1236,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
-        @Test
         void shouldGetOneVOneFullAdmitBySetDateFlagV2() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 

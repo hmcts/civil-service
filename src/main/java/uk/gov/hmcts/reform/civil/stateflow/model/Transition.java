@@ -4,7 +4,6 @@ import lombok.Data;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -18,8 +17,6 @@ public class Transition {
     private Predicate<CaseData> condition;
 
     private Consumer<Map<String, Boolean>> flags;
-
-    private BiConsumer<CaseData, Map<String, Boolean>> dynamicFlags;
 
     public Transition(String sourceState, String targetState) {
         this.sourceState = sourceState;

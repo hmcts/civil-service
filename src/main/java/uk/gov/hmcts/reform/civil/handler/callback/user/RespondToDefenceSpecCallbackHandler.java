@@ -382,8 +382,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
-        if (caseData.isRespondentResponseFullDefence()
-            && RespondToDefenceCallbackHandler.shouldMoveToJudicialReferral(caseData)) {
+        if (caseData.isRespondentResponseFullDefence()) {
             response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
     }
@@ -673,7 +672,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private boolean isDefendantFullAdmitPayImmediately(CaseData caseData) {
         return caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
-            && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()));
     }
 

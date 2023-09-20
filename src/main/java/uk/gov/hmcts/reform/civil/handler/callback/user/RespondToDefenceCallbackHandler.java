@@ -259,57 +259,27 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
-            .state((shouldMoveToJudicialReferral(caseData)
-                ? CaseState.JUDICIAL_REFERRAL
-                : CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).name())
-            .build();
-    }
+        AllocatedTrack allocatedTrack =
+            getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType());
 
-    /**
-     * Computes whether the case data should move to judicial referral or not.
-     *
-     * @param caseData a case data such that defendants rejected the claim, and claimant(s) wants to proceed
-     *                 vs all the defendants
-     * @return true if and only if the case should move to judicial referral
-     */
-    public static boolean shouldMoveToJudicialReferral(CaseData caseData) {
-        CaseCategory caseCategory = caseData.getCaseAccessCategory();
-
-        if (CaseCategory.SPEC_CLAIM.equals(caseCategory)) {
-            MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-            boolean addRespondent2 = YES.equals(caseData.getAddRespondent2());
-
-            return switch (multiPartyScenario) {
-                case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
-                case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimSpec2v1() == YesOrNo.YES;
-                case ONE_V_TWO_ONE_LEGAL_REP -> addRespondent2
-                    && YES.equals(caseData.getRespondentResponseIsSame());
-                case ONE_V_TWO_TWO_LEGAL_REP -> addRespondent2
-                    && caseData.getRespondentResponseIsSame() == null;
-            };
+        CaseState newState;
+        if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
+            newState = CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
         } else {
-            AllocatedTrack allocatedTrack =
-                getAllocatedTrack(
-                    CaseCategory.UNSPEC_CLAIM.equals(caseCategory)
-                        ? caseData.getClaimValue().toPounds()
-                        : caseData.getTotalClaimAmount(),
-                    caseData.getClaimType()
-                );
-            if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
-                return false;
-            }
-            MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-            return switch (multiPartyScenario) {
+            boolean proceed = switch (multiPartyScenario) {
                 case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
                 case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimMultiParty2v1() == YES
-                    && caseData.getApplicant2ProceedWithClaimMultiParty2v1() == YES;
+                    || caseData.getApplicant2ProceedWithClaimMultiParty2v1() == YES;
                 case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
                     caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2() == YES
-                    && caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2() == YES;
+                        || caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2() == YES;
             };
+            newState = proceed ? CaseState.JUDICIAL_REFERRAL : CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
         }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .state(newState.name())
+            .build();
     }
 
     private void updateApplicants(CaseData caseData, CaseData.CaseDataBuilder builder, StatementOfTruth statementOfTruth) {
