@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
@@ -63,40 +64,37 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
     }
 
     private String getHeader() {
-        return format("# Judgement marked as paid in full");
+        return format("# Judgment marked as paid in full");
     }
 
     private String getBody() {
-        return format("# Judgement marked as paid in full");
+        return format("# Judgment marked as paid in full");
     }
 
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
-        if(nonNull(caseData.getJoJudgementIssuedDate())
+        if(nonNull(caseData.getJoJudgmentIssuedDate())
             && nonNull(caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())){
-            boolean paidAfter30Days = checkIfPaidAfter30DaysOfJudgmentGranted(caseData.getJoJudgementIssuedDate(),
+            boolean paidAfter30Days = JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan30Days(caseData.getJoJudgmentIssuedDate(),
                                                                               caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade());
             if(paidAfter30Days){
-                caseData.getJoJudgementStatusDetails().setJudgmentStatusTypes(JudgmentStatusType.SATISFIED);
+                caseData.getJoJudgmentStatusDetails().setJudgmentStatusTypes(JudgmentStatusType.SATISFIED);
+                if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
+                    caseData.getJoJudgmentStatusDetails().setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.SATISFIED));
+                }
             }else{
-                caseData.getJoJudgementStatusDetails().setJudgmentStatusTypes(JudgmentStatusType.CANCELLED);
+                caseData.getJoJudgmentStatusDetails().setJudgmentStatusTypes(JudgmentStatusType.CANCELLED);
+                if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
+                    caseData.getJoJudgmentStatusDetails().setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.CANCELLED));
+                }
             }
-            //TODO Update RTL fields
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
-    }
-
-    private boolean checkIfPaidAfter30DaysOfJudgmentGranted(LocalDate grantedDate, LocalDate paidDtae){
-
-        if(ChronoUnit.DAYS.between(grantedDate, paidDtae) > 30){
-            return true;
-        }
-        return false;
     }
 
     private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {
