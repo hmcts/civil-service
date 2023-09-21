@@ -158,29 +158,39 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidCallback {
         @Test
-        void shouldValidateDateOfOrderAndPaymentInstalmentDate() {
+        void shouldValidatePaymentInstalmentDate() {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoJudgmentInstalmentDetails(JudgmentInstalmentDetails.builder().firstInstalmentDate(LocalDate.now().minusDays(2)).build());
-            caseData.setJoOrderMadeDate(LocalDate.now().minusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().contains("Date of first instalment must be in the future"));
-            assertThat(response.getErrors().contains("Date the judgment will be paid by must be in the future"));
+            assertThat(response.getErrors()).contains("Date of first instalment must be in the future");
         }
 
         @Test
-        void shouldValidatePaymentByDate() {
+        void shouldValidatePaymentPaidByDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoPaymentToBeMadeByDate(LocalDate.now().minusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().contains("Date judge made the order must be in the past"));
+            assertThat(response.getErrors()).contains("Date the judgment will be paid by must be in the future");
+        }
+
+        @Test
+        void shouldValidateOrderDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoOrderMadeDate(LocalDate.now().plusDays(2));
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
+            //When: handler is called with MID event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).contains("Date judge made the order must be in the past");
         }
     }
 
