@@ -13,15 +13,17 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.dq.Experts;
-import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -40,6 +42,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORM
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addApplicantExpertAndWitnessFlagsStructure;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addRespondentDQPartiesFlagStructure;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
@@ -76,6 +80,9 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
     private static final String INVALID_CASE_STATE_ERROR = "You will be able run the manage contact information " +
         "event once the claimant has responded.";
+    private static final String CHECK_LITIGATION_FRIEND_ERROR_TITLE = "Check the litigation friend's details";
+    private static final String CHECK_LITIGATION_FRIEND_ERROR = "After making these changes, please ensure that the "
+        + "litigation friend's contact information is also up to date.";
     private static final List<String> ADMIN_ROLES = List.of(
         "caseworker-civil-admin");
     private static final List<CaseEvent> EVENTS = List.of(
@@ -92,6 +99,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::prepareEvent)
             .put(callbackKey(MID, "show-party-field"), this::showPartyField)
+            .put(callbackKey(MID, "show-warning"), this::showWarning)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitChanges)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -102,6 +110,42 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
+    private CallbackResponse showWarning(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
+        ArrayList<String> warnings = new ArrayList<>();
+
+        if (partyHasLitigationFriend(partyChosen, caseData)) {
+            warnings.add(CHECK_LITIGATION_FRIEND_ERROR_TITLE);
+            warnings.add(CHECK_LITIGATION_FRIEND_ERROR);
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .warnings(warnings)
+            .build();
+    }
+
+    private Boolean partyHasLitigationFriend(String partyChosen, CaseData caseData) {
+        if (hasLitigationFriend(CLAIMANT_ONE_ID, partyChosen, caseData.getApplicant1LitigationFriendRequired())
+            || hasLitigationFriend(CLAIMANT_TWO_ID, partyChosen, caseData.getApplicant2LitigationFriendRequired())
+            || hasLitigationFriend(DEFENDANT_ONE_ID, partyChosen, caseData.getRespondent1LitigationFriend())
+            || hasLitigationFriend(DEFENDANT_TWO_ID, partyChosen, caseData.getRespondent2LitigationFriend())
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    private Boolean hasLitigationFriend(String id, String partyChosen, YesOrNo litigationFriend) {
+        return id.equals(partyChosen) && YES.equals(litigationFriend);
+    }
+
+    private Boolean hasLitigationFriend(String id, String partyChosen, LitigationFriend litigationFriend) {
+        return id.equals(partyChosen) && litigationFriend != null;
+    }
+
     private CallbackResponse showPartyField(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
@@ -109,14 +153,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
         String partyChosenType = null;
 
-        if (CLAIMANT_ONE_ID.equals(partyChosen)
-            || CLAIMANT_TWO_ID.equals(partyChosen)
-            || DEFENDANT_ONE_ID.equals(partyChosen)
-            || DEFENDANT_TWO_ID.equals(partyChosen)
-            || CLAIMANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
-            || CLAIMANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen)
-            || DEFENDANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
-            || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen)) {
+        if (isParty(partyChosen) || isLitigationFriend(partyChosen)) {
             // Party fields are empty in this mid event, this is a workaround
             CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -136,6 +173,20 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();
+    }
+
+    private Boolean isParty(String partyChosen) {
+        return CLAIMANT_ONE_ID.equals(partyChosen)
+            || CLAIMANT_TWO_ID.equals(partyChosen)
+            || DEFENDANT_ONE_ID.equals(partyChosen)
+            || DEFENDANT_TWO_ID.equals(partyChosen);
+    }
+
+    private Boolean isLitigationFriend(String partyChosen) {
+        return CLAIMANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || CLAIMANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || DEFENDANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen);
     }
 
     private CallbackResponse prepareEvent(CallbackParams callbackParams) {
@@ -255,32 +306,40 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
     private void updateExperts(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
         List<Element<UpdatePartyDetailsForm>> formData = caseData.getUpdateDetailsForm().getUpdateExpertsDetailsForm();
+        List<Element<Expert>> mappedExperts;
+
         if (partyId.equals(CLAIMANT_ONE_EXPERTS_ID)) {
+            mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
+                caseData.getApplicant1DQ().getApplicant1DQExperts().getDetails(), formData);
             builder.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
                                      .applicant1DQExperts(
                                          caseData.getApplicant1DQ().getApplicant1DQExperts().toBuilder()
-                                             .details(mapUpdatePartyDetailsFormToDQExperts(
-                                                 caseData.getApplicant1DQ().getApplicant1DQExperts().getDetails(), formData))
+                                             .expertRequired(mappedExperts.size() >= 1 ? YES : NO)
+                                             .details(mappedExperts)
                                              .build())
                                      .build());
             addApplicantExpertAndWitnessFlagsStructure(builder, caseData);
             //TODO: need to add it to top level party object
         } else if (partyId.equals(DEFENDANT_ONE_EXPERTS_ID)) {
+            mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
+                caseData.getRespondent1DQ().getRespondent1DQExperts().getDetails(), formData);
             builder.respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                      .respondent1DQExperts(
                                          caseData.getRespondent1DQ().getRespondent1DQExperts().toBuilder()
-                                             .details(mapUpdatePartyDetailsFormToDQExperts(
-                                                 caseData.getRespondent1DQ().getRespondent1DQExperts().getDetails(), formData))
+                                             .expertRequired(mappedExperts.size() >= 1 ? YES : NO)
+                                             .details(mappedExperts)
                                              .build())
                                      .build());
             addRespondentDQPartiesFlagStructure(builder, caseData);
             //TODO: need to add it to top level party object
         } else if (partyId.equals(DEFENDANT_TWO_EXPERTS_ID)) {
+            mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
+                caseData.getRespondent2DQ().getRespondent2DQExperts().getDetails(), formData);
             builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
                                      .respondent2DQExperts(
                                          caseData.getRespondent2DQ().getRespondent2DQExperts().toBuilder()
-                                             .details(mapUpdatePartyDetailsFormToDQExperts(
-                                                 caseData.getRespondent2DQ().getRespondent2DQExperts().getDetails(), formData))
+                                             .expertRequired(mappedExperts.size() >= 1 ? YES : NO)
+                                             .details(mappedExperts)
                                              .build())
                                      .build());
             addRespondentDQPartiesFlagStructure(builder, caseData);
@@ -291,34 +350,42 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
     private void updateWitnesses(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
         List<Element<UpdatePartyDetailsForm>> formData = caseData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm();
+        List<Element<Witness>> mappedWitnesses;
+
         if (partyId.equals(CLAIMANT_ONE_WITNESSES_ID)) {
+            mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
+                caseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails(), formData);
             builder.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
                                      .applicant1DQWitnesses(
                                          caseData.getApplicant1DQ().getApplicant1DQWitnesses().toBuilder()
-                                             .details(mapUpdatePartyDetailsFormToDQWitnesses(
-                                                 caseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails(), formData))
+                                             .witnessesToAppear(mappedWitnesses.size() >= 1 ? YES : NO)
+                                             .details(mappedWitnesses)
                                              .build())
                                      .build());
             addApplicantExpertAndWitnessFlagsStructure(builder, caseData);
             //TODO: need to add it to top level party object
         } else if (partyId.equals(DEFENDANT_ONE_WITNESSES_ID)) {
+            mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
+                caseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails(), formData);
             builder.respondent1DQ(caseData.getRespondent1DQ().toBuilder()
-                                     .respondent1DQWitnesses(
-                                         caseData.getRespondent1DQ().getRespondent1DQWitnesses().toBuilder()
-                                             .details(mapUpdatePartyDetailsFormToDQWitnesses(
-                                                 caseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails(), formData))
-                                             .build())
-                                     .build());
+                                 .respondent1DQWitnesses(
+                                     caseData.getRespondent1DQ().getRespondent1DQWitnesses().toBuilder()
+                                         .witnessesToAppear(mappedWitnesses.size() >= 1 ? YES : NO)
+                                         .details(mappedWitnesses)
+                                         .build())
+                                 .build());
             addRespondentDQPartiesFlagStructure(builder, caseData);
             //TODO: need to add it to top level party object
         } else if (partyId.equals(DEFENDANT_TWO_WITNESSES_ID)) {
+            mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
+                caseData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails(), formData);
             builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
-                                     .respondent2DQWitnesses(
-                                         caseData.getRespondent2DQ().getRespondent2DQWitnesses().toBuilder()
-                                             .details(mapUpdatePartyDetailsFormToDQWitnesses(
-                                                 caseData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails(), formData))
-                                             .build())
-                                     .build());
+                                 .respondent2DQWitnesses(
+                                     caseData.getRespondent2DQ().getRespondent2DQWitnesses().toBuilder()
+                                         .witnessesToAppear(mappedWitnesses.size() >= 1 ? YES : NO)
+                                         .details(mappedWitnesses)
+                                         .build())
+                                 .build());
             addRespondentDQPartiesFlagStructure(builder, caseData);
             //TODO: need to add it to top level party object
         }

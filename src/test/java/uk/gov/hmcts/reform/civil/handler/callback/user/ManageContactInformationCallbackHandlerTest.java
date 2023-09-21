@@ -47,7 +47,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
@@ -870,6 +870,167 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails()).get(0)).isEqualTo(expectedWitness1);
+        }
+
+        @Test
+        void addingExpertWhenNoneExisted() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(CLAIMANT_ONE_EXPERTS_ID)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(CLAIMANT_ONE_EXPERTS_ID)
+                                       .updateExpertsDetailsForm(wrapElements(party))
+                                       .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQExperts(Experts.builder()
+                                                           .expertRequired(NO)
+                                                           .build())
+                                  .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(unwrapElements(updatedData.getApplicant1DQ().getApplicant1DQExperts().getDetails()).get(0)).isEqualTo(expectedExpert1);
+            assertThat(updatedData.getApplicant1DQ().getApplicant1DQExperts().getExpertRequired()).isEqualTo(YES);
+        }
+
+        @Test
+        void removingAllExperts() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(CLAIMANT_ONE_EXPERTS_ID)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(CLAIMANT_ONE_EXPERTS_ID)
+                                       .updateExpertsDetailsForm(null)
+                                       .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQExperts(Experts.builder()
+                                                           .expertRequired(YES)
+                                                           .details(wrapElements(dqExpert)).build())
+                                  .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(unwrapElements(updatedData.getApplicant1DQ().getApplicant1DQExperts().getDetails())).isEmpty();
+            assertThat(updatedData.getApplicant1DQ().getApplicant1DQExperts().getExpertRequired()).isEqualTo(NO);
+        }
+
+        @Test
+        void addingWitnessWhenNoneExisted() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(DEFENDANT_ONE_WITNESSES_ID)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
+                                       .updateWitnessesDetailsForm(wrapElements(party))
+                                       .build())
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
+                                   .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(unwrapElements(updatedData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails()).get(0)).isEqualTo(expectedWitness1);
+            assertThat(updatedData.getRespondent1DQ().getRespondent1DQWitnesses().getWitnessesToAppear()).isEqualTo(YES);
+        }
+
+        @Test
+        void removingAllWitnesses() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(DEFENDANT_ONE_WITNESSES_ID)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
+                                       .updateWitnessesDetailsForm(null)
+                                       .build())
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQWitnesses(Witnesses.builder()
+                                                               .details(wrapElements(dqWitness))
+                                                               .witnessesToAppear(YES).build())
+                                   .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(unwrapElements(updatedData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails())).isEmpty();
+            assertThat(updatedData.getRespondent1DQ().getRespondent1DQWitnesses().getWitnessesToAppear()).isEqualTo(NO);
+        }
+    }
+
+    @Nested
+    class MidShowWarning {
+        private static final String PAGE_ID = "show-warning";
+
+        @ParameterizedTest
+        @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
+        void shouldReturnWarning(String partyChosenId) {
+            String errorTitle = "Check the litigation friend's details";
+            String errorMessage = "After making these changes, please ensure that the "
+                + "litigation friend's contact information is also up to date.";
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(partyChosenId)
+                                                                   .build())
+                                                        .build())
+                                       .build())
+                .addApplicant1LitigationFriend()
+                .addApplicant2LitigationFriend()
+                .addRespondent1LitigationFriend()
+                .addRespondent2LitigationFriend()
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getWarnings()).contains(errorTitle);
+            assertThat(response.getWarnings()).contains(errorMessage);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID, DEFENDANT_ONE_LITIGATION_FRIEND_ID})
+        void shouldNotReturnWarning(String partyChosenId) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(partyChosenId)
+                                                                   .build())
+                                                        .build())
+                                       .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getWarnings()).isEmpty();
         }
     }
 
