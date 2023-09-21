@@ -1236,6 +1236,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(getCaseData(response).getResponseClaimTrack()).isNotNull();
         }
 
+        @Test
         void shouldGetOneVOneFullAdmitBySetDateFlagV2() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
