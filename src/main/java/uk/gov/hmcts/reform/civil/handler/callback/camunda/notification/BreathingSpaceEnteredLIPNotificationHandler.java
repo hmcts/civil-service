@@ -9,14 +9,17 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_BREATHING_SPACE_ENTER;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -65,8 +68,9 @@ public class BreathingSpaceEnteredLIPNotificationHandler extends CallbackHandler
         Map<String, String> templateProperties = addProperties(caseData);
 
         if (isRespondentNotification(callbackParams)) {
-            String recipientEmail = caseData.getRespondent1() != null ? caseData.getRespondent1().getPartyEmail() : "";
-            if (recipientEmail != null && !recipientEmail.isEmpty()) {
+            String recipientEmail = Optional.ofNullable(caseData.getRespondent1())
+                .map(Party::getPartyEmail).orElse("");
+            if (isNotEmpty(recipientEmail)) {
                 notificationService.sendMail(
                     recipientEmail,
                     notificationsProperties.getNotifyEnteredBreathingSpaceForDefendantLip(),
