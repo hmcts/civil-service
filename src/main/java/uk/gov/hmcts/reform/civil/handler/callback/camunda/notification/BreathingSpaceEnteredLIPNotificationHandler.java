@@ -63,12 +63,15 @@ public class BreathingSpaceEnteredLIPNotificationHandler extends CallbackHandler
         Map<String, String> templateProperties = addProperties(caseData);
 
         if (isRespondentNotification(callbackParams)) {
-            notificationService.sendMail(
-                caseData.getRespondent1().getPartyEmail(),
-                notificationsProperties.getNotifyEnteredBreathingSpaceForDefendantLip(),
-                templateProperties,
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-            );
+            String recipientEmail = caseData.getRespondent1() != null ? caseData.getRespondent1().getPartyEmail() : "";
+            if (recipientEmail != null && !recipientEmail.isEmpty()) {
+                notificationService.sendMail(
+                    recipientEmail,
+                    notificationsProperties.getNotifyEnteredBreathingSpaceForDefendantLip(),
+                    templateProperties,
+                    String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                );
+            }
         } else {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
