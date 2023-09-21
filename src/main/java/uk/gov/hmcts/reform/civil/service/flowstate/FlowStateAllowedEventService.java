@@ -631,7 +631,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 DISMISS_CLAIM,
                 migrateCase,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
         entry(
