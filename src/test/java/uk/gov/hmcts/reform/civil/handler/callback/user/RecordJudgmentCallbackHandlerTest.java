@@ -73,6 +73,8 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("joAmountCostOrdered")).isNull();
             assertThat(response.getData().get("joIsRegisteredWithRTL")).isNull();
             assertThat(response.getData().get("joAmountOrdered")).isNull();
+            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+
         }
     }
 

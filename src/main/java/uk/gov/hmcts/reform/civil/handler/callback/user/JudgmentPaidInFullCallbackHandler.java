@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +25,10 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
 
 @Service
@@ -40,21 +42,13 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::resetPageData)
+            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "validate-payment-date"), this::validatePaymentDate)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::saveJudgmentPaidInFullDetails)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
-    private CallbackResponse resetPageData(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        caseData.setJoJudgmentPaidInFull(null);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader())
@@ -72,26 +66,28 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
 
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
-        if(nonNull(caseData.getJoJudgmentIssuedDate())
-            && nonNull(caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())){
+
+        if (nonNull(caseData.getJoJudgmentIssuedDate())
+            && nonNull(caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())) {
             boolean paidAfter30Days = JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan30Days(caseData.getJoJudgmentIssuedDate(),
                                                                               caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade());
-            if(paidAfter30Days){
+            if (paidAfter30Days) {
                 caseData.getJoJudgmentStatusDetails().setJudgmentStatusTypes(JudgmentStatusType.SATISFIED);
                 if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
                     caseData.getJoJudgmentStatusDetails().setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.SATISFIED));
                 }
-            }else{
+            } else {
                 caseData.getJoJudgmentStatusDetails().setJudgmentStatusTypes(JudgmentStatusType.CANCELLED);
                 if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
                     caseData.getJoJudgmentStatusDetails().setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.CANCELLED));
                 }
             }
             caseData.getJoJudgmentStatusDetails().setLastUpdatedDate(LocalDateTime.now());
+            caseData.setJoIsLiveJudgmentExists(YesOrNo.NO);
         }
 
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -109,7 +105,6 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
             .errors(errors)
             .build();
     }
-
 
     @Override
     public List<CaseEvent> handledEvents() {
