@@ -2,9 +2,12 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -18,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCESS_CLAIM_ISSUE;
@@ -26,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClaimIssueCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(PROCESS_CLAIM_ISSUE);
@@ -70,9 +75,28 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
     }
 
     private void clearOrganisationPolicyId(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        if (YES.equals(caseData.getRespondent1OrgRegistered())) {
-            caseDataBuilder.respondent1OrganisationIDCopy(
-                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
+        if (YES.equals(caseData.getRespondent1OrgRegistered())
+            && StringUtils.isBlank(caseData.getRespondent1OrganisationIDCopy())) {
+            String id = Optional.ofNullable(caseData.getRespondent1OrganisationPolicy())
+                .map(OrganisationPolicy::getOrganisation)
+                .map(Organisation::getOrganisationID)
+                .orElse(null);
+            if (id == null) {
+                /*
+                Could not reproduce the error, but there's been cases when
+                caseData.getRespondent1OrganisationPolicy().getOrganisation() == null
+                despite the if's condition. Study of the cases may give more info.
+
+                If this line doesn't appear in the logs for enough time, the problem is no more
+                 */
+                log.error(
+                    "CIV-9960 CaseData {} has R1Org Registered by r1OrgPolicy.org is null",
+                    caseData.getLegacyCaseReference()
+                );
+            } else {
+                caseDataBuilder.respondent1OrganisationIDCopy(
+                    caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
+            }
 
             caseDataBuilder.respondent1OrganisationPolicy(
                 caseData
