@@ -299,6 +299,8 @@ notifications:
   notifyLiPClaimantDefendantResponded: "4b1325dd-51ed-4dc2-bcc6-d9afb01a3f29"
   notifyLiPClaimantDefendantChangedContactDetails: "72a14146-c897-4fc6-be4f-474266da7398"
 
+  notifyApplicant1EnteredBreathingSpaceLip: "7e34af74-ec20-476b-aea5-6a6508d3acaf"
+  notifyEnteredBreathingSpaceForDefendantLip: "e551a04f-9da1-4654-a7be-2040e02925aa"
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
@@ -310,7 +312,7 @@ os-postcode-lookup:
 stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
-  enabled: ${STITCHING_API_ENABLED:true}
+  enabled: ${STITCHING_API_ENABLED:false}
 
 bundle:
   api:
