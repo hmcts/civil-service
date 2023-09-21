@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -383,10 +384,16 @@ public class ChangeSolicitorEmailCallbackHandler extends CallbackHandler {
     }
 
     private List<String> validateAddress(Address address) {
-        String postCode = Optional.ofNullable(address)
-            .map(Address::getPostCode)
-            .orElse(null);
-        return postcodeValidator.validate(postCode);
+        if (address != null) {
+            String postCode = address.getPostCode();
+            if (StringUtils.isBlank(postCode)) {
+                // postcode validator is ok with null but not ""
+                postCode = null;
+            }
+            return postcodeValidator.validate(postCode);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private CallbackResponse validateApplicant1SolicitorEmail(CallbackParams callbackParams) {
