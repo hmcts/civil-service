@@ -15,14 +15,13 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
@@ -34,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -65,7 +65,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
-import static uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec.ONCE_ONE_WEEK;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED_NOTICE_OF_CHANGE;
@@ -1126,15 +1125,15 @@ public class EventHistoryMapper {
         if (AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             String miscText = "RPA Reason:Multitrack Unspec going offline.";
             builder.miscellaneous(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(MISCELLANEOUS.getCode())
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(miscText)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(miscText)
-                                          .build())
-                        .build());
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build());
         }
     }
 
@@ -1257,7 +1256,7 @@ public class EventHistoryMapper {
                     && AllocatedTrack.SMALL_CLAIM.name().equals(track)
                     && respondent1MediationRequired == YesOrNo.YES
                     && applicant1MediationRequired == YesOrNo.YES
-                    )
+                )
                 ) {
                     List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                     builder.miscellaneous(miscText);
@@ -1284,7 +1283,7 @@ public class EventHistoryMapper {
                     && respondent1MediationRequired == YesOrNo.YES
                     && respondent2MediationRequired == YesOrNo.YES
                     && applicant1MediationRequired == YesOrNo.YES
-                    )
+                )
                 ) {
                     List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                     builder.miscellaneous(miscText);
@@ -1308,7 +1307,7 @@ public class EventHistoryMapper {
                     && respondent1MediationRequired == YesOrNo.YES
                     && applicant1MediationRequired == YesOrNo.YES
                     && applicant2MediationRequired == YesOrNo.YES
-                    )
+                )
                 ) {
                     List<Event> miscText = prepareMiscEventList(builder, caseData, miscEventText);
                     builder.miscellaneous(miscText);
@@ -2060,40 +2059,40 @@ public class EventHistoryMapper {
         if (defendant1ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             builder.miscellaneous(Event.builder()
-                                .eventSequence(prepareEventSequence(builder.build()))
-                                .eventCode(MISCELLANEOUS.getCode())
-                                .dateReceived(caseData.getRespondent1ResponseDate())
-                                .eventDetailsText(miscText)
-                                .eventDetails(EventDetails.builder()
-                                                  .miscText(miscText)
-                                                  .build())
-                                .build());
+                                      .eventSequence(prepareEventSequence(builder.build()))
+                                      .eventCode(MISCELLANEOUS.getCode())
+                                      .dateReceived(caseData.getRespondent1ResponseDate())
+                                      .eventDetailsText(miscText)
+                                      .eventDetails(EventDetails.builder()
+                                                        .miscText(miscText)
+                                                        .build())
+                                      .build());
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
                 builder.miscellaneous(Event.builder()
-                                    .eventSequence(prepareEventSequence(builder.build()))
-                                    .eventCode(MISCELLANEOUS.getCode())
-                                    .dateReceived(respondent2ResponseDate)
-                                    .eventDetailsText(miscText)
-                                    .eventDetails(EventDetails.builder()
-                                                      .miscText(miscText)
-                                                      .build())
-                                    .build());
+                                          .eventSequence(prepareEventSequence(builder.build()))
+                                          .eventCode(MISCELLANEOUS.getCode())
+                                          .dateReceived(respondent2ResponseDate)
+                                          .eventDetailsText(miscText)
+                                          .eventDetails(EventDetails.builder()
+                                                            .miscText(miscText)
+                                                            .build())
+                                          .build());
             }
         }
         if (defendant2ResponseExists.test(caseData)) {
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
             builder.miscellaneous(Event.builder()
-                                .eventSequence(prepareEventSequence(builder.build()))
-                                .eventCode(MISCELLANEOUS.getCode())
-                                .dateReceived(caseData.getRespondent2ResponseDate())
-                                .eventDetailsText(miscText)
-                                .eventDetails(EventDetails.builder()
-                                                  .miscText(miscText)
-                                                  .build())
-                                .build());
+                                      .eventSequence(prepareEventSequence(builder.build()))
+                                      .eventCode(MISCELLANEOUS.getCode())
+                                      .dateReceived(caseData.getRespondent2ResponseDate())
+                                      .eventDetailsText(miscText)
+                                      .eventDetails(EventDetails.builder()
+                                                        .miscText(miscText)
+                                                        .build())
+                                      .build());
         }
     }
 
@@ -2248,7 +2247,7 @@ public class EventHistoryMapper {
     }
 
     private String getInstallmentPeriodForRequestJudgmentByAdmission(Optional<RepaymentPlanLRspec> repaymentPlanLRspec) {
-        return repaymentPlanLRspec.map(RepaymentPlanLRspec::getRepaymentFrequency).map(repaymentFrequency->{
+        return repaymentPlanLRspec.map(RepaymentPlanLRspec::getRepaymentFrequency).map(repaymentFrequency -> {
             switch (repaymentFrequency) {
                 case ONCE_ONE_WEEK:
                     return "WK";
@@ -2310,7 +2309,7 @@ public class EventHistoryMapper {
     }
 
     private void buildClaimInMediation(EventHistory.EventHistoryBuilder builder,
-                                               CaseData caseData) {
+                                       CaseData caseData) {
 
         if (caseData.hasDefendantAgreedToFreeMediation() && caseData.hasClaimantAgreedToFreeMediation()) {
 
@@ -2330,7 +2329,7 @@ public class EventHistoryMapper {
     }
 
     private void buildClaimantDirectionQuestionnaireForSpec(EventHistory.EventHistoryBuilder builder,
-                                               CaseData caseData) {
+                                                            CaseData caseData) {
         List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
 
         CaseCategory claimType = caseData.getCaseAccessCategory();
