@@ -230,15 +230,42 @@ public class CaseDataTest {
     }
 
     @Test
-    public void givenRespondentUnrepresentedAndOnvOne_whenIsLRvLipOneVOne_thenTrue() {
+    public void givenRespondentUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.YES)
             .respondent1(Party.builder().build())
             .applicant1(Party.builder().build())
             .build();
         //Then
         assertTrue(caseData.isLRvLipOneVOne());
+    }
+
+    @Test
+    public void givenRespondentRepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.YES)
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1(Party.builder().build())
+            .applicant1(Party.builder().build())
+            .build();
+        //Then
+        assertFalse(caseData.isLRvLipOneVOne());
+    }
+
+    @Test
+    public void givenApplicantUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1(Party.builder().build())
+            .applicant1(Party.builder().build())
+            .build();
+        //Then
+        assertFalse(caseData.isLRvLipOneVOne());
     }
 
     @Test
