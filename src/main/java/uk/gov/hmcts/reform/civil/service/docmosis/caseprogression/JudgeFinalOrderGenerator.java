@@ -73,7 +73,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private JudgeFinalOrderForm getFinalOrderType(CaseData caseData, String authorisation) {
-        return caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER) ? getFreeFormOrder(caseData, authorisation) : getAssistedOrder(caseData, authorisation);
+        return caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER) ? getFreeFormOrder(
+            caseData,
+            authorisation
+        ) : getAssistedOrder(caseData, authorisation);
     }
 
     private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
@@ -96,7 +99,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
             .defendantReference(nonNull(caseData.getSolicitorReferences())
-                                   ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
+                                    ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null)
             .freeFormRecordedText(caseData.getFreeFormRecordedTextArea())
             .freeFormOrderedText(caseData.getFreeFormOrderedTextArea())
             .orderOnCourtsList(caseData.getOrderOnCourtsList())
@@ -137,13 +140,13 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .judgeNameTitle(userDetails.getFullName())
             .recordedToggle(nonNull(caseData.getFinalOrderRecitals())
                                 && caseData.getFinalOrderRecitals().stream().anyMatch(finalOrderToggle -> finalOrderToggle.equals(
-                    FinalOrderToggle.SHOW)))
+                FinalOrderToggle.SHOW)))
             .recordedText(nonNull(caseData.getFinalOrderRecitalsRecorded())
                               ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
             .orderedText(caseData.getFinalOrderOrderedThatText())
             .claimantAttendsOrRepresented(claimantAttendsOrRepresentedTextBuilder(caseData, false))
             .claimantTwoAttendsOrRepresented(nonNull(caseData.getApplicant2())
-                                             ? claimantAttendsOrRepresentedTextBuilder(caseData, true) : null)
+                                                 ? claimantAttendsOrRepresentedTextBuilder(caseData, true) : null)
             .defendantAttendsOrRepresented(defendantAttendsOrRepresentedTextBuilder(caseData, false))
             .defendantTwoAttendsOrRepresented(nonNull(caseData.getRespondent2())
                                                   ? defendantAttendsOrRepresentedTextBuilder(caseData, true) : null)
@@ -151,9 +154,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                       && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex())
                                       ? caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex().getDetailsRepresentationText() : "")
             .judgeConsideredPapers(nonNull(caseData.getFinalOrderRepresentation()) && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList())
-                                   ? caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList()
-                                       .stream().anyMatch(finalOrdersJudgePapers -> finalOrdersJudgePapers.equals(
-                FinalOrdersJudgePapers.CONSIDERED)) : false)
+                                       ? caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList()
+                .stream().anyMatch(finalOrdersJudgePapers -> finalOrdersJudgePapers.equals(
+                    FinalOrdersJudgePapers.CONSIDERED)) : false)
             .furtherHearingToggle(nonNull(caseData.getFinalOrderFurtherHearingToggle())
                                       ?
                                       caseData.getFinalOrderFurtherHearingToggle().stream().anyMatch(finalOrderToggle -> finalOrderToggle.name().equals(
@@ -167,70 +170,95 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .furtherHearingLocationAlt(nonNull(caseData.getFinalOrderFurtherHearingToggle())
                                            && nonNull(caseData.getFinalOrderFurtherHearingComplex())
                                            && nonNull(caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList())
-                                           ? caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList().getValue().getLabel() : null )
+                                           ? caseData.getFinalOrderFurtherHearingComplex().getAlternativeHearingList().getValue().getLabel() : null)
             .furtherHearingMethod(nonNull(caseData.getFinalOrderFurtherHearingComplex()) && nonNull(caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList())
                                       ? caseData.getFinalOrderFurtherHearingComplex().getHearingMethodList().name() : "")
             .costSelection(caseData.getAssistedOrderCostList().name())
             .costsReservedText(nonNull(caseData.getAssistedOrderCostsReserved())
                                    ? caseData.getAssistedOrderCostsReserved().getDetailsRepresentationText() : null)
             .bespokeCostText(nonNull(caseData.getAssistedOrderCostsBespoke())
-                                  ? caseData.getAssistedOrderCostsBespoke().getBesPokeCostDetailsText() : null)
+                                 ? caseData.getAssistedOrderCostsBespoke().getBesPokeCostDetailsText() : null)
             .summarilyAssessed(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
                                    && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
-                                   && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(CostEnums.COSTS)
+                                   && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
+                CostEnums.COSTS)
                                    ? populateSummarilyAssessedText(caseData) : null)
             .summarilyAssessedDate(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
                                        && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
-                                       && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(CostEnums.COSTS)
+                                       && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
+                CostEnums.COSTS)
                                        ? caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownDate() : null)
             .detailedAssessment(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
-                                   && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
-                                   && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(CostEnums.SUBJECT_DETAILED_ASSESSMENT)
-                                   ? populateDetailedAssessmentText(caseData) : null)
+                                    && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
+                                    && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
+                CostEnums.SUBJECT_DETAILED_ASSESSMENT)
+                                    ? populateDetailedAssessmentText(caseData) : null)
             .interimPayment(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
                                 && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
-                                && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(CostEnums.SUBJECT_DETAILED_ASSESSMENT)
-                                && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList2().equals(CostEnums.YES)
+                                && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
+                CostEnums.SUBJECT_DETAILED_ASSESSMENT)
+                                && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList2().equals(
+                CostEnums.YES)
                                 ? populateInterimPaymentText(caseData) : null)
             .interimPaymentDate(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
                                     && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList())
-                                    && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(CostEnums.SUBJECT_DETAILED_ASSESSMENT)
+                                    && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderClaimantDefendantFirstDropdown().equals(
+                CostEnums.SUBJECT_DETAILED_ASSESSMENT)
                                     ? caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownDate() : null)
             .qcosProtection(nonNull(caseData.getAssistedOrderMakeAnOrderForCosts())
-                            && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo())
-                            &&caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo().equals(YES) ? "true" : null)
+                                && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo())
+                                && caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo().equals(
+                YES) ? "true" : null)
             .costsProtection(caseData.getPublicFundingCostsProtection().equals(YES) ? "true" : null);
 
         return assistedFormOrderBuilder.build();
     }
 
     public String populateInterimPaymentText(CaseData caseData) {
-        return format("An interim payment of £%s on account of costs shall be paid by 4pm on ", caseData.getAssistedOrderMakeAnOrderForCosts()
-                          .getAssistedOrderAssessmentThirdDropdownAmount());
+        return format(
+            "An interim payment of £%s on account of costs shall be paid by 4pm on ",
+            caseData.getAssistedOrderMakeAnOrderForCosts()
+                .getAssistedOrderAssessmentThirdDropdownAmount()
+        );
     }
 
     public String populateSummarilyAssessedText(CaseData caseData) {
         if (caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
-            return format("The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
-                              + "in the sum of £%s. Such a sum shall be made by 4pm on", caseData.getAssistedOrderMakeAnOrderForCosts()
-                .getAssistedOrderCostsFirstDropdownAmount());
-        } else return format("The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
-                                + "in the sum of £%s. Such a sum shall be made by 4pm on", caseData.getAssistedOrderMakeAnOrderForCosts()
-                                                    .getAssistedOrderCostsFirstDropdownAmount());
-
+            return format(
+                "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
+                    + "in the sum of £%s. Such a sum shall be made by 4pm on",
+                caseData.getAssistedOrderMakeAnOrderForCosts()
+                    .getAssistedOrderCostsFirstDropdownAmount()
+            );
+        } else {
+            return format(
+                "The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
+                    + "in the sum of £%s. Such a sum shall be made by 4pm on",
+                caseData.getAssistedOrderMakeAnOrderForCosts()
+                    .getAssistedOrderCostsFirstDropdownAmount()
+            );
+        }
     }
 
     public String populateDetailedAssessmentText(CaseData caseData) {
         String standardOrIndemnity;
-        if (caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList1().equals(CostEnums.INDEMNITY_BASIS)) {
+        if (caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList1().equals(
+            CostEnums.INDEMNITY_BASIS)) {
             standardOrIndemnity = "on the indemnity basis if not agreed";
-        } else standardOrIndemnity = "on the standard basis if not agreed";
+        } else {
+            standardOrIndemnity = "on the standard basis if not agreed";
+        }
 
         if (caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
-            return format("The claimant shall pay the defendant's costs to be subject to a detailed assessment %s",
-                          standardOrIndemnity);
-        }  return format("The defendant shall pay the claimant's costs to be subject to a detailed assessment %s",
-                             standardOrIndemnity);
+            return format(
+                "The claimant shall pay the defendant's costs to be subject to a detailed assessment %s",
+                standardOrIndemnity
+            );
+        }
+        return format(
+            "The defendant shall pay the claimant's costs to be subject to a detailed assessment %s",
+            standardOrIndemnity
+        );
     }
 
     public Boolean isDefaultCourt(CaseData caseData) {
@@ -257,7 +285,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     public LocalDate getFurtherHearingDate(CaseData caseData, boolean isFromDate) {
         if (caseData.getFinalOrderFurtherHearingToggle() != null
             && caseData.getFinalOrderFurtherHearingToggle().stream().anyMatch(finalOrderToggle -> finalOrderToggle.equals(
-                FinalOrderToggle.SHOW)) && caseData.getFinalOrderFurtherHearingComplex() != null) {
+            FinalOrderToggle.SHOW)) && caseData.getFinalOrderFurtherHearingComplex() != null) {
             if (isFromDate) {
                 return caseData.getFinalOrderFurtherHearingComplex().getListFromDate();
             } else {
@@ -312,7 +340,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            }
+        }
         if (caseData.getFinalOrderDateHeardComplex().getDateRangeSelection() != null) {
             String date1 = caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom().toString();
             String date2 = caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo().toString();
@@ -327,7 +355,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             }
         }
         if (caseData.getFinalOrderDateHeardComplex().getBespokeRangeSelection() != null) {
-            return format("on %s", caseData.getFinalOrderDateHeardComplex().getBespokeRangeSelection().getBespokeRangeTextArea());
+            return format(
+                "on %s",
+                caseData.getFinalOrderDateHeardComplex().getBespokeRangeSelection().getBespokeRangeTextArea()
+            );
         }
         return null;
     }
@@ -353,7 +384,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                         return format("A lay representative for %s, the claimant.", name);
                     case CLAIMANT_NOT_ATTENDING:
                         return claimantNotAttendingText(caseData, isClaimant2, name);
-                    default: return "";
+                    default:
+                        return "";
                 }
             }
         }
@@ -376,7 +408,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                         return format("A lay representative for %s, the claimant.", name);
                     case CLAIMANT_NOT_ATTENDING:
                         return claimantNotAttendingText(caseData, isClaimant2, name);
-                    default: return "";
+                    default:
+                        return "";
                 }
             }
         }
@@ -404,7 +437,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                         return format("A lay representative for %s, the defendant.", name);
                     case DEFENDANT_NOT_ATTENDING:
                         return defendantNotAttendingText(caseData, isDefendant2, name);
-                    default: return "";
+                    default:
+                        return "";
                 }
             }
         }
@@ -437,110 +471,129 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     public String claimantNotAttendingText(CaseData caseData, Boolean isClaimant2, String name) {
         if (!isClaimant2 && (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList() != null)) {
-                FinalOrdersClaimantDefendantNotAttending notAttendingType =
-                    caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList();
-                switch (notAttendingType) {
-                    case SATISFIED_REASONABLE_TO_PROCEED:
-                        return format("%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
-                                          + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                                      name);
-                    case SATISFIED_NOTICE_OF_TRIAL:
-                        return format("%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                                          + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                                      name);
-                    case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                        return format("%s, the claimant, did not attend the trial. "
-                                          + "The Judge was not satisfied that they had received notice of the hearing "
-                                          + "and it was not reasonable to proceed in their absence.",
-                                      name);
+            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex() != null
+            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList() != null)) {
+            FinalOrdersClaimantDefendantNotAttending notAttendingType =
+                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureClaimantComplex().getList();
+            switch (notAttendingType) {
+                case SATISFIED_REASONABLE_TO_PROCEED:
+                    return format(
+                        "%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
+                            + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
+                        name
+                    );
+                case SATISFIED_NOTICE_OF_TRIAL:
+                    return format(
+                        "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had "
+                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
+                        name
+                    );
+                case NOT_SATISFIED_NOTICE_OF_TRIAL:
+                    return format(
+                        "%s, the claimant, did not attend the trial. "
+                            + "The Judge was not satisfied that they had received notice of the hearing "
+                            + "and it was not reasonable to proceed in their absence.",
+                        name
+                    );
 
-                    default:
-                        return "";
-                }
-
+                default:
+                    return "";
+            }
         }
         if (isClaimant2 && (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex().getListClaimTwo() != null)) {
-                FinalOrdersClaimantDefendantNotAttending notAttendingType =
-                    caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex().getListClaimTwo();
-                switch (notAttendingType) {
-                    case SATISFIED_REASONABLE_TO_PROCEED:
-                        return format(
-                            "%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
-                                + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                            name
-                        );
-                    case SATISFIED_NOTICE_OF_TRIAL:
-                        return format(
-                            "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                                + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                            name
-                        );
-                    case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                        return format(
-                            "%s, the claimant, did not attend the trial. "
-                                + "The Judge was not satisfied that they had received notice of the hearing "
-                                + "and it was not reasonable to proceed in their absence.",
-                            name
-                        );
+            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex() != null
+            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex().getListClaimTwo() != null)) {
+            FinalOrdersClaimantDefendantNotAttending notAttendingType =
+                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex().getListClaimTwo();
+            switch (notAttendingType) {
 
-                    default:
-                        return "";
-                }
+                case SATISFIED_REASONABLE_TO_PROCEED:
+                    return format(
+                        "%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
+                            + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
+                        name
+                    );
+                case SATISFIED_NOTICE_OF_TRIAL:
+                    return format(
+                        "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had "
+                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
+                        name
+                    );
+                case NOT_SATISFIED_NOTICE_OF_TRIAL:
+                    return format(
+                        "%s, the claimant, did not attend the trial. "
+                            + "The Judge was not satisfied that they had received notice of the hearing "
+                            + "and it was not reasonable to proceed in their absence.",
+                        name
+                    );
 
+                default:
+                    return "";
+            }
         }
         return "";
     }
+
     public String defendantNotAttendingText(CaseData caseData, Boolean isDefendant2, String name) {
         if (!isDefendant2 && (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef() != null)) {
-                FinalOrdersClaimantDefendantNotAttending notAttendingType =
-                    caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef();
-                switch (notAttendingType) {
-                    case SATISFIED_REASONABLE_TO_PROCEED:
-                        return format("%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
-                                          + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                                      name);
-                    case SATISFIED_NOTICE_OF_TRIAL:
-                        return format("%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                                          + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                                      name);
-                    case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                        return format("%s, the defendant, did not attend the trial. "
-                                          + "The Judge was not satisfied that they had received notice of the hearing "
-                                          + "and it was not reasonable to proceed in their absence.",
-                                      name);
-                    default:
-                        return "";
-                }
+            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex() != null
+            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef() != null)) {
+            FinalOrdersClaimantDefendantNotAttending notAttendingType =
+                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureComplex().getListDef();
+            switch (notAttendingType) {
+                case SATISFIED_REASONABLE_TO_PROCEED:
+                    return format(
+                        "%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
+                            + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
+                        name
+                    );
+                case SATISFIED_NOTICE_OF_TRIAL:
+                    return format(
+                        "%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had "
+                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
+                        name
+                    );
+                case NOT_SATISFIED_NOTICE_OF_TRIAL:
+                    return format(
+                        "%s, the defendant, did not attend the trial. "
+                            + "The Judge was not satisfied that they had received notice of the hearing "
+                            + "and it was not reasonable to proceed in their absence.",
+                        name
+                    );
+                default:
+                    return "";
+            }
 
         }
         if (isDefendant2 && (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureDefTwoComplex() != null
-                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureDefTwoComplex().getListDefTwo() != null)) {
-                FinalOrdersClaimantDefendantNotAttending notAttendingType =
-                    caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureDefTwoComplex().getListDefTwo();
-                switch (notAttendingType) {
-                    case SATISFIED_REASONABLE_TO_PROCEED:
-                        return format("%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
-                                          + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                                      name);
-                    case SATISFIED_NOTICE_OF_TRIAL:
-                        return format("%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                                          + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                                      name);
-                    case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                        return format("%s, the defendant, did not attend the trial. "
-                                          + "The Judge was not satisfied that they had received notice of the hearing "
-                                          + "and it was not reasonable to proceed in their absence.",
-                                      name);
-                    default:
-                        return "";
-                }
+            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureDefTwoComplex() != null
+            && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureDefTwoComplex().getListDefTwo() != null)) {
+            FinalOrdersClaimantDefendantNotAttending notAttendingType =
+                caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureDefTwoComplex().getListDefTwo();
+            switch (notAttendingType) {
+
+                case SATISFIED_REASONABLE_TO_PROCEED:
+                    return format(
+                        "%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
+                            + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
+                        name
+                    );
+                case SATISFIED_NOTICE_OF_TRIAL:
+                    return format(
+                        "%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had "
+                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
+                        name
+                    );
+                case NOT_SATISFIED_NOTICE_OF_TRIAL:
+                    return format(
+                        "%s, the defendant, did not attend the trial. "
+                            + "The Judge was not satisfied that they had received notice of the hearing "
+                            + "and it was not reasonable to proceed in their absence.",
+                        name
+                    );
+                default:
+                    return "";
+            }
         }
         return "";
     }
