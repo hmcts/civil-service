@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -41,6 +43,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -62,6 +65,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
+import static uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec.ONCE_ONE_WEEK;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED_NOTICE_OF_CHANGE;
@@ -480,8 +484,9 @@ public class EventHistoryMapper {
     }
 
     private void buildJudgmentByAdmissionEventDetails(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        EventDetails judgmentByAdmissionEvent;
-        judgmentByAdmissionEvent = EventDetails.builder()
+        boolean isResponsePayByInstallment = caseData.isPayByInstallment();
+        Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
+        EventDetails judgmentByAdmissionEvent = EventDetails.builder()
             .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
                                   .add(caseData.getTotalInterest()).setScale(2))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
@@ -491,16 +496,11 @@ public class EventHistoryMapper {
             .paymentInFullDate(caseData.isPayBySetDate()
                                    ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
                                    : null)
-            .installmentAmount(caseData.isPayByInstallment()
-                                   ? MonetaryConversions.penniesToPounds(
-                                       caseData.getRespondent1RepaymentPlan().getPaymentAmount()).setScale(2)
+            .installmentAmount(getInstallmentAmount(isResponsePayByInstallment, repaymentPlan))
+            .installmentPeriod(isResponsePayByInstallment
+                                   ? getInstallmentPeriodForRequestJudgmentByAdmission(repaymentPlan)
                                    : null)
-            .installmentPeriod(caseData.isPayByInstallment()
-                                   ? getInstallmentPeriodForRequestJudgmentByAdmission(caseData)
-                                   : null)
-            .firstInstallmentDate(caseData.isPayByInstallment()
-                                      ? caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate()
-                                      : null)
+            .firstInstallmentDate(getFirstInstallmentDate(isResponsePayByInstallment, repaymentPlan))
             .dateOfJudgment(setApplicant1ResponseDate(caseData))
             .jointJudgment(false)
             .judgmentToBeRegistered(true)
@@ -516,6 +516,22 @@ public class EventHistoryMapper {
             .eventDetailsText("")
             .build()));
 
+    }
+
+    @Nullable
+    private static LocalDate getFirstInstallmentDate(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
+        return isResponsePayByInstallment
+            ? repaymentPlan.map(RepaymentPlanLRspec::getFirstRepaymentDate)
+            .orElse(null)
+            : null;
+    }
+
+    @Nullable
+    private static BigDecimal getInstallmentAmount(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
+        return isResponsePayByInstallment
+            ? MonetaryConversions.penniesToPounds(
+            repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).map(amount -> amount.setScale(2)).orElse(BigDecimal.ZERO))
+            : null;
     }
 
     private void buildRespondentDivergentResponse(EventHistory.EventHistoryBuilder builder, CaseData caseData,
@@ -2231,17 +2247,19 @@ public class EventHistoryMapper {
         return "FUL";
     }
 
-    private String getInstallmentPeriodForRequestJudgmentByAdmission(CaseData caseData) {
-        switch (caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) {
-            case ONCE_ONE_WEEK:
-                return "WK";
-            case ONCE_TWO_WEEKS:
-                return "FOR";
-            case ONCE_ONE_MONTH:
-                return "MTH";
-            default:
-                return null;
-        }
+    private String getInstallmentPeriodForRequestJudgmentByAdmission(Optional<RepaymentPlanLRspec> repaymentPlanLRspec) {
+        return repaymentPlanLRspec.map(RepaymentPlanLRspec::getRepaymentFrequency).map(repaymentFrequency->{
+            switch (repaymentFrequency) {
+                case ONCE_ONE_WEEK:
+                    return "WK";
+                case ONCE_TWO_WEEKS:
+                    return "FOR";
+                case ONCE_ONE_MONTH:
+                    return "MTH";
+                default:
+                    return null;
+            }
+        }).orElse(null);
     }
 
     private BigDecimal getCostOfJudgment(CaseData data) {
