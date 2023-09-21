@@ -7963,6 +7963,7 @@ class EventHistoryMapperTest {
                         )
                         .build()
                 )
+                .specDefenceAdmittedRequired(YES)
                 .build();
 
             List<Event> expectedDirectionsQuestionnaireFiled =
@@ -7988,6 +7989,8 @@ class EventHistoryMapperTest {
             var eventHistory = mapper.buildEvents(caseData);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("statesPaid").asList()
+                .extracting("eventCode").asString().contains("49");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_REASON_MANUAL_DETERMINATION);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
@@ -8053,6 +8056,7 @@ class EventHistoryMapperTest {
                         )
                         .build()
                 )
+                .specDefenceAdmittedRequired(NO)
                 .build();
 
             List<Event> expectedDirectionsQuestionnaireFiled =

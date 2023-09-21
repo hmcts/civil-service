@@ -46,6 +46,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -1946,8 +1947,15 @@ public class EventHistoryMapper {
             Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
 
-            if (caseData.hasDefendantPayedTheAmountClaimed()) {
-                buildLrVLipFullDefenceEvent(builder, caseData, null, statesPaidEvents);
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                && Objects.nonNull(caseData.getSpecDefenceAdmittedRequired())
+                && caseData.getSpecDefenceAdmittedRequired().equals(YES)) {
+                builder.statesPaid(buildDefenceFiledEvent(
+                    builder,
+                    respondent1ResponseDate,
+                    RESPONDENT_ID,
+                    true
+                ));
             } else {
                 builder.receiptOfPartAdmission(
                     Event.builder()
