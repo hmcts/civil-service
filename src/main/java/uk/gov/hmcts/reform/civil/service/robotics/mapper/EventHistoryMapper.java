@@ -49,6 +49,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -1832,6 +1833,21 @@ public class EventHistoryMapper {
                             .build()));
     }
 
+    private void buildRespondentResponseText(EventHistory.EventHistoryBuilder builder, CaseData caseData, String miscText, LocalDateTime respondentResponseDate) {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            builder.miscellaneous(Event.builder()
+                                      .eventSequence(prepareEventSequence(builder.build()))
+                                      .eventCode(MISCELLANEOUS.getCode())
+                                      .dateReceived(respondentResponseDate)
+                                      .eventDetailsText(miscText)
+                                      .eventDetails(EventDetails.builder()
+                                                        .miscText(miscText)
+                                                        .build())
+                                      .build());
+        }
+
+    }
+
     private void buildRespondentFullAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String miscText;
         if (defendant1ResponseExists.test(caseData)) {
@@ -1842,15 +1858,8 @@ public class EventHistoryMapper {
                                            .dateReceived(caseData.getRespondent1ResponseDate())
                                            .litigiousPartyID(RESPONDENT_ID)
                                            .build()
-            ).miscellaneous(Event.builder()
-                                .eventSequence(prepareEventSequence(builder.build()))
-                                .eventCode(MISCELLANEOUS.getCode())
-                                .dateReceived(caseData.getRespondent1ResponseDate())
-                                .eventDetailsText(miscText)
-                                .eventDetails(EventDetails.builder()
-                                                  .miscText(miscText)
-                                                  .build())
-                                .build());
+            );
+            buildRespondentResponseText(builder, caseData, miscText, caseData.getRespondent1ResponseDate());
 
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
@@ -1862,15 +1871,8 @@ public class EventHistoryMapper {
                                                .dateReceived(respondent2ResponseDate)
                                                .litigiousPartyID(RESPONDENT2_ID)
                                                .build()
-                ).miscellaneous(Event.builder()
-                                    .eventSequence(prepareEventSequence(builder.build()))
-                                    .eventCode(MISCELLANEOUS.getCode())
-                                    .dateReceived(respondent2ResponseDate)
-                                    .eventDetailsText(miscText)
-                                    .eventDetails(EventDetails.builder()
-                                                      .miscText(miscText)
-                                                      .build())
-                                    .build());
+                );
+                buildRespondentResponseText(builder, caseData, miscText, respondent2ResponseDate);
             }
         }
         if (defendant2ResponseExists.test(caseData)) {
@@ -1881,15 +1883,8 @@ public class EventHistoryMapper {
                                            .dateReceived(caseData.getRespondent2ResponseDate())
                                            .litigiousPartyID(RESPONDENT2_ID)
                                            .build()
-            ).miscellaneous(Event.builder()
-                                .eventSequence(prepareEventSequence(builder.build()))
-                                .eventCode(MISCELLANEOUS.getCode())
-                                .dateReceived(caseData.getRespondent2ResponseDate())
-                                .eventDetailsText(miscText)
-                                .eventDetails(EventDetails.builder()
-                                                  .miscText(miscText)
-                                                  .build())
-                                .build());
+            );
+            buildRespondentResponseText(builder, caseData, miscText, caseData.getRespondent2ResponseDate());
         }
     }
 
@@ -1898,26 +1893,33 @@ public class EventHistoryMapper {
         List<Event> directionsQuestionnaireFiledEvents = new ArrayList<>();
         boolean isRespondent1;
         if (defendant1ResponseExists.test(caseData)) {
-            Party respondent1 = caseData.getRespondent1();
+            final Party respondent1 = caseData.getRespondent1();
             miscText = prepareRespondentResponseText(caseData, caseData.getRespondent1(), true);
             Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
-            builder.receiptOfPartAdmission(
-                Event.builder()
-                    .eventSequence(prepareEventSequence(builder.build()))
-                    .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .litigiousPartyID(RESPONDENT_ID)
-                    .build()
-            ).miscellaneous(Event.builder()
-                                .eventSequence(prepareEventSequence(builder.build()))
-                                .eventCode(MISCELLANEOUS.getCode())
-                                .dateReceived(caseData.getRespondent1ResponseDate())
-                                .eventDetailsText(miscText)
-                                .eventDetails(EventDetails.builder()
-                                                  .miscText(miscText)
-                                                  .build())
-                                .build());
+
+            if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                && Objects.nonNull(caseData.getSpecDefenceAdmittedRequired())
+                && caseData.getSpecDefenceAdmittedRequired().equals(YES)) {
+                builder.statesPaid(buildDefenceFiledEvent(
+                    builder,
+                    respondent1ResponseDate,
+                    RESPONDENT_ID,
+                    true
+                ));
+            } else {
+                builder.receiptOfPartAdmission(
+                    Event.builder()
+                        .eventSequence(prepareEventSequence(builder.build()))
+                        .eventCode(RECEIPT_OF_PART_ADMISSION.getCode())
+                        .dateReceived(caseData.getRespondent1ResponseDate())
+                        .litigiousPartyID(RESPONDENT_ID)
+                        .build()
+                );
+            }
+
+            buildRespondentResponseText(builder, caseData, miscText, respondent1ResponseDate);
+
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
                                                        respondent1ResponseDate,
@@ -1927,8 +1929,8 @@ public class EventHistoryMapper {
                                                        true
                 ));
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
-                Party respondent2 = caseData.getRespondent2();
-                Respondent1DQ respondent2DQ = caseData.getRespondent1DQ();
+                final Party respondent2 = caseData.getRespondent2();
+                final Respondent1DQ respondent2DQ = caseData.getRespondent1DQ();
                 LocalDateTime respondent2ResponseDate = null != caseData.getRespondent2ResponseDate()
                     ? caseData.getRespondent2ResponseDate() : caseData.getRespondent1ResponseDate();
                 miscText = prepareRespondentResponseText(caseData, caseData.getRespondent2(), false);
@@ -1939,15 +1941,8 @@ public class EventHistoryMapper {
                         .dateReceived(respondent2ResponseDate)
                         .litigiousPartyID(RESPONDENT2_ID)
                         .build()
-                ).miscellaneous(Event.builder()
-                                    .eventSequence(prepareEventSequence(builder.build()))
-                                    .eventCode(MISCELLANEOUS.getCode())
-                                    .dateReceived(respondent2ResponseDate)
-                                    .eventDetailsText(miscText)
-                                    .eventDetails(EventDetails.builder()
-                                                      .miscText(miscText)
-                                                      .build())
-                                    .build());
+                );
+                buildRespondentResponseText(builder, caseData, miscText, respondent2ResponseDate);
                 directionsQuestionnaireFiledEvents.add(
                     buildDirectionsQuestionnaireFiledEvent(builder, caseData,
                                                            respondent2ResponseDate,
@@ -1970,15 +1965,10 @@ public class EventHistoryMapper {
                     .dateReceived(caseData.getRespondent2ResponseDate())
                     .litigiousPartyID(RESPONDENT2_ID)
                     .build()
-            ).miscellaneous(Event.builder()
-                                .eventSequence(prepareEventSequence(builder.build()))
-                                .eventCode(MISCELLANEOUS.getCode())
-                                .dateReceived(caseData.getRespondent2ResponseDate())
-                                .eventDetailsText(miscText)
-                                .eventDetails(EventDetails.builder()
-                                                  .miscText(miscText)
-                                                  .build())
-                                .build());
+            );
+
+            buildRespondentResponseText(builder, caseData, miscText, respondent2ResponseDate);
+
             directionsQuestionnaireFiledEvents.add(
                 buildDirectionsQuestionnaireFiledEvent(builder, caseData,
                                                        respondent2ResponseDate,
