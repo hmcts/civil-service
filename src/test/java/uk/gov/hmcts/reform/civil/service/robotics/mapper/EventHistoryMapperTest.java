@@ -1890,15 +1890,6 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText("Claim issued in CCD.")
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(3)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant fully admits.")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant fully admits.")
-                                      .build())
                     .build()
             );
 
@@ -1908,7 +1899,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
                 .containsExactly(expectedReceiptOfAdmission);
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                .containsExactly(expectedMiscellaneousEvents.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -1950,15 +1941,6 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText("Claim issued in CCD.")
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(3)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant fully admits.")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant fully admits.")
-                                      .build())
                     .build()
             );
 
@@ -1968,7 +1950,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
                 .containsExactly(expectedReceiptOfAdmission);
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                .containsExactly(expectedMiscellaneousEvents.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2001,8 +1983,7 @@ class EventHistoryMapperTest {
                 .litigiousPartyID("002")
                 .build();
 
-            List<Event> expectedMiscellaneousEvents = List.of(
-                Event.builder()
+            Event expectedMiscellaneousEvents = Event.builder()
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getIssueDate().atStartOfDay())
@@ -2010,19 +1991,7 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText("Claim issued in CCD.")
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(3)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText(
-                        "RPA Reason: [1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
-                                                    + "Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
-                                      .build())
-                    .build()
-            );
+                    .build();
 
             var eventHistory = mapper.buildEvents(caseData);
 
@@ -2030,7 +1999,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
                 .containsExactly(expectedReceiptOfAdmission);
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                .containsExactly(expectedMiscellaneousEvents);
 
             assertEmptyEvents(
                 eventHistory,
@@ -2069,8 +2038,7 @@ class EventHistoryMapperTest {
                 .litigiousPartyID("002")
                 .build();
 
-            List<Event> expectedMiscellaneousEvents = List.of(
-                Event.builder()
+            Event expectedMiscellaneousEvents = Event.builder()
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getIssueDate().atStartOfDay())
@@ -2078,17 +2046,7 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText("Claim issued in CCD.")
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(4)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant partial admission.")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant partial admission.")
-                                      .build())
-                    .build()
-            );
+                    .build();
 
             List<Event> expectedDirectionsQuestionnaireFiled = List.of(
                 Event.builder()
@@ -2115,7 +2073,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
                 .containsExactly(expectedReceiptOfPartAdmission);
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                .containsExactly(expectedMiscellaneousEvents);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
                 .contains(expectedDirectionsQuestionnaireFiled.get(0));
 
@@ -8005,6 +7963,7 @@ class EventHistoryMapperTest {
                         )
                         .build()
                 )
+                .specDefenceAdmittedRequired(YES)
                 .build();
 
             List<Event> expectedDirectionsQuestionnaireFiled =
@@ -8030,6 +7989,8 @@ class EventHistoryMapperTest {
             var eventHistory = mapper.buildEvents(caseData);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("statesPaid").asList()
+                .extracting("eventCode").asString().contains("49");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_REASON_MANUAL_DETERMINATION);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
@@ -8095,6 +8056,7 @@ class EventHistoryMapperTest {
                         )
                         .build()
                 )
+                .specDefenceAdmittedRequired(NO)
                 .build();
 
             List<Event> expectedDirectionsQuestionnaireFiled =
