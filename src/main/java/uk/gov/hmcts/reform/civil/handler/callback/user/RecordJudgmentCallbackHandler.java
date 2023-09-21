@@ -65,7 +65,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
             if (!isFutureDate) {
                 errors.add(ERROR_MESSAGE_DATE_PAID_BY_MUST_BE_IN_FUTURE);
             }
-        } else if (callbackParams.getCaseData().getJoPaymentPlanSelection().equals(PaymentPlanSelection.PAY_IN_INSTALLMENT)) {
+        } else if (callbackParams.getCaseData().getJoPaymentPlanSelection().equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)) {
             boolean isFutureDate =
                 JudgmentsOnlineHelper.validateIfFutureDate(callbackParams.getCaseData().getJoJudgmentInstalmentDetails().getFirstInstalmentDate());
             if (!isFutureDate) {

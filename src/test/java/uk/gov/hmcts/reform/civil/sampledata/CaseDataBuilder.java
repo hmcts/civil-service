@@ -5358,7 +5358,7 @@ public class CaseDataBuilder {
                                              .paymentFrequency(PaymentFrequency.MONTHLY).build())
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IN_INSTALLMENT)
+            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IN_INSTALMENTS)
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES).build();
     }

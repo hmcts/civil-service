@@ -95,7 +95,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("joJudgmentRecordReason")).isEqualTo(
                 JudgmentRecordedReason.JUDGE_ORDER.name());
             assertThat(response.getData().get("joPaymentPlanSelection")).isEqualTo(
-                PaymentPlanSelection.PAY_IN_INSTALLMENT.name());
+                PaymentPlanSelection.PAY_IN_INSTALMENTS.name());
             assertThat(response.getData().get("joJudgmentInstalmentDetails")).extracting("instalmentAmount").isEqualTo("120");
             assertThat(response.getData().get("joJudgmentInstalmentDetails")).extracting("paymentFrequency").isEqualTo("MONTHLY");
             assertThat(response.getData().get("joJudgmentInstalmentDetails")).extracting("firstInstalmentDate").isEqualTo("2022-12-12");
