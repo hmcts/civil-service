@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JudgmentsOnlineHelperTest {
 
     @Test
-    private void test_getRTLStatusBasedOnJudgementStatus() {
+    void test_getRTLStatusBasedOnJudgementStatus() {
         assertThat(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED)).isEqualTo("R");
         assertThat(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.MODIFIED)).isEqualTo(
             "M");
@@ -21,7 +21,7 @@ public class JudgmentsOnlineHelperTest {
     }
 
     @Test
-    private void test_validateIfFutureDate() {
+    void test_validateIfFutureDate() {
         assertThat(JudgmentsOnlineHelper.validateIfFutureDate(LocalDate.now())).isFalse();
         assertThat(JudgmentsOnlineHelper.validateIfFutureDate(LocalDate.now().minusDays(3))).isFalse();
         assertThat(JudgmentsOnlineHelper.validateIfFutureDate(LocalDate.now().plusDays(3))).isTrue();
