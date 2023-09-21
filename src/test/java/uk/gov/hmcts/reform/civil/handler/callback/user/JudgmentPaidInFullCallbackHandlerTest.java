@@ -1,83 +1,123 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CloseClaim;
-import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
 
 @SpringBootTest(classes = {
-    WithdrawClaimCallbackHandler.class,
-    ValidationAutoConfiguration.class,
+    JacksonAutoConfiguration.class,
     JudgmentPaidInFullCallbackHandler.class
 })
 class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private WithdrawClaimCallbackHandler handler;
+    private JudgmentPaidInFullCallbackHandler handler;
 
     @Autowired
-    private JudgmentPaidInFullCallbackHandler callBackHandler;
+    private ObjectMapper objectMapper;
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(handler.handledEvents()).containsOnly(JUDGMENT_PAID_IN_FULL);
+    }
 
     @Nested
     class AboutToStartCallback {
 
         @Test
-        void shouldReturnNoError_WhenAboutToStartIsInvoked() {
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().atStateAllFinalOrdersIssued().build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseDetails).build();
+        void shouldPopulateAllFieldsAsNull() {
+            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build().toBuilder()
+                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) callBackHandler
+            //When: handler is called with ABOUT_TO_START event
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors()).isNull();
+            //Then: all joJudgmentPaidInFull fields should be null
+            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+
         }
     }
 
     @Nested
-    class MidEventWithdrawalReasonCallback {
-
-        private static final String PAGE_ID = "validate-payment-dat";
-
+    class AboutToSubmitCallback {
         @Test
-        void shouldReturnErrors_whenDateInFuture() {
-            CaseData caseData = CaseDataBuilder.builder().atStateAllFinalOrdersIssued()
-                .withdrawClaim(CloseClaim.builder().date(LocalDate.now().plusDays(1)).build())
+        void shouldPopulateDate() {
+            //Given: Casedata is in All_FINAL_ORDERS_ISSUED State and Record Judgement is done
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaid();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then: judgmentOnline fields should be set correctly
+            var judgmentPaid = JudgmentPaidInFull.builder()
+                .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
+                .confirmFullPaymentMade(List.of("CONFIRMED"))
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).containsOnly("The date must not be in the future");
+            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo("2023-09-15");
+            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
         }
 
+
+    }
+
+    @Nested
+    class MidCallback {
         @Test
-        void shouldReturnNoErrors_whenDateInPast() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .discontinueClaim(CloseClaim.builder().date(LocalDate.now().minusDays(1)).build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+        void shouldValidatePaymentMadeDate() {
 
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaid();
+            caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(LocalDate.now().minusDays(2));
 
-            assertThat(response.getErrors()).isEmpty();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
+            //When: handler is called with MID event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().contains("Date must be in past"));
         }
     }
+
+    @Nested
+    class SubmittedCallback {
+        @Test
+        public void whenSubmitted_thenIncludeHeader() {
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(CallbackType.SUBMITTED)
+                .build();
+            SubmittedCallbackResponse response =
+                (SubmittedCallbackResponse) handler.handle(params);
+            Assertions.assertTrue(response.getConfirmationHeader().contains("# Judgment marked as paid in full"));
+            Assertions.assertTrue(response.getConfirmationBody().contains("Judgment marked as paid in full"));
+        }
+    }
+
 }
+

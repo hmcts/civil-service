@@ -49,8 +49,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
 
     private CallbackResponse resetPageData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(null);
-        caseData.getJoJudgmentPaidInFull().setConfirmFullPaymentMade(null);
+        caseData.setJoJudgmentPaidInFull(null);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -90,6 +89,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
                     caseData.getJoJudgmentStatusDetails().setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.CANCELLED));
                 }
             }
+            caseData.getJoJudgmentStatusDetails().setLastUpdatedDate(LocalDateTime.now());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
