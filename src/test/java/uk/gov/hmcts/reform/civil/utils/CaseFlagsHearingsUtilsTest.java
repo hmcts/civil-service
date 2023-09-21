@@ -187,11 +187,11 @@ public class CaseFlagsHearingsUtilsTest {
     }
 
     private PartyFlags getRespondent1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Respondent 1", details, caseData.getRespondent1().getPartyID());
+        return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Defendant 1", details, caseData.getRespondent1().getPartyID());
     }
 
     private PartyFlags getApplicant1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty(caseData.getApplicant1().getPartyName(), "Applicant 1", details, caseData.getApplicant1().getPartyID());
+        return getFlagsForParty(caseData.getApplicant1().getPartyName(), "Claimant 1", details, caseData.getApplicant1().getPartyID());
     }
 
     private PartyFlags getRespondent1LitFriendFlags(CaseData caseData, List<Element<FlagDetail>> details) {
