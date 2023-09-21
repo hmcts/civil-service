@@ -338,7 +338,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 String formattedDate = outputFormat.format(convertDateString);
                 return format("on %s", formattedDate);
             } catch (ParseException e) {
-                e.printStackTrace();
             }
         }
         if (caseData.getFinalOrderDateHeardComplex().getDateRangeSelection() != null) {
@@ -351,7 +350,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 String formattedDate2 = outputFormat.format(convertDateString2);
                 return format("between %s and %s", formattedDate1, formattedDate2);
             } catch (ParseException e) {
-                e.printStackTrace();
             }
         }
         if (caseData.getFinalOrderDateHeardComplex().getBespokeRangeSelection() != null) {
