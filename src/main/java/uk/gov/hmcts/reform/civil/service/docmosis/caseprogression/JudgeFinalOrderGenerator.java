@@ -1,18 +1,14 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList;
-import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
+import uk.gov.hmcts.reform.civil.enums.finalorders.*;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
@@ -38,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFinalOrderForm> {
@@ -209,7 +206,19 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                 && nonNull(caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo())
                                 && caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsYesOrNo().equals(
                 YES) ? "true" : null)
-            .costsProtection(caseData.getPublicFundingCostsProtection().equals(YES) ? "true" : null);
+            .costsProtection(caseData.getPublicFundingCostsProtection().equals(YES) ? "true" : null)
+//            .appealToggle(nonNull(caseData.getFinalOrderAppealToggle())
+//                              ?
+//                              caseData.getFinalOrderAppealToggle().stream().anyMatch(finalOrderToggle -> finalOrderToggle.equals(
+//                                  FinalOrderToggle.SHOW)) : false)
+//            .appealFor(getAppealFor(caseData))
+//            .appealGranted(nonNull(caseData.getFinalOrderAppealComplex()) && nonNull(caseData.getFinalOrderAppealComplex().getApplicationList())
+//                               ?
+//                               caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name()) : false)
+//            .appealReason(getAppealReason(caseData))
+            .claimantOrDefendantAppeal(getAppealFor(caseData))
+            .appealGranted(nonNull(caseData.getFinalOrderAppealComplex()) && nonNull(caseData.getFinalOrderAppealComplex().getApplicationList())
+                               ? caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name()) : false);
 
         return assistedFormOrderBuilder.build();
     }
@@ -338,7 +347,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 String formattedDate = outputFormat.format(convertDateString);
                 return format("on %s", formattedDate);
             } catch (ParseException e) {
-                e.printStackTrace();
+                log.error("Date formatting failed");
             }
         }
         if (caseData.getFinalOrderDateHeardComplex().getDateRangeSelection() != null) {
@@ -351,7 +360,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 String formattedDate2 = outputFormat.format(convertDateString2);
                 return format("between %s and %s", formattedDate1, formattedDate2);
             } catch (ParseException e) {
-                e.printStackTrace();
+                log.error("Date formatting failed");
             }
         }
         if (caseData.getFinalOrderDateHeardComplex().getBespokeRangeSelection() != null) {
