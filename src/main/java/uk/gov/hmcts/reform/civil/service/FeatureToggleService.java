@@ -34,7 +34,6 @@ public class FeatureToggleService {
 
     public boolean isPinInPostEnabled() {
         return this.featureToggleApi.isFeatureEnabled("pin-in-post");
-
     }
 
     public boolean isPbaV3Enabled() {
