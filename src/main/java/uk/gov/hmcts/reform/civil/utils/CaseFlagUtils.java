@@ -45,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFE
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ORG_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_WITNESSES_ID;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.appendWithNewPartyId;
 
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -321,13 +322,19 @@ public class CaseFlagUtils {
             for (PartyFlagStructure partyFlagStructure : partyFlagStructures) {
                 String formattedPartyNameForFlags = formattedPartyNameForFlags(partyFlagStructure.getFirstName(), partyFlagStructure.getLastName());
                 if (partyFlagStructure.getFlags() == null) {
-                    // new party so initialise flags
-                    updatedList.add(partyFlagStructure.toBuilder().flags(createFlags(formattedPartyNameForFlags, roleOnCase)).build());
+                    // new party so initialise flags and party ID
+                    updatedList.add(
+                        appendWithNewPartyId(partyFlagStructure
+                                                 .toBuilder()
+                                                 .flags(createFlags(formattedPartyNameForFlags, roleOnCase)).build()));
                 } else {
                     // existing party with flags so just update the name
-                    updatedList.add(partyFlagStructure.toBuilder().flags(partyFlagStructure.getFlags().toBuilder()
-                                                                             .partyName(formattedPartyNameForFlags)
-                                                                             .build()).build());
+                    updatedList.add(
+                        partyFlagStructure
+                            .toBuilder()
+                            .flags(partyFlagStructure.getFlags().toBuilder()
+                                       .partyName(formattedPartyNameForFlags)
+                                       .build()).build());
                 }
             }
             return wrapElements(updatedList);
