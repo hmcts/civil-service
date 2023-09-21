@@ -38,7 +38,7 @@ public class BreathingSpaceEnteredLIPNotificationHandlerTest {
             .thenReturn(templateId);
         CaseData caseData = createCaseData();
         CallbackParams params = createCallbackParams(
-            CaseEvent.NOTIFY_APPLICANT1_BREATHING_SPACE_LIP,
+            CaseEvent.NOTIFY_LIP_APPLICANT1_BREATHING_SPACE_ENTER,
             caseData
         );
 
@@ -59,7 +59,7 @@ public class BreathingSpaceEnteredLIPNotificationHandlerTest {
             .thenReturn(templateId);
         CaseData caseData = createCaseData();
         CallbackParams params = createCallbackParams(
-            CaseEvent.NOTIFY_RESPONDENT_BREATHING_SPACE_LIP,
+            CaseEvent.NOTIFY_LIP_RESPONDENT_BREATHING_SPACE_ENTER,
             caseData
         );
 

@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_BREATHING_SPACE_LIP;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_BREATHING_SPACE_ENTER;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +23,10 @@ import java.util.Map;
 public class BreathingSpaceEnteredLIPNotificationHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS =
-        List.of(CaseEvent.NOTIFY_APPLICANT1_BREATHING_SPACE_LIP, CaseEvent.NOTIFY_RESPONDENT_BREATHING_SPACE_LIP);
+        List.of(
+            CaseEvent.NOTIFY_LIP_APPLICANT1_BREATHING_SPACE_ENTER,
+            CaseEvent.NOTIFY_LIP_RESPONDENT_BREATHING_SPACE_ENTER
+        );
     public static final String TASK_ID_Applicant1 = "NotifyApplicant1BreathingSpaceLIP";
     public static final String TASK_ID_RESPONDENT = "NotifyRespondentBreathingSpaceLIP";
     private static final String REFERENCE_TEMPLATE = "notify-breathing-space-lip-%s";
@@ -85,6 +88,6 @@ public class BreathingSpaceEnteredLIPNotificationHandler extends CallbackHandler
 
     private boolean isRespondentNotification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
-            .equals(NOTIFY_RESPONDENT_BREATHING_SPACE_LIP.name());
+            .equals(NOTIFY_LIP_RESPONDENT_BREATHING_SPACE_ENTER.name());
     }
 }
