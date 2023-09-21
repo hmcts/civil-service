@@ -7,7 +7,12 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.finalorders.*;
+import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
@@ -23,8 +28,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -32,8 +35,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
-import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
-import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList.DEFENDANT_NOT_ATTENDING;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
 
@@ -134,8 +135,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                ? orderMadeDateBuilder(caseData) : null)
             .courtLocation(LocationRefDataService.getDisplayEntry(locationRefData))
             .judgeNameTitle(userDetails.getFullName())
-            .recordedToggle(nonNull(caseData.getFinalOrderRecitals()) && caseData.getFinalOrderRecitals().stream().anyMatch(
-                finalOrderToggle -> finalOrderToggle.equals(
+            .recordedToggle(nonNull(caseData.getFinalOrderRecitals())
+                                && caseData.getFinalOrderRecitals().stream().anyMatch(finalOrderToggle -> finalOrderToggle.equals(
                     FinalOrderToggle.SHOW)))
             .recordedText(nonNull(caseData.getFinalOrderRecitalsRecorded())
                               ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
@@ -161,8 +162,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .furtherHearingFromDate(getFurtherHearingDate(caseData, true))
             .furtherHearingToDate(getFurtherHearingDate(caseData, false))
             .furtherHearingLength(getFurtherHearingLength(caseData))
-            .showFurtherHearingLocationAlt(nonNull(caseData.getFinalOrderFurtherHearingComplex())
-                                               ? isDefaultCourt(caseData) : null)
+            .showFurtherHearingLocationAlt(isDefaultCourt(caseData))
             .furtherHearingLocationDefault(LocationRefDataService.getDisplayEntry(locationRefData))
             .furtherHearingLocationAlt(nonNull(caseData.getFinalOrderFurtherHearingToggle())
                                            && nonNull(caseData.getFinalOrderFurtherHearingComplex())
@@ -205,13 +205,12 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     public String populateInterimPaymentText(CaseData caseData) {
-        return format("An interim payment of %s on account of costs shall be paid by 4pm on ", caseData.getAssistedOrderMakeAnOrderForCosts()
+        return format("An interim payment of £%s on account of costs shall be paid by 4pm on ", caseData.getAssistedOrderMakeAnOrderForCosts()
                           .getAssistedOrderAssessmentThirdDropdownAmount());
     }
 
     public String populateSummarilyAssessedText(CaseData caseData) {
-        if (caseData.getAssistedOrderMakeAnOrderForCosts() != null
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
+        if (caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
             return format("The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
                               + "in the sum of £%s. Such a sum shall be made by 4pm on", caseData.getAssistedOrderMakeAnOrderForCosts()
                 .getAssistedOrderCostsFirstDropdownAmount());
@@ -223,13 +222,11 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     public String populateDetailedAssessmentText(CaseData caseData) {
         String standardOrIndemnity;
-        if (caseData.getAssistedOrderMakeAnOrderForCosts() != null
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList1().equals(CostEnums.INDEMNITY_BASIS)) {
+        if (caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentSecondDropdownList1().equals(CostEnums.INDEMNITY_BASIS)) {
             standardOrIndemnity = "on the indemnity basis if not agreed";
         } else standardOrIndemnity = "on the standard basis if not agreed";
 
-        if (caseData.getAssistedOrderMakeAnOrderForCosts() != null
-            && caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
+        if (caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
             return format("The claimant shall pay the defendant's costs to be subject to a detailed assessment %s",
                           standardOrIndemnity);
         }  return format("The defendant shall pay the claimant's costs to be subject to a detailed assessment %s",
@@ -237,7 +234,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     public Boolean isDefaultCourt(CaseData caseData) {
-        if (caseData.getFinalOrderFurtherHearingToggle() != null && caseData.getFinalOrderFurtherHearingComplex() != null) {
+        if (caseData.getFinalOrderFurtherHearingToggle() != null
+            && caseData.getFinalOrderFurtherHearingComplex() != null
+            && caseData.getFinalOrderFurtherHearingComplex().getHearingLocationList() != null) {
             return caseData.getFinalOrderFurtherHearingComplex()
                 .getHearingLocationList().getValue().getCode().equals("LOCATION_LIST");
         }
@@ -284,16 +283,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                         return "2 hours";
                     case OTHER:
                         StringBuilder otherLength = new StringBuilder();
-                        if (caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays() != null) {
-                            otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays() + " days ");
-                        }
-                        if (caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours() != null) {
-                            otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours() +
-                                                   " hours ");
-                        }
-                        if (caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes() != null) {
-                            otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes() + " minutes");
-                        }
+                        otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays() + " days ").append(
+                            caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours()).append(
+                            " hours ").append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes()).append(
+                            " minutes");
                         return otherLength.toString();
                     default:
                         return "";
@@ -304,7 +297,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private boolean hasSDOBeenMade(CaseState state) {
-
         return !JUDICIAL_REFERRAL.equals(state);
     }
 
