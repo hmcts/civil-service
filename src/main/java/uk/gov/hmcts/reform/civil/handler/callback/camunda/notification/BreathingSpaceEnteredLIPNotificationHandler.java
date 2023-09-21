@@ -46,7 +46,6 @@ public class BreathingSpaceEnteredLIPNotificationHandler extends CallbackHandler
         return isRespondentNotification(callbackParams) ? TASK_ID_RESPONDENT : TASK_ID_Applicant1;
     }
 
-
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
