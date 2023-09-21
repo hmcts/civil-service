@@ -371,6 +371,22 @@ public class EventHistoryMapper {
         return MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
     }
 
+    @Nullable
+    private BigDecimal getInstallmentAmount(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
+        return isResponsePayByInstallment
+            ? MonetaryConversions.penniesToPounds(
+            repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).map(amount -> amount.setScale(2)).orElse(BigDecimal.ZERO))
+            : null;
+    }
+
+    @Nullable
+    private LocalDate getFirstInstallmentDate(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
+        return isResponsePayByInstallment
+            ? repaymentPlan.map(RepaymentPlanLRspec::getFirstRepaymentDate)
+            .orElse(null)
+            : null;
+    }
+
     private void buildBreathingSpaceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                                           EventType eventType, String bsStatus) {
         String eventDetails = null;
@@ -717,22 +733,6 @@ public class EventHistoryMapper {
                 .dateReceived(respondentResponseDate)
                 .litigiousPartyID(respondentID)
                 .build());
-    }
-
-    @Nullable
-    private static LocalDate getFirstInstallmentDate(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
-        return isResponsePayByInstallment
-            ? repaymentPlan.map(RepaymentPlanLRspec::getFirstRepaymentDate)
-            .orElse(null)
-            : null;
-    }
-
-    @Nullable
-    private static BigDecimal getInstallmentAmount(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
-        return isResponsePayByInstallment
-            ? MonetaryConversions.penniesToPounds(
-            repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).map(amount -> amount.setScale(2)).orElse(BigDecimal.ZERO))
-            : null;
     }
 
     public String prepareRespondentResponseText(CaseData caseData, Party respondent, boolean isRespondent1) {
