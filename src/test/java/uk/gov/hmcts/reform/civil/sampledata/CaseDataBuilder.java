@@ -5876,6 +5876,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addApplicantLRIndividual(String firstName, String lastName) {
         List<Element<PartyFlagStructure>> individual =
             wrapElements(PartyFlagStructure.builder()
+                             .partyID("app-lr-ind-party-id")
                              .firstName(firstName)
                              .lastName(lastName)
                              .email("abc@def.ghi")
@@ -5892,6 +5893,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addRespondent1LRIndividual(String firstName, String lastName) {
         List<Element<PartyFlagStructure>> individual =
             wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-1-lr-ind-party-id")
                              .firstName(firstName)
                              .lastName(lastName)
                              .email("abc@def.ghi")
@@ -5908,6 +5910,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addRespondent2LRIndividual(String firstName, String lastName) {
         List<Element<PartyFlagStructure>> individual =
             wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-2-lr-ind-party-id")
                              .firstName(firstName)
                              .lastName(lastName)
                              .email("abc@def.ghi")
@@ -5924,6 +5927,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addApplicant1OrgIndividual(String firstName, String lastName) {
         List<Element<PartyFlagStructure>> individual =
             wrapElements(PartyFlagStructure.builder()
+                             .partyID("app-1-org-ind-party-id")
                              .firstName(firstName)
                              .lastName(lastName)
                              .email("abc@def.ghi")
@@ -5940,6 +5944,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addApplicant2OrgIndividual(String firstName, String lastName) {
         List<Element<PartyFlagStructure>> individual =
             wrapElements(PartyFlagStructure.builder()
+                             .partyID("app-2-org-ind-party-id")
                              .firstName(firstName)
                              .lastName(lastName)
                              .email("abc@def.ghi")
@@ -5956,6 +5961,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addRespondent1OrgIndividual(String firstName, String lastName) {
         List<Element<PartyFlagStructure>> individual =
             wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-1-org-ind-party-id")
                              .firstName(firstName)
                              .lastName(lastName)
                              .email("abc@def.ghi")
@@ -5972,6 +5978,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addRespondent2OrgIndividual(String firstName, String lastName) {
         List<Element<PartyFlagStructure>> individual =
             wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-2-org-ind-party-id")
                              .firstName(firstName)
                              .lastName(lastName)
                              .email("abc@def.ghi")
