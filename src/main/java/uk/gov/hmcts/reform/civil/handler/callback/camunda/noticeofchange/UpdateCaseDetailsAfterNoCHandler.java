@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -169,6 +170,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 .respondent2OrganisationIDCopy(addedOrganisation);
         } else {
             caseDataBuilder.specRespondent2Represented(YES)
+                .specRespondent2CorrespondenceAddressRequired(null)
+                .specRespondent2CorrespondenceAddressdetails(Address.builder().build())
                 .specAoSRespondentCorrespondenceAddressdetails(null);
         }
 
