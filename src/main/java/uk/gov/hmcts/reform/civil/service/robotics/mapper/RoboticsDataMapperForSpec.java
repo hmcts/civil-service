@@ -232,6 +232,7 @@ public class RoboticsDataMapperForSpec {
             return null;
         }
         Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());
+        var providedServiceAddress = caseData.getSpecApplicantCorrespondenceAddressdetails();
         Solicitor.SolicitorBuilder<?, ?> solicitorBuilder = Solicitor.builder()
             .id(RoboticsDataUtil.APPLICANT_SOLICITOR_ID)
             .isPayee(true)
@@ -245,7 +246,7 @@ public class RoboticsDataMapperForSpec {
 
         organisationId
             .flatMap(organisationService::findOrganisationById)
-            .ifPresent(buildOrganisation(solicitorBuilder, caseData.getApplicantSolicitor1ServiceAddress()));
+            .ifPresent(buildOrganisation(solicitorBuilder, providedServiceAddress));
 
         return solicitorBuilder.build();
     }
