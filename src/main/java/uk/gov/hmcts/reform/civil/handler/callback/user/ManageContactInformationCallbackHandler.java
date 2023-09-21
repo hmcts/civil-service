@@ -45,13 +45,17 @@ import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addApplicantExpertAn
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addRespondentDQPartiesFlagStructure;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_WITNESSES_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_WITNESSES_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_WITNESSES_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicant1Options;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.addApplicantOptions2v1;
@@ -110,7 +114,11 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         if (CLAIMANT_ONE_ID.equals(partyChosen)
             || CLAIMANT_TWO_ID.equals(partyChosen)
             || DEFENDANT_ONE_ID.equals(partyChosen)
-            || DEFENDANT_TWO_ID.equals(partyChosen)) {
+            || DEFENDANT_TWO_ID.equals(partyChosen)
+            || CLAIMANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || CLAIMANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || DEFENDANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen)) {
             // Party fields are empty in this mid event, this is a workaround
             CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
