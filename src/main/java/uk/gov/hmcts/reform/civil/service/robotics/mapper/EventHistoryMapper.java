@@ -1939,7 +1939,6 @@ public class EventHistoryMapper {
     private void buildRespondentPartAdmission(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         String miscText;
         List<Event> directionsQuestionnaireFiledEvents = new ArrayList<>();
-        List<Event> statesPaidEvents = new ArrayList<>();
         boolean isRespondent1;
         if (defendant1ResponseExists.test(caseData)) {
             final Party respondent1 = caseData.getRespondent1();
