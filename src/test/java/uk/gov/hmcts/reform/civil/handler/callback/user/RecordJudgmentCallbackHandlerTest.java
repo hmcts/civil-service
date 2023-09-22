@@ -94,17 +94,17 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
                 JudgmentStatusType.ISSUED.name());
             assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("joRtlState").isEqualTo("R");
             assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("lastUpdatedDate").isNotNull();
-            assertThat(response.getData().get("joJudgmentRecordReason")).isEqualTo(
+            assertThat(response.getData()).containsEntry("joJudgmentRecordReason",
                 JudgmentRecordedReason.JUDGE_ORDER.name());
-            assertThat(response.getData().get("joPaymentPlanSelection")).isEqualTo(
-                PaymentPlanSelection.PAY_IN_INSTALLMENT.name());
+            assertThat(response.getData()).containsEntry("joPaymentPlanSelection",
+                PaymentPlanSelection.PAY_IN_INSTALMENTS.name());
             assertThat(response.getData().get("joJudgmentInstalmentDetails")).extracting("instalmentAmount").isEqualTo("120");
             assertThat(response.getData().get("joJudgmentInstalmentDetails")).extracting("paymentFrequency").isEqualTo("MONTHLY");
             assertThat(response.getData().get("joJudgmentInstalmentDetails")).extracting("firstInstalmentDate").isEqualTo("2022-12-12");
-            assertThat(response.getData().get("joIsRegisteredWithRTL")).isEqualTo("Yes");
-            assertThat(response.getData().get("joAmountOrdered")).isEqualTo("1200");
-            assertThat(response.getData().get("joAmountCostOrdered")).isEqualTo("1100");
-            assertThat(response.getData().get("joOrderMadeDate")).isEqualTo("2022-12-12");
+            assertThat(response.getData()).containsEntry("joIsRegisteredWithRTL", "Yes");
+            assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
+            assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
+            assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
         }
 
         @Test
@@ -121,14 +121,14 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
                 JudgmentStatusType.ISSUED.name());
             assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("joRtlState").isEqualTo("R");
             assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("lastUpdatedDate").isNotNull();
-            assertThat(response.getData().get("joJudgmentRecordReason")).isEqualTo(
-                JudgmentRecordedReason.JUDGE_ORDER.name());
-            assertThat(response.getData().get("joPaymentPlanSelection")).isEqualTo(
+            assertThat(response.getData()).containsEntry("joJudgmentRecordReason",
+                                                         JudgmentRecordedReason.JUDGE_ORDER.name());
+            assertThat(response.getData()).containsEntry("joPaymentPlanSelection",
                 PaymentPlanSelection.PAY_IMMEDIATELY.name());
-            assertThat(response.getData().get("joIsRegisteredWithRTL")).isEqualTo("Yes");
-            assertThat(response.getData().get("joAmountOrdered")).isEqualTo("1200");
-            assertThat(response.getData().get("joAmountCostOrdered")).isEqualTo("1100");
-            assertThat(response.getData().get("joOrderMadeDate")).isEqualTo("2022-12-12");
+            assertThat(response.getData()).containsEntry("joIsRegisteredWithRTL", "Yes");
+            assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
+            assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
+            assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
         }
 
         @Test
@@ -145,44 +145,54 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
                 JudgmentStatusType.ISSUED.name());
             assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("joRtlState").isEqualTo("R");
             assertThat(response.getData().get("joJudgmentStatusDetails")).extracting("lastUpdatedDate").isNotNull();
-            assertThat(response.getData().get("joJudgmentRecordReason")).isEqualTo(
-                JudgmentRecordedReason.JUDGE_ORDER.name());
-            assertThat(response.getData().get("joPaymentPlanSelection")).isEqualTo(
+            assertThat(response.getData()).containsEntry("joJudgmentRecordReason",
+                                                         JudgmentRecordedReason.JUDGE_ORDER.name());
+            assertThat(response.getData()).containsEntry("joPaymentPlanSelection",
                 PaymentPlanSelection.PAY_BY_DATE.name());
-            assertThat(response.getData().get("joIsRegisteredWithRTL")).isEqualTo("Yes");
-            assertThat(response.getData().get("joAmountOrdered")).isEqualTo("1200");
-            assertThat(response.getData().get("joAmountCostOrdered")).isEqualTo("1100");
-            assertThat(response.getData().get("joOrderMadeDate")).isEqualTo("2022-12-12");
-            assertThat(response.getData().get("joPaymentToBeMadeByDate")).isEqualTo("2023-12-12");
+            assertThat(response.getData()).containsEntry("joIsRegisteredWithRTL", "Yes");
+            assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
+            assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
+            assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData()).containsEntry("joPaymentToBeMadeByDate", "2023-12-12");
         }
     }
 
     @Nested
     class MidCallback {
         @Test
-        void shouldValidateDateOfOrderAndPaymentInstalmentDate() {
+        void shouldValidatePaymentInstalmentDate() {
 
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoJudgmentInstalmentDetails(JudgmentInstalmentDetails.builder().firstInstalmentDate(LocalDate.now().minusDays(2)).build());
-            caseData.setJoOrderMadeDate(LocalDate.now().minusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().contains("Date of first instalment must be in the future"));
-            assertThat(response.getErrors().contains("Date the judgment will be paid by must be in the future"));
+            assertThat(response.getErrors()).contains("Date of first instalment must be in the future");
         }
 
         @Test
-        void shouldValidatePaymentByDate() {
+        void shouldValidatePaymentPaidByDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoPaymentToBeMadeByDate(LocalDate.now().minusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().contains("Date judge made the order must be in the past"));
+            assertThat(response.getErrors()).contains("Date the judgment will be paid by must be in the future");
+        }
+
+        @Test
+        void shouldValidateOrderDate() {
+
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoOrderMadeDate(LocalDate.now().plusDays(2));
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
+            //When: handler is called with MID event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).contains("Date judge made the order must be in the past");
         }
     }
 

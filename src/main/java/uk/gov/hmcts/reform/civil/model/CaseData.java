@@ -613,7 +613,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     //Judgments Online
     private JudgmentRecordedReason joJudgmentRecordReason;
     private JudgmentStatusDetails joJudgmentStatusDetails;
-    private LocalDate joJudgmentIssuedDate;
     private LocalDate joOrderMadeDate;
     private String joAmountOrdered;
     private String joAmountCostOrdered;
