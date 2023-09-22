@@ -67,7 +67,9 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         String documentBinaryUrl = document.getDocumentBinaryUrl();
 
         return CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl(documentUrl).documentBinaryUrl(documentBinaryUrl).documentFileName(document.getDocumentFileName()).build())
+            .documentLink(Document.builder().documentUrl(documentUrl)
+                              .documentBinaryUrl(documentBinaryUrl)
+                              .documentFileName(document.getDocumentFileName()).build())
             .documentName("Stitched document")
             .documentType(SEALED_CLAIM)
             .createdDatetime(LocalDateTime.now(ZoneId.of("Europe/London")))
