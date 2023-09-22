@@ -322,7 +322,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return builder;
     }
 
-    private List<Party> getApplicants(CaseData caseData) {
+    protected List<Party> getApplicants(CaseData caseData) {
         var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
         var applicant = caseData.getApplicant1();
         var applicant2 = caseData.getApplicant2();

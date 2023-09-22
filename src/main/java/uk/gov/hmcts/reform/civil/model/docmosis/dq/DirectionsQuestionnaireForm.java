@@ -29,7 +29,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
@@ -66,6 +66,7 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final VulnerabilityQuestions vulnerabilityQuestions;
     private final String statementOfTruthText;
     private final Address respondent1LiPCorrespondenceAddress;
+    private final Address applicant1LiPCorrespondenceAddress;
     private final LipExperts lipExperts;
     private final LipExtraDQ lipExtraDQ;
     private final List<HearingLipSupportRequirements> hearingLipSupportRequirements;

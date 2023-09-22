@@ -101,6 +101,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -999,5 +1000,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public String getApplicant1Email() {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
+    }
+
+    @JsonIgnore
+    public Address getRespondent1CorrespondenceAddress() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getRespondent1LiPResponse)
+            .map(RespondentLiPResponse::getRespondent1LiPCorrespondenceAddress)
+            .orElse(null);
+    }
+
+    @JsonIgnore
+    public String getCurrentCamundaBusinessProcessName() {
+       return ofNullable(getBusinessProcess())
+            .map(BusinessProcess::getCamundaEvent)
+            .orElse(null);
     }
 }
