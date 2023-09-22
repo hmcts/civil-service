@@ -70,7 +70,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             .documentLink(Document.builder().documentUrl(documentUrl).documentBinaryUrl(documentBinaryUrl).documentFileName(document.getDocumentFileName()).build())
             .documentName("Stitched document")
             .documentType(SEALED_CLAIM)
-            .createdDatetime(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
+            .createdDatetime(LocalDateTime.now(ZoneId.of("Europe/London")))
             .createdBy(CREATED_BY)
             .build();
     }
