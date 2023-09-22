@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AppealList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList;
@@ -36,6 +37,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 
+import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
+import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.CaseHearingLengthElement;
@@ -47,6 +50,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
 import uk.gov.hmcts.reform.civil.model.finalorders.TrialNoticeProcedure;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -69,6 +73,7 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -248,12 +253,26 @@ public class JudgeFinalOrderGeneratorTest {
             // Costs section
             .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
             .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
+                                                  .makeAnOrderForCostsYesOrNo(YES)
                                                   .assistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
                                                   .assistedOrderAssessmentSecondDropdownList2(CostEnums.YES)
                                                   .makeAnOrderForCostsList(COSTS)
                                                   .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
                                                   .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT).build())
             .publicFundingCostsProtection(YES)
+            // Appeal section
+            .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                         .applicationList(ApplicationAppealList.REFUSED)
+                                         .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                    .circuitOrHighCourtListRefuse(ApplicationAppealList.CIRCUIT_COURT)
+                                                                    .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                     .build()).build()).build())
+            // initiative or without notice section
+            .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
+            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder()
+                                              .ownInitiativeText("own initiative test")
+                                              .ownInitiativeDate(LocalDate.now())
+                                              .build())
             .build();
 
         //When: Assisted order document generation called
@@ -294,9 +313,6 @@ public class JudgeFinalOrderGeneratorTest {
                     finalOrdersJudgePapersList)
                                           .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT).typeRepresentationOtherComplex(
                     ClaimantAndDefendantHeard.builder().detailsRepresentationText("Test").build()).build())
-            // Order made on court's own initiative section
-            .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
-            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
             // recitals section
             .finalOrderRecitals(toggleList)
             .finalOrderRecitalsRecorded(FinalOrderRecitalsRecorded.builder().text("Test").build())
@@ -304,10 +320,14 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderFurtherHearingToggle(toggleList)
             .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
                                                  .alternativeHearingList(dynamicList)
-                                                 .hearingMethodList(IN_PERSON).build())
+                                                 .hearingMethodList(IN_PERSON)
+                                                 .hearingNotesText("test hearing notes")
+                                                 .datesToAvoidDateDropdown(DatesFinalOrders.builder().datesToAvoidDates(LocalDate.now())
+                                                                               .build()).build())
             // Costs section
             .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
             .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
+                                                  .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
                                                   .assistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
                                                   .makeAnOrderForCostsList(COSTS)
                                                   .assistedOrderClaimantDefendantFirstDropdown(COSTS)
@@ -315,8 +335,20 @@ public class JudgeFinalOrderGeneratorTest {
             .assistedOrderCostsReserved(AssistedOrderCostDetails.builder().detailsRepresentationText("Test").build())
             .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("Test").build())
             .assistedOrderCostsBespoke(AssistedOrderCostDetails.builder().besPokeCostDetailsText("Test").build())
-            .finalOrderAppealToggle(toggleList)
             .publicFundingCostsProtection(YES)
+            // Appeal section
+            .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                         .applicationList(ApplicationAppealList.GRANTED)
+                                         .appealGrantedDropdown(AppealGrantedRefused.builder()
+                                                                    .circuitOrHighCourtList(ApplicationAppealList.HIGH_COURT)
+                                                                    .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                     .build()).build()).build())
+            // initiative or without notice section
+            .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
+            .orderMadeOnDetailsOrderWithoutNotice(OrderMadeOnDetailsOrderWithoutNotice.builder()
+                                                      .withOutNoticeText("without notice test")
+                                                      .withOutNoticeDate(LocalDate.now())
+                                                      .build())
             .build();
         //When: Assisted order document generation called
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -428,6 +460,7 @@ public class JudgeFinalOrderGeneratorTest {
                     break;
                 default:
                     break;
+
             }
         }
     }
@@ -875,4 +908,132 @@ public class JudgeFinalOrderGeneratorTest {
         assertEquals(false, responseFalse);
 
     }
+
+    @ParameterizedTest
+    @MethodSource("testCircuitOrHighCourtData")
+    void testCircuitOrHighCourt(CaseData caseData, String expectedResponse) {
+        String response = generator.circuitOrHighCourt(caseData);
+        assertEquals(expectedResponse, response);
+    }
+
+    static Stream<Arguments> testCircuitOrHighCourtData() {
+        return Stream.of(
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.REFUSED)
+                                                 .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtListRefuse(ApplicationAppealList.CIRCUIT_COURT)
+                                                                            .build()).build()).build(),
+                "a"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.GRANTED)
+                                                 .appealGrantedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtList(ApplicationAppealList.CIRCUIT_COURT)
+                                                                            .build()).build()).build(),
+                "a"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.REFUSED)
+                                                 .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtListRefuse(ApplicationAppealList.HIGH_COURT)
+                                                                            .build()).build()).build(),
+                "b"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.GRANTED)
+                                                 .appealGrantedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtList(ApplicationAppealList.HIGH_COURT)
+                                                                            .build()).build()).build(),
+                "b"
+            )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testGetAppealDateData")
+    void testGetAppealDate(CaseData caseData, LocalDate expectedResponse) {
+        LocalDate response = generator.getAppealDate(caseData);
+        assertEquals(expectedResponse, response);
+    }
+
+    static Stream<Arguments> testGetAppealDateData() {
+        return Stream.of(
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.REFUSED)
+                                                 .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtListRefuse(ApplicationAppealList.CIRCUIT_COURT)
+                                                                            .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                             .appealGrantedRefusedDate(LocalDate.now().plusDays(1))
+                                                                                                             .build()).build()).build()).build(),
+                LocalDate.now().plusDays(1)
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.GRANTED)
+                                                 .appealGrantedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtList(ApplicationAppealList.CIRCUIT_COURT)
+                                                                            .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                             .appealGrantedRefusedDate(LocalDate.now().plusDays(10))
+                                                                                                             .build()).build()).build()).build(),
+                LocalDate.now().plusDays(10)
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.REFUSED)
+                                                 .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtListRefuse(ApplicationAppealList.HIGH_COURT)
+                                                                            .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                             .appealGrantedRefusedDate(LocalDate.now().plusDays(5))
+                                                                                                             .build()).build()).build()).build(),
+                LocalDate.now().plusDays(5)
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.GRANTED)
+                                                 .appealGrantedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtList(ApplicationAppealList.HIGH_COURT)
+                                                                            .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                             .appealGrantedRefusedDate(LocalDate.now().plusDays(5))
+                                                                                                             .build()).build()).build()).build(),
+                LocalDate.now().plusDays(5)
+            )
+        );
+    }
+
+    @Test
+    void testGetInitiativeTextWithoutNotice() {
+        CaseData caseDataInitiative = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
+            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeText("test initiative text").build())
+            .build();
+        String responseInitiative = generator.getInitiativeOrWithoutNotice(caseDataInitiative);
+        assertEquals("test initiative text", responseInitiative);
+
+        CaseData caseDataWithoutNotice = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
+            .orderMadeOnDetailsOrderWithoutNotice(OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeText("test without notice text").build())
+            .build();
+        String responseWithoutNotice = generator.getInitiativeOrWithoutNotice(caseDataWithoutNotice);
+        assertEquals("test without notice text", responseWithoutNotice);
+
+        CaseData caseDataWhenNone = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .orderMadeOnDetailsList(OrderMadeOnTypes.NONE)
+            .build();
+        String responseWhenNone = generator.getInitiativeOrWithoutNotice(caseDataWhenNone);
+        assertNull(responseWhenNone);
+    }
+
 }
