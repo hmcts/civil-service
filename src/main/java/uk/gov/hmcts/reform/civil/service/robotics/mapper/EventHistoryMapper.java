@@ -2355,7 +2355,7 @@ public class EventHistoryMapper {
 
     private LocalDateTime setApplicant1ResponseDate(CaseData caseData) {
         LocalDateTime applicant1ResponseDate = caseData.getApplicant1ResponseDate();
-        if (applicant1ResponseDate == null) {
+        if (applicant1ResponseDate == null || applicant1ResponseDate.isBefore(LocalDateTime.now())) {
             applicant1ResponseDate = LocalDateTime.now();
         }
         return applicant1ResponseDate;
