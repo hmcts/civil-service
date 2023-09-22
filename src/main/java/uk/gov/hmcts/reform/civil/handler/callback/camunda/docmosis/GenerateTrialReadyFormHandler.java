@@ -12,10 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.trialready.TrialReadyFormGenerator;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -44,8 +41,6 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
     private final TrialReadyFormGenerator trialReadyFormGenerator;
 
     private final ObjectMapper objectMapper;
-    private final UserService userService;
-    private final CoreCaseUserService coreCaseUserService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -81,26 +76,16 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                CaseData caseData) {
+        CaseRole role = caseData.getUserCaseRole();
         CaseDocument caseDocument = trialReadyFormGenerator.generate(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
             camundaActivityId(callbackParams),
-            getUserRole(callbackParams)
+            role
         );
         var documents = caseData.getTrialReadyDocuments();
         documents.add(element(caseDocument));
         caseDataBuilder.trialReadyDocuments(documents);
-    }
-
-    private CaseRole getUserRole(CallbackParams callbackParams) {
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        String ccdCaseReference = callbackParams.getCaseData().getCcdCaseReference().toString();
-        for (CaseRole role : CaseRole.values()) {
-            if (coreCaseUserService.userHasCaseRole(ccdCaseReference, userInfo.getUid(), role)) {
-                return role;
-            }
-        }
-        return null;
     }
 
     private boolean isApplicant(CallbackParams callbackParams, CaseEvent matchEvent) {

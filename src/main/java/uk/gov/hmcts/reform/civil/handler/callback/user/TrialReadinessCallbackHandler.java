@@ -116,6 +116,8 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+        CaseRole role = getUserRole(callbackParams);
+        updatedData.userCaseRole(role);
 
         if (checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE) || checkUserRoles(callbackParams, CaseRole.CLAIMANT)) {
             if (caseData.getTrialReadyApplicant() == YesOrNo.YES) {
@@ -160,6 +162,17 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         } else {
             return caseData.getTrialReadyRespondent2();
         }
+    }
+
+    private CaseRole getUserRole(CallbackParams callbackParams) {
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        String ccdCaseReference = callbackParams.getCaseData().getCcdCaseReference().toString();
+        for (CaseRole role : CaseRole.values()) {
+            if (coreCaseUserService.userHasCaseRole(ccdCaseReference, userInfo.getUid(), role)) {
+                return role;
+            }
+        }
+        return null;
     }
 
     private boolean checkUserRoles(CallbackParams callbackParams, CaseRole userRole) {
