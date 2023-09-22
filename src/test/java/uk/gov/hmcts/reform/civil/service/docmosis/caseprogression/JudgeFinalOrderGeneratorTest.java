@@ -304,7 +304,10 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderFurtherHearingToggle(toggleList)
             .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
                                                  .alternativeHearingList(dynamicList)
-                                                 .hearingMethodList(IN_PERSON).build())
+                                                 .hearingMethodList(IN_PERSON)
+                                                 .hearingNotesText("test hearing notes")
+                                                 .datesToAvoidDateDropdown(DatesFinalOrders.builder().datesToAvoidDates(LocalDate.now())
+                                                                               .build()).build())
             // Costs section
             .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
             .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
