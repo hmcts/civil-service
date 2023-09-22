@@ -26,6 +26,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
@@ -47,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
@@ -451,6 +454,7 @@ public class FlowStateAllowedEventService {
             PART_ADMISSION.fullName(),
             List.of(
                 WITHDRAW_CLAIM,
+                CLAIMANT_RESPONSE_CUI,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 DISCONTINUE_CLAIM,
                 CASE_PROCEEDS_IN_CASEMAN,
@@ -627,7 +631,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 DISMISS_CLAIM,
                 migrateCase,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
         entry(
@@ -788,6 +793,7 @@ public class FlowStateAllowedEventService {
             CLAIM_ISSUED_PAYMENT_FAILED.fullName(),
             List.of(
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 RESUBMIT_CLAIM,
                 WITHDRAW_CLAIM,
@@ -804,6 +810,7 @@ public class FlowStateAllowedEventService {
             CLAIM_ISSUED.fullName(),
             List.of(
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 NOTIFY_DEFENDANT_OF_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -838,7 +845,8 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 BUNDLE_CREATION_NOTIFICATION,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -846,6 +854,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ACKNOWLEDGEMENT_OF_SERVICE,
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 INFORM_AGREED_EXTENSION_DATE,
                 INFORM_AGREED_EXTENSION_DATE_SPEC,
@@ -874,7 +883,8 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 BUNDLE_CREATION_NOTIFICATION,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -882,6 +892,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_RESPONSE,
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
@@ -904,6 +915,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_RESPONSE,
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
@@ -916,7 +928,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -926,6 +939,7 @@ public class FlowStateAllowedEventService {
                 CLAIMANT_RESPONSE,
                 CLAIMANT_RESPONSE_SPEC,
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -939,7 +953,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 migrateCase,
                 DEFAULT_JUDGEMENT_SPEC,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -948,6 +963,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 CLAIMANT_RESPONSE_SPEC,
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -961,7 +977,8 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 DEFAULT_JUDGEMENT_SPEC,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -969,7 +986,9 @@ public class FlowStateAllowedEventService {
             PART_ADMISSION.fullName(),
             List.of(
                 CLAIMANT_RESPONSE_SPEC,
+                CLAIMANT_RESPONSE_CUI,
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -983,7 +1002,8 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 DEFAULT_JUDGEMENT_SPEC,
                 CHANGE_SOLICITOR_EMAIL,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -999,6 +1019,7 @@ public class FlowStateAllowedEventService {
             COUNTER_CLAIM.fullName(),
             List.of(
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -1009,7 +1030,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -1018,6 +1040,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -1044,7 +1067,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -1053,6 +1077,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -1063,7 +1088,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
                 migrateCase,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -1117,6 +1143,7 @@ public class FlowStateAllowedEventService {
                 RESET_PIN,
                 ACKNOWLEDGE_CLAIM,
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 INFORM_AGREED_EXTENSION_DATE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -1149,7 +1176,8 @@ public class FlowStateAllowedEventService {
                 MEDIATION_UNSUCCESSFUL,
                 CREATE_SDO,
                 CHANGE_SOLICITOR_EMAIL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -1157,6 +1185,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -1182,21 +1211,24 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                LIP_CLAIM_SETTLED
             )
         ),
          entry(
             PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(),
             List.of(
                 CREATE_SDO,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
             RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.fullName(),
             List.of(
                 CHANGE_SOLICITOR_EMAIL,
-                EXTEND_RESPONSE_DEADLINE
+                EXTEND_RESPONSE_DEADLINE,
+                LIP_CLAIM_SETTLED
 
             )
         )
