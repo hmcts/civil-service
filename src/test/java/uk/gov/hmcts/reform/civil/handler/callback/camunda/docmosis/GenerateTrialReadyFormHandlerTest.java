@@ -20,9 +20,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.trialready.TrialReadyFormGenerator;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,8 +54,6 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
     private GenerateTrialReadyFormHandler handler;
     @MockBean
     private TrialReadyFormGenerator trialReadyFormGenerator;
-    @MockBean
-    private CoreCaseUserService coreCaseUserService;
 
     @Test
     public void shouldGenerateForm_when1v1() {
@@ -76,10 +72,8 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
             .ownedBy(CaseRole.APPLICANTSOLICITORONE)
             .build();
 
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().roles(List.of(CaseRole.APPLICANTSOLICITORONE.toString())).uid("uid").build());
-        when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.APPLICANTSOLICITORONE))).thenReturn(true);
         when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class))).thenReturn(document);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().withUserCaseRole(CaseRole.APPLICANTSOLICITORONE).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_TRIAL_READY_FORM_APPLICANT.name());
         // When
@@ -110,10 +104,8 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
             .ownedBy(CaseRole.RESPONDENTSOLICITORONE)
             .build();
 
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().roles(List.of(CaseRole.RESPONDENTSOLICITORONE.toString())).uid("uid").build());
-        when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORONE))).thenReturn(true);
         when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class))).thenReturn(document);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().withUserCaseRole(CaseRole.RESPONDENTSOLICITORONE).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_TRIAL_READY_FORM_RESPONDENT1.name());
         // When
@@ -146,10 +138,8 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(document));
 
-        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().roles(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString())).uid("uid").build());
-        when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORTWO))).thenReturn(true);
         when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class))).thenReturn(document);
-        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().withUserCaseRole(CaseRole.RESPONDENTSOLICITORTWO).build().toBuilder()
             .trialReadyDocuments(systemGeneratedCaseDocuments).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_TRIAL_READY_FORM_RESPONDENT2.name());

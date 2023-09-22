@@ -193,6 +193,26 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.APPLICANT_TRIAL_READY_NOTIFY_OTHERS.name(), "READY");
+            assertThat(response.getData()).extracting("userCaseRole").isEqualTo(CaseRole.APPLICANTSOLICITORONE.toString());
+
+        }
+
+        @Test
+        void shouldTriggerApplicantNotifyOthers_WhenAboutToSubmitIsInvoked_Claimant() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .trialReadyApplicant(YesOrNo.YES).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.CLAIMANT)))
+                .thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(CaseEvent.APPLICANT_TRIAL_READY_NOTIFY_OTHERS.name(), "READY");
+            assertThat(response.getData()).extracting("userCaseRole").isEqualTo(CaseRole.CLAIMANT.toString());
 
         }
 
@@ -213,6 +233,28 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS.name(), "READY");
+            assertThat(response.getData()).extracting("userCaseRole").isEqualTo(CaseRole.RESPONDENTSOLICITORONE.toString());
+
+        }
+
+        @Test
+        void shouldTriggerRespondent1NotifyOthers_WhenAboutToSubmitIsInvoked_Defendant() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .trialReadyRespondent1(YesOrNo.YES).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            ObjectMapper objectmapper = new ObjectMapper();
+            CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.DEFENDANT)))
+                .thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(CaseEvent.RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS.name(), "READY");
+            assertThat(response.getData()).extracting("userCaseRole").isEqualTo(CaseRole.DEFENDANT.toString());
 
         }
 
@@ -233,6 +275,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS.name(), "READY");
+            assertThat(response.getData()).extracting("userCaseRole").isEqualTo(CaseRole.RESPONDENTSOLICITORTWO.toString());
         }
 
         @Test
@@ -250,6 +293,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_APPLICANT.name(), "READY");
+            assertThat(response.getData()).extracting("userCaseRole").isEqualTo(CaseRole.APPLICANTSOLICITORONE.toString());
 
         }
 
@@ -270,6 +314,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1.name(), "READY");
+            assertThat(response.getData()).extracting("userCaseRole").isEqualTo(CaseRole.RESPONDENTSOLICITORONE.toString());
 
         }
 
@@ -290,6 +335,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT2.name(), "READY");
+            assertThat(response.getData()).extracting("userCaseRole").isEqualTo(CaseRole.RESPONDENTSOLICITORTWO.toString());
         }
     }
 
