@@ -1007,4 +1007,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getHelpWithFeesReferenceNumberLip).orElse(null);
     }
+
+    @JsonIgnore
+    public LocalDateTime getRespondentResponseDate() {
+        LocalDateTime responseDate = null != getRespondent1ResponseDate() ? getRespondent1ResponseDate() : getRespondent2ResponseDate();
+        return responseDate.isBefore(LocalDateTime.now()) ? LocalDateTime.now() : responseDate;
+    }
+
 }
