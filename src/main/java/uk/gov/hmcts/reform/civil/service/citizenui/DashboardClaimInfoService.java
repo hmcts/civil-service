@@ -30,6 +30,7 @@ import static java.util.Objects.nonNull;
 @Slf4j
 @RequiredArgsConstructor
 public class DashboardClaimInfoService {
+
     private static final int CASES_PER_PAGE = 10;
 
     private final CaseDetailsConverter caseDetailsConverter;
