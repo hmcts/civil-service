@@ -69,6 +69,6 @@ public class FeatureToggleService {
     }
 
     public boolean isLipVLipEnabled() {
-        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
+        return true;
     }
 }
