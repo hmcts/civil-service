@@ -1001,5 +1001,4 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
 
-
 }
