@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.LEGACY_CASE_R
 })
 
 class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends BaseCallbackHandlerTest {
+
     @MockBean
     private NotificationService notificationService;
     @MockBean
