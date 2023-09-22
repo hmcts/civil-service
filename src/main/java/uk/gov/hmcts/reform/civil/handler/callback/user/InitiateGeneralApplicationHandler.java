@@ -45,7 +45,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_CONSENT_TO_SETTLE_BY_CONSENT;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
 
 @Service
 @RequiredArgsConstructor
@@ -127,9 +127,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                                 && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
         List<String> errors = new ArrayList<>();
         if (generalAppTypes.size() == 1
-                && generalAppTypes.contains(GeneralApplicationTypes.CONSENT_TO_SETTLE_BY_CONSENT)
+                && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)
                 && !consent) {
-            errors.add(INVALID_CONSENT_TO_SETTLE_BY_CONSENT);
+            errors.add(INVALID_SETTLE_BY_CONSENT);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
@@ -149,9 +149,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             errors.add("It is not possible to select an additional application type when applying to vary judgment");
         }
         if (generalAppTypes.size() > 1
-                && generalAppTypes.contains(GeneralApplicationTypes.CONSENT_TO_SETTLE_BY_CONSENT)) {
+                && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)) {
             errors.add("It is not possible to select an additional application type " +
-                    "when applying to consent to Settle by consent");
+                    "when applying to Settle by consent");
         }
 
         if (generalAppTypes.size() == 1
