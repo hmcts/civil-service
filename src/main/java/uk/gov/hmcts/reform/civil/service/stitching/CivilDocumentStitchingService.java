@@ -53,11 +53,11 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         Optional<Document> stitchedDocument = caseDataFromBundlePayload.getCaseBundles().get(0).getValue().getStitchedDocument();
 
         log.info("stitchedDocument.isPresent() {}, legacy case reference {}",  stitchedDocument.isPresent(), caseData.getLegacyCaseReference());
-        return retrieveCaseDocument(stitchedDocument, caseData);
+        return retrieveCaseDocument(stitchedDocument);
 
     }
 
-    private CaseDocument retrieveCaseDocument(Optional<Document> stitchedDocument, CaseData caseData) {
+    private CaseDocument retrieveCaseDocument(Optional<Document> stitchedDocument) {
         if (stitchedDocument.isEmpty()) {
             log.info("stitchedDocument is not present----------");
             return null;
