@@ -121,12 +121,29 @@ class CivilDocumentStitchingServiceTest {
     }
 
     @Test
-    void whenStitchingDocumentIsPresentAndCaseDataNotNullThenCaseDocumentNotNull() {
+    void whenStitchingDocumentIsPresentAndRespondent1ResponseDateNotNullInCaseDataThenCaseDocumentNotNull() {
         //Given: Payload,case data with case bundle details and stitching document
         Optional<Document> stitchedDocument = Optional.of(mock(Document.class));
         List<DocumentMetaData> documentMetaDataList = buildDocumentMetaDataList();
         Bundle bundle = Bundle.builder().stitchedDocument(stitchedDocument).build();
         CaseData caseData1 = buildCaseData(bundle);
+        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").respondent1ResponseDate(LocalDateTime.now()).build();
+        given(bundleRequestExecutor.post(any(BundleRequest.class), anyString(), anyString())).willReturn(caseData1);
+        //when: bundle Request post is called and case data is retrieved with stitching document
+        CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
+                                                                         "Title", "FileName", caseData);
+        //Then: Case Document is retrieved
+        Assertions.assertNotNull(caseDocument);
+    }
+
+    @Test
+    void whenStitchingDocumentIsPresentAndRespondent2ResponseDateNotNullInCaseDataThenCaseDocumentNotNull() {
+        //Given: Payload,case data with case bundle details and stitching document
+        Optional<Document> stitchedDocument = Optional.of(mock(Document.class));
+        List<DocumentMetaData> documentMetaDataList = buildDocumentMetaDataList();
+        Bundle bundle = Bundle.builder().stitchedDocument(stitchedDocument).build();
+        CaseData caseData1 = buildCaseData(bundle);
+        CaseData caseData = CaseDataBuilder.builder().legacyCaseReference("ClaimNumber").respondent2ResponseDate(LocalDateTime.now()).build();
         given(bundleRequestExecutor.post(any(BundleRequest.class), anyString(), anyString())).willReturn(caseData1);
         //when: bundle Request post is called and case data is retrieved with stitching document
         CaseDocument caseDocument = civilDocumentStitchingService.bundle(documentMetaDataList, "Auth",
