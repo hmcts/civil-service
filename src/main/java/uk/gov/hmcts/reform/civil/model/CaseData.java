@@ -1001,13 +1001,5 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
 
-    @JsonIgnore
-    public LocalDateTime getRespondentResponseDate() {
-        LocalDateTime responseDate = getRespondent1ResponseDate();
-        if ((Objects.isNull(responseDate)) || responseDate.isBefore(LocalDateTime.now())) {
-            return LocalDateTime.now();
-        }
-        return responseDate;
-    }
 
 }

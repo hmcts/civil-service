@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,7 +70,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
             .documentLink(Document.builder().documentUrl(documentUrl).documentBinaryUrl(documentBinaryUrl).documentFileName(document.getDocumentFileName()).build())
             .documentName("Stitched document")
             .documentType(SEALED_CLAIM)
-            .createdDatetime(caseData.getRespondentResponseDate())
+            .createdDatetime(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
             .createdBy(CREATED_BY)
             .build();
     }
