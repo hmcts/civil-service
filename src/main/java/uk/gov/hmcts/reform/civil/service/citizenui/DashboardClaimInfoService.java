@@ -116,7 +116,7 @@ public class DashboardClaimInfoService {
 
     private List<DashboardClaimInfo> translateSearchResultToDashboardItems(SearchResult claims) {
         if (claims == null) {
-            Collections.emptyList();
+           return Collections.emptyList();
         }
 
         return claims.getCases().stream().map(caseDetails -> translateCaseDataToDashboardClaimInfo(caseDetails))
