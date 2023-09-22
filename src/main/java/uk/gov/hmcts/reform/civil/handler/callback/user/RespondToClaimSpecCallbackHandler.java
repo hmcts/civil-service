@@ -1570,12 +1570,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
         return (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.PART_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec())
-        ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-            caseData.getRespondent2ClaimResponseTypeForSpec())
-        );
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
+            || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
     }
 
     private void updateCorrespondenceAddress(CallbackParams callbackParams,
