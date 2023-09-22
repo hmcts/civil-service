@@ -602,6 +602,11 @@ public class StateFlowEngine {
             .state(IN_MEDIATION)
                 .transitionTo(MEDIATION_UNSUCCESSFUL_PROCEED).onlyIf(casemanMarksMediationUnsuccessful)
             .state(MEDIATION_UNSUCCESSFUL_PROCEED)
+                .transitionTo(IN_HEARING_READINESS).onlyIf(isInHearingReadiness)
+                .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(caseDismissedPastHearingFeeDue)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
+                .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
+                .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawn)
             .state(IN_HEARING_READINESS)
             .state(FULL_ADMIT_JUDGMENT_ADMISSION)
             .build();
