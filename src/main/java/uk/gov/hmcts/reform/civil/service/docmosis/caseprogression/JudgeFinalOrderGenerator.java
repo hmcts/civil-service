@@ -24,6 +24,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Optional;
+import java.util.jar.JarOutputStream;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -31,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
+import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.*;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
 
@@ -218,9 +221,46 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 //            .appealReason(getAppealReason(caseData))
             .claimantOrDefendantAppeal(getAppealFor(caseData))
             .appealGranted(nonNull(caseData.getFinalOrderAppealComplex()) && nonNull(caseData.getFinalOrderAppealComplex().getApplicationList())
-                               ? caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name()) : false);
+                               ? caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name()) : false)
+            .tableAorB(circuitOrHighCourt(caseData))
+            .appealDate(getAppealDate(caseData));
+
+
 
         return assistedFormOrderBuilder.build();
+    }
+
+    public LocalDate getAppealDate(CaseData caseData) {
+        if (caseData.getFinalOrderAppealComplex() != null
+            && caseData.getFinalOrderAppealComplex().getApplicationList() == GRANTED) {
+            if (caseData.getFinalOrderAppealComplex().getAppealGrantedDropdown().getCircuitOrHighCourtList().equals(
+                CIRCUIT_COURT)) {
+                return caseData.getFinalOrderAppealComplex().getAppealGrantedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate();
+            } else
+                return caseData.getFinalOrderAppealComplex().getAppealGrantedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
+        }
+        if (caseData.getFinalOrderAppealComplex() != null
+            && caseData.getFinalOrderAppealComplex().getApplicationList() == REFUSED) {
+            if (caseData.getFinalOrderAppealComplex().getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse().equals(CIRCUIT_COURT)) {
+                return caseData.getFinalOrderAppealComplex().getAppealRefusedDropdown().getAppealChoiceSecondDropdownA().getAppealGrantedRefusedDate();
+            } else return caseData.getFinalOrderAppealComplex().getAppealRefusedDropdown().getAppealChoiceSecondDropdownB().getAppealGrantedRefusedDate();
+        }
+        return null;
+    }
+
+    public String circuitOrHighCourt(CaseData caseData) {
+        if (caseData.getFinalOrderAppealComplex() != null
+            && caseData.getFinalOrderAppealComplex().getApplicationList() == GRANTED
+            && caseData.getFinalOrderAppealComplex().getAppealGrantedDropdown().getCircuitOrHighCourtList().equals(CIRCUIT_COURT)) {
+            System.out.println("granted return a");
+            return "a";
+        }
+        if (caseData.getFinalOrderAppealComplex() != null
+            && caseData.getFinalOrderAppealComplex().getApplicationList() == REFUSED
+            && caseData.getFinalOrderAppealComplex().getAppealRefusedDropdown().getCircuitOrHighCourtListRefuse().equals(CIRCUIT_COURT)) {
+            System.out.println("redused return a");
+            return "a";
+        } else System.out.println("returning b"); return "b";
     }
 
     public String populateInterimPaymentText(CaseData caseData) {
