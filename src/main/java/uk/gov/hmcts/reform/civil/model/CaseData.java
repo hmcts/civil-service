@@ -556,6 +556,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<Document>> gaEvidenceDocRespondentSol;
     private final List<Element<Document>> gaEvidenceDocRespondentSolTwo;
 
+    private final List<Element<CaseDocument>> gaRespondDoc;
+
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
@@ -998,4 +1000,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public String getApplicant1Email() {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
+
+    @JsonIgnore
+    public LocalDateTime getRespondentResponseDate() {
+        LocalDateTime responseDate = null != getRespondent1ResponseDate() ? getRespondent1ResponseDate() : getRespondent2ResponseDate();
+        return responseDate.isBefore(LocalDateTime.now()) ? LocalDateTime.now() : responseDate;
+    }
+
 }

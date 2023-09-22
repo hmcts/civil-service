@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -146,12 +147,18 @@ public class RoboticsDataMapper {
             .contactEmailAddress(caseData.getRespondentSolicitor1EmailAddress())
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getRespondentSolicitor1Reference)
+                           .map(s -> s.substring(0, Math.min(s.length(), 24)))
                            .orElse(null)
             );
 
         if (organisationId != null) {
-            organisationService.findOrganisationById(organisationId)
-                .ifPresent(buildOrganisation(solicitorBuilder, caseData.getRespondentSolicitor1ServiceAddress()));
+            try {
+                organisationService.findOrganisationById(organisationId)
+                    .ifPresent(buildOrganisation(solicitorBuilder, caseData.getRespondentSolicitor1ServiceAddress()));
+            } catch (FeignException e) {
+                log.error("Error recovering org id " + organisationId
+                              + " for case id " + caseData.getLegacyCaseReference(), e);
+            }
         }
         organisationDetails.ifPresent(buildOrganisationDetails(solicitorBuilder));
 
@@ -216,12 +223,20 @@ public class RoboticsDataMapper {
             .contactEmailAddress(caseData.getApplicantSolicitor1UserDetails().getEmail())
             .reference(ofNullable(caseData.getSolicitorReferences())
                            .map(SolicitorReferences::getApplicantSolicitor1Reference)
+                           .map(s -> s.substring(0, Math.min(s.length(), 24)))
                            .orElse(null)
             );
 
-        organisationId
-            .flatMap(organisationService::findOrganisationById)
-            .ifPresent(buildOrganisation(solicitorBuilder, caseData.getApplicantSolicitor1ServiceAddress()));
+        try {
+            organisationId
+                .flatMap(organisationService::findOrganisationById)
+                .ifPresent(buildOrganisation(solicitorBuilder, caseData.getApplicantSolicitor1ServiceAddress()));
+        } catch (FeignException e) {
+            /* CIV-10011 organisationId is not null (if it were, the call to findOrganisationById would not have
+             been done, so the FeignException would not have been thrown */
+            log.error("Error recovering org id " + organisationId.orElse(null)
+                + " for case id " + caseData.getLegacyCaseReference(), e);
+        }
 
         return solicitorBuilder.build();
     }
@@ -333,7 +348,11 @@ public class RoboticsDataMapper {
             .isPayee(false)
             .organisationId(organisationId)
             .contactEmailAddress(caseData.getRespondentSolicitor2EmailAddress())
-            .reference(caseData.getRespondentSolicitor2Reference());
+            .reference(ofNullable(caseData.getSolicitorReferences())
+                           .map(SolicitorReferences::getRespondentSolicitor2Reference)
+                           .map(s -> s.substring(0, Math.min(s.length(), 24)))
+                           .orElse(null)
+            );
 
         if (organisationId != null) {
             organisationService.findOrganisationById(organisationId)
