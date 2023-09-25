@@ -170,7 +170,7 @@ public class HearingValuesService {
         return false;
     }
 
-  /**
+    /**
      * Tactical solution to update unavailable dates with date and event added.
      * First the unavailable dates fields are checked if date added exists before
      * overwriting with the event and date added fields
