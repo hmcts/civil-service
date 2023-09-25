@@ -238,7 +238,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             case DEFENDANT_TWO_LITIGATION_FRIEND_ID: {
                 return getPartyPostCode(caseData.getRespondent2LitigationFriend());
             }
-            default:{
+            default: {
                 return null;
             }
         }

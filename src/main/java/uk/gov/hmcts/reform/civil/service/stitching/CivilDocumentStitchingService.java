@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
     public CaseDocument bundle(List<DocumentMetaData> documents, String authorisation, String bundleTitle, String bundleFilename, CaseData caseData) {
         CaseDetails payload = createBundlePayload(documents, bundleTitle, bundleFilename, caseData);
         log.info("Calling stitching api end point for {}", caseData.getLegacyCaseReference());
+
         CaseData caseDataFromBundlePayload = bundleRequestExecutor.post(
             BundleRequest.builder().caseDetails(payload).build(),
             stitchingConfiguration.getStitchingUrl(),
@@ -63,11 +65,14 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         Document document = stitchedDocument.get();
         String documentUrl = document.getDocumentUrl();
         String documentBinaryUrl = document.getDocumentBinaryUrl();
+
         return CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl(documentUrl).documentBinaryUrl(documentBinaryUrl).documentFileName(document.getDocumentFileName()).build())
+            .documentLink(Document.builder().documentUrl(documentUrl)
+                              .documentBinaryUrl(documentBinaryUrl)
+                              .documentFileName(document.getDocumentFileName()).build())
             .documentName("Stitched document")
             .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
+            .createdDatetime(LocalDateTime.now(ZoneId.of("Europe/London")))
             .createdBy(CREATED_BY)
             .build();
     }
@@ -80,7 +85,7 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         List<IdValue<Bundle>> idValueList = new ArrayList<>();
         idValueList.add(new IdValue<>(
             "1",
-            Bundle.builder().id("1").description(bundleTitle).eligibleForStitching("yes").documents(bundleDocuments).filename(bundleFilename).build()
+            Bundle.builder().id("1").description(bundleTitle).eligibleForStitching("yes").documents(bundleDocuments).fileName(bundleFilename).build()
         ));
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -112,4 +117,3 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         return bundleDocuments;
     }
 }
-

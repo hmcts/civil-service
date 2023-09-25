@@ -4799,4 +4799,36 @@ class StateFlowEngineTest {
         }
     }
 
+    @Nested
+    class LiPvLiPCase {
+        @Test
+        void shouldContinueOnline_1v1Spec_whenDefendantIsUnrepresented() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1UnrepresentedDefendant()
+                .applicant1Represented(NO)
+                .build().toBuilder()
+                .takenOfflineDate(null)
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .caseAccessCategory(SPEC_CLAIM).build();
+
+            // When
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
+
+            assertThat(stateFlow.getFlags()).contains(
+                entry(FlowFlag.PIP_ENABLED.name(), true),
+                entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
+                entry(FlowFlag.LIP_CASE.name(), true)
+            );
+        }
+    }
+
 }
