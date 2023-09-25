@@ -146,6 +146,21 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
+    public void testClientAbortException() {
+        testTemplate(
+            "ClosedChannelException",
+            str -> new FeignException.InternalServerError(
+                "ClosedChannelException",
+                Mockito.mock(feign.Request.class),
+                new byte[]{},
+                Collections.emptyMap()
+            ),
+            handler::handleClientAbortException,
+            HttpStatus.REQUEST_TIMEOUT
+        );
+    }
+
+    @Test
     public void testHandleNotificationClientException() {
         testTemplate(
             "expected exception from notification api",
