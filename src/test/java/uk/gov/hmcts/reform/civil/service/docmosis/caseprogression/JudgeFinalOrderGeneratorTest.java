@@ -428,6 +428,8 @@ public class JudgeFinalOrderGeneratorTest {
                 case COST_DRAFTSMAN_FOR_THE_DEFENDANT -> assertEquals(format("Costs draftsman for %s, the defendant.", name), response);
                 case THE_DEFENDANT_IN_PERSON -> assertEquals(format("%s, the defendant, in person.", name), response);
                 case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> assertEquals(format("A lay representative for %s, the defendant.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -453,6 +455,8 @@ public class JudgeFinalOrderGeneratorTest {
                 case COST_DRAFTSMAN_FOR_THE_DEFENDANT -> assertEquals(format("Costs draftsman for %s, the defendant.", name), response);
                 case THE_DEFENDANT_IN_PERSON -> assertEquals(format("%s, the defendant, in person.", name), response);
                 case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> assertEquals(format("A lay representative for %s, the defendant.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -475,6 +479,8 @@ public class JudgeFinalOrderGeneratorTest {
                 case COST_DRAFTSMAN_FOR_THE_CLAIMANT -> assertEquals(format("Costs draftsman for %s, the claimant.", name), response);
                 case THE_CLAIMANT_IN_PERSON -> assertEquals(format("%s, the claimant, in person.", name), response);
                 case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> assertEquals(format("A lay representative for %s, the claimant.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -499,6 +505,8 @@ public class JudgeFinalOrderGeneratorTest {
                 case COST_DRAFTSMAN_FOR_THE_CLAIMANT -> assertEquals(format("Costs draftsman for %s, the claimant.", name), response);
                 case THE_CLAIMANT_IN_PERSON -> assertEquals(format("%s, the claimant, in person.", name), response);
                 case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> assertEquals(format("A lay representative for %s, the claimant.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -527,6 +535,8 @@ public class JudgeFinalOrderGeneratorTest {
                     format(
                         "%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
                             + "received notice of the trial and determined that it was reasonable to proceed in their absence.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -558,6 +568,8 @@ public class JudgeFinalOrderGeneratorTest {
                     format(
                         "%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
                             + "received notice of the trial and determined that it was reasonable to proceed in their absence.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -586,6 +598,8 @@ public class JudgeFinalOrderGeneratorTest {
                 case SATISFIED_REASONABLE_TO_PROCEED -> assertEquals(format(
                     "%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
                         + "received notice of the trial and determined that it was reasonable to proceed in their absence.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -615,6 +629,8 @@ public class JudgeFinalOrderGeneratorTest {
                 case SATISFIED_REASONABLE_TO_PROCEED -> assertEquals(format(
                     "%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
                         + "received notice of the trial and determined that it was reasonable to proceed in their absence.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -639,6 +655,8 @@ public class JudgeFinalOrderGeneratorTest {
                 case HOUR_1_5 -> assertEquals("1.5 hours", response);
                 case HOUR_2 -> assertEquals("2 hours", response);
                 case OTHER -> assertEquals("12 days 1 hours 30 minutes", response);
+                default -> {
+                }
             }
         }
     }
