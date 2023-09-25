@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.HearingSupportLip;
@@ -25,5 +26,10 @@ public class DQLipDefendantFormMapper extends DQLipFormMapper {
     protected DQExtraDetailsLip getDQExtraDetails(Optional<CaseDataLiP> caseDataLiPOptional) {
         return caseDataLiPOptional.map(CaseDataLiP::getRespondent1LiPResponse)
             .map(RespondentLiPResponse::getRespondent1DQExtraDetails).orElse(null);
+    }
+
+    @Override
+    protected String getStatementOfTruthName(CaseData caseData) {
+        return caseData.getRespondent1().getPartyName();
     }
 }
