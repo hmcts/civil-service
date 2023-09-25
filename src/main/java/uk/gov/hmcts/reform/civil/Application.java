@@ -20,6 +20,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application {
 
+    
     public static void main(final String[] args) {
         SpringApplication.run(Application.class, args);
     }
