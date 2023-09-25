@@ -25,6 +25,11 @@ import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType.SINGLE_DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.shouldUpdateApplicant1UnavailableDates;
+import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.shouldUpdateApplicant2UnavailableDates;
+import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.shouldUpdateRespondent1UnavailableDates;
+import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.shouldUpdateRespondent2UnavailableDates;
+import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.updateMissingUnavailableDatesForApplicants;
 
 public class UnavailabilityDatesUtilsTest {
 
@@ -367,6 +372,200 @@ public class UnavailabilityDatesUtilsTest {
             List<Element<UnavailableDate>> expected = wrapElements(List.of(expectedSingleDate, expectedDateRange));
 
             assertThat(builder.build().getApplicant1().getUnavailableDates()).isEqualTo(expected);
+        }
+
+        @Test
+        public void shouldRollupUnavailableDatesForClaimant_whenEventIsClaimantResponse() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1DQWithUnavailableDate()
+                .build();
+
+            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            updateMissingUnavailableDatesForApplicants(caseData, builder, true);
+            UnavailableDate expected = UnavailableDate.builder()
+                .date(LocalDate.now().plusDays(1))
+                .unavailableDateType(SINGLE_DATE)
+                .dateAdded(caseData.getApplicant1ResponseDate().toLocalDate())
+                .eventAdded(CLAIMANT_INTENTION_EVENT)
+                .build();
+            UnavailableDate result = unwrapElements(builder.build().getApplicant1().getUnavailableDates()).get(0);
+            assertEquals(expected.getDate(), result.getDate());
+            assertEquals(expected.getUnavailableDateType(), result.getUnavailableDateType());
+        }
+
+        @Test
+        public void shouldRollupUnavailableDatesForClaimant_whenEventIsDefaultJudgement() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .atStateClaimantRequestsDJWithUnavailableDates()
+                .build();
+
+            LocalDate dateAdded = LocalDate.now();
+
+            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            updateMissingUnavailableDatesForApplicants(caseData, builder, true);
+
+            UnavailableDate expectedSingleDate = UnavailableDate.builder()
+                .unavailableDateType(SINGLE_DATE)
+                .date(LocalDate.of(2023, 8, 20))
+                .dateAdded(dateAdded)
+                .eventAdded(DJ_EVENT)
+                .build();
+
+            UnavailableDate expectedDateRange = UnavailableDate.builder()
+                .unavailableDateType(DATE_RANGE)
+                .fromDate(LocalDate.of(2023, 8, 20))
+                .toDate(LocalDate.of(2023, 8, 22))
+                .dateAdded(dateAdded)
+                .eventAdded(DJ_EVENT)
+                .build();
+
+            List<Element<UnavailableDate>> expected = wrapElements(List.of(expectedSingleDate, expectedDateRange));
+
+            assertThat(builder.build().getApplicant1().getUnavailableDates()).isEqualTo(expected);
+        }
+
+        @Test
+        public void shouldReturnFalse_whenApplicant1HasNoMissingUnavailableDates() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData = caseData.toBuilder().applicant1(caseData.getApplicant1().toBuilder()
+                                                .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
+                                                                      .unavailableDateType(DATE_RANGE)
+                                                                      .fromDate(LocalDate.of(2023, 8, 20))
+                                                                      .toDate(LocalDate.of(2023, 8, 22))
+                                                                      .dateAdded(LocalDate.of(2023, 6, 22))
+                                                                      .eventAdded(DJ_EVENT)
+                                                                      .build()))).build()).build();
+
+            boolean actual = shouldUpdateApplicant1UnavailableDates(caseData);
+            assertThat(actual).isFalse();
+        }
+
+        @Test
+        public void shouldReturnTrue_whenApplicant1HasMissingUnavailableDates() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData = caseData.toBuilder().applicant1(caseData.getApplicant1().toBuilder()
+                                                .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
+                                                                                           .unavailableDateType(DATE_RANGE)
+                                                                                           .fromDate(LocalDate.of(2023, 8, 20))
+                                                                                           .toDate(LocalDate.of(2023, 8, 22))
+                                                                                           .build()))).build()).build();
+
+            boolean actual = shouldUpdateApplicant1UnavailableDates(caseData);
+            assertThat(actual).isTrue();
+        }
+
+        @Test
+        public void shouldReturnFalse_whenApplicant2HasNoMissingUnavailableDates() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoApplicants()
+                .addApplicant2()
+                .build();
+            caseData = caseData.toBuilder().applicant2(caseData.getApplicant2().toBuilder()
+                                                .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
+                                                                                           .unavailableDateType(DATE_RANGE)
+                                                                                           .fromDate(LocalDate.of(2023, 8, 20))
+                                                                                           .toDate(LocalDate.of(2023, 8, 22))
+                                                                                           .dateAdded(LocalDate.of(2023, 6, 22))
+                                                                                           .eventAdded(DJ_EVENT)
+                                                                                           .build()))).build()).build();
+
+            boolean actual = shouldUpdateApplicant2UnavailableDates(caseData);
+            assertThat(actual).isFalse();
+        }
+
+        @Test
+        public void shouldReturnTrue_whenApplicant2HasMissingUnavailableDates() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .addApplicant2()
+                .multiPartyClaimTwoApplicants()
+                .build();
+            caseData = caseData.toBuilder().applicant2(caseData.getApplicant2().toBuilder()
+                                                .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
+                                                                                           .unavailableDateType(DATE_RANGE)
+                                                                                           .fromDate(LocalDate.of(2023, 8, 20))
+                                                                                           .toDate(LocalDate.of(2023, 8, 22))
+                                                                                           .build()))).build()).build();
+
+            boolean actual = shouldUpdateApplicant2UnavailableDates(caseData);
+            assertThat(actual).isTrue();
+        }
+
+        @Test
+        public void shouldReturnFalse_whenRespondent1HasNoMissingUnavailableDates() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData = caseData.toBuilder().respondent1(caseData.getRespondent1().toBuilder()
+                                                .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
+                                                                                           .unavailableDateType(DATE_RANGE)
+                                                                                           .fromDate(LocalDate.of(2023, 8, 20))
+                                                                                           .toDate(LocalDate.of(2023, 8, 22))
+                                                                                           .dateAdded(LocalDate.of(2023, 6, 22))
+                                                                                           .eventAdded(DEFENDANT_RESPONSE_EVENT)
+                                                                                           .build()))).build()).build();
+
+            boolean actual = shouldUpdateRespondent1UnavailableDates(caseData);
+            assertThat(actual).isFalse();
+        }
+
+        @Test
+        public void shouldReturnTrue_whenRespondent1HasMissingUnavailableDates() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData = caseData.toBuilder().respondent1(caseData.getRespondent1().toBuilder()
+                                                .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
+                                                                                           .unavailableDateType(DATE_RANGE)
+                                                                                           .fromDate(LocalDate.of(2023, 8, 20))
+                                                                                           .toDate(LocalDate.of(2023, 8, 22))
+                                                                                           .build()))).build()).build();
+
+            boolean actual = shouldUpdateRespondent1UnavailableDates(caseData);
+            assertThat(actual).isTrue();
+        }
+
+        @Test
+        public void shouldReturnFalse_whenRespondent2HasNoMissingUnavailableDates() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build();
+            caseData = caseData.toBuilder().respondent2(caseData.getRespondent1().toBuilder()
+                                                 .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
+                                                                                            .unavailableDateType(DATE_RANGE)
+                                                                                            .fromDate(LocalDate.of(2023, 8, 20))
+                                                                                            .toDate(LocalDate.of(2023, 8, 22))
+                                                                                            .dateAdded(LocalDate.of(2023, 6, 22))
+                                                                                            .eventAdded(DEFENDANT_RESPONSE_EVENT)
+                                                                                            .build()))).build()).build();
+
+            boolean actual = shouldUpdateRespondent2UnavailableDates(caseData);
+            assertThat(actual).isFalse();
+        }
+
+        @Test
+        public void shouldReturnTrue_whenRespondent2HasMissingUnavailableDates() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+            caseData = caseData.toBuilder().respondent2(caseData.getRespondent2().toBuilder()
+                                                 .unavailableDates(wrapElements(List.of(UnavailableDate.builder()
+                                                                                            .unavailableDateType(DATE_RANGE)
+                                                                                            .fromDate(LocalDate.of(2023, 8, 20))
+                                                                                            .toDate(LocalDate.of(2023, 8, 22))
+                                                                                            .build()))).build()).build();
+
+            boolean actual = shouldUpdateRespondent2UnavailableDates(caseData);
+            assertThat(actual).isTrue();
         }
     }
 
