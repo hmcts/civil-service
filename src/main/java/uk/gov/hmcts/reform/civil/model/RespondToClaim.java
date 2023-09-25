@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.validation.groups.PaymentDateGroup;
@@ -23,4 +24,11 @@ public class RespondToClaim {
     private final LocalDate whenWasThisAmountPaid;
     private final PaymentMethod howWasThisAmountPaid;
     private final String howWasThisAmountPaidOther;
+
+    @JsonIgnore
+    public String getExplanationOnHowTheAmountWasPaid() {
+        return getHowWasThisAmountPaid() == PaymentMethod.OTHER
+            ? getHowWasThisAmountPaidOther()
+            : getHowWasThisAmountPaid().getHumanFriendly();
+    }
 }
