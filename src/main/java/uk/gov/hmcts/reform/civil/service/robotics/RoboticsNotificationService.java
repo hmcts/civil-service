@@ -53,6 +53,9 @@ public class RoboticsNotificationService {
         log.info(String.format("Start notifyRobotics and case data is not null %s", caseData.getLegacyCaseReference()));
         Optional<EmailData> emailData = prepareEmailData(RoboticsEmailParams.builder().caseData(caseData).authToken(
             authToken).isMultiParty(isMultiParty).build());
+        log.info(String.format("Email data: to information  %s", emailData.get().getTo()));
+        log.info("----------- EMAILDATA INFO -----------------");
+        log.info(String.valueOf(emailData.get()));
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
 
@@ -151,6 +154,10 @@ public class RoboticsNotificationService {
 
     private String getSubjectForSpec(CaseData caseData, String triggerEvent, boolean isMultiParty) {
         String subject;
+        log.info(String.format("isRespondent1NotRepresented-------- %s", caseData.isRespondent1NotRepresented()));
+        log.info(String.format("isLipvLipOneVOne-------- %s", caseData.isLipvLipOneVOne()));
+        log.info(String.format("isLipVLipEnabled-------- %s", toggleService.isLipVLipEnabled()));
+
         if (caseData.isRespondent1NotRepresented()) {
             if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
                 if (nonNull(caseData.getPaymentTypeSelection())) {
@@ -199,6 +206,7 @@ public class RoboticsNotificationService {
                 caseData.getLegacyCaseReference()
             );
         }
+        log.info(String.format("Subject-------- %s", subject));
         return subject;
     }
 
