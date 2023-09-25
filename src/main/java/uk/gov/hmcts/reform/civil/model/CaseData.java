@@ -999,8 +999,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public String getApplicant1Email() {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
-    }
-
+    
     @JsonIgnore
     public String getHelpWithFeesReferenceNumber() {
         return Optional.ofNullable(getCaseDataLiP())
@@ -1013,5 +1012,4 @@ public class CaseData extends CaseDataParent implements MappableObject {
         LocalDateTime responseDate = null != getRespondent1ResponseDate() ? getRespondent1ResponseDate() : getRespondent2ResponseDate();
         return responseDate.isBefore(LocalDateTime.now()) ? LocalDateTime.now() : responseDate;
     }
-
 }
