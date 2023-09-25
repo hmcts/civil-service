@@ -59,7 +59,7 @@ public class BundleTest {
         assertEquals(bundle.getStitchedDocument(), stitchedDocument);
         assertEquals(bundle.getHasCoversheets(), hasCoversheets);
         assertEquals(bundle.getHasTableOfContents(), hasTableOfContents);
-        assertEquals(bundle.getFilename(), filename);
+        assertEquals(bundle.getFileName(), filename);
     }
 
     @Test
