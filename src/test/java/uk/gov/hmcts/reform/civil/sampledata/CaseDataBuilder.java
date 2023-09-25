@@ -465,6 +465,15 @@ public class CaseDataBuilder {
 
     private UpdateDetailsForm updateDetailsForm;
 
+    private List<Element<PartyFlagStructure>> applicant1LRIndividuals;
+    private List<Element<PartyFlagStructure>> respondent1LRIndividuals;
+    private List<Element<PartyFlagStructure>> respondent2LRIndividuals;
+
+    private List<Element<PartyFlagStructure>> applicant1OrgIndividuals;
+    private List<Element<PartyFlagStructure>> applicant2OrgIndividuals;
+    private List<Element<PartyFlagStructure>> respondent1OrgIndividuals;
+    private List<Element<PartyFlagStructure>> respondent2OrgIndividuals;
+
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
 
@@ -4749,6 +4758,11 @@ public class CaseDataBuilder {
         this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
+        this.solicitorReferences = SolicitorReferences.builder()
+            .applicantSolicitor1Reference("12345")
+            .respondentSolicitor1Reference("6789")
+            .respondentSolicitor2Reference("01234")
+            .build();
         return this;
     }
 
@@ -5893,6 +5907,57 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addApplicantLRIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("app-lr-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.applicant1LRIndividuals != null && !this.applicant1LRIndividuals.isEmpty()) {
+            this.applicant1LRIndividuals.addAll(individual);
+        } else {
+            this.applicant1LRIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1LRIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-1-lr-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.respondent1LRIndividuals != null && !this.respondent1LRIndividuals.isEmpty()) {
+            this.respondent1LRIndividuals.addAll(individual);
+        } else {
+            this.respondent1LRIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent2LRIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-2-lr-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.respondent2LRIndividuals != null && !this.respondent2LRIndividuals.isEmpty()) {
+            this.respondent2LRIndividuals.addAll(individual);
+        } else {
+            this.respondent2LRIndividuals = individual;
+        }
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -6168,6 +6233,9 @@ public class CaseDataBuilder {
             .claimantUserDetails(claimantUserDetails)
             .updateDetailsForm(updateDetailsForm)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
+            .applicant1LRIndividuals(applicant1LRIndividuals)
+            .respondent1LRIndividuals(respondent1LRIndividuals)
+            .respondent2LRIndividuals(respondent2LRIndividuals)
             .build();
     }
 }
