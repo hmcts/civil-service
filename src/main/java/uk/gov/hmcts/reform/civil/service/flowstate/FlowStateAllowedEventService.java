@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_CLOSED_UP
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_OFFLINE_UPDATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
@@ -630,7 +631,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 DISMISS_CLAIM,
                 migrateCase,
-                CREATE_SDO
+                CREATE_SDO,
+                NotSuitable_SDO
             )
         ),
         entry(
@@ -843,7 +845,8 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 BUNDLE_CREATION_NOTIFICATION,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -880,7 +883,8 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
                 BUNDLE_CREATION_NOTIFICATION,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -924,7 +928,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -948,7 +953,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 migrateCase,
                 DEFAULT_JUDGEMENT_SPEC,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -971,7 +977,8 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 DEFAULT_JUDGEMENT_SPEC,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -995,7 +1002,8 @@ public class FlowStateAllowedEventService {
                 migrateCase,
                 DEFAULT_JUDGEMENT_SPEC,
                 CHANGE_SOLICITOR_EMAIL,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -1022,7 +1030,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -1058,7 +1067,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                LIP_CLAIM_SETTLED
             )
         ),
 
@@ -1078,7 +1088,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
                 migrateCase,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -1165,7 +1176,8 @@ public class FlowStateAllowedEventService {
                 MEDIATION_UNSUCCESSFUL,
                 CREATE_SDO,
                 CHANGE_SOLICITOR_EMAIL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
@@ -1199,21 +1211,24 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                LIP_CLAIM_SETTLED
             )
         ),
          entry(
             PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(),
             List.of(
                 CREATE_SDO,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                LIP_CLAIM_SETTLED
             )
         ),
         entry(
             RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.fullName(),
             List.of(
                 CHANGE_SOLICITOR_EMAIL,
-                EXTEND_RESPONSE_DEADLINE
+                EXTEND_RESPONSE_DEADLINE,
+                LIP_CLAIM_SETTLED
 
             )
         )
