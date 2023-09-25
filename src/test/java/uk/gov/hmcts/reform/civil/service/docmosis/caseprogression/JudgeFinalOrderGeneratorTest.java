@@ -574,7 +574,6 @@ public class JudgeFinalOrderGeneratorTest {
         }
     }
 
-
     @Test
     void testGetClaimantOneNotAttendedText() {
         for (FinalOrdersClaimantDefendantNotAttending finalOrdersClaimantDefendantNotAttending : List.of(
