@@ -279,7 +279,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         if (toggleService.isPbaV3Enabled()) {
             caseDataBuilder.paymentTypePBA("PBAv3");
         }
-        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams()
+                                                     .get(BEARER_TOKEN).toString());
         caseDataBuilder.applicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers))
                        .applicantSolicitor1PbaAccountsIsEmpty(pbaNumbers.isEmpty() ? YES : NO);
 
