@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
@@ -17,6 +18,7 @@ public abstract class DQLipFormMapper {
 
     abstract protected List<HearingLipSupportRequirements> toHearingSupportRequirements(Optional<CaseDataLiP> caseDataLiPOptional);
     abstract protected DQExtraDetailsLip getDQExtraDetails(Optional<CaseDataLiP> caseDataLiPOptional);
+    abstract protected Optional<ExpertLiP> getExpertLip(DQExtraDetailsLip dqExtraDetailsLip);
     abstract protected String getStatementOfTruthName(CaseData caseData);
 
     public DirectionsQuestionnaireForm addLipDQs(DirectionsQuestionnaireForm form, Optional<CaseDataLiP> caseDataLiPOptional){
@@ -40,12 +42,12 @@ public abstract class DQLipFormMapper {
                                              .stream()
                                              .map(ExpertReportTemplate::toExpertReportTemplate)
                                              .toList())
-                                .caseNeedsAnExpert(Optional.ofNullable(dqExtraDetails.getRespondent1DQLiPExpert())
+                                .caseNeedsAnExpert(getExpertLip(dqExtraDetails)
                                                        .map(ExpertLiP::getCaseNeedsAnExpert).orElse(null))
-                                .expertCanStillExamineDetails(Optional.ofNullable(dqExtraDetails.getRespondent1DQLiPExpert())
+                                .expertCanStillExamineDetails(getExpertLip(dqExtraDetails)
                                                                   .map(ExpertLiP::getExpertCanStillExamineDetails)
                                                                   .orElse(null))
-                                .expertReportRequired(Optional.ofNullable(dqExtraDetails.getRespondent1DQLiPExpert())
+                                .expertReportRequired(getExpertLip(dqExtraDetails)
                                                           .map(ExpertLiP::getExpertReportRequired)
                                                           .orElse(null))
 
