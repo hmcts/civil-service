@@ -99,7 +99,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
         LocalDate dateOfPaymentMade = caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade();
 
         if (JudgmentsOnlineHelper.validateIfFutureDate(dateOfPaymentMade)) {
-            errors.add(String.format(ERROR_MESSAGE_DATE_MUST_BE_IN_PAST, ERROR_MESSAGE_DATE_MUST_BE_IN_PAST));
+            errors.add(ERROR_MESSAGE_DATE_MUST_BE_IN_PAST);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
