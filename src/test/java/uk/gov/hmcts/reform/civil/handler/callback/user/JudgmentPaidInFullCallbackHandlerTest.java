@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
@@ -19,8 +20,9 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.time.LocalDate;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
 
 @SpringBootTest(classes = {
@@ -38,6 +40,24 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(JUDGMENT_PAID_IN_FULL);
+    }
+
+    @Nested
+    class AboutToStartCallback {
+        @Test
+        void shouldPopulateFieldsAsNull() {
+            //Given: Casedata in All_FINAL_ORDERS_ISSUED State
+            CaseData caseData = CaseDataBuilder.builder().atStateHearingDateScheduled().build().toBuilder()
+                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            //When: handler is called with ABOUT_TO_START event
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+
+        }
     }
 
     @Nested
