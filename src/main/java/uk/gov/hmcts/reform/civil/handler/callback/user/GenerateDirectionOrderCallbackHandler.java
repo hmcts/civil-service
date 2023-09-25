@@ -269,6 +269,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private void checkFieldDate(CaseData caseData, List<String> errors) {
+        String AppealNoticeDate = "Appeal notice date";
         // validate order made dates
         validateDate(Optional.ofNullable(caseData.getFinalOrderDateHeardComplex())
                          .map(OrderMade::getSingleDateSelection)
@@ -310,25 +311,25 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                          .map(FinalOrderAppeal::getAppealGrantedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownA)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
-                     "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
+                     AppealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
 
         validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
                          .map(FinalOrderAppeal::getAppealGrantedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownB)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
-                     "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
+                     AppealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
 
         validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
                          .map(FinalOrderAppeal::getAppealRefusedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownA)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
-                     "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
+                     AppealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
 
         validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
                          .map(FinalOrderAppeal::getAppealRefusedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownB)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
-                     "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
+                     AppealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
 
     }
 

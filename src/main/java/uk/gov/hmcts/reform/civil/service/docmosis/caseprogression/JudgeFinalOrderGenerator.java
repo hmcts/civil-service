@@ -28,9 +28,9 @@ import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -226,7 +226,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             //appeal section
             .claimantOrDefendantAppeal(getAppealFor(caseData))
             .appealGranted(nonNull(caseData.getFinalOrderAppealComplex()) && nonNull(caseData.getFinalOrderAppealComplex().getApplicationList())
-                               ? caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name()) : false)
+                               ? caseData.getFinalOrderAppealComplex().getApplicationList().name().equals(ApplicationAppealList.GRANTED.name()) : null)
             .tableAorB(circuitOrHighCourt(caseData))
             .appealDate(getAppealDate(caseData))
             // InitiativeOrWithoutNotice section
@@ -341,7 +341,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             return caseData.getFinalOrderFurtherHearingComplex()
                 .getHearingLocationList().getValue().getCode().equals("LOCATION_LIST");
         }
-        return null;
+        return false;
     }
 
     public String getAppealFor(CaseData caseData) {
@@ -402,30 +402,16 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     public String orderMadeDateBuilder(CaseData caseData) {
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMMM yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
         if (caseData.getFinalOrderDateHeardComplex().getSingleDateSelection() != null) {
-            String date1 = caseData.getFinalOrderDateHeardComplex().getSingleDateSelection().getSingleDate().toString();
-            try {
-                var convertDateString = inputFormat.parse(date1);
-                String formattedDate = outputFormat.format(convertDateString);
-                return format("on %s", formattedDate);
-            } catch (ParseException e) {
-                log.error("Date formatting failed");
-            }
+            LocalDate date1 = caseData.getFinalOrderDateHeardComplex().getSingleDateSelection().getSingleDate();
+            return format("on %s", date1.format(formatter));
+
         }
         if (caseData.getFinalOrderDateHeardComplex().getDateRangeSelection() != null) {
-            String date1 = caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom().toString();
-            String date2 = caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo().toString();
-            try {
-                var convertDateString1 = inputFormat.parse(date1);
-                var convertDateString2 = inputFormat.parse(date2);
-                String formattedDate1 = outputFormat.format(convertDateString1);
-                String formattedDate2 = outputFormat.format(convertDateString2);
-                return format("between %s and %s", formattedDate1, formattedDate2);
-            } catch (ParseException e) {
-                log.error("Date formatting failed");
-            }
+            LocalDate date1 = caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeFrom();
+            LocalDate date2 = caseData.getFinalOrderDateHeardComplex().getDateRangeSelection().getDateRangeTo();
+            return format("between %s and %s", date1.format(formatter), date2.format(formatter));
         }
         if (caseData.getFinalOrderDateHeardComplex().getBespokeRangeSelection() != null) {
             return format(
