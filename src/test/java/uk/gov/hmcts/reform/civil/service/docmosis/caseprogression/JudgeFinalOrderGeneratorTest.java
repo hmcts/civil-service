@@ -253,7 +253,9 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderFurtherHearingComplex(null)
             // Costs section
             .assistedOrderCostList(AssistedCostTypesList.COSTS_IN_THE_CASE)
-            .publicFundingCostsProtection(YES)
+            .assistedOrderMakeAnOrderForCosts(null)
+            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder().makeAnOrderForCostsList(null).build())
+            .publicFundingCostsProtection(NO)
             // Appeal section
             .finalOrderAppealToggle(null)
             // initiative or without notice section

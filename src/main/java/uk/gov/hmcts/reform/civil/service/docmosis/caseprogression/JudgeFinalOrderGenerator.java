@@ -200,12 +200,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             ? caseData.getFinalOrderRepresentation().getTypeRepresentationOtherComplex().getDetailsRepresentationText() : "";
     }
 
-    private boolean isJudgeConsideredPapers(CaseData caseData) {
+    private String isJudgeConsideredPapers(CaseData caseData) {
         return nonNull(caseData.getFinalOrderRepresentation())
-            && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList())
-            && caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList()
-            .stream().anyMatch(finalOrdersJudgePapers -> finalOrdersJudgePapers.equals(
-                FinalOrdersJudgePapers.CONSIDERED));
+            && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList()) ? "true" : null;
     }
 
     private LocalDate getDatesToAvoid(CaseData caseData) {

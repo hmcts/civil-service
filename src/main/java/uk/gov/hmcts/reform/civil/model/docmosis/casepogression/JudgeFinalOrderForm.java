@@ -29,7 +29,7 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final LocalDate withoutNoticeSelectionDate;
     private final YesOrNo finalOrderMadeSelection;
     private final String otherRepresentedText;
-    private final boolean judgeConsideredPapers;
+    private final String judgeConsideredPapers;
     private final boolean recordedToggle;
     private final String recordedText;
     private final String orderedText;
