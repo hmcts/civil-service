@@ -25,6 +25,7 @@ public abstract class DQLipFormMapper {
         var builder = form.toBuilder();
         builder.hearingLipSupportRequirements(toHearingSupportRequirements(caseDataLiPOptional));
         var dqExtraDetails = getDQExtraDetails(caseDataLiPOptional);
+        var expertLip = getExpertLip(dqExtraDetails);
         if (dqExtraDetails != null) {
             builder.lipExtraDQ(LipExtraDQ.builder().triedToSettle(dqExtraDetails.getTriedToSettle())
                                    .requestExtra4weeks(dqExtraDetails.getRequestExtra4weeks())
@@ -42,12 +43,12 @@ public abstract class DQLipFormMapper {
                                              .stream()
                                              .map(ExpertReportTemplate::toExpertReportTemplate)
                                              .toList())
-                                .caseNeedsAnExpert(getExpertLip(dqExtraDetails)
+                                .caseNeedsAnExpert(expertLip
                                                        .map(ExpertLiP::getCaseNeedsAnExpert).orElse(null))
-                                .expertCanStillExamineDetails(getExpertLip(dqExtraDetails)
+                                .expertCanStillExamineDetails(expertLip
                                                                   .map(ExpertLiP::getExpertCanStillExamineDetails)
                                                                   .orElse(null))
-                                .expertReportRequired(getExpertLip(dqExtraDetails)
+                                .expertReportRequired(expertLip
                                                           .map(ExpertLiP::getExpertReportRequired)
                                                           .orElse(null))
 

@@ -41,7 +41,7 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
         );
         DQLipFormMapper mapper = MAPPER_FACTORY.getDQLipFormMapper(caseData);
         builder.lipStatementOfTruthName(mapper.getStatementOfTruthName(caseData))
-            .applicants(getApplicants(caseData))
+            .applicant(Party.toLipParty(caseData.getApplicant1()))
             .respondent1LiPCorrespondenceAddress(caseData.getRespondent1CorrespondenceAddress());
         return mapper.addLipDQs(builder.build(), Optional.ofNullable(caseData.getCaseDataLiP()));
     }
