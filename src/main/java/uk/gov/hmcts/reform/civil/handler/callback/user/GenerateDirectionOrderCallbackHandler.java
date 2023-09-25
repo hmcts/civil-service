@@ -87,6 +87,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String NOT_ALLOWED_DATE_PAST = "The date in %s may not be before the established date";
     public String defendantTwoPartyName;
     public String claimantTwoPartyName;
+    public String appealNoticeDate = "Appeal notice date";
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
@@ -269,7 +270,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private void checkFieldDate(CaseData caseData, List<String> errors) {
-        String AppealNoticeDate = "Appeal notice date";
         // validate order made dates
         validateDate(Optional.ofNullable(caseData.getFinalOrderDateHeardComplex())
                          .map(OrderMade::getSingleDateSelection)
@@ -311,25 +311,25 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                          .map(FinalOrderAppeal::getAppealGrantedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownA)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
-                     AppealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
+                     appealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
 
         validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
                          .map(FinalOrderAppeal::getAppealGrantedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownB)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
-                     AppealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
+                     appealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
 
         validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
                          .map(FinalOrderAppeal::getAppealRefusedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownA)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
-                     AppealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
+                     appealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
 
         validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
                          .map(FinalOrderAppeal::getAppealRefusedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownB)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
-                     AppealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
+                     appealNoticeDate, NOT_ALLOWED_DATE_PAST, errors, true);
 
     }
 

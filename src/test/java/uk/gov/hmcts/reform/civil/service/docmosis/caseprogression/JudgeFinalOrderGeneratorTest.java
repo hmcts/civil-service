@@ -387,8 +387,6 @@ public class JudgeFinalOrderGeneratorTest {
                 case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT:
                     assertEquals(format("A lay representative for %s, the defendant.", name), response);
                     break;
-                default:
-                    break;
             }
         }
     }
@@ -424,8 +422,6 @@ public class JudgeFinalOrderGeneratorTest {
                 case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT:
                     assertEquals(format("A lay representative for %s, the defendant.", name), response);
                     break;
-                default:
-                    break;
             }
         }
     }
@@ -458,9 +454,6 @@ public class JudgeFinalOrderGeneratorTest {
                 case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT:
                     assertEquals(format("A lay representative for %s, the claimant.", name), response);
                     break;
-                default:
-                    break;
-
             }
         }
     }
@@ -494,8 +487,6 @@ public class JudgeFinalOrderGeneratorTest {
                     break;
                 case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT:
                     assertEquals(format("A lay representative for %s, the claimant.", name), response);
-                    break;
-                default:
                     break;
             }
         }
@@ -537,8 +528,6 @@ public class JudgeFinalOrderGeneratorTest {
                             name
                         ), response
                     );
-                    break;
-                default:
                     break;
             }
         }
@@ -584,8 +573,6 @@ public class JudgeFinalOrderGeneratorTest {
                         ), response
                     );
                     break;
-                default:
-                    break;
             }
         }
     }
@@ -624,8 +611,6 @@ public class JudgeFinalOrderGeneratorTest {
                             + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
                         name
                     ), response);
-                    break;
-                default:
                     break;
             }
         }
@@ -668,8 +653,6 @@ public class JudgeFinalOrderGeneratorTest {
                         name
                     ), response);
                     break;
-                default:
-                    break;
             }
         }
     }
@@ -705,8 +688,6 @@ public class JudgeFinalOrderGeneratorTest {
                     break;
                 case OTHER:
                     assertEquals("12 days 1 hours 30 minutes", response);
-                    break;
-                default:
                     break;
             }
         }
