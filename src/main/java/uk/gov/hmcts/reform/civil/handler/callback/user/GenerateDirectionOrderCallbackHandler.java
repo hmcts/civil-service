@@ -87,7 +87,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String NOT_ALLOWED_DATE_PAST = "The date in %s may not be before the established date";
     public String defendantTwoPartyName;
     public String claimantTwoPartyName;
-    public String appealNoticeDate = "Appeal notice date";
+    public static final String appealNoticeDate = "Appeal notice date";
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;

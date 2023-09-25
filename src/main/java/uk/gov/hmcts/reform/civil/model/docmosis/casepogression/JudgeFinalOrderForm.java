@@ -47,7 +47,7 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final String furtherHearingLocationAlt;
     private final String furtherHearingMethod;
     private final String hearingNotes;
-    private final boolean appealGranted;
+    private final String appealGranted;
     private final String claimantOrDefendantAppeal;
     private final String tableAorB;
     private final LocalDate appealDate;
