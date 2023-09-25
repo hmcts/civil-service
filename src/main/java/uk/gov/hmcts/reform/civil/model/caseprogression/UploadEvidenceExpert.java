@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Data
 @Builder(toBuilder = true)
@@ -24,5 +25,5 @@ public class UploadEvidenceExpert {
     private LocalDate expertOptionUploadDate;
     private Document expertDocument;
     @Builder.Default
-    private LocalDateTime createdDatetime = LocalDateTime.now();
+    private LocalDateTime createdDatetime = LocalDateTime.now(ZoneId.of("Europe/London"));
 }
