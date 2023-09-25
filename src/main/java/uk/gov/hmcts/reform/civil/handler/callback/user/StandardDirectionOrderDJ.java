@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -89,6 +90,7 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StandardDirectionOrderDJ extends CallbackHandler {
@@ -642,7 +644,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.orderSDODocumentDJ(null);
         assignCategoryId.assignCategoryIdToCollection(caseData.getOrderSDODocumentDJCollection(), document -> document.getValue().getDocumentLink(), "sdo");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
-        var state = "CASE_PROGRESSION";
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
             .getCourtLocationsForDefaultJudgments(authToken));
@@ -660,6 +661,16 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         }
 
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
+
+        String state = "CASE_PROGRESSION";
+
+        String locationEpimms = location != null ? location.getEpimmsId() : caseData.getCaseManagementLocation().getBaseLocation();
+        if (!featureToggleService.isLocationWhiteListedForCaseProgression(locationEpimms)) {
+            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+            //ToDo: state = 'PROCEEDS_IN_HERITAGE_SYSTEM'
+        } else {
+            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
