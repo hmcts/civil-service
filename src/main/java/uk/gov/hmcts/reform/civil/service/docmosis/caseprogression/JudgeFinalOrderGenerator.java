@@ -434,22 +434,15 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantList() != null) {
                 FinalOrdersClaimantRepresentationList type =
                     caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantList();
-                switch (type) {
-                    case COUNSEL_FOR_CLAIMANT:
-                        return format("Counsel for %s, the claimant.", name);
-                    case SOLICITOR_FOR_CLAIMANT:
-                        return format("Solicitor for %s, the claimant.", name);
-                    case COST_DRAFTSMAN_FOR_THE_CLAIMANT:
-                        return format("Costs draftsman for %s, the claimant.", name);
-                    case THE_CLAIMANT_IN_PERSON:
-                        return format("%s, the claimant, in person.", name);
-                    case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT:
-                        return format("A lay representative for %s, the claimant.", name);
-                    case CLAIMANT_NOT_ATTENDING:
-                        return claimantNotAttendingText(caseData, isClaimant2, name);
-                    default:
-                        return "";
-                }
+                return switch (type) {
+                    case COUNSEL_FOR_CLAIMANT -> format("Counsel for %s, the claimant.", name);
+                    case SOLICITOR_FOR_CLAIMANT -> format("Solicitor for %s, the claimant.", name);
+                    case COST_DRAFTSMAN_FOR_THE_CLAIMANT -> format("Costs draftsman for %s, the claimant.", name);
+                    case THE_CLAIMANT_IN_PERSON -> format("%s, the claimant, in person.", name);
+                    case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> format("A lay representative for %s, the claimant.", name);
+                    case CLAIMANT_NOT_ATTENDING -> claimantNotAttendingText(caseData, isClaimant2, name);
+                    default -> "";
+                };
             }
         } else  {
             name = caseData.getApplicant2().getPartyName();
@@ -464,6 +457,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     case THE_CLAIMANT_IN_PERSON -> format("%s, the claimant, in person.", name);
                     case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> format("A lay representative for %s, the claimant.", name);
                     case CLAIMANT_NOT_ATTENDING -> claimantNotAttendingText(caseData, isClaimant2, name);
+                    default -> "";
                 };
             }
         }
@@ -486,6 +480,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> format("A lay representative for %s, the defendant.", name
                     );
                     case DEFENDANT_NOT_ATTENDING -> defendantNotAttendingText(caseData, isDefendant2, name);
+                    default -> "";
                 };
             }
         } else {
@@ -501,6 +496,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     case THE_DEFENDANT_IN_PERSON -> format("%s, the defendant, in person.", name);
                     case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> format("A lay representative for %s, the defendant.", name);
                     case DEFENDANT_NOT_ATTENDING -> defendantNotAttendingText(caseData, isDefendant2, name);
+                    default -> "";
                 };
             }
         }
@@ -520,6 +516,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CANNOT_PROCEED);
                 case NOT_SATISFIED_NOTICE_OF_TRIAL -> format(
                     "%s, the claimant, did not attend the trial. %s", name, NOTICE_NOT_RECIEVED_CANNOT_PROCEED);
+                default -> "";
             };
         } else if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex() != null
             && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedClaimTwoComplex().getListClaimTwo() != null) {
@@ -530,8 +527,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     "%s, the claimant, did not attend the trial. The Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CAN_PROCEED);
                 case SATISFIED_NOTICE_OF_TRIAL -> format(
                     "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CANNOT_PROCEED);
-                case NOT_SATISFIED_NOTICE_OF_TRIAL -> format("%s, the claimant, did not attend the trial. %s", name, NOTICE_NOT_RECIEVED_CANNOT_PROCEED
-                );
+                case NOT_SATISFIED_NOTICE_OF_TRIAL -> format("%s, the claimant, did not attend the trial. %s", name, NOTICE_NOT_RECIEVED_CANNOT_PROCEED);
+                default -> "";
             };
         }
         return "";
@@ -549,6 +546,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 case SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial and, whilst the "
                                                              + "Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CANNOT_PROCEED);
                 case NOT_SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial. %s", name, NOTICE_NOT_RECIEVED_CANNOT_PROCEED);
+                default -> "";
             };
 
         } else if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTrialProcedureDefTwoComplex() != null
@@ -561,6 +559,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 case SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial and, "
                                                              + "whilst the Judge was satisfied that they had %s", name, NOTICE_RECIEVED_CANNOT_PROCEED);
                 case NOT_SATISFIED_NOTICE_OF_TRIAL -> format("%s, the defendant, did not attend the trial. %s", name, NOTICE_NOT_RECIEVED_CANNOT_PROCEED);
+                default -> "";
             };
         }
         return "";
