@@ -50,7 +50,6 @@ import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearings
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.ServiceHearingsCaseLevelMapper.getPublicCaseName;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.VocabularyMapper.getVocabulary;
 import static uk.gov.hmcts.reform.civil.utils.HmctsServiceIDUtils.getHmctsServiceID;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.copyDatesIntoListingTabFields;
 import static uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent;
@@ -168,7 +167,6 @@ public class HearingValuesService {
         }
         return false;
     }
-
 
     /**
      * Tactical solution to update unavailable dates with date and event added.
