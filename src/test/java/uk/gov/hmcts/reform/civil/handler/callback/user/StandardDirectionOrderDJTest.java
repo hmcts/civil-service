@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -48,6 +49,7 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -89,6 +91,11 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private FeatureToggleService featureToggleService;
     @MockBean
     private CategoryService categoryService;
+
+    @BeforeEach
+    void setupTests() {
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -679,7 +686,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldFinishBusinessProcess() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().caseManagementLocation(
+                CaseLocationCivil.builder().baseLocation("00000").build()).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
@@ -747,6 +755,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .orderSDODocumentDJCollection(documentList)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
