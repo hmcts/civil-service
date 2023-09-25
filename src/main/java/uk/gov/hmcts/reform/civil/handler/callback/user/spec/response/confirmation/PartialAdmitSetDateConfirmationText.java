@@ -91,25 +91,25 @@ public class PartialAdmitSetDateConfirmationText implements RespondToClaimConfir
 
             .append("<p>Because you've said you will not pay immediately, ")
             .append(applicantName)
-            .append(" can either:</p>")
-            .append("<ul>")
-            .append("<li>ask you to sign a settlement agreement to formalise the repayment plan</li>")
-            .append("<li>request a county court judgment against you for &#163;")
-            .append(admitOwed).append("</li>")
-            .append("</ul>")
+            .append(" can request a county court judgment against you for &#163;")
+            .append(admitOwed).append(".</p>")
 
             .append("<h3 class=\"govuk-heading-m\">If ")
             .append(applicantName)
             .append(" disagrees that you only owe &#163;")
             .append(admitOwed)
-            .append("</h3>")
-            .append("<p>We'll ask if they want to try mediation. ")
-            .append("If they agree we'll contact you to arrange a call with the mediator.</p>")
-            .append(
-                "<p>If they do not want to try mediation the court will review the case for the full amount of &#163;")
-            .append(totalClaimAmount).append(".</p>")
-
-            .append("<h3 class=\"govuk-heading-m\">If ")
+            .append("</h3>");
+        if (caseData.hasDefendantAgreedToFreeMediation()) {
+            sb.append("<p>We'll ask if they want to try mediation. ")
+              .append("If they agree we'll contact you to arrange a call with the mediator.</p>")
+              .append(
+                        "<p>If they do not want to try mediation the court will review the case for the full amount of &#163;")
+                    .append(totalClaimAmount).append(".</p>");
+        } else {
+            sb.append("<p>The court will review the case for the full amount of &#163;")
+              .append(totalClaimAmount).append(".</p>");
+        }
+        sb.append("<h3 class=\"govuk-heading-m\">If ")
             .append(applicantName)
             .append(" rejects your offer to pay by ")
             .append(DateFormatHelper.formatLocalDate(whenWillYouPay, DATE))
