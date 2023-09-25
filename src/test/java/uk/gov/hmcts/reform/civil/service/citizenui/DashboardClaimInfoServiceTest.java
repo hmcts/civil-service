@@ -160,7 +160,7 @@ public class DashboardClaimInfoServiceTest {
     }
 
     @Test
-    void shouldReturnClaimsForClaimantSuccessfullyWhenLipVLipDisabled() {
+    void shouldReturnOnlyOcmcClaimsForClaimantSuccessfullyWhenLipVLipDisabled() {
         given(featureToggleService.isLipVLipEnabled()).willReturn(false);
 
         DashboardResponse claimsForClaimant = dashboardClaimInfoService.getDashboardClaimantResponse(
