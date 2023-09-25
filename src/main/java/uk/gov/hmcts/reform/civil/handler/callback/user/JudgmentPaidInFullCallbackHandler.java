@@ -68,9 +68,9 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
 
-        if (nonNull(caseData.getJoJudgmentIssuedDate())
+        if (nonNull(caseData.getJoOrderMadeDate())
             && nonNull(caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())) {
-            boolean paidAfter30Days = JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan30Days(caseData.getJoJudgmentIssuedDate(),
+            boolean paidAfter30Days = JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan30Days(caseData.getJoOrderMadeDate(),
                                                                               caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade());
             if (paidAfter30Days) {
                 caseData.getJoJudgmentStatusDetails().setJudgmentStatusTypes(JudgmentStatusType.SATISFIED);

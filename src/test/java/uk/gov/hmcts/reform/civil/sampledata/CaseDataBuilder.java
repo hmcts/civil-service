@@ -5395,7 +5395,7 @@ public class CaseDataBuilder {
             .lastUpdatedDate(LocalDateTime.now()).build();
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .joJudgmentIssuedDate(LocalDate.of(2023, 7, 1))
+            .joOrderMadeDate(LocalDate.of(2023, 7, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
                                       .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
@@ -5410,7 +5410,7 @@ public class CaseDataBuilder {
             .lastUpdatedDate(LocalDateTime.now()).build();
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .joJudgmentIssuedDate(LocalDate.of(2023, 9, 1))
+            .joOrderMadeDate(LocalDate.of(2023, 9, 1))
             .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
                                       .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
                                       .confirmFullPaymentMade(List.of("CONFIRMED"))
