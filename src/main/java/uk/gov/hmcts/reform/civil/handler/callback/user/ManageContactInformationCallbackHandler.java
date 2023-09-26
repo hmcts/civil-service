@@ -383,7 +383,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                                              .build())
                                      .build());
             List<Element<PartyFlagStructure>> updatedApplicantExperts = updatePartyDQExperts(
-                unwrapElements(caseData.getApplicantWitnesses()),
+                unwrapElements(caseData.getApplicantExperts()),
                 unwrapElements(mappedExperts)
             );
             builder.applicantExperts(updatedApplicantExperts);
