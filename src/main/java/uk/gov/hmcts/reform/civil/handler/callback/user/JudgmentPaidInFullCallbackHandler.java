@@ -61,7 +61,7 @@ public class JudgmentPaidInFullCallbackHandler extends CallbackHandler {
     }
 
     private String getBody() {
-        return format("# Judgment marked as paid in full");
+        return format("# The judgment has been marked as paid in full");
     }
 
     private CallbackResponse saveJudgmentPaidInFullDetails(CallbackParams callbackParams) {
