@@ -61,4 +61,23 @@ public class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("manageDocuments").isNotNull();
         }
     }
+
+    @Test
+    void shouldThrowErrorForMediationAgreement() {
+        //Given
+        Element<ManageDocument> document = new Element<>(
+            UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+            ManageDocument.builder()
+                .documentType(ManageDocumentType.MEDIATION_AGREEMENT)
+                .documentName("defendant")
+                .documentLink(Document.builder().build())
+                .build()
+        );
+        CaseData caseData = CaseData.builder().manageDocuments((List.of(document))).build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //Then
+        assertThat(response.getErrors()).isNotNull();
+    }
 }

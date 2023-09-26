@@ -10,15 +10,23 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
+import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
+import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocumentType;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_STAYED;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -41,12 +49,47 @@ public class MediationSuccessfulCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitSuccessfulMediation(CallbackParams callbackParams) {
+        List<Element<ManageDocument>> updatedManageDocumentsList =
+            updateManageDocumentsListWithMediationAgreementDocument(callbackParams);
+
         CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(MEDIATION_SUCCESSFUL))
+            .manageDocuments(updatedManageDocumentsList)
             .build();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
             .state(CASE_STAYED.name())
             .build();
+    }
+
+    private List<Element<ManageDocument>> updateManageDocumentsListWithMediationAgreementDocument(
+        CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        List<Element<ManageDocument>> manageDocumentsList =
+            Optional.ofNullable(caseData.getManageDocuments()).orElse(new ArrayList<>());
+        Optional<MediationAgreementDocument> mediationAgreementDocument = Optional.ofNullable(caseData)
+            .map(data -> data.getMediation())
+            .map(mediation -> mediation.getMediationSuccessful())
+            .map(successful -> successful.getMediationAgreement());
+
+        mediationAgreementDocument.ifPresent(document -> {
+            ManageDocument manageDocument = ManageDocument.builder()
+                .documentLink(document.getDocument())
+                .documentName(document.getName())
+                .documentType(mapDocumentTypeToManageDocumentType(document.getDocumentType()))
+                .build();
+            manageDocumentsList.add(element(manageDocument));
+        });
+        return manageDocumentsList;
+    }
+
+    private ManageDocumentType mapDocumentTypeToManageDocumentType(DocumentType documentType) {
+        switch (documentType) {
+            case MEDIATION_AGREEMENT:
+                return ManageDocumentType.MEDIATION_AGREEMENT;
+            default:
+                return null;
+        }
     }
 }
