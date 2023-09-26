@@ -21,15 +21,19 @@ public class RepresentativeService {
     private final OrganisationService organisationService;
     private final FeatureToggleService featureToggleService;
 
-    private boolean doesOrganisationPolicyExist(OrganisationPolicy organisationPolicy) {
-        return organisationPolicy != null
-            && organisationPolicy.getOrganisation() != null
-            && organisationPolicy.getOrganisation().getOrganisationID() != null;
+    private boolean doesOrganisationPolicyExist(OrganisationPolicy organisationPolicy, String organisationIDCopy) {
+        return organisationPolicy != null && organisationPolicy.getOrganisation() != null
+            && (organisationPolicy.getOrganisation().getOrganisationID() != null || organisationIDCopy != null);
     }
 
     public Representative getRespondent1Representative(CaseData caseData) {
-        if (doesOrganisationPolicyExist(caseData.getRespondent1OrganisationPolicy())) {
-            var organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+        if (doesOrganisationPolicyExist(caseData.getRespondent1OrganisationPolicy(), caseData.getRespondent1OrganisationIDCopy())) {
+            var organisationId = caseData.getRespondent1OrganisationIDCopy();
+
+            if (organisationId == null || organisationId.isEmpty()) {
+                organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+            }
+
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
 
@@ -54,8 +58,13 @@ public class RepresentativeService {
     }
 
     public Representative getRespondent2Representative(CaseData caseData) {
-        if (doesOrganisationPolicyExist(caseData.getRespondent2OrganisationPolicy())) {
-            var organisationId = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+        if (doesOrganisationPolicyExist(caseData.getRespondent2OrganisationPolicy(), caseData.getRespondent2OrganisationIDCopy())) {
+            var organisationId = caseData.getRespondent2OrganisationIDCopy();
+
+            if (organisationId == null || organisationId.isEmpty()) {
+                organisationId = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+            }
+
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
 
