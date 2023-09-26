@@ -22,7 +22,12 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
 
     private static final DQLipFormMapperFactory MAPPER_FACTORY = new DQLipFormMapperFactory();
 
-    public DirectionQuestionnaireLipResponseGenerator(DocumentManagementService documentManagementService, DocumentGeneratorService documentGeneratorService, StateFlowEngine stateFlowEngine, RepresentativeService representativeService, FeatureToggleService featureToggleService, LocationRefDataService locationRefDataService) {
+    public DirectionQuestionnaireLipResponseGenerator(DocumentManagementService documentManagementService,
+                                                      DocumentGeneratorService documentGeneratorService,
+                                                      StateFlowEngine stateFlowEngine,
+                                                      RepresentativeService representativeService,
+                                                      FeatureToggleService featureToggleService,
+                                                      LocationRefDataService locationRefDataService) {
         super(
             documentManagementService,
             documentGeneratorService,
@@ -48,7 +53,8 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
 
     @Override
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
-        if ((caseData.isRespondent1NotRepresented() || caseData.isApplicantNotRepresented()) && getFeatureToggleService().isLipVLipEnabled()) {
+        if ((caseData.isRespondent1NotRepresented() || caseData.isApplicantNotRepresented())
+            && getFeatureToggleService().isLipVLipEnabled()) {
             return DQ_LIP_RESPONSE;
         }
         return super.getTemplateId(caseData);
