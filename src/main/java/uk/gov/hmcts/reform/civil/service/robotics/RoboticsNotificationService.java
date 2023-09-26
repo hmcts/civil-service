@@ -53,9 +53,6 @@ public class RoboticsNotificationService {
         log.info(String.format("Start notifyRobotics and case data is not null %s", caseData.getLegacyCaseReference()));
         Optional<EmailData> emailData = prepareEmailData(RoboticsEmailParams.builder().caseData(caseData).authToken(
             authToken).isMultiParty(isMultiParty).build());
-        log.info(String.format("Email data: to information  %s", emailData.get().getTo()));
-        log.info("----------- EMAILDATA INFO -----------------");
-        log.info(String.valueOf(emailData.get()));
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
 
@@ -64,6 +61,9 @@ public class RoboticsNotificationService {
                                                               .caseData(caseData)
                                                               .isMultiParty(false).build());
         log.info(String.format("Start notifyDefaultJudgementLip and case data is not null %s", caseData.getLegacyCaseReference()));
+        log.info(String.format("Email data: to information  %s", emailData.get().getTo()));
+        log.info("----------- EMAILDATA INFO -----------------");
+        log.info(String.valueOf(emailData.get()));
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
 
