@@ -314,6 +314,7 @@ public class ManageContactInformationUtils {
     private static String formatId(String partyChosen, String isAdmin, Party party) {
         return String.format("%s_%s_%s", partyChosen, isAdmin, party.getType().toString());
     }
+
     private static String formatId(String partyChosen, String isAdmin) {
         return String.format("%s_%s", partyChosen, isAdmin);
     }

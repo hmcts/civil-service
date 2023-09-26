@@ -82,6 +82,7 @@ public interface NotificationData {
     String NEW_SOL = "new solicitor";
     String FORMER_SOL = "former solicitor";
     String OTHER_SOL_NAME = "other solicitor name";
+    String EXTERNAL_ID = "externalId";
 
     Map<String, String> addProperties(CaseData caseData);
 

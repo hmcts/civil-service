@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
-public class DashboardDefendantResponse {
+public class DashboardResponse {
 
     private List<DashboardClaimInfo> claims;
     private double totalPages;
