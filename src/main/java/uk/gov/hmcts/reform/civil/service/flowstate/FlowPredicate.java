@@ -972,6 +972,9 @@ public class FlowPredicate {
         && caseData.getListingOrRelisting().equals(LISTING)
         && caseData.getCaseDismissedHearingFeeDueDate() == null
         && caseData.getTakenOfflineDate() == null;
-       
+
     public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
+
+    public static final Predicate<CaseData> casemanMarksMediationUnsuccessful = caseData ->
+        Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason());
 }
