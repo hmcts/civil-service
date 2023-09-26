@@ -273,9 +273,9 @@ public class ManageContactInformationUtils {
             return null;
         }
         for (Witness witness : witnesses) {
-            updateToLevelPartyInfo(witness.getPartyID(), witness.getFirstName(), witness.getLastName(),
-                                   witness.getPhoneNumber(), witness.getEmailAddress(),
-                                   existingParties, updatedPartyWitnesses);
+            updateTopLevelPartyInfo(witness.getPartyID(), witness.getFirstName(), witness.getLastName(),
+                                    witness.getPhoneNumber(), witness.getEmailAddress(),
+                                    existingParties, updatedPartyWitnesses);
         }
         return wrapElements(updatedPartyWitnesses);
     }
@@ -286,15 +286,15 @@ public class ManageContactInformationUtils {
             return null;
         }
         for (Expert expert : experts) {
-            updateToLevelPartyInfo(expert.getPartyID(), expert.getFirstName(), expert.getLastName(),
-                                   expert.getPhoneNumber(), expert.getEmailAddress(),
-                                   existingParties, updatedPartyExperts);
+            updateTopLevelPartyInfo(expert.getPartyID(), expert.getFirstName(), expert.getLastName(),
+                                    expert.getPhoneNumber(), expert.getEmailAddress(),
+                                    existingParties, updatedPartyExperts);
         }
         return wrapElements(updatedPartyExperts);
     }
 
-    private static void updateToLevelPartyInfo(String partyId, String firstName, String lastName, String phoneNumber, String email,
-                                               List<PartyFlagStructure> existingParties, List<PartyFlagStructure> updatedParties) {
+    private static void updateTopLevelPartyInfo(String partyId, String firstName, String lastName, String phoneNumber, String email,
+                                                List<PartyFlagStructure> existingParties, List<PartyFlagStructure> updatedParties) {
         existingParties.stream().filter(p -> p.getPartyID().equals(partyId)).findFirst()
             .map(p -> updatedParties.add(p.toBuilder()
                                              .firstName(firstName)
