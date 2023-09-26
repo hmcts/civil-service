@@ -15,10 +15,10 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LIP_V_LIP_RESPONSE;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DQ_LIP_RESPONSE;
 
 @Service
-public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuestionnaireGenerator{
+public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuestionnaireGenerator {
 
     private static final DQLipFormMapperFactory MAPPER_FACTORY = new DQLipFormMapperFactory();
 
@@ -48,8 +48,8 @@ public class DirectionQuestionnaireLipResponseGenerator extends DirectionsQuesti
 
     @Override
     protected DocmosisTemplates getTemplateId(CaseData caseData) {
-        if ((caseData.isRespondent1NotRepresented()||caseData.isApplicantNotRepresented()) && getFeatureToggleService().isLipVLipEnabled()) {
-            return DQ_LIP_V_LIP_RESPONSE;
+        if ((caseData.isRespondent1NotRepresented() || caseData.isApplicantNotRepresented()) && getFeatureToggleService().isLipVLipEnabled()) {
+            return DQ_LIP_RESPONSE;
         }
         return super.getTemplateId(caseData);
     }

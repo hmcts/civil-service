@@ -18,12 +18,15 @@ import static uk.gov.hmcts.reform.civil.model.docmosis.dq.ExpertReportTemplate.t
 
 public abstract class DQLipFormMapper {
 
-    abstract protected List<HearingLipSupportRequirements> toHearingSupportRequirements(Optional<CaseDataLiP> caseDataLiPOptional);
-    abstract protected DQExtraDetailsLip getDQExtraDetails(Optional<CaseDataLiP> caseDataLiPOptional);
-    abstract protected Optional<ExpertLiP> getExpertLip(DQExtraDetailsLip dqExtraDetailsLip);
-    abstract protected String getStatementOfTruthName(CaseData caseData);
+    protected abstract List<HearingLipSupportRequirements> toHearingSupportRequirements(Optional<CaseDataLiP> caseDataLiPOptional);
 
-    public DirectionsQuestionnaireForm addLipDQs(DirectionsQuestionnaireForm form, Optional<CaseDataLiP> caseDataLiPOptional){
+    protected abstract DQExtraDetailsLip getDQExtraDetails(Optional<CaseDataLiP> caseDataLiPOptional);
+
+    protected abstract Optional<ExpertLiP> getExpertLip(DQExtraDetailsLip dqExtraDetailsLip);
+
+    protected abstract String getStatementOfTruthName(CaseData caseData);
+
+    public DirectionsQuestionnaireForm addLipDQs(DirectionsQuestionnaireForm form, Optional<CaseDataLiP> caseDataLiPOptional) {
         var builder = form.toBuilder();
         builder.hearingLipSupportRequirements(toHearingSupportRequirements(caseDataLiPOptional));
         var dqExtraDetails = getDQExtraDetails(caseDataLiPOptional);
@@ -41,7 +44,7 @@ public abstract class DQLipFormMapper {
                                    .build())
                 .lipExperts(LipExperts.builder()
                                 .details(expertLip.map(ExpertLiP::getUnwrappedDetails).map(Collection::stream)
-                                             .map(stream -> stream.map(item ->toExpertReportTemplate(item)).toList())
+                                             .map(stream -> stream.map(item -> toExpertReportTemplate(item)).toList())
                                              .orElse(Collections.emptyList()))
                                 .caseNeedsAnExpert(expertLip
                                                        .map(ExpertLiP::getCaseNeedsAnExpert).orElse(null))
@@ -57,6 +60,4 @@ public abstract class DQLipFormMapper {
         }
         return builder.build();
     }
-
-
 }

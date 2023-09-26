@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;

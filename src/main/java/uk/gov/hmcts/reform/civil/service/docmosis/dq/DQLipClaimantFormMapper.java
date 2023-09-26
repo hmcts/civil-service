@@ -13,7 +13,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements.toHearingSupportRequirementsList;
 
-public class DQLipClaimantFormMapper extends DQLipFormMapper{
+public class DQLipClaimantFormMapper extends DQLipFormMapper {
 
     @Override
     protected List<HearingLipSupportRequirements> toHearingSupportRequirements(Optional<CaseDataLiP> caseDataLiPOptional) {
