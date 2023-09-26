@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -101,6 +102,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateSDOCallbackHandler extends CallbackHandler {
@@ -860,6 +862,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.sdoOrderDocument(null);
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
+
+        if (featureToggleService.isLocationWhiteListedForCaseProgression(
+            caseData.getCaseManagementLocation().getBaseLocation())) {
+            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+        } else {
+            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))

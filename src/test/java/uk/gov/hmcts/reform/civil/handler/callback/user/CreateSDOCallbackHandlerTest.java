@@ -67,6 +67,7 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -193,7 +194,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
@@ -201,6 +204,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
+
+            given(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).willReturn(true);
         }
 
         @Test
