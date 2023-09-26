@@ -38,6 +38,4 @@ class DQLipFormMapperFactoryTest {
         //Then
         assertThat(mapper).isInstanceOf(DQLipDefendantFormMapper.class);
     }
-
-
 }
