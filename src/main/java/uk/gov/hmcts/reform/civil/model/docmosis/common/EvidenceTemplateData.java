@@ -6,7 +6,10 @@ import lombok.Builder;
 import lombok.Getter;
 import uk.gov.hmcts.reform.civil.model.Evidence;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Getter
 @Builder
@@ -20,6 +23,14 @@ public class EvidenceTemplateData {
         return EvidenceTemplateData.builder().type(evidence.getValue().getEvidenceType())
             .explanation(evidence.getValue().getEvidenceDescription())
             .build();
+    }
+
+    @JsonIgnore
+    public static List<EvidenceTemplateData> toEvidenceTemplateDataList(List<Evidence> evidenceList) {
+        return Optional.ofNullable(evidenceList).map(Collection::stream)
+            .orElseGet(Stream::empty)
+            .map(evidence -> EvidenceTemplateData.toEvidenceTemplateData(evidence))
+            .toList();
     }
 
     @JsonProperty("displayTypeValue")
