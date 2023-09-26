@@ -14,10 +14,12 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
@@ -34,6 +36,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDate;
 import java.util.List;
@@ -72,7 +75,8 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFE
 @SpringBootTest(classes = {
     ManageContactInformationCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
+    CaseDetailsConverter.class,
+    PostcodeValidator.class
 })
 class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -87,6 +91,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
+
+    @MockBean
+    private PostcodeValidator postcodeValidator;
 
     private static final UserInfo ADMIN_USER = UserInfo.builder()
         .roles(List.of("caseworker-civil-admin"))
@@ -1031,6 +1038,35 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getWarnings()).isEmpty();
+        }
+
+        @Test
+        void shouldReturnPostcodeError() {
+            given(postcodeValidator.validate(any())).willReturn(List.of("Please enter Postcode"));
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(CLAIMANT_ONE_ID)
+                                                                   .build())
+                                                        .build())
+                                       .build())
+                .applicant1(Party.builder()
+                                .type(INDIVIDUAL)
+                                .primaryAddress(Address.builder()
+                                                    .postCode(null)
+                                                    .build())
+                                .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNotNull();
+            assertEquals(1, response.getErrors().size());
+            assertEquals("Please enter Postcode", response.getErrors().get(0));
         }
     }
 

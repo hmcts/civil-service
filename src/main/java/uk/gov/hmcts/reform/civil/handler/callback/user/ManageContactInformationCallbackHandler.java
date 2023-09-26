@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.ArrayList;
@@ -39,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -96,6 +99,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private final UserService userService;
     private final ObjectMapper objectMapper;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final PostcodeValidator postcodeValidator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -113,86 +117,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse showWarning(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
-        ArrayList<String> warnings = new ArrayList<>();
-
-        if (partyHasLitigationFriend(partyChosen, caseData)) {
-            warnings.add(CHECK_LITIGATION_FRIEND_ERROR_TITLE);
-            warnings.add(CHECK_LITIGATION_FRIEND_ERROR);
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .warnings(warnings)
-            .build();
-    }
-
-    private Boolean partyHasLitigationFriend(String partyChosen, CaseData caseData) {
-        if (hasLitigationFriend(CLAIMANT_ONE_ID, partyChosen, caseData.getApplicant1LitigationFriendRequired())
-            || hasLitigationFriend(CLAIMANT_TWO_ID, partyChosen, caseData.getApplicant2LitigationFriendRequired())
-            || hasLitigationFriend(DEFENDANT_ONE_ID, partyChosen, caseData.getRespondent1LitigationFriend())
-            || hasLitigationFriend(DEFENDANT_TWO_ID, partyChosen, caseData.getRespondent2LitigationFriend())
-        ) {
-            return true;
-        }
-        return false;
-    }
-
-    private Boolean hasLitigationFriend(String id, String partyChosen, YesOrNo litigationFriend) {
-        return id.equals(partyChosen) && YES.equals(litigationFriend);
-    }
-
-    private Boolean hasLitigationFriend(String id, String partyChosen, LitigationFriend litigationFriend) {
-        return id.equals(partyChosen) && litigationFriend != null;
-    }
-
-    private CallbackResponse showPartyField(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
-
-        String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
-        String partyChosenType = null;
-
-        if (isParty(partyChosen) || isLitigationFriend(partyChosen)) {
-            // Party fields are empty in this mid event, this is a workaround
-            CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-            boolean isAdmin = isAdmin(authToken);
-            partyChosenType = appendUserAndType(partyChosen, oldCaseData, isAdmin);
-        }
-
-        UpdateDetailsForm.UpdateDetailsFormBuilder formBuilder = caseData.getUpdateDetailsForm().toBuilder()
-            .partyChosenId(partyChosen)
-            .partyChosenType(partyChosenType)
-            .updateExpertsDetailsForm(prepareExperts(partyChosen, caseData))
-            .updateWitnessesDetailsForm(prepareWitnesses(partyChosen, caseData))
-            .build().toBuilder();
-
-        builder.updateDetailsForm(formBuilder.build());
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private Boolean isParty(String partyChosen) {
-        return CLAIMANT_ONE_ID.equals(partyChosen)
-            || CLAIMANT_TWO_ID.equals(partyChosen)
-            || DEFENDANT_ONE_ID.equals(partyChosen)
-            || DEFENDANT_TWO_ID.equals(partyChosen);
-    }
-
-    private Boolean isLitigationFriend(String partyChosen) {
-        return CLAIMANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
-            || CLAIMANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen)
-            || DEFENDANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
-            || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen);
-    }
-
     private CallbackResponse prepareEvent(CallbackParams callbackParams) {
+        //TODO: 1v2DS/SS -> LR to show LR org 1/2 dependning on MP
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
@@ -289,6 +215,131 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         return Collections.emptyList();
     }
 
+    private String getPostCode(String partyChosen, CaseData caseData) {
+        switch (partyChosen) {
+            case CLAIMANT_ONE_ID: {
+                return getPartyPostCode(caseData.getApplicant1());
+            }
+            case CLAIMANT_TWO_ID: {
+                return getPartyPostCode(caseData.getApplicant2());
+            }
+            case DEFENDANT_ONE_ID: {
+                return getPartyPostCode(caseData.getRespondent1());
+            }
+            case DEFENDANT_TWO_ID: {
+                return getPartyPostCode(caseData.getRespondent2());
+            }
+            case CLAIMANT_ONE_LITIGATION_FRIEND_ID: {
+                return getPartyPostCode(caseData.getApplicant1LitigationFriend());
+            }
+            case CLAIMANT_TWO_LITIGATION_FRIEND_ID: {
+                return getPartyPostCode(caseData.getApplicant2LitigationFriend());
+            }
+            case DEFENDANT_ONE_LITIGATION_FRIEND_ID: {
+                return getPartyPostCode(caseData.getRespondent1LitigationFriend());
+            }
+            case DEFENDANT_TWO_LITIGATION_FRIEND_ID: {
+                return getPartyPostCode(caseData.getRespondent2LitigationFriend());
+            }
+            default: {
+                return null;
+            }
+        }
+    }
+
+    private String getPartyPostCode(Party party) {
+        return party.getPrimaryAddress().getPostCode();
+    }
+
+    private String getPartyPostCode(LitigationFriend party) {
+        return party.getPrimaryAddress().getPostCode();
+    }
+
+    private CallbackResponse showWarning(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
+        ArrayList<String> warnings = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+
+        if (partyHasLitigationFriend(partyChosen, caseData)) {
+            warnings.add(CHECK_LITIGATION_FRIEND_ERROR_TITLE);
+            warnings.add(CHECK_LITIGATION_FRIEND_ERROR);
+        }
+
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            errors = postcodeValidator.validate(getPostCode(partyChosen, caseData));
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .warnings(warnings)
+            .errors(errors)
+            .build();
+    }
+
+    private Boolean partyHasLitigationFriend(String partyChosen, CaseData caseData) {
+        if (hasLitigationFriend(CLAIMANT_ONE_ID, partyChosen, caseData.getApplicant1LitigationFriendRequired())
+            || hasLitigationFriend(CLAIMANT_TWO_ID, partyChosen, caseData.getApplicant2LitigationFriendRequired())
+            || hasLitigationFriend(DEFENDANT_ONE_ID, partyChosen, caseData.getRespondent1LitigationFriend())
+            || hasLitigationFriend(DEFENDANT_TWO_ID, partyChosen, caseData.getRespondent2LitigationFriend())
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    private Boolean hasLitigationFriend(String id, String partyChosen, YesOrNo litigationFriend) {
+        return id.equals(partyChosen) && YES.equals(litigationFriend);
+    }
+
+    private Boolean hasLitigationFriend(String id, String partyChosen, LitigationFriend litigationFriend) {
+        return id.equals(partyChosen) && litigationFriend != null;
+    }
+
+    private CallbackResponse showPartyField(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+
+        String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
+        String partyChosenType = null;
+
+        if (isParty(partyChosen) || isLitigationFriend(partyChosen)) {
+            // Party fields are empty in this mid event, this is a workaround
+            CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+            boolean isAdmin = isAdmin(authToken);
+            partyChosenType = appendUserAndType(partyChosen, oldCaseData, isAdmin);
+        }
+
+        UpdateDetailsForm.UpdateDetailsFormBuilder formBuilder = caseData.getUpdateDetailsForm().toBuilder()
+            .partyChosenId(partyChosen)
+            .partyChosenType(partyChosenType)
+            .updateExpertsDetailsForm(prepareExperts(partyChosen, caseData))
+            .updateWitnessesDetailsForm(prepareWitnesses(partyChosen, caseData))
+            .build().toBuilder();
+
+        builder.updateDetailsForm(formBuilder.build());
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private Boolean isParty(String partyChosen) {
+        return CLAIMANT_ONE_ID.equals(partyChosen)
+            || CLAIMANT_TWO_ID.equals(partyChosen)
+            || DEFENDANT_ONE_ID.equals(partyChosen)
+            || DEFENDANT_TWO_ID.equals(partyChosen);
+    }
+
+    private Boolean isLitigationFriend(String partyChosen) {
+        return CLAIMANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || CLAIMANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || DEFENDANT_ONE_LITIGATION_FRIEND_ID.equals(partyChosen)
+            || DEFENDANT_TWO_LITIGATION_FRIEND_ID.equals(partyChosen);
+    }
+
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
@@ -304,7 +355,9 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         }
 
         // clear updateDetailsForm
-        builder.updateDetailsForm(null);
+        builder.updateDetailsForm(UpdateDetailsForm.builder()
+                                      .manageContactDetailsEventUsed(YES)
+                                      .build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))

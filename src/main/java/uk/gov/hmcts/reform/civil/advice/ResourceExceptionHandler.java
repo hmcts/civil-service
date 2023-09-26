@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.advice;
 
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,14 @@ public class ResourceExceptionHandler {
     public ResponseEntity<Object> notFound(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({ClientAbortException.class})
+    public ResponseEntity<String> handleClientAbortException(Exception exception) {
+        log.debug(exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(),
+                                    new HttpHeaders(), HttpStatus.REQUEST_TIMEOUT
+        );
     }
 
     @ExceptionHandler({
