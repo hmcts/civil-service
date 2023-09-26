@@ -211,12 +211,22 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealGrantedDropdown")
                 .extracting("appealChoiceSecondDropdownA")
                 .extracting("appealGrantedRefusedDate")
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealGrantedDropdown")
+                .extracting("appealChoiceSecondDropdownB")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealRefusedDropdown")
+                .extracting("appealChoiceSecondDropdownA")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealRefusedDropdown")
                 .extracting("appealChoiceSecondDropdownB")
                 .extracting("appealGrantedRefusedDate")
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
@@ -310,12 +320,22 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealGrantedDropdown")
                 .extracting("appealChoiceSecondDropdownA")
                 .extracting("appealGrantedRefusedDate")
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealGrantedDropdown")
+                .extracting("appealChoiceSecondDropdownB")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealRefusedDropdown")
+                .extracting("appealChoiceSecondDropdownA")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealRefusedDropdown")
                 .extracting("appealChoiceSecondDropdownB")
                 .extracting("appealGrantedRefusedDate")
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
@@ -439,7 +459,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                                     .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                     .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                                        .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
                                                                                                                         .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
                                                                                                                         .build()).build()).build()).build()
@@ -448,10 +468,28 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                                     .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                     .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                                        .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
                                                                                                                         .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
                                                                                                                         .build()).build()).build()).build()
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                                     .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                                .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                                 .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                                                 .build()).build()).build()).build()
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                                     .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                                .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                                 .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                                                 .build()).build()).build()).build()
                 )
             );
         }
@@ -524,7 +562,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                                     .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                     .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                                        .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
                                                                                                                         .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
                                                                                                                         .build()).build()).build()).build(),
@@ -534,10 +572,30 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                                     .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                     .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                                        .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
                                                                                                                         .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
                                                                                                                         .build()).build()).build()).build(),
+                    "The date in Appeal notice date may not be before the established date"
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                                     .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                                .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                                 .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
+                                                                                                                 .build()).build()).build()).build(),
+                    "The date in Appeal notice date may not be before the established date"
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                                     .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                                .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                                 .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
+                                                                                                                 .build()).build()).build()).build(),
                     "The date in Appeal notice date may not be before the established date"
                 )
             );
