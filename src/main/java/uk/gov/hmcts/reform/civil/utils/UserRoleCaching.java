@@ -21,7 +21,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 @RequiredArgsConstructor
 public class UserRoleCaching {
 
-
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
 
@@ -37,7 +36,7 @@ public class UserRoleCaching {
 
     @Bean(name = "userCacheManager")
     @SessionScope(proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public CacheManager getCacheManager(){
+    public CacheManager getCacheManager() {
         return new ConcurrentMapCacheManager();
     }
 
