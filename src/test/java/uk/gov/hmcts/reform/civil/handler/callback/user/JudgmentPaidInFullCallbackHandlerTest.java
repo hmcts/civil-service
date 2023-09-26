@@ -133,7 +133,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);
             Assertions.assertTrue(response.getConfirmationHeader().contains("# Judgment marked as paid in full"));
-            Assertions.assertTrue(response.getConfirmationBody().contains("Judgment marked as paid in full"));
+            Assertions.assertTrue(response.getConfirmationBody().contains("The judgment has been marked as paid in full"));
         }
     }
 }
