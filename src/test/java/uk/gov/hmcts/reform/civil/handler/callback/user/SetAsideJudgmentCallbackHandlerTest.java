@@ -70,7 +70,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-setAside-date");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).contains("Date of order must not be a future date");
+            assertThat(response.getErrors()).contains("Date must be in the past");
         }
 
         @Test
