@@ -408,8 +408,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 .build();
 
             organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
-            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build())
-                .respondent2OrganisationIDCopy(caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
+
+            caseDataBuilder.respondent2OrganisationPolicy(
+                organisationPolicy2Builder
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .build()
+            );
+
+            caseDataBuilder.respondent2OrganisationIDCopy(
+                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+            );
         }
     }
 

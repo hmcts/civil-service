@@ -1137,8 +1137,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
             assertThat(respondent2OrgPolicy)
-                .extracting("Organisation").extracting("OrganisationID")
-                .isNull();
+                .extracting("Organisation").extracting("OrganisationID").isNull();
             assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
             assertThat(response.getData()).extracting("respondent2OrganisationIDCopy").isEqualTo("org1");
         }
