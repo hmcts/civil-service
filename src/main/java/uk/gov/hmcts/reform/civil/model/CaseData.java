@@ -621,6 +621,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
     private LocalDate joPaymentToBeMadeByDate;
     private YesOrNo joIsLiveJudgmentExists;
+    private LocalDate joSetAsideDate;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
