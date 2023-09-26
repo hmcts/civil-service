@@ -1,18 +1,20 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dq;
 
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
-import uk.gov.hmcts.reform.civil.model.docmosis.dq.ExpertReportTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.HearingLipSupportRequirements;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExperts;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.LipExtraDQ;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.model.docmosis.dq.ExpertReportTemplate.toExpertReportTemplate;
 
 public abstract class DQLipFormMapper {
 
@@ -38,11 +40,9 @@ public abstract class DQLipFormMapper {
                                    .wantPhoneOrVideoHearing(dqExtraDetails.getWantPhoneOrVideoHearing())
                                    .build())
                 .lipExperts(LipExperts.builder()
-                                .details(dqExtraDetails
-                                             .getReportExpertDetails()
-                                             .stream()
-                                             .map(ExpertReportTemplate::toExpertReportTemplate)
-                                             .toList())
+                                .details(expertLip.map(ExpertLiP::getUnwrappedDetails).map(Collection::stream)
+                                             .map(stream -> stream.map(item ->toExpertReportTemplate(item)).toList())
+                                             .orElse(Collections.emptyList()))
                                 .caseNeedsAnExpert(expertLip
                                                        .map(ExpertLiP::getCaseNeedsAnExpert).orElse(null))
                                 .expertCanStillExamineDetails(expertLip
