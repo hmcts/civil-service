@@ -35,7 +35,7 @@ public class SetAsideJudgmentCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(SET_ASIDE_JUDGMENT);
     protected final ObjectMapper objectMapper;
-    private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date of order must not be a future date";
+    private static final String ERROR_MESSAGE_DATE_ORDER_MUST_BE_IN_PAST = "Date must be in the past";
 
     @Override
     protected Map<String, Callback> callbacks() {
