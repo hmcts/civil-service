@@ -301,8 +301,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                   .documentFileName("response_sealed_form.pdf")
                                   .documentBinaryUrl("binary-url")
                                   .build()).build();
-
-
             List<Element<CaseDocument>> documentList = new ArrayList<>();
             documentList.add(element(testDocument1));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
