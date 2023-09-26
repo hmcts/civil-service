@@ -1018,9 +1018,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public LocalDateTime getRespondentResponseDate() {
-        LocalDateTime responseDate = null != getRespondent1ResponseDate() ? getRespondent1ResponseDate() : getRespondent2ResponseDate();
-        return responseDate.isBefore(LocalDateTime.now()) ? LocalDateTime.now() : responseDate;
+    public boolean isTranslatedDocumentUploaded() {
+        if (getSystemGeneratedCaseDocuments() != null) {
+            return getSystemGeneratedCaseDocuments().stream()
+                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                   .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
+        }
+        return false;
     }
-
 }
