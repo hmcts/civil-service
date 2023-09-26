@@ -67,8 +67,6 @@ class MediationSuccessfulCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("manageDocuments").isNotNull();
             assertThat(response.getState())
                 .isEqualTo(CaseState.CASE_STAYED.name());
-
-
         }
     }
 }
