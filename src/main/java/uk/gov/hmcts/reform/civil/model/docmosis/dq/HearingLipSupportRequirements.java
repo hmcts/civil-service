@@ -36,7 +36,7 @@ public class HearingLipSupportRequirements {
 
     @JsonIgnore
     public static List<HearingLipSupportRequirements> toHearingSupportRequirementsList(Optional<HearingSupportLip> hearingSupportLip) {
-       return  hearingSupportLip.map(HearingSupportLip::getUnwrappedRequirementsLip)
+        return hearingSupportLip.map(HearingSupportLip::getUnwrappedRequirementsLip)
             .map(Collection::stream)
             .map(items -> items.map(item -> toHearingSupportRequirements(item))
                 .toList())

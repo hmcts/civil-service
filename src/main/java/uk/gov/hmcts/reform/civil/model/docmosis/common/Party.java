@@ -23,7 +23,7 @@ public class Party {
     private final String litigationFriendEmailAddress;
     private final String legalRepHeading;
 
-    public static Party toLipParty(uk.gov.hmcts.reform.civil.model.Party party){
+    public static Party toLipParty(uk.gov.hmcts.reform.civil.model.Party party) {
         return Party.builder()
             .name(party.getPartyName())
             .emailAddress(party.getPartyEmail())

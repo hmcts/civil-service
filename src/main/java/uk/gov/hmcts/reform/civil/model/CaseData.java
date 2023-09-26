@@ -1012,7 +1012,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getCurrentCamundaBusinessProcessName() {
-       return ofNullable(getBusinessProcess())
+        return ofNullable(getBusinessProcess())
             .map(BusinessProcess::getCamundaEvent)
             .orElse(null);
     }
