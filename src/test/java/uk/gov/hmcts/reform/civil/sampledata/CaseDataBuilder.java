@@ -121,6 +121,10 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -5370,6 +5374,44 @@ public class CaseDataBuilder {
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
+    }
+
+    public CaseData buildJudmentOnlineCaseDataWithPaymentByInstalment() {
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .joJudgmentInstalmentDetails(JudgmentInstalmentDetails.builder()
+                                             .firstInstalmentDate(LocalDate.of(2022, 12, 12))
+                                             .instalmentAmount("120")
+                                             .paymentFrequency(PaymentFrequency.MONTHLY).build())
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IN_INSTALMENTS)
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .joIsRegisteredWithRTL(YES).build();
+    }
+
+    public CaseData buildJudmentOnlineCaseDataWithPaymentImmediately() {
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IMMEDIATELY)
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .joIsRegisteredWithRTL(YES).build();
+    }
+
+    public CaseData buildJudmentOnlineCaseDataWithPaymentByDate() {
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlanSelection(PaymentPlanSelection.PAY_BY_DATE)
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .joPaymentToBeMadeByDate(LocalDate.of(2023, 12, 12))
+            .joIsRegisteredWithRTL(YES).build();
     }
 
     public CaseDataBuilder setUnassignedCaseListDisplayOrganisationReferences() {
