@@ -1016,6 +1016,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(BusinessProcess::getCamundaEvent)
             .orElse(null);
     }
+
     @JsonIgnore
     public boolean isTranslatedDocumentUploaded() {
         if (getSystemGeneratedCaseDocuments() != null) {
