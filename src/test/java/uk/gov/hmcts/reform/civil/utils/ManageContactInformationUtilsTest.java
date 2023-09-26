@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.appe
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapExpertsToUpdatePartyDetailsForm;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses;
+
 class ManageContactInformationUtilsTest {
 
     @Test

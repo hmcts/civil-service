@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +37,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private final SpecReferenceNumberRepository specReferenceNumberRepository;
     private final Time time;
     private final ObjectMapper objectMapper;
+    private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -66,6 +68,8 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.submittedDate(time.now());
+        // Add back Pip in post to temporary pass the email event
+        caseDataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         if (Optional.ofNullable(callbackParams.getRequest()).map(CallbackRequest::getEventId).isPresent()) {
             caseDataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             caseDataBuilder.businessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));

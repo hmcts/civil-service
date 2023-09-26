@@ -23,8 +23,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
@@ -114,25 +113,27 @@ public class CasesController {
 
     @GetMapping(path = "/claimant/{submitterId}")
     @Operation(summary = "Gets basic claim information for claimant")
-    public ResponseEntity<List<DashboardClaimInfo>> getClaimsForClaimant(
-        @PathVariable("submitterId") String submitterId,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
-    ) {
-        List<DashboardClaimInfo> ocmcClaims = dashboardClaimInfoService.getClaimsForClaimant(
-            authorization,
-            submitterId
-        );
-        return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/defendant/{submitterId}")
-    @Operation(summary = "Gets basic claim information for defendant")
-    public ResponseEntity<DashboardDefendantResponse> getClaimsForDefendant(
+    public ResponseEntity<DashboardResponse> getClaimsForClaimant(
         @PathVariable("submitterId") String submitterId,
         @RequestParam(value = "page", defaultValue = "1") int currentPage,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
     ) {
-        DashboardDefendantResponse defendantClaims = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimantClaims = dashboardClaimInfoService.getDashboardClaimantResponse(
+            authorization,
+            submitterId,
+            currentPage
+        );
+        return new ResponseEntity<>(claimantClaims, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/defendant/{submitterId}")
+    @Operation(summary = "Gets basic claim information for defendant")
+    public ResponseEntity<DashboardResponse> getClaimsForDefendant(
+        @PathVariable("submitterId") String submitterId,
+        @RequestParam(value = "page", defaultValue = "1") int currentPage,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
+    ) {
+        DashboardResponse defendantClaims = dashboardClaimInfoService.getDashboardDefendantResponse(
             authorization,
             submitterId,
             currentPage

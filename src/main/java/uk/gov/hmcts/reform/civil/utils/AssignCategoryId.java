@@ -30,11 +30,17 @@ public class AssignCategoryId {
         if (!featureToggleService.isCaseFileViewEnabled()) {
             return;
         }
+        if (documentUpload == null) {
+            return;
+        }
         documentUpload.getDocumentLink().setCategoryID(theID);
     }
 
     public void assignCategoryIdToDocument(Document documentUpload, String theID) {
         if (!featureToggleService.isCaseFileViewEnabled()) {
+            return;
+        }
+        if (documentUpload == null) {
             return;
         }
         documentUpload.setCategoryID(theID);
