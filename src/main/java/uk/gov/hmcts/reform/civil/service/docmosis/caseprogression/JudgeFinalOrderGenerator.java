@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -225,9 +226,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     public String populateInterimPaymentText(CaseData caseData) {
         return format(
             "An interim payment of £%s on account of costs shall be paid by 4pm on ",
-            caseData.getAssistedOrderMakeAnOrderForCosts()
-                .getAssistedOrderAssessmentThirdDropdownAmount()
-        );
+            MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownAmount()));
     }
 
     public String populateSummarilyAssessedText(CaseData caseData) {
@@ -235,16 +234,12 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             return format(
                 "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
                     + "in the sum of £%s. Such a sum shall be made by 4pm on",
-                caseData.getAssistedOrderMakeAnOrderForCosts()
-                    .getAssistedOrderCostsFirstDropdownAmount()
-            );
+                MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()));
         } else {
             return format(
                 "The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
                     + "in the sum of £%s. Such a sum shall be made by 4pm on",
-                caseData.getAssistedOrderMakeAnOrderForCosts()
-                    .getAssistedOrderCostsFirstDropdownAmount()
-            );
+                MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()));
         }
     }
 

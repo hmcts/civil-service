@@ -55,6 +55,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -251,6 +252,7 @@ public class JudgeFinalOrderGeneratorTest {
                                                   .assistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
                                                   .assistedOrderAssessmentSecondDropdownList2(CostEnums.YES)
                                                   .makeAnOrderForCostsList(COSTS)
+                                                  .assistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(10000L))
                                                   .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
                                                   .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT).build())
             .publicFundingCostsProtection(YES)
@@ -314,6 +316,7 @@ public class JudgeFinalOrderGeneratorTest {
                                                   .assistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
                                                   .makeAnOrderForCostsList(COSTS)
                                                   .assistedOrderClaimantDefendantFirstDropdown(COSTS)
+                                                  .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L))
                                                   .makeAnOrderForCostsYesOrNo(YesOrNo.YES).build())
             .assistedOrderCostsReserved(AssistedOrderCostDetails.builder().detailsRepresentationText("Test").build())
             .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("Test").build())
@@ -801,9 +804,7 @@ public class JudgeFinalOrderGeneratorTest {
         String response = generator.populateInterimPaymentText(caseData);
         assertEquals(format(
             "An interim payment of £%s on account of costs shall be paid by 4pm on ",
-            caseData.getAssistedOrderMakeAnOrderForCosts()
-                .getAssistedOrderAssessmentThirdDropdownAmount()
-        ), response);
+            MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderAssessmentThirdDropdownAmount())), response);
     }
 
     @Test
@@ -823,11 +824,13 @@ public class JudgeFinalOrderGeneratorTest {
         assertEquals(format(
             "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
                 + "in the sum of £%s. Such a sum shall be made by 4pm on",
-            caseDataClaimant.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()), responseClaimant);
+            MonetaryConversions.penniesToPounds(caseDataClaimant
+                                                    .getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount())), responseClaimant);
         assertEquals(format(
             "The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
                 + "in the sum of £%s. Such a sum shall be made by 4pm on",
-            caseDataDefendant.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()), responseDefendant);
+            MonetaryConversions.penniesToPounds(caseDataDefendant
+                                                    .getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount())), responseDefendant);
     }
 
     @Test
