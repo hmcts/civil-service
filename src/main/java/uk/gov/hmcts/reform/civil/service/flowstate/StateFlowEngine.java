@@ -588,6 +588,7 @@ public class StateFlowEngine {
             .state(PART_ADMIT_PROCEED)
             .state(PART_ADMIT_NOT_PROCEED)
             .state(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
+                .transitionTo(IN_HEARING_READINESS).onlyIf(isInHearingReadiness)
                 .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(caseDismissedPastHearingFeeDue)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
