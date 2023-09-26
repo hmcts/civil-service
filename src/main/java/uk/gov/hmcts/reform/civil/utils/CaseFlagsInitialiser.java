@@ -92,7 +92,7 @@ public class CaseFlagsInitialiser {
             .applicant1(CaseFlagUtils.updateParty(APPLICANT_ONE, caseData.getApplicant1()))
             .applicant2(CaseFlagUtils.updateParty(APPLICANT_TWO, caseData.getApplicant2()))
             .respondent1(CaseFlagUtils.updateParty(RESPONDENT_ONE, caseData.getRespondent1()))
-            .respondent2(CaseFlagUtils.updateParty(RESPONDENT_TWP, caseData.getRespondent2()))
+            .respondent2(CaseFlagUtils.updateParty(RESPONDENT_TWO, caseData.getRespondent2()))
             .applicant1LitigationFriend(CaseFlagUtils.updateLitFriend(
                 APPLICANT_ONE_LITIGATION_FRIEND, caseData.getApplicant1LitigationFriend()))
             .applicant2LitigationFriend(CaseFlagUtils.updateLitFriend(
