@@ -57,7 +57,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     }
 
     private String addTemplate(CaseData caseData) {
-        log.info("notificationsProperties.getNotifyClaimantLrTemplate()---------------->{}",notificationsProperties.getNotifyClaimantLrTemplate());
+        log.info("notificationsProperties.getNotifyClaimantLrTemplate()---------------->{}", notificationsProperties.getNotifyClaimantLrTemplate());
         return notificationsProperties.getNotifyClaimantLrTemplate();
     }
 
