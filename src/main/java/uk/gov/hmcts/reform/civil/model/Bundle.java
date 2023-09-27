@@ -29,7 +29,7 @@ public class Bundle implements MappableObject {
 
     private YesOrNo hasCoversheets;
     private YesOrNo hasTableOfContents;
-    private String filename;
+    private String fileName;
 
     //Added for case progression trial bundling
     private Optional<LocalDateTime> createdOn;
@@ -72,7 +72,7 @@ public class Bundle implements MappableObject {
         Optional<Document> stitchedDocument,
         YesOrNo hasCoversheets,
         YesOrNo hasTableOfContents,
-        String filename
+        String fileName
     ) {
         this.id = id;
         this.title = title;
@@ -83,7 +83,7 @@ public class Bundle implements MappableObject {
         this.stitchedDocument = stitchedDocument;
         this.hasCoversheets = hasCoversheets;
         this.hasTableOfContents = hasTableOfContents;
-        this.filename = filename;
+        this.fileName = fileName;
 
     }
 
@@ -123,8 +123,8 @@ public class Bundle implements MappableObject {
         return hasTableOfContents;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getFileName() {
+        return fileName;
     }
 
     public Optional<LocalDateTime> getCreatedOn() {

@@ -92,7 +92,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -122,6 +121,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -702,76 +702,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitTests {
 
         @Test
-        void shouldAddPartyIdsToPartyFields_whenInvoked() {
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
-                .thenReturn(LocalDateTime.now());
-            when(toggleService.isHmcEnabled()).thenReturn(true);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .respondent2DQ()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .build()
-                .toBuilder()
-                .tempAddress1Required(YES)
-                .tempAddress1(Address.builder().build())
-                .build().toBuilder()
-                .tempAddress2Required(NO)
-                .tempAddress2(AddressBuilder.maximal().build())
-                .build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-
-            assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
-            assertThat(response.getData()).extracting("respondent1").hasFieldOrProperty("partyID");
-            assertThat(response.getData()).extracting("respondent2").hasFieldOrProperty("partyID");
-        }
-
-        @Test
-        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
-                .thenReturn(LocalDateTime.now());
-            when(toggleService.isHmcEnabled()).thenReturn(false);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .respondent2DQ()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .build().toBuilder()
-                .tempAddress1Required(YES)
-                .build().toBuilder()
-                .tempAddress2Required(YES)
-                .build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-
-            var objectMapper = new ObjectMapper();
-            objectMapper.findAndRegisterModules();
-            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-            assertThat(response.getData()).extracting("applicant1")
-                .isEqualTo(objectMapper.convertValue(caseData.getApplicant1(), HashMap.class));
-            assertThat(response.getData()).extracting("respondent1")
-                .isEqualTo(objectMapper.convertValue(caseData.getRespondent1(), HashMap.class));
-            assertThat(response.getData()).extracting("respondent2")
-                .isEqualTo(objectMapper.convertValue(caseData.getRespondent2(), HashMap.class));
-        }
-
-        @Test
         void updateRespondent1AddressWhenUpdated() {
             // Given
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -862,6 +792,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+            when(toggleService.isHmcEnabled()).thenReturn(true);
 
             Witnesses res1witnesses = Witnesses.builder().details(
                 wrapElements(
@@ -920,14 +851,29 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
             // Then
-            assertThat(response.getData())
-                .extracting("respondent1DQWitnesses")
-                .isEqualTo(objectMapper.convertValue(res1witnesses, new TypeReference<>() {
-                }));
-            assertThat(response.getData())
-                .extracting("respondent2DQWitnesses")
-                .isEqualTo(objectMapper.convertValue(res2witnesses, new TypeReference<>() {
-                }));
+
+            Witnesses actualRespondent1DQWitnesses = objectMapper.convertValue(response.getData().get("respondent1DQWitnesses"), new TypeReference<>() {});
+            Witness actualRespondent1Witness = unwrapElements(actualRespondent1DQWitnesses.getDetails()).get(0);
+            assertThat(actualRespondent1Witness.getPartyID()).isNotNull();
+            assertThat(actualRespondent1Witness.getFirstName()).isEqualTo("Witness");
+            assertThat(actualRespondent1Witness.getLastName()).isEqualTo("One");
+            assertThat(actualRespondent1Witness.getEmailAddress()).isEqualTo("test-witness-one@example.com");
+            assertThat(actualRespondent1Witness.getPhoneNumber()).isEqualTo("07865456789");
+            assertThat(actualRespondent1Witness.getReasonForWitness()).isEqualTo("great reasons");
+            assertThat(actualRespondent1Witness.getEventAdded()).isEqualTo("Defendant Response Event");
+            assertThat(actualRespondent1Witness.getDateAdded()).isEqualTo(date);
+
+            Witnesses actualRespondent2DQWitnesses = objectMapper.convertValue(response.getData().get("respondent2DQWitnesses"), new TypeReference<>() {});
+            Witness respondent2Witness = unwrapElements(actualRespondent2DQWitnesses.getDetails()).get(0);
+            assertThat(respondent2Witness.getPartyID()).isNotNull();
+            assertThat(respondent2Witness.getFirstName()).isEqualTo("Witness");
+            assertThat(respondent2Witness.getLastName()).isEqualTo("Two");
+            assertThat(respondent2Witness.getEmailAddress()).isEqualTo("test-witness-two@example.com");
+            assertThat(respondent2Witness.getPhoneNumber()).isEqualTo("07532628263");
+            assertThat(respondent2Witness.getReasonForWitness()).isEqualTo("good reasons");
+            assertThat(respondent2Witness.getEventAdded()).isEqualTo("Defendant Response Event");
+            assertThat(respondent2Witness.getDateAdded()).isEqualTo(date);
+
         }
 
         @Nested

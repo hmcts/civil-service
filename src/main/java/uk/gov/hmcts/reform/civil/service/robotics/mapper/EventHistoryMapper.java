@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -14,13 +15,13 @@ import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
 import uk.gov.hmcts.reform.civil.model.ClaimantResponseDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
@@ -41,6 +43,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -369,6 +372,22 @@ public class EventHistoryMapper {
         return MonetaryConversions.penniesToPounds(regularRepaymentAmountPennies);
     }
 
+    @Nullable
+    private BigDecimal getInstallmentAmount(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
+        return isResponsePayByInstallment
+            ? MonetaryConversions.penniesToPounds(
+            repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).map(amount -> amount.setScale(2)).orElse(BigDecimal.ZERO))
+            : null;
+    }
+
+    @Nullable
+    private LocalDate getFirstInstallmentDate(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
+        return isResponsePayByInstallment
+            ? repaymentPlan.map(RepaymentPlanLRspec::getFirstRepaymentDate)
+            .orElse(null)
+            : null;
+    }
+
     private void buildBreathingSpaceEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
                                           EventType eventType, String bsStatus) {
         String eventDetails = null;
@@ -481,8 +500,9 @@ public class EventHistoryMapper {
     }
 
     private void buildJudgmentByAdmissionEventDetails(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        EventDetails judgmentByAdmissionEvent;
-        judgmentByAdmissionEvent = EventDetails.builder()
+        boolean isResponsePayByInstallment = caseData.isPayByInstallment();
+        Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
+        EventDetails judgmentByAdmissionEvent = EventDetails.builder()
             .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
                                   .add(caseData.getTotalInterest()).setScale(2))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
@@ -492,16 +512,11 @@ public class EventHistoryMapper {
             .paymentInFullDate(caseData.isPayBySetDate()
                                    ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().atStartOfDay()
                                    : null)
-            .installmentAmount(caseData.isPayByInstallment()
-                                   ? MonetaryConversions.penniesToPounds(
-                                       caseData.getRespondent1RepaymentPlan().getPaymentAmount()).setScale(2)
+            .installmentAmount(getInstallmentAmount(isResponsePayByInstallment, repaymentPlan))
+            .installmentPeriod(isResponsePayByInstallment
+                                   ? getInstallmentPeriodForRequestJudgmentByAdmission(repaymentPlan)
                                    : null)
-            .installmentPeriod(caseData.isPayByInstallment()
-                                   ? getInstallmentPeriodForRequestJudgmentByAdmission(caseData)
-                                   : null)
-            .firstInstallmentDate(caseData.isPayByInstallment()
-                                      ? caseData.getRespondent1RepaymentPlan().getFirstRepaymentDate()
-                                      : null)
+            .firstInstallmentDate(getFirstInstallmentDate(isResponsePayByInstallment, repaymentPlan))
             .dateOfJudgment(setApplicant1ResponseDate(caseData))
             .jointJudgment(false)
             .judgmentToBeRegistered(true)
@@ -617,69 +632,6 @@ public class EventHistoryMapper {
             case FULL_ADMISSION:
                 buildReceiptOfAdmission(builder, caseData, respondentResponseDate, respondentID);
                 break;
-            /*case STATES_PAID:
-                builder.statesPaid(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(STATES_PAID.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
-                break;
-            case BREATHING_SPACE_ENTERED:
-                builder.breathingSpaceEntered(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(BREATHING_SPACE_ENTERED.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
-                break;
-            case BREATHING_SPACE_LIFTED:
-                builder.breathingSpaceEntered(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(BREATHING_SPACE_LIFTED.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
-                break;
-            case MENTAL_HEALTH_BREATHING_SPACE_ENTERED:
-                builder.breathingSpaceMentalHealthEntered(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(MENTAL_HEALTH_BREATHING_SPACE_ENTERED.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
-                break;
-            case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
-                builder.breathingSpaceMentalHealthLifted(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(MENTAL_HEALTH_BREATHING_SPACE_LIFTED.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
-                break;*/
-            /*case INTENTION_TO_PROCEED:
-                builder.receiptOfAdmission(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(INTENTION_TO_PROCEED.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
-                break;
-            case INTENTION_TO_PROCEED_STATES_PAID:
-                builder.receiptOfAdmission(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(INTENTION_TO_PROCEED_STATES_PAID.getCode())
-                        .dateReceived(respondentResponseDate)
-                        .litigiousPartyID(respondentID)
-                        .build());
-                break;*/
             default:
                 break;
         }
@@ -1111,15 +1063,15 @@ public class EventHistoryMapper {
         if (AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             String miscText = "RPA Reason:Multitrack Unspec going offline.";
             builder.miscellaneous(
-                    Event.builder()
-                        .eventSequence(prepareEventSequence(builder.build()))
-                        .eventCode(MISCELLANEOUS.getCode())
-                        .dateReceived(caseData.getApplicant1ResponseDate())
-                        .eventDetailsText(miscText)
-                        .eventDetails(EventDetails.builder()
-                                          .miscText(miscText)
-                                          .build())
-                        .build());
+                Event.builder()
+                    .eventSequence(prepareEventSequence(builder.build()))
+                    .eventCode(MISCELLANEOUS.getCode())
+                    .dateReceived(caseData.getApplicant1ResponseDate())
+                    .eventDetailsText(miscText)
+                    .eventDetails(EventDetails.builder()
+                                      .miscText(miscText)
+                                      .build())
+                    .build());
         }
     }
 
@@ -2221,17 +2173,19 @@ public class EventHistoryMapper {
         return "FUL";
     }
 
-    private String getInstallmentPeriodForRequestJudgmentByAdmission(CaseData caseData) {
-        switch (caseData.getRespondent1RepaymentPlan().getRepaymentFrequency()) {
-            case ONCE_ONE_WEEK:
-                return "WK";
-            case ONCE_TWO_WEEKS:
-                return "FOR";
-            case ONCE_ONE_MONTH:
-                return "MTH";
-            default:
-                return null;
-        }
+    private String getInstallmentPeriodForRequestJudgmentByAdmission(Optional<RepaymentPlanLRspec> repaymentPlanLRspec) {
+        return repaymentPlanLRspec.map(RepaymentPlanLRspec::getRepaymentFrequency).map(repaymentFrequency -> {
+            switch (repaymentFrequency) {
+                case ONCE_ONE_WEEK:
+                    return "WK";
+                case ONCE_TWO_WEEKS:
+                    return "FOR";
+                case ONCE_ONE_MONTH:
+                    return "MTH";
+                default:
+                    return null;
+            }
+        }).orElse(null);
     }
 
     private BigDecimal getCostOfJudgment(CaseData data) {
@@ -2282,7 +2236,7 @@ public class EventHistoryMapper {
     }
 
     private void buildClaimInMediation(EventHistory.EventHistoryBuilder builder,
-                                               CaseData caseData) {
+                                       CaseData caseData) {
 
         if (caseData.hasDefendantAgreedToFreeMediation() && caseData.hasClaimantAgreedToFreeMediation()) {
 
@@ -2355,7 +2309,7 @@ public class EventHistoryMapper {
 
     private LocalDateTime setApplicant1ResponseDate(CaseData caseData) {
         LocalDateTime applicant1ResponseDate = caseData.getApplicant1ResponseDate();
-        if (applicant1ResponseDate == null) {
+        if (applicant1ResponseDate == null || applicant1ResponseDate.isBefore(LocalDateTime.now())) {
             applicant1ResponseDate = LocalDateTime.now();
         }
         return applicant1ResponseDate;
