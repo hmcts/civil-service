@@ -191,8 +191,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .initiativeDate(getInitiativeDate(caseData))
             .withoutNoticeDate(getWithoutNoticeDate(caseData))
             .reasonsText(getReasonsText(caseData));
-        System.out.println("true or false " + nonNull(caseData.getFinalOrderJudgeHeardFrom()));
-
+        
         return assistedFormOrderBuilder.build();
     }
 
