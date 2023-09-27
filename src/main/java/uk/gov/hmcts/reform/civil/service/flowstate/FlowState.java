@@ -81,7 +81,8 @@ public interface FlowState {
         TAKEN_OFFLINE_SDO_NOT_DRAWN,
         RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL,
         IN_MEDIATION,
-        IN_HEARING_READINESS;
+        IN_HEARING_READINESS,
+        MEDIATION_UNSUCCESSFUL_PROCEED;
 
         public static final String FLOW_NAME = "MAIN";
 

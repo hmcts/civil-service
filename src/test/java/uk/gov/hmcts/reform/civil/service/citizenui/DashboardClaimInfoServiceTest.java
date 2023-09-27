@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.citizenui;
 
+import org.elasticsearch.common.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -17,12 +19,14 @@ import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +34,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class DashboardClaimInfoServiceTest {
 
     private static final String CLAIMANT_NAME = "Harry Porter";
@@ -46,9 +51,12 @@ public class DashboardClaimInfoServiceTest {
     private CaseDetailsConverter caseDetailsConverter;
 
     @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
     private DashboardClaimStatusFactory dashboardClaimStatusFactory;
 
-    @InjectMocks
+    @Inject
     private DashboardClaimInfoService dashboardClaimInfoService;
 
     private static final BigDecimal PART_ADMIT_PAY_IMMEDIATELY_AMOUNT = BigDecimal.valueOf(500);
@@ -56,10 +64,10 @@ public class DashboardClaimInfoServiceTest {
     private static final LocalDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2025 = LocalDateTime.of(2025, 2, 20, 0, 0);
     private static final List<DashboardClaimInfo> CLAIM_STORE_SERVICE_RESULTS =
-        Arrays.asList(DashboardClaimInfo.builder()
-                          .ocmc(true)
-                          .createdDate(DATE_IN_2025)
-                          .build());
+            Collections.singletonList(DashboardClaimInfo.builder()
+                    .ocmc(true)
+                    .createdDate(DATE_IN_2025)
+                    .build());
     private static final CaseDetails CASE_DETAILS = CaseDetails.builder()
         .id(1L)
         .createdDate(DATE_IN_2021)
@@ -83,6 +91,15 @@ public class DashboardClaimInfoServiceTest {
 
     @BeforeEach
     void setUp() {
+
+        dashboardClaimInfoService = new DashboardClaimInfoService(
+            caseDetailsConverter,
+            claimStoreService,
+            coreCaseDataService,
+            dashboardClaimStatusFactory,
+            featureToggleService
+        );
+
         given(claimStoreService.getClaimsForClaimant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
 
@@ -127,7 +144,9 @@ public class DashboardClaimInfoServiceTest {
     }
 
     @Test
-    void shouldReturnClaimsForClaimantSuccessfully() {
+    void shouldReturnClaimsForClaimantSuccessfullyWhenLipVLipEnabled() {
+        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+
         List<CaseDetails> cases = List.of(CASE_DETAILS, CASE_DETAILS_2);
         SearchResult searchResult = SearchResult.builder().total(cases.size()).cases(cases).build();
         given(coreCaseDataService.getCCDClaimsForLipClaimant(any(), eq(0))).willReturn(searchResult);
@@ -138,6 +157,19 @@ public class DashboardClaimInfoServiceTest {
         );
         assertThat(claimsForClaimant.getClaims().size()).isEqualTo(3);
         assertThat(claimsForClaimant.getClaims().get(2)).isEqualTo(CLAIM_STORE_SERVICE_RESULTS.get(0));
+    }
+
+    @Test
+    void shouldReturnOnlyOcmcClaimsForClaimantSuccessfullyWhenLipVLipDisabled() {
+        given(featureToggleService.isLipVLipEnabled()).willReturn(false);
+
+        DashboardResponse claimsForClaimant = dashboardClaimInfoService.getDashboardClaimantResponse(
+            "authorisation",
+            "123",
+            CURRENT_PAGE_NO
+        );
+        assertThat(claimsForClaimant.getClaims().size()).isEqualTo(1);
+        assertThat(claimsForClaimant.getClaims().get(0)).isEqualTo(CLAIM_STORE_SERVICE_RESULTS.get(0));
     }
 
     @Test

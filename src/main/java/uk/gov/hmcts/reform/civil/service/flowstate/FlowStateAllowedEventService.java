@@ -106,6 +106,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.MEDIATION_UNSUCCESSFUL_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
@@ -1218,8 +1219,36 @@ public class FlowStateAllowedEventService {
          entry(
             PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(),
             List.of(
+                ADD_DEFENDANT_LITIGATION_FRIEND,
+                ENTER_BREATHING_SPACE_SPEC,
+                ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_SPEC,
+                WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM,
+                CASE_PROCEEDS_IN_CASEMAN,
+                AMEND_PARTY_DETAILS,
+                INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
+                NotSuitable_SDO,
+                HEARING_SCHEDULED,
+                TRIAL_READY_CHECK,
+                TRIAL_READY_NOTIFICATION,
+                MOVE_TO_DECISION_OUTCOME,
+                HEARING_FEE_UNPAID,
+                HEARING_FEE_PAID,
+                REFER_TO_JUDGE,
+                migrateCase,
+                TAKE_CASE_OFFLINE,
+                GENERATE_DIRECTIONS_ORDER,
+                TRIAL_READINESS,
+                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD_RESPONDENT,
+                EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS,
+                BUNDLE_CREATION_NOTIFICATION,
+                ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
+                ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED
             )
         ),
@@ -1230,6 +1259,39 @@ public class FlowStateAllowedEventService {
                 EXTEND_RESPONSE_DEADLINE,
                 LIP_CLAIM_SETTLED
 
+            )
+        ),
+        entry(
+            MEDIATION_UNSUCCESSFUL_PROCEED.fullName(),
+            List.of(
+                ADD_DEFENDANT_LITIGATION_FRIEND,
+                ENTER_BREATHING_SPACE_SPEC,
+                LIFT_BREATHING_SPACE_SPEC,
+                WITHDRAW_CLAIM,
+                DISCONTINUE_CLAIM,
+                CASE_PROCEEDS_IN_CASEMAN,
+                AMEND_PARTY_DETAILS,
+                INITIATE_GENERAL_APPLICATION,
+                CREATE_SDO,
+                NotSuitable_SDO,
+                HEARING_SCHEDULED,
+                TRIAL_READY_CHECK,
+                TRIAL_READY_NOTIFICATION,
+                MOVE_TO_DECISION_OUTCOME,
+                HEARING_FEE_UNPAID,
+                HEARING_FEE_PAID,
+                REFER_TO_JUDGE,
+                migrateCase,
+                TAKE_CASE_OFFLINE,
+                GENERATE_DIRECTIONS_ORDER,
+                TRIAL_READINESS,
+                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD_RESPONDENT,
+                EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS,
+                BUNDLE_CREATION_NOTIFICATION,
+                CHANGE_SOLICITOR_EMAIL,
+                ADD_UNAVAILABLE_DATES
             )
         )
     );
