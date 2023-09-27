@@ -78,7 +78,9 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                CaseData caseData) {
-        List<String> userRoles = userRoleCaching.getUserRoles(callbackParams);
+        String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
+        List<String> userRoles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef);
         CaseRole role = null;
         for (CaseRole caseRole : CaseRole.values()) {
             if (userRoles.contains(caseRole.getFormattedName())) {

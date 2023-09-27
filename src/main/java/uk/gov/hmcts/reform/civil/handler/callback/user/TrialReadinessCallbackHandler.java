@@ -24,6 +24,7 @@ import java.util.Map;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -79,7 +80,9 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     CallbackResponse populateValues(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-        List<String> userRoles = userRoleCaching.getUserRoles(callbackParams);
+        String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
+        List<String> userRoles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef);
         //updatedData.userCaseRole(userRole);
 
         var isApplicant = YesOrNo.NO;
@@ -123,7 +126,9 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
         //CaseRole userRole = caseData.getUserCaseRole();
 
-        List<String> roles = userRoleCaching.getUserRoles(callbackParams);
+        String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
+        List<String> roles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef);
 
         if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
             if (caseData.getTrialReadyApplicant() == YesOrNo.YES) {
@@ -160,7 +165,9 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
 
     private YesOrNo checkUserReady(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        List<String> userRoles = userRoleCaching.getUserRoles(callbackParams);
+        String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
+        List<String> userRoles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef);
 
         if (isApplicantSolicitor(userRoles) || isLIPClaimant(userRoles)) {
             return caseData.getTrialReadyApplicant();

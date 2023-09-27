@@ -25,12 +25,9 @@ public class UserRoleCaching {
     private final CoreCaseUserService coreCaseUserService;
 
     @Cacheable(cacheNames = "UserCache", cacheManager = "userCacheManager")
-    public List<String> getUserRoles(CallbackParams callbackParams) {
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        List<String> roles = coreCaseUserService.getUserCaseRoles(
-            callbackParams.getCaseData().getCcdCaseReference().toString(),
-            userInfo.getUid()
-        );
+    public List<String> getUserRoles(String bearerToken, String ccdCaseRef) {
+        UserInfo userInfo = userService.getUserInfo(bearerToken);
+        List<String> roles = coreCaseUserService.getUserCaseRoles(ccdCaseRef, userInfo.getUid());
         return roles;
     }
 
