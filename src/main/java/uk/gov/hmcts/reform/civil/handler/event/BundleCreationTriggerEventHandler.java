@@ -68,7 +68,7 @@ public class BundleCreationTriggerEventHandler {
         Bundle result = Bundle.builder()
             .bundleHearingDate(Optional.of(caseData.getHearingDate()))
             .stitchedDocument(Optional.ofNullable(bundle.getValue().getStitchedDocument()))
-            .filename(bundle.getValue().getFileName())
+            .fileName(bundle.getValue().getFileName())
             .title(bundle.getValue().getTitle())
             .description(null != bundle.getValue().getDescription()
                              ? Optional.of(bundle.getValue().getDescription()).get() : "")

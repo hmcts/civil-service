@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
@@ -59,6 +60,7 @@ import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
@@ -84,6 +86,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -369,6 +372,7 @@ public class CaseDataBuilder {
     private YesOrNo applicantsProceedIntention;
     private SmallClaimMedicalLRspec applicant1ClaimMediationSpecRequired;
     private SmallClaimMedicalLRspec applicantMPClaimMediationSpecRequired;
+    private Mediation mediation;
     private YesOrNo specAoSApplicantCorrespondenceAddressRequired;
     private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
@@ -1497,6 +1501,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder caseDismissedHearingFeeDueDate(LocalDateTime date) {
+        this.caseDismissedHearingFeeDueDate = date;
+        return this;
+    }
+
     public CaseDataBuilder addLegalRepDeadline(LocalDateTime date) {
         this.addLegalRepDeadline = date;
         return this;
@@ -1556,6 +1565,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder applicant1ResponseDate(LocalDateTime date) {
         this.applicant1ResponseDate = date;
+        return this;
+    }
+
+    public CaseDataBuilder reasonNotSuitableSDO(ReasonNotSuitableSDO reasonNotSuitableSDO) {
+        this.reasonNotSuitableSDO = reasonNotSuitableSDO;
         return this;
     }
 
@@ -4651,6 +4665,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateMediationUnsuccessful(MultiPartyScenario mpScenario) {
+        atStateApplicantProceedAllMediation(mpScenario);
+        applicantsProceedIntention = YES;
+        caseDataLiP = CaseDataLiP.builder()
+                                      .applicant1ClaimMediationSpecRequiredLip(
+                                          ClaimantMediationLip.builder()
+                                              .hasAgreedFreeMediation(MediationDecision.Yes)
+                                              .build()).build();
+
+        mediation = Mediation.builder().unsuccessfulMediationReason("Unsuccessful").build();
+
+        return this;
+    }
+
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
         return this;
@@ -6119,6 +6147,7 @@ public class CaseDataBuilder {
             .applicantMPClaimMediationSpecRequired(applicantMPClaimMediationSpecRequired)
             .responseClaimMediationSpecRequired(respondent1MediationRequired)
             .responseClaimMediationSpec2Required(respondent1MediationRequired)
+            .mediation(mediation)
             .respondentSolicitor2Reference(respondentSolicitor2Reference)
             .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
             .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
