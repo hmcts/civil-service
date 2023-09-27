@@ -24,8 +24,9 @@ public class RepresentativeService {
     private final FeatureToggleService featureToggleService;
 
     private boolean doesOrganisationPolicyExist(OrganisationPolicy organisationPolicy, String organisationIDCopy) {
-        return organisationPolicy != null && organisationPolicy.getOrganisation() != null
-            && (organisationPolicy.getOrganisation().getOrganisationID() != null || organisationIDCopy != null);
+        return (organisationPolicy != null && organisationPolicy.getOrganisation() != null
+            && organisationPolicy.getOrganisation().getOrganisationID() != null)
+            || organisationIDCopy != null;
     }
 
     public Representative getRespondent1Representative(CaseData caseData) {
