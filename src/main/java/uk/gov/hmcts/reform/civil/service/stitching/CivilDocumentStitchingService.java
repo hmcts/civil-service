@@ -38,7 +38,12 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
 
     public CaseDocument bundle(List<DocumentMetaData> documents, String authorisation, String bundleTitle, String bundleFilename, CaseData caseData) {
         CaseDetails payload = createBundlePayload(documents, bundleTitle, bundleFilename, caseData);
-        log.info("Calling stitching api end point for {}", caseData.getLegacyCaseReference());
+        log.info(
+            "Calling stitching api end point for {}, Bundle Title {}, File Name {}",
+            caseData.getLegacyCaseReference(),
+            bundleTitle,
+            bundleFilename
+        );
 
         CaseData caseDataFromBundlePayload = bundleRequestExecutor.post(
             BundleRequest.builder().caseDetails(payload).build(),
