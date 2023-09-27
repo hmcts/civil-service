@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Mediation;
+import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
 import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.DocumentTypeMapper;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
@@ -65,10 +67,9 @@ public class MediationSuccessfulCallbackHandler extends CallbackHandler {
         CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<Element<ManageDocument>> manageDocumentsList = caseData.getManageDocumentsList();
-        Optional<MediationAgreementDocument> mediationAgreementDocument = Optional.ofNullable(caseData)
-            .map(data -> data.getMediation())
-            .map(mediation -> mediation.getMediationSuccessful())
-            .map(successful -> successful.getMediationAgreement());
+        Optional<MediationAgreementDocument> mediationAgreementDocument = Optional.ofNullable(caseData.getMediation())
+            .map(Mediation::getMediationSuccessful)
+            .map(MediationSuccessful::getMediationAgreement);
 
         mediationAgreementDocument.ifPresent(document -> {
             ManageDocument manageDocument = ManageDocument.builder()
