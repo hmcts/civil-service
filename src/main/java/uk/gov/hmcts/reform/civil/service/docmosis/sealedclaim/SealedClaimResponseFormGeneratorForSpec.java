@@ -141,7 +141,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private void addRepaymentPlanDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
-        if (featureToggleService.isLipVLipEnabled() && caseData.getRespondent2() == null) {
+        if (featureToggleService.isPinInPostEnabled() && caseData.getRespondent2() == null) {
             builder.commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
         }
     }
