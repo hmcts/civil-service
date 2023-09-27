@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
-import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.ResponseRepaymentDetailsForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimResponseFormForSpec;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.TimelineEventDetailsDocmosis;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -82,9 +82,8 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .whyDisputeTheClaim(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
             .hearingCourtLocation(hearingCourtLocation)
-            .statementOfTruth(statementOfTruth)
-            .commonDetails(SealedClaimResponseForm.toSealedClaimResponseCommonContent(caseData));
-
+            .statementOfTruth(statementOfTruth);
+        addRepaymentPlanDetails(builder, caseData);
         if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
             builder.respondent1(getDefendant1v2ds(caseData));
         } else {
@@ -139,6 +138,12 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
                 .paymentMethod(getPaymentMethod(response)));
 
         return builder.build();
+    }
+
+    private void addRepaymentPlanDetails( SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
+        if(featureToggleService.isLipVLipEnabled() && caseData.getRespondent2() == null){
+            builder.commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
+        }
     }
 
     /**
