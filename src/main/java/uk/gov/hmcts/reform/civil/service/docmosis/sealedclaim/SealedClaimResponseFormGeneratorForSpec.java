@@ -39,6 +39,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1V1_INSTALLMENTS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_SPEC_SEALED_1v2;
@@ -141,7 +142,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     }
 
     private void addRepaymentPlanDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
-        if (featureToggleService.isPinInPostEnabled() && caseData.getRespondent2() == null) {
+        if (featureToggleService.isPinInPostEnabled() && isOneVOne(caseData)) {
             builder.commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
         }
     }
