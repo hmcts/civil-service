@@ -82,6 +82,7 @@ public interface FlowState {
         RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL,
         IN_MEDIATION,
         IN_HEARING_READINESS,
+        MEDIATION_UNSUCCESSFUL_PROCEED,
         All_FINAL_ORDERS_ISSUED;
 
         public static final String FLOW_NAME = "MAIN";
