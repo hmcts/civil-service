@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler extends CallbackHandler implements NotificationData {
 
     private final NotificationService notificationService;
@@ -55,6 +57,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     }
 
     private String addTemplate(CaseData caseData) {
+        log.info("notificationsProperties.getNotifyClaimantLrTemplate()---------------->{}",notificationsProperties.getNotifyClaimantLrTemplate());
         return notificationsProperties.getNotifyClaimantLrTemplate();
     }
 
