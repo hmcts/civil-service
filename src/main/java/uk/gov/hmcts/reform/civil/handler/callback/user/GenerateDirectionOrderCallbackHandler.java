@@ -224,7 +224,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                   .build())
             .publicFundingCostsProtection(YesOrNo.NO)
             .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                         .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                         .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                            .appealChoiceSecondDropdownA(
                                                                                AppealChoiceSecondDropdown.builder()
                                                                                    .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
@@ -233,7 +233,17 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                                                AppealChoiceSecondDropdown.builder()
                                                                                    .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
                                                                                    .build())
-                                                                           .build()).build());
+                                                                           .build())
+                                         .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                    .appealChoiceSecondDropdownA(
+                                                                        AppealChoiceSecondDropdown.builder()
+                                                                            .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                            .build())
+                                                                    .appealChoiceSecondDropdownB(
+                                                                        AppealChoiceSecondDropdown.builder()
+                                                                            .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                            .build())
+                                                                    .build()).build());
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
@@ -297,13 +307,25 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                      "Make an order for detailed/summary costs", NOT_ALLOWED_DATE_PAST, errors, true);
 
         validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
-                         .map(FinalOrderAppeal::getAppealGrantedRefusedDropdown)
+                         .map(FinalOrderAppeal::getAppealGrantedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownA)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
                      "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
 
         validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
-                         .map(FinalOrderAppeal::getAppealGrantedRefusedDropdown)
+                         .map(FinalOrderAppeal::getAppealGrantedDropdown)
+                         .map(AppealGrantedRefused::getAppealChoiceSecondDropdownB)
+                         .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
+                     "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
+
+        validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
+                         .map(FinalOrderAppeal::getAppealRefusedDropdown)
+                         .map(AppealGrantedRefused::getAppealChoiceSecondDropdownA)
+                         .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
+                     "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
+
+        validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
+                         .map(FinalOrderAppeal::getAppealRefusedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownB)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
                      "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
