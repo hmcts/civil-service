@@ -21,7 +21,7 @@ public class UserRoleCaching {
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
 
-    @Cacheable(cacheNames = "UserCache", cacheManager = "userCacheManager")
+    @Cacheable(cacheNames = "UserCache", cacheManager = "userCacheManager", key = "#userInfo.uid")
     public List<String> getUserRoles(String bearerToken, String ccdCaseRef) {
         UserInfo userInfo = userService.getUserInfo(bearerToken);
         List<String> roles = coreCaseUserService.getUserCaseRoles(ccdCaseRef, userInfo.getUid());
@@ -29,7 +29,6 @@ public class UserRoleCaching {
     }
 
     @Bean(name = "userCacheManager")
-    @SessionScope(proxyMode = ScopedProxyMode.TARGET_CLASS)
     public CacheManager getCacheManager() {
         return new ConcurrentMapCacheManager();
     }
