@@ -106,8 +106,8 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
                 civilDocumentStitchingService.bundle(
                     documents,
                     callbackParams.getParams().get(CallbackParams.Params.BEARER_TOKEN).toString(),
-                    sealedClaim.getDocumentName(),
                     BUNDLE_NAME,
+                    sealedClaim.getDocumentName(),
                     caseData
                 );
 
