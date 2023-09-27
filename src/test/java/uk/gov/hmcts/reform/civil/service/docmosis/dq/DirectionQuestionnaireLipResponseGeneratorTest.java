@@ -45,7 +45,6 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
         assertThat(docmosisTemplate).isEqualTo(DQ_LIP_RESPONSE);
     }
 
-
     @Test
     void shouldNotReturnLipTemplateWhenLipvLipIsNotEnabled() {
         //Given
