@@ -10,9 +10,9 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.DQExtraDetailsLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.ExpertLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.docmosis.dq.DirectionsQuestionnaireForm;
 
 import java.util.Optional;
@@ -22,8 +22,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class DQLipClaimantFormMapperTest {
+class DQLipDefendantFormMapperTest {
 
+    private static final String NAME = "Defendant";
     @Mock
     private CaseDataLiP caseDataLiPMock;
     @Mock
@@ -31,15 +32,14 @@ class DQLipClaimantFormMapperTest {
     @Mock
     private ExpertLiP expertLiPMock;
     @Mock
-    private ClaimantLiPResponse claimantLiPResponse;
+    private RespondentLiPResponse respondentLiPResponse;
     @Mock
     private CaseData caseData;
     @Mock
-    private Party applicant1;
+    private Party respondent1;
     @InjectMocks
-    private DQLipClaimantFormMapper dqLipClaimantFormMapper;
+    private DQLipDefendantFormMapper dqLipDefendantFormMapper;
     private DirectionsQuestionnaireForm form;
-    private static final String NAME = "Claimant";
 
     @BeforeEach
     void setUp() {
@@ -47,41 +47,19 @@ class DQLipClaimantFormMapperTest {
     }
 
     @Test
-    void shouldNotPopulateDtoWithLipData_whenCaseDataLipIsNull() {
-        //Given
-        Optional<CaseDataLiP> emptyOptional = Optional.empty();
-        //When
-        DirectionsQuestionnaireForm resultForm = dqLipClaimantFormMapper.addLipDQs(form, emptyOptional);
-        //Then
-        assertThat(resultForm.getLipExtraDQ()).isNull();
-    }
-
-    @Test
-    void shouldNotPopulateLipExtraDQ_whenDQExtraDetailsLipIsNull() {
-        //Given
-        Optional<CaseDataLiP> caseDataLiPOptional = Optional.of(caseDataLiPMock);
-        given(caseDataLiPMock.getApplicant1LiPResponse()).willReturn(claimantLiPResponse);
-        given(claimantLiPResponse.getApplicant1DQExtraDetails()).willReturn(null);
-        //When
-        DirectionsQuestionnaireForm resultForm = dqLipClaimantFormMapper.addLipDQs(form, caseDataLiPOptional);
-        //Then
-        assertThat(resultForm.getLipExtraDQ()).isNull();
-    }
-
-    @Test
     void shouldPopulateLipExtraDQ_whenDQExtraDetailsLipIsNotNull() {
         //Given
         Optional<CaseDataLiP> caseDataLiPOptional = Optional.of(caseDataLiPMock);
-        given(caseDataLiPMock.getApplicant1LiPResponse()).willReturn(claimantLiPResponse);
-        given(claimantLiPResponse.getApplicant1DQExtraDetails()).willReturn(dqExtraDetailsLipMock);
-        given(dqExtraDetailsLipMock.getApplicant1DQLiPExpert()).willReturn(expertLiPMock);
+        given(caseDataLiPMock.getRespondent1LiPResponse()).willReturn(respondentLiPResponse);
+        given(respondentLiPResponse.getRespondent1DQExtraDetails()).willReturn(dqExtraDetailsLipMock);
+        given(dqExtraDetailsLipMock.getRespondent1DQLiPExpert()).willReturn(expertLiPMock);
         given(dqExtraDetailsLipMock.getTriedToSettle()).willReturn(YesOrNo.YES);
         given(dqExtraDetailsLipMock.getRequestExtra4weeks()).willReturn(YesOrNo.YES);
         given(dqExtraDetailsLipMock.getGiveEvidenceYourSelf()).willReturn(YesOrNo.YES);
         given(dqExtraDetailsLipMock.getConsiderClaimantDocumentsDetails()).willReturn("test");
         given(dqExtraDetailsLipMock.getDeterminationWithoutHearingRequired()).willReturn(YesOrNo.NO);
         //When
-        DirectionsQuestionnaireForm resultForm = dqLipClaimantFormMapper.addLipDQs(form, caseDataLiPOptional);
+        DirectionsQuestionnaireForm resultForm = dqLipDefendantFormMapper.addLipDQs(form, caseDataLiPOptional);
         //Then
         assertThat(resultForm.getLipExtraDQ()).isNotNull();
     }
@@ -89,12 +67,12 @@ class DQLipClaimantFormMapperTest {
     @Test
     void shouldReturnClaimantSignature_whenGetStatementOfTruth() {
         //Given
-        given(caseData.getApplicant1()).willReturn(applicant1);
-        given(applicant1.getPartyName()).willReturn(NAME);
+        given(caseData.getRespondent1()).willReturn(respondent1);
+        given(respondent1.getPartyName()).willReturn(NAME);
         //When
-        String result = dqLipClaimantFormMapper.getStatementOfTruthName(caseData);
+        String result = dqLipDefendantFormMapper.getStatementOfTruthName(caseData);
         //Then
         assertThat(result).isEqualTo(NAME);
-        verify(caseData).getApplicant1();
+        verify(caseData).getRespondent1();
     }
 }
