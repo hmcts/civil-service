@@ -15,6 +15,7 @@ public class JudgmentsOnlineHelper {
         switch (judgmentStatus) {
             case ISSUED : return JudgmentRTLStatus.REGISTRATION.getRtlState();
             case MODIFIED: return JudgmentRTLStatus.MODIFIED.getRtlState();
+            case CANCELLED: return JudgmentRTLStatus.CANCELLATION.getRtlState();
             case SET_ASIDE: return JudgmentRTLStatus.CANCELLATION.getRtlState();
             case SATISFIED: return JudgmentRTLStatus.SATISFACTION.getRtlState();
             default: return "";
