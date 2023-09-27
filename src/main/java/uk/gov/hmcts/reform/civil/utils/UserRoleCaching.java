@@ -14,8 +14,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
-
 @Service
 @RequiredArgsConstructor
 public class UserRoleCaching {
