@@ -228,6 +228,7 @@ notifications:
   respondentSolicitorCounterClaimForSpec: "6cb3b3d5-f1aa-4236-ad03-685605a9235e"
   respondentSolicitor1DefaultJudgmentReceived: "3f09399e-b76b-4ea4-8084-c27693e6fd28"
   respondentSolicitor1DefaultJudgmentRequested: "9a974b63-6d0f-4714-8e5d-488554fdc8a0"
+  applicantLiPDefaultJudgmentRequested: "668d4703-e97f-4e2f-8d07-1a697aac6d0b"
   applicantSolicitor1DefaultJudgmentRequested: "cd0486ac-cc6a-4429-865a-7746f64bf4dd"
   interimJudgmentRequestedClaimant: "7c6d0840-3f38-4fc5-a26b-676f27bb8fe2"
   interimJudgmentApprovalClaimant: "d0deee08-edc8-4a25-8b04-6a5ba52267b8"
@@ -276,6 +277,7 @@ notifications:
   respondentLipPartAdmitSettleClaimTemplate: "81745979-5330-4771-816c-aa78085e741a"
   respondent1DefaultJudgmentRequestedTemplate: "d4cf381f-a2b3-4a81-a442-eb2aa5deb210"
   respondent1LipClaimUpdatedTemplate: "9c44f3fb-a340-49e5-bf64-32a3187d7dcd"
+  claimantLipClaimUpdatedTemplate: "0abdcb29-edd3-418a-aeab-a102da4ad441"
 
   hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
 
@@ -291,7 +293,6 @@ notifications:
   notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
   notifyRespondentLiPMediationSuccessfulTemplateWelsh: "aaa19fef-2b16-42fa-a1b9-5af699fcaa58"
   notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"
-  claimantLipClaimUpdatedTemplate: "0abdcb29-edd3-418a-aeab-a102da4ad441"
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
 
