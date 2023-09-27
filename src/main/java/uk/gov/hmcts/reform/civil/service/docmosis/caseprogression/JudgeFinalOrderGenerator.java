@@ -153,6 +153,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .recordedToggle(nonNull(caseData.getFinalOrderRecitals()))
             .recordedText(nonNull(caseData.getFinalOrderRecitalsRecorded()) ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
             .orderedText(caseData.getFinalOrderOrderedThatText())
+            .finalOrderJudgeHeardFrom(nonNull(caseData.getFinalOrderJudgeHeardFrom()))
             .claimantAttendsOrRepresented(claimantAttendsOrRepresentedTextBuilder(caseData, false))
             .claimantTwoAttendsOrRepresented(nonNull(caseData.getApplicant2()) ? claimantAttendsOrRepresentedTextBuilder(caseData, true) : null)
             .defendantAttendsOrRepresented(defendantAttendsOrRepresentedTextBuilder(caseData, false))
@@ -190,6 +191,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .initiativeDate(getInitiativeDate(caseData))
             .withoutNoticeDate(getWithoutNoticeDate(caseData))
             .reasonsText(getReasonsText(caseData));
+        System.out.println("true or false " + nonNull(caseData.getFinalOrderJudgeHeardFrom()));
 
         return assistedFormOrderBuilder.build();
     }

@@ -74,4 +74,5 @@ public class JudgeFinalOrderForm implements MappableObject {
     private final LocalDate interimPaymentDate;
     private final String qcosProtection;
     private final String costsProtection;
+    private final Boolean finalOrderJudgeHeardFrom;
 }
