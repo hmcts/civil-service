@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -14,6 +15,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative.fromOrganisation;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RepresentativeService {
@@ -34,6 +36,7 @@ public class RepresentativeService {
                 organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
             }
 
+            log.info("organisation1ID: " + organisationId);
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
 
@@ -65,6 +68,7 @@ public class RepresentativeService {
                 organisationId = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
             }
 
+            log.info("organisation2ID: " + organisationId);
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
 
