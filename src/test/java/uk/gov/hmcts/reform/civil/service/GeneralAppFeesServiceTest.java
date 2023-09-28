@@ -333,7 +333,7 @@ class GeneralAppFeesServiceTest {
         @Test
         void settle_should_be_108() {
             CaseData caseDataWithNotice = getFeeCase(
-                    List.of(GeneralApplicationTypes.SETTLE_OR_DISCONTINUE_CONSENT),
+                    List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT),
                     YesOrNo.YES, YesOrNo.YES, null);
             Fee feeDto = feesService.getFeeForGA(caseDataWithNotice);
             assertThat(feeDto).isEqualTo(FEE_PENCE_108);
