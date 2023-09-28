@@ -83,8 +83,7 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
             } else {
                 return notificationsProperties.getNotifyDefendantLipTemplate();
             }
-        } else {
-            return notificationsProperties.getNotifyDefendantLrTemplate();
         }
+        return notificationsProperties.getNotifyDefendantLrTemplate();
     }
 }

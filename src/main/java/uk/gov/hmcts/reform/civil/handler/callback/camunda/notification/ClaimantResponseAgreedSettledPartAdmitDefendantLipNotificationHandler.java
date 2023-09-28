@@ -84,8 +84,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             return caseData.isRespondentResponseBilingual()
                 ? notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()
                 : notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate();
-        } else {
-            return notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate();
         }
+        return notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate();
     }
 }
