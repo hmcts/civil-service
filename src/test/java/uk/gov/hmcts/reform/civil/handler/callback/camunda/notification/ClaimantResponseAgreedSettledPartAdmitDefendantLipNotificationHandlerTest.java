@@ -174,24 +174,24 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
         @Test
         void shouldNotifyRespondent_whenInvoked_spec_lr() {
-           CaseData caseData = CaseDataBuilder.builder()
+            CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondent1OrgRegistered(YesOrNo.YES)
                 .build();
 
-           CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(EVENT_ID)
                     .build()).build();
 
-           handler.handle(params);
+            handler.handle(params);
 
-           verify(notificationService).sendMail(
+            verify(notificationService).sendMail(
                 templateEmail_lr,
                 template_id_lr,
                 getNotificationDataMap(caseData),
                 reference
-           );
+            );
         }
 
         @NotNull
