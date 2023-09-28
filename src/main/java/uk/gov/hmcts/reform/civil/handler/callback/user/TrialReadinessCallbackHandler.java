@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -82,7 +81,6 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
         List<String> userRoles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef);
-        //updatedData.userCaseRole(userRole);
 
         var isApplicant = YesOrNo.NO;
         var isRespondent1 = YesOrNo.NO;
@@ -114,15 +112,13 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
-                      ? updatedData.build().toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? updatedData.build().toMap(objectMapper) : null)
             .build();
     }
 
     CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
-        //CaseRole userRole = caseData.getUserCaseRole();
 
         String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();

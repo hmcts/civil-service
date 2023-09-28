@@ -26,8 +26,7 @@ public class UserRoleCaching {
     @Cacheable(cacheNames = "UserCache", cacheManager = "userCacheManager", key = "bearerToken")
     public List<String> getUserRoles(String bearerToken, String ccdCaseRef) {
         UserInfo userInfo = userService.getUserInfo(bearerToken);
-        List<String> roles = coreCaseUserService.getUserCaseRoles(ccdCaseRef, userInfo.getUid());
-        return roles;
+        return coreCaseUserService.getUserCaseRoles(ccdCaseRef, userInfo.getUid());
     }
 
     @Bean(name = "userCacheManager")

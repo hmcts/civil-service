@@ -77,17 +77,12 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                CaseData caseData) {
         String activityID = camundaActivityId(callbackParams);
-        CaseRole role = null;
-        switch (activityID) {
-            case TASK_ID_APPLICANT:
-                role = CaseRole.CLAIMANT;
-                break;
-            case TASK_ID_RESPONDENT1:
-                role = CaseRole.DEFENDANT;
-                break;
-            case TASK_ID_RESPONDENT2:
-                role = CaseRole.RESPONDENTSOLICITORTWO;
-        }
+        CaseRole role = switch (activityID) {
+            case TASK_ID_APPLICANT -> CaseRole.CLAIMANT;
+            case TASK_ID_RESPONDENT1 -> CaseRole.DEFENDANT;
+            case TASK_ID_RESPONDENT2 -> CaseRole.RESPONDENTSOLICITORTWO;
+            default -> null;
+        };
 
         CaseDocument caseDocument = trialReadyFormGenerator.generate(
             callbackParams.getCaseData(),
