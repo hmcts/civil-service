@@ -59,7 +59,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final List<DebtTemplateData> debtList;
     private final List<ReasonMoneyTemplateData> incomeList;
     private final List<ReasonMoneyTemplateData> expenseList;
-    private final SealedClaimResponseForm commonDetails;
+    //repayment details for repayment plan that are common between LR and LiP
+    private final ResponseRepaymentDetailsForm commonDetails;
 
     public boolean isCurrentlyWorking() {
         return (employerDetails != null && !employerDetails.isEmpty())
@@ -84,7 +85,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .defendant2(LipFormParty.toLipDefenceParty(caseData.getRespondent2()))
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
-            .commonDetails(SealedClaimResponseForm.toSealedClaimResponseCommonContent(caseData));
+            .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
         addSolicitorDetails(caseData, builder);
         addEmployeeDetails(caseData, builder);
         addFinancialDetails(caseData, builder);
