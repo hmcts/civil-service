@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Builder (toBuilder = true)
 public class Witness {
 
+    private final String partyID;
     @Deprecated
     private final String name;
     private final String firstName;

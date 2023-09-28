@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +38,12 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
 
     public CaseDocument bundle(List<DocumentMetaData> documents, String authorisation, String bundleTitle, String bundleFilename, CaseData caseData) {
         CaseDetails payload = createBundlePayload(documents, bundleTitle, bundleFilename, caseData);
-        log.info("Calling stitching api end point for {}", caseData.getLegacyCaseReference());
+        log.info(
+            "Calling stitching api end point for {}, Bundle Title {}, File Name {}",
+            caseData.getLegacyCaseReference(),
+            bundleTitle,
+            bundleFilename
+        );
 
         CaseData caseDataFromBundlePayload = bundleRequestExecutor.post(
             BundleRequest.builder().caseDetails(payload).build(),
@@ -51,11 +58,11 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         Optional<Document> stitchedDocument = caseDataFromBundlePayload.getCaseBundles().get(0).getValue().getStitchedDocument();
 
         log.info("stitchedDocument.isPresent() {}, legacy case reference {}",  stitchedDocument.isPresent(), caseData.getLegacyCaseReference());
-        return retrieveCaseDocument(stitchedDocument, caseData);
+        return retrieveCaseDocument(stitchedDocument);
 
     }
 
-    private CaseDocument retrieveCaseDocument(Optional<Document> stitchedDocument, CaseData caseData) {
+    private CaseDocument retrieveCaseDocument(Optional<Document> stitchedDocument) {
         if (stitchedDocument.isEmpty()) {
             log.info("stitchedDocument is not present----------");
             return null;
@@ -65,10 +72,12 @@ public class CivilDocumentStitchingService implements DocumentStitcher {
         String documentBinaryUrl = document.getDocumentBinaryUrl();
 
         return CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl(documentUrl).documentBinaryUrl(documentBinaryUrl).documentFileName(document.getDocumentFileName()).build())
+            .documentLink(Document.builder().documentUrl(documentUrl)
+                              .documentBinaryUrl(documentBinaryUrl)
+                              .documentFileName(document.getDocumentFileName()).build())
             .documentName("Stitched document")
             .documentType(SEALED_CLAIM)
-            .createdDatetime(caseData.getRespondentResponseDate())
+            .createdDatetime(LocalDateTime.now(ZoneId.of("Europe/London")))
             .createdBy(CREATED_BY)
             .build();
     }
