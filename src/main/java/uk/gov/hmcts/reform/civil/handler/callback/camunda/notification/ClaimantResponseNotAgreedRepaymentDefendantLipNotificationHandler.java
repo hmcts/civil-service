@@ -8,17 +8,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -29,7 +26,7 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
+    private final OrganisationDetailsService organisationDetailsService;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_LIP_DEFENDANT_REJECT_REPAYMENT);
     private static final String REFERENCE_TEMPLATE_LIP = "claimant-reject-repayment-respondent-notification-%s";
     public static final String TASK_ID_LIP = "ClaimantDisAgreedRepaymentPlanNotifyLip";
@@ -48,10 +45,9 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
 
     private CallbackResponse notifyDefendantLip(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String defendantEmailId = addEmail(caseData);
-        if (Objects.nonNull(defendantEmailId)) {
+        if (Objects.nonNull(caseData.getRespondent1Email())) {
             notificationService.sendMail(
-                defendantEmailId,
+                caseData.getRespondent1Email(),
                 addTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference())
@@ -67,7 +63,7 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if (isRespondentNotRepresented(caseData)) {
+        if (caseData.isRespondent1NotRepresented()) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
@@ -75,23 +71,13 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
         } else {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
+                CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
             );
         }
     }
 
-    private String addEmail(CaseData caseData) {
-        if (isRespondentNotRepresented(caseData)) {
-            return caseData.getRespondent1().getPartyEmail();
-        }
-        if (isRespondentSolicitorRegistered(caseData)) {
-            return caseData.getRespondentSolicitor1EmailAddress();
-        }
-        return null;
-    }
-
     private String addTemplate(CaseData caseData) {
-        if (isRespondentNotRepresented(caseData)) {
+        if (caseData.isRespondent1NotRepresented()) {
             if (caseData.isRespondentResponseBilingual()) {
                 return notificationsProperties.getNotifyDefendantLipWelshTemplate();
             } else {
@@ -100,23 +86,5 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
         } else {
             return notificationsProperties.getNotifyDefendantLrTemplate();
         }
-    }
-
-    public boolean isRespondentNotRepresented(CaseData caseData) {
-        return YesOrNo.NO.equals(caseData.getSpecRespondent1Represented());
-    }
-
-    public boolean isRespondentSolicitorRegistered(CaseData caseData) {
-        return YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered());
-    }
-
-    private String getRespondentLegalOrganizationName(CaseData caseData) {
-        Optional<Organisation> organisation = organisationService.findOrganisationById(
-            caseData.getRespondent1OrganisationId());
-        String respondentLegalOrganizationName = null;
-        if (organisation.isPresent()) {
-            respondentLegalOrganizationName = organisation.get().getName();
-        }
-        return respondentLegalOrganizationName;
     }
 }

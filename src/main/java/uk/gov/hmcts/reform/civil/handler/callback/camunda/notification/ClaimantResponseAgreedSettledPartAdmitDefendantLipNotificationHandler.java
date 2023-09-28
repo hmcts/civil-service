@@ -8,17 +8,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED;
@@ -34,7 +31,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
+    private final OrganisationDetailsService organisationDetailsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -63,26 +60,16 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
         } else {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
+                CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
             );
         }
     }
 
-    private String getRespondentLegalOrganizationName(CaseData caseData) {
-        Optional<Organisation> organisation = organisationService.findOrganisationById(caseData.getRespondent1OrganisationId());
-        String respondentLegalOrganizationName = null;
-        if (organisation.isPresent()) {
-            respondentLegalOrganizationName = organisation.get().getName();
-        }
-        return respondentLegalOrganizationName;
-    }
-
     private CallbackResponse notifyDefendantForPartAdmitClaimSettled(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String defendantEmailId = addEmail(caseData);
-        if (Objects.nonNull(defendantEmailId)) {
+        if (Objects.nonNull(caseData.getRespondent1Email())) {
             notificationService.sendMail(
-                defendantEmailId,
+                caseData.getRespondent1Email(),
                 setUpEmailTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -100,19 +87,5 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
         } else {
             return notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate();
         }
-    }
-
-    private String addEmail(CaseData caseData) {
-        if (caseData.isRespondent1NotRepresented()) {
-            return caseData.getRespondent1().getPartyEmail();
-        }
-        if (isRespondentSolicitorRegistered(caseData)) {
-            return caseData.getRespondentSolicitor1EmailAddress();
-        }
-        return null;
-    }
-
-    public boolean isRespondentSolicitorRegistered(CaseData caseData) {
-        return YesOrNo.YES.equals(caseData.getRespondent1OrgRegistered());
     }
 }

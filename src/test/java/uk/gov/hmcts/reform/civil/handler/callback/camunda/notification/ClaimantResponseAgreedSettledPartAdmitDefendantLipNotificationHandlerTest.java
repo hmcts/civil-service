@@ -21,14 +21,11 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,13 +51,14 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
     public static final String reference = "claimant-part-admit-settle-respondent-notification-000DC001";
     public static final String EVENT_ID = "NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED";
+    private static final String ORGANISATION_NAME = "Defendant solicitor org";
 
     @MockBean
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
     @MockBean
-    private OrganisationService organisationService;
+    private OrganisationDetailsService organisationDetailsService;
     @Autowired
     private ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandler handler;
 
@@ -72,6 +70,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn(template);
             when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn(bilingualTemplate);
             when(notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate()).thenReturn(template_id_lr);
+            when(organisationDetailsService.getRespondentLegalOrganizationName(any())).thenReturn(ORGANISATION_NAME);
         }
 
         @Test
@@ -175,27 +174,24 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
         @Test
         void shouldNotifyRespondent_whenInvoked_spec_lr() {
-            when(organisationService.findOrganisationById(
-                anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor org").build()));
-
-            CaseData caseData = CaseDataBuilder.builder()
+           CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondent1OrgRegistered(YesOrNo.YES)
                 .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+           CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(EVENT_ID)
                     .build()).build();
 
-            handler.handle(params);
+           handler.handle(params);
 
-            verify(notificationService).sendMail(
+           verify(notificationService).sendMail(
                 templateEmail_lr,
                 template_id_lr,
                 getNotificationDataMap(caseData),
                 reference
-            );
+           );
         }
 
         @NotNull
@@ -208,19 +204,9 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             } else {
                 return Map.of(
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
+                    CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
                 );
-
             }
-        }
-
-        private String getRespondentLegalOrganizationName(CaseData caseData) {
-            Optional<Organisation> organisation = organisationService.findOrganisationById(caseData.getRespondent1OrganisationId());
-            String respondentLegalOrganizationName = null;
-            if (organisation.isPresent()) {
-                respondentLegalOrganizationName = organisation.get().getName();
-            }
-            return respondentLegalOrganizationName;
         }
     }
 }

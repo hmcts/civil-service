@@ -17,17 +17,15 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.util.Map;
-import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -47,9 +45,10 @@ class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest exte
     @MockBean
     private NotificationsProperties notificationsProperties;
     @MockBean
-    private OrganisationService organisationService;
+    private OrganisationDetailsService organisationDetailsService;
     @Autowired
     private ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler handler;
+    private static final String ORGANISATION_NAME = "Defendant solicitor org";
 
     @Nested
     class AboutToSubmitCallback {
@@ -59,6 +58,7 @@ class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest exte
             when(notificationsProperties.getNotifyDefendantLipTemplate()).thenReturn("template-id");
             when(notificationsProperties.getNotifyDefendantLipWelshTemplate()).thenReturn("template-welsh-id");
             when(notificationsProperties.getNotifyDefendantLrTemplate()).thenReturn("template-id-lr");
+            when(organisationDetailsService.getRespondentLegalOrganizationName(any())).thenReturn(ORGANISATION_NAME);
         }
 
         @Test
@@ -120,9 +120,6 @@ class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest exte
 
         @Test
         void shouldNotifyRespondentLrParty_whenInvoked() {
-            when(organisationService.findOrganisationById(
-                anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor org").build()));
-
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondent1OrgRegistered(YesOrNo.YES)
@@ -151,18 +148,9 @@ class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest exte
             } else {
                 return Map.of(
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
+                    CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
                 );
             }
-        }
-
-        private String getRespondentLegalOrganizationName(CaseData caseData) {
-            Optional<Organisation> organisation = organisationService.findOrganisationById(caseData.getRespondent1OrganisationId());
-            String respondentLegalOrganizationName = null;
-            if (organisation.isPresent()) {
-                respondentLegalOrganizationName = organisation.get().getName();
-            }
-            return respondentLegalOrganizationName;
         }
     }
 }
