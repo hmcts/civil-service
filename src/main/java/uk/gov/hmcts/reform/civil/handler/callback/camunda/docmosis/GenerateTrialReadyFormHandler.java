@@ -78,17 +78,29 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                CaseData caseData) {
-        String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+       /* String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
-        List<String> userRoles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef);
+        List<String> userRoles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef);*/
+        String activityID = camundaActivityId(callbackParams);
         CaseRole role = null;
-        for (CaseRole caseRole : CaseRole.values()) {
+        switch (activityID) {
+            case TASK_ID_APPLICANT:
+                role = CaseRole.CLAIMANT;
+                break;
+            case TASK_ID_RESPONDENT1:
+                role = CaseRole.DEFENDANT;
+                break;
+            case TASK_ID_RESPONDENT2:
+                role = CaseRole.RESPONDENTSOLICITORTWO;
+        }
+
+        /*for (CaseRole caseRole : CaseRole.values()) {
             if (userRoles.contains(caseRole.getFormattedName())) {
                 role = caseRole;
                 break;
             }
         }
-
+*/
         CaseDocument caseDocument = trialReadyFormGenerator.generate(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
