@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.docmosis.trialready.TrialReadyFormGenerator;
-import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,6 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
     private final TrialReadyFormGenerator trialReadyFormGenerator;
 
     private final ObjectMapper objectMapper;
-    private final UserRoleCaching userRoleCaching;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -78,9 +76,6 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                CaseData caseData) {
-       /* String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
-        List<String> userRoles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef);*/
         String activityID = camundaActivityId(callbackParams);
         CaseRole role = null;
         switch (activityID) {
@@ -94,13 +89,6 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
                 role = CaseRole.RESPONDENTSOLICITORTWO;
         }
 
-        /*for (CaseRole caseRole : CaseRole.values()) {
-            if (userRoles.contains(caseRole.getFormattedName())) {
-                role = caseRole;
-                break;
-            }
-        }
-*/
         CaseDocument caseDocument = trialReadyFormGenerator.generate(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
