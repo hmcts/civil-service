@@ -17,11 +17,11 @@ public class FeatureToggleService {
     }
 
     public boolean isGeneralApplicationsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
+        return false;
     }
 
     public boolean isBulkClaimEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
+        return false;
     }
 
     public boolean isNoticeOfChangeEnabled() {
@@ -29,11 +29,11 @@ public class FeatureToggleService {
     }
 
     public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags");
+        return false;
     }
 
     public boolean isPinInPostEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
+        return false;
     }
 
     public boolean isPbaV3Enabled() {
@@ -49,26 +49,26 @@ public class FeatureToggleService {
     }
 
     public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
+        return false;
     }
 
     public boolean isCaseFileViewEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-file-view");
+        return false;
     }
 
     public boolean isAutomatedHearingNoticeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("ahn");
+        return false;
     }
 
     public boolean isFastTrackUpliftsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
+        return false;
     }
 
     public boolean isUpdateContactDetailsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("update-contact-details");
+        return false;
     }
 
     public boolean isLipVLipEnabled() {
-        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
+        return false;
     }
 }
