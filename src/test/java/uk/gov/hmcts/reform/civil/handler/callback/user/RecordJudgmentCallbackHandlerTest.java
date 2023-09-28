@@ -73,6 +73,8 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("joAmountCostOrdered")).isNull();
             assertThat(response.getData().get("joIsRegisteredWithRTL")).isNull();
             assertThat(response.getData().get("joAmountOrdered")).isNull();
+            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+
         }
     }
 
@@ -103,6 +105,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
             assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
             assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
         }
 
         @Test
@@ -127,6 +130,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
             assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
             assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
         }
 
         @Test
@@ -152,6 +156,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
             assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
             assertThat(response.getData()).containsEntry("joPaymentToBeMadeByDate", "2023-12-12");
+            assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
         }
     }
 
