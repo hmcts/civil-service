@@ -57,12 +57,11 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
                 RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
             );
-        } else {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
-            );
         }
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
+        );
     }
 
     private CallbackResponse notifyDefendantForPartAdmitClaimSettled(CallbackParams callbackParams) {

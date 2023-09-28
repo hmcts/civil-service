@@ -68,22 +68,25 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
             );
-        } else {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
-            );
         }
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
+        );
+
     }
 
     private String addTemplate(CaseData caseData) {
         if (caseData.isRespondent1NotRepresented()) {
-            if (caseData.isRespondentResponseBilingual()) {
-                return notificationsProperties.getNotifyDefendantLipWelshTemplate();
-            } else {
-                return notificationsProperties.getNotifyDefendantLipTemplate();
-            }
+            return getRespondentLipTemplate(caseData);
         }
         return notificationsProperties.getNotifyDefendantLrTemplate();
+    }
+
+    private String getRespondentLipTemplate(CaseData caseData) {
+        if (caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getNotifyDefendantLipWelshTemplate();
+        }
+        return notificationsProperties.getNotifyDefendantLipTemplate();
     }
 }
