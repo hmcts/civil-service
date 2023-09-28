@@ -75,8 +75,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived();
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
-        if (ofNullable(caseData.getRespondent2()).isEmpty()
-            && caseData.isLipvLipOneVOne()
+        if (caseData.isLipvLipOneVOne()
             && toggleService.isLipVLipEnabled()) {
             template = notificationsProperties.getApplicantLiPDefaultJudgmentRequested();
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
@@ -125,8 +124,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         }
 
         if (caseData.isLipvLipOneVOne()
-            && toggleService.isLipVLipEnabled()
-            && ofNullable(caseData.getRespondent2()).isEmpty()) {
+            && toggleService.isLipVLipEnabled()) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
                 identifyTemplate(caseData),
