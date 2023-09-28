@@ -227,7 +227,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
                 assertThat(response.getErrors()).isNull();
-                assertThat(response.getData().get("respondentSharedClaimResponseDocument").toString().contains("respondent defense"));
+                assertThat(response.getData()).extracting("respondentSharedClaimResponseDocument").isNotNull();
             }
 
             @Test
@@ -247,7 +247,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
                 assertThat(response.getErrors()).isNull();
-                assertThat(response.getData().get("respondent1ClaimResponseDocument").toString().contains("respondent defense"));
+                assertThat(response.getData()).extracting("respondent1ClaimResponseDocument").isNotNull();
             }
 
             @Test

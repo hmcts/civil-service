@@ -445,7 +445,16 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 null
             ).name());
         }
+        // add direction questionaire document from system generated documents, to placeholder field for preview during event.
+        // Or add sealed response form  from system generated documents, to placeholder field for preview during event.
+        populatePreviewDocuments(caseData, updatedCaseData);
 
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.build().toMap(objectMapper))
+            .build();
+    }
+
+    private void populatePreviewDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
         // add direction questionaire document from system generated documents, to placeholder field for preview during event.
         if (caseData.getRespondent2DocumentURL() == null) {
             caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
@@ -463,7 +472,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             });
         }
-
         // add sealed response form  from system generated documents, to placeholder field for preview during event.
         if (featureToggleService.isPinInPostEnabled()) {
             caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
@@ -472,10 +480,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             });
         }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
-            .build();
     }
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
