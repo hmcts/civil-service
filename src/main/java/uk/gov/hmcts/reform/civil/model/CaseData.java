@@ -1017,6 +1017,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public String getApplicant1Email() {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
+    
+    @JsonIgnore
+    public String getHelpWithFeesReferenceNumber() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getRespondent1LiPResponse)
+            .map(RespondentLiPResponse::getHelpWithFeesReferenceNumberLip).orElse(null);
+    }
 
     @JsonIgnore
     public boolean isTranslatedDocumentUploaded() {

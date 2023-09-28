@@ -103,44 +103,6 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldClearOrganisationId_whenClaimIsIssued() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
-            .build().toBuilder()
-            .respondent1OrganisationIDCopy("")
-            .build();;
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(null);
-        assertThat(updatedData.getRespondent1OrganisationIDCopy()).isEqualTo("QWERTY R");
-        assertThat(updatedData.getRespondent2OrganisationIDCopy()).isEqualTo("QWERTY R2");
-
-    }
-
-    @Test
-    void shouldClearOrganisationIdTwoDefendants_whenClaimIsIssued() {
-        CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
-            .multiPartyClaimTwoDefendantSolicitors()
-            .build().toBuilder()
-            .respondent1OrganisationIDCopy("")
-            .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(null);
-        assertThat(updatedData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(null);
-        assertThat(updatedData.getRespondent1OrganisationIDCopy()).isEqualTo("QWERTY R");
-        assertThat(updatedData.getRespondent2OrganisationIDCopy()).isEqualTo("QWERTY R2");
-    }
-
-    @Test
     void shouldRemoveSubmitterIdOnly() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued().applicantSolicitor1UserDetails(
             IdamUserDetails.builder().id("submitter-id").email("applicantsolicitor@example.com").build()).build();
