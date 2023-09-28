@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
@@ -294,9 +293,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
     private final ResponseDocument respondent2SpecDefenceResponseDocument;
-
-    // user case role to populate ownedBy in system generated CaseDocument
-    private final CaseRole userCaseRole;
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
@@ -1022,7 +1018,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public String getApplicant1Email() {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
-    
+
     @JsonIgnore
     public String getHelpWithFeesReferenceNumber() {
         return Optional.ofNullable(getCaseDataLiP())

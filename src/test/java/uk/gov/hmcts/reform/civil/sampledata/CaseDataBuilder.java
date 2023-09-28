@@ -475,7 +475,6 @@ public class CaseDataBuilder {
     private IdamUserDetails claimantUserDetails;
 
     private UpdateDetailsForm updateDetailsForm;
-    private CaseRole userCaseRole;
 
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
@@ -5997,11 +5996,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder withUserCaseRole(CaseRole caseRole) {
-        this.userCaseRole = caseRole;
-        return this;
-    }
-
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -6278,7 +6272,6 @@ public class CaseDataBuilder {
             .claimantUserDetails(claimantUserDetails)
             .updateDetailsForm(updateDetailsForm)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
-            .userCaseRole(userCaseRole)
             .build();
     }
 }
