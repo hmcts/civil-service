@@ -76,7 +76,6 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         );
     }
 
-    @Transactional
     CallbackResponse populateValues(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
@@ -120,7 +119,6 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    @Transactional
     CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
