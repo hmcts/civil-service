@@ -261,6 +261,9 @@ public class BundleRequestMapper {
         bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(getWitnessDocsByPartyAndDocType(partyType, EvidenceUploadFiles.WITNESS_SUMMARY, caseData),
                                                                                 BundleFileNameList.WITNESS_SUMMARY.getDisplayName(),
                                                                                 EvidenceUploadFiles.WITNESS_SUMMARY.name(), partyType, false));
+        bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTS_REFERRED, caseData),
+                                                                                 BundleFileNameList.DOC_REFERRED_TO.getDisplayName(),
+                                                                                 EvidenceUploadFiles.DOCUMENTS_REFERRED.name(), partyType));
         bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(getWitnessDocsByPartyAndDocType(partyType, EvidenceUploadFiles.NOTICE_OF_INTENTION, caseData),
                                                                                  BundleFileNameList.HEARSAY_NOTICE.getDisplayName(),
                                                                                  EvidenceUploadFiles.NOTICE_OF_INTENTION.name(), partyType, false));
@@ -404,11 +407,12 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapStatementOfcaseDocs(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        log.info("System generated docs : " + caseData.getSystemGeneratedCaseDocuments());
         bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
                                                                            .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                                                                           .equals(DocumentType.SEALED_CLAIM)).collect(
-                                                                           Collectors.toList()),
+                                                                           .equals(DocumentType.SEALED_CLAIM)
+                                                                               && null != caseDocumentElement.getValue().getDocumentLink().getCategoryID()
+                                                                               && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"))
+                                                                           .collect(Collectors.toList()),
                                                                        BundleFileNameList.CLAIM_FORM.getDisplayName()));
         List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
         clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
@@ -578,14 +582,18 @@ public class BundleRequestMapper {
                                                                                       PartyType party) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (evidenceUploadDocList != null) {
-            if (documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name()) || documentType.equals(EvidenceUploadFiles.SKELETON_ARGUMENT.name())) {
+            if (documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name())
+                || documentType.equals(EvidenceUploadFiles.SKELETON_ARGUMENT.name())
+                || documentType.equals(EvidenceUploadFiles.COSTS.name())) {
                 sortEvidenceUploadByDate(evidenceUploadDocList, true);
             } else {
                 sortEvidenceUploadByDate(evidenceUploadDocList, false);
             }
 
             evidenceUploadDocList.forEach(uploadEvidenceDocumentTypeElement -> {
-                String docName = getFileNameBaseOnType(fileNamePrefix, uploadEvidenceDocumentTypeElement, documentType, party);
+                String docName = getFileNameBaseOnType(fileNamePrefix, uploadEvidenceDocumentTypeElement,
+                                                       documentType, party,
+                                                       String.valueOf(evidenceUploadDocList.indexOf(uploadEvidenceDocumentTypeElement)+1));
                 bundlingRequestDocuments.add(buildBundlingRequestDoc(docName, uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload(), documentType));
             });
         }
@@ -593,7 +601,7 @@ public class BundleRequestMapper {
     }
 
     private String getFileNameBaseOnType(String fileNamePrefix, Element<UploadEvidenceDocumentType> uploadEvidence,
-                                         String documentType, PartyType party) {
+                                         String documentType, PartyType party, String index) {
         if (fileNamePrefix.equals(DOC_FILE_NAME)) {
             return uploadEvidence.getValue().getDocumentUpload().getDocumentFileName()
                 .substring(0, uploadEvidence.getValue().getDocumentUpload().getDocumentFileName().lastIndexOf("."));
@@ -610,10 +618,19 @@ public class BundleRequestMapper {
                 && (party.equals(PartyType.DEFENDANT1) || party.equals(PartyType.DEFENDANT2))) {
                 partyName = partyName.concat(" counter");
             }
-            return generateDocName(fileNamePrefix, partyName, null,
-                            documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name()) || documentType.equals(EvidenceUploadFiles.SKELETON_ARGUMENT.name())
-                                ? uploadEvidence.getValue().getCreatedDatetime().toLocalDate() :
-                                uploadEvidence.getValue().getDocumentIssuedDate());
+            if (documentType.equals(EvidenceUploadFiles.DOCUMENTS_REFERRED.name())) {
+                return generateDocName(fileNamePrefix,
+                                       index,
+                                       null,
+                                       uploadEvidence.getValue().getDocumentIssuedDate());
+            } else {
+                return generateDocName(fileNamePrefix, partyName, null,
+                                       documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name()) || documentType.equals(
+                                           EvidenceUploadFiles.SKELETON_ARGUMENT.name())
+                                           ? uploadEvidence.getValue().getCreatedDatetime().toLocalDate() :
+                                           uploadEvidence.getValue().getDocumentIssuedDate()
+                );
+            }
         }
     }
 
