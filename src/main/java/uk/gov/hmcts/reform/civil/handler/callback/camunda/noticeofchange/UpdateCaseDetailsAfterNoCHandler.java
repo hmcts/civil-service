@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -133,13 +134,17 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                                            String replacedSolicitorCaseRole) {
         if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(replacedSolicitorCaseRole)) {
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
-            OrganisationPolicy updatedOrgPolicy =
-                respondent1OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
+            OrganisationPolicy updatedOrgPolicy = respondent1OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
+            if (caseData.getCaseAccessCategory() == CaseCategory.UNSPEC_CLAIM) {
+                updatedOrgPolicy.setOrganisation(null);
+            }
             caseDataBuilder.respondent1OrganisationPolicy(updatedOrgPolicy);
         } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(replacedSolicitorCaseRole)) {
             OrganisationPolicy respondent2OrganisationPolicy = caseData.getRespondent2OrganisationPolicy();
-            OrganisationPolicy updatedOrgPolicy =
-                respondent2OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
+            OrganisationPolicy updatedOrgPolicy = respondent2OrganisationPolicy.toBuilder().orgPolicyReference(null).build();
+            if (caseData.getCaseAccessCategory() == CaseCategory.UNSPEC_CLAIM) {
+                updatedOrgPolicy.setOrganisation(null);
+            }
             caseDataBuilder.respondent2OrganisationPolicy(updatedOrgPolicy);
         } else {
             OrganisationPolicy applicant1OrganisationPolicy = caseData.getApplicant1OrganisationPolicy();
