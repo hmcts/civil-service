@@ -559,7 +559,7 @@ class FlowStateAllowedEventServiceTest {
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
                         ADD_UNAVAILABLE_DATES,
-                        SET_ASIDE_JUDGMENT
+                        SET_ASIDE_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
                         RECORD_JUDGMENT
                     }
