@@ -37,7 +37,6 @@ public class RepresentativeService {
                 organisationId = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
             }
 
-            log.info("organisation1ID: " + organisationId);
             var representative = fromOrganisation(organisationService.findOrganisationById(organisationId)
                                                       .orElseThrow(RuntimeException::new));
 
