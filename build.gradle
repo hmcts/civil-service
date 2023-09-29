@@ -269,13 +269,6 @@ task runProdApiTests(type: Exec, description: 'Runs Prod features in functional 
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-prod'
 }
 
-task runNonProdApiTests(type: Exec, description: 'Runs Non Prod featuers in functional tests.') {
-  onlyIf {
-    return System.env.ENVIRONMENT == 'preview'
-  }
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nonprod'
-}
-
 task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
   onlyIf {
     return System.env.NIGHTLY_RUN == 'true'
@@ -300,7 +293,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness,
-    runProdApiTests, runNonProdApiTests, runNightlyApiTests))
+    runProdApiTests, runNightlyApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
@@ -369,7 +362,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.21'
+  implementation 'com.github.hmcts:civil-commons:1.0.24'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'

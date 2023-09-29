@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 
@@ -22,9 +23,11 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.ClaimantAndDefendantHeard;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
@@ -55,6 +58,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFI
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -79,6 +85,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String NOT_ALLOWED_DATE = "The date in %s may not be later than the established date";
     public static final String NOT_ALLOWED_DATE_RANGE = "The date range in %s may not have a 'from date', that is after the 'date to'";
     public static final String NOT_ALLOWED_DATE_PAST = "The date in %s may not be before the established date";
+    public String defendantTwoPartyName;
+    public String claimantTwoPartyName;
+    public static final String APPEAL_NOTICE_DATE = "Appeal notice date";
     private final LocationRefDataService locationRefDataService;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
@@ -184,9 +193,19 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CaseData.CaseDataBuilder<?, ?> populateFields(
         CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> locations, CaseData caseData, String authToken) {
         LocalDate advancedDate = LocalDate.now().plusDays(14);
+
+        populateClaimant2Defendant2PartyNames(caseData);
         return builder.finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders
                                                                                .builder().singleDate(LocalDate.now())
                                                                                .build()).build())
+            .finalOrderRepresentation(FinalOrderRepresentation.builder()
+                                          .typeRepresentationComplex(ClaimantAndDefendantHeard
+                                                                         .builder()
+                                                                         .typeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName())
+                                                                         .typeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName())
+                                                                         .typeRepresentationDefendantTwoDynamic(defendantTwoPartyName)
+                                                                         .typeRepresentationClaimantTwoDynamic(claimantTwoPartyName)
+                                                                         .build()).build())
             .finalOrderFurtherHearingComplex(
                 FinalOrderFurtherHearing.builder()
                     .hearingLocationList(populateCurrentHearingLocation(caseData, authToken))
@@ -206,7 +225,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                   .build())
             .publicFundingCostsProtection(YesOrNo.NO)
             .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                         .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                         .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                            .appealChoiceSecondDropdownA(
                                                                                AppealChoiceSecondDropdown.builder()
                                                                                    .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
@@ -215,7 +234,29 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                                                AppealChoiceSecondDropdown.builder()
                                                                                    .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
                                                                                    .build())
-                                                                           .build()).build());
+                                                                           .build())
+                                         .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                    .appealChoiceSecondDropdownA(
+                                                                        AppealChoiceSecondDropdown.builder()
+                                                                            .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                            .build())
+                                                                    .appealChoiceSecondDropdownB(
+                                                                        AppealChoiceSecondDropdown.builder()
+                                                                            .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                            .build())
+                                                                    .build()).build());
+    }
+
+    private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
+        claimantTwoPartyName = null;
+        defendantTwoPartyName = null;
+        MultiPartyScenario scenario = MultiPartyScenario.getMultiPartyScenario(caseData);
+        if (scenario == ONE_V_TWO_ONE_LEGAL_REP || scenario == ONE_V_TWO_TWO_LEGAL_REP) {
+            defendantTwoPartyName = caseData.getRespondent2().getPartyName();
+        }
+        if (scenario == TWO_V_ONE) {
+            claimantTwoPartyName = caseData.getApplicant2().getPartyName();
+        }
     }
 
     private void validateDate(LocalDate date, String dateDescription, String errorMessage, List<String> errors, Boolean pastDate) {
@@ -267,16 +308,28 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                      "Make an order for detailed/summary costs", NOT_ALLOWED_DATE_PAST, errors, true);
 
         validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
-                         .map(FinalOrderAppeal::getAppealGrantedRefusedDropdown)
+                         .map(FinalOrderAppeal::getAppealGrantedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownA)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
-                     "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
+                     APPEAL_NOTICE_DATE, NOT_ALLOWED_DATE_PAST, errors, true);
 
         validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
-                         .map(FinalOrderAppeal::getAppealGrantedRefusedDropdown)
+                         .map(FinalOrderAppeal::getAppealGrantedDropdown)
                          .map(AppealGrantedRefused::getAppealChoiceSecondDropdownB)
                          .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
-                     "Appeal notice date", NOT_ALLOWED_DATE_PAST, errors, true);
+                     APPEAL_NOTICE_DATE, NOT_ALLOWED_DATE_PAST, errors, true);
+
+        validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
+                         .map(FinalOrderAppeal::getAppealRefusedDropdown)
+                         .map(AppealGrantedRefused::getAppealChoiceSecondDropdownA)
+                         .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
+                     APPEAL_NOTICE_DATE, NOT_ALLOWED_DATE_PAST, errors, true);
+
+        validateDate(Optional.ofNullable(caseData.getFinalOrderAppealComplex())
+                         .map(FinalOrderAppeal::getAppealRefusedDropdown)
+                         .map(AppealGrantedRefused::getAppealChoiceSecondDropdownB)
+                         .map(AppealChoiceSecondDropdown::getAppealGrantedRefusedDate).orElse(null),
+                     APPEAL_NOTICE_DATE, NOT_ALLOWED_DATE_PAST, errors, true);
 
     }
 

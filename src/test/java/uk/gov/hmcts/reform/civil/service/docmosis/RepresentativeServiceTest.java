@@ -436,6 +436,39 @@ class RepresentativeServiceTest {
             );
         }
 
+        @Test
+        void shouldReturnValidOrganisationDetails_whenOrganisationIDIsEmpty() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .applicantSolicitor1ServiceAddress(applicantSolicitorServiceAddress)
+                .build();
+
+            Representative representative = representativeService.getRespondent2Representative(caseData);
+
+            verify(organisationService).findOrganisationById(
+                caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID());
+            assertThat(representative).extracting("organisationName").isEqualTo(respondent2Organisation.getName());
+            assertThat(representative).extracting("dxAddress").isEqualTo(
+                respondent2ContactInformation.getDxAddress().get(0).getDxNumber());
+            assertThat(representative).extracting("emailAddress").isEqualTo(
+                caseData.getRespondentSolicitor2EmailAddress());
+            assertThat(representative).extracting("serviceAddress").extracting(
+                "AddressLine1",
+                "AddressLine2",
+                "AddressLine3",
+                "County",
+                "Country",
+                "PostCode"
+            ).containsExactly(
+                respondent2ContactInformation.getAddressLine1(),
+                respondent2ContactInformation.getAddressLine2(),
+                respondent2ContactInformation.getAddressLine3(),
+                respondent2ContactInformation.getCounty(),
+                respondent2ContactInformation.getCountry(),
+                respondent2ContactInformation.getPostCode()
+            );
+        }
+
         @Nested
         class ToBeRemovedAfterNOC {
             @BeforeEach
