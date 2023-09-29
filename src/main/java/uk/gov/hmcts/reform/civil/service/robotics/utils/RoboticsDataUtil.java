@@ -26,7 +26,7 @@ public class RoboticsDataUtil {
         // NoOp
     }
 
-    private static NoticeOfChange getLatestChange(OrganisationPolicy orgPolicy, String litigantCode) {
+    private static NoticeOfChange getLatestChange(OrganisationPolicy orgPolicy, String litigantCode, CaseData caseData) {
         var latestChange = OrgPolicyUtils.getLatestOrganisationChanges(orgPolicy);
         if (latestChange != null) {
             return NoticeOfChange.builder()
@@ -40,9 +40,9 @@ public class RoboticsDataUtil {
 
     public static List<NoticeOfChange> buildNoticeOfChange(CaseData caseData) {
         var latestChanges =  Arrays.asList(
-                getLatestChange(caseData.getApplicant1OrganisationPolicy(), APPLICANT_SOLICITOR_ID),
-                getLatestChange(caseData.getRespondent1OrganisationPolicy(), RESPONDENT_ID),
-                getLatestChange(caseData.getRespondent2OrganisationPolicy(), RESPONDENT2_ID)
+                getLatestChange(caseData.getApplicant1OrganisationPolicy(), APPLICANT_SOLICITOR_ID, caseData),
+                getLatestChange(caseData.getRespondent1OrganisationPolicy(), RESPONDENT_ID, caseData),
+                getLatestChange(caseData.getRespondent2OrganisationPolicy(), RESPONDENT2_ID, caseData)
             )
             .stream()
             .filter(litigantChange -> litigantChange != null)
