@@ -42,5 +42,6 @@ public class SealedClaimResponseFormForSpec implements MappableObject {
     private final String paymentMethod;
     private final String hearingCourtLocation;
     private final StatementOfTruth statementOfTruth;
-    private final SealedClaimResponseForm commonDetails;
+    //repayment details for repayment plan that are common between LR and LiP
+    private final ResponseRepaymentDetailsForm commonDetails;
 }
