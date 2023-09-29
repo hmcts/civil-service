@@ -23,7 +23,7 @@ public class UserRoleCaching {
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
 
-    @Cacheable(cacheNames = "UserCache", cacheManager = "userCacheManager", key = "bearerToken")
+    @Cacheable(cacheNames = "UserCache", cacheManager = "userCacheManager", key = "#bearerToken")
     public List<String> getUserRoles(String bearerToken, String ccdCaseRef) {
         UserInfo userInfo = userService.getUserInfo(bearerToken);
         return coreCaseUserService.getUserCaseRoles(ccdCaseRef, userInfo.getUid());
