@@ -261,7 +261,8 @@ public class BundleRequestMapper {
         bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(getWitnessDocsByPartyAndDocType(partyType, EvidenceUploadFiles.WITNESS_SUMMARY, caseData),
                                                                                 BundleFileNameList.WITNESS_SUMMARY.getDisplayName(),
                                                                                 EvidenceUploadFiles.WITNESS_SUMMARY.name(), partyType, false));
-        bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTS_REFERRED, caseData),
+        bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(getEvidenceUploadDocsByPartyAndDocType(partyType,
+                                                                                                                           EvidenceUploadFiles.DOCUMENTS_REFERRED, caseData),
                                                                                  BundleFileNameList.DOC_REFERRED_TO.getDisplayName(),
                                                                                  EvidenceUploadFiles.DOCUMENTS_REFERRED.name(), partyType));
         bundlingRequestDocuments.addAll(covertWitnessEvidenceToBundleRequestDocs(getWitnessDocsByPartyAndDocType(partyType, EvidenceUploadFiles.NOTICE_OF_INTENTION, caseData),
@@ -593,7 +594,7 @@ public class BundleRequestMapper {
             evidenceUploadDocList.forEach(uploadEvidenceDocumentTypeElement -> {
                 String docName = getFileNameBaseOnType(fileNamePrefix, uploadEvidenceDocumentTypeElement,
                                                        documentType, party,
-                                                       String.valueOf(evidenceUploadDocList.indexOf(uploadEvidenceDocumentTypeElement)+1));
+                                                       String.valueOf(evidenceUploadDocList.indexOf(uploadEvidenceDocumentTypeElement) + 1));
                 bundlingRequestDocuments.add(buildBundlingRequestDoc(docName, uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload(), documentType));
             });
         }
