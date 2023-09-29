@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AppealList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList;
@@ -36,6 +37,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 
+import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
+import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.CaseHearingLengthElement;
@@ -47,6 +50,7 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
 import uk.gov.hmcts.reform.civil.model.finalorders.TrialNoticeProcedure;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -70,11 +74,13 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.COSTS;
@@ -224,7 +230,54 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
-    void shouldGenerateAssistedFormOrder_whenRecitalsNotSelected() {
+    void shouldGenerateAssistedFormOrder_whenOptionalSectionsNotPresent() {
+        //Given: case data without recitals selected
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_PDF)))
+            .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
+            .thenReturn(ASSISTED_FROM_ORDER);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+            // Order made section
+            .finalOrderMadeSelection(NO)
+            // judge heard from section
+            .finalOrderJudgeHeardFrom(null)
+            // recitals section
+            .finalOrderRecitals(null)
+            // ordered section
+            .finalOrderOrderedThatText("order text")
+            // Further hearing section
+            .finalOrderFurtherHearingToggle(null)
+            .finalOrderFurtherHearingComplex(null)
+            // Costs section
+            .assistedOrderCostList(AssistedCostTypesList.COSTS_IN_THE_CASE)
+            .assistedOrderMakeAnOrderForCosts(null)
+            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder().makeAnOrderForCostsList(null).build())
+            .publicFundingCostsProtection(NO)
+            // Appeal section
+            .finalOrderAppealToggle(null)
+            // initiative or without notice section
+            .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
+            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder()
+                                              .ownInitiativeText("own initiative test")
+                                              .ownInitiativeDate(LocalDate.now())
+                                              .build())
+            .finalOrderGiveReasonsYesNo(NO)
+            .build();
+
+        //When: Assisted order document generation called
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        //Then: It should generate assisted order document
+        assertNotNull(caseDocument);
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER));
+    }
+
+    @Test
+    void shouldGenerateAssistedFormOrder_whenOtherOptions() {
         //Given: case data without recitals selected
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
@@ -238,6 +291,11 @@ public class JudgeFinalOrderGeneratorTest {
             // Order made section
             .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
                 LocalDate.now()).build()).build())
+            // judge heard from section
+            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(null)
+                                          .typeRepresentationList(FinalOrderRepresentationList.OTHER_REPRESENTATION)
+                                          .typeRepresentationOtherComplex(ClaimantAndDefendantHeard
+                                                                              .builder().detailsRepresentationText("Test").build()).build())
             // Order made on court's own initiative section
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
             .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
@@ -249,6 +307,7 @@ public class JudgeFinalOrderGeneratorTest {
             // Costs section
             .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
             .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
+                                                  .makeAnOrderForCostsYesOrNo(YES)
                                                   .assistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
                                                   .assistedOrderAssessmentSecondDropdownList2(CostEnums.YES)
                                                   .makeAnOrderForCostsList(COSTS)
@@ -256,6 +315,19 @@ public class JudgeFinalOrderGeneratorTest {
                                                   .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
                                                   .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT).build())
             .publicFundingCostsProtection(YES)
+            // Appeal section
+            .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                         .applicationList(ApplicationAppealList.REFUSED)
+                                         .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                    .circuitOrHighCourtListRefuse(ApplicationAppealList.CIRCUIT_COURT)
+                                                                    .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                     .build()).build()).build())
+            // initiative or without notice section
+            .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
+            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder()
+                                              .ownInitiativeText("own initiative test")
+                                              .ownInitiativeDate(LocalDate.now())
+                                              .build())
             .build();
 
         //When: Assisted order document generation called
@@ -294,11 +366,8 @@ public class JudgeFinalOrderGeneratorTest {
             .addApplicant2(YES)
             .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(
                     finalOrdersJudgePapersList)
-                                          .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT).typeRepresentationOtherComplex(
-                    ClaimantAndDefendantHeard.builder().detailsRepresentationText("Test").build()).build())
-            // Order made on court's own initiative section
-            .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
-            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
+                                          .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                                          .typeRepresentationComplex(ClaimantAndDefendantHeard.builder().build()).build())
             // recitals section
             .finalOrderRecitals(toggleList)
             .finalOrderRecitalsRecorded(FinalOrderRecitalsRecorded.builder().text("Test").build())
@@ -313,6 +382,7 @@ public class JudgeFinalOrderGeneratorTest {
             // Costs section
             .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
             .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
+                                                  .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
                                                   .assistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
                                                   .makeAnOrderForCostsList(COSTS)
                                                   .assistedOrderClaimantDefendantFirstDropdown(COSTS)
@@ -321,8 +391,20 @@ public class JudgeFinalOrderGeneratorTest {
             .assistedOrderCostsReserved(AssistedOrderCostDetails.builder().detailsRepresentationText("Test").build())
             .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("Test").build())
             .assistedOrderCostsBespoke(AssistedOrderCostDetails.builder().besPokeCostDetailsText("Test").build())
-            .finalOrderAppealToggle(toggleList)
             .publicFundingCostsProtection(YES)
+            // Appeal section
+            .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                         .applicationList(ApplicationAppealList.GRANTED)
+                                         .appealGrantedDropdown(AppealGrantedRefused.builder()
+                                                                    .circuitOrHighCourtList(ApplicationAppealList.HIGH_COURT)
+                                                                    .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                     .build()).build()).build())
+            // initiative or without notice section
+            .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
+            .orderMadeOnDetailsOrderWithoutNotice(OrderMadeOnDetailsOrderWithoutNotice.builder()
+                                                      .withOutNoticeText("without notice test")
+                                                      .withOutNoticeDate(LocalDate.now())
+                                                      .build())
             .build();
         //When: Assisted order document generation called
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -346,23 +428,13 @@ public class JudgeFinalOrderGeneratorTest {
             String name = caseData.getRespondent1().getPartyName();
             String response = generator.defendantAttendsOrRepresentedTextBuilder(caseData, false);
             switch (finalOrdersDefendantRepresentationList) {
-                case COUNSEL_FOR_DEFENDANT:
-                    assertEquals(format("Counsel for %s, the defendant.", name), response);
-                    break;
-                case SOLICITOR_FOR_DEFENDANT:
-                    assertEquals(format("Solicitor for %s, the defendant.", name), response);
-                    break;
-                case COST_DRAFTSMAN_FOR_THE_DEFENDANT:
-                    assertEquals(format("Costs draftsman for %s, the defendant.", name), response);
-                    break;
-                case THE_DEFENDANT_IN_PERSON:
-                    assertEquals(format("%s, the defendant, in person.", name), response);
-                    break;
-                case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT:
-                    assertEquals(format("A lay representative for %s, the defendant.", name), response);
-                    break;
-                default:
-                    break;
+                case COUNSEL_FOR_DEFENDANT -> assertEquals(format("Counsel for %s, the defendant.", name), response);
+                case SOLICITOR_FOR_DEFENDANT -> assertEquals(format("Solicitor for %s, the defendant.", name), response);
+                case COST_DRAFTSMAN_FOR_THE_DEFENDANT -> assertEquals(format("Costs draftsman for %s, the defendant.", name), response);
+                case THE_DEFENDANT_IN_PERSON -> assertEquals(format("%s, the defendant, in person.", name), response);
+                case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> assertEquals(format("A lay representative for %s, the defendant.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -383,23 +455,13 @@ public class JudgeFinalOrderGeneratorTest {
             String name = caseData.getRespondent2().getPartyName();
             String response = generator.defendantAttendsOrRepresentedTextBuilder(caseData, true);
             switch (finalOrdersDefendantRepresentationList) {
-                case COUNSEL_FOR_DEFENDANT:
-                    assertEquals(format("Counsel for %s, the defendant.", name), response);
-                    break;
-                case SOLICITOR_FOR_DEFENDANT:
-                    assertEquals(format("Solicitor for %s, the defendant.", name), response);
-                    break;
-                case COST_DRAFTSMAN_FOR_THE_DEFENDANT:
-                    assertEquals(format("Costs draftsman for %s, the defendant.", name), response);
-                    break;
-                case THE_DEFENDANT_IN_PERSON:
-                    assertEquals(format("%s, the defendant, in person.", name), response);
-                    break;
-                case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT:
-                    assertEquals(format("A lay representative for %s, the defendant.", name), response);
-                    break;
-                default:
-                    break;
+                case COUNSEL_FOR_DEFENDANT -> assertEquals(format("Counsel for %s, the defendant.", name), response);
+                case SOLICITOR_FOR_DEFENDANT -> assertEquals(format("Solicitor for %s, the defendant.", name), response);
+                case COST_DRAFTSMAN_FOR_THE_DEFENDANT -> assertEquals(format("Costs draftsman for %s, the defendant.", name), response);
+                case THE_DEFENDANT_IN_PERSON -> assertEquals(format("%s, the defendant, in person.", name), response);
+                case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> assertEquals(format("A lay representative for %s, the defendant.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -417,23 +479,13 @@ public class JudgeFinalOrderGeneratorTest {
             String name = caseData.getApplicant1().getPartyName();
             String response = generator.claimantAttendsOrRepresentedTextBuilder(caseData, false);
             switch (finalOrdersClaimantRepresentationList) {
-                case COUNSEL_FOR_CLAIMANT:
-                    assertEquals(format("Counsel for %s, the claimant.", name), response);
-                    break;
-                case SOLICITOR_FOR_CLAIMANT:
-                    assertEquals(format("Solicitor for %s, the claimant.", name), response);
-                    break;
-                case COST_DRAFTSMAN_FOR_THE_CLAIMANT:
-                    assertEquals(format("Costs draftsman for %s, the claimant.", name), response);
-                    break;
-                case THE_CLAIMANT_IN_PERSON:
-                    assertEquals(format("%s, the claimant, in person.", name), response);
-                    break;
-                case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT:
-                    assertEquals(format("A lay representative for %s, the claimant.", name), response);
-                    break;
-                default:
-                    break;
+                case COUNSEL_FOR_CLAIMANT -> assertEquals(format("Counsel for %s, the claimant.", name), response);
+                case SOLICITOR_FOR_CLAIMANT -> assertEquals(format("Solicitor for %s, the claimant.", name), response);
+                case COST_DRAFTSMAN_FOR_THE_CLAIMANT -> assertEquals(format("Costs draftsman for %s, the claimant.", name), response);
+                case THE_CLAIMANT_IN_PERSON -> assertEquals(format("%s, the claimant, in person.", name), response);
+                case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> assertEquals(format("A lay representative for %s, the claimant.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -453,23 +505,13 @@ public class JudgeFinalOrderGeneratorTest {
             String name = caseData.getApplicant2().getPartyName();
             String response = generator.claimantAttendsOrRepresentedTextBuilder(caseData, true);
             switch (finalOrdersClaimantRepresentationList) {
-                case COUNSEL_FOR_CLAIMANT:
-                    assertEquals(format("Counsel for %s, the claimant.", name), response);
-                    break;
-                case SOLICITOR_FOR_CLAIMANT:
-                    assertEquals(format("Solicitor for %s, the claimant.", name), response);
-                    break;
-                case COST_DRAFTSMAN_FOR_THE_CLAIMANT:
-                    assertEquals(format("Costs draftsman for %s, the claimant.", name), response);
-                    break;
-                case THE_CLAIMANT_IN_PERSON:
-                    assertEquals(format("%s, the claimant, in person.", name), response);
-                    break;
-                case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT:
-                    assertEquals(format("A lay representative for %s, the claimant.", name), response);
-                    break;
-                default:
-                    break;
+                case COUNSEL_FOR_CLAIMANT -> assertEquals(format("Counsel for %s, the claimant.", name), response);
+                case SOLICITOR_FOR_CLAIMANT -> assertEquals(format("Solicitor for %s, the claimant.", name), response);
+                case COST_DRAFTSMAN_FOR_THE_CLAIMANT -> assertEquals(format("Costs draftsman for %s, the claimant.", name), response);
+                case THE_CLAIMANT_IN_PERSON -> assertEquals(format("%s, the claimant, in person.", name), response);
+                case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> assertEquals(format("A lay representative for %s, the claimant.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -487,32 +529,19 @@ public class JudgeFinalOrderGeneratorTest {
             String name = caseData.getRespondent1().getPartyName();
             String response = generator.defendantNotAttendingText(caseData, false, name);
             switch (finalOrdersClaimantDefendantNotAttending) {
-                case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the defendant, did not attend the trial. "
-                            + "The Judge was not satisfied that they had received notice of the hearing "
-                            + "and it was not reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_REASONABLE_TO_PROCEED:
-                    assertEquals(
-                        format(
-                            "%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
-                                + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                            name
-                        ), response
-                    );
-                    break;
-                default:
-                    break;
+                case NOT_SATISFIED_NOTICE_OF_TRIAL -> assertEquals(format(
+                    "%s, the defendant, did not attend the trial. "
+                        + "The Judge was not satisfied that they had received notice of the hearing "
+                        + "and it was not reasonable to proceed in their absence.", name), response);
+                case SATISFIED_NOTICE_OF_TRIAL -> assertEquals(format(
+                    "%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had "
+                        + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.", name), response);
+                case SATISFIED_REASONABLE_TO_PROCEED -> assertEquals(
+                    format(
+                        "%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
+                            + "received notice of the trial and determined that it was reasonable to proceed in their absence.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -533,32 +562,19 @@ public class JudgeFinalOrderGeneratorTest {
             String name = caseData.getRespondent2().getPartyName();
             String response = generator.defendantNotAttendingText(caseData, true, name);
             switch (finalOrdersClaimantDefendantNotAttending) {
-                case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the defendant, did not attend the trial. "
-                            + "The Judge was not satisfied that they had received notice of the hearing "
-                            + "and it was not reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_REASONABLE_TO_PROCEED:
-                    assertEquals(
-                        format(
-                            "%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
-                                + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                            name
-                        ), response
-                    );
-                    break;
-                default:
-                    break;
+                case NOT_SATISFIED_NOTICE_OF_TRIAL -> assertEquals(format(
+                    "%s, the defendant, did not attend the trial. "
+                        + "The Judge was not satisfied that they had received notice of the hearing "
+                        + "and it was not reasonable to proceed in their absence.", name), response);
+                case SATISFIED_NOTICE_OF_TRIAL -> assertEquals(format(
+                    "%s, the defendant, did not attend the trial and, whilst the Judge was satisfied that they had "
+                        + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.", name), response);
+                case SATISFIED_REASONABLE_TO_PROCEED -> assertEquals(
+                    format(
+                        "%s, the defendant, did not attend the trial. The Judge was satisfied that they had "
+                            + "received notice of the trial and determined that it was reasonable to proceed in their absence.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -576,30 +592,18 @@ public class JudgeFinalOrderGeneratorTest {
             String name = caseData.getApplicant1().getPartyName();
             String response = generator.claimantNotAttendingText(caseData, false, name);
             switch (finalOrdersClaimantDefendantNotAttending) {
-                case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial. "
-                            + "The Judge was not satisfied that they had received notice of the hearing "
-                            + "and it was not reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_REASONABLE_TO_PROCEED:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
-                            + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                default:
-                    break;
+                case NOT_SATISFIED_NOTICE_OF_TRIAL -> assertEquals(format(
+                    "%s, the claimant, did not attend the trial. "
+                        + "The Judge was not satisfied that they had received notice of the hearing "
+                        + "and it was not reasonable to proceed in their absence.", name), response);
+                case SATISFIED_NOTICE_OF_TRIAL -> assertEquals(format(
+                    "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had "
+                        + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.", name), response);
+                case SATISFIED_REASONABLE_TO_PROCEED -> assertEquals(format(
+                    "%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
+                        + "received notice of the trial and determined that it was reasonable to proceed in their absence.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -619,30 +623,18 @@ public class JudgeFinalOrderGeneratorTest {
             String name = caseData.getApplicant2().getPartyName();
             String response = generator.claimantNotAttendingText(caseData, true, name);
             switch (finalOrdersClaimantDefendantNotAttending) {
-                case NOT_SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial. "
-                            + "The Judge was not satisfied that they had received notice of the hearing "
-                            + "and it was not reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_NOTICE_OF_TRIAL:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had "
-                            + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                case SATISFIED_REASONABLE_TO_PROCEED:
-                    assertEquals(format(
-                        "%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
-                            + "received notice of the trial and determined that it was reasonable to proceed in their absence.",
-                        name
-                    ), response);
-                    break;
-                default:
-                    break;
+                case NOT_SATISFIED_NOTICE_OF_TRIAL -> assertEquals(format(
+                    "%s, the claimant, did not attend the trial. "
+                        + "The Judge was not satisfied that they had received notice of the hearing "
+                        + "and it was not reasonable to proceed in their absence.", name), response);
+                case SATISFIED_NOTICE_OF_TRIAL -> assertEquals(format(
+                    "%s, the claimant, did not attend the trial and, whilst the Judge was satisfied that they had "
+                        + "received notice of the trial, the Judge was not satisfied that it was reasonable to proceed in their absence.", name), response);
+                case SATISFIED_REASONABLE_TO_PROCEED -> assertEquals(format(
+                    "%s, the claimant, did not attend the trial. The Judge was satisfied that they had "
+                        + "received notice of the trial and determined that it was reasonable to proceed in their absence.", name), response);
+                default -> {
+                }
             }
         }
     }
@@ -661,26 +653,14 @@ public class JudgeFinalOrderGeneratorTest {
                                                                           .build()).build()).build();
             String response = generator.getFurtherHearingLength(caseData);
             switch (hearingLengthFinalOrderList) {
-                case MINUTES_15:
-                    assertEquals("15 minutes", response);
-                    break;
-                case MINUTES_30:
-                    assertEquals("30 minutes", response);
-                    break;
-                case HOUR_1:
-                    assertEquals("1 hour", response);
-                    break;
-                case HOUR_1_5:
-                    assertEquals("1.5 hours", response);
-                    break;
-                case HOUR_2:
-                    assertEquals("2 hours", response);
-                    break;
-                case OTHER:
-                    assertEquals("12 days 1 hours 30 minutes", response);
-                    break;
-                default:
-                    break;
+                case MINUTES_15 -> assertEquals("15 minutes", response);
+                case MINUTES_30 -> assertEquals("30 minutes", response);
+                case HOUR_1 -> assertEquals("1 hour", response);
+                case HOUR_1_5 -> assertEquals("1.5 hours", response);
+                case HOUR_2 -> assertEquals("2 hours", response);
+                case OTHER -> assertEquals("12 days 1 hours 30 minutes", response);
+                default -> {
+                }
             }
         }
     }
@@ -881,4 +861,132 @@ public class JudgeFinalOrderGeneratorTest {
         assertEquals(false, responseFalse);
 
     }
+
+    @ParameterizedTest
+    @MethodSource("testCircuitOrHighCourtData")
+    void testCircuitOrHighCourt(CaseData caseData, String expectedResponse) {
+        String response = generator.circuitOrHighCourt(caseData);
+        assertEquals(expectedResponse, response);
+    }
+
+    static Stream<Arguments> testCircuitOrHighCourtData() {
+        return Stream.of(
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.REFUSED)
+                                                 .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtListRefuse(ApplicationAppealList.CIRCUIT_COURT)
+                                                                            .build()).build()).build(),
+                "a"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.GRANTED)
+                                                 .appealGrantedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtList(ApplicationAppealList.CIRCUIT_COURT)
+                                                                            .build()).build()).build(),
+                "a"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.REFUSED)
+                                                 .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtListRefuse(ApplicationAppealList.HIGH_COURT)
+                                                                            .build()).build()).build(),
+                "b"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.GRANTED)
+                                                 .appealGrantedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtList(ApplicationAppealList.HIGH_COURT)
+                                                                            .build()).build()).build(),
+                "b"
+            )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testGetAppealDateData")
+    void testGetAppealDate(CaseData caseData, LocalDate expectedResponse) {
+        LocalDate response = generator.getAppealDate(caseData);
+        assertEquals(expectedResponse, response);
+    }
+
+    static Stream<Arguments> testGetAppealDateData() {
+        return Stream.of(
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.REFUSED)
+                                                 .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtListRefuse(ApplicationAppealList.CIRCUIT_COURT)
+                                                                            .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                             .appealGrantedRefusedDate(LocalDate.now().plusDays(1))
+                                                                                                             .build()).build()).build()).build(),
+                LocalDate.now().plusDays(1)
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.GRANTED)
+                                                 .appealGrantedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtList(ApplicationAppealList.CIRCUIT_COURT)
+                                                                            .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                             .appealGrantedRefusedDate(LocalDate.now().plusDays(10))
+                                                                                                             .build()).build()).build()).build(),
+                LocalDate.now().plusDays(10)
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.REFUSED)
+                                                 .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtListRefuse(ApplicationAppealList.HIGH_COURT)
+                                                                            .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                             .appealGrantedRefusedDate(LocalDate.now().plusDays(5))
+                                                                                                             .build()).build()).build()).build(),
+                LocalDate.now().plusDays(5)
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderAppealComplex(FinalOrderAppeal
+                                                 .builder().applicationList(ApplicationAppealList.GRANTED)
+                                                 .appealGrantedDropdown(AppealGrantedRefused.builder()
+                                                                            .circuitOrHighCourtList(ApplicationAppealList.HIGH_COURT)
+                                                                            .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                             .appealGrantedRefusedDate(LocalDate.now().plusDays(5))
+                                                                                                             .build()).build()).build()).build(),
+                LocalDate.now().plusDays(5)
+            )
+        );
+    }
+
+    @Test
+    void testGetInitiativeTextWithoutNotice() {
+        CaseData caseDataInitiative = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
+            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeText("test initiative text").build())
+            .build();
+        String responseInitiative = generator.getInitiativeOrWithoutNotice(caseDataInitiative);
+        assertEquals("test initiative text", responseInitiative);
+
+        CaseData caseDataWithoutNotice = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
+            .orderMadeOnDetailsOrderWithoutNotice(OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeText("test without notice text").build())
+            .build();
+        String responseWithoutNotice = generator.getInitiativeOrWithoutNotice(caseDataWithoutNotice);
+        assertEquals("test without notice text", responseWithoutNotice);
+
+        CaseData caseDataWhenNone = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .orderMadeOnDetailsList(OrderMadeOnTypes.NONE)
+            .build();
+        String responseWhenNone = generator.getInitiativeOrWithoutNotice(caseDataWhenNone);
+        assertNull(responseWhenNone);
+    }
+
 }
