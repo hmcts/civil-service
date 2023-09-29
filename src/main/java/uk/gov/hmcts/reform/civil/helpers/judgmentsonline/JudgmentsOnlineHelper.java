@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRTLStatus;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class JudgmentsOnlineHelper {
 
@@ -25,6 +26,13 @@ public class JudgmentsOnlineHelper {
     public static boolean validateIfFutureDate(LocalDate date) {
         LocalDate today = LocalDate.now();
         if (date.isAfter(today)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean checkIfDateDifferenceIsGreaterThan30Days(LocalDate firstDate, LocalDate secondDate) {
+        if (ChronoUnit.DAYS.between(firstDate, secondDate) > 30) {
             return true;
         }
         return false;
