@@ -463,7 +463,8 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        migrateCase,
+                        CLAIMANT_RESPONSE_CUI
                     }
                 ),
                 of(
@@ -480,7 +481,8 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
-                        migrateCase
+                        migrateCase,
+                        CLAIMANT_RESPONSE_CUI
                     }
                 ),
                 of(
