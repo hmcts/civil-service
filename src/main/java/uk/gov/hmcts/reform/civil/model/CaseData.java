@@ -621,6 +621,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
     private LocalDate joPaymentToBeMadeByDate;
     private YesOrNo joIsLiveJudgmentExists;
+    private LocalDate joSetAsideDate;
     private JudgmentPaidInFull joJudgmentPaidInFull;
 
     /**
@@ -1000,11 +1001,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public List<Element<RecurringExpenseLRspec>> getRecurringExpensesForRespondent1() {
         if (isFullAdmitClaimSpec()) {
-            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA).orElse(
-                null);
+            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA)
+                .orElse(
+                    null);
         }
         return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpenses).orElse(
             null);
+    }
+
+    @JsonIgnore
+    public List<Element<ManageDocument>> getManageDocumentsList() {
+        return Optional.ofNullable(getManageDocuments()).orElse(new ArrayList<>());
     }
 
     @JsonIgnore
