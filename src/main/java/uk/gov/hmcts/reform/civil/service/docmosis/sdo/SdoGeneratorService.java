@@ -6,9 +6,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -18,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
@@ -163,26 +162,22 @@ public class SdoGeneratorService {
 
         sdoDocumentBuilder
             .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
-            .disposalHearingTime(caseData.getDisposalHearingHearingTime())
-            .disposalHearingTimeEstimate(SdoHelper.getDisposalHearingTimeLabel(caseData));
+            .disposalHearingTime(caseData.getDisposalHearingHearingTime());
+        Optional.ofNullable(caseData.getDisposalHearingHearingTime())
+            .map(DisposalHearingHearingTime::getTime)
+            .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
+            .ifPresent(sdoDocumentBuilder::disposalHearingTimeEstimate);
 
-        if (caseData.getDisposalHearingMethod() == DisposalHearingMethod.disposalHearingMethodInPerson) {
-            sdoDocumentBuilder.hearingLocation(
-                locationHelper.getHearingLocation(
-                    Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
-                        .map(DynamicList::getValue)
-                        .map(DynamicListElement::getLabel)
-                        .orElse(null),
-                    caseData,
-                    authorisation
-                ));
-        } else {
-            sdoDocumentBuilder.hearingLocation(locationHelper.getHearingLocation(
-                null,
+        sdoDocumentBuilder.hearingLocation(
+            locationHelper.getHearingLocation(
+                Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
+                    .map(DynamicList::getValue)
+                    .map(DynamicListElement::getLabel)
+                    .orElse(null),
                 caseData,
                 authorisation
-            ));
-        }
+            ))
+            .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
         return sdoDocumentBuilder.build();
     }
@@ -291,23 +286,16 @@ public class SdoGeneratorService {
             .fastTrackHearingTime(caseData.getFastTrackHearingTime())
             .fastTrackHearingTimeEstimate(SdoHelper.getFastClaimsHearingTimeLabel(caseData));
 
-        if (caseData.getFastTrackMethod() == FastTrackMethod.fastTrackMethodInPerson) {
-            sdoDocumentFormBuilder
-                .hearingLocation(locationHelper.getHearingLocation(
-                    Optional.ofNullable(caseData.getFastTrackMethodInPerson())
-                        .map(DynamicList::getValue)
-                        .map(DynamicListElement::getLabel)
-                        .orElse(null),
-                    caseData,
-                    authorisation
-                ));
-        } else {
-            sdoDocumentFormBuilder.hearingLocation(locationHelper.getHearingLocation(
-                null,
+        sdoDocumentFormBuilder
+            .hearingLocation(locationHelper.getHearingLocation(
+                Optional.ofNullable(caseData.getFastTrackMethodInPerson())
+                    .map(DynamicList::getValue)
+                    .map(DynamicListElement::getLabel)
+                    .orElse(null),
                 caseData,
                 authorisation
-            ));
-        }
+            ))
+            .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
         return sdoDocumentFormBuilder.build();
     }
@@ -378,8 +366,7 @@ public class SdoGeneratorService {
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsNumberOfWitnessesToggle")
             );
 
-        if (caseData.getSmallClaimsMethod() == SmallClaimsMethod.smallClaimsMethodInPerson) {
-            sdoDocumentFormBuilder.hearingLocation(
+        sdoDocumentFormBuilder.hearingLocation(
                 locationHelper.getHearingLocation(
                     Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
                         .map(DynamicList::getValue)
@@ -387,16 +374,12 @@ public class SdoGeneratorService {
                         .orElse(null),
                     caseData,
                     authorisation
-                ));
-        } else {
-            sdoDocumentFormBuilder.hearingLocation(locationHelper.getHearingLocation(
-                null,
-                caseData,
-                authorisation
-            ));
-        }
+                ))
+            .caseManagementLocation(
+                locationHelper.getHearingLocation(null, caseData, authorisation));
 
         return sdoDocumentFormBuilder
             .build();
     }
+
 }
