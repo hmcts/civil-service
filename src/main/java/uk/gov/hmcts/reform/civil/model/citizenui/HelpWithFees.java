@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HelpWithFees {
-    
+
     private YesOrNo helpWithFee;
     private String helpWithFeesReferenceNumber;
 }
