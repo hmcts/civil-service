@@ -226,6 +226,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .atStateClaimIssued()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1OrganisationIDCopy("QWERTY R")
                 .changeOfRepresentation(false, true, "QWERTY R", "QWERTY R2", null)
                 .changeOrganisationRequestField(false, true, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(false, true, "QWERTY R")
