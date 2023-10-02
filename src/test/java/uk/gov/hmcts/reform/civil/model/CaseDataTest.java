@@ -657,6 +657,17 @@ public class CaseDataTest {
         //Then
         assertTrue(caseData.getApplicant1ResponseDeadlinePassed());
     }
+
+    @Test
+    void shouldReturnEmptyArrayListOfManageDocumentsIfNull() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().build();
+        //When
+        //Then
+        assertThat(caseData.getManageDocumentsList()).isNotNull();
+        assertThat(caseData.getManageDocumentsList()).isEmpty();
+
+    }
 }
 
 
