@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.fees.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,6 +17,7 @@ import java.math.BigDecimal;
 @ConditionalOnProperty(prefix = "fees.api", name = "url")
 
 public class FeesClient {
+    private static final Logger LOG = LoggerFactory.getLogger(FeesClient.class);
 
     private final FeesApi feesApi;
     private final String service;
@@ -51,8 +54,19 @@ public class FeesClient {
                     ? "MoneyClaim"
                     : "HearingSmallClaims";
             }
+            LOG.info("Calling fee lookup service with keyword : " + keyword + " and event : " + event);
+            FeeLookupResponseDto feeLookupResponseDto = this.feesApi.lookupFee(
+                service,
+                jurisdiction1,
+                jurisdiction2,
+                channel,
+                event,
+                keyword,
+                amount
+            );
 
-            return this.feesApi.lookupFee(service, jurisdiction1, jurisdiction2, channel, event, keyword, amount);
+            LOG.info("Fee returned from fee api is " + feeLookupResponseDto.getFeeAmount());
+            return feeLookupResponseDto;
         } else {
             return this.feesApi.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
         }
