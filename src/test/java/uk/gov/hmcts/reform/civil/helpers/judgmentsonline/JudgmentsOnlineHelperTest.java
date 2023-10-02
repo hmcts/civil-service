@@ -16,6 +16,8 @@ public class JudgmentsOnlineHelperTest {
             "M");
         assertThat(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.CANCELLED)).isEqualTo(
             "C");
+        assertThat(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.SET_ASIDE)).isEqualTo(
+            "C");
         assertThat(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.SATISFIED)).isEqualTo(
             "S");
     }
