@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
@@ -37,11 +38,20 @@ public class FeesClient {
     }
 
     public FeeLookupResponseDto lookupFee(String channel, String event, BigDecimal amount) {
-        String keyword = event.equalsIgnoreCase("issue")
-            ? "MoneyClaim"
-            : "HearingSmallClaims";
-
         if (featureToggleService.isFeatureEnabled("fee-keywords-enable")) {
+            String keyword;
+
+            if (featureToggleService.isLipVLipEnabled() && "hearing".equalsIgnoreCase(event) && AllocatedTrack.FAST_CLAIM == AllocatedTrack.getAllocatedTrack(
+                amount,
+                null
+            )) {
+                keyword = "FastTrackHrg";
+            } else {
+                keyword = event.equalsIgnoreCase("issue")
+                    ? "MoneyClaim"
+                    : "HearingSmallClaims";
+            }
+
             return this.feesApi.lookupFee(service, jurisdiction1, jurisdiction2, channel, event, keyword, amount);
         } else {
             return this.feesApi.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
