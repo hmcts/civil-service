@@ -84,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICAT
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
@@ -531,9 +532,9 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
+                SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
                 RECORD_JUDGMENT
-
             )
         ),
 
@@ -1074,10 +1075,10 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
+                SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
                 RECORD_JUDGMENT,
                 LIP_CLAIM_SETTLED
-
             )
         ),
 
