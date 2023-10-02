@@ -50,7 +50,7 @@ class SendSDOBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).documentLink(DOCUMENT_LINK).build()))
             .respondent1(respondent1)
             .build();
-        given(documentDownloadService.downloadDocument(any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
+        given(documentDownloadService.downloadDocument(any(), any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
 
         // when
         sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);

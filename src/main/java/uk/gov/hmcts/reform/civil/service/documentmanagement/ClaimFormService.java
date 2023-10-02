@@ -20,15 +20,15 @@ public class ClaimFormService {
 
     private final DocumentDownloadService documentDownloadService;
 
+    @Autowired
+    private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
+
     public CaseDocument uploadSealedDocument(
          String authorisation, CaseData caseData) {
         return sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
     }
 
-    @Autowired
-    private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
-
-    public DownloadedDocumentResponse downloadDocumentById(String caseDocumentId) {
-        return documentDownloadService.downloadDocument(caseDocumentId);
+    public DownloadedDocumentResponse downloadDocumentById(String authorisation, String caseDocumentId) {
+        return documentDownloadService.downloadDocument(authorisation, caseDocumentId);
     }
 }
