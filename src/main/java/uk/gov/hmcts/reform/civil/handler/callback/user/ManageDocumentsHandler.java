@@ -44,5 +44,4 @@ public class ManageDocumentsHandler extends CallbackHandler {
             .data(callbackParams.getCaseData().toMap(objectMapper))
             .build();
     }
-
 }
