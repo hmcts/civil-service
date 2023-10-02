@@ -60,13 +60,13 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OTHER_SUPPORT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SETTLE_OR_DISCONTINUE_CONSENT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SETTLE_BY_CONSENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_OR_DISCONTINUE_CONSENT;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_UNAVAILABILITY_RANGE;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.TRIAL_DATE_FROM_REQUIRED;
@@ -271,7 +271,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotCauseAnyErrorsWhenGaTypeIsMultipleTypeWithSettleOrDiscontinueConsent() {
             List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT,
-                    SETTLE_OR_DISCONTINUE_CONSENT);
+                    SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
                     .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
 
@@ -284,7 +284,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
             assertThat(response.getErrors().size()).isEqualTo(1);
             assertThat(response.getErrors().get(0).equals("It is not possible to select an additional application type " +
-                    "when applying to settle or discontinue by consent"));
+                    "when applying to Settle by consent"));
         }
     }
 
@@ -376,7 +376,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotCauseAnyErrors_whenGaTypeIsNotSettleOrDiscontinueConsentYes() {
 
-            List<GeneralApplicationTypes> types = List.of(SETTLE_OR_DISCONTINUE_CONSENT);
+            List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
                     .builder().generalAppType(GAApplicationType.builder().types(types).build())
                     .build().toBuilder()
@@ -394,7 +394,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCauseError_whenGaTypeIsNotSettleOrDiscontinueConsentNo() {
 
-            List<GeneralApplicationTypes> types = List.of(SETTLE_OR_DISCONTINUE_CONSENT);
+            List<GeneralApplicationTypes> types = List.of(SETTLE_BY_CONSENT);
             CaseData caseData = CaseDataBuilder
                     .builder().generalAppType(GAApplicationType.builder().types(types).build())
                     .build().toBuilder()
@@ -407,7 +407,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNotEmpty();
-            assertThat(response.getErrors()).contains(INVALID_SETTLE_OR_DISCONTINUE_CONSENT);
+            assertThat(response.getErrors()).contains(INVALID_SETTLE_BY_CONSENT);
         }
     }
 
