@@ -41,6 +41,7 @@ class SendSDOBulkPrintServiceTest {
     private static final String TEST = "test";
     private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST);
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
+    private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
@@ -53,7 +54,7 @@ class SendSDOBulkPrintServiceTest {
         given(documentDownloadService.downloadDocument(any(), any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
 
         // when
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
+        sendSDOBulkPrintService.sendSDOToDefendantLIP(BEARER_TOKEN, caseData);
         // then
         verify(bulkPrintService)
             .printLetter(
@@ -72,7 +73,7 @@ class SendSDOBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(null).build();
 
         // when
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
+        sendSDOBulkPrintService.sendSDOToDefendantLIP(BEARER_TOKEN, caseData);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -85,7 +86,7 @@ class SendSDOBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build())).build();
 
         // when
-        sendSDOBulkPrintService.sendSDOToDefendantLIP(caseData);
+        sendSDOBulkPrintService.sendSDOToDefendantLIP(BEARER_TOKEN, caseData);
 
         // then
         verifyNoInteractions(bulkPrintService);
