@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import java.time.LocalDate;
@@ -35,6 +36,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final AssignCategoryId assignCategoryId;
 
     public List<CaseDocument> generate(CaseData caseData, String authorisation) {
 
@@ -43,14 +45,16 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
         DocmosisTemplates template = getTemplate(caseData);
         DocmosisDocument document =
             documentGeneratorService.generateDocmosisDocument(templateData, template);
-        caseDocuments.add(documentManagementService.uploadDocument(
-            authorisation,
-            new PDF(
-                getFileName(caseData, template),
-                document.getBytes(),
-                DocumentType.HEARING_FORM
-            )
-        ));
+        CaseDocument caseDocument = documentManagementService.uploadDocument(
+                authorisation,
+                new PDF(
+                        getFileName(caseData, template),
+                        document.getBytes(),
+                        DocumentType.HEARING_FORM
+                )
+        );
+        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, "hearingNotices");
+        caseDocuments.add(caseDocument);
         return caseDocuments;
     }
 

@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
@@ -39,6 +40,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
     private final DocumentGeneratorService documentGeneratorService;
     private final LocationRefDataService locationRefDataService;
     private final HearingFeesService hearingFeesService;
+    private final AssignCategoryId assignCategoryId;
 
     public List<CaseDocument> generate(CaseData caseData, HearingGetResponse hearing, String authorisation) {
 
@@ -52,7 +54,9 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             document.getBytes(),
             DocumentType.HEARING_FORM
         );
-        caseDocuments.add(documentManagementService.uploadDocument(authorisation, pdf));
+        CaseDocument caseDocument = documentManagementService.uploadDocument(authorisation, pdf);
+        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, "hearingNotices");
+        caseDocuments.add(caseDocument);
         return caseDocuments;
     }
 
