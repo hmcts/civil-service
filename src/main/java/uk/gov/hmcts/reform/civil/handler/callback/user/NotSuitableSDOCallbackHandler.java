@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.util.ArrayList;
@@ -28,7 +29,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
-
 @Service
 @RequiredArgsConstructor
 public class NotSuitableSDOCallbackHandler extends CallbackHandler {
@@ -41,6 +41,8 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
 
     private final Time time;
+
+    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -59,6 +61,10 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+
+        if (toggleService.isTransferOnlineCaseEnabled()) {
+            //TODO;
+        };
 
         OtherDetails tempOtherDetails = OtherDetails.builder()
             .notSuitableForSDO(YesOrNo.YES)

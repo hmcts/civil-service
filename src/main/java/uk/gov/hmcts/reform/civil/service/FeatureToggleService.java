@@ -71,4 +71,8 @@ public class FeatureToggleService {
     public boolean isLipVLipEnabled() {
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
+
+    public boolean isTransferOnlineCaseEnabled() {
+        return featureToggleApi.isFeatureEnabled("isTransferOnlineCaseEnabled");
+    }
 }
