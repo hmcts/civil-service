@@ -148,11 +148,11 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return builder
             .orderOnCourtInitiative(FreeFormOrderValues.builder()
                                         .onInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEXT)
-                                        .onInitiativeSelectionDate(LocalDate.now())
+                                        .onInitiativeSelectionDate(LocalDate.now().plusDays(7))
                                         .build())
             .orderWithoutNotice(FreeFormOrderValues.builder()
                                     .withoutNoticeSelectionTextArea(WITHOUT_NOTICE_SELECTION_TEXT)
-                                    .withoutNoticeSelectionDate(LocalDate.now())
+                                    .withoutNoticeSelectionDate(LocalDate.now().plusDays(7))
                                     .build());
     }
 
