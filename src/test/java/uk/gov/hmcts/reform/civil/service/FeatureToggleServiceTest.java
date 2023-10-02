@@ -146,7 +146,7 @@ class FeatureToggleServiceTest {
     void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
         final String feature = "case-progression-location-whitelist";
         String location = "000000";
-        when(featureToggleApi.isFeatureEnabledForLocation(eq(feature), eq(location), eq(true)))
+        when(featureToggleApi.isFeatureEnabledForLocation(eq(feature), eq(location), eq(false)))
             .thenReturn(toggleStat);
 
         assertThat(featureToggleService.isLocationWhiteListedForCaseProgression(location)).isEqualTo(toggleStat);
