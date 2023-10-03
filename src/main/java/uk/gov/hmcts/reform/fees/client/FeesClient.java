@@ -23,39 +23,46 @@ public class FeesClient {
     private final String service;
     private final String jurisdiction1;
     private final String jurisdiction2;
+    private final String jurisdictionFastTrackClaim;
     private final FeatureToggleService featureToggleService;
 
     @Autowired
     public FeesClient(
         FeesApi feesApi,
         FeatureToggleService featureToggleService,
-        @Value("${fees.api.service:}") String service,
-        @Value("${fees.api.jurisdiction1:}") String jurisdiction1,
-        @Value("${fees.api.jurisdiction2:}") String jurisdiction2
+        @Value("${fees.api.service}") String service,
+        @Value("${fees.api.jurisdiction1}") String jurisdiction1,
+        @Value("${fees.api.jurisdiction2}") String jurisdiction2,
+        @Value("${fees.api.jurisdiction-fast-track-claim}") String jurisdictionFastTrackClaim
     ) {
         this.feesApi = feesApi;
         this.service = service;
         this.jurisdiction1 = jurisdiction1;
         this.jurisdiction2 = jurisdiction2;
+        this.jurisdictionFastTrackClaim = jurisdictionFastTrackClaim;
         this.featureToggleService = featureToggleService;
     }
 
     public FeeLookupResponseDto lookupFee(String channel, String event, BigDecimal amount) {
         if (featureToggleService.isFeatureEnabled("fee-keywords-enable")) {
             String keyword;
+            String jurisdiction2;
 
             if (featureToggleService.isLipVLipEnabled() && "hearing".equalsIgnoreCase(event) && AllocatedTrack.FAST_CLAIM == AllocatedTrack.getAllocatedTrack(
                 amount,
                 null
             )) {
                 keyword = "FastTrackHrg";
+                jurisdiction2 = this.jurisdictionFastTrackClaim;
             } else {
                 keyword = event.equalsIgnoreCase("issue")
                     ? "MoneyClaim"
                     : "HearingSmallClaims";
+                jurisdiction2 = this.jurisdiction2;
             }
-            LOG.info("Calling fee lookup service with keyword : " + keyword + " and event : " + event);
-            FeeLookupResponseDto feeLookupResponseDto = this.feesApi.lookupFee(
+
+            LOG.info(String.format("Calling fee lookup service with keyword : %s and event : %s", keyword, event));
+            var feeLookupResponseDto = this.feesApi.lookupFee(
                 service,
                 jurisdiction1,
                 jurisdiction2,

@@ -34,7 +34,7 @@ class FeeClientTest {
 
     @BeforeEach
     void setUp() {
-        feesClient = new FeesClient(feesApi, featureToggleService, "civil", "jurisdiction1", "jurisdiction2");
+        feesClient = new FeesClient(feesApi, featureToggleService, "civil", "jurisdiction1", "jurisdiction2", "jurisdictionFastTrackClaim");
     }
 
     @Test
@@ -117,7 +117,7 @@ class FeeClientTest {
         verify(feesApi).lookupFee(
             "civil",
             "jurisdiction1",
-            "jurisdiction2",
+            "jurisdictionFastTrackClaim",
             CHANNEL,
             HEARING_EVENT,
             "FastTrackHrg",
