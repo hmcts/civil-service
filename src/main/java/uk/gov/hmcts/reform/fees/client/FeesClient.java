@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.fees.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,8 +16,6 @@ import java.math.BigDecimal;
 
 public class FeesClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FeesClient.class);
-
     private final FeesApi feesApi;
     private final String service;
     private final String jurisdiction1;
@@ -31,10 +27,10 @@ public class FeesClient {
     public FeesClient(
         FeesApi feesApi,
         FeatureToggleService featureToggleService,
-        @Value("${fees.api.service}") String service,
-        @Value("${fees.api.jurisdiction1}") String jurisdiction1,
-        @Value("${fees.api.jurisdiction2}") String jurisdiction2,
-        @Value("${fees.api.jurisdiction-fast-track-claim}") String jurisdictionFastTrackClaim
+        @Value("${fees.api.service:}") String service,
+        @Value("${fees.api.jurisdiction1:}") String jurisdiction1,
+        @Value("${fees.api.jurisdiction2:}") String jurisdiction2,
+        @Value("${fees.api.jurisdiction-fast-track-claim:}") String jurisdictionFastTrackClaim
     ) {
         this.feesApi = feesApi;
         this.service = service;
@@ -62,8 +58,7 @@ public class FeesClient {
                 jurisdiction2 = this.jurisdiction2;
             }
 
-            LOG.info(String.format("Calling fee lookup service with keyword : %s and event : %s", keyword, event));
-            var feeLookupResponseDto = this.feesApi.lookupFee(
+            return this.feesApi.lookupFee(
                 service,
                 jurisdiction1,
                 jurisdiction2,
@@ -73,8 +68,6 @@ public class FeesClient {
                 amount
             );
 
-            LOG.info("Fee returned from fee api is " + feeLookupResponseDto.getFeeAmount());
-            return feeLookupResponseDto;
         } else {
             return this.feesApi.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
         }
