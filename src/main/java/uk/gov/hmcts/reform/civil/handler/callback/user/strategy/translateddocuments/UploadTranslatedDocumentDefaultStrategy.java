@@ -30,9 +30,11 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocuments(
             callbackParams);
         CaseDataLiP caseDataLip = callbackParams.getCaseData().getCaseDataLiP();
-        if (Objects.nonNull(caseDataLip) && Objects.nonNull(caseDataLip.getTranslatedDocuments())) {
-            caseDataLip.getTranslatedDocuments().clear();
+
+        if (Objects.nonNull(caseDataLip)) {
+            caseDataLip.setTranslatedDocuments(null);
         }
+
         CaseData updatedCaseData = callbackParams.getCaseData().toBuilder().systemGeneratedCaseDocuments(
                 updatedDocumentList)
             .caseDataLiP(caseDataLip)
