@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 @ConditionalOnProperty(prefix = "fees.api", name = "url")
 
 public class FeesClient {
+
     private static final Logger LOG = LoggerFactory.getLogger(FeesClient.class);
 
     private final FeesApi feesApi;
