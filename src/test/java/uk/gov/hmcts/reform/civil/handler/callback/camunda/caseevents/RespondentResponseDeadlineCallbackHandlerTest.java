@@ -88,13 +88,14 @@ public class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackH
     }
 
     @Test
-    void shouldUpdateRespondent1ResponseDeadlineToNull_whenClaimIssueDateIsNull() {
+    void shouldNotUpdateRespondent1ResponseDeadline_whenLipVLipNotEnabled() {
         CaseData caseData = CaseDataBuilder.builder().build();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
         // Then
         assertThat(response.getData()).isNull();
     }
