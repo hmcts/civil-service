@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.OptionNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -82,9 +83,11 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         final int lengthAllowed = 150;
         List<String> errors = new ArrayList<>();
         var reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
+        var option = callbackParams.getCaseData().getOptionNotSuitableSDO();
 
         if (toggleService.isTransferOnlineCaseEnabled()) {
-            if (reason == "CHANGE_LOCATION") {
+            if (option == OptionNotSuitableSDO.CHANGE_LOCATION) {
+
                 //TODO
             }
         } else {
@@ -94,7 +97,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
                                + lengthAllowed + " characters.");
             }
         }
-            return AboutToStartOrSubmitCallbackResponse.builder()
+        return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)
                 .build();
     }

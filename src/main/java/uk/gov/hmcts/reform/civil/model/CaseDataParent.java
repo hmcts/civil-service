@@ -10,16 +10,7 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
-import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
-import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadDisclosure;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
@@ -699,6 +690,9 @@ public class CaseDataParent implements MappableObject {
     private List<Element<UnavailableDate>> applicant2UnavailableDatesForTab;
     private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
+
+    // TOC
+    private OptionNotSuitableSDO optionNotSuitableSDO;
 
     @JsonUnwrapped
     private final UpdateDetailsForm updateDetailsForm;
