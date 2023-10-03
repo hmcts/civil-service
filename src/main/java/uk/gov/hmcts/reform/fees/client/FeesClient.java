@@ -51,7 +51,7 @@ public class FeesClient {
             String keyword;
             String jurisdiction2;
 
-            if (isFastTrackClaimAndHearingEvent(amount, event)) {
+            if (featureToggleService.isLipVLipEnabled() && isFastTrackClaimAndHearingEvent(amount, event)) {
                 keyword = FAST_TRACK_HEARING;
                 jurisdiction2 = this.jurisdictionFastTrackClaim;
             } else {
@@ -89,7 +89,7 @@ public class FeesClient {
      */
     private boolean isFastTrackClaimAndHearingEvent(BigDecimal amount, String event) {
 
-        return featureToggleService.isLipVLipEnabled() && EVENT_HEARING.equalsIgnoreCase(event) && AllocatedTrack.FAST_CLAIM == AllocatedTrack.getAllocatedTrack(
+        return EVENT_HEARING.equalsIgnoreCase(event) && AllocatedTrack.FAST_CLAIM == AllocatedTrack.getAllocatedTrack(
             amount,
             null
         );
