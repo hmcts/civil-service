@@ -388,12 +388,15 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
         if (!claimantUploads.isEmpty()) {
-            updatedCaseData.claimantResponseDocuments(claimantUploads);
             assignCategoryId.assignCategoryIdToCollection(
                 claimantUploads,
                 document -> document.getValue().getDocumentLink(),
                 "directionsQuestionnaire"
             );
+            List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
+                    claimantUploads, "DQApplicant");
+            claimantUploads.addAll(copy);
+            updatedCaseData.claimantResponseDocuments(claimantUploads);
         }
     }
 

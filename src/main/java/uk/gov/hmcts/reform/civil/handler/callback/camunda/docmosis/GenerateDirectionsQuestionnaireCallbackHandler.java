@@ -67,10 +67,11 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                 sol
             );
         assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
-
+        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(directionsQuestionnaire, "DQRespondent");
         List<Element<CaseDocument>> systemGeneratedCaseDocuments =
             caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
+        systemGeneratedCaseDocuments.add(element(copy));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
     }
 
@@ -120,6 +121,8 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     updatedDocuments.add(element(document));
                     caseDataBuilder.respondent1DocumentURL(document.getDocumentLink().getDocumentUrl());
                     assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant1DefenseDirectionsQuestionnaire");
+                    CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(document,"DQRespondent");
+                    updatedDocuments.add(element(copy));
                 });
             }
 
@@ -138,6 +141,8 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     updatedDocuments.add(element(document));
                     caseDataBuilder.respondent2DocumentURL(document.getDocumentLink().getDocumentUrl());
                     assignCategoryId.assignCategoryIdToCaseDocument(document, "defendant2DefenseDirectionsQuestionnaire");
+                    CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(document,"DQRespondentTwo");
+                    updatedDocuments.add(element(copy));
                 });
             }
 
@@ -189,24 +194,30 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
             caseData,
             bearerToken
         );
-
+        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(directionsQuestionnaire, "");
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
+            assignCategoryId.assignCategoryIdToCaseDocument(copy, "DQApplicant");
             if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
+                assignCategoryId.assignCategoryIdToCaseDocument(copy, "DQRespondent");
             }
             if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant2DefenseDirectionsQuestionnaire");
+                assignCategoryId.assignCategoryIdToCaseDocument(copy, "DQRespondentTwo");
             }
         }
 
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
+        systemGeneratedCaseDocuments.add(element(copy));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "directionsQuestionnaire");
+            assignCategoryId.assignCategoryIdToCaseDocument(copy, "DQApplicant");
             if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, "defendant1DefenseDirectionsQuestionnaire");
+                assignCategoryId.assignCategoryIdToCaseDocument(copy, "DQRespondent");
             }
         }
     }

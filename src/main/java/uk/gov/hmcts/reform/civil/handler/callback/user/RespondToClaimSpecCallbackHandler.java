@@ -58,6 +58,7 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -1586,46 +1587,57 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (respondent1SpecDefenceResponseDocument != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1SpecDefenceResponseDocument.getFile();
             if (respondent1ClaimDocument != null) {
-                defendantUploads.add(
-                    buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
-                                          updatedCaseData.build().getRespondent1ResponseDate(),
-                                          DocumentType.DEFENDANT_DEFENCE
-                    ));
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
+                        respondent1ClaimDocument, "Defendant",
+                        updatedCaseData.build().getRespondent1ResponseDate(),
+                        DocumentType.DEFENDANT_DEFENCE
+                );
+                CaseDocument copy = assignCategoryId
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), "DQRespondent");
                 assignCategoryId.assignCategoryIdToDocument(
                     respondent1ClaimDocument,
                     "defendant1DefenseDirectionsQuestionnaire"
                 );
+                defendantUploads.add(documentElement);
+                defendantUploads.add(ElementUtils.element(copy));
             }
         }
         Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
         if (respondent1DQ != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1DQDraftDirections = respondent1DQ.getRespondent1DQDraftDirections();
             if (respondent1DQDraftDirections != null) {
-                defendantUploads.add(
-                    buildElemCaseDocument(
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent1DQDraftDirections,
                         "Defendant",
                         updatedCaseData.build().getRespondent1ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
-                    ));
+                );
                 assignCategoryId.assignCategoryIdToDocument(
                     respondent1DQDraftDirections,
                     "defendant1DefenseDirectionsQuestionnaire"
                 );
+                CaseDocument copy = assignCategoryId
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), "DQRespondent");
+                defendantUploads.add(documentElement);
+                defendantUploads.add(ElementUtils.element(copy));
             }
             ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
             if (respondent2SpecDefenceResponseDocument != null) {
                 uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
                 if (respondent2ClaimDocument != null) {
-                    defendantUploads.add(
-                        buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
-                                              updatedCaseData.build().getRespondent2ResponseDate(),
-                                              DocumentType.DEFENDANT_DEFENCE
-                        ));
+                    Element<CaseDocument> documentElement = buildElemCaseDocument(
+                            respondent2ClaimDocument, "Defendant 2",
+                            updatedCaseData.build().getRespondent2ResponseDate(),
+                            DocumentType.DEFENDANT_DEFENCE
+                    );
+                    CaseDocument copy = assignCategoryId
+                            .copyCaseDocumentWithCategoryId(documentElement.getValue(), "DQRespondentTwo");
                     assignCategoryId.assignCategoryIdToDocument(
                         respondent2ClaimDocument,
                         "defendant2DefenseDirectionsQuestionnaire"
                     );
+                    defendantUploads.add(documentElement);
+                    defendantUploads.add(ElementUtils.element(copy));
                 }
             }
         } else {
@@ -1633,15 +1645,19 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             if (respondent2SpecDefenceResponseDocument != null) {
                 uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
                 if (respondent2ClaimDocument != null) {
-                    defendantUploads.add(
-                        buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
-                                              updatedCaseData.build().getRespondent2ResponseDate(),
-                                              DocumentType.DEFENDANT_DEFENCE
-                        ));
+                    Element<CaseDocument> documentElement = buildElemCaseDocument(
+                            respondent2ClaimDocument, "Defendant 2",
+                            updatedCaseData.build().getRespondent2ResponseDate(),
+                            DocumentType.DEFENDANT_DEFENCE
+                    );
                     assignCategoryId.assignCategoryIdToDocument(
                         respondent2ClaimDocument,
                         "defendant2DefenseDirectionsQuestionnaire"
                     );
+                    CaseDocument copy = assignCategoryId
+                            .copyCaseDocumentWithCategoryId(documentElement.getValue(), "DQRespondentTwo");
+                    defendantUploads.add(documentElement);
+                    defendantUploads.add(ElementUtils.element(copy));
                 }
             }
         }
@@ -1649,17 +1665,20 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (respondent2DQ != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2DQDraftDirections = respondent2DQ.getRespondent2DQDraftDirections();
             if (respondent2DQDraftDirections != null) {
-                defendantUploads.add(
-                    buildElemCaseDocument(
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent2DQDraftDirections,
                         "Defendant 2",
                         updatedCaseData.build().getRespondent2ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
-                    ));
+                );
                 assignCategoryId.assignCategoryIdToDocument(
                     respondent2DQDraftDirections,
                     "defendant2DefenseDirectionsQuestionnaire"
                 );
+                CaseDocument copy = assignCategoryId
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), "DQRespondentTwo");
+                defendantUploads.add(documentElement);
+                defendantUploads.add(ElementUtils.element(copy));
             }
         }
         if (!defendantUploads.isEmpty()) {

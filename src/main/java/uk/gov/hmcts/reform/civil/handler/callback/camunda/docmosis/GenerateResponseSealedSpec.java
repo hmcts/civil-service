@@ -71,9 +71,13 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
+        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(
+                sealedForm, "");
         assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, "defendant1DefenseDirectionsQuestionnaire");
+        assignCategoryId.assignCategoryIdToCaseDocument(copy, "DQRespondent");
         if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
             assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, "defendant2DefenseDirectionsQuestionnaire");
+            assignCategoryId.assignCategoryIdToCaseDocument(copy, "DQRespondentTwo");
         }
 
         if (stitchEnabled) {
@@ -86,18 +90,23 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 caseData
             );
             assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "defendant1DefenseDirectionsQuestionnaire");
+            CaseDocument stitchedDocumentCopy = assignCategoryId.copyCaseDocumentWithCategoryId(
+                    stitchedDocument, "DQRespondent");
             if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "defendant2DefenseDirectionsQuestionnaire");
+                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocumentCopy, "DQRespondentTwo");
             }
             if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
                 builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
             }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
+            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocumentCopy));
         } else {
             if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
                 builder.respondent1ClaimResponseDocumentSpec(sealedForm);
             }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
+            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(copy));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

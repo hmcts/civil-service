@@ -59,14 +59,18 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-
+        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(
+                acknowledgementOfClaim, "");
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(acknowledgementOfClaim));
+        systemGeneratedCaseDocuments.add(element(copy));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
 
         assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, "defendant1DefenseDirectionsQuestionnaire");
+        assignCategoryId.assignCategoryIdToCaseDocument(copy, "DQRespondent");
         if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
             assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, "defendant2DefenseDirectionsQuestionnaire");
+            assignCategoryId.assignCategoryIdToCaseDocument(copy, "DQRespondentTwo");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
