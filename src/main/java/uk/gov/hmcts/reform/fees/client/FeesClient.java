@@ -16,6 +16,12 @@ import java.math.BigDecimal;
 
 public class FeesClient {
 
+    public static final String EVENT_ISSUE = "issue";
+    public static final String EVENT_HEARING = "hearing";
+    public static final String FAST_TRACK_HEARING = "FastTrackHrg";
+    public static final String HEARING_SMALL_CLAIMS = "HearingSmallClaims";
+    public static final String MONEY_CLAIM = "MoneyClaim";
+
     private final FeesApi feesApi;
     private final String service;
     private final String jurisdiction1;
@@ -45,16 +51,13 @@ public class FeesClient {
             String keyword;
             String jurisdiction2;
 
-            if (featureToggleService.isLipVLipEnabled() && "hearing".equalsIgnoreCase(event) && AllocatedTrack.FAST_CLAIM == AllocatedTrack.getAllocatedTrack(
-                amount,
-                null
-            )) {
-                keyword = "FastTrackHrg";
+            if (isFastTrackClaimAndHearingEvent(amount, event)) {
+                keyword = FAST_TRACK_HEARING;
                 jurisdiction2 = this.jurisdictionFastTrackClaim;
             } else {
-                keyword = event.equalsIgnoreCase("issue")
-                    ? "MoneyClaim"
-                    : "HearingSmallClaims";
+                keyword = EVENT_ISSUE.equalsIgnoreCase(event)
+                    ? MONEY_CLAIM
+                    : HEARING_SMALL_CLAIMS;
                 jurisdiction2 = this.jurisdiction2;
             }
 
@@ -75,5 +78,20 @@ public class FeesClient {
 
     public Fee2Dto[] findRangeGroup(String channel, String event) {
         return this.feesApi.findRangeGroup(service, jurisdiction1, jurisdiction2, channel, event);
+    }
+
+    /**
+     * Returns true if given amount fall under fast track claim and event is hearing.
+     *
+     * @param amount - Claim amount
+     * @param event  - Claim event
+     * @return boolean
+     */
+    private boolean isFastTrackClaimAndHearingEvent(BigDecimal amount, String event) {
+
+        return featureToggleService.isLipVLipEnabled() && EVENT_HEARING.equalsIgnoreCase(event) && AllocatedTrack.FAST_CLAIM == AllocatedTrack.getAllocatedTrack(
+            amount,
+            null
+        );
     }
 }

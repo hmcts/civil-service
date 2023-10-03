@@ -16,13 +16,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.fees.client.FeesClient.EVENT_HEARING;
+import static uk.gov.hmcts.reform.fees.client.FeesClient.EVENT_ISSUE;
+import static uk.gov.hmcts.reform.fees.client.FeesClient.FAST_TRACK_HEARING;
+import static uk.gov.hmcts.reform.fees.client.FeesClient.HEARING_SMALL_CLAIMS;
+import static uk.gov.hmcts.reform.fees.client.FeesClient.MONEY_CLAIM;
 
 @ExtendWith(MockitoExtension.class)
 class FeeClientTest {
 
     private static final String CHANNEL = "channel";
-    private static final String EVENT = "event";
-    private static final String HEARING_EVENT = "hearing";
+
     private static final BigDecimal TEST_FEE_AMOUNT_POUNDS = new BigDecimal("1.00");
     @Mock
     private FeesApi feesApi;
@@ -34,7 +38,14 @@ class FeeClientTest {
 
     @BeforeEach
     void setUp() {
-        feesClient = new FeesClient(feesApi, featureToggleService, "civil", "jurisdiction1", "jurisdiction2", "jurisdictionFastTrackClaim");
+        feesClient = new FeesClient(
+            feesApi,
+            featureToggleService,
+            "civil",
+            "jurisdiction1",
+            "jurisdiction2",
+            "jurisdictionFastTrackClaim"
+        );
     }
 
     @Test
@@ -53,15 +64,15 @@ class FeeClientTest {
             .version(1)
             .build();
 
-        FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(CHANNEL, EVENT, new BigDecimal("50.00"));
+        FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(CHANNEL, EVENT_ISSUE, new BigDecimal("50.00"));
 
         verify(feesApi).lookupFee(
             "civil",
             "jurisdiction1",
             "jurisdiction2",
             CHANNEL,
-            EVENT,
-            "HearingSmallClaims",
+            EVENT_ISSUE,
+            MONEY_CLAIM,
             new BigDecimal("50.00")
         );
         assertThat(feeLookupResponseDto).isEqualTo(expectedFeeDtoFeeLookupResponseDto);
@@ -83,21 +94,21 @@ class FeeClientTest {
             .version(1)
             .build();
 
-        FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(CHANNEL, EVENT, new BigDecimal("50.00"));
+        FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(CHANNEL, EVENT_ISSUE, new BigDecimal("50.00"));
 
         verify(feesApi).lookupFeeWithoutKeyword(
             "civil",
             "jurisdiction1",
             "jurisdiction2",
             CHANNEL,
-            EVENT,
+            EVENT_ISSUE,
             new BigDecimal("50.00")
         );
         assertThat(feeLookupResponseDto).isEqualTo(expectedFeeDtoFeeLookupResponseDto);
     }
 
     @Test
-    void shouldReturnFeeDataWhenFastTrackClaimWithHearingEventAndLipVLipFeatureEnabled() {
+    void shouldCallLookupFeeWhenFastTrackClaimWithHearingEventAndLipVLipFeatureEnabled() {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
@@ -110,7 +121,7 @@ class FeeClientTest {
 
         FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(
             CHANNEL,
-            HEARING_EVENT,
+            EVENT_HEARING,
             new BigDecimal("10001.00")
         );
 
@@ -119,9 +130,33 @@ class FeeClientTest {
             "jurisdiction1",
             "jurisdictionFastTrackClaim",
             CHANNEL,
-            HEARING_EVENT,
-            "FastTrackHrg",
+            EVENT_HEARING,
+            FAST_TRACK_HEARING,
             new BigDecimal("10001.00")
+        );
+
+    }
+
+    @Test
+    void shouldCallLookupFeeWithKeyWordHearingSmallClaimsWhenEventIsNotIssue() {
+        when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(true);
+        given(feesApi.lookupFee(any(), any(), any(), any(), any(), any(), any()))
+            .willReturn(FeeLookupResponseDto.builder()
+                            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
+                            .code("test_fee_code")
+                            .version(1)
+                            .build());
+
+        FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(CHANNEL, "EventOtherThanIssueOrHearing", new BigDecimal("50.00"));
+
+        verify(feesApi).lookupFee(
+            "civil",
+            "jurisdiction1",
+            "jurisdiction2",
+            CHANNEL,
+            "EventOtherThanIssueOrHearing",
+            HEARING_SMALL_CLAIMS,
+            new BigDecimal("50.00")
         );
 
     }
