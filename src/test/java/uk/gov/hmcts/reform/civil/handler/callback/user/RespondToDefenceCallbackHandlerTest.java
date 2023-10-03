@@ -682,7 +682,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(4, docs.size());
+            assertEquals(8, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -743,7 +743,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(4, docs.size());
+            assertEquals(8, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -804,7 +804,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(4, docs.size());
+            assertEquals(8, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -858,7 +858,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(3, docs.size());
+            assertEquals(6, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -911,7 +911,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(3, docs.size());
+            assertEquals(6, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -969,7 +969,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(3, docs.size());
+            assertEquals(6, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -1027,7 +1027,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(3, docs.size());
+            assertEquals(6, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -1085,7 +1085,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(3, docs.size());
+            assertEquals(6, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -1141,6 +1141,11 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getClaimantResponseDocuments().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
             assertThat(updatedData.getClaimantResponseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
             assertThat(updatedData.getClaimantResponseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
+            assertThat(updatedData.getClaimantResponseDocuments().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
+            assertThat(updatedData.getClaimantResponseDocuments().get(4).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
+            assertThat(updatedData.getClaimantResponseDocuments().get(5).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
+            assertThat(updatedData.getClaimantResponseDocuments().get(6).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
+            assertThat(updatedData.getClaimantResponseDocuments().get(7).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
 
         }
 
