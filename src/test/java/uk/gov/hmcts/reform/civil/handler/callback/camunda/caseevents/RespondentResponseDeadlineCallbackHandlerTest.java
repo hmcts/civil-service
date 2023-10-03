@@ -16,12 +16,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -38,21 +38,24 @@ public class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackH
     @Autowired
     private RespondentResponseDeadlineCallbackHandler handler;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
 
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
 
+
     @Test
     void shouldUpdateRespondent1ResponseDeadlineTo28days_whenClaimIssueTimeIsBefore4pm() {
 
         LocalDateTime localDateTime = LocalDateTime.of(2023, 10, 30, 12, 0, 0);
         when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(localDateTime);
-
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .issueDate(LocalDate.of(2023, 10, 2))
-            .respondent1ResponseDeadline(LocalDateTime.of(2023, 10, 2, 12, 0, 0))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -70,10 +73,9 @@ public class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackH
 
         LocalDateTime localDateTime = LocalDateTime.of(2023, 10, 31, 17, 0, 0);
         when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(localDateTime);
-
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder()
             .issueDate(LocalDate.of(2023, 10, 2))
-            .respondent1ResponseDeadline(LocalDateTime.of(2023, 10, 2, 17, 0, 0))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -87,18 +89,14 @@ public class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackH
 
     @Test
     void shouldUpdateRespondent1ResponseDeadlineToNull_whenClaimIssueDateIsNull() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .issueDate(null)
-            .respondent1ResponseDeadline(null)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-
         // Then
-        assertNull(updatedData.getRespondent1ResponseDeadline());
+        assertThat(response.getData()).isNull();
     }
 
     @Test
