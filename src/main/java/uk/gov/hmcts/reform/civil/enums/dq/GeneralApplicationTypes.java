@@ -13,7 +13,7 @@ public enum GeneralApplicationTypes {
     AMEND_A_STMT_OF_CASE("Amend a statement of case"),
     RELIEF_FROM_SANCTIONS("Relief from sanctions"),
     SET_ASIDE_JUDGEMENT("Set aside judgment"),
-    SETTLE_OR_DISCONTINUE_CONSENT("Settle or Discontinue by consent"),
+    SETTLE_BY_CONSENT("Settle by consent"),
     VARY_ORDER("Vary order"),
     ADJOURN_HEARING("Adjourn a hearing"),
     UNLESS_ORDER("Unless order"),
