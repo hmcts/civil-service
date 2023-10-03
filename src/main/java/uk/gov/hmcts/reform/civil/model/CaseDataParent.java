@@ -692,7 +692,7 @@ public class CaseDataParent implements MappableObject {
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
 
     // TOC
-    private OptionNotSuitableSDO optionNotSuitableSDO;
+    private NotSuitableSdoOptions notSuitableSdoOptions;
 
     @JsonUnwrapped
     private final UpdateDetailsForm updateDetailsForm;

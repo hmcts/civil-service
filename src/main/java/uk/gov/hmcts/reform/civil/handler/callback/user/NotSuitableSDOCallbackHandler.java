@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.OptionNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.enums.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -83,10 +83,10 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         final int lengthAllowed = 150;
         List<String> errors = new ArrayList<>();
         var reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
-        var option = callbackParams.getCaseData().getOptionNotSuitableSDO();
+        var option = callbackParams.getCaseData().getNotSuitableSdoOptions();
 
         if (toggleService.isTransferOnlineCaseEnabled()) {
-            if (option == OptionNotSuitableSDO.CHANGE_LOCATION) {
+            if (option == NotSuitableSdoOptions.CHANGE_LOCATION) {
 
                 //TODO
             }
