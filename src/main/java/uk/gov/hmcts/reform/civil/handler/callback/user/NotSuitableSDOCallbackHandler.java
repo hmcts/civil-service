@@ -80,18 +80,23 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateNotSuitableReason(CallbackParams callbackParams) {
         final int lengthAllowed = 150;
-
         List<String> errors = new ArrayList<>();
         var reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
 
-        if (reason.length() > lengthAllowed) {
-            errors.add("Character Limit Reached: "
-                           + "Reason for not drawing Standard Directions order cannot exceed "
-                           + lengthAllowed + " characters.");
+        if (toggleService.isTransferOnlineCaseEnabled()) {
+            if (reason == "CHANGE_LOCATION") {
+                //TODO
+            }
+        } else {
+            if (reason.length() > lengthAllowed) {
+                errors.add("Character Limit Reached: "
+                               + "Reason for not drawing Standard Directions order cannot exceed "
+                               + lengthAllowed + " characters.");
+            }
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
     }
 
     private CallbackResponse addUnsuitableSDODate(CallbackParams callbackParams) {
