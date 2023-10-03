@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
@@ -28,9 +29,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     public CallbackResponse uploadDocument(CallbackParams callbackParams) {
         List<Element<CaseDocument>> updatedDocumentList = updateSystemGeneratedDocumentsWithTranslationDocuments(
             callbackParams);
+        CaseDataLiP caseDataLip = callbackParams.getCaseData().getCaseDataLiP();
+        if (Objects.nonNull(caseDataLip) && Objects.nonNull(caseDataLip.getTranslatedDocuments())) {
+            caseDataLip.getTranslatedDocuments().clear();
+        }
         CaseData updatedCaseData = callbackParams.getCaseData().toBuilder().systemGeneratedCaseDocuments(
                 updatedDocumentList)
-            .caseDataLiP(CaseDataLiP.builder().translatedDocuments(null).build())
+            .caseDataLiP(caseDataLip)
             .businessProcess(BusinessProcess.ready(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT)).build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
