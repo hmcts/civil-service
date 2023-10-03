@@ -133,7 +133,8 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             .disposalHearingCostsAddSection(getToggleValue(caseData.getDisposalHearingCostsDJToggle()))
             .applicant(checkApplicantPartyName(caseData)
                            ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .respondent(checkDefendantRequested(caseData).toUpperCase());
+            .respondent(checkDefendantRequested(caseData).toUpperCase())
+            .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
         djOrderFormBuilder
             .disposalHearingOrderMadeWithoutHearingDJ(caseData.getDisposalHearingOrderMadeWithoutHearingDJ())
@@ -146,8 +147,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentFormTrial(CaseData caseData, String authorisation) {
-        String trialHearingLocation = checkDisposalHearingMethod(caseData.getTrialHearingMethodDJ())
-            ? getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ()) : null;
+        String trialHearingLocation = getDynamicListValueLabel(caseData.getTrialHearingMethodInPersonDJ());
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
 
         boolean isJudge = false;
@@ -207,6 +207,7 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
                                              && caseData.getTrialHearingTimeDJ().getDateToToggle() != null)
             .trialOrderMadeWithoutHearingDJ(caseData.getTrialOrderMadeWithoutHearingDJ())
             .trialHearingTimeEstimateDJ(getHearingTimeEstimateLabel(caseData.getTrialHearingTimeDJ()))
+            .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation))
             .hearingLocation(locationHelper.getHearingLocation(
                                 trialHearingLocation,
                                 caseData,
