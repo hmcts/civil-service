@@ -47,7 +47,6 @@ public class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackH
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
 
-
     @Test
     void shouldUpdateRespondent1ResponseDeadlineTo28days_whenClaimIssueTimeIsBefore4pm() {
 
