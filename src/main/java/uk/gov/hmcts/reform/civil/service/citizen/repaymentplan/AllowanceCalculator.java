@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.allowance.DisabilityAllowance;
 import uk.gov.hmcts.reform.civil.model.allowance.DisabilityParam;
 import uk.gov.hmcts.reform.civil.model.allowance.PersonalAllowance;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -36,13 +37,17 @@ public class AllowanceCalculator {
 
     private double calculateDisabilityAllowance(PartnerAndDependentsLRspec partnerAndDependantInformation,
                                                 YesOrNo disabilityPremiumPayments,
-                                                YesOrNo severeDisability) {
+                                                YesOrNo severeDisability,
+                                                Respondent1DQ respondent1DQ) {
         boolean disabled = YesOrNo.YES == disabilityPremiumPayments;
         boolean severelyDisabled = YesOrNo.YES == severeDisability;
         boolean hasPartner = partnerAndDependantInformation.hasPartner();
         boolean dependantDisabled = YesOrNo.YES == partnerAndDependantInformation.getReceiveDisabilityPayments();
+        YesOrNo carerOption = Optional.ofNullable(respondent1DQ.getRespondent1DQCarerAllowanceCreditFullAdmission())
+            .orElse(respondent1DQ.getRespondent1DQCarerAllowanceCredit());
+        boolean carer = YesOrNo.YES == carerOption;
         return DisabilityAllowance
-            .getDisabilityAllowance(new DisabilityParam(disabled, hasPartner, severelyDisabled, dependantDisabled));
+            .getDisabilityAllowance(new DisabilityParam(disabled, hasPartner, severelyDisabled, dependantDisabled, carer));
 
     }
 
