@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.net.UnknownHostException;
+import java.util.Collections;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,7 +54,8 @@ class ResourceExceptionHandlerTest {
             str -> new FeignException.Unauthorized(
                 "expected exception for feing unauthorized",
                 Mockito.mock(feign.Request.class),
-                new byte[]{}
+                new byte[]{},
+                Collections.emptyMap()
             ),
             handler::unauthorizedFeign,
             HttpStatus.UNAUTHORIZED
@@ -87,7 +89,8 @@ class ResourceExceptionHandlerTest {
             str -> new FeignException.Unauthorized(
                 "expected exception for feing forbidden",
                 Mockito.mock(feign.Request.class),
-                new byte[]{}
+                new byte[]{},
+                Collections.emptyMap()
             ),
             handler::forbiddenFeign,
             HttpStatus.FORBIDDEN
@@ -134,10 +137,26 @@ class ResourceExceptionHandlerTest {
             str -> new FeignException.GatewayTimeout(
                 "gateway time out message",
                 Mockito.mock(feign.Request.class),
-                new byte[]{}
+                new byte[]{},
+                Collections.emptyMap()
             ),
             handler::handleFeignExceptionGatewayTimeout,
             HttpStatus.GATEWAY_TIMEOUT
+        );
+    }
+
+    @Test
+    public void testClientAbortException() {
+        testTemplate(
+            "ClosedChannelException",
+            str -> new FeignException.InternalServerError(
+                "ClosedChannelException",
+                Mockito.mock(feign.Request.class),
+                new byte[]{},
+                Collections.emptyMap()
+            ),
+            handler::handleClientAbortException,
+            HttpStatus.REQUEST_TIMEOUT
         );
     }
 
@@ -158,7 +177,8 @@ class ResourceExceptionHandlerTest {
             str -> new FeignException.NotFound(
                 "expected exception for feign not found",
                 Mockito.mock(feign.Request.class),
-                new byte[]{}
+                new byte[]{},
+                Collections.emptyMap()
             ),
             handler::feignExceptionNotFound,
             HttpStatus.NOT_FOUND

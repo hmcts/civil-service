@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
+import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -293,6 +295,21 @@ class RoboticsDataMapperTest {
             .respondent2Represented(YES)
             .respondent2SameLegalRepresentative(YES)
             .build();
+        RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+        CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
+        assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
+    }
+
+    @Test
+    void shouldCheck_whenFeignException() {
+        CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build().toBuilder()
+            .respondent2(PartyBuilder.builder().company().build())
+            .addRespondent2(YES)
+            .respondent2Represented(YES)
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+        given(organisationApi.findOrganisationById(any(), any(), any()))
+            .willThrow(Mockito.mock(FeignException.class));
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);

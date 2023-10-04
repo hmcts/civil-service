@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec;
 import uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -79,7 +80,7 @@ public class ReasonMoneyTemplateData {
             .type(item.getType() == IncomeTypeLRspec.OTHER
                       ? "Other: " + item.getTypeOtherDetails()
                       : INCOME_TYPE_LIP_RESPONSE.get(item.getType()))
-            .amountPounds(item.getAmount())
+            .amountPounds(MonetaryConversions.penniesToPounds(item.getAmount()))
             .build();
     }
 
@@ -89,7 +90,7 @@ public class ReasonMoneyTemplateData {
             .type(item.getType() == ExpenseTypeLRspec.OTHER
                       ? "Other: " + item.getTypeOtherDetails()
                       : EXPENSE_TYPE_LIP_RESPONSE.get(item.getType()))
-            .amountPounds(item.getAmount())
+            .amountPounds(MonetaryConversions.penniesToPounds(item.getAmount()))
             .build();
     }
 }

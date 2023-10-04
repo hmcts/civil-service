@@ -5,11 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class Expert {
 
+    private final String partyID;
     private final String name;
     private final String firstName;
     private final String lastName;
@@ -19,6 +21,8 @@ public class Expert {
     private final String whyRequired;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal estimatedCost;
+    private final String eventAdded;
+    private final LocalDate dateAdded;
 
     public static Expert fromSmallClaimExpertDetails(ExpertDetails expertDetails) {
         return Expert.builder()

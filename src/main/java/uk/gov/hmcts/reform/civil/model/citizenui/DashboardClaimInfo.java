@@ -18,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
+import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
 
 @Data
 @Builder
@@ -42,6 +43,10 @@ public class DashboardClaimInfo {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate responseDeadline;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime responseDeadlineTime;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate paymentDate;
@@ -58,15 +63,9 @@ public class DashboardClaimInfo {
 
     @JsonGetter("numberOfDays")
     public long getNumberOfDays() {
-        return Optional.ofNullable(responseDeadline)
-            .filter(deadline ->
-                        deadline.isAfter(LocalDate.now()))
-            .map(deadline ->
-                     LocalDate.now().until(
-                         deadline,
-                         ChronoUnit.DAYS
-                     ))
-            .orElse(0L);
+        return Optional.ofNullable(responseDeadlineTime).map(
+            time -> ChronoUnit.DAYS.between(LocalDateTime.now(), responseDeadlineTime)
+        ).orElse(0L);
     }
 
     @JsonGetter("numberOfDaysOverdue")

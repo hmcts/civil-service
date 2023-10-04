@@ -67,4 +67,8 @@ public class DynamicList {
 
         return DynamicList.builder().listItems(items).value(chosen).build();
     }
+
+    public static DynamicList fromDynamicListElementList(List<DynamicListElement> list) {
+        return DynamicList.builder().listItems(list).value(DynamicListElement.EMPTY).build();
+    }
 }

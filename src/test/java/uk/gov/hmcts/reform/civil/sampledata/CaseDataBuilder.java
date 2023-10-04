@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
@@ -30,11 +31,13 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
+import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -51,10 +54,13 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.HearingDates;
+import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
+import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
@@ -80,6 +86,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -97,6 +104,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
+import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
@@ -113,6 +121,13 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -135,6 +150,7 @@ import java.util.List;
 
 import static java.time.LocalDate.now;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
@@ -148,6 +164,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+import static uk.gov.hmcts.reform.civil.enums.ComplexityBand.BAND_1;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
@@ -190,6 +207,7 @@ public class CaseDataBuilder {
     protected LocationRefData locationRefData;
     protected Party applicant1;
     protected Party applicant2;
+    protected YesOrNo applicant1Represented;
     protected YesOrNo applicant1LitigationFriendRequired;
     protected YesOrNo applicant2LitigationFriendRequired;
     protected Party respondent1;
@@ -357,6 +375,7 @@ public class CaseDataBuilder {
     private YesOrNo applicantsProceedIntention;
     private SmallClaimMedicalLRspec applicant1ClaimMediationSpecRequired;
     private SmallClaimMedicalLRspec applicantMPClaimMediationSpecRequired;
+    private Mediation mediation;
     private YesOrNo specAoSApplicantCorrespondenceAddressRequired;
     private Address specAoSApplicantCorrespondenceAddressDetails;
     private YesOrNo specAoSRespondent2HomeAddressRequired;
@@ -450,6 +469,15 @@ public class CaseDataBuilder {
     private YesOrNo specDefenceFullAdmitted2Required;
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
+
+    private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
+    private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
+    private IdamUserDetails claimantUserDetails;
+
+    private UpdateDetailsForm updateDetailsForm;
+
+    protected String hearingReference;
+    protected ListingOrRelisting listingOrRelisting;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -627,6 +655,17 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder cosNotifyClaimDefendant2(CertificateOfService cosNotifyClaimDefendant) {
         this.cosNotifyClaimDefendant2 = cosNotifyClaimDefendant;
+        return this;
+    }
+
+    public CaseDataBuilder respondent1DQWithFixedRecoverableCosts() {
+        respondent1DQ = respondent1DQ.toBuilder()
+            .respondent1DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .build()).build();
         return this;
     }
 
@@ -870,6 +909,17 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2DQWithFixedRecoverableCosts() {
+        respondent2DQ = respondent2DQ.toBuilder()
+            .respondent2DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
+                                                    .isSubjectToFixedRecoverableCostRegime(YES)
+                                                    .band(BAND_1)
+                                                    .complexityBandingAgreed(YES)
+                                                    .reasons("Good reason")
+                                                    .build()).build();
+        return this;
+    }
+
     public CaseDataBuilder respondent2DQ() {
         respondent2DQ = Respondent2DQ.builder()
             .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -1093,6 +1143,28 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder applicant1DQWithFixedRecoverableCosts() {
+        applicant1DQ = applicant1DQ.toBuilder()
+            .applicant1DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .build()).build();
+        return this;
+    }
+
+    public CaseDataBuilder applicant2DQWithFixedRecoverableCosts() {
+        applicant2DQ = applicant2DQ.toBuilder()
+            .applicant2DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
+                                                   .isSubjectToFixedRecoverableCostRegime(YES)
+                                                   .band(BAND_1)
+                                                   .complexityBandingAgreed(YES)
+                                                   .reasons("Good reason")
+                                                   .build()).build();
+        return this;
+    }
+
     public CaseDataBuilder applicant1DQWithLocationWithoutExperts() {
         applicant1DQ = Applicant1DQ.builder()
             .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
@@ -1257,6 +1329,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder hearingReferenceNumber(String hearingReference) {
+        this.hearingReference = hearingReference;
+        return this;
+    }
+
+    public CaseDataBuilder listingOrRelisting(ListingOrRelisting listingOrRelisting) {
+        this.listingOrRelisting = listingOrRelisting;
+        return this;
+    }
+
     public CaseDataBuilder takenOfflineDate(LocalDateTime takenOfflineDate) {
         this.takenOfflineDate = takenOfflineDate;
         return this;
@@ -1299,6 +1381,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder respondent2Represented(YesOrNo isRepresented) {
         this.respondent2Represented = isRepresented;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1Represented(YesOrNo isRepresented) {
+        this.applicant1Represented = isRepresented;
         return this;
     }
 
@@ -1417,6 +1504,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder caseDismissedHearingFeeDueDate(LocalDateTime date) {
+        this.caseDismissedHearingFeeDueDate = date;
+        return this;
+    }
+
     public CaseDataBuilder addLegalRepDeadline(LocalDateTime date) {
         this.addLegalRepDeadline = date;
         return this;
@@ -1461,6 +1553,26 @@ public class CaseDataBuilder {
                        .label(defaultValue)
                        .build())
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder respondent1ResponseDate(LocalDateTime date) {
+        this.respondent1ResponseDate = date;
+        return this;
+    }
+
+    public CaseDataBuilder respondent2ResponseDate(LocalDateTime date) {
+        this.respondent2ResponseDate = date;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ResponseDate(LocalDateTime date) {
+        this.applicant1ResponseDate = date;
+        return this;
+    }
+
+    public CaseDataBuilder reasonNotSuitableSDO(ReasonNotSuitableSDO reasonNotSuitableSDO) {
+        this.reasonNotSuitableSDO = reasonNotSuitableSDO;
         return this;
     }
 
@@ -1998,8 +2110,6 @@ public class CaseDataBuilder {
             .organisation(Organisation.builder().organisationID("QWERTY R2").build())
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
-        respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
-        respondent2OrganisationIDCopy = respondent2OrganisationPolicy.getOrganisation().getOrganisationID();
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
@@ -2070,6 +2180,29 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateClaimSubmittedSmallClaim() {
+        atStateClaimDraft();
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        allocatedTrack = SMALL_CLAIM;
+        ccdState = PENDING_CASE_ISSUED;
+        ccdCaseReference = CASE_ID;
+        submittedDate = SUBMITTED_DATE_TIME;
+        totalClaimAmount = BigDecimal.valueOf(800);
+        claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimSubmittedMultiClaim() {
+        atStateClaimDraft();
+        legacyCaseReference = LEGACY_CASE_REFERENCE;
+        allocatedTrack = MULTI_CLAIM;
+        ccdState = PENDING_CASE_ISSUED;
+        ccdCaseReference = CASE_ID;
+        submittedDate = SUBMITTED_DATE_TIME;
+        claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        return this;
+    }
+
     public CaseDataBuilder atStateClaimSubmittedSpec() {
         atStateClaimDraft();
         legacyCaseReference = LEGACY_CASE_REFERENCE;
@@ -2121,6 +2254,8 @@ public class CaseDataBuilder {
         atStateClaimSubmitted();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
+        respondent1OrgRegistered = NO;
+        respondent2OrgRegistered = NO;
         respondent1Represented = NO;
         respondent2Represented = NO;
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
@@ -2282,6 +2417,29 @@ public class CaseDataBuilder {
             .builder()
             .judgeNameTitle("test name")
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder atStateClaimantRequestsDJWithUnavailableDates() {
+        HearingDates singleDate = HearingDates.builder()
+            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .hearingUnavailableUntil(LocalDate.of(2023, 8, 20))
+            .build();
+
+        HearingDates dateRange = HearingDates.builder()
+            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .hearingUnavailableUntil(LocalDate.of(2023, 8, 22))
+            .build();
+
+        this.hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
+            .hearingUnavailableDates(YES)
+            .hearingDates(wrapElements(List.of(singleDate, dateRange)))
+            .build();
+
+        this.defaultJudgmentDocuments.addAll(wrapElements(CaseDocument.builder()
+                                                              .documentName("test")
+                                                              .createdDatetime(LocalDateTime.now())
+                                                              .build()));
         return this;
     }
 
@@ -2624,7 +2782,6 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         claimNotificationDeadline = NOTIFICATION_DEADLINE;
         ccdState = CASE_ISSUED;
-        respondent1OrganisationIDCopy = "QWERTY R";
         buildHmctsInternalCaseName();
         return this;
     }
@@ -3257,6 +3414,19 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateDivergentResponseWithFullDefence1v2SameSol_NotSingleDQ() {
         atStateRespondentFullDefence();
         respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
+        respondent2ResponseDate = LocalDateTime.now();
+        respondent2ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
+        respondent2DQ();
+        respondentResponseIsSame(NO);
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateDivergentResponseWithRespondent2FullDefence1v2SameSol_NotSingleDQ() {
+        atStateRespondentFullAdmission();
+        respondent2ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
         respondent2ResponseDate = LocalDateTime.now();
         respondent2ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
@@ -3909,6 +4079,23 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTrialReadyCheckLiP(boolean hasEmailAddress) {
+        atStateHearingFeeDuePaid().setClaimTypeToSpecClaim();
+        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        if (!hasEmailAddress) {
+            respondent1 = respondent1.toBuilder().partyEmail("").build();
+            respondent2 = respondent2.toBuilder().partyEmail("").build();
+        }
+        legacyCaseReference = "000MC001";
+        ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+        hearingDate = LocalDate.now().plusWeeks(5).plusDays(5);
+        hearingDuration = MINUTES_120;
+        applicant1Represented = NO;
+        respondent1Represented = NO;
+        respondent2Represented = NO;
+        return this;
+    }
+
     public CaseDataBuilder atStateTrialReadyApplicant() {
         atStateTrialReadyCheck();
         trialReadyApplicant = YES;
@@ -4022,6 +4209,11 @@ public class CaseDataBuilder {
         respondent2ResponseDate = respondent1ResponseDate.plusDays(1);
         respondent2ClaimResponseIntentionType = FULL_DEFENCE;
         uiStatementOfTruth = StatementOfTruth.builder().name("John Smith").role("Solicitor").build();
+        return this;
+    }
+
+    public CaseDataBuilder setMultiTrackClaim() {
+        allocatedTrack = MULTI_CLAIM;
         return this;
     }
 
@@ -4475,6 +4667,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateMediationUnsuccessful(MultiPartyScenario mpScenario) {
+        atStateApplicantProceedAllMediation(mpScenario);
+        applicantsProceedIntention = YES;
+        caseDataLiP = CaseDataLiP.builder()
+                                      .applicant1ClaimMediationSpecRequiredLip(
+                                          ClaimantMediationLip.builder()
+                                              .hasAgreedFreeMediation(MediationDecision.Yes)
+                                              .build()).build();
+
+        mediation = Mediation.builder().unsuccessfulMediationReason("Unsuccessful").build();
+
+        return this;
+    }
+
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
         return this;
@@ -4575,6 +4781,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitors() {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        this.respondent2Represented = YES;
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
         return this;
@@ -5172,6 +5379,74 @@ public class CaseDataBuilder {
             .build();
     }
 
+    public CaseData buildJudmentOnlineCaseDataWithPaymentByInstalment() {
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .joJudgmentInstalmentDetails(JudgmentInstalmentDetails.builder()
+                                             .firstInstalmentDate(LocalDate.of(2022, 12, 12))
+                                             .instalmentAmount("120")
+                                             .paymentFrequency(PaymentFrequency.MONTHLY).build())
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IN_INSTALMENTS)
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .joIsRegisteredWithRTL(YES).build();
+    }
+
+    public CaseData buildJudmentOnlineCaseDataWithPaymentImmediately() {
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlanSelection(PaymentPlanSelection.PAY_IMMEDIATELY)
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .joIsRegisteredWithRTL(YES).build();
+    }
+
+    public CaseData buildJudmentOnlineCaseDataWithPaymentByDate() {
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
+            .joAmountOrdered("1200")
+            .joAmountCostOrdered("1100")
+            .joPaymentPlanSelection(PaymentPlanSelection.PAY_BY_DATE)
+            .joOrderMadeDate(LocalDate.of(2022, 12, 12))
+            .joPaymentToBeMadeByDate(LocalDate.of(2023, 12, 12))
+            .joIsRegisteredWithRTL(YES).build();
+    }
+
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter30Days() {
+        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
+            .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
+            .lastUpdatedDate(LocalDateTime.now()).build();
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joOrderMadeDate(LocalDate.of(2023, 7, 1))
+            .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
+                                      .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
+                                      .confirmFullPaymentMade(List.of("CONFIRMED"))
+                                      .build())
+            .joIsRegisteredWithRTL(YES)
+            .joJudgmentStatusDetails(judgmentStatusDetails).build();
+    }
+
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin30Days() {
+        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
+            .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
+            .lastUpdatedDate(LocalDateTime.now()).build();
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joOrderMadeDate(LocalDate.of(2023, 9, 1))
+            .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
+                                      .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
+                                      .confirmFullPaymentMade(List.of("CONFIRMED"))
+                                      .build())
+            .joIsRegisteredWithRTL(YES)
+            .joJudgmentStatusDetails(judgmentStatusDetails).build();
+    }
+
     public CaseDataBuilder setUnassignedCaseListDisplayOrganisationReferences() {
         this.unassignedCaseListDisplayOrganisationReferences = "Organisation references String";
         return this;
@@ -5260,6 +5535,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addApplicant1ExpertsAndWitnesses() {
         this.applicant1DQ = applicant1DQ.toBuilder()
             .applicant1DQExperts(Experts.builder()
+                                     .expertRequired(YES)
                                      .details(wrapElements(
                                          Expert.builder()
                                              .firstName("Applicant")
@@ -5268,6 +5544,7 @@ public class CaseDataBuilder {
                                      ))
                                      .build())
             .applicant1DQWitnesses(Witnesses.builder()
+                                       .witnessesToAppear(YES)
                                        .details(wrapElements(
                                            Witness.builder()
                                                .firstName("Applicant")
@@ -5292,6 +5569,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addApplicant2ExpertsAndWitnesses() {
         this.applicant2DQ = applicant2DQ.toBuilder()
             .applicant2DQExperts(Experts.builder()
+                                     .expertRequired(YES)
                                      .details(wrapElements(
                                          Expert.builder()
                                              .firstName("Applicant Two")
@@ -5300,6 +5578,7 @@ public class CaseDataBuilder {
                                      ))
                                      .build())
             .applicant2DQWitnesses(Witnesses.builder()
+                                       .witnessesToAppear(YES)
                                        .details(wrapElements(
                                            Witness.builder()
                                                .firstName("Applicant Two")
@@ -5324,6 +5603,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addRespondent1ExpertsAndWitnesses() {
         this.respondent1DQ = respondent1DQ.toBuilder()
             .respondent1DQExperts(Experts.builder()
+                                      .expertRequired(YES)
                                       .details(wrapElements(
                                           Expert.builder()
                                               .firstName("Respondent")
@@ -5332,6 +5612,7 @@ public class CaseDataBuilder {
                                       ))
                                       .build())
             .respondent1DQWitnesses(Witnesses.builder()
+                                        .witnessesToAppear(YES)
                                         .details(wrapElements(
                                             Witness.builder()
                                                 .firstName("Respondent")
@@ -5356,6 +5637,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder addRespondent2ExpertsAndWitnesses() {
         this.respondent2DQ = respondent2DQ.toBuilder()
             .respondent2DQExperts(Experts.builder()
+                                      .expertRequired(YES)
                                       .details(wrapElements(
                                           Expert.builder()
                                               .firstName("Respondent Two")
@@ -5364,6 +5646,7 @@ public class CaseDataBuilder {
                                       ))
                                       .build())
             .respondent2DQWitnesses(Witnesses.builder()
+                                        .witnessesToAppear(YES)
                                         .details(wrapElements(
                                             Witness.builder()
                                                 .firstName("Respondent Two")
@@ -5703,6 +5986,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder claimantUserDetails(IdamUserDetails claimantUserDetails) {
+        this.claimantUserDetails = claimantUserDetails;
+        return this;
+    }
+
+    public CaseDataBuilder updateDetailsForm(UpdateDetailsForm additionalDates) {
+        this.updateDetailsForm = additionalDates;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -5729,6 +6022,7 @@ public class CaseDataBuilder {
             .claimFee(claimFee)
             .applicant1(applicant1)
             .applicant2(applicant2)
+            .applicant1Represented(applicant1Represented)
             .respondent1(respondent1)
             .respondent2(respondent2)
             .respondent1Represented(respondent1Represented)
@@ -5886,6 +6180,7 @@ public class CaseDataBuilder {
             .applicantMPClaimMediationSpecRequired(applicantMPClaimMediationSpecRequired)
             .responseClaimMediationSpecRequired(respondent1MediationRequired)
             .responseClaimMediationSpec2Required(respondent1MediationRequired)
+            .mediation(mediation)
             .respondentSolicitor2Reference(respondentSolicitor2Reference)
             .claimant1ClaimResponseTypeForSpec(claimant1ClaimResponseTypeForSpec)
             .claimant2ClaimResponseTypeForSpec(claimant2ClaimResponseTypeForSpec)
@@ -5962,6 +6257,7 @@ public class CaseDataBuilder {
             .respondentSolicitor2ServiceAddressRequired(respondentSolicitor2ServiceAddressRequired)
             .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
             .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
+            .applicant1Represented(applicant1Represented)
             .caseDataLiP(caseDataLiP)
             .claimant2ResponseFlag(claimant2ResponseFlag)
             .specClaimResponseTimelineList(specClaimResponseTimelineList)
@@ -5970,6 +6266,12 @@ public class CaseDataBuilder {
             .defenceAdmitPartPaymentTimeRouteRequired(defenceAdmitPartPaymentTimeRouteRequired)
             .specDefenceFullAdmitted2Required(specDefenceFullAdmitted2Required)
             .showResponseOneVOneFlag(showResponseOneVOneFlag)
+            .hearingSupportRequirementsDJ(hearingSupportRequirementsDJ)
+            .hearingReferenceNumber(hearingReference)
+            .listingOrRelisting(listingOrRelisting)
+            .claimantUserDetails(claimantUserDetails)
+            .updateDetailsForm(updateDetailsForm)
+            .defaultJudgmentDocuments(defaultJudgmentDocuments)
             .build();
     }
 }

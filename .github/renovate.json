@@ -21,12 +21,17 @@
   ],
   "packageRules": [
     {
+      "matchPackagePatterns": [
+        "*"
+      ],
       "matchUpdateTypes": [
         "minor",
         "patch"
       ],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch",
       "automerge": true
     }
   ],
-  "prConcurrentLimit": 20
+  "prConcurrentLimit": 10
 }

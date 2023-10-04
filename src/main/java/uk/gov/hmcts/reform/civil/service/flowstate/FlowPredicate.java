@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -625,6 +626,10 @@ public class FlowPredicate {
         caseData.getClaimDismissedDeadline() != null
             && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now());
 
+    public static final Predicate<CaseData> demageMultiClaim = caseData ->
+        AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())
+        && CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory());
+
     public static final Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = caseData ->
         caseData.getTakenOfflineDate() != null;
 
@@ -964,7 +969,12 @@ public class FlowPredicate {
     public static final Predicate<CaseData> isInHearingReadiness = caseData ->
         caseData.getHearingReferenceNumber() != null
         && caseData.getListingOrRelisting() != null
-        && caseData.getListingOrRelisting().equals(LISTING);
+        && caseData.getListingOrRelisting().equals(LISTING)
+        && caseData.getCaseDismissedHearingFeeDueDate() == null
+        && caseData.getTakenOfflineDate() == null;
 
     public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
+
+    public static final Predicate<CaseData> casemanMarksMediationUnsuccessful = caseData ->
+        Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason());
 }

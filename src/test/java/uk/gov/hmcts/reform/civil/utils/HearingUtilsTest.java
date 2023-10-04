@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
@@ -168,4 +169,16 @@ public class HearingUtilsTest {
         assertThat(actual).isEqualTo(null);
     }
 
+    @Test
+    void shouldReturnClaimantVDefendant_whenIs1v1Claim() {
+        // Given
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder().individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().companyName("Company").type(Party.Type.COMPANY).build())
+            .build();
+        // When
+        String claimantVDefendant = HearingUtils.getClaimantVDefendant(caseData);
+        // Then
+        assertThat(claimantVDefendant).isEqualTo("Doe v Company");
+    }
 }

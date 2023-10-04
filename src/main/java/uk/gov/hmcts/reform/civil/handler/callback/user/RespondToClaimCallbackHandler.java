@@ -82,7 +82,9 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Service
 @RequiredArgsConstructor
@@ -200,12 +202,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .respondent2DQRequestedCourt(requestedCourt1.build()).build());
         }
 
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent1());
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData
                 .respondent2Copy(caseData.getRespondent2())
-                .respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+                .respondent2DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent2());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
@@ -360,8 +362,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             .respondent1(updatedRespondent1)
             .respondent1Copy(null);
 
-        updatedData.respondent1DetailsForClaimDetailsTab(updatedRespondent1);
-
         // if present, persist the 2nd respondent address in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
@@ -370,7 +370,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .build();
 
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
         }
 
         LocalDateTime responseDate = time.now();
@@ -514,9 +513,24 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         updatedData.isRespondent1(null);
         assembleResponseDocuments(caseData, updatedData);
 
+        if (toggleService.isUpdateContactDetailsEnabled()) {
+            addEventAndDateAddedToRespondentExperts(updatedData);
+            addEventAndDateAddedToRespondentWitnesses(updatedData);
+        }
+
         retainSolicitorReferences(callbackParams.getRequest().getCaseDetailsBefore().getData(), updatedData, caseData);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData,
+                                                                        toggleService.isUpdateContactDetailsEnabled());
+
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1());
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2());
+        }
+
+        if (toggleService.isHmcEnabled()) {
+            populateDQPartyIds(updatedData);
+        }
 
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 
@@ -540,10 +554,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
                 .build();
-        }
-
-        if (toggleService.isHmcEnabled()) {
-            populateWithPartyIds(updatedData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

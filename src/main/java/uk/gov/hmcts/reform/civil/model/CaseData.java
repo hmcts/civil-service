@@ -81,6 +81,11 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
@@ -556,6 +561,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<Document>> gaEvidenceDocRespondentSol;
     private final List<Element<Document>> gaEvidenceDocRespondentSolTwo;
 
+    private final List<Element<CaseDocument>> gaRespondDoc;
+
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
@@ -577,6 +584,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final YesOrNo urgentFlag;
     private final String caseProgAllocatedTrack;
+    private final DynamicList evidenceUploadOptions;
 
     private final List<Element<RegistrationInformation>> registrationTypeRespondentOne;
     private final List<Element<RegistrationInformation>> registrationTypeRespondentTwo;
@@ -587,7 +595,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     // judge final orders
     private final FinalOrderSelection finalOrderSelection;
-    private final String freeFormRecitalTextArea;
     private final String freeFormRecordedTextArea;
     private final String freeFormOrderedTextArea;
     private final FreeFormOrderValues orderOnCourtInitiative;
@@ -597,6 +604,25 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private Document finalOrderDocument;
     @Builder.Default
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
+
+    // bulk claims
+    private final String bulkCustomerId;
+    private final String sdtRequestIdFromSdt;
+    private final List<Element<String>> sdtRequestId;
+
+    //Judgments Online
+    private JudgmentRecordedReason joJudgmentRecordReason;
+    private JudgmentStatusDetails joJudgmentStatusDetails;
+    private LocalDate joOrderMadeDate;
+    private String joAmountOrdered;
+    private String joAmountCostOrdered;
+    private YesOrNo joIsRegisteredWithRTL;
+    private PaymentPlanSelection joPaymentPlanSelection;
+    private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
+    private LocalDate joPaymentToBeMadeByDate;
+    private YesOrNo joIsLiveJudgmentExists;
+    private LocalDate joSetAsideDate;
+    private JudgmentPaidInFull joJudgmentPaidInFull;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -731,7 +757,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (
             getApplicant1ProceedsWithClaimSpec() != null
                 || getApplicant1AcceptAdmitAmountPaidSpec() != null
-                || !isPartAdmitClaimSpec()
                 || isClaimantIntentionNotSettlePartAdmit()
                 || isClaimantConfirmAmountNotPaidPartAdmit());
     }
@@ -912,7 +937,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getApplicantOrganisationId() {
-        return Optional.ofNullable(getApplicant1OrganisationPolicy())
+        return getOrganisationId(Optional.ofNullable(getApplicant1OrganisationPolicy()));
+    }
+
+    @JsonIgnore
+    public String getRespondent1OrganisationId() {
+        return getOrganisationId(Optional.ofNullable(getRespondent1OrganisationPolicy()));
+    }
+
+    @JsonIgnore
+    private String getOrganisationId(Optional<OrganisationPolicy> policy) {
+        return policy
             .map(OrganisationPolicy::getOrganisation)
             .map(Organisation::getOrganisationID)
             .orElse("");
@@ -966,10 +1001,45 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public List<Element<RecurringExpenseLRspec>> getRecurringExpensesForRespondent1() {
         if (isFullAdmitClaimSpec()) {
-            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA).orElse(
-                null);
+            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA)
+                .orElse(
+                    null);
         }
         return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpenses).orElse(
             null);
+    }
+
+    @JsonIgnore
+    public List<Element<ManageDocument>> getManageDocumentsList() {
+        return Optional.ofNullable(getManageDocuments()).orElse(new ArrayList<>());
+    }
+
+    @JsonIgnore
+    public boolean getApplicant1ResponseDeadlinePassed() {
+        return getApplicant1ResponseDeadline() != null
+            && getApplicant1ResponseDeadline().isBefore(LocalDateTime.now())
+            && getApplicant1ProceedWithClaim() == null;
+    }
+
+    @JsonIgnore
+    public String getApplicant1Email() {
+        return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
+    }
+    
+    @JsonIgnore
+    public String getHelpWithFeesReferenceNumber() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getRespondent1LiPResponse)
+            .map(RespondentLiPResponse::getHelpWithFeesReferenceNumberLip).orElse(null);
+    }
+
+    @JsonIgnore
+    public boolean isTranslatedDocumentUploaded() {
+        if (getSystemGeneratedCaseDocuments() != null) {
+            return getSystemGeneratedCaseDocuments().stream()
+                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                   .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
+        }
+        return false;
     }
 }

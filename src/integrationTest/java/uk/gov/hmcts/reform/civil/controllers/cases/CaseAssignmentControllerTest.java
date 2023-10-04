@@ -6,6 +6,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
+import uk.gov.hmcts.reform.civil.service.citizen.defendant.LipDefendantCaseAssignmentService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.service.search.CaseLegacyReferenceSearchService;
@@ -28,9 +29,10 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
     private CaseLegacyReferenceSearchService caseByLegacyReferenceSearchService;
     @MockBean
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
-
     @MockBean
     private AssignCaseService assignCaseService;
+    @MockBean
+    private LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
 
     @Test
     @SneakyThrows

@@ -13,7 +13,7 @@ public class AcceptPartAdmitAndPaidConfHeader implements RespondToResponseConfir
 
     @Override
     public Optional<String> generateTextFor(CaseData caseData) {
-        if (caseData.isPartAdmitClaimNotSettled()) {
+        if (!caseData.isPartAdmitClaimSpec() || caseData.isPartAdmitClaimNotSettled()) {
             return Optional.empty();
         }
         String claimNumber = caseData.getLegacyCaseReference();

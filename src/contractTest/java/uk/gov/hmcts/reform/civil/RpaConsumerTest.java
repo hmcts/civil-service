@@ -270,6 +270,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentPartAdmissionAfterNotificationAcknowledgement()
                 .legacyCaseReference("000DC007")
+                .respondent1DQ()
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
@@ -288,6 +289,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataMinEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMinimalData(PART_ADMISSION)
                 .legacyCaseReference("000DC008")
+                .respondent1DQ()
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
@@ -306,6 +308,7 @@ class RpaConsumerTest extends BaseRpaTest {
             CaseData caseData = CaseDataMaxEdgeCasesBuilder.builder()
                 .atStateRespondentRespondToClaimWithMaximalData(PART_ADMISSION)
                 .legacyCaseReference("000DC009")
+                .respondent1DQ()
                 .respondent1ClaimResponseIntentionType(PART_DEFENCE)
                 .build();
             String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();

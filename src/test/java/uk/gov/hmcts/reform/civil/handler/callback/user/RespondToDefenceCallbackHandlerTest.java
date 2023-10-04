@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -639,7 +640,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldAssembleClaimantResponseDocuments2v1() {
+        void shouldAssembleClaimantResponseDocuments2v1ProceedBoth() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
@@ -667,6 +668,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimValue(ClaimValue.builder()
                                 .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
                                 .build())
+                .applicant1ProceedWithClaimMultiParty2v1(YES)
+                .applicant2ProceedWithClaimMultiParty2v1(YES)
                 .build();
             /*
             CourtLocation.builder()
@@ -694,10 +697,133 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("documentName=claimant-1-draft-dir.pdf")
                 .contains("documentName=claimant-2-draft-dir.pdf")
                 .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
+            assertThat(response.getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
         }
 
         @Test
-        void shouldAssembleClaimantResponseDocuments1v1() {
+        void shouldAssembleClaimantResponseDocuments2v1ProceedOne() {
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
+                .applicant1DefenceResponseDocument(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def1.pdf").build())
+                                                       .build())
+                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def2.pdf").build())
+                                                       .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-1-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .addApplicant2(YesOrNo.YES)
+                .applicant2DQ(Applicant2DQ.builder()
+                                  .applicant2DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-2-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .build().toBuilder()
+                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
+                .claimValue(ClaimValue.builder()
+                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
+                                .build())
+                .applicant1ProceedWithClaimMultiParty2v1(NO)
+                .applicant2ProceedWithClaimMultiParty2v1(YES)
+                .build();
+            /*
+            CourtLocation.builder()
+            .applicantPreferredCourt("127")
+            .build();
+             */
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            @SuppressWarnings("unchecked")
+            List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
+            assertEquals(4, docs.size());
+
+            assertThat(response.getData())
+                .extracting("claimantResponseDocuments")
+                .asString()
+                .contains("createdBy=Claimant")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentSize=0")
+                .contains("createdDatetime=2022-02-18T12:10:55")
+                .contains("documentType=CLAIMANT_DEFENCE")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentName=claimant-response-def2.pdf")
+                .contains("documentName=claimant-1-draft-dir.pdf")
+                .contains("documentName=claimant-2-draft-dir.pdf")
+                .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
+            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldAssembleClaimantResponseDocuments2v1NotProceed() {
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
+                .applicant1DefenceResponseDocument(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def1.pdf").build())
+                                                       .build())
+                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def2.pdf").build())
+                                                       .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-1-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .addApplicant2(YesOrNo.YES)
+                .applicant2DQ(Applicant2DQ.builder()
+                                  .applicant2DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-2-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .build().toBuilder()
+                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
+                .claimValue(ClaimValue.builder()
+                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
+                                .build())
+                .applicant1ProceedWithClaimMultiParty2v1(NO)
+                .applicant2ProceedWithClaimMultiParty2v1(NO)
+                .build();
+            /*
+            CourtLocation.builder()
+            .applicantPreferredCourt("127")
+            .build();
+             */
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            @SuppressWarnings("unchecked")
+            List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
+            assertEquals(4, docs.size());
+
+            assertThat(response.getData())
+                .extracting("claimantResponseDocuments")
+                .asString()
+                .contains("createdBy=Claimant")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentSize=0")
+                .contains("createdDatetime=2022-02-18T12:10:55")
+                .contains("documentType=CLAIMANT_DEFENCE")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentName=claimant-response-def2.pdf")
+                .contains("documentName=claimant-1-draft-dir.pdf")
+                .contains("documentName=claimant-2-draft-dir.pdf")
+                .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
+            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldAssembleClaimantResponseDocuments1v1Proceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
@@ -719,6 +845,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimValue(ClaimValue.builder()
                                 .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
                                 .build())
+                .applicant1ProceedWithClaim(YES)
                 .build();
             /*
             CourtLocation.builder()
@@ -745,10 +872,64 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("documentName=claimant-response-def2.pdf")
                 .contains("documentName=claimant-1-draft-dir.pdf")
                 .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
+            assertThat(response.getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
         }
 
         @Test
-        void shouldAssembleClaimantResponseDocuments1v2ss() {
+        void shouldAssembleClaimantResponseDocuments1v1NotProceed() {
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
+                .applicant1DefenceResponseDocument(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def1.pdf").build())
+                                                       .build())
+                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def2.pdf").build())
+                                                       .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-1-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .build().toBuilder()
+                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
+                .claimValue(ClaimValue.builder()
+                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
+                                .build())
+                .applicant1ProceedWithClaim(NO)
+                .build();
+            /*
+            CourtLocation.builder()
+            .applicantPreferredCourt("127")
+            .build();
+             */
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            @SuppressWarnings("unchecked")
+            List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
+            assertEquals(3, docs.size());
+
+            assertThat(response.getData())
+                .extracting("claimantResponseDocuments")
+                .asString()
+                .contains("createdBy=Claimant")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentSize=0")
+                .contains("createdDatetime=2022-02-18T12:10:55")
+                .contains("documentType=CLAIMANT_DEFENCE")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentName=claimant-response-def2.pdf")
+                .contains("documentName=claimant-1-draft-dir.pdf")
+                .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
+            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldAssembleClaimantResponseDocuments1v2ssProceedBoth() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
@@ -774,6 +955,8 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimValue(ClaimValue.builder()
                                 .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
                                 .build())
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(YES)
                 .build();
             /*
             CourtLocation.builder()
@@ -800,6 +983,123 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .contains("documentName=claimant-response-def2.pdf")
                 .contains("documentName=claimant-1-draft-dir.pdf")
                 .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
+            assertThat(response.getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+        }
+
+        @Test
+        void shouldAssembleClaimantResponseDocuments1v2ssProceedOne() {
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
+                .applicant1DefenceResponseDocument(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def1.pdf").build())
+                                                       .build())
+                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def2.pdf").build())
+                                                       .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-1-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .respondent2(Party.builder().companyName("company 2")
+                                 .type(Party.Type.COMPANY)
+                                 .build())
+                .respondentResponseIsSame(YesOrNo.YES)
+                .build().toBuilder()
+                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
+                .claimValue(ClaimValue.builder()
+                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
+                                .build())
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
+                .build();
+            /*
+            CourtLocation.builder()
+            .applicantPreferredCourt("127")
+            .build();
+             */
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            @SuppressWarnings("unchecked")
+            List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
+            assertEquals(3, docs.size());
+
+            assertThat(response.getData())
+                .extracting("claimantResponseDocuments")
+                .asString()
+                .contains("createdBy=Claimant")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentSize=0")
+                .contains("createdDatetime=2022-02-18T12:10:55")
+                .contains("documentType=CLAIMANT_DEFENCE")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentName=claimant-response-def2.pdf")
+                .contains("documentName=claimant-1-draft-dir.pdf")
+                .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
+            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldAssembleClaimantResponseDocuments1v2ssNotProceed() {
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
+                .applicant1DefenceResponseDocument(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def1.pdf").build())
+                                                       .build())
+                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def2.pdf").build())
+                                                       .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-1-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .respondent2(Party.builder().companyName("company 2")
+                                 .type(Party.Type.COMPANY)
+                                 .build())
+                .respondentResponseIsSame(YesOrNo.YES)
+                .build().toBuilder()
+                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
+                .claimValue(ClaimValue.builder()
+                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
+                                .build())
+                .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(NO)
+                .applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2(NO)
+                .build();
+            /*
+            CourtLocation.builder()
+            .applicantPreferredCourt("127")
+            .build();
+             */
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            @SuppressWarnings("unchecked")
+            List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
+            assertEquals(3, docs.size());
+
+            assertThat(response.getData())
+                .extracting("claimantResponseDocuments")
+                .asString()
+                .contains("createdBy=Claimant")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentSize=0")
+                .contains("createdDatetime=2022-02-18T12:10:55")
+                .contains("documentType=CLAIMANT_DEFENCE")
+                .contains("documentName=claimant-response-def1.pdf")
+                .contains("documentName=claimant-response-def2.pdf")
+                .contains("documentName=claimant-1-draft-dir.pdf")
+                .contains("documentType=CLAIMANT_DRAFT_DIRECTIONS");
+            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
 
         @Test

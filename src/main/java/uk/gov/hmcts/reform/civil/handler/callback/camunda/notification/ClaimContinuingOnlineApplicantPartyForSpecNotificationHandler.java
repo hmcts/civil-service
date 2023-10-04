@@ -71,7 +71,7 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler exten
 
     private void generateEmail(CaseData caseData) {
         notificationService.sendMail(
-            caseData.getApplicant1().getPartyEmail(),
+            caseData.getApplicant1Email(),
             notificationsProperties.getClaimantClaimContinuingOnlineForSpec(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -73,7 +74,8 @@ public class LocationHelper {
                 .map(Respondent2DQ::getRespondent2DQRequestedCourt);
         }
 
-        if (EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER).contains(getDefendantType.get())) {
+        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && EnumSet.of(Party.Type.INDIVIDUAL, Party.Type.SOLE_TRADER).contains(getDefendantType.get())) {
             log.debug(
                 "Case {}, defendant is a person, so their court request has priority",
                 caseData.getLegacyCaseReference()
@@ -144,7 +146,7 @@ public class LocationHelper {
      * @param caseData case data
      * @return true if defendant 1 is lead defendant
      */
-    private boolean leadDefendantIs1(CaseData caseData) {
+    public boolean leadDefendantIs1(CaseData caseData) {
         if (caseData.getRespondent2ResponseDate() == null) {
             return true;
         }
@@ -164,7 +166,7 @@ public class LocationHelper {
      * @param caseData case data
      * @return requested court object for the lead claimant
      */
-    private Optional<RequestedCourt> getClaimantRequestedCourt(CaseData caseData) {
+    public Optional<RequestedCourt> getClaimantRequestedCourt(CaseData caseData) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             return getSpecClaimantRequestedCourt(caseData);
         } else {
@@ -196,7 +198,7 @@ public class LocationHelper {
      * @return first matching location
      */
 
-    private Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
+    public Optional<LocationRefData> getMatching(List<LocationRefData> locations, RequestedCourt preferredCourt) {
         if (preferredCourt == null) {
             return Optional.empty();
         }

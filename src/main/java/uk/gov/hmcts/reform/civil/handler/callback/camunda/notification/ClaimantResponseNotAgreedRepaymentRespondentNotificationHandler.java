@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_CLAIMANT_FOR_RESPONDENT1_REJECT_REPAYMENT);
     private static final String REFERENCE_TEMPLATE = "claimant-reject-repayment-respondent-notification-%s";
     public static final String TASK_ID_CLAIMANT = "ClaimantDisAgreeRepaymentPlanNotifyApplicant";
+    private final OrganisationDetailsService organisationDetailsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -64,7 +66,8 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
         return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganizationName(caseData)
         ));
     }
 

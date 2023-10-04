@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
@@ -21,7 +23,7 @@ public class SendSDOBulkPrintService {
     private final DocumentDownloadService documentDownloadService;
     private static final String SDO_ORDER_PACK_LETTER_TYPE = "sdo-order-pack";
 
-    public void sendSDOToDefendantLIP(CaseData caseData) {
+    public void sendSDOToDefendantLIP(String authorisation, CaseData caseData) {
         if (caseData.getSystemGeneratedCaseDocuments() != null && !caseData.getSystemGeneratedCaseDocuments().isEmpty()) {
             Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
 
@@ -30,12 +32,14 @@ public class SendSDOBulkPrintService {
                 String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
                 byte[] letterContent;
                 try {
-                    letterContent = documentDownloadService.downloadDocument(documentId).file().getInputStream().readAllBytes();
+                    letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
                 } catch (IOException e) {
                     log.error("Failed getting letter content for SDO ");
                     throw new DocumentDownloadException(caseDocument.get().getValue().getDocumentName(), e);
                 }
-                bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(), caseData.getLegacyCaseReference(), SDO_ORDER_PACK_LETTER_TYPE);
+                List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
+                bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+                                             caseData.getLegacyCaseReference(), SDO_ORDER_PACK_LETTER_TYPE, recipients);
             }
         }
     }

@@ -15,7 +15,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
-import uk.gov.hmcts.reform.civil.service.citizenui.MediationCSVService;
+import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVService;
+import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -33,7 +34,7 @@ public class CyaAgreedMediationNotificationHandler extends CallbackHandler imple
     public static final String TASK_ID = "CyaAgreedMediationNotification";
     private final SendGridClient sendGridClient;
     private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
-    private final MediationCSVService mediationCSVService;
+    private final MediationCsvServiceFactory mediationCsvServiceFactory;
 
     private final String subject = "OCMC Mediation Data";
     private final String filename = "ocmc_mediation_data.csv";
@@ -58,18 +59,16 @@ public class CyaAgreedMediationNotificationHandler extends CallbackHandler imple
     private CallbackResponse sendCVSMediation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        // LRvLR will be added in CIV-9525
-        if (caseData.isLRvLipOneVOne()) {
-            Optional<EmailData> emailData = prepareEmail(caseData);
+        Optional<EmailData> emailData = prepareEmail(caseData);
 
-            emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
-        }
+        emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 
     private Optional<EmailData> prepareEmail(CaseData data) {
+        MediationCSVService mediationCSVService = mediationCsvServiceFactory.getMediationCSVService(data);
         String content = mediationCSVService.generateCSVContent(data);
         InputStreamSource inputSource = new ByteArrayResource(content.getBytes(StandardCharsets.UTF_8));
 

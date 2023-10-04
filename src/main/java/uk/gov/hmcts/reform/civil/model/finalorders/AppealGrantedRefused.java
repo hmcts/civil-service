@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
+import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 
 @Data
 @Builder(toBuilder = true)
@@ -13,8 +12,8 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class AppealGrantedRefused {
 
-    private String reasonsText;
-    private String permissionText;
-    private String refusedText;
-    private LocalDate appealDate;
+    private AppealChoiceSecondDropdown appealChoiceSecondDropdownA;
+    private AppealChoiceSecondDropdown appealChoiceSecondDropdownB;
+    private ApplicationAppealList circuitOrHighCourtList;
+    private ApplicationAppealList circuitOrHighCourtListRefuse;
 }

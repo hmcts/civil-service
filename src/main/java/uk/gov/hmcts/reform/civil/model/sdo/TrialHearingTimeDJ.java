@@ -18,8 +18,11 @@ public class TrialHearingTimeDJ {
 
     private LocalDate date1;
     private LocalDate date2;
+
     private List<DateToShowToggle> dateToToggle;
     private TrialHearingTimeEstimateDJ hearingTimeEstimate;
     private String helpText1;
     private String helpText2;
+    private String otherHours;
+    private String otherMinutes;
 }

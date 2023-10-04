@@ -16,6 +16,19 @@ import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSIN
 @RequiredArgsConstructor
 public class DeadlineExtensionValidator {
 
+    /**
+     * initial deadline for a claim.
+     */
+    public static final long INITIAL_DEADLINE = 14;
+    /**
+     * deadline extension when respondent acks the claim.
+     */
+    public static final long ACK_EXTENSION = 14;
+    /**
+     * deadline extension when there is an agreed extension.
+     */
+    public static final long AGREED_EXTENSION = 28;
+
     private final WorkingDayIndicator workingDayIndicator;
 
     public List<String> validateProposedDeadline(LocalDate dateToValidate, LocalDateTime responseDeadline) {
@@ -50,9 +63,10 @@ public class DeadlineExtensionValidator {
         }
 
         LocalDateTime newResponseDeadline = workingDayIndicator.isWorkingDay(responseDeadline.plusDays(28)
-                .toLocalDate()) ? responseDeadline.plusDays(28) : LocalDateTime.of(
-                        workingDayIndicator.getNextWorkingDay(responseDeadline.plusDays(28).toLocalDate()),
-                                LocalDateTime.now().toLocalTime()
+                                                                                 .toLocalDate()) ? responseDeadline.plusDays(
+            28) : LocalDateTime.of(
+            workingDayIndicator.getNextWorkingDay(responseDeadline.plusDays(28).toLocalDate()),
+            LocalDateTime.now().toLocalTime()
         );
 
         if (!isAoSApplied && LocalDateTime.of(
@@ -73,5 +87,18 @@ public class DeadlineExtensionValidator {
             return List.of("Date must be next working weekday");
         }
         return emptyList();
+    }
+
+    public LocalDate getMaxDate(LocalDateTime notificationDetailsDate, LocalDateTime ackNotificationDate) {
+        LocalDate date = notificationDetailsDate
+            .plusDays(
+                AGREED_EXTENSION
+                    + INITIAL_DEADLINE
+                    + (ackNotificationDate == null ? 0L : ACK_EXTENSION))
+            .toLocalDate();
+        while (!workingDayIndicator.isWorkingDay(date)) {
+            date = date.plusDays(1L);
+        }
+        return date;
     }
 }

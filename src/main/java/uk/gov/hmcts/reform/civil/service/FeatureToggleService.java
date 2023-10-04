@@ -20,6 +20,10 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
     }
 
+    public boolean isBulkClaimEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
+    }
+
     public boolean isNoticeOfChangeEnabled() {
         return this.featureToggleApi.isFeatureEnabled("notice-of-change");
     }
@@ -60,4 +64,11 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("fast-track-uplifts");
     }
 
+    public boolean isUpdateContactDetailsEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("update-contact-details");
+    }
+
+    public boolean isLipVLipEnabled() {
+        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
+    }
 }

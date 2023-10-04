@@ -22,4 +22,6 @@ public class FastTrackHearingTime {
     private FastTrackHearingTimeEstimate hearingDuration;
     private String helpText1;
     private String helpText2;
+    private String otherHours;
+    private String otherMinutes;
 }

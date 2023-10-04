@@ -13,8 +13,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
@@ -52,7 +53,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
-import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
@@ -109,6 +109,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingStandardDisposalOrder;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
@@ -144,6 +145,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -466,6 +468,22 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> documentAuthorities;
     private final List<Element<UploadEvidenceDocumentType>> documentCosts;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial;
+    //applicant2
+    private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureApp2;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessStatementApp2;
+    private final List<Element<UploadEvidenceWitness>> documentWitnessSummaryApp2;
+    private final List<Element<UploadEvidenceWitness>> documentHearsayNoticeApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentReferredInStatementApp2;
+    private final List<Element<UploadEvidenceExpert>> documentExpertReportApp2;
+    private final List<Element<UploadEvidenceExpert>> documentJointStatementApp2;
+    private final List<Element<UploadEvidenceExpert>> documentQuestionsApp2;
+    private final List<Element<UploadEvidenceExpert>> documentAnswersApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentCaseSummaryApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentSkeletonArgumentApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentCostsApp2;
+    private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialApp2;
     private final LocalDateTime caseDocumentUploadDate;
     //respondent
     private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes;
@@ -605,11 +623,9 @@ public class CaseDataParent implements MappableObject {
     private String finalOrderOrderedThatText;
     private AssistedCostTypesList assistedOrderCostList;
     private AssistedOrderCostDetails assistedOrderCostsReserved;
-    private AssistedOrderCostDetails assistedOrderCostsDefendantPaySub;
-    private AssistedOrderCostDetails assistedOrderCostsClaimantPaySub;
-    private AssistedOrderCostDetails assistedOrderCostsDefendantSum;
-    private AssistedOrderCostDetails assistedOrderCostsClaimantSum;
     private AssistedOrderCostDetails assistedOrderCostsBespoke;
+    private AssistedOrderCostDetails assistedOrderMakeAnOrderForCosts;
+    private YesOrNo publicFundingCostsProtection;
     private List<FinalOrderToggle> finalOrderFurtherHearingToggle;
     private FinalOrderFurtherHearing finalOrderFurtherHearingComplex;
     private HearingLengthFinalOrderList lengthList;
@@ -676,6 +692,18 @@ public class CaseDataParent implements MappableObject {
     private DisposalHearingMethodDJ trialHearingMethodDJ;
     private HearingMethodTelephoneHearingDJ trialHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ trialHearingMethodVideoConferenceHearingDJ;
+    private final Address specRespondent2CorrespondenceAddressdetails;
+    private final YesOrNo specRespondent2CorrespondenceAddressRequired;
+
+    private List<Element<UnavailableDate>> applicant1UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> applicant2UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
+    private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
+
+    @JsonUnwrapped
+    private final UpdateDetailsForm updateDetailsForm;
+
+    private FastTrackAllocation fastTrackAllocation;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
@@ -685,6 +713,7 @@ public class CaseDataParent implements MappableObject {
     }
 
     private final IdamUserDetails claimantUserDetails;
+    private final IdamUserDetails defendantUserDetails;
 
     private final ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
 
@@ -692,20 +721,16 @@ public class CaseDataParent implements MappableObject {
     public BigDecimal getUpFixedCostAmount(BigDecimal claimAmount) {
         BigDecimal lowerRangeClaimAmount = BigDecimal.valueOf(25);
         BigDecimal upperRangeClaimAmount = BigDecimal.valueOf(5000);
-        BigDecimal lowCostAmount = ZERO;
         BigDecimal midCostAmount = BigDecimal.valueOf(40);
-        BigDecimal highCostAmount = BigDecimal.valueOf(55);
 
-        if (!YES.equals(getCcjPaymentDetails().getCcjJudgmentFixedCostOption())) {
+        if ((!YES.equals(getCcjPaymentDetails().getCcjJudgmentFixedCostOption())
+            || (claimAmount.compareTo(lowerRangeClaimAmount) < 0))) {
             return ZERO;
         }
-        if (claimAmount.compareTo(lowerRangeClaimAmount) < 0) {
-            return lowCostAmount;
-        } else if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
+        if (claimAmount.compareTo(upperRangeClaimAmount) <= 0) {
             return midCostAmount;
-        } else {
-            return highCostAmount;
         }
+        return BigDecimal.valueOf(55);
     }
 
     @JsonIgnore
@@ -725,8 +750,10 @@ public class CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public Optional<TranslatedDocument> getTranslatedDocument() {
-        return Optional.ofNullable(getCaseDataLiP()).map(CaseDataLiP::getTranslatedDocument);
+    public List<Element<TranslatedDocument>> getTranslatedDocuments() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getTranslatedDocuments)
+            .orElse(Collections.emptyList());
     }
 
     @JsonIgnore
@@ -734,10 +761,5 @@ public class CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantNotAgreedToFreeMediation).isPresent();
-    }
-
-    @JsonIgnore
-    public boolean isTranslatedDocumentUploaded() {
-        return getCaseDataLiP() != null && getCaseDataLiP().getTranslatedDocument() != null;
     }
 }

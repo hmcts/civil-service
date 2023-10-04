@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -99,8 +100,9 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private void generatePIPLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         byte[] letter = pipLetterGenerator.downloadLetter(caseData);
+        List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
         bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE);
+                                     caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
     }
 
     private void generatePIPEmail(CaseData caseData) {
