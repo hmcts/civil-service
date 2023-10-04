@@ -18,20 +18,20 @@ import static uk.gov.hmcts.reform.civil.utils.PaymentFrequencyCalculator.calcula
 @Component
 public class ExpenditureCalculator {
 
-    public int calculateTotalExpenditure(List<Element<RecurringExpenseLRspec>> recurringExpenseElementList,
+    public double calculateTotalExpenditure(List<Element<RecurringExpenseLRspec>> recurringExpenseElementList,
                                          Respondent1DebtLRspec respondent1DebtLRspec) {
         return calculateTotalMonthlyExpenses(recurringExpenseElementList)
             + calculateTotalMonthlyDebt(respondent1DebtLRspec);
     }
 
-    private int calculateTotalMonthlyExpenses(List<Element<RecurringExpenseLRspec>> recurringExpenseElementList) {
+    private double calculateTotalMonthlyExpenses(List<Element<RecurringExpenseLRspec>> recurringExpenseElementList) {
         List<RecurringExpenseLRspec> expenses = unwrapElementsNullSafe(recurringExpenseElementList);
         return expenses.stream()
-            .map(expense -> calculatePaymentPerMonth(expense.getAmount().intValue(), expense.getFrequency()))
-            .collect(Collectors.summingInt(Integer::intValue));
+            .mapToDouble(expense -> calculatePaymentPerMonth(expense.getAmount().intValue(), expense.getFrequency()))
+            .sum();
     }
 
-    private int calculateTotalMonthlyDebt(Respondent1DebtLRspec respondent1DebtLRspec) {
+    private double calculateTotalMonthlyDebt(Respondent1DebtLRspec respondent1DebtLRspec) {
        if(respondent1DebtLRspec.getHasLoanCardDebt() == YesOrNo.YES) {
            return calculateCreditCardDebts(respondent1DebtLRspec.getLoanCardDebtDetails())
                + calculateDepts(respondent1DebtLRspec.getDebtDetails());
@@ -39,18 +39,18 @@ public class ExpenditureCalculator {
        return calculateDepts(respondent1DebtLRspec.getDebtDetails());
     }
 
-    private int calculateCreditCardDebts(List<Element<LoanCardDebtLRspec>> loanCardDebtDetails) {
+    private double calculateCreditCardDebts(List<Element<LoanCardDebtLRspec>> loanCardDebtDetails) {
         List<LoanCardDebtLRspec> cardDebtList = unwrapElementsNullSafe(loanCardDebtDetails);
         return cardDebtList.stream()
             .map(LoanCardDebtLRspec::getMonthlyPayment)
-            .collect(Collectors.summingInt(BigDecimal::intValue));
+            .collect(Collectors.summingDouble(BigDecimal::doubleValue));
     }
 
-    private int calculateDepts(List<Element<DebtLRspec>> debtDetails) {
+    private double calculateDepts(List<Element<DebtLRspec>> debtDetails) {
         List<DebtLRspec> debts = unwrapElementsNullSafe(debtDetails);
         return debts.stream()
-            .map(debt -> calculatePaymentPerMonth(debt.getPaymentAmount().intValue(), debt.getPaymentFrequency()))
-            .collect(Collectors.summingInt(Integer::intValue));
+            .mapToDouble(debt -> calculatePaymentPerMonth(debt.getPaymentAmount().intValue(), debt.getPaymentFrequency()))
+            .sum();
     }
 
 }

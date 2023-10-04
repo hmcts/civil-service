@@ -8,7 +8,7 @@ public class PaymentFrequencyCalculator {
 
     }
 
-    public static int calculatePaymentPerMonth(int amount, PaymentFrequencyLRspec paymentFrequencyLRspec) {
+    public static double calculatePaymentPerMonth(int amount, PaymentFrequencyLRspec paymentFrequencyLRspec) {
         switch (paymentFrequencyLRspec) {
             case ONCE_FOUR_WEEKS -> {
                 return calculateWeeklyIncomeIntoMonthly(4, amount);
@@ -28,11 +28,11 @@ public class PaymentFrequencyCalculator {
         }
     }
 
-    public static int calculateWeeklyIncomeIntoMonthly(int weeks, int amount) {
+    public static double calculateWeeklyIncomeIntoMonthly(int weeks, double amount) {
         return calculateWeeklyIncomeIntoMonthly(amount / weeks);
     }
 
-    public static int calculateWeeklyIncomeIntoMonthly(int amount) {
+    public static double calculateWeeklyIncomeIntoMonthly(double amount) {
         return amount * 52 / 12;
     }
 

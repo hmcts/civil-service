@@ -17,7 +17,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElementsNullSaf
 @Component
 public class IncomeCalculator {
 
-    public int calculateTotalMonthlyIncome(List<Element<AccountSimple>> bankAccountElements,
+    public double calculateTotalMonthlyIncome(List<Element<AccountSimple>> bankAccountElements,
                                            List<Element<RecurringIncomeLRspec>> recuringIncomeElements,
                                            Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails) {
         return calculateRegularIncome(recuringIncomeElements)
@@ -25,16 +25,16 @@ public class IncomeCalculator {
             + calculateMonthlyIncomeFromAnnualTurnover(specDefendant1SelfEmploymentDetails);
     }
 
-    public int calculateTotalSavings(List<Element<AccountSimple>> bankAccountElements) {
+    public double calculateTotalSavings(List<Element<AccountSimple>> bankAccountElements) {
         List<AccountSimple> bankAccounts = unwrapElementsNullSafe(bankAccountElements);
         return bankAccounts.stream().filter(item -> item.getBalance().compareTo(BigDecimal.ZERO) > 0)
-            .map(AccountSimple::getBalance).collect(Collectors.summingInt(BigDecimal::intValue));
+            .map(AccountSimple::getBalance).collect(Collectors.summingDouble(BigDecimal::doubleValue));
     }
 
-    public int calculateRegularIncome(List<Element<RecurringIncomeLRspec>> recurringIncomeElements) {
+    public double calculateRegularIncome(List<Element<RecurringIncomeLRspec>> recurringIncomeElements) {
         List<RecurringIncomeLRspec> recurringIncomes = unwrapElementsNullSafe(recurringIncomeElements);
         return recurringIncomes.stream().filter(income -> income.getAmount().compareTo(BigDecimal.ZERO) > 0)
-            .map(income -> calculateIncomePerMonth(income)).collect(Collectors.summingInt(Integer::intValue));
+            .mapToDouble(income -> calculateIncomePerMonth(income)).sum();
     }
 
     public int calculateMonthlyIncomeFromAnnualTurnover (Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails) {
@@ -44,7 +44,7 @@ public class IncomeCalculator {
         return result.intValue();
     }
 
-    private int calculateIncomePerMonth(RecurringIncomeLRspec income) {
+    private double calculateIncomePerMonth(RecurringIncomeLRspec income) {
         int incomeAmount = income.getAmount().intValue();
         return PaymentFrequencyCalculator.calculatePaymentPerMonth(incomeAmount, income.getFrequency());
     }
