@@ -843,8 +843,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isApplicant1NotRepresented() {
+        return NO.equals(getApplicant1Represented());
+    }
+
+    @JsonIgnore
     public boolean isLRvLipOneVOne() {
         return isRespondent1NotRepresented()
+            && !isApplicant1NotRepresented()
+            && isOneVOne(this);
+    }
+
+    @JsonIgnore
+    public boolean isLipvLipOneVOne() {
+        return isRespondent1NotRepresented()
+            && isApplicant1NotRepresented()
             && isOneVOne(this);
     }
 
@@ -1001,11 +1014,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public List<Element<RecurringExpenseLRspec>> getRecurringExpensesForRespondent1() {
         if (isFullAdmitClaimSpec()) {
-            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA).orElse(
-                null);
+            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA)
+                .orElse(
+                    null);
         }
         return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpenses).orElse(
             null);
+    }
+
+    @JsonIgnore
+    public List<Element<ManageDocument>> getManageDocumentsList() {
+        return Optional.ofNullable(getManageDocuments()).orElse(new ArrayList<>());
     }
 
     @JsonIgnore
