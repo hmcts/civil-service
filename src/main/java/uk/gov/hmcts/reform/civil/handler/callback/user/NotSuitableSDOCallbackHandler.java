@@ -64,22 +64,18 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-        OtherDetails tempOtherDetails = null;
 
-        if (!toggleService.isTransferOnlineCaseEnabled()) {
-           tempOtherDetails = OtherDetails.builder()
-               .notSuitableForSDO(YesOrNo.YES)
-               .reasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput())
-               .build();
-        } else {
-            if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
+        if (toggleService.isTransferOnlineCaseEnabled()
+            && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
                 TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
                     .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
                     .build();
                 dataBuilder.tocTransferCaseReason(tocTransferCaseReason).build();
-                tempOtherDetails = OtherDetails.builder().notSuitableForSDO(YesOrNo.YES).build();
-            }
         }
+        OtherDetails tempOtherDetails = OtherDetails.builder()
+            .notSuitableForSDO(YesOrNo.YES)
+            .reasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput())
+            .build();
         dataBuilder.otherDetails(tempOtherDetails).build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -90,12 +86,9 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         final int lengthAllowed = 150;
         List<String> errors = new ArrayList<>();
         String reason;
-        if (toggleService.isTransferOnlineCaseEnabled()) {
-            if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
+        if (toggleService.isTransferOnlineCaseEnabled()
+            && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
                 reason = ""; //Change to ReasonForCaseTransferJudgeTxt if validation also needed for this field
-            } else {
-                reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
-            }
         } else {
             reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
         }
@@ -122,12 +115,9 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-        if (toggleService.isTransferOnlineCaseEnabled()) {
-            if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
+        if (toggleService.isTransferOnlineCaseEnabled()
+            && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
                 //TODO add new event
-            } else {
-                dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
-            }
         } else {
             dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
         }
@@ -136,18 +126,18 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (toggleService.isTransferOnlineCaseEnabled()) {
-            if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
+        if (toggleService.isTransferOnlineCaseEnabled()
+            && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
                 return SubmittedCallbackResponse.builder()
                     .confirmationHeader(getHeaderTOC(caseData))
                     .confirmationBody(getBodyTOC(caseData))
                     .build();
-            }
+        } else {
+            return SubmittedCallbackResponse.builder()
+                .confirmationHeader(getHeader(caseData))
+                .confirmationBody(getBody(caseData))
+                .build();
         }
-        return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData))
-            .build();
     }
 
     private String getHeader(CaseData caseData) {
