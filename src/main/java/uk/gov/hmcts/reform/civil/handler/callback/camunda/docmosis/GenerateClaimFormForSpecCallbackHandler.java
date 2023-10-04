@@ -74,8 +74,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
 
     private CallbackResponse generateClaimFormForSpec(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        if (featureToggleService.isLipVLipEnabled()) {
+        if (featureToggleService.isLipVLipEnabled() && caseData.isApplicantNotRepresented()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .build();
         }
