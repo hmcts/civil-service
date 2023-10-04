@@ -11,30 +11,30 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -54,7 +54,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -63,7 +62,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
@@ -247,11 +246,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             addEventAndDateAddedToApplicantWitnesses(builder);
         }
 
-        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
-
         if (featureToggleService.isHmcEnabled()) {
-            populateWithPartyIds(builder);
+            populateDQPartyIds(builder);
         }
+
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             builder.respondentSharedClaimResponseDocument(null);
@@ -276,12 +275,24 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
      * @return true if and only if the case should move to judicial referral
      */
     public static boolean shouldMoveToJudicialReferral(CaseData caseData) {
-        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
+        CaseCategory caseCategory = caseData.getCaseAccessCategory();
+
+        if (CaseCategory.SPEC_CLAIM.equals(caseCategory)) {
+            MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+            boolean addRespondent2 = YES.equals(caseData.getAddRespondent2());
+
+            return switch (multiPartyScenario) {
+                case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
+                case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimSpec2v1() == YesOrNo.YES;
+                case ONE_V_TWO_ONE_LEGAL_REP -> addRespondent2
+                    && YES.equals(caseData.getRespondentResponseIsSame());
+                case ONE_V_TWO_TWO_LEGAL_REP -> addRespondent2
+                    && caseData.getRespondentResponseIsSame() == null;
+            };
         } else {
             AllocatedTrack allocatedTrack =
                 getAllocatedTrack(
-                    CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                    CaseCategory.UNSPEC_CLAIM.equals(caseCategory)
                         ? caseData.getClaimValue().toPounds()
                         : caseData.getTotalClaimAmount(),
                     caseData.getClaimType()

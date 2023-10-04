@@ -28,6 +28,7 @@ public class DQExtraDetailsLip {
     private YesOrNo considerClaimantDocuments;
     private String considerClaimantDocumentsDetails;
     private ExpertLiP respondent1DQLiPExpert;
+    private ExpertLiP applicant1DQLiPExpert;
 
     @JsonIgnore
     public List<ExpertReportLiP> getReportExpertDetails() {

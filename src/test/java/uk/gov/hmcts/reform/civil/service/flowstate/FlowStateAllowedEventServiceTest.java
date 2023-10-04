@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIF
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_SOLICITOR_EMAIL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PAYMENT;
@@ -80,6 +81,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
@@ -483,6 +487,7 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     PART_ADMISSION,
                     new CaseEvent[]{
+                        CLAIMANT_RESPONSE_CUI,
                         WITHDRAW_CLAIM,
                         ADD_DEFENDANT_LITIGATION_FRIEND,
                         DISCONTINUE_CLAIM,
@@ -553,7 +558,10 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_JUDGE,
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
-                        ADD_UNAVAILABLE_DATES
+                        ADD_UNAVAILABLE_DATES,
+                        SET_ASIDE_JUDGMENT,
+                        JUDGMENT_PAID_IN_FULL,
+                        RECORD_JUDGMENT
                     }
                 ),
                 of(
@@ -651,7 +659,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         DISMISS_CLAIM,
                         migrateCase,
-                        CREATE_SDO
+                        CREATE_SDO,
+                        NotSuitable_SDO
                     }
                 ),
                 of(

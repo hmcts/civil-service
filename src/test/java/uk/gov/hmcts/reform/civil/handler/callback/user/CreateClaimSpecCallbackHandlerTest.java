@@ -1838,7 +1838,18 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCopyRespondent1OrgPolicyReferenceForSameRegisteredSolicitorScenario_whenInvoked() {
-            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative().build();
+            caseData = CaseDataBuilder.builder().atStateClaimIssued1v2AndSameRepresentative()
+                .respondent2(Party.builder()
+                                 .type(Party.Type.COMPANY)
+                                 .companyName("Company 3")
+                                 .build())
+                .build().toBuilder()
+                .specRespondentCorrespondenceAddressRequired(YES)
+                .specRespondentCorrespondenceAddressdetails(Address.builder()
+                                                                .postCode("Postcode")
+                                                                .addressLine1("Address")
+                                                                .build())
+                .build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(
                     caseData,
@@ -1852,6 +1863,15 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("Organisation").extracting("OrganisationID")
                 .isEqualTo("org1");
             assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
+
+            assertEquals(
+                response.getData().get("specRespondentCorrespondenceAddressRequired"),
+                response.getData().get("specRespondent2CorrespondenceAddressRequired")
+            );
+            assertEquals(
+                response.getData().get("specRespondentCorrespondenceAddressdetails"),
+                response.getData().get("specRespondent2CorrespondenceAddressdetails")
+            );
         }
 
         @Test
