@@ -18,7 +18,8 @@ public class CourtLocation {
     @JsonCreator
     CourtLocation(@JsonProperty("applicantPreferredCourt") String applicantPreferredCourt,
                   @JsonProperty("applicantPreferredCourtLocationList") DynamicList applicantPreferredCourtLocationList,
-                  @JsonProperty("caseLocation") CaseLocationCivil caseLocation) {
+                  @JsonProperty("caseLocation") CaseLocationCivil caseLocation,
+                  @JsonProperty("reasonForHearingAtSpecificCourt") String reasonForHearingAtSpecificCourt) {
         this.applicantPreferredCourt = applicantPreferredCourt;
         this.applicantPreferredCourtLocationList = applicantPreferredCourtLocationList;
         this.caseLocation = caseLocation;
