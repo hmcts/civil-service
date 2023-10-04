@@ -192,13 +192,13 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .isEqualTo("Mr. John Rambo");
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
                 .extracting("ownInitiativeDate")
-                .isEqualTo(LocalDate.now().toString());
+                .isEqualTo(LocalDate.now().plusDays(7).toString());
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
                 .extracting("withOutNoticeText")
                 .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
                 .extracting("withOutNoticeDate")
-                .isEqualTo(LocalDate.now().toString());
+                .isEqualTo(LocalDate.now().plusDays(7).toString());
             assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
                 .extracting("assistedOrderCostsFirstDropdownDate")
                 .isEqualTo(advancedDate);
@@ -301,13 +301,13 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .isEqualTo("Mr. John Rambo");
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
                 .extracting("ownInitiativeDate")
-                .isEqualTo(LocalDate.now().toString());
+                .isEqualTo(LocalDate.now().plusDays(7).toString());
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
                 .extracting("withOutNoticeText")
                 .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
                 .extracting("withOutNoticeDate")
-                .isEqualTo(LocalDate.now().toString());
+                .isEqualTo(LocalDate.now().plusDays(7).toString());
             assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
                 .extracting("assistedOrderCostsFirstDropdownDate")
                 .isEqualTo(advancedDate);

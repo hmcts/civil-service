@@ -214,10 +214,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                            .datesToAvoidDates(LocalDate.now().plusDays(7)).build()).build())
             .orderMadeOnDetailsOrderCourt(
                 OrderMadeOnDetails.builder().ownInitiativeDate(
-                    LocalDate.now()).ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
+                    LocalDate.now().plusDays(7)).ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
             .orderMadeOnDetailsOrderWithoutNotice(
                 OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(
-                    LocalDate.now()).withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
+                    LocalDate.now().plusDays(7)).withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
             .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
                                                   .assistedOrderCostsFirstDropdownDate(advancedDate)
                                                   .assistedOrderAssessmentThirdDropdownDate(advancedDate)
