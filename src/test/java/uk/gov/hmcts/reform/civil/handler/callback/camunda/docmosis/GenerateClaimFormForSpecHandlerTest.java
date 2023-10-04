@@ -443,12 +443,15 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
         }
 
         @Test
-        void shouldNotGenerateClaimForm_whenLipvLipFlagIsOn() {
+        void shouldNotGenerateClaimForm_whenLipvLipFlagIsOnAndApplicantIsLip() {
             given(toggleService.isLipVLipEnabled()).willReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssuedUnrepresentedDefendant().build().toBuilder()
                 .specRespondent1Represented(NO)
+                .build()
+                .toBuilder()
+                .applicant1Represented(NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

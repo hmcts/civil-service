@@ -1148,9 +1148,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(respondent2OrgPolicy).extracting("OrgPolicyReference").isEqualTo("org1PolicyReference");
             assertThat(respondent2OrgPolicy)
-                .extracting("Organisation").extracting("OrganisationID")
-                .isEqualTo("org1");
+                .extracting("Organisation").extracting("OrganisationID").isNull();
             assertThat(respondentSolicitor2EmailAddress).isEqualTo("respondentsolicitor@example.com");
+            assertThat(response.getData()).extracting("respondent2OrganisationIDCopy").isEqualTo("org1");
         }
 
         @Test
@@ -1531,9 +1531,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                   .build())
                 .respondent1OrganisationPolicy(OrganisationPolicy.builder()
                                                    .orgPolicyReference("DEFENDANTREF1")
+                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                     .organisationID("QWERTY R").build())
                                                    .build())
                 .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                    .orgPolicyReference("DEFENDANTREF2")
+                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                     .organisationID("QWERTY R2").build())
                                                    .build())
                 .build();
 
@@ -1545,6 +1549,59 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                "CLAIMANTREF1, DEFENDANTREF1, DEFENDANTREF2");
             assertThat(response.getData())
                 .containsEntry("caseListDisplayDefendantSolicitorReferences", "6789, 01234");
+        }
+
+        @Test
+        void shouldUpdateRespondent1Organisation1IDCopySameSol() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v2AndSameRepresentative()
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyReference("DEFENDANTREF1")
+                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                     .organisationID("QWERTY R").build())
+                                                   .build())
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData())
+                .extracting("respondent1OrganisationIDCopy")
+                .isEqualTo("QWERTY R");
+            assertThat(response.getData())
+                .extracting("respondent2OrganisationIDCopy")
+                .isEqualTo("QWERTY R");
+        }
+
+        @Test
+        void shouldUpdateRespondent1And2Organisation1IDCopy() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .orgPolicyReference("CLAIMANTREF1")
+                                                  .build())
+                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyReference("DEFENDANTREF1")
+                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                     .organisationID("QWERTY R").build())
+                                                   .build())
+                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                                   .orgPolicyReference("DEFENDANTREF2")
+                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                     .organisationID("QWERTY R2").build())
+                                                   .build())
+                .build();
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+
+            assertThat(response.getData())
+                .extracting("respondent1OrganisationIDCopy")
+                .isEqualTo("QWERTY R");
+            assertThat(response.getData())
+                .extracting("respondent2OrganisationIDCopy")
+                .isEqualTo("QWERTY R2");
         }
 
         @Test
@@ -1602,7 +1659,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void unrepresentedDefendants() {
                 CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimDraft()
+                    .atStateClaimSubmittedNoRespondentRepresented()
                     .respondent1OrganisationPolicy(null)
                     .respondent2OrganisationPolicy(null)
                     .build();

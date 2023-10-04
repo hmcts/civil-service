@@ -63,7 +63,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
@@ -249,11 +249,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             addEventAndDateAddedToApplicantWitnesses(builder);
         }
 
-        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
-
         if (featureToggleService.isHmcEnabled()) {
-            populateWithPartyIds(builder);
+            populateDQPartyIds(builder);
         }
+
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             builder.respondentSharedClaimResponseDocument(null);
