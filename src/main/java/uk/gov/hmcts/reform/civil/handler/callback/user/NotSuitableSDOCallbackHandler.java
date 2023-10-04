@@ -67,11 +67,11 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         OtherDetails tempOtherDetails;
         if (toggleService.isTransferOnlineCaseEnabled()
             && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
-                TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
-                    .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
-                    .build();
-                dataBuilder.tocTransferCaseReason(tocTransferCaseReason).build();
-                tempOtherDetails = OtherDetails.builder()
+            TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
+                .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
+                .build();
+            dataBuilder.tocTransferCaseReason(tocTransferCaseReason).build();
+            tempOtherDetails = OtherDetails.builder()
                 .notSuitableForSDO(YesOrNo.YES)
                 .build();
         } else {
@@ -92,7 +92,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         String reason;
         if (toggleService.isTransferOnlineCaseEnabled()
             && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
-                reason = ""; //Change to ReasonForCaseTransferJudgeTxt if validation also needed for this field
+            reason = ""; //Change to ReasonForCaseTransferJudgeTxt if validation also needed for this field
         } else {
             reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
         }
@@ -132,10 +132,10 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         if (toggleService.isTransferOnlineCaseEnabled()
             && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
-                return SubmittedCallbackResponse.builder()
-                    .confirmationHeader(getHeaderTOC(caseData))
-                    .confirmationBody(getBodyTOC(caseData))
-                    .build();
+            return SubmittedCallbackResponse.builder()
+                .confirmationHeader(getHeaderTOC(caseData))
+                .confirmationBody(getBodyTOC(caseData))
+                .build();
         } else {
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(getHeader(caseData))
