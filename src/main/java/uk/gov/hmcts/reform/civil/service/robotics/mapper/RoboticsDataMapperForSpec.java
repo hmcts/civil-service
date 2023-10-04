@@ -107,7 +107,8 @@ public class RoboticsDataMapperForSpec {
 
     private List<Solicitor> buildSolicitors(CaseData caseData) {
         List<Solicitor> solicitorsList = new ArrayList<>();
-        solicitorsList.add(buildApplicantSolicitor(caseData));
+        ofNullable(buildApplicantSolicitor(caseData))
+            .ifPresent(solicitorsList::add);
         ofNullable(buildRespondentSolicitor(caseData))
             .ifPresent(solicitorsList::add);
 
@@ -227,6 +228,9 @@ public class RoboticsDataMapperForSpec {
     }
 
     private Solicitor buildApplicantSolicitor(CaseData caseData) {
+        if (featureToggleService.isLipVLipEnabled() && caseData.isLipvLipOneVOne()) {
+            return null;
+        }
         Optional<String> organisationId = getOrganisationId(caseData.getApplicant1OrganisationPolicy());
         var providedServiceAddress = caseData.getSpecApplicantCorrespondenceAddressdetails();
         Solicitor.SolicitorBuilder<?, ?> solicitorBuilder = Solicitor.builder()
