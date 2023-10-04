@@ -125,6 +125,9 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -5413,6 +5416,36 @@ public class CaseDataBuilder {
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joPaymentToBeMadeByDate(LocalDate.of(2023, 12, 12))
             .joIsRegisteredWithRTL(YES).build();
+    }
+
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter30Days() {
+        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
+            .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
+            .lastUpdatedDate(LocalDateTime.now()).build();
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joOrderMadeDate(LocalDate.of(2023, 7, 1))
+            .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
+                                      .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
+                                      .confirmFullPaymentMade(List.of("CONFIRMED"))
+                                      .build())
+            .joIsRegisteredWithRTL(YES)
+            .joJudgmentStatusDetails(judgmentStatusDetails).build();
+    }
+
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin30Days() {
+        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
+            .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
+            .lastUpdatedDate(LocalDateTime.now()).build();
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joOrderMadeDate(LocalDate.of(2023, 9, 1))
+            .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
+                                      .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
+                                      .confirmFullPaymentMade(List.of("CONFIRMED"))
+                                      .build())
+            .joIsRegisteredWithRTL(YES)
+            .joJudgmentStatusDetails(judgmentStatusDetails).build();
     }
 
     public CaseDataBuilder setUnassignedCaseListDisplayOrganisationReferences() {
