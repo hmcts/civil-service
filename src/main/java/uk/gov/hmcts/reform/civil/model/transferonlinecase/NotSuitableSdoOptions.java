@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.transferOnlineCase;
+package uk.gov.hmcts.reform.civil.model.transferonlinecase;
 
 import lombok.Getter;
 
