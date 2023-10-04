@@ -64,26 +64,21 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-        OtherDetails tempOtherDetails;
+        OtherDetails tempOtherDetails = null;
 
-        if (toggleService.isTransferOnlineCaseEnabled()) {
+        if (!toggleService.isTransferOnlineCaseEnabled()) {
+           tempOtherDetails = OtherDetails.builder()
+               .notSuitableForSDO(YesOrNo.YES)
+               .reasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput())
+               .build();
+        } else {
             if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
                 TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
                     .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
                     .build();
                 dataBuilder.tocTransferCaseReason(tocTransferCaseReason).build();
                 tempOtherDetails = OtherDetails.builder().notSuitableForSDO(YesOrNo.YES).build();
-            } else {
-                tempOtherDetails = OtherDetails.builder()
-                    .notSuitableForSDO(YesOrNo.YES)
-                    .reasonNotSuitableForSDO(callbackParams.getCaseData().getTocOtherReasons().getInput())
-                    .build();
             }
-        } else {
-            tempOtherDetails = OtherDetails.builder()
-                .notSuitableForSDO(YesOrNo.YES)
-                .reasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput())
-                .build();
         }
         dataBuilder.otherDetails(tempOtherDetails).build();
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -96,10 +91,10 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         String reason;
         if (toggleService.isTransferOnlineCaseEnabled()) {
-            if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.OTHER_REASONS) {
-                reason = callbackParams.getCaseData().getTocOtherReasons().getInput();
+            if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
+                reason = ""; //Change to ReasonForCaseTransferJudgeTxt if validation also needed for this field
             } else {
-                reason = ""; //Change to ReasonForCaseTransferJudgeTxt if validation needed for this field
+                reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
             }
         } else {
             reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
