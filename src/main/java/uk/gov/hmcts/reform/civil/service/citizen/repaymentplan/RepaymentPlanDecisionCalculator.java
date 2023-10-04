@@ -24,7 +24,8 @@ public class RepaymentPlanDecisionCalculator {
                                                                                caseData.getRecurringIncomeForRespondent1(),
                                                                                caseData.getSpecDefendant1SelfEmploymentDetails());
         double calculatedExpenditure = expenditureCalculator.calculateTotalExpenditure(caseData.getRecurringExpensesForRespondent1(),
-                                                                                       caseData.getSpecDefendant1Debts());
+                                                                                       caseData.getSpecDefendant1Debts(),
+                                                                                       caseData.getRespondent1CourtOrderDetails());
         return calculatedIncome - calculatedExpenditure;
     }
 
