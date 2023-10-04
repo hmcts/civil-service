@@ -8,9 +8,18 @@ public enum PensionerAllowance {
     SINGLE(335.83),
     COUPLE(502.66);
 
-
     private double allowance;
     PensionerAllowance(double allowance) {
         this.allowance = allowance;
+    }
+
+    public static double getPensionerAllowance(boolean pensioner, boolean partnerPensioner) {
+        if((pensioner && !pensioner) || (!pensioner && partnerPensioner)) {
+            return SINGLE.allowance;
+        }
+        if(pensioner && partnerPensioner) {
+            return COUPLE.allowance;
+        }
+        return 0.0;
     }
 }

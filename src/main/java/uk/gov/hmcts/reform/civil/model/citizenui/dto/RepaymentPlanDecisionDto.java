@@ -9,4 +9,5 @@ public class RepaymentPlanDecisionDto {
 
     private LocalDate repaymentDate;
     private RepaymentDecisionType repaymentDecisionType;
+    private double repaymentInstallmentAmount;
 }
