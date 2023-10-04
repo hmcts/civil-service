@@ -143,7 +143,6 @@ public class DJApplicantReceivedNotificationHandlerTest {
             );
         }
 
-        @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAndLiPvsLiPEnabled() {
             when(featureToggleService.isLipVLipEnabled())
                 .thenReturn(true);

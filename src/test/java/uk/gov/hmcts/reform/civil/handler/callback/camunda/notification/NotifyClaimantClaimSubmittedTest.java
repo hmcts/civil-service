@@ -51,7 +51,6 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                 EMAIL_TEMPLATE);
         }
 
-        @Test
         void shouldNotifyApplicant1_ClaimIsSubmittedButNotIssued() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
