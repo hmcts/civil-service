@@ -87,19 +87,6 @@ public class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackH
     }
 
     @Test
-    void shouldNotUpdateRespondent1ResponseDeadline_whenLipVLipNotEnabled() {
-        CaseData caseData = CaseDataBuilder.builder().build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-        // When
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-        // Then
-        assertThat(response.getData()).isNull();
-    }
-
-    @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
             "SET_LIP_RESPONDENT_RESPONSE_DEADLINE").build()).build())).isEqualTo(TASK_ID);

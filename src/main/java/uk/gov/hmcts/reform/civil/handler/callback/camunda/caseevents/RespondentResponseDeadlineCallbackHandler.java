@@ -54,10 +54,6 @@ public class RespondentResponseDeadlineCallbackHandler extends CallbackHandler {
     private CallbackResponse updateRespondentDeadlineDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (!featureToggleService.isLipVLipEnabled()) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .build();
-        }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
             .respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(
                 LocalDateTime.now()));
