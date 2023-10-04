@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -30,6 +31,7 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -51,6 +53,9 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private IdamClient idamClient;
+
+    @MockBean
+    private FeatureToggleService toggleService;
 
     @Autowired
     private NotSuitableSDOCallbackHandler handler;
@@ -99,7 +104,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateReasonLessThan150_whenInvoked() {
-
+            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             final String PAGE_ID = "not-suitable-reason";
 
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
@@ -113,7 +118,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateReasonMoreThan150_whenInvoked() {
-
+            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             final String PAGE_ID = "not-suitable-reason";
             final int lengthALlowed = 150;
 
@@ -148,6 +153,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
+            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -161,6 +167,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void checkOtherDetailsUpdated() {
+            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -176,6 +183,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse() {
+            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -196,6 +204,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
+        when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
         assertThat(handler.handledEvents()).contains(NotSuitable_SDO);
     }
 }
