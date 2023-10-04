@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.LoanCardDebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,7 +18,18 @@ import static uk.gov.hmcts.reform.civil.utils.PaymentFrequencyCalculator.calcula
 @Component
 public class ExpenditureCalculator {
 
+    public int calculateTotalExpenditure(List<Element<RecurringExpenseLRspec>> recurringExpenseElementList,
+                                         Respondent1DebtLRspec respondent1DebtLRspec) {
+        return calculateTotalMonthlyExpenses(recurringExpenseElementList)
+            + calculateTotalMonthlyDebt(respondent1DebtLRspec);
+    }
 
+    private int calculateTotalMonthlyExpenses(List<Element<RecurringExpenseLRspec>> recurringExpenseElementList) {
+        List<RecurringExpenseLRspec> expenses = unwrapElementsNullSafe(recurringExpenseElementList);
+        return expenses.stream()
+            .map(expense -> calculatePaymentPerMonth(expense.getAmount().intValue(), expense.getFrequency()))
+            .collect(Collectors.summingInt(Integer::intValue));
+    }
 
     private int calculateTotalMonthlyDebt(Respondent1DebtLRspec respondent1DebtLRspec) {
        if(respondent1DebtLRspec.getHasLoanCardDebt() == YesOrNo.YES) {
