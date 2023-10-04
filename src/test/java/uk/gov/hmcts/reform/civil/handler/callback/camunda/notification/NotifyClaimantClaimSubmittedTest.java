@@ -47,7 +47,7 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate()).thenReturn(
+            when(notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate()).thenReturn(
                 EMAIL_TEMPLATE);
         }
 
