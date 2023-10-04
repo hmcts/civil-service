@@ -8,14 +8,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -38,6 +41,9 @@ class CreateClaimSpecAfterPaymentCallbackHandlerTest extends BaseCallbackHandler
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
 
+    @MockBean
+    private FeatureToggleService toggleService;
+
     @Test
     void shouldRespondWithStateChanged() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
@@ -58,8 +64,12 @@ class CreateClaimSpecAfterPaymentCallbackHandlerTest extends BaseCallbackHandler
 
         LocalDateTime localDateTime = LocalDateTime.of(2023, 10, 4, 12, 0, 0);
         when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(localDateTime);
+        when(toggleService.isLipVLipEnabled()).thenReturn(true);
 
-        CaseData caseData = CaseDataBuilder.builder().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
         caseData = caseData.toBuilder().ccdState(CASE_ISSUED).build();
         CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
 
@@ -68,6 +78,46 @@ class CreateClaimSpecAfterPaymentCallbackHandlerTest extends BaseCallbackHandler
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(localDateTime);
+
+    }
+
+    @Test
+    void shouldNotUpdateRespondent1ResponseDeadlineTo28days_whenClaimIssued() {
+
+        when(toggleService.isLipVLipEnabled()).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+        caseData = caseData.toBuilder().ccdState(CASE_ISSUED).build();
+        CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertNull(updatedData.getRespondent1ResponseDeadline());
+
+    }
+
+    @Test
+    void shouldNotUpdateRespondent1ResponseDeadlineTo28days_whenLRClaimIssued() {
+
+        when(toggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.YES)
+            .build();
+        caseData = caseData.toBuilder().ccdState(CASE_ISSUED).build();
+        CallbackParams params = callbackParamsOf(V_1, caseData, ABOUT_TO_SUBMIT);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertNull(updatedData.getRespondent1ResponseDeadline());
 
     }
 }
