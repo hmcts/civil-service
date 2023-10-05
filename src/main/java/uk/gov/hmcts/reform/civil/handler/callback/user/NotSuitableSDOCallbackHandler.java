@@ -121,6 +121,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
         if (toggleService.isTransferOnlineCaseEnabled()
             && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
+            dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
                 //TODO add new event
         } else {
             dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
