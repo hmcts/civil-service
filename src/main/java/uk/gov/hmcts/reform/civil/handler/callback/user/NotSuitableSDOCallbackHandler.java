@@ -123,10 +123,10 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-        if (toggleService.isTransferOnlineCaseEnabled()
+        if (toggleService.isTransferOnlineCaseEnabled() //NOSONAR
             && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
             dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
-            //TODO add new event
+            //TODO add the new event and remove noSonar tag
         } else {
             dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
         }
