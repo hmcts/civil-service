@@ -91,4 +91,35 @@ public class AssignCategoryIdTests {
         assertThat(documentList.get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("testDocumentCollectionID");
     }
 
+    @Test
+    public void shouldCopyDocumentWithCategoryId_whenInvoked() {
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(testCaseDocument, "testDocumentID");
+        assertThat(copy.getDocumentLink().getCategoryID()).isEqualTo("testDocumentID");
+    }
+
+    @Test
+    public void shouldCopyDocumentsWithCategoryId_whenInvoked() {
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        List<Element<CaseDocument>> documentList = new ArrayList<>();
+        documentList.add(element(testCaseDocument));
+        List<Element<CaseDocument>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryId(documentList,
+                "testDocumentCollectionID");
+
+        assertThat(copyList.get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("testDocumentCollectionID");
+    }
+
+    @Test
+    public void shouldNotCopy_whenInvokedAndToggleFalse() {
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(false);
+        List<Element<CaseDocument>> documentList = new ArrayList<>();
+        documentList.add(element(testCaseDocument));
+        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(testCaseDocument, "testDocumentID");
+        List<Element<CaseDocument>> copyList = assignCategoryId.copyCaseDocumentListWithCategoryId(documentList,
+                "testDocumentCollectionID");
+
+        assertThat(copyList).isNull();
+        assertThat(copy).isNull();
+    }
+
 }

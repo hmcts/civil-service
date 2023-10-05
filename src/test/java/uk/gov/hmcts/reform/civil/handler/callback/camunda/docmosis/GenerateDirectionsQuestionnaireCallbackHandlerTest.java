@@ -307,7 +307,7 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(4);
+        assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(4);
     }
 
     @Test
