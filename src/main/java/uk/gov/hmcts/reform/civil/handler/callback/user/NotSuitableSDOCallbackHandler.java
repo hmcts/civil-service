@@ -68,7 +68,9 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
         OtherDetails tempOtherDetails;
-        if (isTransferOnlineCase(callbackParams.getCaseData())) {
+        if (toggleService.isTransferOnlineCaseEnabled()
+            && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
+            dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.CHANGE_LOCATION);
             TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
                 .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
                 .build();
@@ -77,6 +79,9 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
                 .notSuitableForSDO(YesOrNo.YES)
                 .build();
         } else {
+            if (toggleService.isTransferOnlineCaseEnabled()) {
+                dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);
+            }
             tempOtherDetails = OtherDetails.builder()
                 .notSuitableForSDO(YesOrNo.YES)
                 .reasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput())

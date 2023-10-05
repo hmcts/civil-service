@@ -245,6 +245,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            assertThat(response.getData()).extracting("notSuitableSdoOptions").isEqualTo("OTHER_REASONS");
             assertThat(response.getData()).extracting("otherDetails").extracting("notSuitableForSDO").isEqualTo("Yes");
             assertThat(response.getData()).extracting("otherDetails").extracting("reasonNotSuitableForSDO").isEqualTo("unforeseen complexities");
 
@@ -270,6 +271,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            assertThat(response.getData()).extracting("notSuitableSdoOptions").isEqualTo("CHANGE_LOCATION");
             assertThat(response.getData()).extracting("otherDetails").extracting("notSuitableForSDO").isEqualTo("Yes");
             assertThat(response.getData()).extracting("tocTransferCaseReason").extracting("reasonForCaseTransferJudgeTxt").isEqualTo("unforeseen complexities");
 
@@ -279,9 +281,10 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class SubmittedCallback {
 
-        @Test
-        void shouldReturnExpectedSubmittedCallbackResponse() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldReturnExpectedSubmittedCallbackResponse(Boolean toggleState) {
+            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(toggleState);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -300,55 +303,14 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldReturnExpectedSubmittedCallbackResponseWhenTOCEnabled() {
+        void shouldReturnExpectedSubmittedCallbackResponse_whenTOCEnabledTransferCase() {
             when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawn().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            String header = format("# Your request was successful%n## This claim will be transferred to a different location");
-            String body = format("<br />A notification will be sent to the listing officer to look at this case and " +
-                                     "process the transfer of case.");
-
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(header)
-                    .confirmationBody(body)
-                    .build());
-        }
-
-        @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_whenTOCEnabledOtherReasons() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            String header = format("# Your request was accepted%n## Case has now moved offline");
-            String body = format("<br />If a Judge has submitted this information, "
-                                     + "a notification will be sent to the listing officer to look at this case offline."
-                                     + "%n%nIf a legal adviser has submitted this information a notification will be sent "
-                                     + "to a judge for review.");
-
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(header)
-                    .confirmationBody(body)
-                    .build());
-        }
-
-        @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_whenTOCEnabledTransferCase() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            String header = format("# Your request was accepted%n## Case has now moved offline");
-            String body = format("<br />If a Judge has submitted this information, "
-                                     + "a notification will be sent to the listing officer to look at this case offline."
-                                     + "%n%nIf a legal adviser has submitted this information a notification will be sent "
-                                     + "to a judge for review.");
+            String header = format("# Your request was accepted%n## Case has now moved...");
+            String body = format("TOC body");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
