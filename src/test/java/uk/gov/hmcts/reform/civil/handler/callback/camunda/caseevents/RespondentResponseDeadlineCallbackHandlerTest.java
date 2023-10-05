@@ -40,7 +40,7 @@ public class RespondentResponseDeadlineCallbackHandlerTest extends BaseCallbackH
     private DeadlinesCalculator deadlinesCalculator;
 
     @Test
-    void shouldUpdateRespondent1ResponseDeadlineTo28days_whenClaimIssudAtOrAfter4pm() {
+    void shouldUpdateRespondent1ResponseDeadlineTo28days_whenClaimIssud() {
 
         LocalDateTime localDateTime = LocalDateTime.of(2023, 10, 30, 12, 0, 0);
         when(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).thenReturn(localDateTime);
