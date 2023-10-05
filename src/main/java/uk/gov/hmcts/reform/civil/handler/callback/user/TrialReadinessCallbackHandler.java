@@ -144,14 +144,6 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private List<String> getUserRoles(CallbackParams callbackParams) {
-
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        List<String> userRoles = coreCaseUserService.getUserCaseRoles(callbackParams.getCaseData().getCcdCaseReference().toString(),
-                                                                      userInfo.getUid());
-        return userRoles;
-    }
-
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
 
         return SubmittedCallbackResponse.builder()
@@ -171,6 +163,14 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         } else {
             return caseData.getTrialReadyRespondent2();
         }
+    }
+
+    private List<String> getUserRoles(CallbackParams callbackParams) {
+
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        List<String> userRoles = coreCaseUserService.getUserCaseRoles(callbackParams.getCaseData().getCcdCaseReference().toString(),
+                                                                      userInfo.getUid());
+        return userRoles;
     }
 
     private boolean checkUserRoles(List<String> userRoles, CaseRole userRole) {

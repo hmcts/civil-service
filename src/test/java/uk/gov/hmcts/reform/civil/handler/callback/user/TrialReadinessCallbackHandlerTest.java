@@ -24,6 +24,8 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -74,9 +76,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //given: applicant solicitor logs in more than 3 weeks before hearing
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.APPLICANTSOLICITORONE)))
-                                                                                                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[APPLICANTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -91,9 +94,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //given: respondent 1 solicitor logs in more than 3 weeks before hearing
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORONE)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -108,9 +112,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //given: respondent 2 solicitor logs in more than 3 weeks before hearing
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORTWO)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -126,9 +131,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .hearingDate(LocalDate.now().plusWeeks(2).plusDays(6)).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.APPLICANTSOLICITORONE)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[APPLICANTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -144,9 +150,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .hearingDate(LocalDate.now().plusWeeks(2).plusDays(6)).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORONE)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -162,9 +169,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .hearingDate(LocalDate.now().plusWeeks(2).plusDays(6)).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORTWO)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -183,9 +191,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .trialReadyApplicant(YesOrNo.YES).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.APPLICANTSOLICITORONE)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[APPLICANTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -203,9 +212,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             ObjectMapper objectmapper = new ObjectMapper();
             CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORONE)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -223,9 +233,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             ObjectMapper objectmapper = new ObjectMapper();
             CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORTWO)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -240,9 +251,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .trialReadyApplicant(YesOrNo.NO).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.APPLICANTSOLICITORONE)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[APPLICANTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -260,9 +272,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             ObjectMapper objectmapper = new ObjectMapper();
             CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORONE)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -280,9 +293,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             ObjectMapper objectmapper = new ObjectMapper();
             CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORTWO)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -301,9 +315,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //given: applicant solicitor selects Ready
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyApplicant().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.APPLICANTSOLICITORONE)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[APPLICANTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -322,9 +337,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //given: applicant solicitor selects Not Ready
             CaseData caseData = CaseDataBuilder.builder().atStateTrialNotReadyApplicant().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.APPLICANTSOLICITORONE)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[APPLICANTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -343,9 +359,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //given: respondent 1 solicitor selects Ready
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyRespondent1().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORONE)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -364,9 +381,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //given: respondent 1 solicitor selects Not Ready
             CaseData caseData = CaseDataBuilder.builder().atStateTrialNotReadyRespondent1().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORONE)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORONE]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -385,9 +403,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //given: Respondent 2 selects Ready
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyRespondent2().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORTWO)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -406,9 +425,10 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //given: Respondent 2 solicitor selects Not Ready
             CaseData caseData = CaseDataBuilder.builder().atStateTrialNotReadyRespondent2().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.RESPONDENTSOLICITORTWO)))
-                .thenReturn(true);
+            List<String> userRoles = new ArrayList<String>();
+            userRoles.add("[RESPONDENTSOLICITORTWO]");
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(userRoles);
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
