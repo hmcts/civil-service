@@ -1114,11 +1114,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
             .showConditionFlags(initialShowTags);
 
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
 
         ofNullable(caseData.getRespondent2())
             .ifPresent(r2 -> updatedCaseData.respondent2Copy(r2)
-                .respondent2DetailsForClaimDetailsTab(r2)
+                .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build())
             );
 
         DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
@@ -1344,7 +1344,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .primaryAddress(caseData.getSpecAoSApplicantCorrespondenceAddressdetails()).build();
         } else {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress()).build();
+                .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+                .flags(caseData.getRespondent1Copy().getFlags())
+                .build();
         }
 
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
@@ -1365,9 +1367,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
+                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
         }
 
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
@@ -1416,11 +1419,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         .primaryAddress(caseData.getSpecAoSRespondent2HomeAddressDetails()).build();
                 } else {
                     updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                        .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
+                        .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
+                        .flags(caseData.getRespondent2Copy().getFlags())
+                        .build();
                 }
 
                 updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
-                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+                updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
             }
 
             // moving statement of truth value to correct field, this was not possible in mid event.
@@ -1480,9 +1485,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData,
                                                                         toggleService.isUpdateContactDetailsEnabled());
 
-        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1());
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1().toBuilder().flags(null).build());
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2());
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2().toBuilder().flags(null).build());
         }
 
         if (toggleService.isUpdateContactDetailsEnabled()) {
