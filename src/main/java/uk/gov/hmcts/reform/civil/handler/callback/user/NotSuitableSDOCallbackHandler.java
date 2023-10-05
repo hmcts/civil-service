@@ -41,6 +41,9 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         + "a notification will be sent to the listing officer to look at this case offline."
         + "%n%nIf a legal adviser has submitted this information a notification will be sent to a judge for review.";
 
+    public static final String NOT_SUITABLE_SDO_TRANSFER_CASE_CONFIRMATION_BODY = "<br />A notification will be sent" +
+        " to the listing officer to look at this case and process the transfer of case.";
+
     private final ObjectMapper objectMapper;
 
     private final Time time;
@@ -65,8 +68,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
         OtherDetails tempOtherDetails;
-        if (toggleService.isTransferOnlineCaseEnabled()
-            && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
+        if (isTransferOnlineCase(callbackParams.getCaseData())) {
             TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
                 .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
                 .build();
@@ -90,8 +92,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         final int lengthAllowed = 150;
         List<String> errors = new ArrayList<>();
         String reason;
-        if (toggleService.isTransferOnlineCaseEnabled()
-            && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
+        if (isTransferOnlineCase(callbackParams.getCaseData())) {
             reason = ""; //Change to ReasonForCaseTransferJudgeTxt if validation also needed for this field
         } else {
             reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
@@ -119,10 +120,8 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-        if (toggleService.isTransferOnlineCaseEnabled()
-            && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
-            dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
-                //TODO add new event
+        if (isTransferOnlineCase(caseData)) {
+            return dataBuilder;
         } else {
             dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
         }
@@ -131,8 +130,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (toggleService.isTransferOnlineCaseEnabled()
-            && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
+        if (isTransferOnlineCase(caseData)) {
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(getHeaderTOC(caseData))
                 .confirmationBody(getBodyTOC(caseData))
@@ -153,13 +151,19 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         return format(NotSuitableSDO_CONFIRMATION_BODY);
     }
 
+    private boolean isTransferOnlineCase(CaseData caseData) {
+        if (toggleService.isTransferOnlineCaseEnabled() && caseData.getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private String getHeaderTOC(CaseData caseData) {
-        //TODO change for transfer online case confirmation message
-        return format("# Your request was accepted%n## Case has now moved...");
+        return format("# Your request was successful%n## This claim will be transferred to a different location");
     }
 
     private String getBodyTOC(CaseData caseData) {
-        //TODO change for transfer online case confirmation message
-        return format("TOC body");
+        return format(NOT_SUITABLE_SDO_TRANSFER_CASE_CONFIRMATION_BODY);
     }
 }

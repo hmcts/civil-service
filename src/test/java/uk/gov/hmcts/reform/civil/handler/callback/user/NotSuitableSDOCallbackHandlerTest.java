@@ -259,8 +259,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsOnly(NotSuitable_SDO.name(), "READY");
+                .isNull();
 
         }
 
@@ -292,6 +291,24 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 + "a notification will be sent to the listing officer to look at this case offline."
                 + "%n%nIf a legal adviser has submitted this information a notification will be sent "
                                      + "to a judge for review.");
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(header)
+                    .confirmationBody(body)
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponseWhenTOCEnabled() {
+            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawn().build();
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String header = format("# Your request was successful%n## This claim will be transferred to a different location");
+            String body = format("<br />A notification will be sent to the listing officer to look at this case and " +
+                                     "process the transfer of case.");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
