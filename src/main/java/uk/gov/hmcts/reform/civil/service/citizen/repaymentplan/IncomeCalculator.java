@@ -45,7 +45,7 @@ public class IncomeCalculator {
     }
 
     private double calculateIncomePerMonth(RecurringIncomeLRspec income) {
-        int incomeAmount = income.getAmount().intValue();
+        double incomeAmount = income.getAmount().doubleValue();
         return PaymentFrequencyCalculator.calculatePaymentPerMonth(incomeAmount, income.getFrequency());
     }
 }

@@ -5,11 +5,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentPlanDecisionDto;
 import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 
@@ -21,15 +23,43 @@ public class RepaymentPlanDecisionCalculator {
     private ExpenditureCalculator expenditureCalculator;
     private AllowanceCalculator allowanceCalculator;
 
-    public RepaymentPlanDecisionDto calculateRepaymentDecision(CaseData caseData, ClaimantProposedPlan claimantProposedPlan ) {
+    public RepaymentDecisionType calculateRepaymentDecision(CaseData caseData, ClaimantProposedPlan claimantProposedPlan ) {
       double disposableIncome = calculateDisposableIncome(caseData);
-      BigDecimal claimTotalAmount = caseData.getTotalClaimAmount();
-      RepaymentPlanLRspec defendantRepaymentPlan = caseData.getRespondent1RepaymentPlan();
-      RespondentResponsePartAdmissionPaymentTimeLRspec respondentResponseType = caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
-      LocalDate proposedDefendantRepaymentDate = respondentResponseType == BY_SET_DATE ?
-          caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid(): defendantRepaymentPlan.finalPaymentBy(claimTotalAmount);
-      if(claimantProposedPlan)
+      BigDecimal claimTotalAmount = Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmountPounds()).orElse(caseData.getTotalClaimAmount());
+      LocalDate proposedDefendantRepaymentDate = getProposedDefendantRepaymentDate(caseData, claimTotalAmount);
 
+      if(claimantProposedPlan.hasProposedPayImmediatly()){
+          return calculateDecisionBasedOnAmountAndDisposableIncome(claimTotalAmount.doubleValue(), disposableIncome);
+      }
+      if(claimantProposedPlan.hasProposedPayBySetDate()) {
+          return calculateDecisionBasedOnProposedDate(proposedDefendantRepaymentDate, claimantProposedPlan.getRepaymentByDate());
+      }
+      if(claimantProposedPlan.hasProposedPayByInstallments()) {
+         return calculateDecisionBasedOnAmountAndDisposableIncome(claimantProposedPlan.getCalculatedPaymentPerMonthFromRepaymentPlan(), disposableIncome);
+      }
+      return RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
+    }
+
+    private LocalDate getProposedDefendantRepaymentDate(CaseData caseData, BigDecimal claimTotalAmount) {
+        RespondentResponsePartAdmissionPaymentTimeLRspec respondentResponseType = caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
+        RepaymentPlanLRspec defendantRepaymentPlan = caseData.getRespondent1RepaymentPlan();
+        return respondentResponseType == BY_SET_DATE ?
+            caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() : defendantRepaymentPlan.finalPaymentBy(
+            claimTotalAmount);
+    }
+
+    private RepaymentDecisionType calculateDecisionBasedOnAmountAndDisposableIncome(double totalAmount, double disposableIncome) {
+        if(totalAmount > disposableIncome) {
+            return RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
+        }
+        return RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT;
+    }
+
+    private RepaymentDecisionType calculateDecisionBasedOnProposedDate(LocalDate defendantProposedDate, LocalDate claimantProposedDate) {
+        if(claimantProposedDate.isAfter(defendantProposedDate)) {
+            return RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT;
+        }
+        return RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
     }
 
     private double calculateDisposableIncome(CaseData caseData) {

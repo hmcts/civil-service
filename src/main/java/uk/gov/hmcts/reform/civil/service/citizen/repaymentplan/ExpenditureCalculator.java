@@ -58,7 +58,7 @@ public class ExpenditureCalculator {
     private double calculateDepts(List<Element<DebtLRspec>> debtDetails) {
         List<DebtLRspec> debts = unwrapElementsNullSafe(debtDetails);
         return debts.stream()
-            .mapToDouble(debt -> calculatePaymentPerMonth(debt.getPaymentAmount().intValue(), debt.getPaymentFrequency()))
+            .mapToDouble(debt -> calculatePaymentPerMonth(debt.getPaymentAmount().doubleValue(), debt.getPaymentFrequency()))
             .sum();
     }
 
