@@ -262,9 +262,10 @@ public class CasesController {
 
     @GetMapping(path = "/{caseId}/courtDecision")
     @Operation(summary = "Get decision on proposed claimant repayment")
-    public RepaymentDecisionType getDecisionOnClaimantProposedRepayment(@PathVariable("caseId") Long caseId,
-                                                                        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
-                                                                        @RequestBody ClaimantProposedPlan claimantProposedPlan) {
+    public RepaymentDecisionType getDecisionOnClaimantProposedRepayment(
+        @PathVariable("caseId") Long caseId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        @RequestBody ClaimantProposedPlan claimantProposedPlan) {
         var caseDetails = coreCaseDataService.getCase(caseId, authorisation);
         return repaymentPlanDecisionService.getCalculatedDecision(caseDetails, claimantProposedPlan);
     }
