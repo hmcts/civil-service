@@ -260,7 +260,7 @@ public class CasesController {
         return ResponseEntity.ok(userInformationService.getUserCaseRoles(caseId, authorization));
     }
 
-    @GetMapping(path = "/{caseId}/courtDecision")
+    @PostMapping(path = "/{caseId}/courtDecision")
     @Operation(summary = "Get decision on proposed claimant repayment")
     public RepaymentDecisionType getDecisionOnClaimantProposedRepayment(
         @PathVariable("caseId") Long caseId,
