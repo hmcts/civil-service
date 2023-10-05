@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -53,7 +55,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                         DocumentType.HEARING_FORM
                 )
         );
-        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, "hearingNotices");
+        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.HEARING_NOTICES.getValue());
         caseDocuments.add(caseDocument);
         return caseDocuments;
     }

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -623,9 +624,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         DocumentType.DEFENDANT_DEFENCE
                 );
                 assignCategoryId.assignCategoryIdToDocument(respondent1ClaimDocument,
-                                                       "defendant1DefenseDirectionsQuestionnaire");
+                        DocCategory.DEF1_DEFENSE_DQ.getValue());
                 CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), "DQRespondent");
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
                 defendantUploads.add(documentElement);
                 defendantUploads.add(ElementUtils.element(copy));
             }
@@ -642,9 +643,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 );
                 assignCategoryId.assignCategoryIdToDocument(respondent1DQDraftDirections,
-                        "defendant1DefenseDirectionsQuestionnaire");
+                        DocCategory.DEF1_DEFENSE_DQ.getValue());
                 CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), "DQRespondent");
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
                 defendantUploads.add(documentElement);
                 defendantUploads.add(ElementUtils.element(copy));
             }
@@ -660,9 +661,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         DocumentType.DEFENDANT_DEFENCE
                 );
                 CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), "DQRespondentTwo");
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                 assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
-                                                       "defendant2DefenseDirectionsQuestionnaire");
+                        DocCategory.DEF2_DEFENSE_DQ.getValue());
                 defendantUploads.add(documentElement);
                 defendantUploads.add(ElementUtils.element(copy));
             }
@@ -678,9 +679,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 );
                 CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), "DQRespondentTwo");
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                 assignCategoryId.assignCategoryIdToDocument(respondent2DQDraftDirections,
-                                                       "defendant2DefenseDirectionsQuestionnaire");
+                        DocCategory.DEF2_DEFENSE_DQ.getValue());
                 defendantUploads.add(documentElement);
                 defendantUploads.add(ElementUtils.element(copy));
             }

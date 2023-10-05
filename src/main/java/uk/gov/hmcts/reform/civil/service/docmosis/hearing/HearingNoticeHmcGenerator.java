@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -55,7 +56,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             DocumentType.HEARING_FORM
         );
         CaseDocument caseDocument = documentManagementService.uploadDocument(authorisation, pdf);
-        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, "hearingNotices");
+        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.HEARING_NOTICES.getValue());
         caseDocuments.add(caseDocument);
         return caseDocuments;
     }
