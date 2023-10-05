@@ -12,13 +12,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -34,8 +30,6 @@ public class CreateClaimSpecAfterPaymentCallbackHandler extends CallbackHandler 
     // This should be created by the handler/service that receives payment info via our endpoint.
     private static final List<CaseEvent> EVENTS = singletonList(CREATE_CLAIM_SPEC_AFTER_PAYMENT);
     private final ObjectMapper objectMapper;
-    private final DeadlinesCalculator deadlinesCalculator;
-    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -56,15 +50,9 @@ public class CreateClaimSpecAfterPaymentCallbackHandler extends CallbackHandler 
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
         dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC_AFTER_PAYMENT));
 
-        if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-            if (Objects.isNull(caseData.getRespondent1ResponseDeadline())) {
-                dataBuilder.respondent1ResponseDeadline(deadlinesCalculator.plus28DaysAt4pmDeadline(
-                    LocalDateTime.now()));
-            }
-        }
         return AboutToStartOrSubmitCallbackResponse.builder()
-                 .data(dataBuilder.build().toMap(objectMapper))
-                 .build();
+                .data(dataBuilder.build().toMap(objectMapper))
+                .build();
     }
 
 }
