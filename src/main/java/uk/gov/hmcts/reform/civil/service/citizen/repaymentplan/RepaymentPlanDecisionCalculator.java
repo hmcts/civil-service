@@ -19,20 +19,24 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPay
 @RequiredArgsConstructor
 public class RepaymentPlanDecisionCalculator {
 
-    private IncomeCalculator incomeCalculator;
-    private ExpenditureCalculator expenditureCalculator;
-    private AllowanceCalculator allowanceCalculator;
+    private final IncomeCalculator incomeCalculator;
+    private final ExpenditureCalculator expenditureCalculator;
+    private final AllowanceCalculator allowanceCalculator;
 
     public RepaymentDecisionType calculateRepaymentDecision(CaseData caseData, ClaimantProposedPlan claimantProposedPlan ) {
       double disposableIncome = calculateDisposableIncome(caseData);
       BigDecimal claimTotalAmount = Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmountPounds()).orElse(caseData.getTotalClaimAmount());
-      LocalDate proposedDefendantRepaymentDate = getProposedDefendantRepaymentDate(caseData, claimTotalAmount);
 
       if(claimantProposedPlan.hasProposedPayImmediatly()){
           return calculateDecisionBasedOnAmountAndDisposableIncome(claimTotalAmount.doubleValue(), disposableIncome);
       }
       if(claimantProposedPlan.hasProposedPayBySetDate()) {
-          return calculateDecisionBasedOnProposedDate(proposedDefendantRepaymentDate, claimantProposedPlan.getRepaymentByDate());
+          RepaymentDecisionType repaymentDecisionType = calculateDecisionBasedOnAmountAndDisposableIncome(claimTotalAmount.doubleValue(), disposableIncome);
+          if(repaymentDecisionType.isInFavourOfDefendant()){
+              LocalDate proposedDefendantRepaymentDate = getProposedDefendantRepaymentDate(caseData, claimTotalAmount);
+              return calculateDecisionBasedOnProposedDate(proposedDefendantRepaymentDate, claimantProposedPlan.getRepaymentByDate());
+          }
+         return repaymentDecisionType;
       }
       if(claimantProposedPlan.hasProposedPayByInstallments()) {
          return calculateDecisionBasedOnAmountAndDisposableIncome(claimantProposedPlan.getCalculatedPaymentPerMonthFromRepaymentPlan(), disposableIncome);
@@ -72,6 +76,5 @@ public class RepaymentPlanDecisionCalculator {
         double calculatedAllowance = allowanceCalculator.calculateAllowance(caseData);
         return calculatedIncome - calculatedExpenditure - calculatedAllowance;
     }
-
 
 }
