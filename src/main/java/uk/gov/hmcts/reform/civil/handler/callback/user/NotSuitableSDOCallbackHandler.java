@@ -67,6 +67,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         OtherDetails tempOtherDetails;
         if (toggleService.isTransferOnlineCaseEnabled()
             && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
+            dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.CHANGE_LOCATION);
             TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
                 .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
                 .build();
@@ -75,6 +76,9 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
                 .notSuitableForSDO(YesOrNo.YES)
                 .build();
         } else {
+            if (toggleService.isTransferOnlineCaseEnabled()) {
+                dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);
+            }
             tempOtherDetails = OtherDetails.builder()
                 .notSuitableForSDO(YesOrNo.YES)
                 .reasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput())
@@ -122,7 +126,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         if (toggleService.isTransferOnlineCaseEnabled()
             && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
             dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
-                //TODO add new event
+            //TODO add new event
         } else {
             dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
         }
