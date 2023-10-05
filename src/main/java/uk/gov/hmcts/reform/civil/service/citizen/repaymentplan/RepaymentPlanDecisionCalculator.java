@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
-import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentPlanDecisionDto;
 import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
 
 import java.math.BigDecimal;
