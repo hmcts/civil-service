@@ -58,6 +58,20 @@ hmc:
   api:
     url: ${HMC_API_URL:http://localhost:8765}
 
+migration:
+  id: ${MIGRATION_ID}
+  caseIds: ${MIGRATION_CASE_IDS:}
+  caseType: CIVIL
+  jurisdiction: Civil
+  eventId: ${MIGRATION_CASE_EVENT_ID:migrateCase}
+  eventDescription: ${MIGRATION_CASE_EVENT_DESC:Migrate Case}
+  eventSummary: ${MIGRATION_CASE_EVENT_SUMMARY:Migrate Case}
+  dryRun: ${MIGRATION_DRY_RUN:false}
+  maxCasesToProcess: ${MIGRATION_CASE_LIMIT:80000}
+  numThreads: ${MIGRATION_NO_OF_THREADS:20}
+  esEnabled: ${MIGRATION_ES_ENABLED:false}
+  esQuerySize: ${MIGRATION_ES_QUERY_SIZE:500}
+
 serviceRequest:
   api:
     callback-url : ${SERVICE_REQUEST_UPDATE:}
