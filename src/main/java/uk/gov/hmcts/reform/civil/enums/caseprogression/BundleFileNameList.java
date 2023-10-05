@@ -17,6 +17,7 @@ public enum BundleFileNameList {
     WITNESS_STATEMENT_OTHER_DISPLAY_NAME("Witness Statement %s %s %s"),
     WITNESS_STATEMENT("Witness Statement"),
     WITNESS_SUMMARY("Witness Summary %s %s"),
+    DOC_REFERRED_TO("Documents referred to in statement %s %s"),
     HEARSAY_NOTICE("Hearsay notice %s %s"),
     NOTICE_TO_ADMIT_FACTS("Notice to admit facts %s %s"),
     DF_RESPONSE("DF Response %s"),
