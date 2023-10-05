@@ -180,7 +180,8 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     private boolean isLiPDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && caseData.isLRvLipOneVOne()
+            && (caseData.isLRvLipOneVOne()
+            || caseData.isLipvLipOneVOne())
             && !isCcNotification(callbackParams);
     }
 }
