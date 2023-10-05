@@ -77,14 +77,15 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     private CallbackResponse populateValues(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+        List<String> userRoles = getUserRoles(callbackParams);
 
         var isApplicant = YesOrNo.NO;
         var isRespondent1 = YesOrNo.NO;
         var isRespondent2 = YesOrNo.NO;
-        if (checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE)) {
+        if (checkUserRoles(userRoles, CaseRole.APPLICANTSOLICITORONE)) {
             isApplicant = YesOrNo.YES;
             updatedData.hearingDurationTextApplicant(formatHearingDuration(caseData.getHearingDuration()));
-        } else if (checkUserRoles(callbackParams, CaseRole.RESPONDENTSOLICITORONE)) {
+        } else if (checkUserRoles(userRoles, CaseRole.RESPONDENTSOLICITORONE)) {
             isRespondent1 = YesOrNo.YES;
             updatedData.hearingDurationTextRespondent1(formatHearingDuration(caseData.getHearingDuration()));
         } else {
@@ -116,14 +117,15 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+        List<String> userRoles = getUserRoles(callbackParams);
 
-        if (checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE) || checkUserRoles(callbackParams, CaseRole.CLAIMANT)) {
+        if (checkUserRoles(userRoles, CaseRole.APPLICANTSOLICITORONE) || checkUserRoles(userRoles, CaseRole.CLAIMANT)) {
             if (caseData.getTrialReadyApplicant() == YesOrNo.YES) {
                 updatedData.businessProcess(BusinessProcess.ready(APPLICANT_TRIAL_READY_NOTIFY_OTHERS));
             } else {
                 updatedData.businessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_APPLICANT));
             }
-        } else if (checkUserRoles(callbackParams, CaseRole.RESPONDENTSOLICITORONE) || checkUserRoles(callbackParams, CaseRole.DEFENDANT)) {
+        } else if (checkUserRoles(userRoles, CaseRole.RESPONDENTSOLICITORONE) || checkUserRoles(userRoles, CaseRole.DEFENDANT)) {
             if (caseData.getTrialReadyRespondent1() == YesOrNo.YES) {
                 updatedData.businessProcess(BusinessProcess.ready(RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS));
             } else {
@@ -142,6 +144,14 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private List<String> getUserRoles(CallbackParams callbackParams) {
+
+        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        List<String> userRoles = coreCaseUserService.getUserCaseRoles(callbackParams.getCaseData().getCcdCaseReference().toString(),
+                                                                      userInfo.getUid());
+        return userRoles;
+    }
+
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
 
         return SubmittedCallbackResponse.builder()
@@ -152,20 +162,19 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
 
     private YesOrNo checkUserReady(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
+        List<String> userRoles = getUserRoles(callbackParams);
 
-        if (checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE)) {
+        if (checkUserRoles(userRoles, CaseRole.APPLICANTSOLICITORONE)) {
             return caseData.getTrialReadyApplicant();
-        } else if (checkUserRoles(callbackParams, CaseRole.RESPONDENTSOLICITORONE)) {
+        } else if (checkUserRoles(userRoles, CaseRole.RESPONDENTSOLICITORONE)) {
             return caseData.getTrialReadyRespondent1();
         } else {
             return caseData.getTrialReadyRespondent2();
         }
     }
 
-    private boolean checkUserRoles(CallbackParams callbackParams, CaseRole userRole) {
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
-        return coreCaseUserService.userHasCaseRole(callbackParams.getCaseData().getCcdCaseReference().toString(),
-            userInfo.getUid(), userRole);
+    private boolean checkUserRoles(List<String> userRoles, CaseRole userRole) {
+        return userRoles.stream().anyMatch(u -> u.equals(userRole.getFormattedName()));
     }
 
     @Override
