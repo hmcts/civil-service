@@ -2036,7 +2036,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateCourtLocations() {
             // Given
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder()
+                                 .partyName("name")
+                                 .build())
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             List<LocationRefData> locations = List.of(LocationRefData.builder()
