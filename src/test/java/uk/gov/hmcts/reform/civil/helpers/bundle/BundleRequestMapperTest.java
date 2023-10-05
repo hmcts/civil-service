@@ -103,14 +103,24 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(2).getValue().getDocumentFileName());
         assertEquals("CL 1 - Statement 10/02/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(0).getValue().getDocumentFileName());
-        assertEquals("CL 2 - Statement 10/02/2023",
+        assertEquals("CL 2 - Statement 12/02/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2WitnessStatements().get(0).getValue().getDocumentFileName());
-        assertEquals("DF 1 - Statement 10/02/2023",
+        assertEquals("DF 1 - Statement 11/02/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1WitnessStatements().get(0).getValue().getDocumentFileName());
-        assertEquals("DF 2 - Statement 10/02/2023",
+        assertEquals("DF 2 - Statement 13/02/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2WitnessStatements().get(0).getValue().getDocumentFileName());
-        assertEquals("Witness Statement cl2Fname 1 10/02/2023",
+        assertEquals("Witness Statement cl2Fname 1 12/02/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(1).getValue().getDocumentFileName());
+        assertEquals("Witness Statement FirstName LastName 1 14/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(2).getValue().getDocumentFileName());
+        assertEquals("Witness Statement df2Fname 1 13/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(3).getValue().getDocumentFileName());
+        assertEquals("Witness Statement df1Fname 1 11/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(4).getValue().getDocumentFileName());
+        assertEquals("Witness Summary cl1Fname 12/12/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(5).getValue().getDocumentFileName());
+        assertEquals("Documents referred to in statement 1 12/12/2022",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(10).getValue().getDocumentFileName());
         assertEquals("Expert Evidence expert1 Test 12/01/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(0).getValue().getDocumentFileName());
         assertEquals("Questions to expert1 12/01/2023",
@@ -278,6 +288,7 @@ class BundleRequestMapperTest {
                                                        .builder()
                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).build())
+                                                       .documentIssuedDate(LocalDate.of(2022, 12, 12))
                                                        .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
         return otherEvidenceDocs;
     }
@@ -299,6 +310,7 @@ class BundleRequestMapperTest {
     private List<Element<UploadEvidenceWitness>> getWitnessDocs() {
         List<String> witnessNames = new ArrayList<>(Arrays.asList("cl1Fname", "df1Fname", "cl2Fname", "df2Fname", "FirstName LastName"));
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
+        LocalDateTime createdDateTime = LocalDateTime.of(2023, 12, 12, 8, 8, 5);
         witnessNames.forEach(witnessName -> {
             witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
                                                              .builder()
@@ -306,7 +318,8 @@ class BundleRequestMapperTest {
                                                                      TEST_URL)
                                                                                         .documentFileName(TEST_FILE_NAME).build())
                                                              .witnessOptionName(witnessName)
-                                                             .witnessOptionUploadDate(LocalDate.of(2023, 2, 10)).build()));
+                                                             .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
+                                                             .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
         });
         return witnessEvidenceDocs;
     }
@@ -315,7 +328,7 @@ class BundleRequestMapperTest {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentClaim =
             CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
-                TEST_URL).documentFileName(TEST_FILE_NAME).build()).createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("detailsOfClaim").build()).createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
                  2, 2)).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
         CaseDocument caseDocumentDQ =
