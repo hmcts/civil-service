@@ -67,25 +67,22 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-        OtherDetails tempOtherDetails;
-        if (toggleService.isTransferOnlineCaseEnabled()
-            && (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION)) {
-            dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.CHANGE_LOCATION);
-            TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
-                .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
-                .build();
-            dataBuilder.tocTransferCaseReason(tocTransferCaseReason).build();
-            tempOtherDetails = OtherDetails.builder()
-                .notSuitableForSDO(YesOrNo.YES)
-                .build();
-        } else {
-            if (toggleService.isTransferOnlineCaseEnabled()) {
+        OtherDetails tempOtherDetails = OtherDetails.builder()
+            .notSuitableForSDO(YesOrNo.YES)
+            .build();
+        if (toggleService.isTransferOnlineCaseEnabled()) {
+            if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
+                dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.CHANGE_LOCATION);
+                TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
+                    .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
+                    .build();
+                dataBuilder.tocTransferCaseReason(tocTransferCaseReason).build();
+            } else {
                 dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);
+                tempOtherDetails.setReasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput());
             }
-            tempOtherDetails = OtherDetails.builder()
-                .notSuitableForSDO(YesOrNo.YES)
-                .reasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput())
-                .build();
+        } else {
+            tempOtherDetails.setReasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput());
         }
         dataBuilder.otherDetails(tempOtherDetails).build();
         return AboutToStartOrSubmitCallbackResponse.builder()
