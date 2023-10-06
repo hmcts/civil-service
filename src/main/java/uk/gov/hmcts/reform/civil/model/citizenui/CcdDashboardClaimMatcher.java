@@ -112,7 +112,8 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isProceedOffline() {
-        return false;
+        return Objects.nonNull(caseData.getCcdState())
+            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }
 
     @Override
