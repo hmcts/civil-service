@@ -14,13 +14,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElementsNullSafe;
+import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 import static uk.gov.hmcts.reform.civil.utils.PaymentFrequencyCalculator.calculatePaymentPerMonth;
 
 @Component
 public class ExpenditureCalculator {
 
     public double calculateTotalExpenditure(List<Element<RecurringExpenseLRspec>> recurringExpenseElementList,
-                                         Respondent1DebtLRspec respondent1DebtLRspec,
+                                            Respondent1DebtLRspec respondent1DebtLRspec,
                                             List<Element<Respondent1CourtOrderDetails>> courtOrderDetailsElementList) {
         return calculateTotalMonthlyExpenses(recurringExpenseElementList)
             + calculateTotalMonthlyDebt(respondent1DebtLRspec)
@@ -30,7 +31,10 @@ public class ExpenditureCalculator {
     private double calculateTotalMonthlyExpenses(List<Element<RecurringExpenseLRspec>> recurringExpenseElementList) {
         List<RecurringExpenseLRspec> expenses = unwrapElementsNullSafe(recurringExpenseElementList);
         return expenses.stream()
-            .mapToDouble(expense -> calculatePaymentPerMonth(expense.getAmount().intValue(), expense.getFrequency()))
+            .mapToDouble(expense -> calculatePaymentPerMonth(
+                penniesToPounds(expense.getAmount()).doubleValue(),
+                expense.getFrequency()
+            ))
             .sum();
     }
 
@@ -41,24 +45,28 @@ public class ExpenditureCalculator {
     }
 
     private double calculateTotalMonthlyDebt(Respondent1DebtLRspec respondent1DebtLRspec) {
-       if(respondent1DebtLRspec.getHasLoanCardDebt() == YesOrNo.YES) {
-           return calculateCreditCardDebts(respondent1DebtLRspec.getLoanCardDebtDetails())
-               + calculateDepts(respondent1DebtLRspec.getDebtDetails());
-       }
-       return calculateDepts(respondent1DebtLRspec.getDebtDetails());
+        if (respondent1DebtLRspec.getHasLoanCardDebt() == YesOrNo.YES) {
+            return calculateCreditCardDebts(respondent1DebtLRspec.getLoanCardDebtDetails())
+                + calculateDebts(respondent1DebtLRspec.getDebtDetails());
+        }
+        return calculateDebts(respondent1DebtLRspec.getDebtDetails());
     }
 
     private double calculateCreditCardDebts(List<Element<LoanCardDebtLRspec>> loanCardDebtDetails) {
         List<LoanCardDebtLRspec> cardDebtList = unwrapElementsNullSafe(loanCardDebtDetails);
         return cardDebtList.stream()
             .map(LoanCardDebtLRspec::getMonthlyPayment)
+            .map(debt -> penniesToPounds(debt))
             .collect(Collectors.summingDouble(BigDecimal::doubleValue));
     }
 
-    private double calculateDepts(List<Element<DebtLRspec>> debtDetails) {
+    private double calculateDebts(List<Element<DebtLRspec>> debtDetails) {
         List<DebtLRspec> debts = unwrapElementsNullSafe(debtDetails);
         return debts.stream()
-            .mapToDouble(debt -> calculatePaymentPerMonth(debt.getPaymentAmount().doubleValue(), debt.getPaymentFrequency()))
+            .mapToDouble(debt -> calculatePaymentPerMonth(
+                penniesToPounds(debt.getPaymentAmount()).doubleValue(),
+                debt.getPaymentFrequency()
+            ))
             .sum();
     }
 

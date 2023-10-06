@@ -8,9 +8,11 @@ public record DisabilityParam(boolean disabled, boolean hasPartner, boolean seve
     public boolean disabledCouple() {
         return disabled && hasPartner && !severelyDisabled;
     }
+
     public boolean disabledSeverelySingle() {
         return !hasPartner && severelyDisabled;
     }
+
     public boolean disabledSeverelyCouple() {
         return hasPartner && severelyDisabled;
     }
@@ -19,6 +21,9 @@ public record DisabilityParam(boolean disabled, boolean hasPartner, boolean seve
         return dependant;
     }
 
+    public boolean notDisabled(){
+        return !disabled && !severelyDisabled && !dependant && !carer;
+    }
     public boolean isCarer() {
         return carer;
     }

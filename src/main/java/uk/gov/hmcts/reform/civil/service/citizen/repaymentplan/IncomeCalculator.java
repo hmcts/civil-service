@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElementsNullSafe;
+import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 
 @Component
 public class IncomeCalculator {
@@ -37,15 +38,15 @@ public class IncomeCalculator {
             .mapToDouble(income -> calculateIncomePerMonth(income)).sum();
     }
 
-    public int calculateMonthlyIncomeFromAnnualTurnover (Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails) {
+    public double calculateMonthlyIncomeFromAnnualTurnover (Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails) {
         BigDecimal result = Optional.ofNullable(specDefendant1SelfEmploymentDetails)
             .map(selfEmploymentDetails -> selfEmploymentDetails.getAnnualTurnover().divide(new BigDecimal(12)))
             .orElse(BigDecimal.ZERO);
-        return result.intValue();
+        return result.doubleValue();
     }
 
     private double calculateIncomePerMonth(RecurringIncomeLRspec income) {
-        double incomeAmount = income.getAmount().doubleValue();
+        double incomeAmount = penniesToPounds(income.getAmount()).doubleValue();
         return PaymentFrequencyCalculator.calculatePaymentPerMonth(incomeAmount, income.getFrequency());
     }
 }
