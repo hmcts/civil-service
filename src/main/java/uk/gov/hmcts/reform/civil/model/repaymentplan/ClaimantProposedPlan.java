@@ -13,6 +13,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
+import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPounds;
 import static uk.gov.hmcts.reform.civil.utils.PaymentFrequencyCalculator.calculatePaymentPerMonth;
 
 @Data
@@ -32,7 +33,7 @@ public class ClaimantProposedPlan {
     @JsonIgnore
     public double getCalculatedPaymentPerMonthFromRepaymentPlan() {
         return calculatePaymentPerMonth(
-            repaymentPlanLRspec.getPaymentAmount().doubleValue(),
+            penniesToPounds(repaymentPlanLRspec.getPaymentAmount()).doubleValue(),
             repaymentPlanLRspec.getRepaymentFrequency()
         );
     }
