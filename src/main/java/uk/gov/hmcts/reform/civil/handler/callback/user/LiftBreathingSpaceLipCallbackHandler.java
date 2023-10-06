@@ -26,9 +26,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_
 public class LiftBreathingSpaceLipCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(LIFT_BREATHING_SPACE_LIP);
-    private final Map<String, Callback> callbackMap = Map.of(
+    private final Map<String, Callback> callbacksMap = Map.of(
         callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-        callbackKey(ABOUT_TO_SUBMIT), this::prepareSubmit,
+        callbackKey(ABOUT_TO_SUBMIT), this::submitLiftBreathingSpace,
         callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
     );
 
@@ -41,10 +41,10 @@ public class LiftBreathingSpaceLipCallbackHandler extends CallbackHandler {
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return callbackMap;
+        return callbacksMap;
     }
 
-    private CallbackResponse prepareSubmit(CallbackParams callbackParams) {
+    private CallbackResponse submitLiftBreathingSpace(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder<?, ?>  updatedData = caseData.toBuilder()
