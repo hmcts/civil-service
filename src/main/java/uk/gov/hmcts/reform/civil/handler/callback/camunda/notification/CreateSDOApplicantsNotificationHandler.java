@@ -56,11 +56,9 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
-                ? notificationsProperties.getSdoOrderedSpec()
-                : notificationsProperties.getSdoOrdered(),
-            addProperties(caseData),
+            getRecipientEmail(caseData),
+            getNotificationTemplate(caseData),
+            getEmailProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
 
@@ -76,9 +74,38 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
         );
     }
 
+    public Map<String, String> addPropertiesLip(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+        );
+    }
+
     public String getApplicantsLegalOrganizationName(String id, CaseData caseData) {
         Optional<Organisation> organisation = organisationService.findOrganisationById(id);
         return organisation.isPresent() ? organisation.get().getName() :
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+    }
+
+    private String getNotificationTemplate(CaseData caseData) {
+        if (caseData.isApplicantLiP()) {
+            return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
+        } else {
+            if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
+                return notificationsProperties.getSdoOrderedSpec();
+            } else {
+                return notificationsProperties.getSdoOrdered();
+            }
+        }
+    }
+
+    private String getRecipientEmail(CaseData caseData) {
+        return caseData.isApplicantLiP() ? caseData.getClaimantUserDetails().getEmail()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
+    }
+
+    private Map<String, String> getEmailProperties(CaseData caseData) {
+        return caseData.isApplicantLiP() ? addPropertiesLip(caseData)
+            : addProperties(caseData);
     }
 }
