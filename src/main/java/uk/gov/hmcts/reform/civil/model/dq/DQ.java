@@ -29,6 +29,8 @@ public interface DQ {
         return experts;
     }
 
+    RemoteHearing getRemoteHearing();
+
     Witnesses getWitnesses();
 
     default Witnesses getWitnesses(Witnesses witnesses) {
