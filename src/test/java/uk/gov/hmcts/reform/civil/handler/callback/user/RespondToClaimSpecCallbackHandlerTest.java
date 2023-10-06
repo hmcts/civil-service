@@ -199,12 +199,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         // Given
         String postCode = "postCode";
         CaseData caseData = CaseData.builder()
-            .build().toBuilder()
-            .tempAddress1Required(NO)
-            .tempAddress1(Address.builder().postCode(postCode).build())
-            .isRespondent1(YES)
+            .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
+            .specAoSApplicantCorrespondenceAddressdetails(Address.builder()
+                                                              .postCode(postCode)
+                                                              .build())
             .build();
-        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "confirm-details");
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
         CallbackRequest request = CallbackRequest.builder()
             .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
             .build();
@@ -712,9 +712,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
-                .build().toBuilder()
-                .tempAddress1Required(NO)
-                .tempAddress1(AddressBuilder.maximal().build())
+                .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -747,19 +746,15 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             Address changedAddress = AddressBuilder.maximal().build();
 
-            Address newAddress2 = AddressBuilder.maximal().build();
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .respondent2DQ()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
-                .build().toBuilder()
-                .tempAddress1Required(YES)
-                .tempAddress1(Address.builder().build())
-                .build().toBuilder()
-                .tempAddress2Required(NO)
-                .tempAddress2(newAddress2)
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -773,13 +768,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine1").isEqualTo(newAddress2.getAddressLine1());
+                .extracting("AddressLine1").isEqualTo("address line 1");
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine2").isEqualTo(newAddress2.getAddressLine2());
+                .extracting("AddressLine2").isEqualTo("address line 2");
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine3").isEqualTo(newAddress2.getAddressLine3());
+                .extracting("AddressLine3").isEqualTo("address line 3");
         }
 
         @Test
@@ -823,20 +818,18 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .respondent2DQ()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
+                .atSpecAoSRespondent2HomeAddressRequired(NO)
+                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
                 .build().toBuilder()
                 .respondent1DQWitnessesSmallClaim(res1witnesses)
                 .respondent2DQWitnessesSmallClaim(res2witnesses)
                 .build().toBuilder()
-                .tempAddress1Required(YES)
-                .tempAddress1(Address.builder().build())
                 .respondent2ResponseDate(dateTime)
-                .respondent1ResponseDate(dateTime).build().toBuilder()
-                .tempAddress2Required(NO)
-                .tempAddress2(AddressBuilder.maximal().build())
-                .build();
+                .respondent1ResponseDate(dateTime).build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
@@ -963,10 +956,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .type(Party.Type.COMPANY)
                     .companyName("company")
                     .build();
-                Party defendant2 = Party.builder()
-                    .type(Party.Type.COMPANY)
-                    .companyName("company2")
-                    .build();
                 CaseData caseData = CaseData.builder()
                     .respondent2SameLegalRepresentative(YES)
                     .caseAccessCategory(SPEC_CLAIM)
@@ -975,8 +964,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2ClaimResponseTypeForSpec(FULL_ADMISSION)
                     .respondent1(defendant1)
                     .respondent1Copy(defendant1)
-                    .respondent2(defendant2)
-                    .respondent2Copy(defendant2)
                     .respondent1DQ(
                         Respondent1DQ.builder()
                             .respondToCourtLocation(
@@ -1054,17 +1041,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .type(Party.Type.COMPANY)
                     .companyName("company")
                     .build();
-                Party defendant2 = Party.builder()
-                    .type(Party.Type.COMPANY)
-                    .companyName("company 2")
-                    .build();
                 CaseData caseData = CaseData.builder()
                     .caseAccessCategory(SPEC_CLAIM)
                     .ccdCaseReference(354L)
                     .respondent1(defendant1)
                     .respondent1Copy(defendant1)
-                    .respondent2(defendant2)
-                    .respondent2Copy(defendant2)
                     .respondent1DQ(
                         Respondent1DQ.builder()
                             .respondToCourtLocation(
@@ -1148,11 +1129,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1(PartyBuilder.builder().individual().build())
             .respondent1Copy(PartyBuilder.builder().individual().build())
             .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
             .respondent2DQ(Respondent2DQ.builder().build())
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .ccdCaseReference(354L)
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
@@ -1190,8 +1167,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
             .isRespondent1(YesOrNo.YES)
-            .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
-            .respondentSolicitor1ServiceAddress(
+            .specAoSRespondentCorrespondenceAddressRequired(YesOrNo.NO)
+            .specAoSRespondentCorrespondenceAddressdetails(
                 Address.builder()
                     .postCode("new postcode")
                     .build()
@@ -1208,7 +1185,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
             .extracting("PostCode")
             .isEqualTo("new postcode");
-        assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
+        assertThat(response.getData().get("specAoSRespondentCorrespondenceAddressdetails"))
             .extracting("PostCode")
                 .isNull();
     }
@@ -1234,8 +1211,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
             .isRespondent1(YesOrNo.YES)
-            .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
-            .respondentSolicitor1ServiceAddress(
+            .specAoSRespondentCorrespondenceAddressRequired(YesOrNo.NO)
+            .specAoSRespondentCorrespondenceAddressdetails(
                 Address.builder()
                     .postCode("new postcode")
                     .build()
@@ -1257,7 +1234,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
             .extracting("PostCode")
             .isEqualTo("new postcode");
-        assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
+        assertThat(response.getData().get("specAoSRespondentCorrespondenceAddressdetails"))
             .extracting("PostCode")
             .isNull();
         assertEquals(
@@ -1285,15 +1262,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1(PartyBuilder.builder().individual().build())
             .respondent1Copy(PartyBuilder.builder().individual().build())
             .respondent1DQ(Respondent1DQ.builder().build())
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
             .respondent2DQ(Respondent2DQ.builder().build())
             .ccdCaseReference(354L)
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
             .isRespondent2(YesOrNo.YES)
-            .respondentSolicitor2ServiceAddressRequired(YesOrNo.NO)
-            .respondentSolicitor2ServiceAddress(
+            .specAoSRespondent2CorrespondenceAddressRequired(YesOrNo.NO)
+            .specAoSRespondent2CorrespondenceAddressdetails(
                 Address.builder()
                     .postCode("new postcode")
                     .build()
@@ -1310,7 +1285,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
             .extracting("PostCode")
             .isEqualTo("new postcode");
-        assertThat(response.getData().get("respondentSolicitor2ServiceAddress"))
+        assertThat(response.getData().get("specAoSRespondent2CorrespondenceAddressdetails"))
             .extracting("PostCode")
             .isNull();
     }
@@ -1991,12 +1966,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
                 .isRespondent1(YES)
-                .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
-                .respondentSolicitor1ServiceAddress(Address.builder()
+                .specAoSRespondentCorrespondenceAddressRequired(YesOrNo.NO)
+                .specAoSRespondentCorrespondenceAddressdetails(Address.builder()
                                                                    .postCode("postal code")
                                                                    .build())
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
+            CallbackParams params = callbackParamsOf(caseData, MID, "confirm-details");
             when(postcodeValidator.validate("postal code")).thenReturn(Collections.emptyList());
 
             // When
@@ -2013,12 +1988,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
                 .isRespondent2(YES)
-                .respondentSolicitor2ServiceAddressRequired(YesOrNo.NO)
-                .respondentSolicitor2ServiceAddress(Address.builder()
+                .specAoSRespondent2CorrespondenceAddressRequired(YesOrNo.NO)
+                .specAoSRespondent2CorrespondenceAddressdetails(Address.builder()
                                                                    .postCode("postal code")
                                                                    .build())
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
+            CallbackParams params = callbackParamsOf(caseData, MID, "confirm-details");
             when(postcodeValidator.validate("postal code")).thenReturn(Collections.emptyList());
 
             // When
