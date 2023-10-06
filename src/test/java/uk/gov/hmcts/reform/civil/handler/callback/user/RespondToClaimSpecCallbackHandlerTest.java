@@ -2039,6 +2039,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder()
                 .respondent1(Party.builder()
                                  .partyName("name")
+                                 .type(Party.Type.INDIVIDUAL)
                                  .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
