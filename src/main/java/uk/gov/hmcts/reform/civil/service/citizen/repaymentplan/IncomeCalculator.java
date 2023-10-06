@@ -39,10 +39,9 @@ public class IncomeCalculator {
     }
 
     public double calculateMonthlyIncomeFromAnnualTurnover (Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails) {
-        BigDecimal result = Optional.ofNullable(specDefendant1SelfEmploymentDetails)
-            .map(selfEmploymentDetails -> selfEmploymentDetails.getAnnualTurnover().divide(new BigDecimal(12)))
-            .orElse(BigDecimal.ZERO);
-        return result.doubleValue();
+      return Optional.ofNullable(specDefendant1SelfEmploymentDetails)
+            .map(selfEmploymentDetails -> selfEmploymentDetails.getAnnualTurnover().doubleValue()/12)
+            .orElse(0.0);
     }
 
     private double calculateIncomePerMonth(RecurringIncomeLRspec income) {

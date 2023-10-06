@@ -45,7 +45,10 @@ public class ExpenditureCalculator {
     }
 
     private double calculateTotalMonthlyDebt(Respondent1DebtLRspec respondent1DebtLRspec) {
-        if (respondent1DebtLRspec.getHasLoanCardDebt() == YesOrNo.YES) {
+        if(respondent1DebtLRspec == null) {
+            return 0.0;
+        }
+        if (YesOrNo.YES == respondent1DebtLRspec.getHasLoanCardDebt()) {
             return calculateCreditCardDebts(respondent1DebtLRspec.getLoanCardDebtDetails())
                 + calculateDebts(respondent1DebtLRspec.getDebtDetails());
         }
