@@ -10,16 +10,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
-
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +33,8 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
     private static final String REFERENCE_TEMPLATE = "claim-continuing-online-notification-%s";
     private static final String FIRST_CONTACT_PACK_LETTER_TYPE = "first-contact-pack";
     private final NotificationService notificationService;
@@ -74,7 +73,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             generatePIPEmail(caseData);
         }
 
-        generatePIPLetter(callbackParams);
+        // generatePIPLetter(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -100,9 +99,10 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private void generatePIPLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         byte[] letter = pipLetterGenerator.downloadLetter(caseData);
-        List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
+        List<String> recipients = Collections.singletonList(caseData.getRespondent1().getPartyName());
         bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
+                                     caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients
+        );
     }
 
     private void generatePIPEmail(CaseData caseData) {
