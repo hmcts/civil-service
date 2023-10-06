@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -110,9 +109,10 @@ public class DocmosisTemplateDataUtils {
     }
 
     private static void litigationFriend(LitigationFriend litigationFriend, StringBuilder stringBuilder) {
-        Optional.ofNullable(litigationFriend)
-            .map(LitigationFriend::getFullName)
-            .ifPresent(fullName -> stringBuilder.append(format(" (proceeding by L/F %s)", fullName)));
+        if (litigationFriend != null) {
+            String fullName = litigationFriend.getFirstName() + " " + litigationFriend.getLastName();
+            stringBuilder.append(format(" (proceeding by L/F %s)", fullName));
+        }
     }
 
     public static SolicitorReferences fetchSolicitorReferencesMultiparty(CaseData caseData) {

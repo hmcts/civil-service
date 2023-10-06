@@ -196,11 +196,12 @@ class DocmosisTemplateDataUtilsTest {
                              .individualLastName("Richards")
                              .partyName("Mr. Other Party")
                              .build())
-            .respondent1LitigationFriend(LitigationFriend.builder().fullName("Mr. Litigation Friend").build())
+            .respondent1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
+                                             .lastName("Friend").build())
             .build();
         String caseName = toCaseName.apply(caseData);
         assertThat(caseName)
-            .isEqualTo("Mr. Sam Clark \nvs Mr. Alex Richards (proceeding by L/F Mr. Litigation Friend)");
+            .isEqualTo("Mr. Sam Clark \nvs Mr. Alex Richards (proceeding by L/F Litigation Friend)");
     }
 
     @Test
@@ -212,7 +213,8 @@ class DocmosisTemplateDataUtilsTest {
                             .individualFirstName("Sam")
                             .individualLastName("Clark")
                             .build())
-            .applicant1LitigationFriend(LitigationFriend.builder().fullName("Mr. Litigation Friend").build())
+            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
+                                            .lastName("Friend").build())
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
                              .individualTitle("Mr.")
@@ -223,7 +225,7 @@ class DocmosisTemplateDataUtilsTest {
             .build();
         String caseName = toCaseName.apply(caseData);
         assertThat(caseName)
-            .isEqualTo("Mr. Sam Clark (proceeding by L/F Mr. Litigation Friend) \nvs Mr. Alex Richards");
+            .isEqualTo("Mr. Sam Clark (proceeding by L/F Litigation Friend) \nvs Mr. Alex Richards");
     }
 
     @Test
@@ -236,18 +238,21 @@ class DocmosisTemplateDataUtilsTest {
                             .individualLastName("Clark")
                             .partyName("Mr. Sam Clark")
                             .build())
-            .applicant1LitigationFriend(LitigationFriend.builder().fullName("Mr. Applicant Friend").build())
+            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Applicant")
+                                            .lastName("Friend").build())
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
                              .individualTitle("Mr.")
                              .individualFirstName("Alex")
                              .individualLastName("Richards")
                              .build())
-            .respondent1LitigationFriend(LitigationFriend.builder().fullName("Mr. Respondent Friend").build())
+            .respondent1LitigationFriend(LitigationFriend.builder()
+                                             .firstName("Respondent")
+                                             .lastName("Friend").build())
             .build();
         String caseName = toCaseName.apply(caseData);
-        assertThat(caseName).isEqualTo("Mr. Sam Clark (proceeding by L/F Mr. Applicant Friend) \nvs Mr. Alex Richards "
-                                           + "(proceeding by L/F Mr. Respondent Friend)");
+        assertThat(caseName).isEqualTo("Mr. Sam Clark (proceeding by L/F Applicant Friend) \nvs Mr. Alex Richards "
+                                           + "(proceeding by L/F Respondent Friend)");
     }
 
     @Nested
