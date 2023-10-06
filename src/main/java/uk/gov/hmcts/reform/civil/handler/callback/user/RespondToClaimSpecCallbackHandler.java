@@ -145,6 +145,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     implements ExpertsValidator, WitnessesValidator, DefendantAddressValidator {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(DEFENDANT_RESPONSE_SPEC);
+    private static final String DEF2 = "Defendant 2";
 
     private final DateOfBirthValidator dateOfBirthValidator;
     private final UnavailableDateValidator unavailableDateValidator;
@@ -1646,7 +1647,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
                 if (respondent2ClaimDocument != null) {
                     Element<CaseDocument> documentElement = buildElemCaseDocument(
-                            respondent2ClaimDocument, "Defendant 2",
+                            respondent2ClaimDocument, DEF2,
                             updatedCaseData.build().getRespondent2ResponseDate(),
                             DocumentType.DEFENDANT_DEFENCE
                     );
@@ -1666,7 +1667,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2SpecDefenceResponseDocument.getFile();
                 if (respondent2ClaimDocument != null) {
                     Element<CaseDocument> documentElement = buildElemCaseDocument(
-                            respondent2ClaimDocument, "Defendant 2",
+                            respondent2ClaimDocument, DEF2,
                             updatedCaseData.build().getRespondent2ResponseDate(),
                             DocumentType.DEFENDANT_DEFENCE
                     );
@@ -1687,7 +1688,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             if (respondent2DQDraftDirections != null) {
                 Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent2DQDraftDirections,
-                        "Defendant 2",
+                        DEF2,
                         updatedCaseData.build().getRespondent2ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
                 );

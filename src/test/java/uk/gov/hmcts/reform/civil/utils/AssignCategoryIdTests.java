@@ -50,7 +50,7 @@ public class AssignCategoryIdTests {
     }
 
     @Test
-    public void shouldNotAssignCategory_whenInvokedAndToggleFalse() {
+    void shouldNotAssignCategory_whenInvokedAndToggleFalse() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(false);
         List<Element<CaseDocument>> documentList = new ArrayList<>();
         documentList.add(element(testCaseDocument));
@@ -65,7 +65,7 @@ public class AssignCategoryIdTests {
     }
 
     @Test
-    public void shouldAssignCaseDocumentCategoryId_whenInvoked() {
+    void shouldAssignCaseDocumentCategoryId_whenInvoked() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         assignCategoryId.assignCategoryIdToCaseDocument(testCaseDocument, "testCaseDocumentID");
 
@@ -73,7 +73,7 @@ public class AssignCategoryIdTests {
     }
 
     @Test
-    public void shouldAssignDocumentCategoryId_whenInvoked() {
+    void shouldAssignDocumentCategoryId_whenInvoked() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         assignCategoryId.assignCategoryIdToDocument(testDocument, "testDocumentID");
 
@@ -81,7 +81,7 @@ public class AssignCategoryIdTests {
     }
 
     @Test
-    public void shouldAssignDocumentIdCollection_whenInvoked() {
+    void shouldAssignDocumentIdCollection_whenInvoked() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         List<Element<CaseDocument>> documentList = new ArrayList<>();
         documentList.add(element(testCaseDocument));
@@ -92,14 +92,14 @@ public class AssignCategoryIdTests {
     }
 
     @Test
-    public void shouldCopyDocumentWithCategoryId_whenInvoked() {
+    void shouldCopyDocumentWithCategoryId_whenInvoked() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(testCaseDocument, "testDocumentID");
         assertThat(copy.getDocumentLink().getCategoryID()).isEqualTo("testDocumentID");
     }
 
     @Test
-    public void shouldCopyDocumentsWithCategoryId_whenInvoked() {
+    void shouldCopyDocumentsWithCategoryId_whenInvoked() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         List<Element<CaseDocument>> documentList = new ArrayList<>();
         documentList.add(element(testCaseDocument));
@@ -110,7 +110,7 @@ public class AssignCategoryIdTests {
     }
 
     @Test
-    public void shouldNotCopy_whenInvokedAndToggleFalse() {
+    void shouldNotCopy_whenInvokedAndToggleFalse() {
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(false);
         List<Element<CaseDocument>> documentList = new ArrayList<>();
         documentList.add(element(testCaseDocument));
