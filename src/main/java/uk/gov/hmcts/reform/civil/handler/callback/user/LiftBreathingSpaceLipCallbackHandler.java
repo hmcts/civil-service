@@ -47,7 +47,7 @@ public class LiftBreathingSpaceLipCallbackHandler extends CallbackHandler {
     private CallbackResponse prepareSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?>  updatedData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(LIFT_BREATHING_SPACE_LIP));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
