@@ -84,6 +84,170 @@ class DocmosisTemplateDataUtilsTest {
     }
 
     @Test
+    void shouldReturnCaseName_whenMultiApplicantAndApplicant2HaveLF() {
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("Sam")
+                            .individualLastName("Clark")
+                            .partyName("Mr. Sam Clark")
+                            .build())
+            .applicant2(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("White")
+                            .individualLastName("Clark")
+                            .build())
+            .applicant2LitigationFriend(LitigationFriend.builder().firstName("Litigation")
+                                            .lastName("Friend").build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
+                             .build())
+            .build();
+
+        String caseName = toCaseName.apply(caseData);
+        assertThat(caseName).isEqualTo("1 Mr. Sam Clark & 2 Mr. White Clark (proceeding by L/F Litigation Friend) \nvs Mr. Alex Richards");
+    }
+
+    @Test
+    void shouldReturnCaseName_whenMultiApplicantAndApplicant1HaveLF() {
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("Sam")
+                            .individualLastName("Clark")
+                            .partyName("Mr. Sam Clark")
+                            .build())
+            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
+                                            .lastName("Friend").build())
+            .applicant2(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("White")
+                            .individualLastName("Clark")
+                            .build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
+                             .build())
+            .build();
+
+        String caseName = toCaseName.apply(caseData);
+        assertThat(caseName).isEqualTo("1 Mr. Sam Clark (proceeding by L/F Litigation Friend) & 2 Mr. White Clark \nvs Mr. Alex Richards");
+    }
+
+    @Test
+    void shouldReturnCaseName_whenMultiApplicantAndBothApplicantsHaveLF() {
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("Sam")
+                            .individualLastName("Clark")
+                            .partyName("Mr. Sam Clark")
+                            .build())
+            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
+                                            .lastName("Friend").build())
+            .applicant2(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("White")
+                            .individualLastName("Clark")
+                            .build())
+            .applicant2LitigationFriend(LitigationFriend.builder().firstName("Litigation")
+                                            .lastName("Friend").build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
+                             .build())
+            .build();
+
+        String caseName = toCaseName.apply(caseData);
+        assertThat(caseName).isEqualTo("1 Mr. Sam Clark (proceeding by L/F Litigation Friend) & 2 Mr. White Clark (proceeding by L/F Litigation Friend) \nvs Mr. Alex Richards");
+    }
+
+    @Test
+    void shouldReturnCaseName_whenMultiApplicantAndBothApplicantsAndRespondent1HaveLF() {
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("Sam")
+                            .individualLastName("Clark")
+                            .partyName("Mr. Sam Clark")
+                            .build())
+            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
+                                            .lastName("Friend").build())
+            .applicant2(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("White")
+                            .individualLastName("Clark")
+                            .build())
+            .applicant2LitigationFriend(LitigationFriend.builder().firstName("Litigation")
+                                            .lastName("Friend").build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
+                             .build())
+            .respondent1LitigationFriend(LitigationFriend.builder().firstName("Respondent Litigation")
+                                             .lastName("Friend").build())
+            .build();
+
+        String caseName = toCaseName.apply(caseData);
+        assertThat(caseName).isEqualTo("1 Mr. Sam Clark (proceeding by L/F Litigation Friend) & " +
+                                           "2 Mr. White Clark (proceeding by L/F Litigation Friend) \nvs " +
+                                           "Mr. Alex Richards (proceeding by L/F Respondent Litigation Friend)");
+    }
+
+    @Test
+    void shouldReturnCaseName_whenMultiRespondentAndBothApplicantAndRespondentsHaveLF() {
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .individualTitle("Mr.")
+                            .individualFirstName("Sam")
+                            .individualLastName("Clark")
+                            .partyName("Mr. Sam Clark")
+                            .build())
+            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
+                                            .lastName("Friend").build())
+            .respondent1(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("Alex")
+                             .individualLastName("Richards")
+                             .build())
+            .respondent1LitigationFriend(LitigationFriend.builder().firstName("Respondent Litigation")
+                                             .lastName("Friend").build())
+            .respondent2(Party.builder()
+                             .type(Party.Type.INDIVIDUAL)
+                             .individualTitle("Mr.")
+                             .individualFirstName("White")
+                             .individualLastName("Richards")
+                             .build())
+            .respondent2LitigationFriend(LitigationFriend.builder().firstName("Respondent2 Litigation")
+                                        .lastName("Friend").build())
+            .build();
+
+        String caseName = toCaseName.apply(caseData);
+        assertThat(caseName).isEqualTo("Mr. Sam Clark (proceeding by L/F Litigation Friend) \n" +
+                                           "vs 1 Mr. Alex Richards (proceeding by L/F Respondent Litigation Friend) &" +
+                                           " 2 Mr. White Richards (proceeding by L/F Respondent2 Litigation Friend)");
+    }
+
+    @Test
     void shouldReturnCaseName_whenMultiRespondent() {
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()
