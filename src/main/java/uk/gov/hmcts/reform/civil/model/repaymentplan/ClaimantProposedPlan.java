@@ -38,7 +38,7 @@ public class ClaimantProposedPlan {
     }
 
     @JsonIgnore
-    public boolean hasProposedPayImmediatly() {
+    public boolean hasProposedPayImmediately() {
         return IMMEDIATELY == proposedRepaymentType;
     }
 

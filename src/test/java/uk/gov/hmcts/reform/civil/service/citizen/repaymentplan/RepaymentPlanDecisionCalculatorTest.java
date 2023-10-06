@@ -67,7 +67,7 @@ class RepaymentPlanDecisionCalculatorTest {
 
         @BeforeEach
         void setUp() {
-            given(claimantProposedPlan.hasProposedPayImmediatly()).willReturn(true);
+            given(claimantProposedPlan.hasProposedPayImmediately()).willReturn(true);
         }
 
         @Test

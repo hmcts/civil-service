@@ -26,7 +26,7 @@ public class RepaymentPlanDecisionCalculator {
       double disposableIncome = calculateDisposableIncome(caseData);
       BigDecimal claimTotalAmount = Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmountPounds()).orElse(caseData.getTotalClaimAmount());
 
-      if(claimantProposedPlan.hasProposedPayImmediatly()){
+      if(claimantProposedPlan.hasProposedPayImmediately()){
           return calculateDecisionBasedOnAmountAndDisposableIncome(claimTotalAmount.doubleValue(), disposableIncome);
       }
       if(claimantProposedPlan.hasProposedPayBySetDate()) {
