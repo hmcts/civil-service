@@ -1353,13 +1353,16 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
         if (NO.equals(caseData.getTempAddress1Required())) {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .flags(caseData.getRespondent1Copy().getFlags())
                 .primaryAddress(caseData.getTempAddress1()).build();
         } else {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
                 .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
-                .flags(caseData.getRespondent1Copy().getFlags())
                 .build();
+        }
+
+        if (caseData.getRespondent1Copy() != null) {
+            updatedRespondent1 =
+                updatedRespondent1.toBuilder().flags(caseData.getRespondent1Copy().getFlags()).build();
         }
 
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
