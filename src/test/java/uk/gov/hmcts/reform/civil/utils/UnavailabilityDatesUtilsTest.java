@@ -206,6 +206,7 @@ public class UnavailabilityDatesUtilsTest {
                 .atStateRespondentFullDefence()
                 .respondent1DQWithUnavailableDates()
                 .build();
+
             CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
             UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder, true);
             UnavailableDate expected = UnavailableDate.builder()
