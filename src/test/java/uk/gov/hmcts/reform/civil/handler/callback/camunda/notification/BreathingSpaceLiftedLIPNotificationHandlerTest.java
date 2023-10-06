@@ -36,7 +36,7 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilderSpec.LEGACY_CA
     BreathingSpaceLiftedLIPNotificationHandler.class,
     JacksonAutoConfiguration.class,
 })
-public class BreathingSpaceLiftedLIPNotificationHandlerTest extends BaseCallbackHandlerTest {
+class BreathingSpaceLiftedLIPNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;

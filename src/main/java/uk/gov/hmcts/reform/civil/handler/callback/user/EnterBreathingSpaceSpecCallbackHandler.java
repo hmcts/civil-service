@@ -97,7 +97,7 @@ public class EnterBreathingSpaceSpecCallbackHandler extends CallbackHandler {
     private CallbackResponse prepareSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder()
+        CaseData.CaseDataBuilder<?, ?>  updatedData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(ENTER_BREATHING_SPACE_SPEC));
 
         return AboutToStartOrSubmitCallbackResponse.builder()

@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_
     LiftBreathingSpaceLipCallbackHandler.class,
     JacksonAutoConfiguration.class,
 })
-public class LiftBreathingSpaceLipCallbackHandlerTest  extends BaseCallbackHandlerTest {
+class LiftBreathingSpaceLipCallbackHandlerTest  extends BaseCallbackHandlerTest {
 
     @Autowired
     private LiftBreathingSpaceLipCallbackHandler handler;
