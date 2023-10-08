@@ -849,10 +849,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateInputValue(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        //CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
-        if (nonNull(caseData.getClaimsTrack()) && nonNull(caseData.getClaimsTrack().name())
-            && caseData.getClaimsTrack().name().equals("smallClaimsTrack")) {
+        if (nonNull(caseData.getSmallClaimsWitnessStatement())) {
             String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
             String inputValue2 = caseData.getSmallClaimsWitnessStatement().getInput3();
             if (validateNegativeWitness(errors, inputValue1, inputValue2)) {
@@ -860,8 +859,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     .errors(errors)
                     .build();
             }
-        } else if (nonNull(caseData.getClaimsTrack()) && nonNull(caseData.getClaimsTrack().name())
-            && caseData.getClaimsTrack().name().equals("fastTrack")) {
+        } else if (nonNull(caseData.getFastTrackWitnessOfFact())) {
             String inputValue1 = caseData.getFastTrackWitnessOfFact().getInput2();
             String inputValue2 = caseData.getFastTrackWitnessOfFact().getInput3();
             if (validateNegativeWitness(errors, inputValue1, inputValue2)) {
