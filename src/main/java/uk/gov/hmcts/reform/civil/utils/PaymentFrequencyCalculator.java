@@ -4,6 +4,9 @@ import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 
 public class PaymentFrequencyCalculator {
 
+    private static final int NUMBER_OF_WORKING_WEEKS_IN_A_YEAR = 52;
+    private static final int NUMBER_OF_MONTHS_IN_A_YEAR = 12;
+
     private PaymentFrequencyCalculator () {
 
     }
@@ -33,7 +36,7 @@ public class PaymentFrequencyCalculator {
     }
 
     public static double calculateWeeklyIncomeIntoMonthly(double amount) {
-        return amount * 52 / 12;
+        return Math.round(amount * NUMBER_OF_WORKING_WEEKS_IN_A_YEAR / NUMBER_OF_MONTHS_IN_A_YEAR);
     }
 
 }
