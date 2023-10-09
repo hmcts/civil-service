@@ -25,7 +25,7 @@ class ClaimantProposedPlanTest {
     @Test
     void shouldGetRepaymentDate_fromSetDate() {
         //Given
-        LocalDate proposedDate = LocalDate.of(2023, 2,1);
+        LocalDate proposedDate = LocalDate.of(2023, 2, 1);
         ClaimantProposedPlan claimantProposedPlan = ClaimantProposedPlan
             .builder()
             .repaymentByDate(proposedDate)
@@ -39,14 +39,14 @@ class ClaimantProposedPlanTest {
     @Test
     void shouldGetRepaymentDate_fromRepaymentPlan() {
         //Given
-        LocalDate proposedDate = LocalDate.of(2023, 2,1);
+        LocalDate proposedDate = LocalDate.of(2023, 2, 1);
         given(repaymentPlan.finalPaymentBy(any())).willReturn(proposedDate);
         ClaimantProposedPlan claimantProposedPlan = ClaimantProposedPlan
             .builder()
             .repaymentPlanLRspec(repaymentPlan)
             .build();
         //When
-        LocalDate result  = claimantProposedPlan.getRepaymentDate(new BigDecimal(2345));
+        LocalDate result = claimantProposedPlan.getRepaymentDate(new BigDecimal(2345));
         //Then
         assertThat(result).isEqualTo(proposedDate);
     }

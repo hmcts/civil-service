@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.allowance;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -17,12 +16,13 @@ import static uk.gov.hmcts.reform.civil.model.allowance.PersonalAllowance.SINGLE
 class PersonalAllowanceTest {
 
     static Stream<Arguments> shouldReturnCorrespondingEnum() {
-        return Stream.of(Arguments.of(24, false, false, SINGLE_UNDER_25),
-                         Arguments.of(26, false, false, SINGLE_OVER_25),
-                         Arguments.of(24, true, false, COUPLES_UNDER_18_UNDER_25),
-                         Arguments.of(31, true, false, COUPLES_UNDER_18_OVER_25),
-                         Arguments.of(30, true, true, COUPLES_OVER_18)
-                        );
+        return Stream.of(
+            Arguments.of(24, false, false, SINGLE_UNDER_25),
+            Arguments.of(26, false, false, SINGLE_OVER_25),
+            Arguments.of(24, true, false, COUPLES_UNDER_18_UNDER_25),
+            Arguments.of(31, true, false, COUPLES_UNDER_18_OVER_25),
+            Arguments.of(30, true, true, COUPLES_OVER_18)
+        );
     }
 
     @ParameterizedTest
