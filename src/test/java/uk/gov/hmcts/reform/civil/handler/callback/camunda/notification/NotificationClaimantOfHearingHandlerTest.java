@@ -378,13 +378,13 @@ public class NotificationClaimantOfHearingHandlerTest {
         }
 
         @Test
-        void shouldNotifyApplicantSolicitorLip_whenInvokedAnd1v1() {
+        void shouldNotifyApplicantLip_whenInvokedAnd1v1() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .hearingTimeHourMinute("1030")
                 .applicant1Represented(YesOrNo.NO)
-                .applicant1(Party.builder().partyName("John").partyEmail("applicant1@example.com").type(Party.Type.INDIVIDUAL).build())
+                .claimantUserDetails(IdamUserDetails.builder().email("applicant1@example.com").build())
                 .hearingReferenceNumber("000HN001")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
