@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
@@ -85,8 +84,6 @@ class HearingNoticeHmcGeneratorTest {
     private LocationRefDataService locationRefDataService;
     @MockBean
     private HearingFeesService hearingFeesService;
-    @MockBean
-    private AssignCategoryId assignCategoryId;
 
     @BeforeEach
     void setupTest() {
