@@ -76,7 +76,7 @@ public class UnavailabilityDatesUtils {
                     .getUnavailableDates();
 
                 List<Element<UnavailableDate>> updatedUnavailableDates = addEventAndDate(
-                    caseData.getRespondent2ResponseDate().toLocalDate(),
+                    caseData.getRespondent1ResponseDate().toLocalDate(),
                     DEFENDANT_RESPONSE_EVENT,
                     respondent2DQUnavailableDates
                 );
