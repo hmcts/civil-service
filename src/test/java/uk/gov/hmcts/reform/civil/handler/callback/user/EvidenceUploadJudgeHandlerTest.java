@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -97,8 +96,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("caseNotesTA")
-                .isEqualTo(objectMapper.convertValue(updatedCaseNotes, new TypeReference<>() {
-            }));
+                .isEqualTo(objectMapper.convertValue(updatedCaseNotes, new TypeReference<>() {}));
 
         }
 
