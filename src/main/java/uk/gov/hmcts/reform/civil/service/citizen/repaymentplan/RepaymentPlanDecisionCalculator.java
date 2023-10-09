@@ -59,8 +59,8 @@ public class RepaymentPlanDecisionCalculator {
     private LocalDate getProposedDefendantRepaymentDate(CaseData caseData, BigDecimal claimTotalAmount) {
         RespondentResponsePartAdmissionPaymentTimeLRspec respondentResponseType = caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
         RepaymentPlanLRspec defendantRepaymentPlan = caseData.getRespondent1RepaymentPlan();
-        return respondentResponseType == BY_SET_DATE ?
-            caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() : defendantRepaymentPlan.finalPaymentBy(
+        return respondentResponseType == BY_SET_DATE
+            ? caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() : defendantRepaymentPlan.finalPaymentBy(
             claimTotalAmount);
     }
 
