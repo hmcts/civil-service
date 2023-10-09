@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -76,7 +75,6 @@ public class BundleCreationTriggerEventHandler {
             .stitchStatus(Optional.ofNullable(bundle.getValue().getStitchStatus()))
             .createdOn(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
             .id(bundle.getValue().getId()).build();
-        result.getStitchedDocument().ifPresent(x -> x.setCategoryID(DocCategory.BUNDLES.getValue()));
         return new IdValue<>(result.getId(), result);
     }
 

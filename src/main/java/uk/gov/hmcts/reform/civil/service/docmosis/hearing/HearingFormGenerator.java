@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -15,7 +13,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import java.time.LocalDate;
@@ -38,7 +35,6 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
-    private final AssignCategoryId assignCategoryId;
 
     public List<CaseDocument> generate(CaseData caseData, String authorisation) {
 
@@ -47,16 +43,14 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
         DocmosisTemplates template = getTemplate(caseData);
         DocmosisDocument document =
             documentGeneratorService.generateDocmosisDocument(templateData, template);
-        CaseDocument caseDocument = documentManagementService.uploadDocument(
-                authorisation,
-                new PDF(
-                        getFileName(caseData, template),
-                        document.getBytes(),
-                        DocumentType.HEARING_FORM
-                )
-        );
-        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.HEARING_NOTICES.getValue());
-        caseDocuments.add(caseDocument);
+        caseDocuments.add(documentManagementService.uploadDocument(
+            authorisation,
+            new PDF(
+                getFileName(caseData, template),
+                document.getBytes(),
+                DocumentType.HEARING_FORM
+            )
+        ));
         return caseDocuments;
     }
 
