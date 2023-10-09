@@ -70,7 +70,7 @@ class ClaimantProposedPlanTest {
             .proposedRepaymentType(BY_SET_DATE)
             .build();
         //Then
-        assertThat(claimantProposedPlan.hasProposedPayBySetDate());
+        assertThat(claimantProposedPlan.hasProposedPayBySetDate()).isTrue();
     }
 
     @Test
@@ -81,7 +81,7 @@ class ClaimantProposedPlanTest {
             .proposedRepaymentType(SUGGESTION_OF_REPAYMENT_PLAN)
             .build();
         //Then
-        assertThat(claimantProposedPlan.hasProposedPayByInstallments());
+        assertThat(claimantProposedPlan.hasProposedPayByInstallments()).isTrue();
     }
 
 }

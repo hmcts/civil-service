@@ -25,7 +25,7 @@ public class IncomeCalculator {
         double result = calculateRegularIncome(recurringIncomeElements)
             + calculateTotalSavings(bankAccountElements)
             + calculateMonthlyIncomeFromAnnualTurnover(specDefendant1SelfEmploymentDetails);
-        return new BigDecimal(result).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        return BigDecimal.valueOf(result).setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 
     private double calculateTotalSavings(List<Element<AccountSimple>> bankAccountElements) {
@@ -37,12 +37,12 @@ public class IncomeCalculator {
     private double calculateRegularIncome(List<Element<RecurringIncomeLRspec>> recurringIncomeElements) {
         List<RecurringIncomeLRspec> recurringIncomes = unwrapElementsNullSafe(recurringIncomeElements);
         return recurringIncomes.stream().filter(income -> income.getAmount().compareTo(BigDecimal.ZERO) > 0)
-            .mapToDouble(income -> calculateIncomePerMonth(income)).sum();
+            .mapToDouble(this::calculateIncomePerMonth).sum();
     }
 
     private double calculateMonthlyIncomeFromAnnualTurnover(Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails) {
         return Optional.ofNullable(specDefendant1SelfEmploymentDetails)
-            .map(selfEmploymentDetails -> new BigDecimal(penniesToPounds(selfEmploymentDetails.getAnnualTurnover()).doubleValue() / 12)
+            .map(selfEmploymentDetails ->  BigDecimal.valueOf(penniesToPounds(selfEmploymentDetails.getAnnualTurnover()).doubleValue() / 12)
                 .setScale(2, RoundingMode.HALF_UP)
                 .doubleValue())
             .orElse(0.0);
@@ -50,7 +50,6 @@ public class IncomeCalculator {
 
     private double calculateIncomePerMonth(RecurringIncomeLRspec income) {
         double incomeAmount = penniesToPounds(income.getAmount()).doubleValue();
-        double paymentPerMonth = calculatePaymentPerMonth(incomeAmount, income.getFrequency());
-        return paymentPerMonth;
+        return calculatePaymentPerMonth(incomeAmount, income.getFrequency());
     }
 }

@@ -18,7 +18,7 @@ public enum PensionerAllowance {
         if ((pensioner && !partnerPensioner) || (!pensioner && partnerPensioner)) {
             return SINGLE.allowance;
         }
-        if (pensioner && partnerPensioner) {
+        if (pensioner) {
             return COUPLE.allowance;
         }
         return 0.0;

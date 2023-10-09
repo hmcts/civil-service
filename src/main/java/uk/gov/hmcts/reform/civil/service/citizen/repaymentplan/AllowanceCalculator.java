@@ -100,8 +100,8 @@ public class AllowanceCalculator {
 
     private double calculatePensionerAllowance(FinancialDetailsLiP financialDetailsLiP, UnemployedComplexTypeLRspec uneployedType) {
         boolean partnerPensioner = YesOrNo.YES == financialDetailsLiP.getPartnerPensionLiP();
-        boolean defendantPensioner = RETIRED == Optional.ofNullable(uneployedType)
-            .map(UnemployedComplexTypeLRspec::getUnemployedComplexTypeRequired).orElse("");
+        boolean defendantPensioner = RETIRED.equals(Optional.ofNullable(uneployedType)
+            .map(UnemployedComplexTypeLRspec::getUnemployedComplexTypeRequired).orElse(""));
         return PensionerAllowance.getPensionerAllowance(defendantPensioner, partnerPensioner);
     }
 

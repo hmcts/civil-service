@@ -27,7 +27,7 @@ public class ExpenditureCalculator {
         double calculatedResult = calculateTotalMonthlyExpenses(recurringExpenseElementList)
             + calculateTotalMonthlyDebt(respondent1DebtLRspec)
             + calculateCourtOrders(courtOrderDetailsElementList);
-        return new BigDecimal(calculatedResult).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        return BigDecimal.valueOf(calculatedResult).setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 
     private double calculateTotalMonthlyExpenses(List<Element<RecurringExpenseLRspec>> recurringExpenseElementList) {
@@ -42,7 +42,7 @@ public class ExpenditureCalculator {
 
     private double calculateCourtOrders(List<Element<Respondent1CourtOrderDetails>> courtOrderDetailsElementList) {
         List<Respondent1CourtOrderDetails> courtOrderDetails = unwrapElementsNullSafe(courtOrderDetailsElementList);
-        return courtOrderDetails.size() > 0 ? courtOrderDetails.stream().map(item -> penniesToPounds(item.getMonthlyInstalmentAmount()))
+        return !courtOrderDetails.isEmpty() ? courtOrderDetails.stream().map(item -> penniesToPounds(item.getMonthlyInstalmentAmount()))
             .collect(Collectors.summingDouble(BigDecimal::doubleValue)) : 0.0;
     }
 
