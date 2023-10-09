@@ -36,12 +36,12 @@ public class PaymentFrequencyCalculator {
         return calculateWeeklyPaymentIntoMonthly(amountPerWeek);
     }
 
-    private static double calculatePaymentPerWeek(int weeks, double amount) {
-        return amount / weeks;
-    }
-
     public static double calculateWeeklyPaymentIntoMonthly(double amount) {
         return Math.round(amount * NUMBER_OF_WORKING_WEEKS_IN_A_YEAR / NUMBER_OF_MONTHS_IN_A_YEAR);
+    }
+
+    private static double calculatePaymentPerWeek(int weeks, double amount) {
+        return amount / weeks;
     }
 
 }
