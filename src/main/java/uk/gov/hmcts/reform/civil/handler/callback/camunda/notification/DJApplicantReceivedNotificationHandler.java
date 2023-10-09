@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
@@ -36,6 +37,8 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
     private static final String REFERENCE_TEMPLATE_RECEIVED = "default-judgment-applicant-received-notification-%s";
     private static final String REFERENCE_TEMPLATE_REQUESTED = "default-judgment-applicant-requested-notification-%s";
     private String templateReference;
+
+    private final FeatureToggleService toggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -68,8 +71,13 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested();
             templateReference = REFERENCE_TEMPLATE_REQUESTED;
         }
-        if (ofNullable(caseData.getRespondent2()).isEmpty()) {
+        if (ofNullable(caseData.getRespondent2()).isEmpty() && !caseData.isLipvLipOneVOne()) {
             template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived();
+            templateReference = REFERENCE_TEMPLATE_RECEIVED;
+        }
+        if (caseData.isLipvLipOneVOne()
+            && toggleService.isLipVLipEnabled()) {
+            template = notificationsProperties.getApplicantLiPDefaultJudgmentRequested();
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
         return template;
@@ -106,7 +114,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                 String.format(templateReference, caseData.getLegacyCaseReference())
             );
         }
-        if (ofNullable(caseData.getRespondent2()).isEmpty()) {
+        if (ofNullable(caseData.getRespondent2()).isEmpty() && !caseData.isLipvLipOneVOne()) {
             notificationService.sendMail(
                 caseData.getApplicantSolicitor1UserDetails().getEmail(),
                 identifyTemplate(caseData),
@@ -114,6 +122,18 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
                 String.format(templateReference, caseData.getLegacyCaseReference())
             );
         }
+
+        if (caseData.isLipvLipOneVOne()
+            && toggleService.isLipVLipEnabled()) {
+            notificationService.sendMail(
+                caseData.getApplicant1Email(),
+                identifyTemplate(caseData),
+                addLipvsLiPProperties(caseData),
+                String.format(templateReference, caseData.getLegacyCaseReference())
+            );
+
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -123,6 +143,14 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
             LEGAL_ORG_SPECIFIED, getLegalOrganizationName(caseData.getApplicant1OrganisationPolicy()
                                                                .getOrganisation()
                                                                .getOrganisationID(), caseData),
+            CLAIM_NUMBER, caseData.getLegacyCaseReference(),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+        );
+    }
+
+    public Map<String, String> addLipvsLiPProperties(CaseData caseData) {
+        return Map.of(
+            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             CLAIM_NUMBER, caseData.getLegacyCaseReference(),
             DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
