@@ -621,6 +621,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
     private LocalDate joPaymentToBeMadeByDate;
     private YesOrNo joIsLiveJudgmentExists;
+    private LocalDate joSetAsideDate;
     private JudgmentPaidInFull joJudgmentPaidInFull;
 
     /**
@@ -842,8 +843,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isApplicant1NotRepresented() {
+        return NO.equals(getApplicant1Represented());
+    }
+
+    @JsonIgnore
     public boolean isLRvLipOneVOne() {
         return isRespondent1NotRepresented()
+            && !isApplicant1NotRepresented()
+            && isOneVOne(this);
+    }
+
+    @JsonIgnore
+    public boolean isLipvLipOneVOne() {
+        return isRespondent1NotRepresented()
+            && isApplicant1NotRepresented()
             && isOneVOne(this);
     }
 
@@ -1000,11 +1014,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public List<Element<RecurringExpenseLRspec>> getRecurringExpensesForRespondent1() {
         if (isFullAdmitClaimSpec()) {
-            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA).orElse(
-                null);
+            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA)
+                .orElse(
+                    null);
         }
         return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpenses).orElse(
             null);
+    }
+
+    @JsonIgnore
+    public List<Element<ManageDocument>> getManageDocumentsList() {
+        return Optional.ofNullable(getManageDocuments()).orElse(new ArrayList<>());
     }
 
     @JsonIgnore
@@ -1034,5 +1054,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
                    .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
         }
         return false;
+    }
+
+    @JsonIgnore
+    public boolean isRespondentSolicitorRegistered() {
+        return YesOrNo.YES.equals(getRespondent1OrgRegistered());
+    }
+
+    @JsonIgnore
+    public String getRespondent1Email() {
+        if (isRespondent1NotRepresented()) {
+            return getRespondent1().getPartyEmail();
+        }
+        if (isRespondentSolicitorRegistered()) {
+            return getRespondentSolicitor1EmailAddress();
+        }
+        return null;
     }
 }
