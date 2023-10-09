@@ -25,7 +25,7 @@ public class AllowanceCalculator {
     public static final String RETIRED = "RETIRED";
 
     public double calculateAllowance(CaseData caseData) {
-        PartnerAndDependentsLRspec partnerAndDependantInformation = caseData.getRespondent1PartnerAndDependent();
+        Optional<PartnerAndDependentsLRspec> partnerAndDependantInformation = Optional.ofNullable(caseData.getRespondent1PartnerAndDependent());
         FinancialDetailsLiP defendantFinancialDetailsLiP = caseData.getCaseDataLiP().getRespondent1LiPFinancialDetails();
         double personalAllowance = calculatePersonalAllowance(
             partnerAndDependantInformation,
@@ -46,23 +46,27 @@ public class AllowanceCalculator {
         return personalAllowance + dependantsAllowance + disabilityAllowance + pensionerAllowance;
     }
 
-    private double calculatePersonalAllowance(PartnerAndDependentsLRspec partnerAndDependantInformation, Party defendant) {
+    private double calculatePersonalAllowance(Optional<PartnerAndDependentsLRspec> partnerAndDependantInformation, Party defendant) {
         int defendantAge = calculateDefendantAge(defendant);
-        boolean hasPartner = partnerAndDependantInformation.hasPartner();
-        boolean partnerOver18 = YesOrNo.YES == partnerAndDependantInformation.getPartnerAgedOver();
+        boolean hasPartner = getHasPartner(partnerAndDependantInformation);
+        boolean partnerOver18 = YesOrNo.YES == partnerAndDependantInformation.map(PartnerAndDependentsLRspec::getPartnerAgedOver).orElse(null);
         return PersonalAllowance.getPersonalAllowance(defendantAge, hasPartner, partnerOver18).getAllowance();
     }
 
-    private double calculateDependantsAllowance(PartnerAndDependentsLRspec partnerAndDependantInformation) {
-        int numberOfSupportedPeople = Optional.ofNullable(partnerAndDependantInformation.getSupportPeopleNumber())
+    private boolean getHasPartner(Optional<PartnerAndDependentsLRspec> partnerAndDependantInformation) {
+        return partnerAndDependantInformation.map(PartnerAndDependentsLRspec::hasPartner).orElse(false);
+    }
+
+    private double calculateDependantsAllowance(Optional<PartnerAndDependentsLRspec> partnerAndDependantInformation) {
+        int numberOfSupportedPeople = partnerAndDependantInformation.map(PartnerAndDependentsLRspec::getSupportPeopleNumber)
             .map(Integer::parseInt).orElse(0);
-        int numberOfChildren = Optional.ofNullable(partnerAndDependantInformation.getHowManyChildrenByAgeGroup())
+        int numberOfChildren = partnerAndDependantInformation.map(PartnerAndDependentsLRspec::getHowManyChildrenByAgeGroup)
             .map(ChildrenByAgeGroupLRspec::getTotalChildren).orElse(0);
         return DEPENDANT_MONTHLY_ALLOWANCE * (numberOfSupportedPeople + numberOfChildren);
     }
 
 
-    private double calculateDisabilityAllowance(PartnerAndDependentsLRspec partnerAndDependantInformation,
+    private double calculateDisabilityAllowance(Optional<PartnerAndDependentsLRspec> partnerAndDependantInformation,
                                                 YesOrNo disabilityPremiumPayments,
                                                 YesOrNo severeDisability,
                                                 Respondent1DQ respondent1DQ,
@@ -70,10 +74,9 @@ public class AllowanceCalculator {
         boolean disabled = YesOrNo.YES == disabilityPremiumPayments;
         boolean severelyDisabled = YesOrNo.YES == severeDisability
             || YesOrNo.YES == financialDetailsLiP.getPartnerSevereDisabilityLiP();
-        boolean hasPartner = partnerAndDependantInformation.hasPartner();
-        boolean dependantDisabled = YesOrNo.YES == partnerAndDependantInformation.getReceiveDisabilityPayments();
-        YesOrNo carerOption = Optional.ofNullable(respondent1DQ.getRespondent1DQCarerAllowanceCreditFullAdmission())
-            .orElse(respondent1DQ.getRespondent1DQCarerAllowanceCredit());
+        boolean hasPartner = getHasPartner(partnerAndDependantInformation);
+        boolean dependantDisabled = YesOrNo.YES == partnerAndDependantInformation.map(PartnerAndDependentsLRspec::getReceiveDisabilityPayments).orElse(YesOrNo.NO);
+        YesOrNo carerOption = getCarerOption(respondent1DQ);
         boolean carer = YesOrNo.YES == carerOption;
         return DisabilityAllowance
             .getDisabilityAllowance(new DisabilityParam(
@@ -84,6 +87,14 @@ public class AllowanceCalculator {
                 carer
             ));
 
+    }
+
+    private YesOrNo getCarerOption(Respondent1DQ respondent1DQ) {
+        if(respondent1DQ == null) {
+            return YesOrNo.NO;
+        }
+        return Optional.ofNullable(respondent1DQ.getRespondent1DQCarerAllowanceCreditFullAdmission())
+            .orElse(respondent1DQ.getRespondent1DQCarerAllowanceCredit());
     }
 
     private double calculatePensionerAllowance(FinancialDetailsLiP financialDetailsLiP, UnemployedComplexTypeLRspec uneployedType) {
