@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.model.allowance;
 
+import lombok.Builder;
+
+@Builder
 public record DisabilityParam(boolean disabled, boolean hasPartner, boolean severelyDisabled,  boolean dependant, boolean carer) {
 
     public boolean disabledSingle() {
