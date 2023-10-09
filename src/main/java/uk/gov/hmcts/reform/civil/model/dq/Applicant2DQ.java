@@ -36,13 +36,6 @@ public class Applicant2DQ implements DQ {
     private StatementOfTruth applicant2DQStatementOfTruth;
     private VulnerabilityQuestions applicant2DQVulnerabilityQuestions;
 
-    private RemoteHearing remoteHearing;
-
-    @JsonProperty("applicant2DQRemoteHearing")
-    public RemoteHearing getRemoteHearing() {
-        return remoteHearing;
-    }
-
     @Override
     @JsonProperty("applicant2DQFileDirectionsQuestionnaire")
     public FileDirectionsQuestionnaire getFileDirectionQuestionnaire() {
