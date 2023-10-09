@@ -1795,7 +1795,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("defendantResponseDocuments");
             //Then
-            assertEquals(4, docs.size());
+            assertEquals(8, docs.size());
             assertThat(response.getData())
                 .extracting("defendantResponseDocuments")
                 .asString()
@@ -1834,7 +1834,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("defendantResponseDocuments")
                 .asString()
                 .contains("category_id=defendant1DefenseDirectionsQuestionnaire")
-                .contains("category_id=defendant2DefenseDirectionsQuestionnaire");
+                .contains("category_id=defendant2DefenseDirectionsQuestionnaire")
+                .contains("category_id=DQRespondent")
+                .contains("category_id=DQRespondentTwo");
         }
 
         @Test
