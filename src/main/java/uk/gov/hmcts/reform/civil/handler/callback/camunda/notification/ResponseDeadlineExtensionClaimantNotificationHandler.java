@@ -62,7 +62,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimantForDeadlineExtension(@NotNull CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimantForDeadlineExtension(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
