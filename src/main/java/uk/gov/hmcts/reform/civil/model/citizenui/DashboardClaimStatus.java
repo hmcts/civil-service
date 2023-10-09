@@ -94,7 +94,6 @@ public enum DashboardClaimStatus {
     PROCEED_OFFLINE(
         Claim::isProceedOffline
     ),
-
     CHANGE_BY_DEFENDANT(
         Claim::hasChangeRequestFromDefendant
     ),
