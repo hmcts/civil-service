@@ -14,7 +14,7 @@ public enum PensionerAllowance {
     }
 
     public static double getPensionerAllowance(boolean pensioner, boolean partnerPensioner) {
-        if((pensioner && !pensioner) || (!pensioner && partnerPensioner)) {
+        if((pensioner && !partnerPensioner) || (!pensioner && partnerPensioner)) {
             return SINGLE.allowance;
         }
         if(pensioner && partnerPensioner) {
