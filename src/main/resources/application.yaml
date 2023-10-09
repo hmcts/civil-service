@@ -58,6 +58,20 @@ hmc:
   api:
     url: ${HMC_API_URL:http://localhost:8765}
 
+migration:
+  id: ${MIGRATION_ID:caseflagsV2}
+  caseIds: ${MIGRATION_CASE_IDS:}
+  caseType: CIVIL
+  jurisdiction: Civil
+  eventId: ${MIGRATION_CASE_EVENT_ID:migrateCase}
+  eventDescription: ${MIGRATION_CASE_EVENT_DESC:Migrate Case}
+  eventSummary: ${MIGRATION_CASE_EVENT_SUMMARY:Migrate Case}
+  dryRun: ${MIGRATION_DRY_RUN:false}
+  maxCasesToProcess: ${MIGRATION_CASE_LIMIT:80000}
+  numThreads: ${MIGRATION_NO_OF_THREADS:20}
+  esEnabled: ${MIGRATION_ES_ENABLED:true}
+  esQuerySize: ${MIGRATION_ES_QUERY_SIZE:500}
+
 serviceRequest:
   api:
     callback-url : ${SERVICE_REQUEST_UPDATE:}
@@ -79,7 +93,6 @@ fees:
     service: civil money claims
     jurisdiction1: civil
     jurisdiction2: county court
-    jurisdiction-fast-track-claim: civil
     channel: default
     event: issue
     hearingEvent: hearing
@@ -462,10 +475,10 @@ rd_commondata:
 robotics:
   notification:
     sender: hmcts.civil@gmail.com
-    recipient: hmcts.civil.multiparty.robotics@gmail.com
-    multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
-    specRecipient: hmcts.civil.multiparty.robotics@gmail.com
-    lipJRecipient: civilmoneyclaimsdemo@gmail.com
+    recipient: gareth.lancaster1@hmcts.net
+    multipartyrecipient: gareth.lancaster1@hmcts.net
+    specRecipient: gareth.lancaster1@hmcts.net
+    lipJRecipient: gareth.lancaster1@hmcts.net
 
 notification:
   caseworker:
