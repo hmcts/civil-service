@@ -64,7 +64,7 @@ class CaseNoteServiceTest {
     @Test
     void shouldAddNoteToList_WhenNullList() {
         CaseNote caseNote = caseNoteForToday("new note");
-        List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(caseNote, null);
+        List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToListStart(caseNote, null);
 
         assertThat(unwrapElements(caseNotes)).contains(caseNote);
     }
@@ -72,7 +72,7 @@ class CaseNoteServiceTest {
     @Test
     void shouldAddNoteToList_WhenEmptyList() {
         CaseNote caseNote = caseNoteForToday("new note");
-        List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(caseNote, new ArrayList<>());
+        List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToListStart(caseNote, new ArrayList<>());
 
         assertThat(unwrapElements(caseNotes)).contains(caseNote);
     }
@@ -83,7 +83,7 @@ class CaseNoteServiceTest {
         CaseNote newNote = caseNoteWithDate(today);
         CaseNote oldNote = caseNoteWithDate(today.minusDays(5));
 
-        List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(newNote, wrapElements(oldNote));
+        List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToListStart(newNote, wrapElements(oldNote));
 
         assertThat(unwrapElements(caseNotes)).isEqualTo(List.of(newNote, oldNote));
     }
