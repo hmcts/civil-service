@@ -49,7 +49,8 @@ public class AllowanceCalculator {
     private double calculatePersonalAllowance(Optional<PartnerAndDependentsLRspec> partnerAndDependantInformation, Party defendant) {
         int defendantAge = calculateDefendantAge(defendant);
         boolean hasPartner = getHasPartner(partnerAndDependantInformation);
-        boolean partnerOver18 = YesOrNo.YES == partnerAndDependantInformation.map(PartnerAndDependentsLRspec::getPartnerAgedOver).orElse(null);
+        boolean partnerOver18 = YesOrNo.YES == partnerAndDependantInformation.map(PartnerAndDependentsLRspec::getPartnerAgedOver).orElse(
+            null);
         return PersonalAllowance.getPersonalAllowance(defendantAge, hasPartner, partnerOver18).getAllowance();
     }
 
@@ -65,7 +66,6 @@ public class AllowanceCalculator {
         return DEPENDANT_MONTHLY_ALLOWANCE * (numberOfSupportedPeople + numberOfChildren);
     }
 
-
     private double calculateDisabilityAllowance(Optional<PartnerAndDependentsLRspec> partnerAndDependantInformation,
                                                 YesOrNo disabilityPremiumPayments,
                                                 YesOrNo severeDisability,
@@ -75,7 +75,8 @@ public class AllowanceCalculator {
         boolean severelyDisabled = YesOrNo.YES == severeDisability
             || YesOrNo.YES == financialDetailsLiP.getPartnerSevereDisabilityLiP();
         boolean hasPartner = getHasPartner(partnerAndDependantInformation);
-        boolean dependantDisabled = YesOrNo.YES == partnerAndDependantInformation.map(PartnerAndDependentsLRspec::getReceiveDisabilityPayments).orElse(YesOrNo.NO);
+        boolean dependantDisabled = YesOrNo.YES == partnerAndDependantInformation.map(PartnerAndDependentsLRspec::getReceiveDisabilityPayments).orElse(
+            YesOrNo.NO);
         YesOrNo carerOption = getCarerOption(respondent1DQ);
         boolean carer = YesOrNo.YES == carerOption;
         return DisabilityAllowance
@@ -90,7 +91,7 @@ public class AllowanceCalculator {
     }
 
     private YesOrNo getCarerOption(Respondent1DQ respondent1DQ) {
-        if(respondent1DQ == null) {
+        if (respondent1DQ == null) {
             return YesOrNo.NO;
         }
         return Optional.ofNullable(respondent1DQ.getRespondent1DQCarerAllowanceCreditFullAdmission())
@@ -109,5 +110,4 @@ public class AllowanceCalculator {
         LocalDate now = LocalDate.now();
         return dateOfBirth != null ? Period.between(now, dateOfBirth).getYears() : 0;
     }
-
 }

@@ -38,6 +38,4 @@ public enum DisabilityAllowance {
             .filter(disabilityAllowance -> disabilityAllowance.disabilityMatcher.test(disabilityParam))
             .mapToDouble(DisabilityAllowance::getAllowance).sum();
     }
-
-
 }

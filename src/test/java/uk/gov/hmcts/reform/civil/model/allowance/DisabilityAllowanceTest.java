@@ -11,7 +11,7 @@ import static uk.gov.hmcts.reform.civil.model.allowance.DisabilityAllowance.getD
 
 class DisabilityAllowanceTest {
 
-    static Stream<Arguments> shouldReturnCalculatedDisabilityAllowance(){
+    static Stream<Arguments> shouldReturnCalculatedDisabilityAllowance() {
         DisabilityParam severelyDisabledAndCarer = DisabilityParam.builder()
             .carer(true)
             .severelyDisabled(true)
@@ -28,11 +28,13 @@ class DisabilityAllowanceTest {
             .dependant(true)
             .carer(true)
             .build();
-        return Stream.of(Arguments.of(severelyDisabledAndCarer, 417.94),
-                         Arguments.of(severelyDisabledCouple, 536.03),
-                         Arguments.of(disabledCouple, 199.12),
-                         Arguments.of(hasDependantDisabledAndIsCarer, 410.19),
-                         Arguments.of(null, 0.0));
+        return Stream.of(
+            Arguments.of(severelyDisabledAndCarer, 417.94),
+            Arguments.of(severelyDisabledCouple, 536.03),
+            Arguments.of(disabledCouple, 199.12),
+            Arguments.of(hasDependantDisabledAndIsCarer, 410.19),
+            Arguments.of(null, 0.0)
+        );
     }
 
     @ParameterizedTest

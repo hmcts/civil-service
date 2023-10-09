@@ -20,8 +20,8 @@ import static uk.gov.hmcts.reform.civil.utils.PaymentFrequencyCalculator.calcula
 public class IncomeCalculator {
 
     public double calculateTotalMonthlyIncome(List<Element<AccountSimple>> bankAccountElements,
-                                           List<Element<RecurringIncomeLRspec>> recurringIncomeElements,
-                                           Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails) {
+                                              List<Element<RecurringIncomeLRspec>> recurringIncomeElements,
+                                              Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails) {
         double result = calculateRegularIncome(recurringIncomeElements)
             + calculateTotalSavings(bankAccountElements)
             + calculateMonthlyIncomeFromAnnualTurnover(specDefendant1SelfEmploymentDetails);
@@ -40,9 +40,9 @@ public class IncomeCalculator {
             .mapToDouble(income -> calculateIncomePerMonth(income)).sum();
     }
 
-    private double calculateMonthlyIncomeFromAnnualTurnover (Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails) {
-      return Optional.ofNullable(specDefendant1SelfEmploymentDetails)
-            .map(selfEmploymentDetails -> new BigDecimal(penniesToPounds(selfEmploymentDetails.getAnnualTurnover()).doubleValue()/12 )
+    private double calculateMonthlyIncomeFromAnnualTurnover(Respondent1SelfEmploymentLRspec specDefendant1SelfEmploymentDetails) {
+        return Optional.ofNullable(specDefendant1SelfEmploymentDetails)
+            .map(selfEmploymentDetails -> new BigDecimal(penniesToPounds(selfEmploymentDetails.getAnnualTurnover()).doubleValue() / 12)
                 .setScale(2, RoundingMode.HALF_UP)
                 .doubleValue())
             .orElse(0.0);

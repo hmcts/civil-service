@@ -9,15 +9,16 @@ public enum PensionerAllowance {
     COUPLE(502.66);
 
     private double allowance;
+
     PensionerAllowance(double allowance) {
         this.allowance = allowance;
     }
 
     public static double getPensionerAllowance(boolean pensioner, boolean partnerPensioner) {
-        if((pensioner && !partnerPensioner) || (!pensioner && partnerPensioner)) {
+        if ((pensioner && !partnerPensioner) || (!pensioner && partnerPensioner)) {
             return SINGLE.allowance;
         }
-        if(pensioner && partnerPensioner) {
+        if (pensioner && partnerPensioner) {
             return COUPLE.allowance;
         }
         return 0.0;
