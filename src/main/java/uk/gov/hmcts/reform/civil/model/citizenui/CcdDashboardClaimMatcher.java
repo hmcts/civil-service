@@ -24,7 +24,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean hasResponsePending() {
-        return caseData.getRespondent1ResponseDate() == null;
+        return caseData.getRespondent1ResponseDate() == null && !isPaperResponse();
     }
 
     @Override
@@ -112,13 +112,13 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isProceedOffline() {
-        return Objects.nonNull(caseData.getCcdState())
-            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        return false;
     }
 
     @Override
     public boolean isPaperResponse() {
-        return false;
+        return Objects.nonNull(caseData.getCcdState())
+            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }
 
     @Override
