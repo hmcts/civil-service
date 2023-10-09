@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,9 +24,10 @@ public class ExpenditureCalculator {
     public double calculateTotalExpenditure(List<Element<RecurringExpenseLRspec>> recurringExpenseElementList,
                                             Respondent1DebtLRspec respondent1DebtLRspec,
                                             List<Element<Respondent1CourtOrderDetails>> courtOrderDetailsElementList) {
-        return calculateTotalMonthlyExpenses(recurringExpenseElementList)
+        double calculatedResult = calculateTotalMonthlyExpenses(recurringExpenseElementList)
             + calculateTotalMonthlyDebt(respondent1DebtLRspec)
             + calculateCourtOrders(courtOrderDetailsElementList);
+        return new BigDecimal(calculatedResult).setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 
     private double calculateTotalMonthlyExpenses(List<Element<RecurringExpenseLRspec>> recurringExpenseElementList) {
@@ -40,7 +42,7 @@ public class ExpenditureCalculator {
 
     private double calculateCourtOrders(List<Element<Respondent1CourtOrderDetails>> courtOrderDetailsElementList) {
         List<Respondent1CourtOrderDetails> courtOrderDetails = unwrapElementsNullSafe(courtOrderDetailsElementList);
-        return courtOrderDetails.size() > 0 ? courtOrderDetails.stream().map(Respondent1CourtOrderDetails::getMonthlyInstalmentAmount)
+        return courtOrderDetails.size() > 0 ? courtOrderDetails.stream().map(item -> penniesToPounds(item.getMonthlyInstalmentAmount()))
             .collect(Collectors.summingDouble(BigDecimal::doubleValue)) : 0.0;
     }
 
