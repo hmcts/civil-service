@@ -88,7 +88,7 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-        assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(3);
+        assertThat(updatedData.getSystemGeneratedCaseDocuments()).hasSize(2);
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue()).isEqualTo(DOCUMENT);
     }
 
@@ -109,7 +109,6 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant2DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondentTwo");
     }
 
     @Test
@@ -127,7 +126,6 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondent");
     }
 
     @Test
@@ -145,7 +143,6 @@ class GenerateAcknowledgementOfClaimCallbackHandlerTest extends BaseCallbackHand
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondent");
     }
 
     @Test

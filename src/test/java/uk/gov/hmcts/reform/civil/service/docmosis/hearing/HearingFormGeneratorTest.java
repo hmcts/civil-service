@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -57,8 +56,7 @@ public class HearingFormGeneratorTest {
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
-    private AssignCategoryId assignCategoryId;
+
     @Autowired
     private HearingFormGenerator generator;
 

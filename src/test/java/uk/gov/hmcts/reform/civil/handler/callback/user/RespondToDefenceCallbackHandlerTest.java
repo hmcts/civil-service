@@ -642,7 +642,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments2v1ProceedBoth() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
@@ -683,7 +682,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(8, docs.size());
+            assertEquals(4, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -704,7 +703,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments2v1ProceedOne() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
@@ -745,7 +743,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(8, docs.size());
+            assertEquals(4, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -766,7 +764,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments2v1NotProceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
@@ -807,7 +804,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(8, docs.size());
+            assertEquals(4, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -828,7 +825,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v1Proceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
@@ -862,7 +858,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(6, docs.size());
+            assertEquals(3, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -882,7 +878,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v1NotProceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
@@ -916,7 +911,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(6, docs.size());
+            assertEquals(3, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -936,7 +931,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v2ssProceedBoth() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
@@ -975,7 +969,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(6, docs.size());
+            assertEquals(3, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -995,7 +989,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v2ssProceedOne() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
@@ -1034,7 +1027,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(6, docs.size());
+            assertEquals(3, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -1054,7 +1047,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAssembleClaimantResponseDocuments1v2ssNotProceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
-            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
@@ -1093,7 +1085,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("claimantResponseDocuments");
-            assertEquals(6, docs.size());
+            assertEquals(3, docs.size());
 
             assertThat(response.getData())
                 .extracting("claimantResponseDocuments")
@@ -1149,11 +1141,6 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getClaimantResponseDocuments().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
             assertThat(updatedData.getClaimantResponseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
             assertThat(updatedData.getClaimantResponseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
-            assertThat(updatedData.getClaimantResponseDocuments().get(3).getValue().getDocumentLink().getCategoryID()).isEqualTo("directionsQuestionnaire");
-            assertThat(updatedData.getClaimantResponseDocuments().get(4).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getClaimantResponseDocuments().get(5).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getClaimantResponseDocuments().get(6).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
-            assertThat(updatedData.getClaimantResponseDocuments().get(7).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQApplicant");
 
         }
 
