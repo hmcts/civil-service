@@ -179,5 +179,7 @@ public class Respondent2DQ implements DQ {
 
     @Override
     @JsonProperty("respondent2DQRemoteHearing")
-    public RemoteHearing getRemoteHearing() { return respondent2DQRemoteHearing; }
+    public RemoteHearing getRemoteHearing() {
+        return respondent2DQRemoteHearing;
+    }
 }
