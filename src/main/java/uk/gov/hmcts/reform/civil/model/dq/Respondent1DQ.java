@@ -211,9 +211,4 @@ public class Respondent1DQ implements DQ {
     public VulnerabilityQuestions getVulnerabilityQuestions() {
         return respondent1DQVulnerabilityQuestions;
     }
-
-    @Override
-    public RemoteHearing getRemoteHearing() {
-        return null;
-    }
 }

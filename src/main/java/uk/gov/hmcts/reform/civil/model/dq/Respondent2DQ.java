@@ -174,9 +174,4 @@ public class Respondent2DQ implements DQ {
     public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
         return respondent2DQLanguageLRspec;
     }
-
-    @Override
-    public RemoteHearing getRemoteHearing() {
-        return null;
-    }
 }
