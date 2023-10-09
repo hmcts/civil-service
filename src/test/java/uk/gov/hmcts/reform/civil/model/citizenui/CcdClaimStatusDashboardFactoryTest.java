@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -31,11 +31,15 @@ import java.util.UUID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class CcdClaimStatusDashboardFactoryTest {
 
-    @InjectMocks
     private DashboardClaimStatusFactory ccdClaimStatusDashboardFactory;
+
+    @BeforeEach
+    void setUp() {
+        ccdClaimStatusDashboardFactory = new DashboardClaimStatusFactory();
+    }
 
     @Test
     void given_hasResponsePending_whenGetStatus_thenReturnNoResponse() {
@@ -204,13 +208,15 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hearingDateForSmallClaimIsAfterToday_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
-        Element<CaseDocument> document = new Element<>(UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
-                                                       CaseDocument.builder()
-                                                           .documentType(DocumentType.SDO_ORDER)
-                                                           .build());
+        Element<CaseDocument> document = new Element<>(
+            UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+            CaseDocument.builder()
+                .documentType(DocumentType.SDO_ORDER)
+                .build()
+        );
         CaseData claim = CaseData.builder()
             .smallClaimsHearing(SmallClaimsHearing.builder()
-                    .dateFrom(LocalDate.now().plusDays(10))
+                                    .dateFrom(LocalDate.now().plusDays(10))
                                     .build())
             .respondent1ResponseDate(LocalDateTime.now())
             .systemGeneratedCaseDocuments(List.of(document))
@@ -222,14 +228,16 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hearingDateForFastTrackClaimIsAfterToday_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
-        Element<CaseDocument> document = new Element<>(UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
-                                                       CaseDocument.builder()
-                                                           .documentType(DocumentType.SDO_ORDER)
-                                                           .build());
+        Element<CaseDocument> document = new Element<>(
+            UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+            CaseDocument.builder()
+                .documentType(DocumentType.SDO_ORDER)
+                .build()
+        );
         CaseData claim = CaseData.builder()
             .fastTrackHearingTime(FastTrackHearingTime.builder()
-                                    .dateFrom(LocalDate.now().plusDays(10))
-                                    .build())
+                                      .dateFrom(LocalDate.now().plusDays(10))
+                                      .build())
             .respondent1ResponseDate(LocalDateTime.now())
             .systemGeneratedCaseDocuments(List.of(document))
             .build();
@@ -372,5 +380,21 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim));
         assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
+    }
+
+    @Test
+    void givenClaimStatusInProcessHeritageSystem_WhenGetStatus_thenReturnResponseByPost() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .takenOfflineDate(LocalDateTime.now())
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
     }
 }
