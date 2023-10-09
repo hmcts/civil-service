@@ -22,25 +22,38 @@ public class RepaymentPlanDecisionCalculator {
     private final ExpenditureCalculator expenditureCalculator;
     private final AllowanceCalculator allowanceCalculator;
 
-    public RepaymentDecisionType calculateRepaymentDecision(CaseData caseData, ClaimantProposedPlan claimantProposedPlan ) {
-      double disposableIncome = calculateDisposableIncome(caseData);
-      BigDecimal claimTotalAmount = Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmountPounds()).orElse(caseData.getTotalClaimAmount());
+    public RepaymentDecisionType calculateRepaymentDecision(CaseData caseData, ClaimantProposedPlan claimantProposedPlan) {
+        double disposableIncome = calculateDisposableIncome(caseData);
+        BigDecimal claimTotalAmount = Optional.ofNullable(caseData.getRespondToAdmittedClaimOwingAmountPounds()).orElse(
+            caseData.getTotalClaimAmount());
 
-      if(claimantProposedPlan.hasProposedPayImmediately()){
-          return calculateDecisionBasedOnAmountAndDisposableIncome(claimTotalAmount.doubleValue(), disposableIncome);
-      }
-      if(claimantProposedPlan.hasProposedPayBySetDate()) {
-          RepaymentDecisionType repaymentDecisionType = calculateDecisionBasedOnAmountAndDisposableIncome(claimTotalAmount.doubleValue(), disposableIncome);
-          if(repaymentDecisionType.isInFavourOfDefendant()){
-              LocalDate proposedDefendantRepaymentDate = getProposedDefendantRepaymentDate(caseData, claimTotalAmount);
-              return calculateDecisionBasedOnProposedDate(proposedDefendantRepaymentDate, claimantProposedPlan.getRepaymentByDate());
-          }
-         return repaymentDecisionType;
-      }
-      if(claimantProposedPlan.hasProposedPayByInstallments()) {
-         return calculateDecisionBasedOnAmountAndDisposableIncome(claimantProposedPlan.getCalculatedPaymentPerMonthFromRepaymentPlan(), disposableIncome);
-      }
-      return RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
+        if (claimantProposedPlan.hasProposedPayImmediately()) {
+            return calculateDecisionBasedOnAmountAndDisposableIncome(claimTotalAmount.doubleValue(), disposableIncome);
+        }
+        if (claimantProposedPlan.hasProposedPayBySetDate()) {
+            RepaymentDecisionType repaymentDecisionType = calculateDecisionBasedOnAmountAndDisposableIncome(
+                claimTotalAmount.doubleValue(),
+                disposableIncome
+            );
+            if (repaymentDecisionType.isInFavourOfDefendant()) {
+                LocalDate proposedDefendantRepaymentDate = getProposedDefendantRepaymentDate(
+                    caseData,
+                    claimTotalAmount
+                );
+                return calculateDecisionBasedOnProposedDate(
+                    proposedDefendantRepaymentDate,
+                    claimantProposedPlan.getRepaymentByDate()
+                );
+            }
+            return repaymentDecisionType;
+        }
+        if (claimantProposedPlan.hasProposedPayByInstallments()) {
+            return calculateDecisionBasedOnAmountAndDisposableIncome(
+                claimantProposedPlan.getCalculatedPaymentPerMonthFromRepaymentPlan(),
+                disposableIncome
+            );
+        }
+        return RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
     }
 
     private LocalDate getProposedDefendantRepaymentDate(CaseData caseData, BigDecimal claimTotalAmount) {
@@ -52,26 +65,30 @@ public class RepaymentPlanDecisionCalculator {
     }
 
     private RepaymentDecisionType calculateDecisionBasedOnAmountAndDisposableIncome(double totalAmount, double disposableIncome) {
-        if(totalAmount > disposableIncome) {
+        if (totalAmount > disposableIncome) {
             return RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
         }
         return RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT;
     }
 
     private RepaymentDecisionType calculateDecisionBasedOnProposedDate(LocalDate defendantProposedDate, LocalDate claimantProposedDate) {
-        if(claimantProposedDate.isAfter(defendantProposedDate)) {
+        if (claimantProposedDate.isAfter(defendantProposedDate)) {
             return RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT;
         }
         return RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
     }
 
     private double calculateDisposableIncome(CaseData caseData) {
-        double calculatedIncome = incomeCalculator.calculateTotalMonthlyIncome(caseData.getRespondent1DQ().getRespondent1BankAccountList(),
-                                                                               caseData.getRecurringIncomeForRespondent1(),
-                                                                               caseData.getSpecDefendant1SelfEmploymentDetails());
-        double calculatedExpenditure = expenditureCalculator.calculateTotalExpenditure(caseData.getRecurringExpensesForRespondent1(),
-                                                                                       caseData.getSpecDefendant1Debts(),
-                                                                                       caseData.getRespondent1CourtOrderDetails());
+        double calculatedIncome = incomeCalculator.calculateTotalMonthlyIncome(
+            caseData.getRespondent1DQ().getRespondent1BankAccountList(),
+            caseData.getRecurringIncomeForRespondent1(),
+            caseData.getSpecDefendant1SelfEmploymentDetails()
+        );
+        double calculatedExpenditure = expenditureCalculator.calculateTotalExpenditure(
+            caseData.getRecurringExpensesForRespondent1(),
+            caseData.getSpecDefendant1Debts(),
+            caseData.getRespondent1CourtOrderDetails()
+        );
         double calculatedAllowance = allowanceCalculator.calculateAllowance(caseData);
         return calculatedIncome - calculatedExpenditure - calculatedAllowance;
     }

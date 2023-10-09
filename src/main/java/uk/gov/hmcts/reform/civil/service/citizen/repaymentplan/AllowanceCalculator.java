@@ -110,5 +110,4 @@ public class AllowanceCalculator {
         return dateOfBirth != null ? Period.between(now, dateOfBirth).getYears() : 0;
     }
 
-
 }

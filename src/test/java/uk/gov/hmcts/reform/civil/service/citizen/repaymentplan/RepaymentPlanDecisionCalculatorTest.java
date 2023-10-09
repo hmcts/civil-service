@@ -79,9 +79,10 @@ class RepaymentPlanDecisionCalculatorTest {
                 caseData,
                 claimantProposedPlan
             );
-           //Then
+            //Then
             assertThat(decision.isInFavourOfDefendant()).isFalse();
         }
+
         @Test
         void shouldDeclineClaimantProposition_whenDefendantCantAffordIt() {
             //Given
@@ -120,7 +121,7 @@ class RepaymentPlanDecisionCalculatorTest {
             given(caseData.getRespondToAdmittedClaimOwingAmountPounds()).willReturn(UNAFFORDABLE_CLAIM_TOTAL);
             given(claimantProposedPlan.getRepaymentByDate()).willReturn(CLAIMANT_PROPOSED_DATE_BEFORE_DEFENDANT_DATE);
             //When
-           repaymentPlanDecisionCalculator.calculateRepaymentDecision(
+            repaymentPlanDecisionCalculator.calculateRepaymentDecision(
                 caseData,
                 claimantProposedPlan
             );
@@ -194,6 +195,7 @@ class RepaymentPlanDecisionCalculatorTest {
             assertThat(decision.isInFavourOfDefendant()).isTrue();
         }
     }
+
     @Nested
     class DecisionCalculationOnPayByInstalments {
 
@@ -208,7 +210,8 @@ class RepaymentPlanDecisionCalculatorTest {
         @Test
         void shouldAcceptClaimantProposal_whenDefendantCanAffordIt() {
             //Given
-            given(claimantProposedPlan.getCalculatedPaymentPerMonthFromRepaymentPlan()).willReturn(AFFORDABLE_CLAIM_TOTAL.doubleValue());
+            given(claimantProposedPlan.getCalculatedPaymentPerMonthFromRepaymentPlan()).willReturn(
+                AFFORDABLE_CLAIM_TOTAL.doubleValue());
             //When
             RepaymentDecisionType decision = repaymentPlanDecisionCalculator.calculateRepaymentDecision(
                 caseData,
@@ -221,7 +224,8 @@ class RepaymentPlanDecisionCalculatorTest {
         @Test
         void shouldDeclineClaimantProposal_whenDefendantCantAffordIt() {
             //Given
-            given(claimantProposedPlan.getCalculatedPaymentPerMonthFromRepaymentPlan()).willReturn(UNAFFORDABLE_CLAIM_TOTAL.doubleValue());
+            given(claimantProposedPlan.getCalculatedPaymentPerMonthFromRepaymentPlan()).willReturn(
+                UNAFFORDABLE_CLAIM_TOTAL.doubleValue());
             //When
             RepaymentDecisionType decision = repaymentPlanDecisionCalculator.calculateRepaymentDecision(
                 caseData,
