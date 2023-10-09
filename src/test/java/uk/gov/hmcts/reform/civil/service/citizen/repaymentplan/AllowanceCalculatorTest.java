@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.citizen.repaymentplan;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -36,7 +35,7 @@ class AllowanceCalculatorTest {
     @Mock
     private ChildrenByAgeGroupLRspec children;
     @Mock
-    private UnemployedComplexTypeLRspec uneploymentType;
+    private UnemployedComplexTypeLRspec unemploymentType;
     @Mock
     private FinancialDetailsLiP defendantFinancialDetailsLiP;
     @Mock
@@ -81,8 +80,8 @@ class AllowanceCalculatorTest {
     void shouldCalculatePensionerAllowance() {
         //Given
         double expectedResultWithPersonalAllowanceAndPension = SINGLE.getAllowance() + SINGLE_UNDER_25.getAllowance();
-        given(caseData.getRespondToClaimAdmitPartUnemployedLRspec()).willReturn(uneploymentType);
-        given(uneploymentType.getUnemployedComplexTypeRequired()).willReturn(RETIRED);
+        given(caseData.getRespondToClaimAdmitPartUnemployedLRspec()).willReturn(unemploymentType);
+        given(unemploymentType.getUnemployedComplexTypeRequired()).willReturn(RETIRED);
         //When
         double actualResult = allowanceCalculator.calculateAllowance(caseData);
         //Then
@@ -100,5 +99,4 @@ class AllowanceCalculatorTest {
         //Then
         assertThat(actualResult).isEqualTo(expectedResultWithPersonalAllowanceAndSingleDisability);
     }
-
 }

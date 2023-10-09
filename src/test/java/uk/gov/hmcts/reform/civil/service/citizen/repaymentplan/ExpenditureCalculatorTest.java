@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.citizen.repaymentplan;
 
-
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.DebtTypeLRspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -106,7 +105,7 @@ class ExpenditureCalculatorTest {
             .build();
     }
 
-    private List<Element<DebtLRspec>>  createDebts() {
+    private List<Element<DebtLRspec>> createDebts() {
         return wrapElements(DebtLRspec.builder()
                                 .debtType(DebtTypeLRspec.MORTGAGE)
                                 .paymentAmount(new BigDecimal(20000))
@@ -125,5 +124,4 @@ class ExpenditureCalculatorTest {
                                 .monthlyInstalmentAmount(new BigDecimal(30000))
                                 .build());
     }
-
 }

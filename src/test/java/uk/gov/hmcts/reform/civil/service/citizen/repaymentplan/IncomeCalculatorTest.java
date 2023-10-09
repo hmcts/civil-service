@@ -31,7 +31,7 @@ class IncomeCalculatorTest {
     }
 
     @Test
-    void shouldCalculateTotalRegularIncome_positiveValuesOnly(){
+    void shouldCalculateTotalRegularIncome_positiveValuesOnly() {
         //Given
         double expectedResult = 2384.0;
         List<Element<RecurringIncomeLRspec>> recurringIncomeList = createRecurringIncomeWithPositiveAndNegativeAmount();
@@ -60,7 +60,11 @@ class IncomeCalculatorTest {
         List<Element<AccountSimple>> bankAccountElements = createBankAccountsWithPositiveAndNegativeBalance();
         List<Element<RecurringIncomeLRspec>> recurringIncomeList = createRecurringIncomeWithPositiveAndNegativeAmount();
         //When
-        double result = new IncomeCalculator().calculateTotalMonthlyIncome(bankAccountElements, recurringIncomeList, annualTurnover);
+        double result = new IncomeCalculator().calculateTotalMonthlyIncome(
+            bankAccountElements,
+            recurringIncomeList,
+            annualTurnover
+        );
         //Then
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -97,7 +101,6 @@ class IncomeCalculatorTest {
             );
         return bankAccountElements;
     }
-
 
     private static List<Element<RecurringIncomeLRspec>> createRecurringIncomeWithPositiveAndNegativeAmount() {
         return
