@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
@@ -41,7 +39,6 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
     private final DocumentGeneratorService documentGeneratorService;
     private final LocationRefDataService locationRefDataService;
     private final HearingFeesService hearingFeesService;
-    private final AssignCategoryId assignCategoryId;
 
     public List<CaseDocument> generate(CaseData caseData, HearingGetResponse hearing, String authorisation) {
 
@@ -55,9 +52,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             document.getBytes(),
             DocumentType.HEARING_FORM
         );
-        CaseDocument caseDocument = documentManagementService.uploadDocument(authorisation, pdf);
-        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.HEARING_NOTICES.getValue());
-        caseDocuments.add(caseDocument);
+        caseDocuments.add(documentManagementService.uploadDocument(authorisation, pdf));
         return caseDocuments;
     }
 

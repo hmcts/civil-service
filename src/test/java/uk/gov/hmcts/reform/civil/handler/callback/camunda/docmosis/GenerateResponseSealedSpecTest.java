@@ -148,7 +148,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -157,7 +156,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then: updatedData should contain stitched doc
         assertThat(updatedData.getSystemGeneratedCaseDocuments().stream()
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
-                           .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(2);
+                           .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(1);
 
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
     }
@@ -168,7 +167,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(true);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -177,7 +175,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then: updatedData should contain stitched doc
         assertThat(updatedData.getSystemGeneratedCaseDocuments().stream()
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
-                           .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(2);
+                           .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(1);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
     }
 
@@ -188,7 +186,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -197,7 +194,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then: updatedData should contain stitched doc
         assertThat(updatedData.getSystemGeneratedCaseDocuments().stream()
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
-                           .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(2);
+                           .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(1);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
     }
 
@@ -207,7 +204,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(true);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -216,7 +212,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then: updatedData should contain sealed form not stitched doc
         assertThat(updatedData.getSystemGeneratedCaseDocuments().stream()
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
-                           .getDocumentName().equals(SEALED_FORM.getDocumentName())).count()).isEqualTo(3);
+                           .getDocumentName().equals(SEALED_FORM.getDocumentName())).count()).isEqualTo(2);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
     }
 
@@ -226,7 +222,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -235,7 +230,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then: updatedData should contain sealed form not stitched doc
         assertThat(updatedData.getSystemGeneratedCaseDocuments().stream()
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
-                           .getDocumentName().equals(SEALED_FORM.getDocumentName())).count()).isEqualTo(3);
+                           .getDocumentName().equals(SEALED_FORM.getDocumentName())).count()).isEqualTo(2);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
     }
 
@@ -246,7 +241,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", false);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -255,7 +249,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then: updatedData should contain sealed form not stitched doc
         assertThat(updatedData.getSystemGeneratedCaseDocuments().stream()
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
-                           .getDocumentName().equals(SEALED_FORM.getDocumentName())).count()).isEqualTo(3);
+                           .getDocumentName().equals(SEALED_FORM.getDocumentName())).count()).isEqualTo(2);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
     }
 
@@ -270,7 +264,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "stitchEnabled", true);
         CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_SUBMIT);
         when(toggleService.isPinInPostEnabled()).thenReturn(false);
-        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
 
         // When: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -279,7 +272,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         // Then: updatedData should contain stitched doc
         assertThat(updatedData.getSystemGeneratedCaseDocuments().stream()
                        .filter(caseDocumentElement -> caseDocumentElement.getValue()
-                           .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(2);
+                           .getDocumentName().equals(STITCHED_DOC.getDocumentName())).count()).isEqualTo(1);
         verify(sealedClaimResponseFormGeneratorForSpec).generate(any(CaseData.class), eq(BEARER_TOKEN));
     }
 
@@ -302,7 +295,6 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondent");
 
     }
 
@@ -325,7 +317,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant1DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondent");
+
     }
 
     @Test
@@ -348,7 +340,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant2DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondentTwo");
+
     }
 
     @Test
@@ -371,7 +363,7 @@ class GenerateResponseSealedSpecTest extends BaseCallbackHandlerTest {
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then
         assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo("defendant2DefenseDirectionsQuestionnaire");
-        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo("DQRespondentTwo");
+
     }
 
     @Test
