@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -46,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -390,17 +388,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
         if (!claimantUploads.isEmpty()) {
+            updatedCaseData.claimantResponseDocuments(claimantUploads);
             assignCategoryId.assignCategoryIdToCollection(
                 claimantUploads,
                 document -> document.getValue().getDocumentLink(),
-                DocCategory.APP1_DQ.getValue()
+                "directionsQuestionnaire"
             );
-            List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
-                    claimantUploads, "DQApplicant");
-            if (Objects.nonNull(copy)) {
-                claimantUploads.addAll(copy);
-            }
-            updatedCaseData.claimantResponseDocuments(claimantUploads);
         }
     }
 
