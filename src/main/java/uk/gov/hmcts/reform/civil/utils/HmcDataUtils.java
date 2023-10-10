@@ -185,7 +185,7 @@ public class HmcDataUtils {
         }
     }
 
-    private static boolean hasHearings(HearingsResponse hearings) {
+    public static boolean hasHearings(HearingsResponse hearings) {
         return hearings.getCaseHearings() != null && hearings.getCaseHearings().size() > 0;
     }
 

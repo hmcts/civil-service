@@ -7,11 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -57,9 +59,16 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
+import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
+import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
+import uk.gov.hmcts.reform.hmc.service.HearingsService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -76,6 +85,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -90,6 +101,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.SUBJECT_DETA
 import static uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
+import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -123,6 +135,15 @@ public class JudgeFinalOrderGeneratorTest {
     private LocationRefDataService locationRefDataService;
     @MockBean
     private DocumentHearingLocationHelper locationHelper;
+    @MockBean
+    private FeatureToggleService toggleService;
+    @MockBean
+    private HearingsService hearingService;
+    @MockBean
+    private UserService userService;
+    @MockBean
+    private SystemUpdateUserConfiguration userConfig;
+
     @Autowired
     private JudgeFinalOrderGenerator generator;
 
@@ -142,6 +163,29 @@ public class JudgeFinalOrderGeneratorTest {
 
         when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefData);
         when(locationRefDataService.getCcmccLocation(any())).thenReturn(locationRefData);
+        when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(List.of(locationRefData));
+        when(userConfig.getUserName()).thenReturn("test");
+        when(userConfig.getPassword()).thenReturn("test");
+        when(userService.getAccessToken("test", "test")).thenReturn("test");
+        when(hearingService.getHearings(anyString(), anyLong(), anyString())).thenReturn(
+            HearingsResponse.builder()
+                .caseRef("reference")
+                .hmctsServiceCode("AAA7")
+                .caseHearings(List.of(CaseHearing.builder()
+                                          .hearingDaySchedule(List.of(
+                                              HearingDaySchedule.builder()
+                                                  .hearingVenueId("000000")
+                                                  .attendees(List.of(
+                                                      Attendees.builder()
+                                                          .hearingSubChannel(VIDCVP)
+                                                          .build(),
+                                                      Attendees.builder()
+                                                          .hearingSubChannel(null)
+                                                          .build()
+                                                  )).build()
+                                          ))
+                                          .build()))
+                .build());
     }
 
     @Test
@@ -860,6 +904,69 @@ public class JudgeFinalOrderGeneratorTest {
         assertEquals(true, response);
         assertEquals(false, responseFalse);
 
+    }
+
+    @Test
+    void testGetCourtLocation_whenCaseProgression() {
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build().toBuilder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .build();
+
+        assertEquals(generator.getCourtLocation(caseData, "auth"), locationRefData);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"HEARING_READINESS", "PREPARE_FOR_HEARING_CONDUCT_HEARING", "DECISION_OUTCOME"})
+    void testGetCourtLocation_AfterCaseProgression(String state) {
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build().toBuilder()
+            .ccdState(CaseState.valueOf(state))
+            .build();
+
+        assertEquals(generator.getCourtLocation(caseData, "auth"), locationRefData);
+    }
+
+    @Test
+    void testGetCourtLocation_LocationNotFound_shouldReturnNull() {
+        when(hearingService.getHearings(anyString(), anyLong(), anyString())).thenReturn(
+            HearingsResponse.builder()
+                .caseRef("reference")
+                .hmctsServiceCode("AAA7")
+                .caseHearings(List.of(CaseHearing.builder()
+                                          .hearingDaySchedule(List.of(
+                                              HearingDaySchedule.builder()
+                                                  .hearingVenueId("000001")
+                                                  .attendees(List.of(
+                                                      Attendees.builder()
+                                                          .hearingSubChannel(VIDCVP)
+                                                          .build(),
+                                                      Attendees.builder()
+                                                          .hearingSubChannel(null)
+                                                          .build()
+                                                  )).build()
+                                          ))
+                                          .build()))
+                .build());
+
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build().toBuilder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .build();
+
+        assertEquals(generator.getCourtLocation(caseData, "auth"), null);
+    }
+
+    @Test
+    void testGetCourtLocation_NoHearing_shouldReturnNull() {
+        when(hearingService.getHearings(anyString(), anyLong(), anyString())).thenReturn(
+            HearingsResponse.builder()
+                .caseRef("reference")
+                .hmctsServiceCode("AAA7")
+                .build());
+
+        CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build().toBuilder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .build();
+
+        assertEquals(generator.getCourtLocation(caseData, "auth"), null);
     }
 
     @ParameterizedTest

@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -20,21 +22,30 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
+import uk.gov.hmcts.reform.hmc.service.HearingsService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.DECISION_OUTCOME;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
@@ -43,6 +54,8 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.
 import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.REFUSED;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.hasHearings;
+import static uk.gov.hmcts.reform.hmc.model.hearing.ListAssistCaseStatus.LISTED;
 
 @Slf4j
 @Service
@@ -54,6 +67,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private final IdamClient idamClient;
     private final LocationRefDataService locationRefDataService;
     private final DocumentHearingLocationHelper locationHelper;
+    private final HearingsService hearingService;
+    private final UserService userService;
+    private final SystemUpdateUserConfiguration userConfig;
+    private final FeatureToggleService toggleService;
 
     private static final String NOTICE_RECIEVED_CAN_PROCEED = "received notice of the trial and determined that it was reasonable to proceed in their absence.";
     private static final String NOTICE_RECIEVED_CANNOT_PROCEED =     "received notice of the trial, the Judge was not satisfied that it was "
@@ -96,10 +113,14 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         LocationRefData locationRefData;
 
-        if (hasSDOBeenMade(caseData.getCcdState())) {
-            locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
+        if (toggleService.isHmcEnabled()) {
+            locationRefData = getCourtLocation(caseData, authorisation);
         } else {
-            locationRefData = locationRefDataService.getCcmccLocation(authorisation);
+            if (hasSDOBeenMade(caseData.getCcdState())) {
+                locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
+            } else {
+                locationRefData = locationRefDataService.getCcmccLocation(authorisation);
+            }
         }
 
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
@@ -128,6 +149,42 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .courtName(locationRefData.getVenueName())
             .courtLocation(LocationRefDataService.getDisplayEntry(locationRefData));
         return freeFormOrderBuilder.build();
+    }
+
+    private boolean isAfterCaseProgression(CaseState state) {
+        return HEARING_READINESS.equals(state)
+            || PREPARE_FOR_HEARING_CONDUCT_HEARING.equals(state)
+            || DECISION_OUTCOME.equals(state);
+    }
+
+    @Nullable
+    private LocationRefData getLocationRefData(String venueId, String bearerToken) {
+        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(bearerToken);
+        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
+        return matchedLocations.size() > 0 ? matchedLocations.get(0) : null;
+    }
+
+    public LocationRefData getCourtLocation(CaseData caseData, String authorisation) {
+        if (CASE_PROGRESSION.equals(caseData.getCcdState())) {
+            // case management location
+            return locationHelper.getHearingLocation(null, caseData, authorisation);
+        } else if (isAfterCaseProgression(caseData.getCcdState())) {
+            // hearing location
+            return getLocationRefData(getHearingCourtVenue(caseData), authorisation);
+        }
+        return null;
+    }
+
+    @Nullable
+    private String getHearingCourtVenue(CaseData caseData) {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        HearingsResponse hearings = hearingService.getHearings(userToken, caseData.getCcdCaseReference(), LISTED.name());
+
+        if (hasHearings(hearings)
+            && hearings.getCaseHearings().get(0).getHearingDaySchedule() != null) {
+            return hearings.getCaseHearings().get(0).getHearingDaySchedule().get(0).getHearingVenueId();
+        }
+        return null;
     }
 
     private JudgeFinalOrderForm getAssistedOrder(CaseData caseData, String authorisation) {
@@ -191,7 +248,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .initiativeDate(getInitiativeDate(caseData))
             .withoutNoticeDate(getWithoutNoticeDate(caseData))
             .reasonsText(getReasonsText(caseData));
-        
+
         return assistedFormOrderBuilder.build();
     }
 
