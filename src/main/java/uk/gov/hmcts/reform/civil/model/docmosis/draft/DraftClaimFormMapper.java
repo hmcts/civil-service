@@ -3,7 +3,10 @@ package uk.gov.hmcts.reform.civil.model.docmosis.draft;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
@@ -30,6 +33,12 @@ public class DraftClaimFormMapper {
 
     public DraftClaimForm toDraftClaimForm(CaseData caseData) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
+        CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
+        Optional<AdditionalLipPartyDetails> applicantDetails =
+            Optional.ofNullable(caseDataLip.getApplicant1AdditionalLipPartyDetails());
+        Optional<AdditionalLipPartyDetails> defendantDetails =
+            Optional.ofNullable(caseDataLip.getRespondent1AdditionalLipPartyDetails());
+
         return DraftClaimForm.builder()
             .totalInterestAmount(interest != null ? interest.toString() : null)
             .howTheInterestWasCalculated(Optional.ofNullable(caseData.getInterestClaimOptions()).map(
@@ -58,10 +67,26 @@ public class DraftClaimFormMapper {
                           .toString())
             .totalAmountOfClaim(calculateTotalAmountOfClaim(caseData, interest))
             .descriptionOfClaim(caseData.getDetailsOfClaim())
-            .claimant(LipFormParty.toLipFormParty(caseData.getApplicant1(), null, null))
-            .defendant(LipFormParty.toLipFormParty(caseData.getRespondent1(), null, null))
+            .claimant(LipFormParty.toLipFormParty(
+                caseData.getApplicant1(),
+                getCorrespondenceAddress(applicantDetails),
+                getContactPerson(applicantDetails)
+            ))
+            .defendant(LipFormParty.toLipFormParty(
+                caseData.getRespondent1(),
+                getCorrespondenceAddress(defendantDetails),
+                getContactPerson(defendantDetails)
+            ))
             .generationDate(LocalDate.now())
             .build();
+    }
+
+    private Address getCorrespondenceAddress(Optional<AdditionalLipPartyDetails> partyDetails) {
+        return partyDetails.map(AdditionalLipPartyDetails::getCorrespondenceAddress).orElse(null);
+    }
+
+    private String getContactPerson(Optional<AdditionalLipPartyDetails> partyDetails) {
+        return partyDetails.map(AdditionalLipPartyDetails::getContactPerson).orElse(null);
     }
 
     private String generateInterestRateExplanation(CaseData caseData) {
