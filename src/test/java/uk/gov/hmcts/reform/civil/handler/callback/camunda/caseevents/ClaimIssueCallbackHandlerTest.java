@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -56,6 +57,8 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldAddClaimNotificationDeadline_whenClaimIsIssued() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
+            .build().toBuilder()
+            .respondent1OrganisationIDCopy("")
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -67,7 +70,7 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    void shouldClearOrganisationId_whenClaimIsIssued() {
+    void shouldNotThrowException_whenIdCopyIsDefined() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -75,29 +78,28 @@ class ClaimIssueCallbackHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(null);
-        assertThat(updatedData.getRespondent1OrganisationIDCopy()).isEqualTo("QWERTY R");
-        assertThat(updatedData.getRespondent2OrganisationIDCopy()).isEqualTo("QWERTY R2");
-
+        assertThat(updatedData.getClaimNotificationDeadline()).isEqualTo(deadline);
+        assertThat(updatedData.getNextDeadline()).isEqualTo(deadline.toLocalDate());
     }
 
     @Test
-    void shouldClearOrganisationIdTwoDefendants_whenClaimIsIssued() {
+    void shouldNotThrowException_whenIdCopyIsNotDefined() {
         CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssued()
-            .multiPartyClaimTwoDefendantSolicitors()
+            .build().toBuilder()
+            .respondent1OrganisationIDCopy("")
+            .build();
+        caseData = caseData.toBuilder()
+            .respondent1OrganisationPolicy(
+                OrganisationPolicy.builder().build()
+            )
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(null);
-        assertThat(updatedData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo(null);
-        assertThat(updatedData.getRespondent1OrganisationIDCopy()).isEqualTo("QWERTY R");
-        assertThat(updatedData.getRespondent2OrganisationIDCopy()).isEqualTo("QWERTY R2");
+        assertThat(updatedData.getClaimNotificationDeadline()).isEqualTo(deadline);
+        assertThat(updatedData.getNextDeadline()).isEqualTo(deadline.toLocalDate());
     }
 
     @Test

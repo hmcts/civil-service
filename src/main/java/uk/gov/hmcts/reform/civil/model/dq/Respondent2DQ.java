@@ -33,6 +33,8 @@ public class Respondent2DQ implements DQ {
     private SmallClaimHearing respondent2DQHearingSmallClaim;
     private Document respondent2DQDraftDirections;
     private RequestedCourt respondent2DQRequestedCourt;
+
+    private RemoteHearing respondent2DQRemoteHearing;
     private RemoteHearingLRspec respondent2DQRemoteHearingLRspec;
     private HearingSupport respondent2DQHearingSupport;
     private YesOrNo respondent2DQCarerAllowanceCredit;
@@ -173,5 +175,11 @@ public class Respondent2DQ implements DQ {
     @JsonProperty("respondent2DQLanguageLRspec")
     public WelshLanguageRequirements getWelshLanguageRequirementsLRspec() {
         return respondent2DQLanguageLRspec;
+    }
+
+    @Override
+    @JsonProperty("respondent2DQRemoteHearing")
+    public RemoteHearing getRemoteHearing() {
+        return respondent2DQRemoteHearing;
     }
 }

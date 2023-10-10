@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.HearingNotes;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
@@ -149,11 +150,11 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "onInitiativeSelectionTextArea")
                 .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
             assertThat(response.getData()).extracting("orderOnCourtInitiative").extracting("onInitiativeSelectionDate")
-                .isEqualTo(LocalDate.now().toString());
+                .isEqualTo(LocalDate.now().plusDays(7).toString());
             assertThat(response.getData()).extracting("orderWithoutNotice").extracting("withoutNoticeSelectionTextArea")
                 .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
             assertThat(response.getData()).extracting("orderWithoutNotice").extracting("withoutNoticeSelectionDate")
-                .isEqualTo(LocalDate.now().toString());
+                .isEqualTo(LocalDate.now().plusDays(7).toString());
 
         }
 
@@ -211,12 +212,22 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealGrantedDropdown")
                 .extracting("appealChoiceSecondDropdownA")
                 .extracting("appealGrantedRefusedDate")
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealGrantedDropdown")
+                .extracting("appealChoiceSecondDropdownB")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealRefusedDropdown")
+                .extracting("appealChoiceSecondDropdownA")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealRefusedDropdown")
                 .extracting("appealChoiceSecondDropdownB")
                 .extracting("appealGrantedRefusedDate")
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
@@ -310,12 +321,22 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealGrantedDropdown")
                 .extracting("appealChoiceSecondDropdownA")
                 .extracting("appealGrantedRefusedDate")
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedRefusedDropdown")
+                .extracting("appealGrantedDropdown")
+                .extracting("appealChoiceSecondDropdownB")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealRefusedDropdown")
+                .extracting("appealChoiceSecondDropdownA")
+                .extracting("appealGrantedRefusedDate")
+                .isEqualTo(LocalDate.now().plusDays(21).toString());
+            assertThat(response.getData()).extracting("finalOrderAppealComplex")
+                .extracting("appealRefusedDropdown")
                 .extracting("appealChoiceSecondDropdownB")
                 .extracting("appealGrantedRefusedDate")
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
@@ -439,7 +460,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                                     .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                     .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                                        .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
                                                                                                                         .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
                                                                                                                         .build()).build()).build()).build()
@@ -448,10 +469,28 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                                     .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                     .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                                        .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
                                                                                                                         .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
                                                                                                                         .build()).build()).build()).build()
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                                     .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                                .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                                 .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                                                 .build()).build()).build()).build()
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                                     .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                                .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                                 .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
+                                                                                                                 .build()).build()).build()).build()
                 )
             );
         }
@@ -524,7 +563,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                                     .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                     .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                                        .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
                                                                                                                         .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
                                                                                                                         .build()).build()).build()).build(),
@@ -534,10 +573,30 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                                     .appealGrantedRefusedDropdown(AppealGrantedRefused.builder()
+                                                     .appealGrantedDropdown(AppealGrantedRefused.builder()
                                                                                        .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
                                                                                                                         .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
                                                                                                                         .build()).build()).build()).build(),
+                    "The date in Appeal notice date may not be before the established date"
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                                     .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                                .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
+                                                                                                                 .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
+                                                                                                                 .build()).build()).build()).build(),
+                    "The date in Appeal notice date may not be before the established date"
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                                                     .appealRefusedDropdown(AppealGrantedRefused.builder()
+                                                                                .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                                                                                                 .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
+                                                                                                                 .build()).build()).build()).build(),
                     "The date in Appeal notice date may not be before the established date"
                 )
             );
@@ -620,6 +679,43 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getState()).isEqualTo("CASE_PROGRESSION");
+        }
+
+        @Test
+        void shouldRePopulateHearingNotes_whenAssistedHearingNotesExist() {
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingToggle(toggle)
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                                                     .hearingNotesText("test text hearing notes assisted order").build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("test text hearing notes assisted order");
+        }
+
+        @Test
+        void shouldNotRePopulateHearingNotes_whenAssistedHearingNotesDoNotExist() {
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingToggle(toggle)
+                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("preexisting hearing notes");
         }
     }
 
