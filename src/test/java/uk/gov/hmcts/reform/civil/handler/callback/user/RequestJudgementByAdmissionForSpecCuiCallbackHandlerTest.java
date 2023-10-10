@@ -347,6 +347,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
+
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getState())
@@ -377,7 +378,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(caseDetailsConverter.toCaseData(params.getRequest().getCaseDetails())).thenReturn(caseData);
-
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             CCJPaymentDetails ccjResponseForJudgement =
