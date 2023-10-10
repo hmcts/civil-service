@@ -34,16 +34,16 @@ public class DraftClaimFormMapper {
             .totalInterestAmount(interest != null ? interest.toString() : null)
             .howTheInterestWasCalculated(Optional.ofNullable(caseData.getInterestClaimOptions()).map(
                 InterestClaimOptions::getDescription).orElse(null))
-            .interestRate(caseData.getSameRateInterestSelection() != null ?
-                              Optional.ofNullable(caseData.getSameRateInterestSelection().getDifferentRate())
-                                  .map(BigDecimal::toString)
-                                  .orElse(STANDARD_INTEREST_RATE) : null)
+            .interestRate(caseData.getSameRateInterestSelection() != null
+                              ? Optional.ofNullable(caseData.getSameRateInterestSelection().getDifferentRate())
+                .map(BigDecimal::toString)
+                .orElse(STANDARD_INTEREST_RATE) : null)
             .interestExplanationText(generateInterestRateExplanation(caseData))
             .interestFromDate(Optional.ofNullable(caseData.getInterestFromSpecificDate())
                                   .orElse(Optional.ofNullable(caseData.getSubmittedDate())
                                               .map(LocalDateTime::toLocalDate).orElse(null)))
-            .interestEndDate(StringUtils.isBlank(caseData.getBreakDownInterestDescription()) ?
-                                 getRequiredDateBeforeFourPm(LocalDateTime.now())
+            .interestEndDate(StringUtils.isBlank(caseData.getBreakDownInterestDescription())
+                                 ? getRequiredDateBeforeFourPm(LocalDateTime.now())
                                  : null)
             .interestEndDateDescription(Optional.ofNullable(caseData.getBreakDownInterestDescription())
                                             .orElse(null))
