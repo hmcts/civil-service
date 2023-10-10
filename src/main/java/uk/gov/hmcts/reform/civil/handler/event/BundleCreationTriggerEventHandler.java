@@ -78,8 +78,7 @@ public class BundleCreationTriggerEventHandler {
             .stitchStatus(Optional.ofNullable(bundle.getValue().getStitchStatus()))
             .createdOn(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
             .id(bundle.getValue().getId()).build();
-        result.getStitchedDocument().ifPresent(x -> assignCategoryId.assignCategoryIdToDocument(
-                x, DocCategory.BUNDLES.getValue()));
+        result.getStitchedDocument().ifPresent(x -> x.setCategoryID(DocCategory.BUNDLES.getValue()));
         return new IdValue<>(result.getId(), result);
     }
 

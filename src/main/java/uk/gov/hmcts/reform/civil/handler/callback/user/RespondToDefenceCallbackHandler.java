@@ -281,8 +281,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             currentApplicant1DQ.setApplicant1DQDraftDirections(null);
             builder.applicant1DQ(currentApplicant1DQ);
             Applicant2DQ currentApplicant2DQ = caseData.getApplicant2DQ();
-            currentApplicant2DQ.setApplicant2DQDraftDirections(null);
-            builder.applicant2DQ(currentApplicant2DQ);
+            if (Objects.nonNull(currentApplicant2DQ)) {
+                currentApplicant2DQ.setApplicant2DQDraftDirections(null);
+                builder.applicant2DQ(currentApplicant2DQ);
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
