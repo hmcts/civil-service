@@ -20,8 +20,7 @@ java:
         - robotics-notification-recipient
         - robotics-notification-recipient-spec
         - robotics-notification-recipient-lipj
-        - name: launch-darkly-sdk-key-non-prod
-          alias: launch-darkly-sdk-key
+        - launch-darkly-sdk-key
         - robotics-notification-multipartyrecipient
         - ordnance-survey-api-key
         - notification-caseworker-spec-receiver
