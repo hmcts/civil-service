@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
-import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -48,6 +48,7 @@ public class DraftClaimFormMapper {
             .interestEndDateDescription(Optional.ofNullable(caseData.getBreakDownInterestDescription())
                                             .orElse(null))
             .whenAreYouClaimingInterestFrom(generateWhenAreYouPlanningInterestFrom(caseData))
+            .timelineEvents(EventTemplateData.toEventTemplateDataList(caseData.getTimelineOfEvents()))
             .totalClaimAmount(Optional.ofNullable(caseData.getTotalClaimAmount())
                                   .map(BigDecimal::toString)
                                   .orElse("0"))
