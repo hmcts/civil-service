@@ -38,13 +38,6 @@ public class Applicant1DQ implements DQ {
     private FutureApplications applicant1DQFutureApplications;
     private WelshLanguageRequirements applicant1DQLanguageLRspec;
 
-    private RemoteHearing remoteHearing;
-
-    @JsonProperty("applicant1DQRemoteHearing")
-    public RemoteHearing getRemoteHearing() {
-        return remoteHearing;
-    }
-
     @Override
     @JsonProperty("applicant1DQFileDirectionsQuestionnaire")
     public FileDirectionsQuestionnaire getFileDirectionQuestionnaire() {
