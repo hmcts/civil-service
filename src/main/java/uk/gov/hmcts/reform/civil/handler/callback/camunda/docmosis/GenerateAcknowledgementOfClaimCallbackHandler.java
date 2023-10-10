@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -60,18 +59,14 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(
-                acknowledgementOfClaim, "");
+
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(acknowledgementOfClaim));
-        systemGeneratedCaseDocuments.add(element(copy));
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
 
-        assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, DocCategory.DEF1_DEFENSE_DQ.getValue());
-        assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF1.getValue());
+        assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, "defendant1DefenseDirectionsQuestionnaire");
         if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
-            assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, DocCategory.DEF2_DEFENSE_DQ.getValue());
-            assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF2.getValue());
+            assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, "defendant2DefenseDirectionsQuestionnaire");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

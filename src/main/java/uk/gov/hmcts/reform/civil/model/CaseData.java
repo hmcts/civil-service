@@ -1071,4 +1071,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
         }
         return false;
     }
+
+    @JsonIgnore
+    public boolean isRespondentSolicitorRegistered() {
+        return YesOrNo.YES.equals(getRespondent1OrgRegistered());
+    }
+
+    @JsonIgnore
+    public String getRespondent1Email() {
+        if (isRespondent1NotRepresented()) {
+            return getRespondent1().getPartyEmail();
+        }
+        if (isRespondentSolicitorRegistered()) {
+            return getRespondentSolicitor1EmailAddress();
+        }
+        return null;
+    }
 }

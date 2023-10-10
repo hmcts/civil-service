@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -66,19 +65,13 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
     private CallbackResponse prepareSealedForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
-
         CaseDocument sealedForm = formGenerator.generate(
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(
-                sealedForm, "");
-        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
-        assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF1.getValue());
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, "defendant1DefenseDirectionsQuestionnaire");
         if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
-            assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF2_DEFENSE_DQ.getValue());
-            assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF2.getValue());
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, "defendant2DefenseDirectionsQuestionnaire");
         }
 
         if (stitchEnabled) {
@@ -90,25 +83,15 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 sealedForm.getDocumentName(),
                 caseData
             );
-            assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF1_DEFENSE_DQ.getValue());
-            CaseDocument stitchedDocumentCopy = assignCategoryId.copyCaseDocumentWithCategoryId(
-                    stitchedDocument, DocCategory.DQ_DEF1.getValue());
+            assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "defendant1DefenseDirectionsQuestionnaire");
             if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
-                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, DocCategory.DEF2_DEFENSE_DQ.getValue());
-                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocumentCopy, DocCategory.DQ_DEF2.getValue());
-            }
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
-                builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
+                assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "defendant2DefenseDirectionsQuestionnaire");
             }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
-            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocumentCopy));
         } else {
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
-                builder.respondent1ClaimResponseDocumentSpec(sealedForm);
-            }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
-            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(copy));
         }
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))

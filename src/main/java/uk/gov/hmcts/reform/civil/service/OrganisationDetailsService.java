@@ -18,4 +18,13 @@ public class OrganisationDetailsService {
         return organisation.map(Organisation::getName).orElse(caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
     }
 
+    public String getRespondentLegalOrganizationName(CaseData caseData) {
+        Optional<Organisation> organisation = organisationService.findOrganisationById(
+            caseData.getRespondent1OrganisationId());
+        String respondentLegalOrganizationName = null;
+        if (organisation.isPresent()) {
+            respondentLegalOrganizationName = organisation.get().getName();
+        }
+        return respondentLegalOrganizationName;
+    }
 }
