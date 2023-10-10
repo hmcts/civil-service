@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DRAFT_FORM;
 @RequiredArgsConstructor
 public class GenerateDraftClaimFormCallBackHandler extends CallbackHandler {
 
-    private static List<CaseEvent> EVENTS = List.of(GENERATE_DRAFT_FORM);
+    private static final List<CaseEvent> EVENTS = List.of(GENERATE_DRAFT_FORM);
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateDraftPdfForm);
     private final ObjectMapper objectMapper;
     private final DraftClaimFormGenerator draftClaimFormGenerator;
