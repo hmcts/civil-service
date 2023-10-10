@@ -94,6 +94,9 @@ java:
         - robotics-notification-sender
         - robotics-notification-recipient
         - launch-darkly-sdk-key
+        - robotics-notification-multipartyrecipient
+        - robotics-notification-recipient-spec
+        - robotics-notification-recipient-lipj
         - ordnance-survey-api-key
         - notification-caseworker-spec-receiver
         - mediation-notification-sender
