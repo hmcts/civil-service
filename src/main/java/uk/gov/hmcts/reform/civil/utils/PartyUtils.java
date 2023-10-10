@@ -89,7 +89,7 @@ public class PartyUtils {
                 return party.getOrganisationName();
             case INDIVIDUAL:
                 return ofNullable(litigationFriend)
-                    .map(lf -> getIndividualName(party) + " L/F " + lf.getFullName())
+                    .map(lf -> getIndividualName(party) + " L/F " + lf.getFirstName() + " " + lf.getLastName())
                     .orElse(getIndividualName(party));
             case SOLE_TRADER:
                 return ofNullable(party.getSoleTraderTradingAs())
