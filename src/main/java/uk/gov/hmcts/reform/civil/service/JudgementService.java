@@ -31,8 +31,11 @@ public class JudgementService {
             .ccjJudgmentAmountInterestToDate(ccjJudgmentInterest(caseData))
             .ccjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData))
             .ccjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData))
-            .ccjJudgmentFixedCostOption(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())
+            .ccjJudgmentFixedCostOption(caseData.getCcjPaymentDetails()
+                                            .getCcjJudgmentFixedCostOption())
             .ccjJudgmentStatement(ccjJudgmentStatement(caseData))
+            .ccjPaymentPaidSomeOption(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption())
+            .ccjJudgmentLipInterest(caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest())
             .build();
     }
 
@@ -53,7 +56,8 @@ public class JudgementService {
     }
 
     private BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
-        return MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+        return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee() :
+            MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
     }
 
     private BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
@@ -66,13 +70,14 @@ public class JudgementService {
     }
 
     private BigDecimal ccjJudgmentInterest(CaseData caseData) {
-        return caseData.getTotalInterest();
+        return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
+            caseData.getTotalInterest();
     }
 
     private BigDecimal ccjJudgementSubTotal(CaseData caseData) {
         return ccjJudgmentClaimAmount(caseData)
             .add(ccjJudgmentClaimFee(caseData))
-            .add(caseData.getTotalInterest())
+            .add(ccjJudgmentInterest(caseData))
             .add(ccjJudgmentFixedCost(caseData));
     }
 
