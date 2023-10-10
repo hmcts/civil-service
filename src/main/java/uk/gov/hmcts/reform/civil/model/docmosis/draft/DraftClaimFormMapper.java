@@ -37,14 +37,14 @@ public class DraftClaimFormMapper {
             .interestRate(caseData.getSameRateInterestSelection() != null ?
                               Optional.ofNullable(caseData.getSameRateInterestSelection().getDifferentRate())
                                   .map(BigDecimal::toString)
-                              .orElse(STANDARD_INTEREST_RATE) : null)
+                                  .orElse(STANDARD_INTEREST_RATE) : null)
             .interestExplanationText(generateInterestRateExplanation(caseData))
             .interestFromDate(Optional.ofNullable(caseData.getInterestFromSpecificDate())
                                   .orElse(Optional.ofNullable(caseData.getSubmittedDate())
                                               .map(LocalDateTime::toLocalDate).orElse(null)))
-            .interestEndDate(StringUtils.isBlank(caseData.getBreakDownInterestDescription())?
+            .interestEndDate(StringUtils.isBlank(caseData.getBreakDownInterestDescription()) ?
                                  getRequiredDateBeforeFourPm(LocalDateTime.now())
-                : null)
+                                 : null)
             .interestEndDateDescription(Optional.ofNullable(caseData.getBreakDownInterestDescription())
                                             .orElse(null))
             .whenAreYouClaimingInterestFrom(generateWhenAreYouPlanningInterestFrom(caseData))
@@ -65,16 +65,16 @@ public class DraftClaimFormMapper {
     }
 
     private String generateInterestRateExplanation(CaseData caseData) {
-       return caseData.getSameRateInterestSelection() != null ?
-           Optional.ofNullable(caseData.getSameRateInterestSelection().getDifferentRateReason())
-           .orElse(EXPLANATION_OF_INTEREST_RATE)
-           : null;
+        return caseData.getSameRateInterestSelection() != null
+            ? Optional.ofNullable(caseData.getSameRateInterestSelection().getDifferentRateReason())
+            .orElse(EXPLANATION_OF_INTEREST_RATE)
+            : null;
     }
 
     private String generateWhenAreYouPlanningInterestFrom(CaseData caseData) {
         return Optional.ofNullable(caseData.getInterestClaimFrom())
             .map(interestClaimFromType -> {
-                if(interestClaimFromType.equals(FROM_CLAIM_SUBMIT_DATE)) {
+                if (interestClaimFromType.equals(FROM_CLAIM_SUBMIT_DATE)) {
                     return INTEREST_START_FROM_CLAIM_ISSUED_DATE;
                 }
                 return caseData.getInterestFromSpecificDateDescription();

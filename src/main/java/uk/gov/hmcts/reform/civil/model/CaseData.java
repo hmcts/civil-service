@@ -1089,7 +1089,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public BigDecimal getCalculatedClaimFeeInPence(){
+    public BigDecimal getCalculatedClaimFeeInPence() {
         return Optional.ofNullable(getClaimFee())
             .map(Fee::getCalculatedAmountInPence)
             .orElse(BigDecimal.ZERO);

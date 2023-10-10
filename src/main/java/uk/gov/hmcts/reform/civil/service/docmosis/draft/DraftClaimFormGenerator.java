@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.draft.DraftClaimFormMapper;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 
-
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DRAFT_CLAIM_FORM;
 
 @Service
@@ -27,10 +26,14 @@ public class DraftClaimFormGenerator implements TemplateDataGenerator<DraftClaim
     private final DocumentGeneratorService documentGeneratorService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(getTemplateData(caseData), DRAFT_CLAIM_FORM);
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
+            getTemplateData(caseData),
+            DRAFT_CLAIM_FORM
+        );
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(String.format(DRAFT_CLAIM_FORM.getDocumentTitle(), caseData.getLegacyCaseReference()), docmosisDocument.getBytes(),
+            new PDF(String.format(DRAFT_CLAIM_FORM.getDocumentTitle(), caseData.getLegacyCaseReference()),
+                    docmosisDocument.getBytes(),
                     DocumentType.DRAFT_CLAIM_FORM
             )
         );
