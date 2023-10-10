@@ -261,8 +261,8 @@ public class CasesController {
     }
 
     @PostMapping(path = "/{caseId}/courtDecision")
-    @Operation(summary = "Get decision on proposed claimant repayment")
-    public RepaymentDecisionType getDecisionOnClaimantProposedRepayment(
+    @Operation(summary = "Calculates decision on proposed claimant repayment")
+    public RepaymentDecisionType calculateDecisionOnClaimantProposedRepayment(
         @PathVariable("caseId") Long caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
         @RequestBody ClaimantProposedPlan claimantProposedPlan) {
