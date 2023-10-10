@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.AccommodationTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
-import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
+import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormPartyDefence;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -47,9 +47,9 @@ public class SealedClaimLipResponseForm implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate generationDate;
-    private final LipFormParty claimant1;
-    private final LipFormParty defendant1;
-    private final LipFormParty defendant2;
+    private final LipFormPartyDefence claimant1;
+    private final LipFormPartyDefence defendant1;
+    private final LipFormPartyDefence defendant2;
     private final AccommodationTemplate whereTheyLive;
     private final PartnerAndDependentsLRspec partnerAndDependent;
     private final List<EmployerDetailsLRspec> employerDetails;
@@ -77,12 +77,12 @@ public class SealedClaimLipResponseForm implements MappableObject {
         SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder builder = SealedClaimLipResponseForm.builder()
             .generationDate(LocalDate.now())
             .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .claimant1(LipFormParty.toLipDefenceParty(caseData.getApplicant1()))
-            .defendant1(LipFormParty.toLipDefenceParty(
+            .claimant1(LipFormPartyDefence.toLipDefenceParty(caseData.getApplicant1()))
+            .defendant1(LipFormPartyDefence.toLipDefenceParty(
                 caseData.getRespondent1(),
                 caseData.getRespondent1CorrespondanceAddress()
             ))
-            .defendant2(LipFormParty.toLipDefenceParty(caseData.getRespondent2()))
+            .defendant2(LipFormPartyDefence.toLipDefenceParty(caseData.getRespondent2()))
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
             .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
