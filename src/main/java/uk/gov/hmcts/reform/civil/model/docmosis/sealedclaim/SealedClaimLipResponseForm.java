@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.AccommodationTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
+import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
