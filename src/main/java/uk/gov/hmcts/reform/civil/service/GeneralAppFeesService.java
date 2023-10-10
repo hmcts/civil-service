@@ -52,7 +52,7 @@ public class GeneralAppFeesService {
     protected static final List<GeneralApplicationTypes> ADJOURN_TYPES
             = List.of(GeneralApplicationTypes.ADJOURN_HEARING);
     protected static final List<GeneralApplicationTypes> SD_CONSENT_TYPES
-            = List.of(GeneralApplicationTypes.SETTLE_OR_DISCONTINUE_CONSENT);
+            = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
 
     public Fee getFeeForGA(CaseData caseData) {
         Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();

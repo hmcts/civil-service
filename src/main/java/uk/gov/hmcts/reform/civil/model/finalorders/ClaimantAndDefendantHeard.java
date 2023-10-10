@@ -14,9 +14,13 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresent
 public class ClaimantAndDefendantHeard {
 
     private FinalOrdersClaimantRepresentationList typeRepresentationClaimantList;
+    private FinalOrdersClaimantRepresentationList typeRepresentationClaimantListTwo;
     private TrialNoticeProcedure trialProcedureClaimantComplex;
     private FinalOrdersDefendantRepresentationList typeRepresentationDefendantList;
+    private FinalOrdersDefendantRepresentationList typeRepresentationDefendantTwoList;
     private TrialNoticeProcedure trialProcedureComplex;
+    private TrialNoticeProcedure trialProcedureDefTwoComplex;
+    private TrialNoticeProcedure trialProcedClaimTwoComplex;
     private String detailsRepresentationText;
     private String typeRepresentationClaimantOneDynamic;
     private String typeRepresentationClaimantTwoDynamic;

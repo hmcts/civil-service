@@ -13,6 +13,7 @@ public class OrderMade {
 
     private DatesFinalOrders singleDateSelection;
     private DatesFinalOrders dateRangeSelection;
+    private DatesFinalOrders bespokeRangeSelection;
 
 }
 
