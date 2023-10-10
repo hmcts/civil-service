@@ -504,7 +504,7 @@ public class EventHistoryMapper {
         Optional<RepaymentPlanLRspec> repaymentPlan = Optional.ofNullable(caseData.getRespondent1RepaymentPlan());
         EventDetails judgmentByAdmissionEvent = EventDetails.builder()
             .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
-                                  .add(caseData.isLipvLipOneVOne()
+                                  .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
                                            ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
                                            caseData.getTotalInterest())
                                   .setScale(2))
