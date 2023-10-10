@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.HearingNotes;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -381,6 +382,14 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         CaseState state = All_FINAL_ORDERS_ISSUED;
         if (caseData.getFinalOrderFurtherHearingToggle() != null) {
             state = CASE_PROGRESSION;
+        }
+
+        if (caseData.getFinalOrderFurtherHearingComplex() != null
+            && caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText() != null) {
+            caseDataBuilder.hearingNotes(HearingNotes.builder()
+                                             .date(LocalDate.now())
+                                             .notes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText())
+                                             .build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

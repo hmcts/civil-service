@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.HearingNotes;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
@@ -830,6 +831,43 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getState()).isEqualTo("CASE_PROGRESSION");
+        }
+
+        @Test
+        void shouldRePopulateHearingNotes_whenAssistedHearingNotesExist() {
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingToggle(toggle)
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                                                     .hearingNotesText("test text hearing notes assisted order").build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("test text hearing notes assisted order");
+        }
+
+        @Test
+        void shouldNotRePopulateHearingNotes_whenAssistedHearingNotesDoNotExist() {
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderFurtherHearingToggle(toggle)
+                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("preexisting hearing notes");
         }
     }
 
