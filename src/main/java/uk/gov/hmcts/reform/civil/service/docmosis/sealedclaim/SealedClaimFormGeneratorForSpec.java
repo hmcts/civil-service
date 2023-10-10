@@ -278,5 +278,4 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .build();
     }
 
-
 }
