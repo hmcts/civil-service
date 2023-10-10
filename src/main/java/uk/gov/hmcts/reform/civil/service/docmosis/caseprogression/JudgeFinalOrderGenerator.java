@@ -146,8 +146,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .withoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
             .judgeNameTitle(userDetails.getFullName())
-            .courtName(locationRefData.getVenueName())
-            .courtLocation(LocationRefDataService.getDisplayEntry(locationRefData));
+            .courtName(nonNull(locationRefData) ? locationRefData.getVenueName() : null)
+            .courtLocation(nonNull(locationRefData) ? LocationRefDataService.getDisplayEntry(locationRefData) : null);
         return freeFormOrderBuilder.build();
     }
 
@@ -172,7 +172,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             // hearing location
             return getLocationRefData(getHearingCourtVenue(caseData), authorisation);
         }
-        return null;
+        // TODO: remove when CIV-10948 is merged
+        // JUDICIAL_REFFERAL
+        return locationRefDataService.getCcmccLocation(authorisation);
     }
 
     @Nullable
