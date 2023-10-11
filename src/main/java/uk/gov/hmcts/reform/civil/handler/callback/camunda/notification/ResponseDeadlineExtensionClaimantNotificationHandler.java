@@ -65,8 +65,8 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            addEmail(caseData),
-            addTemplate(caseData),
+            getEmail(caseData),
+            getTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
@@ -104,14 +104,14 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
-    private String addTemplate(CaseData caseData) {
+    private String getTemplate(CaseData caseData) {
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
             return notificationsProperties.getClaimantLipDeadlineExtension();
         }
         return notificationsProperties.getClaimantDeadlineExtension();
     }
 
-    private String addEmail(CaseData caseData) {
+    private String getEmail(CaseData caseData) {
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
             return caseData.getApplicant1Email();
         }
