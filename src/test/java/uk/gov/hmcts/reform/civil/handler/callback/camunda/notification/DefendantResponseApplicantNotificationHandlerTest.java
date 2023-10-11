@@ -85,7 +85,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
         when(organisationService.findOrganisationById(anyString()))
             .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
         when(notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec()).thenReturn("templateImm-id");
-
+        when(notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction()).thenReturn("spec-respondent-template-id-action");
     }
 
     @Nested
@@ -343,7 +343,30 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
-                    "spec-respondent-template-id",
+                    "spec-1v1-template-id",
+                    getNotificationDataMapSpec(caseData),
+                    "defendant-response-applicant-notification-000DC001"
+                );
+            }
+
+            @Test
+            void sendNotificationToSolicitorSpec_shouldNotifyRespondentSolicitorSpecDef1v1() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged().build();
+                caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
+                    .respondent1DQ(Respondent1DQ.builder().build())
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                    .build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC")
+                            .build())
+                    .build();
+
+                handler.handle(params);
+
+                verify(notificationService).sendMail(
+                    "respondentsolicitor@example.com",
+                    "spec-respondent-template-id-action",
                     getNotificationDataMapSpec(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
@@ -368,7 +391,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 final CaseData finalCaseData = caseData;
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("respondentsolicitor2@example.com"),
-                    ArgumentMatchers.eq("spec-respondent-template-id"),
+                    ArgumentMatchers.eq("spec-respondent-template-id-action"),
                     ArgumentMatchers.argThat(map -> {
                         Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
