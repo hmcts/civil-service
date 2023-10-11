@@ -67,7 +67,7 @@ def checkForEnableHelmLabel(branch_name) {
 withPipeline(type, product, component) {
 
   onPR {
-    env.ENVIRONMENT = "aat"
+    env.ENVIRONMENT = "preview"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     loadVaultSecrets(secrets)
   }
@@ -85,7 +85,7 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-camunda-files.sh ${camundaBranch}
       ./bin/pull-latest-ccd-files.sh ${ccdBranch}
-      ./bin/import-ccd-definition.sh "-e *GAspec.json,*-nonprod.json,*COS-nonprod.json,*CUI-nonprod.json,*CUI.json,AuthorisationCaseType-shuttered.json"
+      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
     """
 
     env.URL="https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
