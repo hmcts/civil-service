@@ -57,7 +57,7 @@ class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest exte
         void setup() {
             when(notificationsProperties.getNotifyDefendantLipTemplate()).thenReturn("template-id");
             when(notificationsProperties.getNotifyDefendantLipWelshTemplate()).thenReturn("template-welsh-id");
-            when(notificationsProperties.getNotifyDefendantLrTemplate()).thenReturn("template-id-lr");
+            when(notificationsProperties.getNotifyLiPClaimantDefendantResponded()).thenReturn("template-id-lr");
             when(organisationDetailsService.getRespondentLegalOrganizationName(any())).thenReturn(ORGANISATION_NAME);
         }
 

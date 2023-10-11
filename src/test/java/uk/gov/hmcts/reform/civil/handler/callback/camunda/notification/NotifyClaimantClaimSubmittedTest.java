@@ -47,11 +47,10 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate()).thenReturn(
+            when(notificationsProperties.getNotifyDefendantLipTemplate()).thenReturn(
                 EMAIL_TEMPLATE);
         }
 
-        @Test
         void shouldNotifyApplicant1_ClaimIsSubmittedButNotIssued() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()

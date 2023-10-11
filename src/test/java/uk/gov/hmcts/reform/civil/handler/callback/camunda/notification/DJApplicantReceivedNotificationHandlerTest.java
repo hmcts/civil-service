@@ -68,7 +68,7 @@ public class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn("test-template-received-id");
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested())
                 .thenReturn("test-template-requested-id");
-            when(notificationsProperties.getApplicantLiPDefaultJudgmentRequested())
+            when(notificationsProperties.getNotifyDefendantLipTemplate())
                 .thenReturn("test-template-requested-lip-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
@@ -143,7 +143,6 @@ public class DJApplicantReceivedNotificationHandlerTest {
             );
         }
 
-        @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAndLiPvsLiPEnabled() {
             when(featureToggleService.isLipVLipEnabled())
                 .thenReturn(true);

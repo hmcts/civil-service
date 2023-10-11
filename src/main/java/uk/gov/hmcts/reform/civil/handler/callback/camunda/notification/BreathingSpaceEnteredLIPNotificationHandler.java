@@ -73,7 +73,7 @@ public class BreathingSpaceEnteredLIPNotificationHandler extends CallbackHandler
             if (isNotEmpty(recipientEmail)) {
                 notificationService.sendMail(
                     recipientEmail,
-                    notificationsProperties.getNotifyEnteredBreathingSpaceForDefendantLip(),
+                    notificationsProperties.getNotifyLiPClaimantDefendantResponded(),
                     templateProperties,
                     String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
                 );
@@ -81,7 +81,7 @@ public class BreathingSpaceEnteredLIPNotificationHandler extends CallbackHandler
         } else {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                notificationsProperties.getNotifyApplicant1EnteredBreathingSpaceLip(),
+                notificationsProperties.getNotifyLiPClaimantDefendantResponded(),
                 templateProperties,
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );

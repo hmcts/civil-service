@@ -84,6 +84,6 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
                 ? notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()
                 : notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate();
         }
-        return notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate();
+        return notificationsProperties.getNotifyLiPClaimantDefendantResponded();
     }
 }

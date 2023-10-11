@@ -34,7 +34,7 @@ public class BreathingSpaceEnteredLIPNotificationHandlerTest {
     @Test
     public void notifyApplicant1BreathingSpace() {
 
-        Mockito.when(notificationsProperties.getNotifyApplicant1EnteredBreathingSpaceLip())
+        Mockito.when(notificationsProperties.getNotifyLiPClaimantDefendantResponded())
             .thenReturn(templateId);
         CaseData caseData = createCaseData();
         CallbackParams params = createCallbackParams(
@@ -55,7 +55,7 @@ public class BreathingSpaceEnteredLIPNotificationHandlerTest {
     @Test
     public void notifyRespondentBreathingSpace() {
 
-        Mockito.when(notificationsProperties.getNotifyEnteredBreathingSpaceForDefendantLip())
+        Mockito.when(notificationsProperties.getNotifyLiPClaimantDefendantResponded())
             .thenReturn(templateId);
         CaseData caseData = createCaseData();
         CallbackParams params = createCallbackParams(

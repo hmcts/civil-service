@@ -69,7 +69,7 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
         if (Objects.nonNull(caseData.getApplicant1Email())) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate(),
+                notificationsProperties.getNotifyLiPClaimantDefendantResponded(),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );

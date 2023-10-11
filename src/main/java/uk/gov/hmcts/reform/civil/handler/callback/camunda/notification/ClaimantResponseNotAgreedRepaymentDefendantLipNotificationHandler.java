@@ -80,7 +80,7 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
         if (caseData.isRespondent1NotRepresented()) {
             return getRespondentLipTemplate(caseData);
         }
-        return notificationsProperties.getNotifyDefendantLrTemplate();
+        return notificationsProperties.getNotifyLiPClaimantDefendantResponded();
     }
 
     private String getRespondentLipTemplate(CaseData caseData) {

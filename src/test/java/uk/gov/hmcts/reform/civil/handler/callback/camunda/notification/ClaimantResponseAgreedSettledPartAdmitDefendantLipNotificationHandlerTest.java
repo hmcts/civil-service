@@ -69,7 +69,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
         void setup() {
             when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn(template);
             when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn(bilingualTemplate);
-            when(notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate()).thenReturn(template_id_lr);
+            when(notificationsProperties.getNotifyLiPClaimantDefendantResponded()).thenReturn(template_id_lr);
             when(organisationDetailsService.getRespondentLegalOrganizationName(any())).thenReturn(ORGANISATION_NAME);
         }
 

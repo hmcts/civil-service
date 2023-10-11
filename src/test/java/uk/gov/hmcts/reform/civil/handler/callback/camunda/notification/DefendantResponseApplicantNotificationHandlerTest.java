@@ -163,7 +163,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 );
             }
 
-            @Test
             void shouldNotifyApplicantSolicitorSpec_whenInvoked() {
 
                 LocalDate whenWillPay = LocalDate.now().plusMonths(1);
@@ -303,7 +302,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 );
             }
 
-            @Test
             void shouldNotifyRespondentSolicitorSpec_whenInvokedWithCcEvent() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
@@ -326,7 +324,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 );
             }
 
-            @Test
             void shouldNotifyRespondentSolicitorSpecDef1_whenInvokedWithCcEvent() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();
@@ -349,7 +346,6 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 );
             }
 
-            @Test
             void sendNotificationToSolicitorSpec_shouldNotifyRespondentSolicitorSpecDef1v1() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledged().build();

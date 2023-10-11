@@ -47,7 +47,7 @@ class ClaimantResponseConfirmsToProceedApplicantNotificationHandlerTest extends 
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyLiPClaimantDefendantResponded()).thenReturn("template-id");
         }
 
         @Test
