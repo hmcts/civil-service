@@ -33,11 +33,11 @@ public class DraftClaimFormMapper {
 
     public DraftClaimForm toDraftClaimForm(CaseData caseData) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        CaseDataLiP caseDataLip = caseData.getCaseDataLiP();
+        Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
         Optional<AdditionalLipPartyDetails> applicantDetails =
-            Optional.ofNullable(caseDataLip.getApplicant1AdditionalLipPartyDetails());
+            caseDataLip.map(CaseDataLiP::getApplicant1AdditionalLipPartyDetails);
         Optional<AdditionalLipPartyDetails> defendantDetails =
-            Optional.ofNullable(caseDataLip.getRespondent1AdditionalLipPartyDetails());
+            caseDataLip.map(CaseDataLiP::getRespondent1AdditionalLipPartyDetails);
 
         return DraftClaimForm.builder()
             .totalInterestAmount(interest != null ? interest.toString() : null)

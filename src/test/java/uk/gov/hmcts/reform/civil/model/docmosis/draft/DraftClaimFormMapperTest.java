@@ -8,6 +8,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
@@ -418,6 +420,14 @@ class DraftClaimFormMapperTest {
                              .type(Party.Type.ORGANISATION)
                              .build())
             .totalClaimAmount(TOTAL_CLAIM_AMOUNT)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1AdditionalLipPartyDetails(AdditionalLipPartyDetails
+                                                                      .builder()
+                                                                      .build())
+                             .respondent1AdditionalLipPartyDetails(AdditionalLipPartyDetails
+                                                                       .builder()
+                                                                       .build())
+                             .build())
             .build();
         return caseData;
     }
