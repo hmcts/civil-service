@@ -1419,7 +1419,7 @@ public class EventHistoryMapper {
             Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
             LocalDateTime respondent1ResponseDate = caseData.getRespondent1ResponseDate();
 
-            if (caseData.isLRvLipOneVOne()) {
+            if (caseData.isLRvLipOneVOne() || caseData.isLipvLipOneVOne()) {
                 buildLrVLipFullDefenceEvent(builder, caseData, defenceFiledEvents, statesPaidEvents);
             } else {
                 if (isAllPaid(caseData.getTotalClaimAmount(), caseData.getRespondToClaim())) {
