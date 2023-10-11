@@ -1601,7 +1601,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     DocCategory.DEF1_DEFENSE_DQ.getValue()
                 );
                 defendantUploads.add(documentElement);
-                defendantUploads.add(ElementUtils.element(copy));
+                if (Objects.nonNull(copy)) {
+                    defendantUploads.add(ElementUtils.element(copy));
+                }
             }
         }
         Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
@@ -1621,7 +1623,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 CaseDocument copy = assignCategoryId
                         .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
                 defendantUploads.add(documentElement);
-                defendantUploads.add(ElementUtils.element(copy));
+                if (Objects.nonNull(copy)) {
+                    defendantUploads.add(ElementUtils.element(copy));
+                }
             }
             ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
             if (respondent2SpecDefenceResponseDocument != null) {
@@ -1639,7 +1643,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         DocCategory.DEF2_DEFENSE_DQ.getValue()
                     );
                     defendantUploads.add(documentElement);
-                    defendantUploads.add(ElementUtils.element(copy));
+                    if (Objects.nonNull(copy)) {
+                        defendantUploads.add(ElementUtils.element(copy));
+                    }
                 }
             }
         } else {
@@ -1659,7 +1665,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     CaseDocument copy = assignCategoryId
                             .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                     defendantUploads.add(documentElement);
-                    defendantUploads.add(ElementUtils.element(copy));
+                    if (Objects.nonNull(copy)) {
+                        defendantUploads.add(ElementUtils.element(copy));
+                    }
                 }
             }
         }
@@ -1680,7 +1688,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 CaseDocument copy = assignCategoryId
                         .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                 defendantUploads.add(documentElement);
-                defendantUploads.add(ElementUtils.element(copy));
+                if (Objects.nonNull(copy)) {
+                    defendantUploads.add(ElementUtils.element(copy));
+                }
             }
         }
         if (!defendantUploads.isEmpty()) {

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -96,10 +97,14 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocumentCopy, DocCategory.DQ_DEF2.getValue());
             }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
-            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocumentCopy));
+            if (Objects.nonNull(stitchedDocumentCopy)) {
+                caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocumentCopy));
+            }
         } else {
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
-            caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(copy));
+            if (Objects.nonNull(copy)) {
+                caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(copy));
+            }
         }
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
 

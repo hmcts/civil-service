@@ -61,6 +61,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -628,7 +629,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 CaseDocument copy = assignCategoryId
                         .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
                 defendantUploads.add(documentElement);
-                defendantUploads.add(ElementUtils.element(copy));
+                if (Objects.nonNull(copy)) {
+                    defendantUploads.add(ElementUtils.element(copy));
+                }
             }
         }
 
@@ -647,7 +650,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 CaseDocument copy = assignCategoryId
                         .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
                 defendantUploads.add(documentElement);
-                defendantUploads.add(ElementUtils.element(copy));
+                if (Objects.nonNull(copy)) {
+                    defendantUploads.add(ElementUtils.element(copy));
+                }
             }
         }
 
@@ -665,7 +670,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
                         DocCategory.DEF2_DEFENSE_DQ.getValue());
                 defendantUploads.add(documentElement);
-                defendantUploads.add(ElementUtils.element(copy));
+                if (Objects.nonNull(copy)) {
+                    defendantUploads.add(ElementUtils.element(copy));
+                }
             }
         }
         Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
@@ -683,7 +690,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 assignCategoryId.assignCategoryIdToDocument(respondent2DQDraftDirections,
                         DocCategory.DEF2_DEFENSE_DQ.getValue());
                 defendantUploads.add(documentElement);
-                defendantUploads.add(ElementUtils.element(copy));
+                if (Objects.nonNull(copy)) {
+                    defendantUploads.add(ElementUtils.element(copy));
+                }
             }
         }
 

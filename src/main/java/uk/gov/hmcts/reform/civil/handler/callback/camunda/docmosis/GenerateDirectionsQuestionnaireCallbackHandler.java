@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -71,7 +72,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         List<Element<CaseDocument>> systemGeneratedCaseDocuments =
             caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
-        systemGeneratedCaseDocuments.add(element(copy));
+        if (Objects.nonNull(copy)) {
+            systemGeneratedCaseDocuments.add(element(copy));
+        }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
     }
@@ -123,7 +126,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     caseDataBuilder.respondent1DocumentURL(document.getDocumentLink().getDocumentUrl());
                     assignCategoryId.assignCategoryIdToCaseDocument(document, DocCategory.DEF1_DEFENSE_DQ.getValue());
                     CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(document, DocCategory.DQ_DEF1.getValue());
-                    updatedDocuments.add(element(copy));
+                    if (Objects.nonNull(copy)) {
+                        updatedDocuments.add(element(copy));
+                    }
                 });
             }
 
@@ -143,7 +148,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                     caseDataBuilder.respondent2DocumentURL(document.getDocumentLink().getDocumentUrl());
                     assignCategoryId.assignCategoryIdToCaseDocument(document, DocCategory.DEF2_DEFENSE_DQ.getValue());
                     CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(document, DocCategory.DQ_DEF2.getValue());
-                    updatedDocuments.add(element(copy));
+                    if (Objects.nonNull(copy)) {
+                        updatedDocuments.add(element(copy));
+                    }
                 });
             }
 
@@ -211,7 +218,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
 
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
-        systemGeneratedCaseDocuments.add(element(copy));
+        if (Objects.nonNull(copy)) {
+            systemGeneratedCaseDocuments.add(element(copy));
+        }
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.APP1_DQ.getValue());

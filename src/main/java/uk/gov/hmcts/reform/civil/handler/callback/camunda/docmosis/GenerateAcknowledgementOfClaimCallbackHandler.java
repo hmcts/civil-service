@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -64,7 +65,9 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
                 acknowledgementOfClaim, "");
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(acknowledgementOfClaim));
-        systemGeneratedCaseDocuments.add(element(copy));
+        if (Objects.nonNull(copy)) {
+            systemGeneratedCaseDocuments.add(element(copy));
+        }
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
 
         assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, DocCategory.DEF1_DEFENSE_DQ.getValue());
