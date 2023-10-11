@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateClaimRespondentNotificationHandler extends CallbackHandler implements NotificationData {
@@ -109,7 +111,11 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
                 throw new CallbackException(String.format("Callback handler received illegal event: %s", caseEvent));
         }
 
-        sendNotificationToSolicitor(caseData, recipient);
+        if (recipient != null) {
+            sendNotificationToSolicitor(caseData, recipient);
+        } else {
+            log.info(String.format("Email address is null for %s", caseData.getLegacyCaseReference()));
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
