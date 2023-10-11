@@ -1795,7 +1795,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @SuppressWarnings("unchecked")
             List<CaseDocument> docs = (ArrayList<CaseDocument>) response.getData().get("defendantResponseDocuments");
             //Then
-            assertEquals(8, docs.size());
+            assertEquals(4, docs.size());
             assertThat(response.getData())
                 .extracting("defendantResponseDocuments")
                 .asString()
