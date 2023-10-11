@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model.docmosis.draft;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -43,17 +44,10 @@ public class DraftClaimFormMapper {
             .totalInterestAmount(interest != null ? interest.toString() : null)
             .howTheInterestWasCalculated(Optional.ofNullable(caseData.getInterestClaimOptions()).map(
                 InterestClaimOptions::getDescription).orElse(null))
-            .interestRate(caseData.getSameRateInterestSelection() != null
-                              ? Optional.ofNullable(caseData.getSameRateInterestSelection().getDifferentRate())
-                .map(BigDecimal::toString)
-                .orElse(STANDARD_INTEREST_RATE) : null)
+            .interestRate(getInterestRate(caseData))
             .interestExplanationText(generateInterestRateExplanation(caseData))
-            .interestFromDate(Optional.ofNullable(caseData.getInterestFromSpecificDate())
-                                  .orElse(Optional.ofNullable(caseData.getSubmittedDate())
-                                              .map(LocalDateTime::toLocalDate).orElse(null)))
-            .interestEndDate(StringUtils.isBlank(caseData.getBreakDownInterestDescription())
-                                 ? getRequiredDateBeforeFourPm(LocalDateTime.now())
-                                 : null)
+            .interestFromDate(getInterestFromDate(caseData))
+            .interestEndDate(getInterestEndDate(caseData))
             .interestEndDateDescription(Optional.ofNullable(caseData.getBreakDownInterestDescription())
                                             .orElse(null))
             .whenAreYouClaimingInterestFrom(generateWhenAreYouPlanningInterestFrom(caseData))
@@ -79,6 +73,28 @@ public class DraftClaimFormMapper {
             ))
             .generationDate(LocalDate.now())
             .build();
+    }
+
+    @Nullable
+    private static LocalDate getInterestEndDate(CaseData caseData) {
+        return StringUtils.isBlank(caseData.getBreakDownInterestDescription())
+            ? getRequiredDateBeforeFourPm(LocalDateTime.now())
+            : null;
+    }
+
+    @Nullable
+    private static LocalDate getInterestFromDate(CaseData caseData) {
+        return Optional.ofNullable(caseData.getInterestFromSpecificDate())
+            .orElse(Optional.ofNullable(caseData.getSubmittedDate())
+                        .map(LocalDateTime::toLocalDate).orElse(null));
+    }
+
+    @Nullable
+    private static String getInterestRate(CaseData caseData) {
+        return caseData.getSameRateInterestSelection() != null
+            ? Optional.ofNullable(caseData.getSameRateInterestSelection().getDifferentRate())
+            .map(BigDecimal::toString)
+            .orElse(STANDARD_INTEREST_RATE) : null;
     }
 
     private Address getCorrespondenceAddress(Optional<AdditionalLipPartyDetails> partyDetails) {
