@@ -821,6 +821,19 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder respondent2DQWithUnavailableDateRange() {
+        UnavailableDate unavailableDate = UnavailableDate.builder()
+            .fromDate(LocalDate.now().plusDays(1))
+            .toDate(LocalDate.now().plusDays(2))
+            .unavailableDateType(UnavailableDateType.DATE_RANGE)
+            .build();
+        this.respondent2DQ = Respondent2DQ.builder()
+            .respondent2DQHearing(Hearing.builder().hearingLength(MORE_THAN_DAY).unavailableDatesRequired(YES)
+                                      .unavailableDates(wrapElements(List.of(unavailableDate))).build())
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder applicant1DQWithUnavailableDateRange() {
         UnavailableDate unavailableDate = UnavailableDate.builder()
             .fromDate(LocalDate.now().plusDays(1))
