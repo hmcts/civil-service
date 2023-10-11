@@ -260,8 +260,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsOnly(NotSuitable_SDO.name(), "READY");
+                .isNull();
 
         }
 
