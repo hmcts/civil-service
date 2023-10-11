@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -21,7 +19,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -33,7 +30,6 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -55,9 +51,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private IdamClient idamClient;
-
-    @MockBean
-    private FeatureToggleService toggleService;
 
     @Autowired
     private NotSuitableSDOCallbackHandler handler;
@@ -106,7 +99,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidateReasonLessThan150_whenInvoked() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
+
             final String PAGE_ID = "not-suitable-reason";
 
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
@@ -119,39 +112,8 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldValidateReasonMoreThan150_whenInvokedA() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
-            final String PAGE_ID = "not-suitable-reason";
-            final int lengthALlowed = 150;
+        void shouldValidateReasonMoreThan150_whenInvoked() {
 
-            caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawnOverLimit().build();
-            params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors().get(0)).isEqualTo("Character Limit Reached: "
-                                                   + "Reason for not drawing Standard Directions order cannot exceed "
-                                                   + lengthALlowed + " characters.");
-
-        }
-
-        @Test
-        void shouldValidateReasonLessThan150_whenInvokedAndTOCEnabledOtherReasons() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
-            final String PAGE_ID = "not-suitable-reason";
-
-            caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
-            params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
-
-        }
-
-        @Test
-        void shouldValidateReasonMoreThan150_whenInvokedAndTOCEnabledOtherReasons() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             final String PAGE_ID = "not-suitable-reason";
             final int lengthALlowed = 150;
 
@@ -163,20 +125,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors().get(0)).isEqualTo("Character Limit Reached: "
                                                                   + "Reason for not drawing Standard Directions order cannot exceed "
                                                                   + lengthALlowed + " characters.");
-
-        }
-
-        @Test
-        void shouldValidateTOCReason_whenInvokedAndTOCEnabledTransferCase() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
-            final String PAGE_ID = "not-suitable-reason";
-
-            caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawn().build();
-            params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).isEmpty();
 
         }
     }
@@ -200,7 +148,6 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -214,67 +161,12 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void checkOtherDetailsUpdated() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(false);
             caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("otherDetails").extracting("notSuitableForSDO").isEqualTo("Yes");
             assertThat(response.getData()).extracting("otherDetails").extracting("reasonNotSuitableForSDO").isEqualTo("unforeseen complexities");
-
-        }
-
-        @Test
-        void shouldUpdateBusinessProcess_whenInvokedAndTOCEnabledOtherReasons() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
-            caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsOnly(NotSuitable_SDO.name(), "READY");
-
-        }
-
-        @Test
-        void checkOtherDetailsUpdated_whenTOCEnabledOtherReasons() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
-            caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("notSuitableSdoOptions").isEqualTo("OTHER_REASONS");
-            assertThat(response.getData()).extracting("otherDetails").extracting("notSuitableForSDO").isEqualTo("Yes");
-            assertThat(response.getData()).extracting("otherDetails").extracting("reasonNotSuitableForSDO").isEqualTo("unforeseen complexities");
-
-        }
-
-        @Test
-        void shouldUpdateBusinessProcess_whenInvokedAndTOCEnabledTransferCase() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
-            caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawn().build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent", "status")
-                .containsOnly(NotSuitable_SDO.name(), "READY");
-
-        }
-
-        @Test
-        void checkOtherDetailsUpdated_whenTOCEnabledTransferCase() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
-            caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawn().build();
-            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("notSuitableSdoOptions").isEqualTo("CHANGE_LOCATION");
-            assertThat(response.getData()).extracting("otherDetails").extracting("notSuitableForSDO").isEqualTo("Yes");
-            assertThat(response.getData()).extracting("tocTransferCaseReason").extracting("reasonForCaseTransferJudgeTxt").isEqualTo("unforeseen complexities");
 
         }
     }
@@ -282,18 +174,16 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class SubmittedCallback {
 
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldReturnExpectedSubmittedCallbackResponse(Boolean toggleState) {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(toggleState);
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
             String header = format("# Your request was accepted%n## Case has now moved offline");
             String body = format("<br />If a Judge has submitted this information, "
-                + "a notification will be sent to the listing officer to look at this case offline."
-                + "%n%nIf a legal adviser has submitted this information a notification will be sent "
+                                     + "a notification will be sent to the listing officer to look at this case offline."
+                                     + "%n%nIf a legal adviser has submitted this information a notification will be sent "
                                      + "to a judge for review.");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
@@ -302,29 +192,10 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .confirmationBody(body)
                     .build());
         }
-
-        @Test
-        void shouldReturnExpectedSubmittedCallbackResponse_whenTOCEnabledTransferCase() {
-            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawn().build();
-            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            String header = format("# Your request was accepted%n## Case has now moved...");
-            String body = format("TOC body");
-
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                SubmittedCallbackResponse.builder()
-                    .confirmationHeader(header)
-                    .confirmationBody(body)
-                    .build());
-        }
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void handleEventsReturnsTheExpectedCallbackEvent(Boolean toggleState) {
-        when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(toggleState);
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(NotSuitable_SDO);
     }
 }

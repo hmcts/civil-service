@@ -138,9 +138,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
-import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocNewCourtLocation;
-import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
@@ -478,10 +476,6 @@ public class CaseDataBuilder {
     private IdamUserDetails claimantUserDetails;
 
     private UpdateDetailsForm updateDetailsForm;
-
-    private TocTransferCaseReason tocTransferCaseReason;
-
-    private NotSuitableSdoOptions notSuitableSdoOptions;
     private TocNewCourtLocation tocNewCourtLocation;
 
     protected String hearingReference;
@@ -4535,20 +4529,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStateBeforeTransferCaseSDONotDrawn() {
-
-        atStateApplicantRespondToDefenceAndProceed();
-
-        ccdState = JUDICIAL_REFERRAL;
-        notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
-
-        tocTransferCaseReason = TocTransferCaseReason.builder()
-            .reasonForCaseTransferJudgeTxt("unforeseen complexities")
-            .build();
-        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
-        return this;
-    }
-
     public CaseDataBuilder atStateTakenOfflineSDONotDrawn(MultiPartyScenario mpScenario) {
 
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
@@ -6300,8 +6280,6 @@ public class CaseDataBuilder {
             .updateDetailsForm(updateDetailsForm)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
             //Transfer Online Case
-            .notSuitableSdoOptions(notSuitableSdoOptions)
-            .tocTransferCaseReason(tocTransferCaseReason)
             .tocNewCourtLocation(tocNewCourtLocation)
             .build();
     }
