@@ -107,6 +107,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterClaimDetailsNotified;
@@ -156,6 +157,14 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataAtDraftState() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             assertFalse(claimSubmittedOneRespondentRepresentative.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseTakenOfflineBeforeIssue() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
+                .takenOfflineByStaff()
+                .build();
+            assertTrue(takenOfflineByStaffBeforeClaimIssued.test(caseData));
         }
     }
 
