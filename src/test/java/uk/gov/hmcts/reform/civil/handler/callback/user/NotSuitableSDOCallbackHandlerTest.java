@@ -123,8 +123,8 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors().get(0)).isEqualTo("Character Limit Reached: "
-                                                                  + "Reason for not drawing Standard Directions order cannot exceed "
-                                                                  + lengthALlowed + " characters.");
+                                                   + "Reason for not drawing Standard Directions order cannot exceed "
+                                                   + lengthALlowed + " characters.");
 
         }
     }
@@ -182,8 +182,8 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             String header = format("# Your request was accepted%n## Case has now moved offline");
             String body = format("<br />If a Judge has submitted this information, "
-                                     + "a notification will be sent to the listing officer to look at this case offline."
-                                     + "%n%nIf a legal adviser has submitted this information a notification will be sent "
+                + "a notification will be sent to the listing officer to look at this case offline."
+                + "%n%nIf a legal adviser has submitted this information a notification will be sent "
                                      + "to a judge for review.");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
