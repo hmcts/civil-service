@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.
 import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.REFUSED;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF_HMC;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.hasHearings;
 import static uk.gov.hmcts.reform.hmc.model.hearing.ListAssistCaseStatus.LISTED;
 
@@ -80,12 +81,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeFinalOrderForm templateData = getFinalOrderType(caseData, authorisation);
-        DocmosisTemplates docmosisTemplate = null;
-        if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
-            docmosisTemplate = FREE_FORM_ORDER_PDF;
-        } else {
-            docmosisTemplate = ASSISTED_ORDER_PDF;
-        }
+        DocmosisTemplates docmosisTemplate = getTemplate(caseData);
+
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
         return documentManagementService.uploadDocument(
@@ -96,6 +93,22 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 DocumentType.JUDGE_FINAL_ORDER
             )
         );
+    }
+
+    private DocmosisTemplates getTemplate(CaseData caseData) {
+        switch(caseData.getFinalOrderSelection()) {
+            case FREE_FORM_ORDER: {
+                if (toggleService.isHmcEnabled()) {
+                    return FREE_FORM_ORDER_PDF_HMC;
+                } else {
+                    return FREE_FORM_ORDER_PDF;
+                }
+            }
+            // ASSISTED_ORDER
+            default: {
+                return ASSISTED_ORDER_PDF;
+            }
+        }
     }
 
     private String getFileName(DocmosisTemplates docmosisTemplate) {
