@@ -866,8 +866,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (featureToggleService.isLocationWhiteListedForCaseProgression(
             caseData.getCaseManagementLocation().getBaseLocation())) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+            dataBuilder.eaCourtLocation(YesOrNo.YES);
         } else {
             log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+            dataBuilder.eaCourtLocation(YesOrNo.NO);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

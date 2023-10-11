@@ -308,6 +308,8 @@ public class CaseDataParent implements MappableObject {
 
     private CaseDocument sdoOrderDocument;
 
+    private final YesOrNo eaCourtLocation;
+
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
     private final YesOrNo setFastTrackFlag;
