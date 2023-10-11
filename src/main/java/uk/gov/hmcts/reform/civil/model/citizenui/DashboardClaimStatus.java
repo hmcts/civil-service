@@ -112,6 +112,7 @@ public enum DashboardClaimStatus {
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
+
     NO_STATUS(c -> false);
 
     @Getter

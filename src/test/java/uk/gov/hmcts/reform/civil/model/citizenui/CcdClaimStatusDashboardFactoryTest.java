@@ -360,4 +360,17 @@ class CcdClaimStatusDashboardFactoryTest {
                 claim));
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
     }
+
+    @Test
+    void given_claimantRejectsDefendantsPaymentPlan() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .build();
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim));
+        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
+    }
 }

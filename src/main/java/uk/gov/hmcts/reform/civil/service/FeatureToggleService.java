@@ -67,9 +67,8 @@ public class FeatureToggleService {
     public boolean isUpdateContactDetailsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("update-contact-details");
     }
-  
+
     public boolean isLipVLipEnabled() {
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
-
 }

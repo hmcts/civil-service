@@ -12,5 +12,4 @@ public enum ComplexityBand {
     BAND_4("Band 4");
 
     private final String label;
-
 }

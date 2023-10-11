@@ -20,4 +20,6 @@ public class DisposalHearingHearingTime {
     @Future(message = "The date entered must be in the future")
     private LocalDate dateTo;
     private DisposalHearingFinalDisposalHearingTimeEstimate time;
+    private String otherHours;
+    private String otherMinutes;
 }

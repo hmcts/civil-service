@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.IsPresentOrEqualToOrLessT
 import java.time.LocalDate;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @IsPresentOrEqualToOrLessThanOneYearInTheFuture(groups = UnavailableDateGroup.class)
 public class UnavailableDate {
 
@@ -18,4 +18,6 @@ public class UnavailableDate {
     private final LocalDate fromDate;
     private final LocalDate toDate;
     private final UnavailableDateType unavailableDateType;
+    private final String eventAdded;
+    private final LocalDate dateAdded;
 }

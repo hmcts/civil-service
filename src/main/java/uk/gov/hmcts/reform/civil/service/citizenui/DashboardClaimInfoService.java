@@ -10,8 +10,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CcdDashboardClaimMatcher;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
@@ -29,15 +31,13 @@ import static java.util.Objects.nonNull;
 @RequiredArgsConstructor
 public class DashboardClaimInfoService {
 
-    private final ClaimStoreService claimStoreService;
-    private final CoreCaseDataService coreCaseDataService;
-    private final CaseDetailsConverter caseDetailsConverter;
-    private final DashboardClaimStatusFactory dashboardClaimStatusFactory;
     private static final int CASES_PER_PAGE = 10;
 
-    public List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
-        return claimStoreService.getClaimsForClaimant(authorisation, claimantId);
-    }
+    private final CaseDetailsConverter caseDetailsConverter;
+    private final ClaimStoreService claimStoreService;
+    private final CoreCaseDataService coreCaseDataService;
+    private final DashboardClaimStatusFactory dashboardClaimStatusFactory;
+    private final FeatureToggleService featureToggleService;
 
     public List<DashboardClaimInfo> getOcmcDefendantClaims(String authorisation, String defendantId) {
         log.info("-----------calling ocmc getOCMCDefendantClaims()-------------");
@@ -46,17 +46,40 @@ public class DashboardClaimInfoService {
         return ocmcClaims;
     }
 
-    public DashboardDefendantResponse getDashboardDefendantResponse(String authorisation, String defendantId,
-                                                                    int currentPage) {
+    public DashboardResponse getDashboardDefendantResponse(String authorisation, String defendantId,
+                                                           int currentPage) {
         log.info("-----------Claims for Defendant started-------------");
         List<DashboardClaimInfo> ocmcClaims = getOcmcDefendantClaims(authorisation, defendantId);
         int startIndex = (currentPage - 1) * CASES_PER_PAGE;
-        var ccdData = getCCDCasesForDefendant(authorisation, startIndex);
+        var ccdData = coreCaseDataService.getCCDClaimsForLipDefendant(authorisation, startIndex);
         int totalPages = getTotalPagesToBeListed(ccdData.getTotal() + ocmcClaims.size());
         List<DashboardClaimInfo> currentPageItems = currentPage <= totalPages
             ? getDashboardItemsForCurrentPage(ocmcClaims, currentPage, ccdData) :
             Collections.emptyList();
-        return DashboardDefendantResponse.builder().totalPages(totalPages).claims(currentPageItems).build();
+        return DashboardResponse.builder().totalPages(totalPages).claims(currentPageItems).build();
+    }
+
+    public DashboardResponse getDashboardClaimantResponse(String authorisation, String claimantId, int currentPage) {
+        List<DashboardClaimInfo> ocmcClaims = getClaimsForClaimant(authorisation, claimantId);
+
+        int startIndex = (currentPage - 1) * CASES_PER_PAGE;
+        SearchResult ccdData = null;
+
+        if (featureToggleService.isLipVLipEnabled()) {
+            ccdData = coreCaseDataService.getCCDClaimsForLipClaimant(authorisation, startIndex);
+        }
+
+        int totalPages = getTotalPagesToBeListed(getCcdClaimsCount(ccdData) + ocmcClaims.size());
+        List<DashboardClaimInfo> currentPageItems = currentPage <= totalPages
+            ? getDashboardItemsForCurrentPage(ocmcClaims, currentPage, ccdData) :
+            Collections.emptyList();
+        return DashboardResponse.builder().totalPages(totalPages).claims(currentPageItems).build();
+    }
+
+    private List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
+        log.info("-----------calling ocmc claimant claims-------------");
+        List<DashboardClaimInfo> ocmcClaims = claimStoreService.getClaimsForClaimant(authorisation, claimantId);
+        return ocmcClaims;
     }
 
     private List<DashboardClaimInfo> getDashboardItemsForCurrentPage(List<DashboardClaimInfo> ocmcClaims,
@@ -65,7 +88,8 @@ public class DashboardClaimInfoService {
 
         int startIndex = (currentPage - 1) * CASES_PER_PAGE;
         int endIndex = startIndex + CASES_PER_PAGE;
-        int ccdClaimsCount = ccdClaims.getTotal();
+        int ccdClaimsCount = getCcdClaimsCount(ccdClaims);
+
         List<DashboardClaimInfo> dashBoardClaimInfo = new ArrayList<>();
         if (startIndex >= ccdClaimsCount) {
             int ocmcStartIndex = startIndex - ccdClaimsCount;
@@ -90,14 +114,11 @@ public class DashboardClaimInfoService {
             .collect(Collectors.toList());
     }
 
-    private SearchResult getCCDCasesForDefendant(String authorisation, int startIndex) {
-        log.info("-----------calling CCD claims-------------");
-        SearchResult claims = coreCaseDataService.getCCDDataBasedOnIndex(authorisation, startIndex);
-        log.info("-----------CCD claims received-------------total " + claims.getCases().size());
-        return claims;
-    }
-
     private List<DashboardClaimInfo> translateSearchResultToDashboardItems(SearchResult claims) {
+        if (claims == null) {
+            return Collections.emptyList();
+        }
+
         return claims.getCases().stream().map(caseDetails -> translateCaseDataToDashboardClaimInfo(caseDetails))
             .collect(Collectors.toList());
     }
@@ -111,6 +132,7 @@ public class DashboardClaimInfoService {
             .defendantName(nonNull(caseData.getRespondent1()) ? caseData.getRespondent1().getPartyName() : null)
             .claimAmount(nonNull(caseData.getTotalClaimAmount()) ? caseData.getTotalClaimAmount() : null)
             .admittedAmount(caseData.getPartAdmitPaidValuePounds())
+            .responseDeadlineTime(caseData.getRespondent1ResponseDeadline())
             .status(dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(caseData)))
             .build();
         if (caseData.getRespondent1ResponseDeadline() != null) {
@@ -142,5 +164,10 @@ public class DashboardClaimInfoService {
             totalPages = (int) Math.ceil(totalClaims / (double) CASES_PER_PAGE);
         }
         return totalPages;
+    }
+
+    private int getCcdClaimsCount(final SearchResult ccdClaims) {
+
+        return Optional.ofNullable(ccdClaims).map(SearchResult::getTotal).orElse(0);
     }
 }

@@ -214,7 +214,7 @@ class BundleCreationTriggerEventHandlerTest {
             generatedBundle.getValue().getDescription()
         );
         Assertions.assertEquals(bundle.getValue().getTitle(), generatedBundle.getValue().getTitle());
-        Assertions.assertEquals(bundle.getValue().getFileName(), generatedBundle.getValue().getFilename());
+        Assertions.assertEquals(bundle.getValue().getFileName(), generatedBundle.getValue().getFileName());
         Assertions.assertEquals(bundle.getValue().getStitchedDocument().getDocumentFileName(),
                                 generatedBundle.getValue().getStitchedDocument().get().getDocumentFileName());
         Assertions.assertEquals(caseData.getHearingDate(), generatedBundle.getValue().getBundleHearingDate().get());
@@ -230,7 +230,7 @@ class BundleCreationTriggerEventHandlerTest {
         List<IdValue<uk.gov.hmcts.reform.civil.model.Bundle>> caseBundles = new ArrayList<>();
         caseBundles.add(new IdValue<>("1",
                                       uk.gov.hmcts.reform.civil.model.Bundle.builder()
-                                          .title("Trial Bundle").filename("TrialBundle.pdf")
+                                          .title("Trial Bundle").fileName("TrialBundle.pdf")
                                           .stitchStatus(Optional.of("NEW")).build()));
         // When: I call the prepareCaseContent method
         CaseDataContent caseDataContent = bundleCreationTriggerEventHandler.prepareCaseContent(caseBundles,

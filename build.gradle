@@ -161,8 +161,8 @@ allprojects {
       ) {
         entry 'groovy-all'
       }
-      // CVE-2023-28709
-      dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.75') {
+
+      dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.80') {
         entry 'tomcat-embed-core'
         entry 'tomcat-embed-el'
         entry 'tomcat-embed-websocket'
@@ -314,7 +314,7 @@ sonarqube {
     property "sonar.projectName", "CIVIL :: service"
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**"
+    property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
@@ -369,8 +369,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.17'
-
+  implementation 'com.github.hmcts:civil-commons:1.0.25'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -405,8 +404,13 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
-  implementation group: 'com.github.hmcts', name: 'fees-java-client', version: '0.0.6'
-  implementation group: 'com.github.hmcts', name: 'payments-java-client', version: '1.5.2'
+  implementation('com.github.hmcts:fees-java-client:0.0.6') {
+    exclude group: 'java-logging', module: ' java-logging'
+  }
+
+  implementation('com.github.hmcts:payments-java-client:1.5.2') {
+    exclude group: 'java-logging', module: ' java-logging'
+  }
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.0-RELEASE'
@@ -434,8 +438,8 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.20.0'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.20.0'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.73'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.7'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.80'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.13'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.9'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.78'
 
