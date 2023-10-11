@@ -278,7 +278,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_RESPONDENT,
                 GENERATE_DIRECTIONS_ORDER,
                 TRIAL_READINESS,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                TRANSFER_ONLINE_CASE
             )
         ),
 

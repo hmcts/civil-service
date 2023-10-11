@@ -139,6 +139,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocNewCourtLocation;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
@@ -481,6 +482,7 @@ public class CaseDataBuilder {
     private TocTransferCaseReason tocTransferCaseReason;
 
     private NotSuitableSdoOptions notSuitableSdoOptions;
+    private TocNewCourtLocation tocNewCourtLocation;
 
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
@@ -6016,6 +6018,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder tocNewCourtLocation(TocNewCourtLocation tocNewCourtLocation) {
+        this.tocNewCourtLocation = tocNewCourtLocation;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -6295,6 +6302,7 @@ public class CaseDataBuilder {
             //Transfer Online Case
             .notSuitableSdoOptions(notSuitableSdoOptions)
             .tocTransferCaseReason(tocTransferCaseReason)
+            .tocNewCourtLocation(tocNewCourtLocation)
             .build();
     }
 }

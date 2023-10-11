@@ -142,6 +142,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocNewCourtLocation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -705,6 +706,7 @@ public class CaseDataParent implements MappableObject {
     // TOC
     private NotSuitableSdoOptions notSuitableSdoOptions;
     private TocTransferCaseReason tocTransferCaseReason;
+    private TocNewCourtLocation tocNewCourtLocation;
 
     @JsonUnwrapped
     private final UpdateDetailsForm updateDetailsForm;
