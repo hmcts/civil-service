@@ -701,6 +701,7 @@ public class CaseDataParent implements MappableObject {
     private List<Element<UnavailableDate>> applicant2UnavailableDatesForTab;
     private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
+    private String pcqId;
 
     // TOC
     private NotSuitableSdoOptions notSuitableSdoOptions;
