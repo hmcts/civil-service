@@ -267,7 +267,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (featureToggleService.isCaseFileViewEnabled()) {
             builder.respondent1GeneratedResponseDocument(null);
             builder.respondent2GeneratedResponseDocument(null);
-            builder.respondent1ClaimResponseDocumentSpec(null);
         }
 
         locationHelper.getCaseManagementLocation(caseData)
@@ -445,17 +444,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 null
             ).name());
         }
-        // add direction questionaire document from system generated documents, to placeholder field for preview during event.
-        // Or add sealed response form  from system generated documents, to placeholder field for preview during event.
-        populatePreviewDocuments(caseData, updatedCaseData);
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
-            .build();
-    }
-
-    private void populatePreviewDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
-        // add direction questionaire document from system generated documents, to placeholder field for preview during event.
+        // add document from system generated documents, to placeholder field for preview during event.
         if (caseData.getRespondent2DocumentURL() == null) {
             caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
                 if (document.getValue().getDocumentName().contains("defendant_directions_questionnaire_form")) {
@@ -472,14 +462,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             });
         }
-        // add sealed response form  from system generated documents, to placeholder field for preview during event.
-        if (featureToggleService.isPinInPostEnabled()) {
-            caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
-                if (document.getValue().getDocumentName().contains("response_sealed_form.pdf")) {
-                    updatedCaseData.respondent1ClaimResponseDocumentSpec(document.getValue());
-                }
-            });
-        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.build().toMap(objectMapper))
+            .build();
     }
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
