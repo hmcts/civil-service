@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 
@@ -33,8 +33,9 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
     public EvidenceUploadRespondentHandler(UserService userService, CoreCaseUserService coreCaseUserService,
                                            CaseDetailsConverter caseDetailsConverter,
                                            CoreCaseDataService coreCaseDataService,
+                                           UserRoleCaching userRoleCaching,
                                            ObjectMapper objectMapper, Time time) {
-        super(userService, coreCaseUserService, caseDetailsConverter, coreCaseDataService,
+        super(userService, coreCaseUserService, caseDetailsConverter, coreCaseDataService, userRoleCaching,
                 objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_RESPONDENT),
               "validateValuesRespondent", "createShowCondition");
     }
@@ -66,9 +67,9 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
     }
 
     @Override
-    CallbackResponse createShowCondition(CaseData caseData, UserInfo userInfo) {
+    CallbackResponse createShowCondition(CaseData caseData, List<String> userRoles) {
 
-        return showCondition(caseData, userInfo, caseData.getWitnessSelectionEvidenceRes(),
+        return showCondition(caseData, userRoles, caseData.getWitnessSelectionEvidenceRes(),
                              caseData.getWitnessSelectionEvidenceSmallClaimRes(),
                              caseData.getWitnessSelectionEvidenceRes(),
                              caseData.getWitnessSelectionEvidenceSmallClaimRes(),

@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT2;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.formatHearingDuration;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
@@ -76,6 +77,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     }
 
     CallbackResponse populateValues(CallbackParams callbackParams) {
+        log.info("Start of populateValues");
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -110,6 +112,8 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             errors.add(format(NO_SMALL_CLAIMS));
         }
 
+        log.info("End of populateValues");
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty() ? updatedData.build().toMap(objectMapper) : null)
@@ -117,6 +121,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     }
 
     CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
+        log.info("Start of setBusinessProcess");
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
@@ -143,14 +148,14 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
                 updatedData.businessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT2));
             }
         }
-
+        log.info("End of setBusinessProcess");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-
+        log.info("Start of buildConfirmation");
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(checkUserReady(callbackParams).equals(YesOrNo.YES) ? READY_HEADER : NOT_READY_HEADER)
             .confirmationBody(checkUserReady(callbackParams).equals(YesOrNo.YES) ? READY_BODY : NOT_READY_BODY)
@@ -166,6 +171,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         if (isApplicantSolicitor(userRoles) || isLIPClaimant(userRoles)) {
             return caseData.getTrialReadyApplicant();
         } else if (isRespondentSolicitorOne(userRoles) || isLIPDefendant(userRoles)) {
+            log.info("End of buildConfirmation");
             return caseData.getTrialReadyRespondent1();
         } else {
             return caseData.getTrialReadyRespondent2();

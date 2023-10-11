@@ -42,7 +42,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPO
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
 abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
@@ -67,6 +68,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     private final UserService userService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
+
+    private final UserRoleCaching userRoleCaching;
 
     private static final String SPACE = " ";
     private static final String END = ".";
@@ -146,7 +149,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
                                         CaseDetailsConverter caseDetailsConverter,
-                                        CoreCaseDataService coreCaseDataService,
+                                        CoreCaseDataService coreCaseDataService, UserRoleCaching userRoleCaching,
                                         ObjectMapper objectMapper, Time time, List<CaseEvent> events, String pageId,
                                         String createShowCondition) {
         this.objectMapper = objectMapper;
@@ -156,13 +159,14 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         this.pageId = pageId;
         this.coreCaseUserService = coreCaseUserService;
         this.userService = userService;
+        this.userRoleCaching = userRoleCaching;
         this.caseDetailsConverter = caseDetailsConverter;
         this.coreCaseDataService = coreCaseDataService;
     }
 
     abstract CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData);
 
-    abstract CallbackResponse createShowCondition(CaseData caseData, UserInfo userInfo);
+    abstract CallbackResponse createShowCondition(CaseData caseData, List<String> userInfo);
 
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);
 
@@ -214,16 +218,18 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     CallbackResponse createShow(CallbackParams callbackParams) {
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        CaseData caseData = callbackParams.getCaseData();
+        List<String> userRoles = userRoleCaching.getUserRoles(callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                                     caseData.getCcdCaseReference().toString());
 
-        return createShowCondition(callbackParams.getCaseData(), userInfo);
+        return createShowCondition(callbackParams.getCaseData(), userRoles);
     }
 
     // CCD has limited show hide functionality, we want to show a field based on a fixed listed containing an element,
     // or a second list containing an element, AND with the addition of the user being respondent2 solicitor, the below
     // combines the list condition into one single condition, which can then be used in CCD along with the
     // caseTypeFlag condition
-    CallbackResponse showCondition(CaseData caseData, UserInfo userInfo,
+    CallbackResponse showCondition(CaseData caseData, List<String> userRoles,
                                    List<EvidenceUploadWitness> witnessStatementFastTrack,
                                    List<EvidenceUploadWitness> witnessStatementSmallTrack,
                                    List<EvidenceUploadWitness> witnessSummaryFastTrack,
@@ -266,8 +272,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     .getValue().getLabel().startsWith(OPTION_DEF2))
                     //1v2 dif sol, log in as def2
                     || (!multiParts && Objects.nonNull(caseData.getCcdCaseReference())
-                        && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference()
-                        .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
+                        && isRespondentSolicitorTwo(userRoles))) {
                 caseDataBuilder.caseTypeFlag("RespondentTwoFields");
             }
         }
@@ -988,7 +993,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
                 && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();
-        UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
+
         if (events.get(0).equals(EVIDENCE_UPLOAD_APPLICANT)) {
             if (multiParts && caseData.getEvidenceUploadOptions()
                     .getValue().getLabel().startsWith(OPTION_APP2)) {
@@ -1000,11 +1005,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             }
             return CaseRole.APPLICANTSOLICITORONE.name();
         } else {
+            List<String> userRoles =
+                userRoleCaching.getUserRoles(callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                                                             caseData.getCcdCaseReference().toString());
             if ((multiParts && caseData.getEvidenceUploadOptions()
                     .getValue().getLabel().startsWith(OPTION_DEF2))
                 || (!multiParts
-                    && coreCaseUserService.userHasCaseRole(caseData.getCcdCaseReference().toString(),
-                    userInfo.getUid(), RESPONDENTSOLICITORTWO))) {
+                    && isRespondentSolicitorTwo(userRoles))) {
                 return CaseRole.RESPONDENTSOLICITORTWO.name();
             }
             if (multiParts && caseData.getEvidenceUploadOptions()
