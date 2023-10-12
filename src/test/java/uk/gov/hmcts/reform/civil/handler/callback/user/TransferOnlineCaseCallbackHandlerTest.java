@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocNewCourtLocation;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -60,8 +59,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData())
-                .extracting("tocNewCourtLocation")
-                .extracting("responseCourtLocationList")
+                .extracting("transferCourtLocationList")
                 .extracting("list_items")
                 .asList().hasSize(3);
         }
@@ -84,10 +82,8 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                             .region("2")
                                             .baseLocation("111")
                                             .build())
-                .tocNewCourtLocation(TocNewCourtLocation.builder()
-                                         .responseCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
-                                                                                                    .label("Site 1 - Adr 1 - AAA 111").build()).build()).build())
-                .build();
+                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
+                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("111")
@@ -108,11 +104,8 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                             .region("2")
                                             .baseLocation("111")
                                             .build())
-                .tocNewCourtLocation(TocNewCourtLocation.builder()
-                                         .responseCourtLocationList(DynamicList.builder()
-                                                                        .value(DynamicListElement.builder()
-                                                                                   .label("Site 1 - Adr 1 - AAA 111").build()).build()).build())
-                .build();
+                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
+                                                                           .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
 
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
@@ -135,11 +128,9 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                                             .region("2")
                                             .baseLocation("111")
                                             .build())
-                .tocNewCourtLocation(TocNewCourtLocation.builder()
-                                         .reasonForTransfer("Reason")
-                                         .responseCourtLocationList(DynamicList.builder()
-                                                                        .value(DynamicListElement.builder()
-                                                                                   .label("Site 1 - Adr 1 - AAA 111").build()).build()).build()).build();
+                .reasonForTransfer("Reason")
+                .transferCourtLocationList(DynamicList.builder().value(DynamicListElement.builder()
+                                                                                   .label("Site 1 - Adr 1 - AAA 111").build()).build()).build();
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(LocationRefData.builder().siteName("")
                                 .epimmsId("222")
@@ -148,18 +139,15 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData())
-                .extracting("tocNewCourtLocation")
                 .extracting("reasonForTransfer")
                 .isEqualTo("Reason");
             assertThat(response.getData())
-                .extracting("tocNewCourtLocation")
-                .extracting("responseCourtLocationList")
+                .extracting("transferCourtLocationList")
                 .extracting("value")
                 .extracting("label")
                 .isEqualTo("Site 1 - Adr 1 - AAA 111");
             assertThat(response.getData())
-                .extracting("tocNewCourtLocation")
-                .extracting("responseCourtLocationList")
+                .extracting("transferCourtLocationList")
                 .extracting("list_items")
                 .isNull();
             assertThat(response.getData())

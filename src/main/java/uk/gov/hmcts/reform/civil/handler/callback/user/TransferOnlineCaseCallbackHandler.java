@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
-import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocNewCourtLocation;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -80,7 +79,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<LocationRefData> locations = fetchLocationData(callbackParams);
-        caseDataBuilder.tocNewCourtLocation(TocNewCourtLocation.builder().responseCourtLocationList(getLocationsFromList(locations)).build());
+        caseDataBuilder.transferCourtLocationList(getLocationsFromList(locations));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -107,16 +106,13 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         LocationRefData newCourtLocation = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams),
-            callbackParams.getCaseData().getTocNewCourtLocation().getResponseCourtLocationList());
+            callbackParams.getCaseData().getTransferCourtLocationList());
         if (nonNull(newCourtLocation)) {
             caseDataBuilder.caseManagementLocation(LocationHelper.buildCaseLocation(newCourtLocation));
-            caseDataBuilder.locationName(newCourtLocation.getSiteName());
         }
-        DynamicList locationList = caseData.getTocNewCourtLocation().getResponseCourtLocationList();
-        locationList.setListItems(null);
-        caseDataBuilder.tocNewCourtLocation(TocNewCourtLocation.builder()
-                                                .responseCourtLocationList(locationList)
-                                                .reasonForTransfer(caseData.getTocNewCourtLocation().getReasonForTransfer()).build());
+        DynamicList tempLocationList = caseData.getTransferCourtLocationList();
+        tempLocationList.setListItems(null);
+        caseDataBuilder.transferCourtLocationList(tempLocationList);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -125,7 +121,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     private boolean ifSameCourtSelected(CallbackParams callbackParams) {
         LocationRefData newCourtLocation = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams),
-            callbackParams.getCaseData().getTocNewCourtLocation().getResponseCourtLocationList());
+            callbackParams.getCaseData().getTransferCourtLocationList());
         LocationRefData caseManagementLocation =
             getLocationRefData(callbackParams);
         if (caseManagementLocation != null && newCourtLocation.getCourtLocationCode().equals(caseManagementLocation.getCourtLocationCode())) {

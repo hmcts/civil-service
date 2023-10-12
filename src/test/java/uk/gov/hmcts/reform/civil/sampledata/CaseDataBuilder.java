@@ -138,7 +138,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
-import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocNewCourtLocation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
@@ -476,10 +475,12 @@ public class CaseDataBuilder {
     private IdamUserDetails claimantUserDetails;
 
     private UpdateDetailsForm updateDetailsForm;
-    private TocNewCourtLocation tocNewCourtLocation;
 
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
+
+    private DynamicList transferCourtLocationList;
+    private String reasonForTransfer;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -5110,6 +5111,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder transferCourtLocationList(DynamicList transferCourtLocationList) {
+        this.transferCourtLocationList = transferCourtLocationList;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForTransfer(String reasonForTransfer) {
+        this.reasonForTransfer = reasonForTransfer;
+        return this;
+    }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -6011,11 +6022,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder tocNewCourtLocation(TocNewCourtLocation tocNewCourtLocation) {
-        this.tocNewCourtLocation = tocNewCourtLocation;
-        return this;
-    }
-
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -6292,8 +6298,8 @@ public class CaseDataBuilder {
             .claimantUserDetails(claimantUserDetails)
             .updateDetailsForm(updateDetailsForm)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
-            //Transfer Online Case
-            .tocNewCourtLocation(tocNewCourtLocation)
+            .transferCourtLocationList(transferCourtLocationList)
+            .reasonForTransfer(reasonForTransfer)
             .build();
     }
 }
