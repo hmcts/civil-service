@@ -114,7 +114,11 @@ public class CreateClaimRespondentNotificationHandler extends CallbackHandler im
         if (recipient != null) {
             sendNotificationToSolicitor(caseData, recipient);
         } else {
-            log.info(String.format("Email address is null for %s", caseData.getLegacyCaseReference()));
+            log.info(String.format(
+                "Email address is null for caseEvent: %s for: %s",
+                caseEvent,
+                caseData.getLegacyCaseReference()
+            ));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
