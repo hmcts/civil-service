@@ -25,8 +25,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -110,7 +108,9 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            template = getTemplateForSpec(caseData, isCcNotification(callbackParams));
+            template = isCcNotification(callbackParams)
+                ? notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec()
+                : notificationsProperties.getRespondentSolicitorNotifyToProceedSpec();
         } else {
             template = notificationsProperties.getClaimantSolicitorConfirmsToProceed();
         }
@@ -126,20 +126,6 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    private String getTemplateForSpec(CaseData caseData, boolean ccNotification) {
-        String template;
-        if (ccNotification && getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
-            template = notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec1v1();
-        } else if (ccNotification && !getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
-            template = notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec();
-        } else if (!ccNotification && getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
-            template = notificationsProperties.getRespondentSolicitorNotifyToProceedSpec1v1();
-        } else {
-            template = notificationsProperties.getRespondentSolicitorNotifyToProceedSpec();
-        }
-        return template;
     }
 
     @Override

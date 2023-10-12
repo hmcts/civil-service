@@ -70,8 +70,6 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
         void setup() {
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
-            when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpec1v1()).thenReturn("spec-template-id");
-            when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec1v1()).thenReturn("spec-template-id");
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpec()).thenReturn("spec-template-id");
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceedSpec()).thenReturn("spec-template-id");
             when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn("spec-template-id");
