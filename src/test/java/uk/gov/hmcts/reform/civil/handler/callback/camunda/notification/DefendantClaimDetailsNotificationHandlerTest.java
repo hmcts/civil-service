@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -180,6 +182,57 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
                 getNotificationDataMap(caseData),
                 "claim-details-respondent-notification-000DC001"
             );
+        }
+
+        @Test
+        void shouldNotNotifyRespondentSolicitor_when1v2SSRecipient1IsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondentSolicitor1EmailAddress(null)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+            assertThatNoException();
+        }
+
+        @Test
+        void shouldNotNotifyApplicantSolicitor_ApplicantRecipient1IsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(null).build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIM_DETAILS_CC.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+            assertThatNoException();
+        }
+
+        @Test
+        void shouldNotNotifyRespondentSolicitor_1v2DSRecipient1IsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
+                .respondentSolicitor2EmailAddress(null)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIM_DETAILS.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+            assertThatNoException();
         }
 
     }
