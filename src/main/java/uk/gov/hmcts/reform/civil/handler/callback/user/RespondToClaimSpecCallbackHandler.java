@@ -1426,7 +1426,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
                 }
 
-                updatedData.respondent2(updatedRespondent2.toBuilder().flags(caseData.getRespondent2Copy().getFlags()).build()).respondent2Copy(null);
+                updatedData
+                    .respondent2(updatedRespondent2.toBuilder()
+                                     .flags(caseData.getRespondent2Copy().getFlags()).build())
+                    .respondent2Copy(null);
                 updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
             }
 
