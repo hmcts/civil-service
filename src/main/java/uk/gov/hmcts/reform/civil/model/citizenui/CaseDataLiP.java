@@ -26,6 +26,12 @@ public class CaseDataLiP {
     private FinancialDetailsLiP respondent1LiPFinancialDetails;
     @JsonProperty("applicant1ClaimMediationSpecRequiredLip")
     private ClaimantMediationLip applicant1ClaimMediationSpecRequiredLip;
+    @JsonProperty("helpWithFees")
+    private HelpWithFees helpWithFees;
+    @JsonProperty("respondent1AdditionalLipPartyDetails")
+    private AdditionalLipPartyDetails respondent1AdditionalLipPartyDetails;
+    @JsonProperty("applicant1AdditionalLipPartyDetails")
+    private AdditionalLipPartyDetails applicant1AdditionalLipPartyDetails;
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {

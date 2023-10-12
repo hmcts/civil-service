@@ -470,4 +470,108 @@ class RoboticsNotificationServiceTest {
         assertThat(capturedEmailData.getMessage()).isEqualTo(message);
         assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
     }
+
+    @Test
+    void shouldNotifyJudgementLiP_whenLipvsLiPEnabled() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+            .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
+        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        String lastEventText = "event text";
+        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
+            .events(EventHistory.builder()
+                        .miscellaneous(Event.builder()
+                                           .eventDetailsText(lastEventText)
+                                           .dateReceived(LocalDateTime.now())
+                                           .build())
+                        .build())
+            .build();
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+
+        //When
+        service.notifyJudgementLip(caseData);
+
+        //Then
+        verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
+
+        EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+        String reference = caseData.getLegacyCaseReference();
+        String message = format("Robotics case data JSON is attached for %s", reference);
+        String subject = format("LiP v LiP Case Data for %s", reference);
+
+        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
+    }
+
+    @Test
+    void shouldNotifyDefaultJudgementLiP_whenLipvsLiPEnabled() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+            .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM).paymentTypeSelection(
+                DJPaymentTypeSelection.SET_DATE).build();
+        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        String lastEventText = "event text";
+        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
+            .events(EventHistory.builder()
+                        .miscellaneous(Event.builder()
+                                           .eventDetailsText(lastEventText)
+                                           .dateReceived(LocalDateTime.now())
+                                           .build())
+                        .build())
+            .build();
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+
+        //When
+        service.notifyJudgementLip(caseData);
+
+        //Then
+        verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
+
+        EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+        String reference = caseData.getLegacyCaseReference();
+        String message = format("Robotics case data JSON is attached for %s", reference);
+        String subject = format("LiP v LiP Default Judgement Case Data for %s", reference);
+
+        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
+    }
+
+    @Test
+    void shouldNotifyJudgementByAdmissionLiP_whenLipvsLiPEnabled() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+            .toBuilder().respondent1Represented(NO).applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM)
+            .ccjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build()).build();
+        when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        String lastEventText = "event text";
+        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
+            .events(EventHistory.builder()
+                        .miscellaneous(Event.builder()
+                                           .eventDetailsText(lastEventText)
+                                           .dateReceived(LocalDateTime.now())
+                                           .build())
+                        .build())
+            .build();
+        when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData)).thenReturn(build);
+
+        //When
+        service.notifyJudgementLip(caseData);
+
+        //Then
+        verify(sendGridClient).sendEmail(eq(emailConfiguration.getSender()), emailDataArgumentCaptor.capture());
+
+        EmailData capturedEmailData = emailDataArgumentCaptor.getValue();
+        String reference = caseData.getLegacyCaseReference();
+        String message = format("Robotics case data JSON is attached for %s", reference);
+        String subject = format("LiP v LiP Judgement by Admission Case Data for %s", reference);
+
+        assertThat(capturedEmailData.getSubject()).isEqualTo(subject);
+        assertThat(capturedEmailData.getMessage()).isEqualTo(message);
+        assertThat(capturedEmailData.getTo()).isEqualTo(emailConfiguration.getLipJRecipient());
+    }
 }

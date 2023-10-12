@@ -125,6 +125,9 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -811,6 +814,19 @@ public class CaseDataBuilder {
             .build();
         this.respondent1DQ = Respondent1DQ.builder()
             .respondent1DQHearing(Hearing.builder().hearingLength(MORE_THAN_DAY).unavailableDatesRequired(YES)
+                                      .unavailableDates(wrapElements(List.of(unavailableDate))).build())
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder respondent2DQWithUnavailableDateRange() {
+        UnavailableDate unavailableDate = UnavailableDate.builder()
+            .fromDate(LocalDate.now().plusDays(1))
+            .toDate(LocalDate.now().plusDays(2))
+            .unavailableDateType(UnavailableDateType.DATE_RANGE)
+            .build();
+        this.respondent2DQ = Respondent2DQ.builder()
+            .respondent2DQHearing(Hearing.builder().hearingLength(MORE_THAN_DAY).unavailableDatesRequired(YES)
                                       .unavailableDates(wrapElements(List.of(unavailableDate))).build())
             .build();
         return this;
@@ -2107,8 +2123,6 @@ public class CaseDataBuilder {
             .organisation(Organisation.builder().organisationID("QWERTY R2").build())
             .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
             .build();
-        respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
-        respondent2OrganisationIDCopy = respondent2OrganisationPolicy.getOrganisation().getOrganisationID();
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
@@ -2253,6 +2267,8 @@ public class CaseDataBuilder {
         atStateClaimSubmitted();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
+        respondent1OrgRegistered = NO;
+        respondent2OrgRegistered = NO;
         respondent1Represented = NO;
         respondent2Represented = NO;
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
@@ -2779,7 +2795,6 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         claimNotificationDeadline = NOTIFICATION_DEADLINE;
         ccdState = CASE_ISSUED;
-        respondent1OrganisationIDCopy = "QWERTY R";
         buildHmctsInternalCaseName();
         return this;
     }
@@ -4779,6 +4794,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitors() {
         this.addRespondent2 = YES;
         this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        this.respondent2Represented = YES;
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
         return this;
@@ -5412,6 +5428,36 @@ public class CaseDataBuilder {
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joPaymentToBeMadeByDate(LocalDate.of(2023, 12, 12))
             .joIsRegisteredWithRTL(YES).build();
+    }
+
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter30Days() {
+        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
+            .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
+            .lastUpdatedDate(LocalDateTime.now()).build();
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joOrderMadeDate(LocalDate.of(2023, 7, 1))
+            .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
+                                      .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
+                                      .confirmFullPaymentMade(List.of("CONFIRMED"))
+                                      .build())
+            .joIsRegisteredWithRTL(YES)
+            .joJudgmentStatusDetails(judgmentStatusDetails).build();
+    }
+
+    public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin30Days() {
+        JudgmentStatusDetails judgmentStatusDetails = JudgmentStatusDetails.builder()
+            .judgmentStatusTypes(JudgmentStatusType.SATISFIED)
+            .lastUpdatedDate(LocalDateTime.now()).build();
+        return build().toBuilder()
+            .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+            .joOrderMadeDate(LocalDate.of(2023, 9, 1))
+            .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
+                                      .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
+                                      .confirmFullPaymentMade(List.of("CONFIRMED"))
+                                      .build())
+            .joIsRegisteredWithRTL(YES)
+            .joJudgmentStatusDetails(judgmentStatusDetails).build();
     }
 
     public CaseDataBuilder setUnassignedCaseListDisplayOrganisationReferences() {
