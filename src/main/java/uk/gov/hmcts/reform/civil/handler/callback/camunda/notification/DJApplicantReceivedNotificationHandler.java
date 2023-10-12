@@ -77,7 +77,7 @@ public class DJApplicantReceivedNotificationHandler extends CallbackHandler impl
         }
         if (caseData.isLipvLipOneVOne()
             && toggleService.isLipVLipEnabled()) {
-            template = notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived();
+            template = notificationsProperties.getApplicantLiPDefaultJudgmentRequested();
             templateReference = REFERENCE_TEMPLATE_RECEIVED;
         }
         return template;

@@ -10,6 +10,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
@@ -47,10 +49,11 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate()).thenReturn(
+            when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate()).thenReturn(
                 EMAIL_TEMPLATE);
         }
 
+        @Test
         void shouldNotifyApplicant1_ClaimIsSubmittedButNotIssued() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
@@ -83,6 +86,31 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                                 .build())
                 .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                                  .build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(0)).sendMail(
+                CLAIMANT_EMAIL_ID,
+                EMAIL_TEMPLATE,
+                getNotificationDataMap(caseData),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotSendEmail_whenHFWReferanceNumberPresent() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
+                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
+                                .build())
+                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
+                                 .build())
+                .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("1111").build()).build())
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();

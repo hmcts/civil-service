@@ -58,7 +58,7 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
         if (caseData.getApplicant1Email() != null) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                notificationsProperties.getClaimantClaimContinuingOnlineForSpec(),
+                notificationsProperties.getClaimantLipClaimUpdatedTemplate(),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );

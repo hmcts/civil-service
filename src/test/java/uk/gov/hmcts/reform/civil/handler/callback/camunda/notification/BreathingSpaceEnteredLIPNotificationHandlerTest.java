@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,9 +31,10 @@ public class BreathingSpaceEnteredLIPNotificationHandlerTest {
 
     private static String templateId = "templateId";
 
+    @Test
     public void notifyApplicant1BreathingSpace() {
 
-        Mockito.when(notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate())
+        Mockito.when(notificationsProperties.getNotifyApplicant1EnteredBreathingSpaceLip())
             .thenReturn(templateId);
         CaseData caseData = createCaseData();
         CallbackParams params = createCallbackParams(
@@ -50,9 +52,10 @@ public class BreathingSpaceEnteredLIPNotificationHandlerTest {
         );
     }
 
+    @Test
     public void notifyRespondentBreathingSpace() {
 
-        Mockito.when(notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate())
+        Mockito.when(notificationsProperties.getNotifyEnteredBreathingSpaceForDefendantLip())
             .thenReturn(templateId);
         CaseData caseData = createCaseData();
         CallbackParams params = createCallbackParams(
