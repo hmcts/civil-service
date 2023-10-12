@@ -36,6 +36,7 @@ public class Respondent1DQ implements DQ {
     private Hearing respondent1DQHearingFastClaim;
     private Document respondent1DQDraftDirections;
     private RequestedCourt respondent1DQRequestedCourt;
+    private RemoteHearing respondent1DQRemoteHearing;
     private RemoteHearingLRspec respondent1DQRemoteHearingLRspec;
     private HearingSupport respondent1DQHearingSupport;
     private FurtherInformation respondent1DQFurtherInformation;
@@ -213,7 +214,8 @@ public class Respondent1DQ implements DQ {
     }
 
     @Override
+    @JsonProperty("respondent1DQRemoteHearing")
     public RemoteHearing getRemoteHearing() {
-        return null;
+        return respondent1DQRemoteHearing;
     }
 }
