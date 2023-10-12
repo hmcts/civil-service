@@ -44,7 +44,6 @@ java:
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
     DOCUMENT_MANAGEMENT_SECURED: true
     STITCHING_API_ENABLED: true
-    WA_TOGGLE: WA3.5
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
   postgresql:
