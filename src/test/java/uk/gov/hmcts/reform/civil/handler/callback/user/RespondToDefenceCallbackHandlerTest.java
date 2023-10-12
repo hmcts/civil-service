@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
@@ -77,6 +78,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -211,18 +213,46 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetRespondentSharedClaimResponseDocumentSameSolicitorScenario_WhenAboutToStartIsInvoked() {
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateRespondentFullDefenceAfterNotifyClaimDetails()
-                    .multiPartyClaimOneDefendantSolicitor()
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .addRespondent2(YES)
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2SameLegalRepresentative(YES)
+                    .defendantResponseDocuments(wrapElements(CaseDocument.builder()
+                                                                 .documentType(DEFENDANT_DEFENCE)
+                                                                 .documentLink(Document.builder()
+                                                                                   .documentUrl("url")
+                                                                                   .documentHash("hash")
+                                                                                   .documentFileName("respondent defense")
+                                                                                   .documentBinaryUrl("binUrl")
+                                                                                   .build()).build()))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
                 AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                     .handle(params);
-
                 assertThat(response.getErrors()).isNull();
-                assertThat(response.getData().get("respondentSharedClaimResponseDocument"))
-                    .isEqualTo(caseData.toMap(mapper).get("respondent1ClaimResponseDocument"));
+                assertThat(response.getData()).extracting("respondentSharedClaimResponseDocument").isNotNull();
+            }
+
+            @Test
+            void shouldSetRespondent1ClaimResponseDocument_WhenAboutToStartIsInvoked() {
+                CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build().toBuilder()
+                    .defendantResponseDocuments(wrapElements(CaseDocument.builder()
+                                                                 .documentType(DEFENDANT_DEFENCE)
+                                                                 .documentLink(Document.builder()
+                                                                                   .documentUrl("url")
+                                                                                   .documentHash("hash")
+                                                                                   .documentFileName("respondent defense")
+                                                                                   .documentBinaryUrl("binUrl")
+                                                                                   .build()).build()))
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+                assertThat(response.getErrors()).isNull();
+                assertThat(response.getData()).extracting("respondent1ClaimResponseDocument").isNotNull();
             }
 
             @Test

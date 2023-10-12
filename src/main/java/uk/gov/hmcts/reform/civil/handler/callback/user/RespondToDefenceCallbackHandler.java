@@ -112,9 +112,19 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         updatedData.featureToggleWA(toggleConfiguration.getFeatureToggle());
 
-        if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
-            updatedData.respondentSharedClaimResponseDocument(caseData.getRespondent1ClaimResponseDocument());
-        }
+        // add document from defendant response documents, to placeholder field for preview during event.
+        caseData.getDefendantResponseDocuments().forEach(document -> {
+            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)) {
+                updatedData.respondent1ClaimResponseDocument(ResponseDocument.builder()
+                                                                      .file(document.getValue().getDocumentLink())
+                                                                      .build());
+                if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
+                    updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
+                                                                     .file(document.getValue().getDocumentLink())
+                                                                     .build());
+                }
+            }
+        });
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -261,6 +271,20 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
+
+        // null/delete the document used for preview, otherwise it will show as duplicate within case file view
+        // and documents are added to claimantUploads, if we do not remove/null the original,
+        if (featureToggleService.isCaseFileViewEnabled()) {
+            builder.applicant1DefenceResponseDocument(null);
+            builder.respondent1ClaimResponseDocument(null);
+            builder.respondentSharedClaimResponseDocument(null);
+            Applicant1DQ currentApplicant1DQ = caseData.getApplicant1DQ();
+            currentApplicant1DQ.setApplicant1DQDraftDirections(null);
+            builder.applicant1DQ(currentApplicant1DQ);
+            Applicant2DQ currentApplicant2DQ = caseData.getApplicant2DQ();
+            currentApplicant2DQ.setApplicant2DQDraftDirections(null);
+            builder.applicant2DQ(currentApplicant2DQ);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
