@@ -320,7 +320,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
-                    "spec-respondent-template-id",
+                    "spec-claimant-template-id",
                     getNotificationDataMapSpec(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
@@ -343,8 +343,8 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
-                    "spec-1v1-template-id",
-                    getNotificationDataMapSpec(caseData),
+                    "spec-claimant-template-id",
+                    getNotificationDataMapPartAdmissionSpec(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
             }
@@ -366,7 +366,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
-                    "spec-respondent-template-id-action",
+                    "spec-claimant-template-id",
                     getNotificationDataMapSpec(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
@@ -391,7 +391,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 final CaseData finalCaseData = caseData;
                 verify(notificationService).sendMail(
                     ArgumentMatchers.eq("respondentsolicitor2@example.com"),
-                    ArgumentMatchers.eq("spec-respondent-template-id-action"),
+                    ArgumentMatchers.eq("spec-respondent-template-id"),
                     ArgumentMatchers.argThat(map -> {
                         Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
@@ -569,6 +569,15 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
             );
         }
+
+        private Map<String, String> getNotificationDataMapPartAdmissionSpec(CaseData caseData) {
+            return Map.of(
+                "defendantName", "Mr. Sole Trader",
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE
+            );
+        }
+
     }
 
     @Test
