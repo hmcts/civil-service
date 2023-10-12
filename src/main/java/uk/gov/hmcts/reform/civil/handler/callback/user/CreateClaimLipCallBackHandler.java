@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
