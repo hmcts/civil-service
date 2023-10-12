@@ -92,8 +92,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
-        }
-        else{
+        } else {
             log.info(String.format(
                 "Email address is null for caseEvent: %s for: %s",
                 caseEvent,
