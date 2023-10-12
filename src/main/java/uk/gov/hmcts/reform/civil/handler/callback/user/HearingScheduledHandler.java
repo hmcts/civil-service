@@ -44,7 +44,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
-import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
@@ -93,7 +92,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private CallbackResponse locationList(CallbackParams callbackParams) {
-        log.info("Start of locationList");
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -103,7 +101,6 @@ public class HearingScheduledHandler extends CallbackHandler {
         caseDataBuilder.hearingLocation(getLocationsFromList(locations))
             .build();
 
-        log.info("End of locationList");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -117,7 +114,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private CallbackResponse checkPastDate(CallbackParams callbackParams) {
-        log.info("Start of checkPastDate");
         var caseData = callbackParams.getCaseData();
 
         LocalDate dateOfApplication = caseData.getDateOfApplication();
@@ -127,7 +123,6 @@ public class HearingScheduledHandler extends CallbackHandler {
                                     "The Date must be in the past");
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        log.info("End of locationList");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
@@ -157,7 +152,6 @@ public class HearingScheduledHandler extends CallbackHandler {
     }
 
     private CallbackResponse handleAboutToSubmit(CallbackParams callbackParams) {
-        log.info("Start of handleAboutToSubmit");
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.hearingReferenceNumber(HearingReferenceNumber.generateHearingReference());
@@ -182,7 +176,6 @@ public class HearingScheduledHandler extends CallbackHandler {
             caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         }
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
-        log.info("End of handleAboutToSubmit");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(caseState.name())
             .data(caseDataBuilder.build().toMap(objectMapper))
