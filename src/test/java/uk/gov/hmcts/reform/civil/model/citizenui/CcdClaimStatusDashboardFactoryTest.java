@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -211,13 +210,15 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hearingDateForSmallClaimIsAfterToday_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
-        Element<CaseDocument> document = new Element<>(UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
-                                                       CaseDocument.builder()
-                                                           .documentType(DocumentType.SDO_ORDER)
-                                                           .build());
+        Element<CaseDocument> document = new Element<>(
+            UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+            CaseDocument.builder()
+                .documentType(DocumentType.SDO_ORDER)
+                .build()
+        );
         CaseData claim = CaseData.builder()
             .smallClaimsHearing(SmallClaimsHearing.builder()
-                    .dateFrom(LocalDate.now().plusDays(10))
+                                    .dateFrom(LocalDate.now().plusDays(10))
                                     .build())
             .respondent1ResponseDate(LocalDateTime.now())
             .systemGeneratedCaseDocuments(List.of(document))
@@ -230,14 +231,16 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void given_hearingDateForFastTrackClaimIsAfterToday_and_SDOBeenDrawn_whenGetStatus_moreDetailsRequired() {
-        Element<CaseDocument> document = new Element<>(UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
-                                                       CaseDocument.builder()
-                                                           .documentType(DocumentType.SDO_ORDER)
-                                                           .build());
+        Element<CaseDocument> document = new Element<>(
+            UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f4c"),
+            CaseDocument.builder()
+                .documentType(DocumentType.SDO_ORDER)
+                .build()
+        );
         CaseData claim = CaseData.builder()
             .fastTrackHearingTime(FastTrackHearingTime.builder()
-                                    .dateFrom(LocalDate.now().plusDays(10))
-                                    .build())
+                                      .dateFrom(LocalDate.now().plusDays(10))
+                                      .build())
             .respondent1ResponseDate(LocalDateTime.now())
             .systemGeneratedCaseDocuments(List.of(document))
             .build();
