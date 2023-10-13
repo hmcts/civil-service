@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -126,8 +125,13 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
                 && nonNull(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())) {
                 reference = caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
             }
-            map.put(HEARING_FEE, caseData.getHearingFee() == null ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()));
-            map.put(HEARING_DUE_DATE, caseData.getHearingDueDate() == null ? "" : NotificationUtils.getFormattedHearingDate(caseData.getHearingDueDate()));
+            if(caseData.getHearingFeePaymentDetails() == null ||
+                !SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) {
+                map.put(HEARING_FEE, caseData.getHearingFee() == null
+                    ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()));
+                map.put(HEARING_DUE_DATE, caseData.getHearingDueDate() == null
+                    ? "" : NotificationUtils.getFormattedHearingDate(caseData.getHearingDueDate()));
+            }
             map.put(CLAIMANT_REFERENCE_NUMBER, reference);
         }
         return map;
@@ -151,10 +155,11 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         if (isApplicantLip) {
             return notificationsProperties.getHearingNotificationLipDefendantTemplate();
         }
-        if (nonNull(caseData.getHearingFee()) && caseData.getHearingFee().getCalculatedAmountInPence().compareTo(BigDecimal.ZERO) > 0) {
-            return notificationsProperties.getHearingListedFeeClaimantLrTemplate();
-        } else {
+        if (caseData.getHearingFeePaymentDetails() != null
+            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) {
             return notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
+        } else {
+            return notificationsProperties.getHearingListedFeeClaimantLrTemplate();
         }
     }
 
