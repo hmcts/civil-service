@@ -51,7 +51,7 @@ public class HearingUtils {
             case IN_PERSON:
                 return caseData.getHearingLocation().getValue().getLabel();
             case VIDEO:
-                return "videoconference";
+                return "video conference";
             case TELEPHONE:
                 return "telephone";
             default:
