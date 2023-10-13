@@ -66,6 +66,9 @@ def checkForEnableHelmLabel(branch_name) {
 
 withPipeline(type, product, component) {
 
+  def branchesToSync = ['perftest']
+  syncBranchesWithMaster(branchesToSync)
+
   onPR {
     env.ENVIRONMENT = "preview"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
