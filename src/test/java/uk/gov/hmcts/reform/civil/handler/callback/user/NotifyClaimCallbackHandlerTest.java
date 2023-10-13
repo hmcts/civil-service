@@ -13,23 +13,25 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 
 import static java.lang.String.format;
@@ -62,6 +64,9 @@ import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSIN
 class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
+    private WorkingDayIndicator workingDayIndicator;
+
+    @MockBean
     private DeadlinesCalculator deadlinesCalculator;
 
     @MockBean
@@ -89,6 +94,15 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
         "Date of Service should not be more than 14 days old";
+
+    public static final String DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS =
+        "Date of service must be no greater than 2 working days in the future";
+
+    public static final String DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS =
+        "On what day did you serve should not be more than 14 days old";
+
+    public static final String DATE_OF_SERVICE_DATE_IS_WORKING_DAY =
+        "For the date of service please enter a working day";
 
     @Nested
     class AboutToStartCallback {
@@ -211,10 +225,12 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldThrowError_whenNotifyingDate_futureDate() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v1LiP(CertificateOfService.builder()
+                                                .cosDateDeemedServedForDefendant(LocalDate.now())
                                                 .cosDateOfServiceForDefendant(LocalDate.now().plusDays(2))
                                                 .build())
                 .build();
             when(time.now()).thenReturn(LocalDateTime.now());
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -226,14 +242,21 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             ArrayList<String> cosUIStatement = new ArrayList<>();
             cosUIStatement.add("CERTIFIED");
             LocalDate cosNotifyDate = LocalDate.now();
+            LocalDate deemedServedDate = LocalDate.now();
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v1LiP(CertificateOfService.builder()
+                                                .cosDateDeemedServedForDefendant(LocalDate.now())
                                                 .cosDateOfServiceForDefendant(LocalDate.now())
                                                 .build())
                 .build();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
+                .thenReturn(LocalDate.of(2023, 10, 16));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                 .thenReturn(cosNotifyDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(15, 05)))
+                .thenReturn(deemedServedDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -245,21 +268,111 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNot_ThrowError_whenNotifyingDate_isPastDate_notOlderThan14days() {
             LocalDate cosNotifyDate = LocalDate.now().minusDays(3);
+            LocalDate deemedServedDate = LocalDate.now().minusDays(3);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v1LiP(CertificateOfService.builder()
                                                 .cosDateOfServiceForDefendant(cosNotifyDate)
+                                                .cosDateDeemedServedForDefendant(deemedServedDate)
                                                 .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
+                .thenReturn(LocalDate.now().plusDays(2));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
-                .thenReturn(cosNotifyDate.plusDays(14).atTime(16, 0));
+                .thenReturn(cosNotifyDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(15, 05)))
+                .thenReturn(deemedServedDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
         }
 
+        @Test
+        void shouldThrowError_whenDeemedServedDateIsOlderThan14Days() {
+            LocalDate currentDate = LocalDate.now();
+            LocalDate deemedServedDate = currentDate.minusDays(15);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(currentDate)
+                                                .cosDateDeemedServedForDefendant(deemedServedDate)
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
+            when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
+                .thenReturn(LocalDate.of(2023, 10, 16));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(16, 0)))
+                .thenReturn(LocalDateTime.of(deemedServedDate, LocalTime.of(16, 0)));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(currentDate.atTime(16, 0)))
+                .thenReturn(LocalDateTime.of(currentDate, LocalTime.of(16, 0)));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains(DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS);
+            assertThat(response.getErrors()).size().isEqualTo(1);
+        }
+
+        @Test
+        void shouldThrowError_whenDeemedServedDateExceeds2WorkingDays() {
+            LocalDate currentDate = LocalDate.now();
+            LocalDate deemedServedDate = currentDate.plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(currentDate)
+                                                .cosDateDeemedServedForDefendant(deemedServedDate)
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
+            when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
+                .thenReturn(LocalDate.of(2023, 10, 16));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(16, 0)))
+                .thenReturn(LocalDateTime.of(deemedServedDate, LocalTime.of(16, 0)));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(currentDate.atTime(16, 0)))
+                .thenReturn(LocalDateTime.of(currentDate, LocalTime.of(16, 0)));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains(DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS);
+            assertThat(response.getErrors()).size().isEqualTo(1);
+        }
+
+        @Test
+        void shouldThrowError_whenDeemedServedDateIsWorkingDay() {
+            LocalDate currentDate = LocalDate.now();
+            LocalDate deemedServedDate = currentDate.plusDays(2);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v1LiP(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(currentDate)
+                                                .cosDateDeemedServedForDefendant(deemedServedDate)
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
+            when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
+                .thenReturn(LocalDate.of(2023, 10, 16));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(16, 0))) // assuming 4 pm deadline
+                .thenReturn(LocalDateTime.of(deemedServedDate, LocalTime.of(16, 0)));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(currentDate.atTime(16, 0))) // assuming 4 pm deadline
+                .thenReturn(LocalDateTime.of(currentDate, LocalTime.of(16, 0)));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains(DATE_OF_SERVICE_DATE_IS_WORKING_DAY);
+        }
     }
 
     @Nested
@@ -275,6 +388,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
                                               .cosDateOfServiceForDefendant(LocalDate.now().plusDays(2))
+                                              .cosDateDeemedServedForDefendant(LocalDate.now())
                                               .build())
                 .build();
             when(time.now()).thenReturn(LocalDateTime.now());
@@ -292,6 +406,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
                                               .cosDateOfServiceForDefendant(cosNotifyDate)
+                                              .cosDateDeemedServedForDefendant(LocalDate.now())
                                               .build())
                 .build();
 
@@ -313,17 +428,25 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             ArrayList<String> cosUIStatement = new ArrayList<>();
             cosUIStatement.add("CERTIFIED");
             LocalDate cosNotifyDate = LocalDate.now();
+            LocalDate deemedServedDate = LocalDate.now();
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
                                               .cosDateOfServiceForDefendant(cosNotifyDate)
+                                              .cosDateDeemedServedForDefendant(LocalDate.now())
                                               .build())
                 .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
+                .thenReturn(LocalDate.of(2023, 10, 16));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                 .thenReturn(cosNotifyDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(15, 05)))
+                .thenReturn(deemedServedDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
         }
@@ -331,20 +454,25 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNot_ThrowError_whenCosServiceDate_notOlderThan14Days() {
             LocalDate cosNotifyDate = LocalDate.now().minusDays(5);
+            LocalDate deemedServedDate = LocalDate.now();
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
                                               .cosDateOfServiceForDefendant(cosNotifyDate)
+                                              .cosDateDeemedServedForDefendant(LocalDate.now())
                                               .build())
                 .build();
 
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                 .thenReturn(cosNotifyDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(15, 05)))
+                .thenReturn(deemedServedDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
+                .thenReturn(LocalDate.of(2023, 10, 16));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -357,19 +485,25 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNot_ThrowError_whenCosServiceDate_is14thDay_beforeBusinessDayEndTime() {
 
             LocalDate cosNotifyDate = LocalDate.of(2021, 5, 1);
+            LocalDate deemedServedDate = LocalDate.of(2021, 5, 1);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
                                               .cosDateOfServiceForDefendant(cosNotifyDate)
+                                              .cosDateDeemedServedForDefendant(deemedServedDate)
                                               .build())
                 .build();
 
             when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 15, 15, 05));
             when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                 .thenReturn(claimDetailsNotificationDeadline);
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(15, 05)))
+                .thenReturn(claimDetailsNotificationDeadline);
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
+                .thenReturn(LocalDate.of(2021, 5, 4));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -378,6 +512,91 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isEmpty();
         }
 
+        @Test
+        void shouldThrowError_whenDeemedServedDateIsOlderThan14Days() {
+            LocalDate currentDate = LocalDate.now();
+            LocalDate deemedServedDate = currentDate.minusDays(15);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v2RespondentLiP()
+                .cosNotifyClaimDefendant2(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(currentDate)
+                                                .cosDateDeemedServedForDefendant(deemedServedDate)
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
+            when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
+                .thenReturn(LocalDate.of(2023, 10, 16));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(16, 0)))
+                .thenReturn(LocalDateTime.of(deemedServedDate, LocalTime.of(16, 0)));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(currentDate.atTime(16, 0)))
+                .thenReturn(LocalDateTime.of(currentDate, LocalTime.of(16, 0)));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains(DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS);
+            assertThat(response.getErrors()).size().isEqualTo(1);
+        }
+
+        @Test
+        void shouldThrowError_whenDeemedServedDateExceeds2WorkingDays() {
+            LocalDate currentDate = LocalDate.now();
+            LocalDate deemedServedDate = currentDate.plusDays(5);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v2RespondentLiP()
+                .cosNotifyClaimDefendant2(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(currentDate)
+                                                .cosDateDeemedServedForDefendant(deemedServedDate)
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
+            when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
+                .thenReturn(LocalDate.of(2023, 10, 16));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(16, 0)))
+                .thenReturn(LocalDateTime.of(deemedServedDate, LocalTime.of(16, 0)));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(currentDate.atTime(16, 0)))
+                .thenReturn(LocalDateTime.of(currentDate, LocalTime.of(16, 0)));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains(DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS);
+            assertThat(response.getErrors()).size().isEqualTo(1);
+        }
+
+        @Test
+        void shouldThrowError_whenDeemedServedDateIsWorkingDay() {
+            LocalDate currentDate = LocalDate.now();
+            LocalDate deemedServedDate = currentDate.plusDays(2);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified1v2RespondentLiP()
+                .cosNotifyClaimDefendant2(CertificateOfService.builder()
+                                                .cosDateOfServiceForDefendant(currentDate)
+                                                .cosDateDeemedServedForDefendant(deemedServedDate)
+                                                .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
+            when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
+                .thenReturn(LocalDate.of(2023, 10, 16));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(16, 0))) // assuming 4 pm deadline
+                .thenReturn(LocalDateTime.of(deemedServedDate, LocalTime.of(16, 0)));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(currentDate.atTime(16, 0))) // assuming 4 pm deadline
+                .thenReturn(LocalDateTime.of(currentDate, LocalTime.of(16, 0)));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains(DATE_OF_SERVICE_DATE_IS_WORKING_DAY);
+        }
     }
 
     @Nested
