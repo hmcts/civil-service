@@ -1,4 +1,4 @@
-# civil-service test PR
+# civil-service
 
 Civil CCD Callback Service.
 
