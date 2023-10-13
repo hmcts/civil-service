@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -464,11 +465,26 @@ public class FlowPredicate {
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
         caseData.getTakenOfflineByStaffDate() != null;
 
+    public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse = caseData ->
+        getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(caseData);
+
     public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = caseData ->
         getPredicateTakenOfflineByStaffAfterClaimIssue(caseData);
 
     public static final Predicate<CaseData> takenOfflineByStaffBeforeClaimIssued = caseData ->
         getPredicateTakenOfflineByStaffBeforeClaimIssue(caseData);
+
+    public static final boolean getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(CaseData caseData) {
+        boolean basePredicate = caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getApplicant1ResponseDate() == null;
+
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && YES.equals(caseData.getAddApplicant2())) {
+            return basePredicate && caseData.getApplicant2ResponseDate() == null;
+        }
+
+        return basePredicate;
+    }
 
     public static final boolean getPredicateTakenOfflineByStaffBeforeClaimIssue(CaseData caseData) {
         // In case of SPEC and UNSPEC claim ClaimNotificationDeadline will be set when the case is issued

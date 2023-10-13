@@ -105,6 +105,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimIssue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterDefendantResponse;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeClaimIssued;
@@ -1264,6 +1265,50 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataAtStateCaseProceedsInCaseman() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
             assertFalse(fullDefence.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse1v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse1v2DS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence()
+                .respondent2Responds(FULL_DEFENCE)
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse1v2SS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .atStateBothRespondentsSameResponse(FULL_DEFENCE)
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse2v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoApplicants()
+                .atStateRespondentFullDefence()
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAfterClaimantResponseAfterDefendantResponse() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .takenOfflineByStaff().build();
+            assertFalse(takenOfflineByStaffAfterDefendantResponse.test(caseData));
         }
     }
 
