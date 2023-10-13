@@ -29,8 +29,6 @@ public interface DQ {
         return experts;
     }
 
-    RemoteHearing getRemoteHearing();
-
     Witnesses getWitnesses();
 
     default Witnesses getWitnesses(Witnesses witnesses) {
@@ -68,6 +66,8 @@ public interface DQ {
     HearingSupport getHearingSupport();
 
     FurtherInformation getFurtherInformation();
+
+    RemoteHearing getRemoteHearing();
 
     WelshLanguageRequirements getWelshLanguageRequirements();
 

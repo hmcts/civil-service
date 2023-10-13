@@ -8,13 +8,14 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -25,6 +26,7 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationDetailsService organisationDetailsService;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_LIP_DEFENDANT_REJECT_REPAYMENT);
     private static final String REFERENCE_TEMPLATE_LIP = "claimant-reject-repayment-respondent-notification-%s";
     public static final String TASK_ID_LIP = "ClaimantDisAgreedRepaymentPlanNotifyLip";
@@ -43,15 +45,15 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
 
     private CallbackResponse notifyDefendantLip(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (isRespondentNotRepresented(caseData) && caseData.getRespondent1().getPartyEmail() != null) {
+        if (Objects.nonNull(caseData.getRespondent1Email())) {
             notificationService.sendMail(
-                addEmail(caseData),
+                caseData.getRespondent1Email(),
                 addTemplate(caseData),
                 addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference()));
+                String.format(REFERENCE_TEMPLATE_LIP, caseData.getLegacyCaseReference())
+            );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-
     }
 
     @Override
@@ -61,32 +63,30 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-
-        if (isRespondentNotRepresented(caseData)) {
+        if (caseData.isRespondent1NotRepresented()) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
             );
         }
-        return null;
-    }
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
+        );
 
-    private String addEmail(CaseData caseData) {
-        if (isRespondentNotRepresented(caseData)) {
-            return caseData.getRespondent1().getPartyEmail();
-        }
-        return null;
     }
 
     private String addTemplate(CaseData caseData) {
-        if (caseData.isRespondentResponseBilingual()) {
-            return notificationsProperties.getNotifyDefendantLipWelshTemplate();
-        } else {
-            return notificationsProperties.getNotifyDefendantLipTemplate();
+        if (caseData.isRespondent1NotRepresented()) {
+            return getRespondentLipTemplate(caseData);
         }
+        return notificationsProperties.getNotifyDefendantLrTemplate();
     }
 
-    public boolean isRespondentNotRepresented(CaseData caseData) {
-        return YesOrNo.NO.equals(caseData.getSpecRespondent1Represented());
+    private String getRespondentLipTemplate(CaseData caseData) {
+        if (caseData.isRespondentResponseBilingual()) {
+            return notificationsProperties.getNotifyDefendantLipWelshTemplate();
+        }
+        return notificationsProperties.getNotifyDefendantLipTemplate();
     }
 }
