@@ -147,7 +147,7 @@ class FeatureToggleServiceTest {
         var caseFileKey = "cui-case-progression";
         givenToggle(caseFileKey, toggleStat);
 
-        assertThat(featureToggleService.isUpdateContactDetailsEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {
