@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -1038,12 +1039,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public String getApplicant1Email() {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
-    
+
     @JsonIgnore
     public String getHelpWithFeesReferenceNumber() {
         return Optional.ofNullable(getCaseDataLiP())
-            .map(CaseDataLiP::getRespondent1LiPResponse)
-            .map(RespondentLiPResponse::getHelpWithFeesReferenceNumberLip).orElse(null);
+            .map(CaseDataLiP::getHelpWithFees)
+            .map(HelpWithFees::getHelpWithFeesReferenceNumber).orElse(null);
     }
 
     @JsonIgnore
