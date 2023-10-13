@@ -369,7 +369,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.24'
+  implementation 'com.github.hmcts:civil-commons:1.0.25'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -400,6 +400,8 @@ dependencies {
 
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '12.4'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
+
+  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.0.1'
 
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
