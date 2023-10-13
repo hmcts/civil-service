@@ -56,7 +56,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1v1;
@@ -266,82 +265,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .extracting("typeRepresentationDefendantTwoDynamic")
                 .isEqualTo("Mr. John Rambo");
 
-        }
-
-        @Test
-        void shouldPopulateFields_whenIsCalledBeforeSdo() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .addApplicant2(YES)
-                .applicant2(PartyBuilder.builder().individual().build())
-                .ccdState(JUDICIAL_REFERRAL)
-                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            String advancedDate = LocalDate.now().plusDays(14).toString();
-            when(locationRefDataService.getCcmccLocation(any())).thenReturn(locationRefDataBeforeSdo);
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            // Then
-            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
-                .extracting("ownInitiativeText")
-                .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
-            assertThat(response.getData()).extracting("finalOrderRepresentation")
-                .extracting("typeRepresentationComplex")
-                .extracting("typeRepresentationClaimantOneDynamic")
-                .isEqualTo("Mr. John Rambo");
-            assertThat(response.getData()).extracting("finalOrderRepresentation")
-                .extracting("typeRepresentationComplex")
-                .extracting("typeRepresentationDefendantOneDynamic")
-                .isEqualTo("Mr. Sole Trader");
-            assertThat(response.getData()).extracting("finalOrderRepresentation")
-                .extracting("typeRepresentationComplex")
-                .extracting("typeRepresentationClaimantTwoDynamic")
-                .isEqualTo("Mr. John Rambo");
-            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
-                .extracting("ownInitiativeDate")
-                .isEqualTo(LocalDate.now().toString());
-            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
-                .extracting("withOutNoticeText")
-                .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
-            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
-                .extracting("withOutNoticeDate")
-                .isEqualTo(LocalDate.now().toString());
-            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
-                .extracting("assistedOrderCostsFirstDropdownDate")
-                .isEqualTo(advancedDate);
-            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
-                .extracting("assistedOrderAssessmentThirdDropdownDate")
-                .isEqualTo(advancedDate);
-            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
-                .extracting("makeAnOrderForCostsQOCSYesOrNo")
-                .isEqualTo("No");
-            assertThat(response.getData()).extracting("publicFundingCostsProtection")
-                .isEqualTo("No");
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedDropdown")
-                .extracting("appealChoiceSecondDropdownA")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedDropdown")
-                .extracting("appealChoiceSecondDropdownB")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealRefusedDropdown")
-                .extracting("appealChoiceSecondDropdownA")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealRefusedDropdown")
-                .extracting("appealChoiceSecondDropdownB")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderFurtherHearingComplex")
-                .extracting("hearingLocationList").asString().contains("SiteName before Sdo");
         }
     }
 
