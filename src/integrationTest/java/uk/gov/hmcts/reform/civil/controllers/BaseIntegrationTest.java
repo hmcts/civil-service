@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
+import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -73,6 +74,8 @@ public abstract class BaseIntegrationTest {
     protected SecurityContext securityContext;
     @MockBean
     protected JwtDecoder jwtDecoder;
+    @MockBean
+    public AuthorisationService authorisationService;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -82,6 +85,7 @@ public abstract class BaseIntegrationTest {
 
     @BeforeEach
     public void setUpBase() {
+        when(authorisationService.isServiceAuthorized(any())).thenReturn(true);
         when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
         when(userService.getUserInfo(anyString())).thenReturn(USER_INFO);
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -119,7 +123,6 @@ public abstract class BaseIntegrationTest {
         return mockMvc.perform(
             MockMvcRequestBuilders.post(urlTemplate, uriVars)
                 .header(HttpHeaders.AUTHORIZATION, auth)
-                .header("ServiceAuthorization", s2sToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(toJson(content)));
     }
@@ -138,7 +141,6 @@ public abstract class BaseIntegrationTest {
         return mockMvc.perform(
             MockMvcRequestBuilders.get(urlTemplate, uriVars)
                 .header(HttpHeaders.AUTHORIZATION, auth)
-                .header("ServiceAuthorization", s2sToken)
                 .contentType(MediaType.APPLICATION_JSON));
     }
 

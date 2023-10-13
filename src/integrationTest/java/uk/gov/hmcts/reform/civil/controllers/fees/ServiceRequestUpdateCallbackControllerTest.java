@@ -18,11 +18,14 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
+import javax.servlet.ServletException;
 import java.math.BigDecimal;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
@@ -32,6 +35,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     private static final String PAID = "Paid";
     private static final String REFERENCE = "reference";
     private static final String ACCOUNT_NUMBER = "123445555";
+    private static final String s2sToken = "s2s AuthToken";
 
     @MockBean
     CoreCaseDataApi coreCaseDataApi;
@@ -50,6 +54,33 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
         given(coreCaseDataApi.getCase(any(), any(), any())).willReturn(caseDetails);
         given(coreCaseDataApi.startEventForCaseWorker(any(), any(), any(), any(), any(), any(), any())).willReturn(startEventResponse);
         given(coreCaseDataApi.submitEventForCaseWorker(any(), any(), any(), any(), any(), any(), anyBoolean(), any())).willReturn(caseDetails);
+    }
+
+    @Test
+    public void whenValidPaymentCallbackIsReceivedReturnSuccess() throws Exception {
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void whenPaymentCallbackIsReceivedWithoutServiceAuthorisationReturn400() throws Exception {
+        mockMvc.perform(
+            MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(buildServiceDto()))).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButreturnsfalseReturn400() throws Exception {
+        when(authorisationService.isServiceAuthorized(any())).thenReturn(false);
+        Exception e = assertThrows(
+            ServletException.class,
+            () -> mockMvc.perform(
+                MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
+                    .header("ServiceAuthorization", s2sToken)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(toJson(buildServiceDto()))).andExpect(status().isBadRequest()));
+
     }
 
     @Test

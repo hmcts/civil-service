@@ -17,8 +17,6 @@ import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
 import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
-import uk.gov.hmcts.reform.authorisation.filters.ServiceAuthFilter;
 import uk.gov.hmcts.reform.civil.security.JwtGrantedAuthoritiesConverter;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
@@ -51,7 +49,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/",
         "/loggers/**",
         "/assignment/**",
-        "/case/document/**"
+        "/case/document/**",
+        "/service-request-update",
     };
 
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
@@ -62,12 +61,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
-    private final ServiceAuthFilter serviceAuthFilter;
-
     @Autowired
-    public SecurityConfiguration(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter,
-                                 final ServiceAuthFilter serviceAuthFilter) {
-        this.serviceAuthFilter = serviceAuthFilter;
+    public SecurityConfiguration(final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter) {
         jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
     }
@@ -80,7 +75,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .addFilterBefore(serviceAuthFilter,  AbstractPreAuthenticatedProcessingFilter.class)
             .sessionManagement().sessionCreationPolicy(STATELESS).and()
             .csrf().disable()
             .formLogin().disable()
