@@ -125,8 +125,8 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
                 && nonNull(caseData.getSolicitorReferences().getApplicantSolicitor1Reference())) {
                 reference = caseData.getSolicitorReferences().getApplicantSolicitor1Reference();
             }
-            if(caseData.getHearingFeePaymentDetails() == null ||
-                !SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) {
+            if (caseData.getHearingFeePaymentDetails() == null
+                || !SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) {
                 map.put(HEARING_FEE, caseData.getHearingFee() == null
                     ? "£0.00" : String.valueOf(caseData.getHearingFee().formData()));
                 map.put(HEARING_DUE_DATE, caseData.getHearingDueDate() == null
