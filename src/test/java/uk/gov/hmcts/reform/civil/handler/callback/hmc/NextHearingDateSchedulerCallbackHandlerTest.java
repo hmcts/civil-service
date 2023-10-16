@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
-import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
 @SpringBootTest(classes = {
