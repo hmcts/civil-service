@@ -120,7 +120,7 @@ public class BundleRequestMapper {
             bundlingRequestDocuments.addAll(getAllExpertReports(partyType, EvidenceUploadFiles.JOINT_STATEMENT, caseData,
                                                                 BundleFileNameList.JOINT_STATEMENTS_OF_EXPERTS, allJointExpertsNames
             ));
-            bundlingRequestDocuments.addAll(getAllExpertReports(partyType, EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS, caseData,
+            bundlingRequestDocuments.addAll(getAllOtherPartyQuestions(partyType, EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS, caseData,
                                                                 BundleFileNameList.QUESTIONS_TO, allJointExpertsNames));
             bundlingRequestDocuments.addAll(getAllExpertReports(partyType, EvidenceUploadFiles.ANSWERS_FOR_EXPERTS, caseData,
                                                                 BundleFileNameList.REPLIES_FROM, allJointExpertsNames));
@@ -174,12 +174,15 @@ public class BundleRequestMapper {
                                                                 caseData, BundleFileNameList.REPLIES_FROM, allExpertsNames));
         List<String> allJointExpertsNames = getAllExpertsNames(partyType, EvidenceUploadFiles.JOINT_STATEMENT,
                                                                caseData, false);
+        List<String> allJointExpertsNamesFromOtherParty = getAllExpertsNames(partyType,
+                                                                          EvidenceUploadFiles.JOINT_STATEMENT,
+                                                               caseData, true);
         List<String> allExpertNamesFromOtherParty = getAllExpertsNames(partyType,
                                                                           EvidenceUploadFiles.EXPERT_REPORT,
                                                                caseData, true);
         bundlingRequestDocuments.addAll(getAllRemainingExpertReports(partyType,
                                                                     EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS, caseData,
-                                                            BundleFileNameList.QUESTIONS_TO, allExpertNamesFromOtherParty, allJointExpertsNames));
+                                                            BundleFileNameList.QUESTIONS_TO, allExpertNamesFromOtherParty, allJointExpertsNamesFromOtherParty));
         bundlingRequestDocuments.addAll(getAllRemainingExpertReports(partyType, EvidenceUploadFiles.ANSWERS_FOR_EXPERTS,
                                                              caseData,
                                                             BundleFileNameList.REPLIES_FROM, allExpertsNames, allJointExpertsNames));
