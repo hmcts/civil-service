@@ -95,7 +95,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         String reason;
         if (isTransferOnlineCase(callbackParams.getCaseData())) {
-            reason = ""; //Change to ReasonForCaseTransferJudgeTxt if validation also needed for this field
+            reason = callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt();
         } else {
             reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
         }

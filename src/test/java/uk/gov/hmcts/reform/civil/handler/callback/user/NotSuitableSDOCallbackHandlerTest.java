@@ -167,7 +167,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldValidateTOCReason_whenInvokedAndTOCEnabledTransferCase() {
+        void shouldValidateTOCReasonLessThan150_whenInvokedAndTOCEnabledTransferCase() {
             when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
             final String PAGE_ID = "not-suitable-reason";
 
@@ -177,6 +177,23 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isEmpty();
+
+        }
+
+        @Test
+        void shouldValidateTOCReasonMoreThan150_whenInvokedAndTOCEnabledTransferCase() {
+            when(toggleService.isTransferOnlineCaseEnabled()).thenReturn(true);
+            final String PAGE_ID = "not-suitable-reason";
+            final int lengthALlowed = 150;
+
+            caseData = CaseDataBuilder.builder().atStateBeforeTransferCaseSDONotDrawnOverLimit().build();
+            params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors().get(0)).isEqualTo("Character Limit Reached: "
+                                                                  + "Reason for not drawing Standard Directions order cannot exceed "
+                                                                  + lengthALlowed + " characters.");
 
         }
     }
