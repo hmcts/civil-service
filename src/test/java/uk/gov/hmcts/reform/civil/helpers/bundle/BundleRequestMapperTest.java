@@ -40,13 +40,8 @@ class BundleRequestMapperTest {
     @Test
     void testBundleRequestMapperWithAllDocs() {
         // Given
-        List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = getWitnessDocs();
-        List<Element<UploadEvidenceExpert>> expertEvidenceDocs = getExpertDocs();
-        List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = setupOtherEvidenceDocs();
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = setupSystemGeneratedCaseDocs();
         //Add all type of documents and other request details in case data
-        CaseData caseData = getCaseData(witnessEvidenceDocs, expertEvidenceDocs, otherEvidenceDocs,
-                                        systemGeneratedCaseDocuments);
+        CaseData caseData = getCaseData();
 
         // When
         BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
@@ -127,13 +122,13 @@ class BundleRequestMapperTest {
                       bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(1).getValue().getDocumentFileName());
         assertEquals("Replies from expert1 12/01/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(2).getValue().getDocumentFileName());
-        assertEquals("Expert Evidence expert1 Test 12/01/2023",
+        assertEquals("Expert Evidence expert2 Test 12/01/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2ExpertEvidence().get(0).getValue().getDocumentFileName());
-        assertEquals("Expert Evidence expert1 Test 12/01/2023",
+        assertEquals("Expert Evidence expert3 Test 12/01/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1ExpertEvidence().get(0).getValue().getDocumentFileName());
-        assertEquals("Expert Evidence expert1 Test 12/01/2023",
+        assertEquals("Expert Evidence expert4 Test 12/01/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2ExpertEvidence().get(0).getValue().getDocumentFileName());
-        assertEquals("Joint statement of experts expert1 Test1 Test2 12/01/2023",
+        assertEquals("Joint statement of experts expert5 Test1 Test2 12/01/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getJointStatementOfExperts().get(0).getValue().getDocumentFileName());
         assertEquals("testFileName",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1DisclosedDocuments().get(0).getValue().getDocumentFileName());
@@ -153,61 +148,58 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2CostsBudgets().get(0).getValue().getDocumentFileName());
     }
 
-    private CaseData getCaseData(List<Element<UploadEvidenceWitness>> witnessEvidenceDocs,
-                                 List<Element<UploadEvidenceExpert>> expertEvidenceDocs,
-                                 List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs,
-                                 List<Element<CaseDocument>> systemGeneratedCaseDocuments) {
+    private CaseData getCaseData() {
         return CaseData.builder().ccdCaseReference(1L)
-            .documentWitnessStatement(witnessEvidenceDocs)
-            .documentWitnessStatementApp2(witnessEvidenceDocs)
-            .documentWitnessStatementRes(witnessEvidenceDocs)
-            .documentWitnessStatementRes2(witnessEvidenceDocs)
-            .documentWitnessSummary(witnessEvidenceDocs)
-            .documentWitnessSummaryApp2(witnessEvidenceDocs)
-            .documentWitnessSummaryRes(witnessEvidenceDocs)
-            .documentWitnessSummaryRes2(witnessEvidenceDocs)
-            .documentHearsayNotice(witnessEvidenceDocs)
-            .documentHearsayNoticeApp2(witnessEvidenceDocs)
-            .documentHearsayNoticeRes(witnessEvidenceDocs)
-            .documentHearsayNoticeRes2(witnessEvidenceDocs)
-            .documentReferredInStatement(otherEvidenceDocs)
-            .documentReferredInStatementApp2(otherEvidenceDocs)
-            .documentReferredInStatementRes(otherEvidenceDocs)
-            .documentReferredInStatementRes2(otherEvidenceDocs)
-            .documentExpertReport(expertEvidenceDocs)
-            .documentExpertReportApp2(expertEvidenceDocs)
-            .documentExpertReportRes(expertEvidenceDocs)
-            .documentExpertReportRes2(expertEvidenceDocs)
-            .documentJointStatement(expertEvidenceDocs)
-            .documentJointStatementApp2(expertEvidenceDocs)
-            .documentJointStatementRes(expertEvidenceDocs)
-            .documentJointStatementRes2(expertEvidenceDocs)
-            .documentAnswers(expertEvidenceDocs)
-            .documentAnswersApp2(expertEvidenceDocs)
-            .documentAnswersRes(expertEvidenceDocs)
-            .documentAnswersRes2(expertEvidenceDocs)
-            .documentQuestions(expertEvidenceDocs)
-            .documentQuestionsApp2(expertEvidenceDocs)
-            .documentQuestionsRes(expertEvidenceDocs)
-            .documentQuestionsRes2(expertEvidenceDocs)
+            .documentWitnessStatement(getWitnessDocs())
+            .documentWitnessStatementApp2(getWitnessDocs())
+            .documentWitnessStatementRes(getWitnessDocs())
+            .documentWitnessStatementRes2(getWitnessDocs())
+            .documentWitnessSummary(getWitnessDocs())
+            .documentWitnessSummaryApp2(getWitnessDocs())
+            .documentWitnessSummaryRes(getWitnessDocs())
+            .documentWitnessSummaryRes2(getWitnessDocs())
+            .documentHearsayNotice(getWitnessDocs())
+            .documentHearsayNoticeApp2(getWitnessDocs())
+            .documentHearsayNoticeRes(getWitnessDocs())
+            .documentHearsayNoticeRes2(getWitnessDocs())
+            .documentReferredInStatement(setupOtherEvidenceDocs())
+            .documentReferredInStatementApp2(setupOtherEvidenceDocs())
+            .documentReferredInStatementRes(setupOtherEvidenceDocs())
+            .documentReferredInStatementRes2(setupOtherEvidenceDocs())
+            .documentExpertReport(getExpertDocs("expert1"))
+            .documentExpertReportApp2(getExpertDocs("expert2"))
+            .documentExpertReportRes(getExpertDocs("expert3"))
+            .documentExpertReportRes2(getExpertDocs("expert4"))
+            .documentJointStatement(getExpertDocs("expert5"))
+            .documentJointStatementApp2(getExpertDocs("expert6"))
+            .documentJointStatementRes(getExpertDocs("expert7"))
+            .documentJointStatementRes2(getExpertDocs("expert8"))
+            .documentAnswers(getExpertDocs("expert1"))
+            .documentAnswersApp2(getExpertDocs("expert2"))
+            .documentAnswersRes(getExpertDocs("expert3"))
+            .documentAnswersRes2(getExpertDocs("expert4"))
+            .documentQuestions(getExpertOtherPartyQuestionDocs("cl1Fname"))
+            .documentQuestionsApp2(getExpertOtherPartyQuestionDocs("cl2Fname"))
+            .documentQuestionsRes(getExpertOtherPartyQuestionDocs("df1Fname"))
+            .documentQuestionsRes2(getExpertOtherPartyQuestionDocs("df2Fname"))
             .documentEvidenceForTrial(getDocumentEvidenceForTrial())
             .documentEvidenceForTrialApp2(getDocumentEvidenceForTrial())
             .documentEvidenceForTrialRes(getDocumentEvidenceForTrial())
             .documentEvidenceForTrialRes2(getDocumentEvidenceForTrial())
-            .documentCaseSummary(otherEvidenceDocs)
-            .documentCaseSummaryApp2(otherEvidenceDocs)
-            .documentCaseSummaryRes(otherEvidenceDocs)
-            .documentCaseSummaryRes2(otherEvidenceDocs)
-            .documentForDisclosure(otherEvidenceDocs)
+            .documentCaseSummary(setupOtherEvidenceDocs())
+            .documentCaseSummaryApp2(setupOtherEvidenceDocs())
+            .documentCaseSummaryRes(setupOtherEvidenceDocs())
+            .documentCaseSummaryRes2(setupOtherEvidenceDocs())
+            .documentForDisclosure(setupOtherEvidenceDocs())
             .defendantResponseDocuments(getDefendantResponseDocs())
             .claimantResponseDocuments(getClaimantResponseDocs())
             .dismissalOrderDocStaff(getOrderDoc(DocumentType.DISMISSAL_ORDER))
             .generalOrderDocStaff(getOrderDoc(DocumentType.GENERAL_ORDER))
-            .documentCosts(otherEvidenceDocs)
-            .documentCostsApp2(otherEvidenceDocs)
-            .documentCostsRes(otherEvidenceDocs)
-            .documentCostsRes2(otherEvidenceDocs)
-            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
+            .documentCosts(setupOtherEvidenceDocs())
+            .documentCostsApp2(setupOtherEvidenceDocs())
+            .documentCostsRes(setupOtherEvidenceDocs())
+            .documentCostsRes2(setupOtherEvidenceDocs())
+            .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocs())
             .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
                 "applicant1").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualLastName("lastname").individualFirstName("df1Fname").partyName(
@@ -221,6 +213,36 @@ class BundleRequestMapperTest {
             .hearingDate(LocalDate.now())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .build();
+    }
+
+    private List<Element<UploadEvidenceExpert>> getExpertOtherPartyQuestionDocs(String partyName) {
+        String expertName = "";
+        String otherParty = "";
+        if (partyName.equals("cl1Fname")) {
+            expertName = "expert3";
+            otherParty = "df1Fname";
+        } else if (partyName.equals("cl2Fname")) {
+            expertName = "expert4";
+            otherParty = "df2Fname";
+        } else if (partyName.equals("df1Fname")) {
+            expertName = "expert1";
+            otherParty = "cl1Fname";
+        } else {
+            expertName = "expert2";
+            otherParty = "cl2Fname";
+        }
+        List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
+        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
+                                                        .builder()
+                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                            .documentFileName(TEST_FILE_NAME).build())
+                                                        .expertOptionExpertise("Test")
+                                                        .expertOptionOtherParty(otherParty)
+                                                        .expertOptionExpertises("Test1 Test2")
+                                                        .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
+                                                        .expertOptionName(expertName).build()));
+
+        return  expertEvidenceDocs;
     }
 
     private List<Element<CaseDocument>> getClaimantResponseDocs() {
@@ -293,7 +315,7 @@ class BundleRequestMapperTest {
         return otherEvidenceDocs;
     }
 
-    private List<Element<UploadEvidenceExpert>> getExpertDocs() {
+    private List<Element<UploadEvidenceExpert>> getExpertDocs(String expertName) {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
         expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
                                                         .builder()
@@ -302,7 +324,7 @@ class BundleRequestMapperTest {
                                                         .expertOptionExpertise("Test")
                                                         .expertOptionExpertises("Test1 Test2")
                                                         .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
-                                                        .expertOptionName("expert1").build()));
+                                                        .expertOptionName(expertName).build()));
 
         return  expertEvidenceDocs;
     }
