@@ -290,8 +290,7 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("notSuitableSdoOptions").isEqualTo("CHANGE_LOCATION");
             assertThat(response.getData()).extracting("otherDetails").extracting("notSuitableForSDO").isEqualTo("Yes");
-            assertThat(response.getData()).extracting("tocTransferCaseReason").extracting("reasonForCaseTransferJudgeTxt").isEqualTo("unforeseen complexities");
-
+            assertThat(response.getData()).extracting("transferCaseDetails").extracting("reasonForTransferCaseTxt").isEqualTo("unforeseen complexities");
         }
     }
 
