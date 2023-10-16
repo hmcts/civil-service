@@ -105,6 +105,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimIssue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimantResponseBeforeSDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterDefendantResponse;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
@@ -1758,6 +1759,27 @@ class FlowPredicateTest {
                 .build();
 
             assertTrue(takenOfflineBySystem.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffAferClaimantResponseBeforeSdo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .takenOfflineByStaff()
+                .build();
+
+            assertTrue(takenOfflineByStaffAfterClaimantResponseBeforeSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineByStaffAferClaimantResponseAfterSdo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .takenOfflineByStaff()
+                .build().toBuilder()
+                .drawDirectionsOrderRequired(YES).build();
+
+            assertFalse(takenOfflineByStaffAfterClaimantResponseBeforeSDO.test(caseData));
         }
     }
 

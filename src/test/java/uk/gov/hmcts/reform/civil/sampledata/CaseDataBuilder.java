@@ -485,6 +485,8 @@ public class CaseDataBuilder {
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
 
+    private YesOrNo drawDirectionsOrderRequired;
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -4665,6 +4667,7 @@ public class CaseDataBuilder {
             atStateBothApplicantsRespondToDefenceAndProceed_2v1();
         }
 
+        drawDirectionsOrderRequired = NO;
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = applicant1ResponseDate.plusDays(1);
         return this;
@@ -6308,6 +6311,7 @@ public class CaseDataBuilder {
             //Transfer Online Case
             .notSuitableSdoOptions(notSuitableSdoOptions)
             .tocTransferCaseReason(tocTransferCaseReason)
+            .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
             .build();
     }
 }
