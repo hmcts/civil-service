@@ -10,7 +10,7 @@ Civil CCD Callback Service.
 
 ## Building and deploying the application
 
-### Dependencies
+### Dependencies 
 
 The project is dependent on other Civil repositories:
 
