@@ -103,7 +103,7 @@ public class JudgeFinalOrderGeneratorTest {
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String DATE_FORMAT = "dd/MM/yyyy";
     private static final String fileFreeForm = format(FREE_FORM_ORDER_PDF.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
-    private static final String assistedForm = format(ASSISTED_ORDER_PDF.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));;
+    private static final String assistedForm = format(ASSISTED_ORDER_PDF.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     List<FinalOrderToggle> toggleList = new ArrayList<FinalOrderToggle>(Arrays.asList(FinalOrderToggle.SHOW));
     private static final CaseDocument FREE_FROM_ORDER = CaseDocumentBuilder.builder()
         .documentName(fileFreeForm)
