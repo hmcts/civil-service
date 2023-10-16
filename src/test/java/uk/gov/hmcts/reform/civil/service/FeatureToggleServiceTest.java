@@ -152,6 +152,15 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isLocationWhiteListedForCaseProgression(location)).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
+        var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
+        givenToggle(transferCaseOnlineKey, toggleStat);
+
+        assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
