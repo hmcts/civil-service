@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @Service
 @RequiredArgsConstructor
 public class ResponseOneVOneShowTagService {
+
     public ResponseOneVOneShowTag setUpOneVOneFlow(CaseData caseData) {
         if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
             if (caseData.getRespondent1ClaimResponseTypeForSpec() == null) {
