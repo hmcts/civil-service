@@ -309,9 +309,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
                 case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimSpec2v1() == YesOrNo.YES;
                 case ONE_V_TWO_ONE_LEGAL_REP -> addRespondent2
-                    && YES.equals(caseData.getRespondentResponseIsSame());
+                    && YES.equals(caseData.getRespondent2SameLegalRepresentative());
                 case ONE_V_TWO_TWO_LEGAL_REP -> addRespondent2
-                    && caseData.getRespondentResponseIsSame() == null;
+                    && NO.equals(caseData.getRespondent2SameLegalRepresentative());
             };
         } else {
             AllocatedTrack allocatedTrack =
