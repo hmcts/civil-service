@@ -175,7 +175,7 @@ public class BundleRequestMapper {
         List<String> allJointExpertsNames = getAllExpertsNames(partyType, EvidenceUploadFiles.JOINT_STATEMENT,
                                                                caseData, false);
         List<String> allExpertNamesFromOtherParty = getAllExpertsNames(partyType,
-                                                                          EvidenceUploadFiles.JOINT_STATEMENT,
+                                                                          EvidenceUploadFiles.EXPERT_REPORT,
                                                                caseData, true);
         bundlingRequestDocuments.addAll(getAllRemainingExpertReports(partyType,
                                                                     EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS, caseData,
@@ -190,7 +190,9 @@ public class BundleRequestMapper {
                                                                  EvidenceUploadFiles questionsForExperts, CaseData caseData,
                                                                           BundleFileNameList questionsTo, List<String> allExpertsNames) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        List<Element<UploadEvidenceExpert>> questionsFromOtherPartyDocs = getAllDocsFromOtherParty(partyType, caseData);
+        List<Element<UploadEvidenceExpert>> questionsFromOtherPartyDocs = getAllDocsFromOtherParty(partyType, caseData,
+                                                                                                   questionsForExperts
+        );
         if (!questionsFromOtherPartyDocs.isEmpty()) {
             List<Element<UploadEvidenceExpert>> tempList = questionsFromOtherPartyDocs.stream().filter(expertElement -> matchType(
                     expertElement.getValue().getExpertOptionName(), allExpertsNames, false
@@ -217,15 +219,16 @@ public class BundleRequestMapper {
         return false;
     }
 
-    private List<Element<UploadEvidenceExpert>> getAllDocsFromOtherParty(PartyType partyType, CaseData caseData) {
+    private List<Element<UploadEvidenceExpert>> getAllDocsFromOtherParty(PartyType partyType, CaseData caseData,
+                                                                         EvidenceUploadFiles evidenceUploadFileType) {
         List<Element<UploadEvidenceExpert>> list = new ArrayList<>();
         if (partyType.equals(PartyType.CLAIMANT1) || partyType.equals(PartyType.CLAIMANT2)) {
             list.addAll(getExpertDocsByPartyAndDocType(PartyType.DEFENDANT1,
-                                                          EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS, caseData));
-            list.addAll(getExpertDocsByPartyAndDocType(PartyType.DEFENDANT2, EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS, caseData));
+                                                          evidenceUploadFileType, caseData));
+            list.addAll(getExpertDocsByPartyAndDocType(PartyType.DEFENDANT2, evidenceUploadFileType, caseData));
         } else  {
-            list.addAll(getExpertDocsByPartyAndDocType(PartyType.CLAIMANT1, EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS, caseData));
-            list.addAll(getExpertDocsByPartyAndDocType(PartyType.CLAIMANT2, EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS, caseData));
+            list.addAll(getExpertDocsByPartyAndDocType(PartyType.CLAIMANT1, evidenceUploadFileType, caseData));
+            list.addAll(getExpertDocsByPartyAndDocType(PartyType.CLAIMANT2, evidenceUploadFileType, caseData));
         }
         return list;
     }
@@ -256,7 +259,7 @@ public class BundleRequestMapper {
                                             CaseData caseData, boolean isOtherPartyList) {
         List<Element<UploadEvidenceExpert>> expertsList = new ArrayList<>();
         if (isOtherPartyList) {
-            expertsList = getAllDocsFromOtherParty(partyType, caseData);
+            expertsList = getAllDocsFromOtherParty(partyType, caseData, evidenceUploadFileType);
         } else {
             expertsList = getExpertDocsByPartyAndDocType(partyType, evidenceUploadFileType, caseData);
         }
