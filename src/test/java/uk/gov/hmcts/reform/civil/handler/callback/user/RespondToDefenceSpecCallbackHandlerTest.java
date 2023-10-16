@@ -146,6 +146,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private PaymentDateService paymentDateService;
 
+    @Autowired
+    private ResponseOneVOneShowTagService responseOneVOneShowTagService;
+
     @MockBean
     private UnavailableDateValidator unavailableDateValidator;
 
@@ -167,8 +170,6 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RespondentMediationService respondentMediationService;
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
-    private ResponseOneVOneShowTagService responseOneVOneShowTagService;
 
     @Nested
     class AboutToStart {
