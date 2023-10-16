@@ -140,6 +140,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -700,6 +702,10 @@ public class CaseDataParent implements MappableObject {
     private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
     private String pcqId;
+
+    // TOC
+    private NotSuitableSdoOptions notSuitableSdoOptions;
+    private TocTransferCaseReason tocTransferCaseReason;
 
     @JsonUnwrapped
     private final UpdateDetailsForm updateDetailsForm;
