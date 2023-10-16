@@ -269,6 +269,13 @@ task runProdApiTests(type: Exec, description: 'Runs Prod features in functional 
   commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-prod'
 }
 
+task runNonProdApiTests(type: Exec, description: 'Runs Non Prod featuers in functional tests.') {
+  onlyIf {
+    return System.env.ENVIRONMENT == 'preview'
+  }
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:api-nonprod'
+}
+
 task runNightlyApiTests(type: Exec, description: 'Runs additional multiparty nightly tests.') {
   onlyIf {
     return System.env.NIGHTLY_RUN == 'true'
@@ -293,7 +300,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness,
-    runProdApiTests, runNightlyApiTests))
+    runProdApiTests, runNonProdApiTests, runNightlyApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
@@ -362,7 +369,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.24'
+  implementation 'com.github.hmcts:civil-commons:1.0.26'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -394,11 +401,18 @@ dependencies {
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '12.4'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
+  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.0.1'
+
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
-  implementation group: 'com.github.hmcts', name: 'fees-java-client', version: '0.0.6'
-  implementation group: 'com.github.hmcts', name: 'payments-java-client', version: '1.5.2'
+  implementation('com.github.hmcts:fees-java-client:0.0.6') {
+    exclude group: 'java-logging', module: ' java-logging'
+  }
+
+  implementation('com.github.hmcts:payments-java-client:1.5.2') {
+    exclude group: 'java-logging', module: ' java-logging'
+  }
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.0-RELEASE'

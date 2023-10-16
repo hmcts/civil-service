@@ -4,15 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimForm;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
@@ -147,32 +146,31 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
     private List<Party> getApplicants(CaseData caseData, MultiPartyScenario multiPartyScenario) {
         var applicant = caseData.getApplicant1();
         var applicantRepresentative = representativeService.getApplicantRepresentative(caseData);
+        var litigationFriend1 = caseData.getApplicant1LitigationFriend();
         var applicantParties = new ArrayList<>(List.of(
             Party.builder()
                 .type(applicant.getType().getDisplayValue())
                 .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant))
                 .name(applicant.getPartyName())
                 .primaryAddress(applicant.getPrimaryAddress())
-                .litigationFriendName(
-                    ofNullable(caseData.getApplicant1LitigationFriend())
-                        .map(LitigationFriend::getFullName)
-                        .orElse(""))
+                .litigationFriendName(litigationFriend1 != null ? litigationFriend1.getFirstName() + " "
+                    + litigationFriend1.getLastName() : "")
                 .representative(applicantRepresentative)
                 .build()));
 
         if (multiPartyScenario == TWO_V_ONE) {
             var applicant2 = caseData.getApplicant2();
-            applicantParties.add(Party.builder()
-                                     .type(applicant2.getType().getDisplayValue())
-                                     .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant2))
-                                     .name(applicant2.getPartyName())
-                                     .primaryAddress(applicant2.getPrimaryAddress())
-                                     .litigationFriendName(
-                                         ofNullable(caseData.getApplicant2LitigationFriend())
-                                             .map(LitigationFriend::getFullName)
-                                             .orElse(""))
-                                     .representative(applicantRepresentative)
-                                     .build());
+            var litigationFriend2 = caseData.getApplicant2LitigationFriend();
+            applicantParties.add(
+                Party.builder()
+                    .type(applicant2.getType().getDisplayValue())
+                    .soleTraderTradingAs(DocmosisTemplateDataUtils.fetchSoleTraderCompany(applicant2))
+                    .name(applicant2.getPartyName())
+                    .primaryAddress(applicant2.getPrimaryAddress())
+                    .litigationFriendName(litigationFriend2 != null ? litigationFriend2.getFirstName() + " "
+                        + litigationFriend2.getLastName() : "")
+                    .representative(applicantRepresentative)
+                    .build());
         }
 
         return applicantParties;

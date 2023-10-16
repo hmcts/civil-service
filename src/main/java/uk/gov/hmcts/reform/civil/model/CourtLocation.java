@@ -14,13 +14,16 @@ public class CourtLocation {
     private final String applicantPreferredCourt;
     private final DynamicList applicantPreferredCourtLocationList;
     private final CaseLocationCivil caseLocation;
+    private final String reasonForHearingAtSpecificCourt;
 
     @JsonCreator
     CourtLocation(@JsonProperty("applicantPreferredCourt") String applicantPreferredCourt,
                   @JsonProperty("applicantPreferredCourtLocationList") DynamicList applicantPreferredCourtLocationList,
-                  @JsonProperty("caseLocation") CaseLocationCivil caseLocation) {
+                  @JsonProperty("caseLocation") CaseLocationCivil caseLocation,
+                  @JsonProperty("reasonForHearingAtSpecificCourt") String reasonForHearingAtSpecificCourt) {
         this.applicantPreferredCourt = applicantPreferredCourt;
         this.applicantPreferredCourtLocationList = applicantPreferredCourtLocationList;
         this.caseLocation = caseLocation;
+        this.reasonForHearingAtSpecificCourt = reasonForHearingAtSpecificCourt;
     }
 }
