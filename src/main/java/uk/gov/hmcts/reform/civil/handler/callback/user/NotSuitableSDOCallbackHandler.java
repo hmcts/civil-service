@@ -41,6 +41,9 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         + "a notification will be sent to the listing officer to look at this case offline."
         + "%n%nIf a legal adviser has submitted this information a notification will be sent to a judge for review.";
 
+    public static final String NOT_SUITABLE_SDO_TRANSFER_CASE_CONFIRMATION_BODY = "<br />A notification will be sent" +
+        " to the listing officer to look at this case and process the transfer of case.";
+
     private final ObjectMapper objectMapper;
 
     private final Time time;
@@ -159,12 +162,10 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     }
 
     private String getHeaderTOC(CaseData caseData) {
-        //TODO change for transfer online case confirmation message
-        return format("# Your request was accepted%n## Case has now moved...");
+        return format("# Your request was successful%n## This claim will be transferred to a different location");
     }
 
     private String getBodyTOC(CaseData caseData) {
-        //TODO change for transfer online case confirmation message
-        return format("TOC body");
+        return format(NOT_SUITABLE_SDO_TRANSFER_CASE_CONFIRMATION_BODY);
     }
 }
