@@ -205,12 +205,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .respondent2DQRequestedCourt(requestedCourt1.build()).build());
         }
 
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent1());
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent1()
+                                                                 .toBuilder().flags(null).build());
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData
                 .respondent2Copy(caseData.getRespondent2())
-                .respondent2DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent2());
+                .respondent2DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent2()
+                                                          .toBuilder().flags(null).build());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
@@ -359,6 +361,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         // persist respondent address (ccd issue)
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+            .flags(caseData.getRespondent1Copy().getFlags())
             .build();
 
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
@@ -370,6 +373,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
+                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
 
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
@@ -487,7 +491,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 updatedData
                     .respondent2(updatedRespondent2)
                     .respondent2Copy(null)
-                    .respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+                    .respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
 
                 if (caseData.getRespondent2ResponseDate() == null) {
                     updatedData.nextDeadline(caseData.getRespondent2ResponseDeadline().toLocalDate());
@@ -526,9 +530,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData,
                                                                         toggleService.isUpdateContactDetailsEnabled());
 
-        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1());
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1().toBuilder().flags(null).build());
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2());
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2().toBuilder().flags(null).build());
         }
 
         if (toggleService.isHmcEnabled()) {
