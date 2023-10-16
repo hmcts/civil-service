@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -124,7 +125,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsCompany_toAll_FINAL_ORDERS_ISSUED() {
+        void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsCompany_toAllFinalOrdersIssued() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
@@ -141,12 +142,12 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsCompany_All_FINAL_ORDERS_ISSUED() {
+        void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsOrganisation_toAllFinalOrdersIssued() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
                 .respondent1(Party.builder()
-                                 .type(COMPANY)
+                                 .type(ORGANISATION)
                                  .companyName("Test Inc")
                                  .build())
                 .build();
