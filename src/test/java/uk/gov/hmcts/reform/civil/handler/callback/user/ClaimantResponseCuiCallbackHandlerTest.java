@@ -32,7 +32,8 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     ClaimantResponseCuiCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    ResponseOneVOneShowTagService.class
 })
 class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
