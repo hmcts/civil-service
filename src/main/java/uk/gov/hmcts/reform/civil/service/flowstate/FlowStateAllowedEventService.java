@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
@@ -1340,6 +1341,10 @@ public class FlowStateAllowedEventService {
         }
 
         if (caseEvent.equals(MANAGE_CONTACT_INFORMATION)) {
+            return true;
+        }
+
+        if (caseEvent.equals(UpdateNextHearingInfo)) {
             return true;
         }
 
