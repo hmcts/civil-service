@@ -28,13 +28,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -115,7 +109,7 @@ public class BundleRequestMapper {
     private List<Element<BundlingRequestDocument>> mapJointStatementOfExperts(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
-            List<String> allJointExpertsNames = getAllExpertsNames(partyType, EvidenceUploadFiles.JOINT_STATEMENT,
+            Set<String> allJointExpertsNames = getAllExpertsNames(partyType, EvidenceUploadFiles.JOINT_STATEMENT,
                                                                    caseData, false);
             bundlingRequestDocuments.addAll(getAllExpertReports(partyType, EvidenceUploadFiles.JOINT_STATEMENT, caseData,
                                                                 BundleFileNameList.JOINT_STATEMENTS_OF_EXPERTS, allJointExpertsNames
@@ -163,7 +157,7 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapExpertEvidenceDocs(CaseData caseData, PartyType partyType) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        List<String> allExpertsNames = getAllExpertsNames(partyType, EvidenceUploadFiles.EXPERT_REPORT, caseData, false);
+        Set<String> allExpertsNames = getAllExpertsNames(partyType, EvidenceUploadFiles.EXPERT_REPORT, caseData, false);
         bundlingRequestDocuments.addAll(getAllExpertReports(partyType, EvidenceUploadFiles.EXPERT_REPORT, caseData,
                                                                 BundleFileNameList.EXPERT_EVIDENCE, allExpertsNames));
 
@@ -172,26 +166,70 @@ public class BundleRequestMapper {
 
         bundlingRequestDocuments.addAll(getAllExpertReports(partyType, EvidenceUploadFiles.ANSWERS_FOR_EXPERTS,
                                                                 caseData, BundleFileNameList.REPLIES_FROM, allExpertsNames));
-        List<String> allJointExpertsNames = getAllExpertsNames(partyType, EvidenceUploadFiles.JOINT_STATEMENT,
+        Set<String> allJointExpertsNames = getAllExpertsNames(partyType, EvidenceUploadFiles.JOINT_STATEMENT,
                                                                caseData, false);
-        List<String> allJointExpertsNamesFromOtherParty = getAllExpertsNames(partyType,
+        Set<String> allJointExpertsNamesFromOtherParty = getAllExpertsNames(partyType,
                                                                           EvidenceUploadFiles.JOINT_STATEMENT,
                                                                caseData, true);
-        List<String> allExpertNamesFromOtherParty = getAllExpertsNames(partyType,
+        Set<String> allExpertNamesFromOtherParty = getAllExpertsNames(partyType,
                                                                           EvidenceUploadFiles.EXPERT_REPORT,
                                                                caseData, true);
-        bundlingRequestDocuments.addAll(getAllRemainingExpertReports(partyType,
+        bundlingRequestDocuments.addAll(getAllRemainingExpertQuestions(partyType,
                                                                     EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS, caseData,
-                                                            BundleFileNameList.QUESTIONS_TO, allExpertNamesFromOtherParty, allJointExpertsNamesFromOtherParty));
+                                                            BundleFileNameList.QUESTIONS_TO,
+                                                                       allExpertNamesFromOtherParty,
+                                                                       allJointExpertsNamesFromOtherParty));
         bundlingRequestDocuments.addAll(getAllRemainingExpertReports(partyType, EvidenceUploadFiles.ANSWERS_FOR_EXPERTS,
                                                              caseData,
                                                             BundleFileNameList.REPLIES_FROM, allExpertsNames, allJointExpertsNames));
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
+    private List<BundlingRequestDocument> getAllRemainingExpertQuestions(PartyType partyType,
+                                                                      EvidenceUploadFiles questionsForExperts, CaseData caseData,
+                                                                               BundleFileNameList questionsTo,
+                                                                         Set<String> allExpertNamesFromOtherParty,
+                                                                         Set<String> allJointExpertsNamesFromOtherParty) {
+        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+        Party party = getPartyByPartyType(partyType, caseData);
+        List<Element<UploadEvidenceExpert>> list = getExpertDocsByPartyAndDocType(partyType, questionsForExperts,
+            caseData);
+        if (!list.isEmpty()) {
+            List<Element<UploadEvidenceExpert>> tempList = new ArrayList<>();
+            list.forEach(expertElement -> {
+                if ((isSameExpert(expertElement.getValue().getExpertOptionName(), allExpertNamesFromOtherParty)
+                || isSameExpert(expertElement.getValue().getExpertOptionName(), allJointExpertsNamesFromOtherParty))
+                    && (party != null && party.getPartyName() != null && expertElement.getValue().getExpertOptionOtherParty().equalsIgnoreCase(
+                    party.getPartyName().trim())
+                    || (party != null && party.isIndividual() && party.getIndividualFirstName() != null && expertElement.getValue().getExpertOptionOtherParty().equalsIgnoreCase(
+                    party.getIndividualFirstName()
+                )))) {
+                    return;
+                } else {
+                    tempList.add(expertElement);
+                }
+            });
+            if (!tempList.isEmpty()) {
+                bundlingRequestDocuments.addAll(covertExpertEvidenceTypeToBundleRequestDocs(tempList,
+                                                                                            questionsTo.getDisplayName(),
+                                                                                            questionsForExperts.name()
+                ));
+            }
+        }
+        return bundlingRequestDocuments;
+    }
+
+    private boolean isSameExpert(String expertOptionOtherParty, Set<String> allExpertNamesFromOtherParty) {
+        if (allExpertNamesFromOtherParty.stream().anyMatch(s -> s.equalsIgnoreCase(expertOptionOtherParty))){
+            return true;
+        }
+        return false;
+    }
+
     private List<BundlingRequestDocument> getAllOtherPartyQuestions(PartyType partyType,
                                                                  EvidenceUploadFiles questionsForExperts, CaseData caseData,
-                                                                          BundleFileNameList questionsTo, List<String> allExpertsNames) {
+                                                                          BundleFileNameList questionsTo,
+                                                                    Set<String> allExpertsNames) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         List<Element<UploadEvidenceExpert>> questionsFromOtherPartyDocs = getAllDocsFromOtherParty(partyType, caseData,
                                                                                                    questionsForExperts
@@ -238,7 +276,7 @@ public class BundleRequestMapper {
 
     private List<BundlingRequestDocument> getAllRemainingExpertReports(PartyType partyType,
                                                                              EvidenceUploadFiles evidenceUploadFiles, CaseData caseData,
-                                                                       BundleFileNameList bundleFileNameList, List<String> allExpertsNames, List<String> allJointExpertsNames) {
+                                                                       BundleFileNameList bundleFileNameList, Set<String> allExpertsNames, Set<String> allJointExpertsNames) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         Map<String, List<Element<UploadEvidenceExpert>>> expertReportMap =
             groupExpertStatementsByName(getExpertDocsByPartyAndDocType(partyType, evidenceUploadFiles, caseData));
@@ -258,7 +296,7 @@ public class BundleRequestMapper {
         return bundlingRequestDocuments;
     }
 
-    private List<String> getAllExpertsNames(PartyType partyType, EvidenceUploadFiles evidenceUploadFileType,
+    private Set<String> getAllExpertsNames(PartyType partyType, EvidenceUploadFiles evidenceUploadFileType,
                                             CaseData caseData, boolean isOtherPartyList) {
         List<Element<UploadEvidenceExpert>> expertsList = new ArrayList<>();
         if (isOtherPartyList) {
@@ -267,15 +305,15 @@ public class BundleRequestMapper {
             expertsList = getExpertDocsByPartyAndDocType(partyType, evidenceUploadFileType, caseData);
         }
         if (expertsList != null) {
-            return expertsList.stream().map(expertElement -> expertElement.getValue().getExpertOptionName())
-                .collect(Collectors.toList());
+            return expertsList.stream().map(expertElement -> expertElement.getValue().getExpertOptionName().toLowerCase())
+                .collect(Collectors.toSet());
         }
-        return Collections.emptyList();
+        return Collections.emptySet();
     }
 
     private List<BundlingRequestDocument> getAllExpertReports(PartyType partyType, EvidenceUploadFiles evidenceUploadFiles,
                                                               CaseData caseData, BundleFileNameList bundleFileNameList,
-                                                              List<String> allExpertsNames) {
+                                                              Set<String> allExpertsNames) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         Map<String, List<Element<UploadEvidenceExpert>>> expertReportMap =
             groupExpertStatementsByName(getExpertDocsByPartyAndDocType(partyType, evidenceUploadFiles, caseData));
@@ -593,11 +631,11 @@ public class BundleRequestMapper {
         )).collect(Collectors.toList());
     }
 
-    private boolean matchType(String typeOfDocument, List<String> displayNames, boolean doesNotMatchType) {
+    private boolean matchType(String name, Collection<String> displayNames, boolean doesNotMatchType) {
         if (doesNotMatchType) {
-            return displayNames.stream().noneMatch(s -> s.equalsIgnoreCase(typeOfDocument.trim()));
+            return displayNames.stream().noneMatch(s -> s.equalsIgnoreCase(name.trim()));
         } else {
-            return displayNames.stream().anyMatch(s -> s.equalsIgnoreCase(typeOfDocument.trim()));
+            return displayNames.stream().anyMatch(s -> s.equalsIgnoreCase(name.trim()));
         }
     }
 
