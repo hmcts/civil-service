@@ -45,18 +45,20 @@ public class ClaimStoreServiceTest {
     private static final LocalDate RESPONSE_DEADLINE = LocalDate.of(2021, 1, 1);
     private static final LocalDate CREATE_DATE = LocalDate.of(2023, 1, 22);
     private static final LocalDateTime CREATE_DATETIME = CREATE_DATE.atTime(0, 0);
-    private static final List<DashboardClaimInfo> EXPECTED_CLAIM_RESULT = Arrays.asList(DashboardClaimInfo.builder()
-                                                                                            .claimNumber(
-                                                                                                REFERENCE_NUMBER)
-                                                                                            .claimAmount(TOTAL_AMOUNT)
-                                                                                            .claimantName(CLAIMANT_NAME)
-                                                                                            .defendantName(
-                                                                                                DEFENDANT_NAME)
-                                                                                            .responseDeadline(
-                                                                                                RESPONSE_DEADLINE)
-                                                                                            .ocmc(true)
-                                                                                            .createdDate(CREATE_DATETIME)
-                                                                                            .build());
+    private static final List<DashboardClaimInfo> EXPECTED_CLAIM_RESULT
+        = Arrays.asList(DashboardClaimInfo.builder()
+                            .claimNumber(
+                                REFERENCE_NUMBER)
+                            .claimAmount(TOTAL_AMOUNT)
+                            .claimantName(CLAIMANT_NAME)
+                            .defendantName(
+                                DEFENDANT_NAME)
+                            .responseDeadline(
+                                RESPONSE_DEADLINE)
+                            .responseDeadlineTime(RESPONSE_DEADLINE.atStartOfDay())
+                            .ocmc(true)
+                            .createdDate(CREATE_DATETIME)
+                            .build());
 
     @BeforeEach
     void setUp() {

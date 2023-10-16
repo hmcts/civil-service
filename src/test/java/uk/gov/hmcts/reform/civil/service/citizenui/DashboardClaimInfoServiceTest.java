@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.citizenui;
 
+import org.elasticsearch.common.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -15,15 +17,16 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.claimstore.ClaimStoreService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +34,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class DashboardClaimInfoServiceTest {
 
     private static final String CLAIMANT_NAME = "Harry Porter";
@@ -47,9 +51,12 @@ public class DashboardClaimInfoServiceTest {
     private CaseDetailsConverter caseDetailsConverter;
 
     @Mock
+    private FeatureToggleService featureToggleService;
+
+    @Mock
     private DashboardClaimStatusFactory dashboardClaimStatusFactory;
 
-    @InjectMocks
+    @Inject
     private DashboardClaimInfoService dashboardClaimInfoService;
 
     private static final BigDecimal PART_ADMIT_PAY_IMMEDIATELY_AMOUNT = BigDecimal.valueOf(500);
@@ -57,10 +64,10 @@ public class DashboardClaimInfoServiceTest {
     private static final LocalDateTime DATE_IN_2022 = LocalDateTime.of(2022, 2, 20, 0, 0);
     private static final LocalDateTime DATE_IN_2025 = LocalDateTime.of(2025, 2, 20, 0, 0);
     private static final List<DashboardClaimInfo> CLAIM_STORE_SERVICE_RESULTS =
-        Arrays.asList(DashboardClaimInfo.builder()
-                          .ocmc(true)
-                          .createdDate(DATE_IN_2025)
-                          .build());
+            Collections.singletonList(DashboardClaimInfo.builder()
+                    .ocmc(true)
+                    .createdDate(DATE_IN_2025)
+                    .build());
     private static final CaseDetails CASE_DETAILS = CaseDetails.builder()
         .id(1L)
         .createdDate(DATE_IN_2021)
@@ -84,12 +91,21 @@ public class DashboardClaimInfoServiceTest {
 
     @BeforeEach
     void setUp() {
+
+        dashboardClaimInfoService = new DashboardClaimInfoService(
+            caseDetailsConverter,
+            claimStoreService,
+            coreCaseDataService,
+            dashboardClaimStatusFactory,
+            featureToggleService
+        );
+
         given(claimStoreService.getClaimsForClaimant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(CLAIM_STORE_SERVICE_RESULTS);
 
         List<CaseDetails> cases = List.of(CASE_DETAILS, CASE_DETAILS_2);
         SearchResult searchResult = SearchResult.builder().total(cases.size()).cases(cases).build();
-        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(0))).willReturn(searchResult);
+        given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(0))).willReturn(searchResult);
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder()
                             .applicant1(Party.builder()
@@ -128,19 +144,38 @@ public class DashboardClaimInfoServiceTest {
     }
 
     @Test
-    void shouldReturnClaimsForClaimantSuccessfully() {
-        List<DashboardClaimInfo> claimsForClaimant = dashboardClaimInfoService.getClaimsForClaimant(
+    void shouldReturnClaimsForClaimantSuccessfullyWhenLipVLipEnabled() {
+        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+
+        List<CaseDetails> cases = List.of(CASE_DETAILS, CASE_DETAILS_2);
+        SearchResult searchResult = SearchResult.builder().total(cases.size()).cases(cases).build();
+        given(coreCaseDataService.getCCDClaimsForLipClaimant(any(), eq(0))).willReturn(searchResult);
+        DashboardResponse claimsForClaimant = dashboardClaimInfoService.getDashboardClaimantResponse(
             "authorisation",
-            "123"
+            "123",
+            CURRENT_PAGE_NO
         );
-        assertThat(claimsForClaimant.size()).isEqualTo(1);
-        assertThat(claimsForClaimant).isEqualTo(CLAIM_STORE_SERVICE_RESULTS);
+        assertThat(claimsForClaimant.getClaims().size()).isEqualTo(3);
+        assertThat(claimsForClaimant.getClaims().get(2)).isEqualTo(CLAIM_STORE_SERVICE_RESULTS.get(0));
+    }
+
+    @Test
+    void shouldReturnOnlyOcmcClaimsForClaimantSuccessfullyWhenLipVLipDisabled() {
+        given(featureToggleService.isLipVLipEnabled()).willReturn(false);
+
+        DashboardResponse claimsForClaimant = dashboardClaimInfoService.getDashboardClaimantResponse(
+            "authorisation",
+            "123",
+            CURRENT_PAGE_NO
+        );
+        assertThat(claimsForClaimant.getClaims().size()).isEqualTo(1);
+        assertThat(claimsForClaimant.getClaims().get(0)).isEqualTo(CLAIM_STORE_SERVICE_RESULTS.get(0));
     }
 
     @Test
     void shouldReturnClaimsForDefendantSuccessfully() {
 
-        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
             "123",
             CURRENT_PAGE_NO
@@ -172,7 +207,7 @@ public class DashboardClaimInfoServiceTest {
                                                                                             .build())
                                                                             .respondent1ResponseDeadline(DATE_IN_2025)
                                                                             .build());
-        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
             "123",
             CURRENT_PAGE_NO
@@ -206,7 +241,7 @@ public class DashboardClaimInfoServiceTest {
                                     .builder()
                                     .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
                             .build());
-        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
             "123",
             CURRENT_PAGE_NO
@@ -241,7 +276,7 @@ public class DashboardClaimInfoServiceTest {
                                     .builder()
                                     .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
                             .build());
-        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
             "123",
             CURRENT_PAGE_NO
@@ -256,9 +291,9 @@ public class DashboardClaimInfoServiceTest {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
-        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(0))).willReturn(searchResult);
+        given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(0))).willReturn(searchResult);
 
-        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
             "123",
             CURRENT_PAGE_NO
@@ -275,10 +310,10 @@ public class DashboardClaimInfoServiceTest {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(0).cases(cases).build();
 
-        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(0))).willReturn(searchResult);
+        given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(0))).willReturn(searchResult);
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(List.of());
 
-        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
             "123",
             CURRENT_PAGE_NO
@@ -292,9 +327,9 @@ public class DashboardClaimInfoServiceTest {
         List<CaseDetails> cases = List.of();
         SearchResult searchResult = SearchResult.builder().total(15).cases(cases).build();
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
-        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(0))).willReturn(searchResult);
+        given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(0))).willReturn(searchResult);
 
-        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
             "123",
             CURRENT_PAGE_NO
@@ -322,9 +357,9 @@ public class DashboardClaimInfoServiceTest {
         SearchResult searchResult = SearchResult.builder().total(caseDetailsList.size())
             .cases(caseDetailsList.subList(10, caseDetailsList.size())).build();
         given(claimStoreService.getClaimsForDefendant(any(), any())).willReturn(ORDERED_CASES);
-        given(coreCaseDataService.getCCDDataBasedOnIndex(any(), eq(10))).willReturn(searchResult);
+        given(coreCaseDataService.getCCDClaimsForLipDefendant(any(), eq(10))).willReturn(searchResult);
         //when
-        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
             "123",
             2
@@ -344,7 +379,7 @@ public class DashboardClaimInfoServiceTest {
             .willReturn(CaseData.builder()
                             .submittedDate(now)
                             .build());
-        DashboardDefendantResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
             "123",
             1

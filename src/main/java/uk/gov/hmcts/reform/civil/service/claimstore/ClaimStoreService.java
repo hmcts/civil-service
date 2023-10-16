@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 import uk.gov.hmcts.reform.cmc.model.Response;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +51,9 @@ public class ClaimStoreService {
                                               .claimantName(cmcClaim.getClaimantName())
                                               .defendantName(cmcClaim.getDefendantName())
                                               .responseDeadline(cmcClaim.getResponseDeadline())
+                                              .responseDeadlineTime(Optional.ofNullable(cmcClaim.getResponseDeadline()).map(
+                                                                        LocalDate::atStartOfDay).orElse(null)
+                                                  )
                                               .claimAmount(cmcClaim.getTotalAmountTillToday())
                                               .paymentDate(cmcClaim.getBySpecifiedDate())
                                               .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())

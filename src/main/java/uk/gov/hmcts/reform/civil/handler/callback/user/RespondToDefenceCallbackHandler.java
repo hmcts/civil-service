@@ -11,30 +11,30 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
-import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ExpertsValidator;
@@ -54,7 +54,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -63,7 +62,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
@@ -110,9 +109,19 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         updatedData.claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
 
-        if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
-            updatedData.respondentSharedClaimResponseDocument(caseData.getRespondent1ClaimResponseDocument());
-        }
+        // add document from defendant response documents, to placeholder field for preview during event.
+        caseData.getDefendantResponseDocuments().forEach(document -> {
+            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)) {
+                updatedData.respondent1ClaimResponseDocument(ResponseDocument.builder()
+                                                                      .file(document.getValue().getDocumentLink())
+                                                                      .build());
+                if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
+                    updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
+                                                                     .file(document.getValue().getDocumentLink())
+                                                                     .build());
+                }
+            }
+        });
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -239,18 +248,19 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         assembleResponseDocuments(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
+                                                                       featureToggleService.isUpdateContactDetailsEnabled());
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToApplicantExperts(builder);
             addEventAndDateAddedToApplicantWitnesses(builder);
         }
 
-        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
-
         if (featureToggleService.isHmcEnabled()) {
-            populateWithPartyIds(builder);
+            populateDQPartyIds(builder);
         }
+
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE, builder);
 
         if (multiPartyScenario == ONE_V_TWO_ONE_LEGAL_REP) {
             builder.respondentSharedClaimResponseDocument(null);
@@ -258,6 +268,20 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         //Set to null because there are no more deadlines
         builder.nextDeadline(null);
+
+        // null/delete the document used for preview, otherwise it will show as duplicate within case file view
+        // and documents are added to claimantUploads, if we do not remove/null the original,
+        if (featureToggleService.isCaseFileViewEnabled()) {
+            builder.applicant1DefenceResponseDocument(null);
+            builder.respondent1ClaimResponseDocument(null);
+            builder.respondentSharedClaimResponseDocument(null);
+            Applicant1DQ currentApplicant1DQ = caseData.getApplicant1DQ();
+            currentApplicant1DQ.setApplicant1DQDraftDirections(null);
+            builder.applicant1DQ(currentApplicant1DQ);
+            Applicant2DQ currentApplicant2DQ = caseData.getApplicant2DQ();
+            currentApplicant2DQ.setApplicant2DQDraftDirections(null);
+            builder.applicant2DQ(currentApplicant2DQ);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -275,12 +299,24 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
      * @return true if and only if the case should move to judicial referral
      */
     public static boolean shouldMoveToJudicialReferral(CaseData caseData) {
-        if (CaseCategory.SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            return caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
+        CaseCategory caseCategory = caseData.getCaseAccessCategory();
+
+        if (CaseCategory.SPEC_CLAIM.equals(caseCategory)) {
+            MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+            boolean addRespondent2 = YES.equals(caseData.getAddRespondent2());
+
+            return switch (multiPartyScenario) {
+                case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
+                case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimSpec2v1() == YesOrNo.YES;
+                case ONE_V_TWO_ONE_LEGAL_REP -> addRespondent2
+                    && YES.equals(caseData.getRespondentResponseIsSame());
+                case ONE_V_TWO_TWO_LEGAL_REP -> addRespondent2
+                    && caseData.getRespondentResponseIsSame() == null;
+            };
         } else {
             AllocatedTrack allocatedTrack =
                 getAllocatedTrack(
-                    CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                    CaseCategory.UNSPEC_CLAIM.equals(caseCategory)
                         ? caseData.getClaimValue().toPounds()
                         : caseData.getTotalClaimAmount(),
                     caseData.getClaimType()

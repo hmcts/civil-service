@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDism
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.casemanMarksMediationUnsuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissalOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certificateOfServiceEnabled;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
@@ -140,6 +141,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.IN_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.MEDIATION_UNSUCCESSFUL_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
@@ -280,7 +282,14 @@ public class StateFlowEngine {
             .state(CLAIM_SUBMITTED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
-                .transitionTo(PENDING_CLAIM_ISSUED).onlyIf(isLipCase)
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLipCase)
+                    .set(flags -> {
+                        if (featureToggleService.isPinInPostEnabled()) {
+                            flags.put(FlowFlag.PIP_ENABLED.name(), true);
+                        }
+                        flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
+                        flags.put(FlowFlag.LIP_CASE.name(), true);
+                    })
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
@@ -398,7 +407,7 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION)
                     .onlyIf(respondentTimeExtension.and(not(notificationAcknowledged)))
                 //Acknowledging Claim First
-                .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged)
+                .transitionTo(NOTIFICATION_ACKNOWLEDGED).onlyIf(notificationAcknowledged.and(not(isInHearingReadiness)))
                 //Direct Response, without Acknowledging
                 .transitionTo(ALL_RESPONSES_RECEIVED)
                     .onlyIf(allResponsesReceived.and(not(notificationAcknowledged)).and(not(respondentTimeExtension)).and(not(isInHearingReadiness)))
@@ -579,6 +588,7 @@ public class StateFlowEngine {
             .state(PART_ADMIT_PROCEED)
             .state(PART_ADMIT_NOT_PROCEED)
             .state(PART_ADMIT_NOT_SETTLED_NO_MEDIATION)
+                .transitionTo(IN_HEARING_READINESS).onlyIf(isInHearingReadiness)
                 .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(caseDismissedPastHearingFeeDue)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
@@ -591,6 +601,13 @@ public class StateFlowEngine {
             .state(PART_ADMIT_PAY_IMMEDIATELY)
             .state(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE)
             .state(IN_MEDIATION)
+                .transitionTo(MEDIATION_UNSUCCESSFUL_PROCEED).onlyIf(casemanMarksMediationUnsuccessful)
+            .state(MEDIATION_UNSUCCESSFUL_PROCEED)
+                .transitionTo(IN_HEARING_READINESS).onlyIf(isInHearingReadiness)
+                .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(caseDismissedPastHearingFeeDue)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
+                .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
+                .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawn)
             .state(IN_HEARING_READINESS)
             .state(FULL_ADMIT_JUDGMENT_ADMISSION)
             .build();

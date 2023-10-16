@@ -31,6 +31,7 @@ public class JudgementService {
             .ccjJudgmentAmountInterestToDate(ccjJudgmentInterest(caseData))
             .ccjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData))
             .ccjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData))
+            .ccjJudgmentFixedCostOption(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostOption())
             .ccjJudgmentStatement(ccjJudgmentStatement(caseData))
             .build();
     }

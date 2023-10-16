@@ -79,6 +79,7 @@ fees:
     service: civil money claims
     jurisdiction1: civil
     jurisdiction2: county court
+    jurisdiction-fast-track-claim: civil
     channel: default
     event: issue
     hearingEvent: hearing
@@ -208,8 +209,8 @@ notifications:
   respondentSolicitorAcknowledgeClaimForSpec: "16b86d3b-f370-4dc1-b25b-871e7470ebf1"
   claimantSolicitorAgreedExtensionDateForSpec: "5b6d65ea-a3b5-4e40-94e0-69dc7100c982"
   respondentSolicitorAgreedExtensionDateForSpec: "fbf3ed5e-3726-4009-8561-f856fb5dbda0"
-  claimantSolicitorDefendantResponseForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
   claimantSolicitorDefendantResponse1v2DSForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
+  claimantSolicitorDefendantResponseForSpec: "28ea1d53-93b1-4e48-a7e5-7a876f910f86"
   claimantSolicitorImmediatelyDefendantResponseForSpec: "263d7737-933d-4d0b-9f08-23847613f6a4"
   respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
   respondentDefendantResponseForSpec: "94c71894-9590-4995-aae0-edea94fc4594"
@@ -265,7 +266,8 @@ notifications:
   bundleCreationTemplate: "0280b3c7-ad4e-4c43-8974-72b5a5501b02"
   generateOrderNotificationTemplate: "78532d45-aadf-4223-89fd-4932b4cbe411"
 
-  notifyClaimantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
+  notifyClaimantLrTemplate: "adcf4c5f-2b9c-482d-8311-a4b8ffe7ef45"
+  notifyDefendantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
   notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
   notifyDefendantLipWelshTemplate : "d63b744a-97c8-42bd-95a2-3d86dd703c3d"
 
@@ -274,8 +276,11 @@ notifications:
   notifyRespondentLiPMediationAgreementTemplateWelsh: "07a98d47-91a3-4806-a6e2-9e75366556af"
   notifyRespondentLRMediationAgreementTemplate: "998d0355-7aa8-4bd3-87b2-537eb31c9db5"
   respondentLipPartAdmitSettleClaimTemplate: "81745979-5330-4771-816c-aa78085e741a"
+  respondentLrPartAdmitSettleClaimTemplate: "6a1f4ef9-5334-4f2c-9e43-b292753929fb"
   respondent1DefaultJudgmentRequestedTemplate: "d4cf381f-a2b3-4a81-a442-eb2aa5deb210"
   respondent1LipClaimUpdatedTemplate: "9c44f3fb-a340-49e5-bf64-32a3187d7dcd"
+  claimantLipClaimUpdatedTemplate: "0abdcb29-edd3-418a-aeab-a102da4ad441"
+  applicantLiPDefaultJudgmentRequested: "668d4703-e97f-4e2f-8d07-1a697aac6d0b"
 
   hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
 
@@ -296,6 +301,12 @@ notifications:
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
+  notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "3d302844-ecdc-47e6-8aed-971c3f42a059"
+  notifyLiPClaimantDefendantResponded: "4b1325dd-51ed-4dc2-bcc6-d9afb01a3f29"
+  notifyLiPClaimantDefendantChangedContactDetails: "72a14146-c897-4fc6-be4f-474266da7398"
+
+  notifyApplicant1EnteredBreathingSpaceLip: "7e34af74-ec20-476b-aea5-6a6508d3acaf"
+  notifyEnteredBreathingSpaceForDefendantLip: "e551a04f-9da1-4654-a7be-2040e02925aa"
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 

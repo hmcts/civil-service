@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderMade {
 
-    private DateHeardFinalOrders singleDateSelection;
-    private DateHeardFinalOrders dateRangeSelection;
+    private DatesFinalOrders singleDateSelection;
+    private DatesFinalOrders dateRangeSelection;
+    private DatesFinalOrders bespokeRangeSelection;
 
 }
+

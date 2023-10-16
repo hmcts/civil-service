@@ -65,8 +65,6 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
 
     private CallbackResponse prepareSealedForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder builder = caseData.toBuilder();
-
         CaseDocument sealedForm = formGenerator.generate(
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
@@ -89,16 +87,11 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
             if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "defendant2DefenseDirectionsQuestionnaire");
             }
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
-                builder.respondent1ClaimResponseDocumentSpec(stitchedDocument);
-            }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
         } else {
-            if (V_1.equals(callbackParams.getVersion()) && toggleService.isPinInPostEnabled()) {
-                builder.respondent1ClaimResponseDocumentSpec(sealedForm);
-            }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
         }
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))

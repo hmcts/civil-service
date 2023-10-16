@@ -11,10 +11,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.util.ArrayList;
@@ -42,6 +45,8 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private final Time time;
 
+    private final FeatureToggleService toggleService;
+
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
@@ -59,14 +64,24 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse submitNotSuitableSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
-
         OtherDetails tempOtherDetails = OtherDetails.builder()
             .notSuitableForSDO(YesOrNo.YES)
-            .reasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput())
             .build();
-
+        if (toggleService.isTransferOnlineCaseEnabled()) {
+            if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
+                dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.CHANGE_LOCATION);
+                TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
+                    .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
+                    .build();
+                dataBuilder.tocTransferCaseReason(tocTransferCaseReason).build();
+            } else {
+                dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);
+                tempOtherDetails.setReasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput());
+            }
+        } else {
+            tempOtherDetails.setReasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput());
+        }
         dataBuilder.otherDetails(tempOtherDetails).build();
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
@@ -74,14 +89,17 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateNotSuitableReason(CallbackParams callbackParams) {
         final int lengthAllowed = 150;
-
         List<String> errors = new ArrayList<>();
-        var reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
-
+        String reason;
+        if (isTransferOnlineCase(callbackParams.getCaseData())) {
+            reason = ""; //Change to ReasonForCaseTransferJudgeTxt if validation also needed for this field
+        } else {
+            reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
+        }
         if (reason.length() > lengthAllowed) {
             errors.add("Character Limit Reached: "
-                           + "Reason for not drawing Standard Directions order cannot exceed "
-                           + lengthAllowed + " characters.");
+                + "Reason for not drawing Standard Directions order cannot exceed "
+                + lengthAllowed + " characters.");
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -101,19 +119,27 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private CaseData.CaseDataBuilder getSharedData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
-
-        dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
-
+        if (isTransferOnlineCase(caseData)) {
+            return dataBuilder;
+        } else {
+            dataBuilder.businessProcess(BusinessProcess.ready(NotSuitable_SDO));
+        }
         return dataBuilder;
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader(caseData))
-            .confirmationBody(getBody(caseData))
-            .build();
+        if (isTransferOnlineCase(caseData)) {
+            return SubmittedCallbackResponse.builder()
+                .confirmationHeader(getHeaderTOC(caseData))
+                .confirmationBody(getBodyTOC(caseData))
+                .build();
+        } else {
+            return SubmittedCallbackResponse.builder()
+                .confirmationHeader(getHeader(caseData))
+                .confirmationBody(getBody(caseData))
+                .build();
+        }
     }
 
     private String getHeader(CaseData caseData) {
@@ -124,4 +150,21 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         return format(NotSuitableSDO_CONFIRMATION_BODY);
     }
 
+    private boolean isTransferOnlineCase(CaseData caseData) {
+        if (toggleService.isTransferOnlineCaseEnabled() && caseData.getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private String getHeaderTOC(CaseData caseData) {
+        //TODO change for transfer online case confirmation message
+        return format("# Your request was accepted%n## Case has now moved...");
+    }
+
+    private String getBodyTOC(CaseData caseData) {
+        //TODO change for transfer online case confirmation message
+        return format("TOC body");
+    }
 }

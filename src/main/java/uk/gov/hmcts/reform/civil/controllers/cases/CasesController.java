@@ -23,8 +23,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
@@ -38,6 +37,7 @@ import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
+import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.time.LocalDate;
@@ -64,6 +64,7 @@ public class CasesController {
     private final CaseworkerCaseEventService caseworkerCaseEventService;
     private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
     private final PostcodeValidator postcodeValidator;
+    private final UserInformationService userInformationService;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -112,25 +113,27 @@ public class CasesController {
 
     @GetMapping(path = "/claimant/{submitterId}")
     @Operation(summary = "Gets basic claim information for claimant")
-    public ResponseEntity<List<DashboardClaimInfo>> getClaimsForClaimant(
-        @PathVariable("submitterId") String submitterId,
-        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
-    ) {
-        List<DashboardClaimInfo> ocmcClaims = dashboardClaimInfoService.getClaimsForClaimant(
-            authorization,
-            submitterId
-        );
-        return new ResponseEntity<>(ocmcClaims, HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/defendant/{submitterId}")
-    @Operation(summary = "Gets basic claim information for defendant")
-    public ResponseEntity<DashboardDefendantResponse> getClaimsForDefendant(
+    public ResponseEntity<DashboardResponse> getClaimsForClaimant(
         @PathVariable("submitterId") String submitterId,
         @RequestParam(value = "page", defaultValue = "1") int currentPage,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
     ) {
-        DashboardDefendantResponse defendantClaims = dashboardClaimInfoService.getDashboardDefendantResponse(
+        DashboardResponse claimantClaims = dashboardClaimInfoService.getDashboardClaimantResponse(
+            authorization,
+            submitterId,
+            currentPage
+        );
+        return new ResponseEntity<>(claimantClaims, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/defendant/{submitterId}")
+    @Operation(summary = "Gets basic claim information for defendant")
+    public ResponseEntity<DashboardResponse> getClaimsForDefendant(
+        @PathVariable("submitterId") String submitterId,
+        @RequestParam(value = "page", defaultValue = "1") int currentPage,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
+    ) {
+        DashboardResponse defendantClaims = dashboardClaimInfoService.getDashboardDefendantResponse(
             authorization,
             submitterId,
             currentPage
@@ -238,6 +241,19 @@ public class CasesController {
     ) {
         List<String> errors =  postcodeValidator.validate(postCode);
         return errors;
+    }
+
+    @GetMapping(path = "/{caseId}/userCaseRoles")
+    @Operation(summary = "Get user Roles for a case")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "400", description = "Bad request for caseId"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "404", description = "User not found on case")})
+    public ResponseEntity<List<String>> getUserInfo(
+        @PathVariable("caseId") String caseId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+        return ResponseEntity.ok(userInformationService.getUserCaseRoles(caseId, authorization));
     }
 
 }

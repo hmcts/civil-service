@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -81,6 +82,11 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
@@ -556,6 +562,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<Document>> gaEvidenceDocRespondentSol;
     private final List<Element<Document>> gaEvidenceDocRespondentSolTwo;
 
+    private final List<Element<CaseDocument>> gaRespondDoc;
+
     @Builder.Default
     private final List<Element<CaseDocument>> hearingDocuments = new ArrayList<>();
 
@@ -602,6 +610,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String bulkCustomerId;
     private final String sdtRequestIdFromSdt;
     private final List<Element<String>> sdtRequestId;
+
+    //Judgments Online
+    private JudgmentRecordedReason joJudgmentRecordReason;
+    private JudgmentStatusDetails joJudgmentStatusDetails;
+    private LocalDate joOrderMadeDate;
+    private String joAmountOrdered;
+    private String joAmountCostOrdered;
+    private YesOrNo joIsRegisteredWithRTL;
+    private PaymentPlanSelection joPaymentPlanSelection;
+    private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
+    private LocalDate joPaymentToBeMadeByDate;
+    private YesOrNo joIsLiveJudgmentExists;
+    private LocalDate joSetAsideDate;
+    private JudgmentPaidInFull joJudgmentPaidInFull;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -822,8 +844,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isApplicant1NotRepresented() {
+        return NO.equals(getApplicant1Represented());
+    }
+
+    @JsonIgnore
     public boolean isLRvLipOneVOne() {
         return isRespondent1NotRepresented()
+            && !isApplicant1NotRepresented()
+            && isOneVOne(this);
+    }
+
+    @JsonIgnore
+    public boolean isLipvLipOneVOne() {
+        return isRespondent1NotRepresented()
+            && isApplicant1NotRepresented()
             && isOneVOne(this);
     }
 
@@ -980,11 +1015,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public List<Element<RecurringExpenseLRspec>> getRecurringExpensesForRespondent1() {
         if (isFullAdmitClaimSpec()) {
-            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA).orElse(
-                null);
+            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA)
+                .orElse(
+                    null);
         }
         return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpenses).orElse(
             null);
+    }
+
+    @JsonIgnore
+    public List<Element<ManageDocument>> getManageDocumentsList() {
+        return Optional.ofNullable(getManageDocuments()).orElse(new ArrayList<>());
     }
 
     @JsonIgnore
@@ -997,5 +1038,38 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public String getApplicant1Email() {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
+    }
+
+    @JsonIgnore
+    public String getHelpWithFeesReferenceNumber() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getHelpWithFees)
+            .map(HelpWithFees::getHelpWithFeesReferenceNumber).orElse(null);
+    }
+
+    @JsonIgnore
+    public boolean isTranslatedDocumentUploaded() {
+        if (getSystemGeneratedCaseDocuments() != null) {
+            return getSystemGeneratedCaseDocuments().stream()
+                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                   .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
+        }
+        return false;
+    }
+
+    @JsonIgnore
+    public boolean isRespondentSolicitorRegistered() {
+        return YesOrNo.YES.equals(getRespondent1OrgRegistered());
+    }
+
+    @JsonIgnore
+    public String getRespondent1Email() {
+        if (isRespondent1NotRepresented()) {
+            return getRespondent1().getPartyEmail();
+        }
+        if (isRespondentSolicitorRegistered()) {
+            return getRespondentSolicitor1EmailAddress();
+        }
+        return null;
     }
 }
