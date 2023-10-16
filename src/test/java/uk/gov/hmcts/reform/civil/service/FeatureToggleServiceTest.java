@@ -143,6 +143,15 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenNextHearingDateEnabled(Boolean toggleStat) {
+        var caseFileKey = "next-hearing-date";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isNextHearingDateEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
         final String feature = "case-progression-location-whitelist";
         String location = "000000";

@@ -72,6 +72,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
 
+    public boolean isNextHearingDateEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("next-hearing-date");
+    }
+
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", locationEpimms,
                                                             true);

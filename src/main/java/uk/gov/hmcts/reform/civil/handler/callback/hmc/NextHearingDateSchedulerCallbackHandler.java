@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,8 @@ public class NextHearingDateSchedulerCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(UpdateNextHearingInfo);
     private static final String TASK_ID = "UpdateNextHearingInfo";
+
+    private final FeatureToggleService featureToggleService;
 
     private final ObjectMapper objectMapper;
 
@@ -47,6 +50,10 @@ public class NextHearingDateSchedulerCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+        if (!featureToggleService.isNextHearingDateEnabled()) {
+            return emptyCallbackResponse(callbackParams);
+        }
+
         CaseData caseData = callbackParams.getCaseData().toBuilder()
             .businessProcess(BusinessProcess.ready(UpdateNextHearingInfo))
             .build();
