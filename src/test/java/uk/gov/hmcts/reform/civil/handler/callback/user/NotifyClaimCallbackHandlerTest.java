@@ -350,7 +350,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldThrowError_whenDeemedServedDateIsWorkingDay() {
             LocalDate currentDate = LocalDate.now();
-            LocalDate deemedServedDate = currentDate.plusDays(2);
+            LocalDate deemedServedDate = currentDate;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v1LiP(CertificateOfService.builder()
                                                 .cosDateOfServiceForDefendant(currentDate)
@@ -573,7 +573,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldThrowError_whenDeemedServedDateIsWorkingDay() {
             LocalDate currentDate = LocalDate.now();
-            LocalDate deemedServedDate = currentDate.plusDays(2);
+            LocalDate deemedServedDate = currentDate;
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified1v2RespondentLiP()
                 .cosNotifyClaimDefendant2(CertificateOfService.builder()
