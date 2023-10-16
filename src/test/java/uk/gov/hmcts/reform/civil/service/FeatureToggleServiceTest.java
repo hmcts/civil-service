@@ -143,13 +143,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
-        var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
-        givenToggle(transferCaseOnlineKey, toggleStat);
-
-        assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
-    }
-
     void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
         final String feature = "case-progression-location-whitelist";
         String location = "000000";
