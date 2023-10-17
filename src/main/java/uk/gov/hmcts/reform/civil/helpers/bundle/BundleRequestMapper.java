@@ -26,9 +26,17 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
-
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.time.LocalDate;
-import java.util.*;
+
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -447,7 +455,7 @@ public class BundleRequestMapper {
     private void  sortExpertListByDate(List<Element<UploadEvidenceExpert>> expertEvidence,
                                                                         boolean sortByCreatedDate) {
         expertEvidence.sort(Comparator.comparing(
-                uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getExpertOptionUploadDate(),
+                uploadEvidenceExpertElement -> uploadEvidenceExpertElement.getValue().getExpertOptionUploadDate(),
                 Comparator.reverseOrder()
         ));
     }
