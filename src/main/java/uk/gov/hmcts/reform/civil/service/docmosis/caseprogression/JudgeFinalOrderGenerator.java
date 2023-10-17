@@ -437,21 +437,25 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 case HOUR_2:
                     return "2 hours";
                 case OTHER:
-                    StringBuilder otherLength = new StringBuilder();
-                    if (Objects.nonNull(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther())) {
-                        String otherDay = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays();
-                        String otherHour = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours();
-                        String otherMinute = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes();
-                        otherLength.append(Objects.nonNull(otherDay) ? (otherDay + " days ") : "")
-                                .append(Objects.nonNull(otherHour) ? (otherHour + " hours ") : "")
-                                .append(Objects.nonNull(otherMinute) ? (otherMinute + " minutes") : "");
-                    }
-                    return otherLength.toString();
+                    return getOtherLength(caseData);
                 default:
                     return "";
             }
         }
         return "";
+    }
+
+    private String getOtherLength(CaseData caseData) {
+        StringBuilder otherLength = new StringBuilder();
+        if (Objects.nonNull(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther())) {
+            String otherDay = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays();
+            String otherHour = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours();
+            String otherMinute = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes();
+            otherLength.append(Objects.nonNull(otherDay) ? (otherDay + " days ") : "")
+                    .append(Objects.nonNull(otherHour) ? (otherHour + " hours ") : "")
+                    .append(Objects.nonNull(otherMinute) ? (otherMinute + " minutes") : "");
+        }
+        return otherLength.toString();
     }
 
     private boolean hasSDOBeenMade(CaseState state) {
