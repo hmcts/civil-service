@@ -635,7 +635,7 @@ public class BundleRequestMapper {
         return documentEvidenceForTrial.stream().filter(uploadEvidenceDocumentTypeElement -> matchType(
             uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument(),
             displayNames, doesNotMatchType
-        )).toList();
+        )).collect(Collectors.toList());
     }
 
     private boolean matchType(String name, Collection<String> displayNames, boolean doesNotMatchType) {
