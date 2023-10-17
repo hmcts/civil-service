@@ -841,9 +841,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
         }
 
+        dataBuilder.disposalHearingMethodInPerson(getEmptyDynamicList(caseData.getDisposalHearingMethodInPerson()));
+        dataBuilder.fastTrackMethodInPerson(getEmptyDynamicList(caseData.getFastTrackMethodInPerson()));
+        dataBuilder.smallClaimsMethodInPerson(getEmptyDynamicList(caseData.getSmallClaimsMethodInPerson()));
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private DynamicList getEmptyDynamicList(DynamicList listToBeEmptied) {
+        return listToBeEmptied != null
+            ? DynamicList.builder().value(listToBeEmptied.getValue()).listItems(null).build()
+            : null;
     }
 
     private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {

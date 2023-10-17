@@ -641,9 +641,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         //  we only use orderSDODocumentDJ as a preview and do not want it shown on case file view, so to prevent it
         // showing, we remove.
         caseDataBuilder.orderSDODocumentDJ(null);
-        assignCategoryId.assignCategoryIdToCollection(caseData.getOrderSDODocumentDJCollection(), document -> document.getValue().getDocumentLink(), "sdo");
+        assignCategoryId.assignCategoryIdToCollection(
+            caseData.getOrderSDODocumentDJCollection(),
+            document -> document.getValue().getDocumentLink(),
+            "sdo"
+        );
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
-        var state = "CASE_PROGRESSION";
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
             .getCourtLocationsForDefaultJudgments(authToken));
@@ -657,11 +660,19 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         }
 
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
+        caseDataBuilder.trialHearingMethodInPersonDJ(getEmptyDynamicList(caseData.getTrialHearingMethodInPersonDJ()));
+        caseDataBuilder.disposalHearingMethodInPersonDJ(getEmptyDynamicList(caseData.getDisposalHearingMethodInPersonDJ()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
-            .state(state)
+            .state("CASE_PROGRESSION")
             .build();
+    }
+
+    private DynamicList getEmptyDynamicList(DynamicList listToBeEmptied) {
+        return listToBeEmptied != null
+            ? DynamicList.builder().value(listToBeEmptied.getValue()).listItems(null).build()
+            : null;
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
