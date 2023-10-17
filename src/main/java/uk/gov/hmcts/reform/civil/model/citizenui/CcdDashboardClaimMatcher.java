@@ -279,4 +279,9 @@ public class CcdDashboardClaimMatcher implements Claim {
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
     }
 
+    @Override
+    public boolean isClaimantDefaultJudgment() {
+        return caseData.getPaymentTypeSelection() != null;
+    }
+
 }
