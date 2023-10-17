@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -110,6 +111,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeClaimIssued;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeMediationUnsuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterClaimDetailsNotified;
@@ -1780,6 +1782,28 @@ class FlowPredicateTest {
                 .drawDirectionsOrderRequired(YES).build();
 
             assertFalse(takenOfflineByStaffAfterClaimantResponseBeforeSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineByStaffMediationUnsuccessful() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build();
+
+            assertFalse(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineByStaffInMediation() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build().toBuilder()
+                .mediation(Mediation.builder().build())
+                .build();
+
+            assertTrue(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
         }
     }
 

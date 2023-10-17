@@ -106,6 +106,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeClaimIssued;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeMediationUnsuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterClaimDetailsNotified;
@@ -606,6 +607,7 @@ public class StateFlowEngine {
             .state(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE)
             .state(IN_MEDIATION)
                 .transitionTo(MEDIATION_UNSUCCESSFUL_PROCEED).onlyIf(casemanMarksMediationUnsuccessful)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffBeforeMediationUnsuccessful)
             .state(MEDIATION_UNSUCCESSFUL_PROCEED)
                 .transitionTo(IN_HEARING_READINESS).onlyIf(isInHearingReadiness)
                 .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(caseDismissedPastHearingFeeDue)
