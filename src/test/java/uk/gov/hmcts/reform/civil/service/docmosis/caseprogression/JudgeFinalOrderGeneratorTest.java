@@ -709,7 +709,7 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderRecitals(null)
             .finalOrderAppealComplex(FinalOrderAppeal.builder().list(AppealList.CLAIMANT).build()).build();
         String response = generator.getAppealFor(caseData);
-        assertEquals(AppealList.CLAIMANT.name().toLowerCase(), response);
+        assertEquals(AppealList.CLAIMANT.name().toLowerCase() + "'s", response);
     }
 
     @Test
@@ -803,12 +803,12 @@ public class JudgeFinalOrderGeneratorTest {
         String responseDefendant = generator.populateSummarilyAssessedText(caseDataDefendant);
         assertEquals(format(
             "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
-                + "in the sum of £%s. Such a sum shall be made by 4pm on",
+                + "in the sum of £%s. Such sum shall be paid by 4pm on",
             MonetaryConversions.penniesToPounds(caseDataClaimant
                                                     .getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount())), responseClaimant);
         assertEquals(format(
             "The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
-                + "in the sum of £%s. Such a sum shall be made by 4pm on",
+                + "in the sum of £%s. Such sum shall be paid by 4pm on",
             MonetaryConversions.penniesToPounds(caseDataDefendant
                                                     .getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount())), responseDefendant);
     }
