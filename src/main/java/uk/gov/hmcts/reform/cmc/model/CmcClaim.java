@@ -396,7 +396,7 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isClaimantDefaultJudgment() {
+    public boolean isClaimantDefaultJudgement() {
         return false;
     }
 }

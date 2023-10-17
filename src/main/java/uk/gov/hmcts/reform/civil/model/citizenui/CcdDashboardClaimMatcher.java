@@ -280,7 +280,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     }
 
     @Override
-    public boolean isClaimantDefaultJudgment() {
+    public boolean isClaimantDefaultJudgement() {
         return caseData.getPaymentTypeSelection() != null;
     }
 
