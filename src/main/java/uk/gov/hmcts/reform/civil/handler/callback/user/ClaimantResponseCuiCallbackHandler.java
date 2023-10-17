@@ -65,6 +65,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
         if (updatedData.hasClaimantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
+        } else if(!updatedData.hasApplicantProceededWithClaim()) {
+            response.state(CaseState.CASE_DISMISSED.name());
         } else {
             response.state(CaseState.JUDICIAL_REFERRAL.name());
         }

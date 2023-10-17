@@ -106,13 +106,26 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldChangeCaseState_whenApplicantDoesNotProceedWithTheClaim() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1ProceedWithClaim(NO).applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_DISMISSED.name());
+        }
+
+        @Test
         void shouldChangeCaseState_whenApplicantRejectClaimSettlementAndAgreeToMediation() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                    MediationDecision.Yes).build())
-                            .build())
+                        MediationDecision.Yes).build())
+                                 .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
