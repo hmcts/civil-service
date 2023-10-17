@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -50,9 +51,23 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         CaseData updatedData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
             .build();
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.toMap(objectMapper))
-            .build();
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(updatedData.toMap(objectMapper));
+
+        updateClaimEndState(response, updatedData);
+
+        return response.build();
     }
 
+    private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
+
+        if (updatedData.hasClaimantAgreedToFreeMediation()) {
+            response.state(CaseState.IN_MEDIATION.name());
+        } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
+            response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        } else {
+            response.state(CaseState.JUDICIAL_REFERRAL.name());
+        }
+    }
 }
