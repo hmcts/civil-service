@@ -309,8 +309,9 @@ class NotSuitableSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            String header = format("# Your request was accepted%n## Case has now moved...");
-            String body = format("TOC body");
+            String header = format("# Your request was successful%n## This claim will be transferred to a different location");
+            String body = format("<br />A notification will be sent to the listing officer to look at this case and " +
+                                     "process the transfer of case.");
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
