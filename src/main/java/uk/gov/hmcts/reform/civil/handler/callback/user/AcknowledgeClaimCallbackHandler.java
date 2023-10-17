@@ -175,6 +175,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+            .flags(caseData.getRespondent1Copy().getFlags())
             .build();
 
         CaseData.CaseDataBuilder caseDataUpdated = caseData.toBuilder();
@@ -233,6 +234,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             //1v2 same
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
+                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
 
             caseDataUpdated.respondent1AcknowledgeNotificationDate(time.now())
@@ -277,6 +279,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
             && respondent1Check.equals(NO) && !respondent2HasSameLegalRep(caseData)) {
             var updatedRespondent2 = caseData.getRespondent2Copy().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
+                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
             //1v2 diff login 2
             caseDataUpdated
