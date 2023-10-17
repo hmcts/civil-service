@@ -64,6 +64,9 @@ public enum DashboardClaimStatus {
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
     ),
+    DEFAULT_JUDGEMENT(
+        Claim::isClaimantDefaultJudgement
+    ),
     RESPONSE_OVERDUE(
         Claim::hasResponsePendingOverdue
     ),
@@ -111,9 +114,6 @@ public enum DashboardClaimStatus {
     ),
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
-    ),
-    DEFAULT_JUDGMENT(
-        Claim::isClaimantDefaultJudgement
     ),
 
     NO_STATUS(c -> false);
