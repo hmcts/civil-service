@@ -1132,11 +1132,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondentSolicitor2ServiceAddressRequired(null)
             .showConditionFlags(initialShowTags);
 
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
 
         ofNullable(caseData.getRespondent2())
             .ifPresent(r2 -> updatedCaseData.respondent2Copy(r2)
-                .respondent2DetailsForClaimDetailsTab(r2)
+                .respondent2DetailsForClaimDetailsTab(r2.toBuilder().flags(null).build())
             );
 
         DynamicList courtLocationList = courtLocationUtils.getLocationsFromList(fetchLocationData(callbackParams));
@@ -1281,11 +1281,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
             respondent = callbackParams.getCaseData().getRespondent2();
         }
-        List<String> errors = respondent == null ? new ArrayList<>()
-            : dateOfBirthValidator.validate(respondent);
+        List<String> errors = dateOfBirthValidator.validate(respondent);
 
         CaseData caseData = callbackParams.getCaseData();
-        errors.addAll(homeAddressCorrect(caseData));
+        errors.addAll(correspondenceAddressCorrect(caseData));
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
             && YES.equals(caseData.getAddRespondent2())) {
@@ -1311,18 +1310,25 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private List<String> homeAddressCorrect(CaseData caseData) {
+    /**
+     * Checks that the address of case data was ok when the applicant set it, or that its postcode is correct
+     * if the defendant has modified.
+     *
+     * @param caseData the case data
+     * @return errors of the correspondence address (if any)
+     */
+    private List<String> correspondenceAddressCorrect(CaseData caseData) {
         if (caseData.getIsRespondent1() == YesOrNo.YES
-            && caseData.getTempAddress1Required() == YesOrNo.NO) {
+            && caseData.getSpecAoSRespondentCorrespondenceAddressRequired() == YesOrNo.NO) {
             return postcodeValidator.validate(
-                Optional.ofNullable(caseData.getTempAddress1())
+                Optional.ofNullable(caseData.getSpecAoSRespondentCorrespondenceAddressdetails())
                     .map(Address::getPostCode)
                     .orElse(null)
             );
         } else if (caseData.getIsRespondent2() == YesOrNo.YES
-            && caseData.getTempAddress2Required() == YesOrNo.NO) {
+            && caseData.getSpecAoSRespondent2CorrespondenceAddressRequired() == YesOrNo.NO) {
             return postcodeValidator.validate(
-                Optional.ofNullable(caseData.getTempAddress2())
+                Optional.ofNullable(caseData.getSpecAoSRespondent2CorrespondenceAddressdetails())
                     .map(Address::getPostCode)
                     .orElse(null)
             );
@@ -1356,7 +1362,13 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 .primaryAddress(caseData.getTempAddress1()).build();
         } else {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress()).build();
+                .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+                .build();
+        }
+
+        if (caseData.getRespondent1Copy() != null) {
+            updatedRespondent1 =
+                updatedRespondent1.toBuilder().flags(caseData.getRespondent1Copy().getFlags()).build();
         }
 
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
@@ -1377,9 +1389,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
+                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
         }
 
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
@@ -1402,9 +1415,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedData
                     .applicant1ResponseDeadline(getApplicant1ResponseDeadline(responseDate, allocatedTrack));
             }
-
-            Party updatedRespondent2 = applyRespondent2Address(caseData, updatedData);
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedRespondent2);
 
             // 1v1, 2v1
             // represents 1st respondent - need to set deadline if only 1 respondent,
@@ -1487,9 +1497,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             toggleService.isUpdateContactDetailsEnabled()
         );
 
-        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1());
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1().toBuilder().flags(null).build());
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2());
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2().toBuilder().flags(null).build());
         }
 
         if (toggleService.isUpdateContactDetailsEnabled()) {
@@ -1574,9 +1584,12 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
 
     private boolean ifResponseTypeIsPartOrFullAdmission(CaseData caseData) {
         return (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
-            || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()));
+            || RespondentResponseTypeSpec.PART_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+            ) || (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
+            caseData.getRespondent2ClaimResponseTypeForSpec())
+            );
     }
 
     private void updateCorrespondenceAddress(CallbackParams callbackParams,
@@ -1592,7 +1605,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updatedCaseData.specRespondent2CorrespondenceAddressdetails(newAddress);
             }
         } else if (solicitorHasCaseRole(callbackParams, RESPONDENTSOLICITORTWO)
-            && caseData.getRespondentSolicitor2ServiceAddressRequired() == YesOrNo.NO) {
+            && caseData.getRespondentSolicitor2ServiceAddressRequired() == YesOrNo.NO)  {
             updatedCaseData.specRespondent2CorrespondenceAddressdetails(
                     caseData.getRespondentSolicitor2ServiceAddress())
                 .respondentSolicitor2ServiceAddress(Address.builder().build());

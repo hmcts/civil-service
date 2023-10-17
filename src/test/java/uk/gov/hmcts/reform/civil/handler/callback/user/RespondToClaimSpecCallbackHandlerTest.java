@@ -200,11 +200,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         String postCode = "postCode";
         CaseData caseData = CaseData.builder()
             .build().toBuilder()
-            .tempAddress1Required(NO)
-            .tempAddress1(Address.builder().postCode(postCode).build())
+            .respondentSolicitor1ServiceAddressRequired(NO)
+            .respondentSolicitor1ServiceAddress(Address.builder().postCode(postCode).build())
             .isRespondent1(YES)
             .build();
-        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "confirm-details");
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
         CallbackRequest request = CallbackRequest.builder()
             .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
             .build();
@@ -711,6 +711,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             Address changedAddress = AddressBuilder.maximal().build();
 
             CaseData caseData = CaseDataBuilder.builder()
+                .respondent1(PartyBuilder.builder().individual().build())
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
                 .tempAddress1Required(NO)
@@ -745,9 +746,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
-            Address changedAddress = AddressBuilder.maximal().build();
-
-            Address newAddress2 = AddressBuilder.maximal().build();
+            Address newAddress2 = AddressBuilder.defaults().build();
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .respondent2DQ()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
@@ -760,6 +759,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build().toBuilder()
                 .tempAddress2Required(NO)
                 .tempAddress2(newAddress2)
+                .respondentSolicitor2ServiceAddressRequired(NO)
+                .respondentSolicitor2ServiceAddress(newAddress2)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2036,7 +2037,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateCourtLocations() {
             // Given
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder()
+                                 .partyName("name")
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .build())
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             List<LocationRefData> locations = List.of(LocationRefData.builder()
