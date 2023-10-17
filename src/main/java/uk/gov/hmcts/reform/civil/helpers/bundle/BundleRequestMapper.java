@@ -206,7 +206,7 @@ public class BundleRequestMapper {
             List<Element<UploadEvidenceExpert>> tempList = new ArrayList<>();
             list.forEach(expertElement -> {
                 if ((isSameExpert(expertElement.getValue().getExpertOptionName(), allExpertNamesFromOtherParty)
-                || isSameExpert(expertElement.getValue().getExpertOptionName(), allJointExpertsNamesFromOtherParty))
+                    || isSameExpert(expertElement.getValue().getExpertOptionName(), allJointExpertsNamesFromOtherParty))
                     && (party != null && party.getPartyName() != null && expertElement.getValue().getExpertOptionOtherParty().equalsIgnoreCase(
                     party.getPartyName().trim())
                     || (party != null && party.isIndividual() && party.getIndividualFirstName() != null && expertElement.getValue().getExpertOptionOtherParty().equalsIgnoreCase(
@@ -228,7 +228,7 @@ public class BundleRequestMapper {
     }
 
     private boolean isSameExpert(String expertOptionOtherParty, Set<String> allExpertNamesFromOtherParty) {
-        if (allExpertNamesFromOtherParty.stream().anyMatch(s -> s.equalsIgnoreCase(expertOptionOtherParty))){
+        if (allExpertNamesFromOtherParty.stream().anyMatch(s -> s.equalsIgnoreCase(expertOptionOtherParty))) {
             return true;
         }
         return false;
