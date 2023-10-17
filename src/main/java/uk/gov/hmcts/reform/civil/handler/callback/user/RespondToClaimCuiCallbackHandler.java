@@ -69,7 +69,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
 
     private CaseData getUpdatedCaseData(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null, null);
+        CaseDocument dummyDocument = new CaseDocument(null, null, null, 0, null, null);
         LocalDateTime responseDate = time.now();
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         return caseData.toBuilder()
