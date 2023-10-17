@@ -462,7 +462,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder
             .uiStatementOfTruth(StatementOfTruth.builder().build())
             .applicantSolicitor1ClaimStatementOfTruth(statementOfTruth)
-            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
 
         // data for case list and unassigned list
         dataBuilder
@@ -471,7 +471,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
         }
 
         dataBuilder
