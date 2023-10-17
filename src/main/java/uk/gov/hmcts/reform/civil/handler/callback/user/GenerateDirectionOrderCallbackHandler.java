@@ -287,7 +287,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                                         AppealChoiceSecondDropdown.builder()
                                                                             .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
                                                                             .build())
-                                                                    .build()).build());
+
+                                                                    .build()).build())
+            .finalOrderGiveReasonsYesNo(YesOrNo.NO);
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {

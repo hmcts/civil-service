@@ -293,8 +293,10 @@ public class JudgeFinalOrderGeneratorTest {
             // Order made section
             .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
                 LocalDate.now()).build()).build())
+            // Papers considered
+            .finalOrderJudgePapers(null)
             // judge heard from section
-            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(null)
+            .finalOrderRepresentation(FinalOrderRepresentation.builder()
                                           .typeRepresentationList(FinalOrderRepresentationList.OTHER_REPRESENTATION)
                                           .typeRepresentationOtherComplex(ClaimantAndDefendantHeard
                                                                               .builder().detailsRepresentationText("Test").build()).build())
@@ -360,14 +362,16 @@ public class JudgeFinalOrderGeneratorTest {
             // Order made section
             .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
                 LocalDate.now()).build()).build())
+            //Papers considered
+            .finalOrderJudgePapers(
+                finalOrdersJudgePapersList)
             // judge heard from section
             .respondent2(PartyBuilder.builder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
             .applicant2(PartyBuilder.builder().individual().build())
             .addApplicant2(YES)
-            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(
-                    finalOrdersJudgePapersList)
+            .finalOrderRepresentation(FinalOrderRepresentation.builder()
                                           .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
                                           .typeRepresentationComplex(ClaimantAndDefendantHeard.builder().build()).build())
             // recitals section

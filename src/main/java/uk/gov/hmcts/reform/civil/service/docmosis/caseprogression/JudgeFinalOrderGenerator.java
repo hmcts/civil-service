@@ -205,8 +205,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private String isJudgeConsideredPapers(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderRepresentation())
-            && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList()) ? "true" : null;
+        return nonNull(caseData.getFinalOrderJudgePapers()) ? "true" : null;
     }
 
     private LocalDate getDatesToAvoid(CaseData caseData) {
