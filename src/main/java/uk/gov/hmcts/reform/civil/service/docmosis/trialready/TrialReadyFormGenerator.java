@@ -50,7 +50,7 @@ public class TrialReadyFormGenerator {
             )
         );
 
-        return trialReadyDocument.toBuilder().ownedBy(userRole).build();
+        return trialReadyDocument;
     }
 
     private TrialReadyForm getTemplateData(CaseData caseData, String camundaActivity) {
