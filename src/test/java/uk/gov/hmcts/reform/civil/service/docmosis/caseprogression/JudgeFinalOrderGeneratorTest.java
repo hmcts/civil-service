@@ -668,6 +668,42 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
+    void testGetFurtherHearingLengthOther() {
+        CaseData minCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderRecitals(null)
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().lengthList(HearingLengthFinalOrderList.OTHER)
+                        .lengthListOther(CaseHearingLengthElement.builder()
+                                //.lengthListOtherDays("12")
+                                //.lengthListOtherHours("1")
+                                .lengthListOtherMinutes("30")
+                                .build()).build()).build();
+        String response = generator.getFurtherHearingLength(minCaseData);
+        assertEquals("30 minutes", response);
+
+        CaseData hourCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderRecitals(null)
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().lengthList(HearingLengthFinalOrderList.OTHER)
+                        .lengthListOther(CaseHearingLengthElement.builder()
+                                //.lengthListOtherDays("12")
+                                .lengthListOtherHours("1")
+                                //.lengthListOtherMinutes("30")
+                                .build()).build()).build();
+        response = generator.getFurtherHearingLength(hourCaseData);
+        assertEquals("1 hours ", response);
+
+        CaseData dayCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderRecitals(null)
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().lengthList(HearingLengthFinalOrderList.OTHER)
+                        .lengthListOther(CaseHearingLengthElement.builder()
+                                .lengthListOtherDays("12")
+                                //.lengthListOtherHours("1")
+                                //.lengthListOtherMinutes("30")
+                                .build()).build()).build();
+        response = generator.getFurtherHearingLength(dayCaseData);
+        assertEquals("12 days ", response);
+    }
+
+    @Test
     void testGetFurtherHearingLengthWhenNull() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderRecitals(null)
