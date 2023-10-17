@@ -446,10 +446,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         dataBuilder
             .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
-            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1())
+            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build())
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
+        }
 
         //assign case management category to the case and caseNameHMCTSinternal
         dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
