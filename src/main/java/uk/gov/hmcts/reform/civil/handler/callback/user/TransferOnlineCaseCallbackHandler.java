@@ -69,9 +69,12 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        LocationRefData newCourtLocation = courtLocationUtils.findPreferredLocationData(
+            fetchLocationData(callbackParams),
+            callbackParams.getCaseData().getTransferCourtLocationList());
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(getHeader())
-            .confirmationBody(getBody())
+            .confirmationBody(getBody(newCourtLocation.getSiteName()))
             .build();
     }
 
@@ -90,15 +93,18 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
                 .append(" - ").append(location.getCourtAddress())
                 .append(" - ").append(location.getPostcode()).toString())
-                            .collect(Collectors.toList()));
+                            .toList());
     }
 
     private String getHeader() {
         return format("# Case transferred to new location");
     }
 
-    private String getBody() {
-        return format("# Case transferred to new location");
+    private String getBody(String siteName) {
+        return format( "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                           + "The case has now been transferred to "
+                           + siteName
+                           + ". If the case has moved out of your region, you will no longer see it.");
     }
 
     private CallbackResponse saveTransferOnlineCase(CallbackParams callbackParams) {
