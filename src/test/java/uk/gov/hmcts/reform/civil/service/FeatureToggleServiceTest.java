@@ -165,4 +165,11 @@ class FeatureToggleServiceTest {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldLipVLipEnabledReturnTrue() {
+
+        assertThat(featureToggleService.isLipVLipEnabled()).isEqualTo(true);
+    }
 }
