@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
@@ -34,7 +33,6 @@ import java.util.Locale;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
@@ -94,13 +92,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-        LocationRefData locationRefData;
-
-        if (hasSDOBeenMade(caseData.getCcdState())) {
-            locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
-        } else {
-            locationRefData = locationRefDataService.getCcmccLocation(authorisation);
-        }
+        LocationRefData locationRefData = locationRefDataService.getCcmccLocation(authorisation);
 
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
@@ -132,13 +124,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private JudgeFinalOrderForm getAssistedOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-        LocationRefData locationRefData;
+        LocationRefData locationRefData = locationRefDataService.getCcmccLocation(authorisation);
 
-        if (hasSDOBeenMade(caseData.getCcdState())) {
-            locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
-        } else {
-            locationRefData = locationRefDataService.getCcmccLocation(authorisation);
-        }
         var assistedFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
             .claimant1Name(caseData.getApplicant1().getPartyName())
@@ -191,7 +178,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .initiativeDate(getInitiativeDate(caseData))
             .withoutNoticeDate(getWithoutNoticeDate(caseData))
             .reasonsText(getReasonsText(caseData));
-        
+
         return assistedFormOrderBuilder.build();
     }
 
@@ -445,10 +432,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             }
         }
         return "";
-    }
-
-    private boolean hasSDOBeenMade(CaseState state) {
-        return !JUDICIAL_REFERRAL.equals(state);
     }
 
     public String orderMadeDateBuilder(CaseData caseData) {
