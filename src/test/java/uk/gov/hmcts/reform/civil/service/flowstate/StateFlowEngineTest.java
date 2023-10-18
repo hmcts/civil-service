@@ -2442,7 +2442,8 @@ class StateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
                 .takenOfflineDate(LocalDateTime.now())
-                .build();
+                .build().toBuilder()
+                .drawDirectionsOrderRequired(NO).build();
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);

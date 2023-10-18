@@ -460,10 +460,18 @@ public class FlowPredicate {
         caseData.getTakenOfflineDate() != null;
 
     public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
-        caseData.getReasonNotSuitableSDO() == null && caseData.getTakenOfflineDate() != null;
+        caseData.getDrawDirectionsOrderRequired() != null
+            && caseData.getReasonNotSuitableSDO() == null
+            && caseData.getTakenOfflineDate() != null;
 
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
         caseData.getTakenOfflineByStaffDate() != null;
+
+    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimantResponseBeforeSDO = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+        && caseData.getApplicant1ResponseDate() != null
+        && caseData.getDrawDirectionsOrderRequired() == null
+        && caseData.getReasonNotSuitableSDO() == null;
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse = caseData ->
         getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(caseData);
@@ -1004,4 +1012,8 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> casemanMarksMediationUnsuccessful = caseData ->
         Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason());
+
+    public static final Predicate<CaseData> takenOfflineByStaffBeforeMediationUnsuccessful = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+        && Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason());
 }

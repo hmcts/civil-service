@@ -138,6 +138,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
@@ -476,8 +478,14 @@ public class CaseDataBuilder {
 
     private UpdateDetailsForm updateDetailsForm;
 
+    private TocTransferCaseReason tocTransferCaseReason;
+
+    private NotSuitableSdoOptions notSuitableSdoOptions;
+
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
+
+    private YesOrNo drawDirectionsOrderRequired;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -4540,6 +4548,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateBeforeTransferCaseSDONotDrawn() {
+
+        atStateApplicantRespondToDefenceAndProceed();
+
+        ccdState = JUDICIAL_REFERRAL;
+        notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
+
+        tocTransferCaseReason = TocTransferCaseReason.builder()
+            .reasonForCaseTransferJudgeTxt("unforeseen complexities")
+            .build();
+        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder atStateTakenOfflineSDONotDrawn(MultiPartyScenario mpScenario) {
 
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
@@ -4645,6 +4667,7 @@ public class CaseDataBuilder {
             atStateBothApplicantsRespondToDefenceAndProceed_2v1();
         }
 
+        drawDirectionsOrderRequired = NO;
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = applicant1ResponseDate.plusDays(1);
         return this;
@@ -6285,6 +6308,10 @@ public class CaseDataBuilder {
             .claimantUserDetails(claimantUserDetails)
             .updateDetailsForm(updateDetailsForm)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
+            //Transfer Online Case
+            .notSuitableSdoOptions(notSuitableSdoOptions)
+            .tocTransferCaseReason(tocTransferCaseReason)
+            .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
             .build();
     }
 }
