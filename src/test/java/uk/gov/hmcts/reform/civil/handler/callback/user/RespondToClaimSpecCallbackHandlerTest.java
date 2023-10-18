@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
@@ -55,12 +56,13 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
@@ -68,15 +70,12 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
@@ -99,6 +98,7 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -137,8 +137,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private UnavailableDateValidator dateValidator;
     @Mock
-    private ExitSurveyContentService exitSurveyContentService;
-    @Mock
     private FeatureToggleService toggleService;
     @Mock
     private PostcodeValidator postcodeValidator;
@@ -157,11 +155,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private LocationRefDataService locationRefDataService;
     @Mock
-    private AssignCategoryId assignCategoryId;
-    @Mock
     private CourtLocationUtils courtLocationUtils;
-    @Mock
-    private CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
@@ -195,6 +189,28 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void whenCallBackEventNotImplementedOrEventInvalid() {
+        // Given
+        String postCode = "postCode";
+        CaseData caseData = CaseData.builder()
+            .build().toBuilder()
+            .respondentSolicitor1ServiceAddressRequired(NO)
+            .respondentSolicitor1ServiceAddress(Address.builder().postCode(postCode).build())
+            .isRespondent1(YES)
+            .build();
+        CallbackParams callbackParams = callbackParamsOf(caseData, CallbackType.MID, " ").toBuilder()
+            .request(CallbackRequest.builder().eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
+                         .build()).build();
+
+        //When
+        CallbackException ex = assertThrows(CallbackException.class, () -> handler.handle(callbackParams),
+
+                                                                            "A CallbackException was expected to be thrown but wasn't.");
+        // Then
+        assertThat(ex.getMessage()).contains("Callback for event");
+    }
+
+    @Test
     void midSpecCorrespondenceAddress_checkAddressIfWasIncorrect() {
         // Given
         String postCode = "postCode";
@@ -203,6 +219,35 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondentSolicitor1ServiceAddressRequired(NO)
             .respondentSolicitor1ServiceAddress(Address.builder().postCode(postCode).build())
             .isRespondent1(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
+        CallbackRequest request = CallbackRequest.builder()
+            .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
+            .build();
+        params = params.toBuilder().request(request).build();
+
+        List<String> errors = Collections.singletonList("error 1");
+        Mockito.when(postcodeValidator.validate(postCode)).thenReturn(errors);
+
+        // When
+        CallbackResponse response = handler.handle(params);
+
+        // Then
+        assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
+    }
+
+    @Test
+    void midSpecCorrespondenceAddress_checkAddressIfWasIncorrectForSol2() {
+        // Given
+        String postCode = "postCode";
+        CaseData caseData = CaseData.builder()
+            .build().toBuilder()
+            .respondentSolicitor1ServiceAddressRequired(YES)
+            .respondentSolicitor1ServiceAddress(Address.builder().postCode(postCode).build())
+            .isRespondent1(YES)
+            .isRespondent2(YES)
+            .respondentSolicitor2ServiceAddressRequired(NO)
+            .respondentSolicitor2ServiceAddress(Address.builder().postCode(postCode).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
         CallbackRequest request = CallbackRequest.builder()
@@ -651,9 +696,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-
-            List<String> expectedErrorArray = new ArrayList<>();
-            expectedErrorArray.add("Date for when will the amount be paid must be today or in the future.");
 
             // Then
             assertThat(response).isNotNull();
@@ -1342,6 +1384,58 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldPopulateRespondent2Flag_WhenInvokedWithSmallClaimExperts_1DQ() {
+        // Given
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondToClaimExperts(ExpertDetails.builder().build()).build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        // Given
+        assertThat(response.getData().get("respondent2DocumentGeneration")).isEqualTo("userRespondent2");
+    }
+
+    @Test
+    void shouldPopulateRespondent2Flag_WhenInvokedWithSmallClaimExperts_2DQ() {
+        // Given
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder()
+                               .respondToClaimExperts2(ExpertDetails.builder().build()).build())
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        // Given
+        assertThat(response.getData().get("respondent2DocumentGeneration")).isEqualTo("userRespondent2");
+    }
+
+    @Test
     void shouldNotPopulateRespondent2Flag_WhenInvoked() {
         // Given
         when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
@@ -1493,7 +1587,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
             // Given
             List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().build())
                 .respondent1DQWitnessesRequiredSpec(YES)
@@ -1581,9 +1674,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
-            String claimNumber = caseData.getLegacyCaseReference();
 
             // Then
             assertThat(response.getConfirmationBody())
