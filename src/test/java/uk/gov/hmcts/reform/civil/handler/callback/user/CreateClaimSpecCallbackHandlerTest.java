@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -200,6 +201,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService toggleService;
+
+    @MockBean
+    private ToggleConfiguration toggleConfiguration;
 
     @Nested
     class AboutToStartCallback {
@@ -1637,7 +1641,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
-
+            given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
             given(defendantPinToPostLRspecService.buildDefendantPinToPost())
                 .willReturn(DefendantPinToPostLRspec.builder()
                                 .accessCode(
