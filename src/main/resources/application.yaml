@@ -71,7 +71,7 @@ serviceRequestClaimIssued:
     service: CIVIL
 
 wa:
-  feature-toggle: ${WA_TOGGLE:WA 4}
+  feature-toggle: ${WA_TOGGLE:Prod}
 
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
