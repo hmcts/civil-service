@@ -122,6 +122,8 @@ class BundleRequestMapperTest {
                       bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(1).getValue().getDocumentFileName());
         assertEquals("Replies from expert1 12/01/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(2).getValue().getDocumentFileName());
+        assertEquals("Questions to Other expert 12/01/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(3).getValue().getDocumentFileName());
         assertEquals("Expert Evidence expert2 Test 12/01/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getClaimant2ExpertEvidence().get(0).getValue().getDocumentFileName());
         assertEquals("Expert Evidence expert3 Test 12/01/2023",
@@ -241,6 +243,15 @@ class BundleRequestMapperTest {
                                                         .expertOptionExpertises("Test1 Test2")
                                                         .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
                                                         .expertOptionName(expertName).build()));
+        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
+                                                        .builder()
+                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                            .documentFileName(TEST_FILE_NAME).build())
+                                                        .expertOptionExpertise("Test")
+                                                        .expertOptionOtherParty("wrong party name")
+                                                        .expertOptionExpertises("Test1 Test2")
+                                                        .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
+                                                        .expertOptionName("Other expert").build()));
 
         return  expertEvidenceDocs;
     }
