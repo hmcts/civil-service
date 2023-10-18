@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
@@ -20,9 +20,10 @@ import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -86,6 +87,15 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
         "Date of Service should not be more than 14 days old";
 
+    public static final String DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS =
+        "Date of service must be no greater than 2 working days in the future";
+
+    public static final String DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS =
+        "On what day did you serve should not be more than 14 days old";
+
+    public static final String DATE_OF_SERVICE_DATE_IS_WORKING_DAY =
+        "For the date of service please enter a working day";
+
     public static final String DOC_SERVED_MANDATORY =
             "Supporting evidence is required";
 
@@ -96,6 +106,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private final ObjectMapper objectMapper;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final WorkingDayIndicator workingDayIndicator;
     private final FeatureToggleService featureToggleService;
     private final AssignCategoryId assignCategoryId;
 
@@ -434,6 +445,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 return DOC_SERVED_DATE_IN_FUTURE;
             } else if (isCosDefendantNotifyDateOlderThan14Days(certificateOfService.getCosDateOfServiceForDefendant())) {
                 return DOC_SERVED_DATE_OLDER_THAN_14DAYS;
+            } else if (isDeemedServedWithinMaxWorkingDays(certificateOfService.getCosDateDeemedServedForDefendant())) {
+                return DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS;
+            } else if (isDeemedServedDateIsNotWorkingDay(certificateOfService.getCosDateDeemedServedForDefendant())) {
+                return DATE_OF_SERVICE_DATE_IS_WORKING_DAY;
+            } else if (isDeemedServedDateOlderThan14Days(certificateOfService.getCosDateDeemedServedForDefendant())) {
+                return DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS;
             }
         }
         return errorMessage;
@@ -446,7 +463,22 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
         return time.now().isAfter(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
                                                                                   .atTime(time.now().toLocalTime())));
+    }
 
+    private boolean isDeemedServedDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
+        return time.now().isAfter(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
+                                                                                  .atTime(time.now().toLocalTime())));
+    }
+
+    public boolean isDeemedServedWithinMaxWorkingDays(LocalDate cosDateOfServiceForDefendant) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate maxWorkingDaysDate = deadlinesCalculator.plusWorkingDays(currentDate, 2);
+
+        return cosDateOfServiceForDefendant.isAfter(maxWorkingDaysDate);
+    }
+
+    private boolean isDeemedServedDateIsNotWorkingDay(LocalDate cosDateOfServiceForDefendant) {
+        return !workingDayIndicator.isWorkingDay(cosDateOfServiceForDefendant);
     }
 
     private boolean isBothDefendantLip(CaseData caseData) {
