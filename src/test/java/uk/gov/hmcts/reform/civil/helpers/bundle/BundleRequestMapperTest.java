@@ -213,7 +213,6 @@ class BundleRequestMapperTest {
             .respondent2(Party.builder().individualLastName("lastname").individualFirstName("df2Fname").partyName(
                 "respondent2").type(Party.Type.INDIVIDUAL).build())
             .hearingDate(LocalDate.now())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
             .build();
     }
 
