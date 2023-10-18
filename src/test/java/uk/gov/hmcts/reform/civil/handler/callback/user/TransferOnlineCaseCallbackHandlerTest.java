@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -26,15 +27,15 @@ import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     TransferOnlineCaseCallbackHandler.class,
     JacksonAutoConfiguration.class})
 class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    private static final String CONFIRMATION_HEADER = "# Case transferred to new location";
 
     @Autowired
     private TransferOnlineCaseCallbackHandler handler;
@@ -159,7 +160,30 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class SubmittedCallback {
+        @Test
+        void shouldReturnExpectedSubmittedCallbackResponse() {
+            String newCourtLocationSiteName = "Site 2";
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            given(courtLocationUtils.findPreferredLocationData(any(), any()))
+                .willReturn(LocationRefData.builder().siteName("")
+                                .epimmsId("222")
+                                .siteName(newCourtLocationSiteName).courtAddress("Adr 2").postcode("BBB 222")
+                                .courtLocationCode("other code").build());
 
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String body = "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                + "The case has now been transferred to "
+                + newCourtLocationSiteName
+                + ". If the case has moved out of your region, you will no longer see it.<br><br>";
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(CONFIRMATION_HEADER)
+                    .confirmationBody(body)
+                    .build());
+        }
     }
 
     @Test
