@@ -77,7 +77,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     }
 
     CallbackResponse populateValues(CallbackParams callbackParams) {
-        log.info("Start of populateValues");
+
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
@@ -121,7 +121,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     }
 
     CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
-        log.info("Start of setBusinessProcess");
+
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
@@ -171,7 +171,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         if (isApplicantSolicitor(userRoles) || isLIPClaimant(userRoles)) {
             return caseData.getTrialReadyApplicant();
         } else if (isRespondentSolicitorOne(userRoles) || isLIPDefendant(userRoles)) {
-            log.info("End of buildConfirmation");
+
             return caseData.getTrialReadyRespondent1();
         } else {
             return caseData.getTrialReadyRespondent2();
