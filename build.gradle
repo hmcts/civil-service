@@ -401,6 +401,8 @@ dependencies {
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '12.4'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
+  implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.0.1'
+
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.1'
   implementation group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
@@ -438,8 +440,8 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.20.0'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.20.0'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.80'
-  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.13'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.82'
+  implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '10.1.14'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.9'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.0.78'
 
