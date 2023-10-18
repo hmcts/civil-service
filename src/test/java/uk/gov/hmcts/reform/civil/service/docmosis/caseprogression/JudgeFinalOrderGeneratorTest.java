@@ -88,6 +88,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.INDEMNITY_BASIS;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.SUBJECT_DETAILED_ASSESSMENT;
 import static uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel.IN_PERSON;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
 
@@ -100,8 +101,9 @@ public class JudgeFinalOrderGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
-    private static final String fileFreeForm = format(FREE_FORM_ORDER_PDF.getDocumentTitle(), LocalDate.now());
-    private static final String assistedForm = format(ASSISTED_ORDER_PDF.getDocumentTitle(), LocalDate.now());
+    private static final String DATE_FORMAT = "dd/MM/yyyy";
+    private static final String fileFreeForm = format(FREE_FORM_ORDER_PDF.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
+    private static final String assistedForm = format(ASSISTED_ORDER_PDF.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     List<FinalOrderToggle> toggleList = new ArrayList<FinalOrderToggle>(Arrays.asList(FinalOrderToggle.SHOW));
     private static final CaseDocument FREE_FROM_ORDER = CaseDocumentBuilder.builder()
         .documentName(fileFreeForm)
@@ -291,8 +293,10 @@ public class JudgeFinalOrderGeneratorTest {
             // Order made section
             .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
                 LocalDate.now()).build()).build())
+            // Papers considered
+            .finalOrderJudgePapers(null)
             // judge heard from section
-            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(null)
+            .finalOrderRepresentation(FinalOrderRepresentation.builder()
                                           .typeRepresentationList(FinalOrderRepresentationList.OTHER_REPRESENTATION)
                                           .typeRepresentationOtherComplex(ClaimantAndDefendantHeard
                                                                               .builder().detailsRepresentationText("Test").build()).build())
@@ -358,14 +362,16 @@ public class JudgeFinalOrderGeneratorTest {
             // Order made section
             .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
                 LocalDate.now()).build()).build())
+            //Papers considered
+            .finalOrderJudgePapers(
+                finalOrdersJudgePapersList)
             // judge heard from section
             .respondent2(PartyBuilder.builder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
             .applicant2(PartyBuilder.builder().individual().build())
             .addApplicant2(YES)
-            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(
-                    finalOrdersJudgePapersList)
+            .finalOrderRepresentation(FinalOrderRepresentation.builder()
                                           .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
                                           .typeRepresentationComplex(ClaimantAndDefendantHeard.builder().build()).build())
             // recitals section
@@ -663,6 +669,42 @@ public class JudgeFinalOrderGeneratorTest {
                 }
             }
         }
+    }
+
+    @Test
+    void testGetFurtherHearingLengthOther() {
+        CaseData minCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderRecitals(null)
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().lengthList(HearingLengthFinalOrderList.OTHER)
+                        .lengthListOther(CaseHearingLengthElement.builder()
+                                //.lengthListOtherDays("12")
+                                //.lengthListOtherHours("1")
+                                .lengthListOtherMinutes("30")
+                                .build()).build()).build();
+        String response = generator.getFurtherHearingLength(minCaseData);
+        assertEquals("30 minutes", response);
+
+        CaseData hourCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderRecitals(null)
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().lengthList(HearingLengthFinalOrderList.OTHER)
+                        .lengthListOther(CaseHearingLengthElement.builder()
+                                //.lengthListOtherDays("12")
+                                .lengthListOtherHours("1")
+                                //.lengthListOtherMinutes("30")
+                                .build()).build()).build();
+        response = generator.getFurtherHearingLength(hourCaseData);
+        assertEquals("1 hours ", response);
+
+        CaseData dayCaseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderRecitals(null)
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().lengthList(HearingLengthFinalOrderList.OTHER)
+                        .lengthListOther(CaseHearingLengthElement.builder()
+                                .lengthListOtherDays("12")
+                                //.lengthListOtherHours("1")
+                                //.lengthListOtherMinutes("30")
+                                .build()).build()).build();
+        response = generator.getFurtherHearingLength(dayCaseData);
+        assertEquals("12 days ", response);
     }
 
     @Test
