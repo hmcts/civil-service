@@ -16,22 +16,18 @@ import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.bundle.BundleCreateResponse;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleData;
-import uk.gov.hmcts.reform.civil.model.bundle.BundleDetails;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.BUNDLE_CREATION_NOTIFICATION;
@@ -55,29 +51,11 @@ public class BundleCreationTriggerEventHandler {
      */
     @EventListener
     public void sendBundleCreationTrigger(BundleCreationTriggerEvent event) {
-        //BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
+        BundleCreateResponse bundleCreateResponse = bundleCreationService.createBundle(event);
+
         String caseId = event.getCaseId().toString();
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, CREATE_BUNDLE);
         CaseData caseData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails().getData());
-        Document document = caseData.getServedDocumentFiles().getParticularsOfClaimDocument().get(0).getValue();
-        BundleDetails bundleDetails = BundleDetails.builder()
-                .bundleHearingDate(LocalDate.now().plusDays(5))
-                .createdOn(LocalDateTime.now())
-                .fileName(document.getDocumentFileName())
-                .id(String.valueOf(UUID.randomUUID()))
-                .title("Trial Bundle")
-                .stitchStatus("DONE")
-                .stitchedDocument(document)
-                .build();
-
-        BundleCreateResponse bundleCreateResponse = BundleCreateResponse.builder()
-                .documentTaskId(1)
-                .data(BundleData.builder()
-                        .caseBundles(List.of(uk.gov.hmcts.reform.civil.model.bundle.Bundle.builder()
-                                .value(bundleDetails)
-                                .build()))
-                        .build()).build();
-
 
         List<IdValue<Bundle>> caseBundles = caseData.getCaseBundles();
         caseBundles.addAll(bundleCreateResponse.getData().getCaseBundles()
@@ -91,7 +69,9 @@ public class BundleCreationTriggerEventHandler {
     IdValue<Bundle> prepareNewBundle(uk.gov.hmcts.reform.civil.model.bundle.Bundle bundle, CaseData caseData) {
         Bundle result = Bundle.builder()
             .bundleHearingDate(Optional.of(caseData.getHearingDate()))
-            .stitchedDocument(Optional.ofNullable(bundle.getValue().getStitchedDocument()))
+            .stitchedDocument(Optional.ofNullable(
+                    deepCopyWithCategoryId(bundle.getValue().getStitchedDocument(),
+                            DocCategory.BUNDLES.getValue())))
             .fileName(bundle.getValue().getFileName())
             .title(bundle.getValue().getTitle())
             .description(null != bundle.getValue().getDescription()
@@ -99,8 +79,17 @@ public class BundleCreationTriggerEventHandler {
             .stitchStatus(Optional.ofNullable(bundle.getValue().getStitchStatus()))
             .createdOn(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
             .id(bundle.getValue().getId()).build();
-        result.getStitchedDocument().ifPresent(x -> x.setCategoryID(DocCategory.BUNDLES.getValue()));
         return new IdValue<>(result.getId(), result);
+    }
+
+    private Document deepCopyWithCategoryId(Document sourceDocument, String theID) {
+        return Document.builder()
+                .categoryID(theID)
+                .documentFileName(sourceDocument.getDocumentFileName())
+                .documentBinaryUrl(sourceDocument.getDocumentBinaryUrl())
+                .documentHash(sourceDocument.getDocumentHash())
+                .documentUrl(sourceDocument.getDocumentUrl())
+                .build();
     }
 
     CaseDataContent prepareCaseContent(List<IdValue<Bundle>> caseBundles, StartEventResponse startEventResponse) {
