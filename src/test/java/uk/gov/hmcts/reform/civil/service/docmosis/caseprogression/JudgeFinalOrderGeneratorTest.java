@@ -291,8 +291,10 @@ public class JudgeFinalOrderGeneratorTest {
             // Order made section
             .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
                 LocalDate.now()).build()).build())
+            // Papers considered
+            .finalOrderJudgePapers(null)
             // judge heard from section
-            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(null)
+            .finalOrderRepresentation(FinalOrderRepresentation.builder()
                                           .typeRepresentationList(FinalOrderRepresentationList.OTHER_REPRESENTATION)
                                           .typeRepresentationOtherComplex(ClaimantAndDefendantHeard
                                                                               .builder().detailsRepresentationText("Test").build()).build())
@@ -358,14 +360,16 @@ public class JudgeFinalOrderGeneratorTest {
             // Order made section
             .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
                 LocalDate.now()).build()).build())
+            //Papers considered
+            .finalOrderJudgePapers(
+                finalOrdersJudgePapersList)
             // judge heard from section
             .respondent2(PartyBuilder.builder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
             .applicant2(PartyBuilder.builder().individual().build())
             .addApplicant2(YES)
-            .finalOrderRepresentation(FinalOrderRepresentation.builder().typeRepresentationJudgePapersList(
-                    finalOrdersJudgePapersList)
+            .finalOrderRepresentation(FinalOrderRepresentation.builder()
                                           .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
                                           .typeRepresentationComplex(ClaimantAndDefendantHeard.builder().build()).build())
             // recitals section
@@ -709,7 +713,7 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderRecitals(null)
             .finalOrderAppealComplex(FinalOrderAppeal.builder().list(AppealList.CLAIMANT).build()).build();
         String response = generator.getAppealFor(caseData);
-        assertEquals(AppealList.CLAIMANT.name().toLowerCase(), response);
+        assertEquals(AppealList.CLAIMANT.name().toLowerCase() + "'s", response);
     }
 
     @Test
@@ -803,12 +807,12 @@ public class JudgeFinalOrderGeneratorTest {
         String responseDefendant = generator.populateSummarilyAssessedText(caseDataDefendant);
         assertEquals(format(
             "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
-                + "in the sum of £%s. Such a sum shall be made by 4pm on",
+                + "in the sum of £%s. Such sum shall be paid by 4pm on",
             MonetaryConversions.penniesToPounds(caseDataClaimant
                                                     .getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount())), responseClaimant);
         assertEquals(format(
             "The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
-                + "in the sum of £%s. Such a sum shall be made by 4pm on",
+                + "in the sum of £%s. Such sum shall be paid by 4pm on",
             MonetaryConversions.penniesToPounds(caseDataDefendant
                                                     .getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount())), responseDefendant);
     }

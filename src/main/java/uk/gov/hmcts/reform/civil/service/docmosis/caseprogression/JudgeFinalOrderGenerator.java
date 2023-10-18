@@ -191,7 +191,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .initiativeDate(getInitiativeDate(caseData))
             .withoutNoticeDate(getWithoutNoticeDate(caseData))
             .reasonsText(getReasonsText(caseData));
-        
+
         return assistedFormOrderBuilder.build();
     }
 
@@ -202,8 +202,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private String isJudgeConsideredPapers(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderRepresentation())
-            && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList()) ? "true" : null;
+        return nonNull(caseData.getFinalOrderJudgePapers()) ? "true" : null;
     }
 
     private LocalDate getDatesToAvoid(CaseData caseData) {
@@ -355,12 +354,12 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         if (caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
             return format(
                 "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
-                    + "in the sum of £%s. Such a sum shall be made by 4pm on",
+                    + "in the sum of £%s. Such sum shall be paid by 4pm on",
                 MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()));
         } else {
             return format(
                 "The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
-                    + "in the sum of £%s. Such a sum shall be made by 4pm on",
+                    + "in the sum of £%s. Such sum shall be paid by 4pm on",
                 MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()));
         }
     }
@@ -401,7 +400,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             if (caseData.getFinalOrderAppealComplex().getList().name().equals(OTHER.name())) {
                 return caseData.getFinalOrderAppealComplex().getOtherText();
             } else {
-                return caseData.getFinalOrderAppealComplex().getList().name().toLowerCase();
+                return caseData.getFinalOrderAppealComplex().getList().name().toLowerCase() + "'s";
             }
         }
         return "";

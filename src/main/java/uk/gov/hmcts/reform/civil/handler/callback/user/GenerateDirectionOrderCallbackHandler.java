@@ -62,7 +62,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -86,6 +88,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String NOT_ALLOWED_DATE = "The date in %s may not be later than the established date";
     public static final String NOT_ALLOWED_DATE_RANGE = "The date range in %s may not have a 'from date', that is after the 'date to'";
     public static final String NOT_ALLOWED_DATE_PAST = "The date in %s may not be before the established date";
+    public static final String JUDGE_HEARD_FROM_EMPTY = "Judge Heard from: 'Claimant(s) and defendant(s)' section for %s, requires a selection to be made";
     public String defendantTwoPartyName;
     public String claimantTwoPartyName;
     public static final String APPEAL_NOTICE_DATE = "Appeal notice date";
@@ -131,7 +134,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
+
         if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
+            checkJudgeHeardFrom(caseData, errors);
             checkFieldDate(caseData, errors);
         }
 
@@ -143,6 +148,26 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
+    }
+
+    private void checkJudgeHeardFrom(CaseData caseData, List<String> errors) {
+        if (caseData.getFinalOrderRepresentation() != null
+            && caseData.getFinalOrderRepresentation().getTypeRepresentationList().equals(CLAIMANT_AND_DEFENDANT)) {
+            if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantList() == null) {
+                errors.add(format(JUDGE_HEARD_FROM_EMPTY, "claimant"));
+            }
+            if (caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationDefendantList() == null) {
+                errors.add(format(JUDGE_HEARD_FROM_EMPTY, "defendant"));
+            }
+            if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)
+                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationClaimantListTwo() == null) {
+                errors.add(format(JUDGE_HEARD_FROM_EMPTY, "second claimant"));
+            }
+            if ((getMultiPartyScenario(caseData).equals(ONE_V_TWO_ONE_LEGAL_REP) || getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP))
+                && caseData.getFinalOrderRepresentation().getTypeRepresentationComplex().getTypeRepresentationDefendantTwoList() == null) {
+                errors.add(format(JUDGE_HEARD_FROM_EMPTY, "second defendant"));
+            }
+        }
     }
 
     private CaseData.CaseDataBuilder<?, ?> populateFreeFormFields(CaseData.CaseDataBuilder<?, ?> builder) {
@@ -215,10 +240,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                            .datesToAvoidDates(LocalDate.now().plusDays(7)).build()).build())
             .orderMadeOnDetailsOrderCourt(
                 OrderMadeOnDetails.builder().ownInitiativeDate(
-                    LocalDate.now()).ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
+                    LocalDate.now().plusDays(7)).ownInitiativeText(ON_INITIATIVE_SELECTION_TEXT).build())
             .orderMadeOnDetailsOrderWithoutNotice(
                 OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeDate(
-                    LocalDate.now()).withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
+                    LocalDate.now().plusDays(7)).withOutNoticeText(WITHOUT_NOTICE_SELECTION_TEXT).build())
             .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
                                                   .assistedOrderCostsFirstDropdownDate(advancedDate)
                                                   .assistedOrderAssessmentThirdDropdownDate(advancedDate)
@@ -245,7 +270,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                                         AppealChoiceSecondDropdown.builder()
                                                                             .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
                                                                             .build())
-                                                                    .build()).build());
+
+                                                                    .build()).build())
+            .finalOrderGiveReasonsYesNo(YesOrNo.NO);
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
