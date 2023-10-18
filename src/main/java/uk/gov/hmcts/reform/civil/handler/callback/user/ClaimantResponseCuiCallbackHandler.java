@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -30,6 +31,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_CUI);
 
     private final ObjectMapper objectMapper;
+
+    private final Time time;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -48,6 +51,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData updatedData = caseData.toBuilder()
+            .claimantResponseSubmittedDate(time.now())
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
