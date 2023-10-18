@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -41,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.CIRCUIT_COURT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.GRANTED;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.REFUSED;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
 
@@ -60,6 +62,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         + "reasonable to proceed in their absence.";
     private static final String NOTICE_NOT_RECIEVED_CANNOT_PROCEED =     "The Judge was not satisfied that they had received notice of the hearing "
         + "and it was not reasonable to proceed in their absence.";
+    private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeFinalOrderForm templateData = getFinalOrderType(caseData, authorisation);
@@ -82,7 +85,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private String getFileName(DocmosisTemplates docmosisTemplate) {
-        return format(docmosisTemplate.getDocumentTitle(), LocalDate.now());
+        return format(docmosisTemplate.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     }
 
     private JudgeFinalOrderForm getFinalOrderType(CaseData caseData, String authorisation) {
@@ -191,7 +194,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .initiativeDate(getInitiativeDate(caseData))
             .withoutNoticeDate(getWithoutNoticeDate(caseData))
             .reasonsText(getReasonsText(caseData));
-        
+
         return assistedFormOrderBuilder.build();
     }
 
@@ -202,8 +205,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private String isJudgeConsideredPapers(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderRepresentation())
-            && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList()) ? "true" : null;
+        return nonNull(caseData.getFinalOrderJudgePapers()) ? "true" : null;
     }
 
     private LocalDate getDatesToAvoid(CaseData caseData) {
@@ -355,12 +357,12 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         if (caseData.getAssistedOrderMakeAnOrderForCosts().getMakeAnOrderForCostsList().equals(CostEnums.CLAIMANT)) {
             return format(
                 "The claimant shall pay the defendant's costs (both fixed and summarily assessed as appropriate) "
-                    + "in the sum of £%s. Such a sum shall be made by 4pm on",
+                    + "in the sum of £%s. Such sum shall be paid by 4pm on",
                 MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()));
         } else {
             return format(
                 "The defendant shall pay the claimant's costs (both fixed and summarily assessed as appropriate) "
-                    + "in the sum of £%s. Such a sum shall be made by 4pm on",
+                    + "in the sum of £%s. Such sum shall be paid by 4pm on",
                 MonetaryConversions.penniesToPounds(caseData.getAssistedOrderMakeAnOrderForCosts().getAssistedOrderCostsFirstDropdownAmount()));
         }
     }
@@ -401,7 +403,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             if (caseData.getFinalOrderAppealComplex().getList().name().equals(OTHER.name())) {
                 return caseData.getFinalOrderAppealComplex().getOtherText();
             } else {
-                return caseData.getFinalOrderAppealComplex().getList().name().toLowerCase();
+                return caseData.getFinalOrderAppealComplex().getList().name().toLowerCase() + "'s";
             }
         }
         return "";
@@ -434,17 +436,25 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 case HOUR_2:
                     return "2 hours";
                 case OTHER:
-                    StringBuilder otherLength = new StringBuilder();
-                    otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays() + " days ").append(
-                        caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours()).append(
-                        " hours ").append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes()).append(
-                        " minutes");
-                    return otherLength.toString();
+                    return getOtherLength(caseData);
                 default:
                     return "";
             }
         }
         return "";
+    }
+
+    private String getOtherLength(CaseData caseData) {
+        StringBuilder otherLength = new StringBuilder();
+        if (Objects.nonNull(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther())) {
+            String otherDay = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays();
+            String otherHour = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours();
+            String otherMinute = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes();
+            otherLength.append(Objects.nonNull(otherDay) ? (otherDay + " days ") : "")
+                    .append(Objects.nonNull(otherHour) ? (otherHour + " hours ") : "")
+                    .append(Objects.nonNull(otherMinute) ? (otherMinute + " minutes") : "");
+        }
+        return otherLength.toString();
     }
 
     private boolean hasSDOBeenMade(CaseState state) {

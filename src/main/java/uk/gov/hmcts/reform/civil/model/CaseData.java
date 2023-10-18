@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -570,7 +571,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentWithName>> documentAndName;
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
-    private final String caseNoteTypeNoteTA;
+    private final String caseNoteTA;
+    private final List<Element<CaseNote>> caseNotesTA;
     private final LocalDateTime noteAdditionDateTime;
     private final String caseTypeFlag;
     private final String witnessStatementFlag;
@@ -843,8 +845,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isApplicant1NotRepresented() {
+        return NO.equals(getApplicant1Represented());
+    }
+
+    @JsonIgnore
     public boolean isLRvLipOneVOne() {
         return isRespondent1NotRepresented()
+            && !isApplicant1NotRepresented()
+            && isOneVOne(this);
+    }
+
+    @JsonIgnore
+    public boolean isLipvLipOneVOne() {
+        return isRespondent1NotRepresented()
+            && isApplicant1NotRepresented()
             && isOneVOne(this);
     }
 
@@ -1025,12 +1040,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public String getApplicant1Email() {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
-    
+
     @JsonIgnore
     public String getHelpWithFeesReferenceNumber() {
         return Optional.ofNullable(getCaseDataLiP())
-            .map(CaseDataLiP::getRespondent1LiPResponse)
-            .map(RespondentLiPResponse::getHelpWithFeesReferenceNumberLip).orElse(null);
+            .map(CaseDataLiP::getHelpWithFees)
+            .map(HelpWithFees::getHelpWithFeesReferenceNumber).orElse(null);
     }
 
     @JsonIgnore
@@ -1041,5 +1056,21 @@ public class CaseData extends CaseDataParent implements MappableObject {
                    .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
         }
         return false;
+    }
+
+    @JsonIgnore
+    public boolean isRespondentSolicitorRegistered() {
+        return YesOrNo.YES.equals(getRespondent1OrgRegistered());
+    }
+
+    @JsonIgnore
+    public String getRespondent1Email() {
+        if (isRespondent1NotRepresented()) {
+            return getRespondent1().getPartyEmail();
+        }
+        if (isRespondentSolicitorRegistered()) {
+            return getRespondentSolicitor1EmailAddress();
+        }
+        return null;
     }
 }
