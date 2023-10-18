@@ -125,15 +125,13 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
             callbackParams.getCaseData().getTransferCourtLocationList());
         LocationRefData caseManagementLocation =
             getLocationRefData(callbackParams);
-        if (caseManagementLocation != null && newCourtLocation.getCourtLocationCode().equals(caseManagementLocation.getCourtLocationCode())) {
-            return true;
-        }
-        return false;
+        return caseManagementLocation != null && newCourtLocation.getCourtLocationCode().equals(caseManagementLocation.getCourtLocationCode());
     }
 
     private LocationRefData getLocationRefData(CallbackParams callbackParams) {
         List<LocationRefData> locations = fetchLocationData(callbackParams);
-        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(callbackParams.getCaseData().getCaseManagementLocation().getBaseLocation())).toList();
+        String baseLocation = callbackParams.getCaseData().getCaseManagementLocation() == null ? null : callbackParams.getCaseData().getCaseManagementLocation().getBaseLocation();
+        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(baseLocation)).toList();
         return matchedLocations.size() > 0 ? matchedLocations.get(0) : null;
     }
 
