@@ -310,8 +310,6 @@ notifications:
 
   notifyLiPApplicantBreathingSpaceLifted: "b6dbc714-210e-475d-a1db-bf5ea28de98b"
   notifyLiPRespondentBreathingSpaceLifted: "4ca3017b-b2fa-4ac0-a867-9bfada50a80c"
-  notifyDefendantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
-  respondentLrPartAdmitSettleClaimTemplate: "6a1f4ef9-5334-4f2c-9e43-b292753929fb"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
