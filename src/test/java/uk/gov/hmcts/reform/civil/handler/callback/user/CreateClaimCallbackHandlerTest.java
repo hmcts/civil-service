@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
-import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -117,8 +116,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
     ValidationAutoConfiguration.class,
     ValidateEmailService.class,
     OrganisationService.class,
-    AssignCategoryId.class,
-    ToggleConfiguration.class},
+    AssignCategoryId.class},
     properties = {"reference.database.enabled=false"})
 class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -172,9 +170,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Value("${civil.response-pack-url}")
     private String responsePackLink;
-
-    @MockBean
-    private ToggleConfiguration toggleConfiguration;
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -379,7 +374,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             given(feesService.getFeeDataByClaimValue(any())).willReturn(feeData);
-            given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
         }
 
         @Test
@@ -463,11 +457,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventStartClaimCallback {
 
         private static final String PAGE_ID = "start-claim";
-
-        @BeforeEach
-        void setup() {
-            given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
-        }
 
         @Test
         void shouldAddClaimStartedFlagToData_whenInvoked() {

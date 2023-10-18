@@ -526,7 +526,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
-    private String featureToggleWA;
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
