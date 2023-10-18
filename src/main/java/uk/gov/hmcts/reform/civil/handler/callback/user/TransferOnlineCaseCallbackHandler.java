@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -43,6 +42,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private static final String ERROR_SELECT_DIFF_LOCATION = "Select a different hearing court location to transfer!";
+    private static final String CONFIRMATION_HEADER = "# Case transferred to new location";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -69,12 +69,12 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        LocationRefData newCourtLocation = courtLocationUtils.findPreferredLocationData(
+        String newCourtLocationSiteName = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams),
-            callbackParams.getCaseData().getTransferCourtLocationList());
+            callbackParams.getCaseData().getTransferCourtLocationList()).getSiteName();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader())
-            .confirmationBody(getBody(newCourtLocation.getSiteName()))
+            .confirmationHeader(CONFIRMATION_HEADER)
+            .confirmationBody(getBody(newCourtLocationSiteName))
             .build();
     }
 
@@ -96,15 +96,11 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
                             .toList());
     }
 
-    private String getHeader() {
-        return format("# Case transferred to new location");
-    }
-
     private String getBody(String siteName) {
-        return format( "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+        return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
                            + "The case has now been transferred to "
                            + siteName
-                           + ". If the case has moved out of your region, you will no longer see it.");
+                           + ". If the case has moved out of your region, you will no longer see it.<br><br>";
     }
 
     private CallbackResponse saveTransferOnlineCase(CallbackParams callbackParams) {
