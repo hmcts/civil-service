@@ -100,8 +100,7 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -217,6 +216,22 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                             "A CallbackException was expected to be thrown but wasn't.");
         // Then
         assertThat(ex.getMessage()).contains("Callback for event");
+    }
+
+    @Test
+    void resetStatementOfTruth() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "statement-of-truth");
+        CallbackRequest request = CallbackRequest.builder()
+            .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
+            .build();
+        params = params.toBuilder().request(request).build();
+
+        // When
+        CallbackResponse response = handler.handle(params);
+
+        // Then
+        assertTrue(response != null);
     }
 
     @Test
@@ -1286,6 +1301,64 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
             .isRespondent1(YesOrNo.YES)
+            .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+            .respondentSolicitor1ServiceAddress(
+                Address.builder()
+                    .postCode("new postcode")
+                    .build()
+            )
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("Company 3")
+                             .build())
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
+            .extracting("PostCode")
+            .isEqualTo("new postcode");
+        assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
+            .extracting("PostCode")
+            .isNull();
+        assertEquals(
+            response.getData().get("specRespondentCorrespondenceAddressdetails"),
+            response.getData().get("specRespondent2CorrespondenceAddressdetails")
+        );
+        assertEquals(
+            response.getData().get("specRespondentCorrespondenceAddressRequired"),
+            response.getData().get("specRespondent2CorrespondenceAddressRequired")
+        );
+    }
+
+    @Test
+    void shouldUpdateCorrespondence1_whenProvided1v2ss_withSameResponse() {
+        // Given
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        var testDocument = ResponseDocument.builder()
+            .file(Document.builder().documentUrl("fake-url").documentFileName("file-name").documentBinaryUrl("binary-url").build()).build();
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .ccdCaseReference(354L)
+            .respondent1SpecDefenceResponseDocument(testDocument)
+            .respondent2SpecDefenceResponseDocument(testDocument)
+            .isRespondent1(YesOrNo.YES)
+            .respondentResponseIsSame(YES)
             .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
             .respondentSolicitor1ServiceAddress(
                 Address.builder()
