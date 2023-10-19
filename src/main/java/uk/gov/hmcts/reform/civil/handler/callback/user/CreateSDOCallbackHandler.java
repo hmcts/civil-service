@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -81,6 +82,7 @@ import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -100,6 +102,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateSDOCallbackHandler extends CallbackHandler {
@@ -158,6 +161,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .put(callbackKey(V_1, ABOUT_TO_START), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
             .put(callbackKey(MID, "generate-sdo-order"), this::generateSdoOrder)
+            .put(callbackKey(MID, "validateInputValue"), this::validateInputValue)
             .put(callbackKey(V_1, MID, "generate-sdo-order"), this::generateSdoOrder)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -832,9 +836,60 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
+        if (featureToggleService.isLocationWhiteListedForCaseProgression(
+            caseData.getCaseManagementLocation().getBaseLocation())) {
+            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+        } else {
+            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean nonNull(Object object) {
+        if (object != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private CallbackResponse validateInputValue(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        //CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        List<String> errors = new ArrayList<>();
+        if (nonNull(caseData.getSmallClaimsWitnessStatement())) {
+            String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
+            String inputValue2 = caseData.getSmallClaimsWitnessStatement().getInput3();
+            if (validateNegativeWitness(errors, inputValue1, inputValue2)) {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            }
+        } else if (nonNull(caseData.getFastTrackWitnessOfFact())) {
+            String inputValue1 = caseData.getFastTrackWitnessOfFact().getInput2();
+            String inputValue2 = caseData.getFastTrackWitnessOfFact().getInput3();
+            if (validateNegativeWitness(errors, inputValue1, inputValue2)) {
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(errors)
+                    .build();
+            }
+        }
+        return generateSdoOrder(callbackParams);
+    }
+
+    private boolean validateNegativeWitness(List<String> errors, String inputValue1, String inputValue2) {
+        if (inputValue1 != null && inputValue2 != null) {
+            int number1 = Integer.parseInt(inputValue1);
+            int number2 = Integer.parseInt(inputValue2);
+            if (number1 < 0 || number2 < 0) {
+                errors.add("The number entered cannot be less than zero");
+                return true;
+            }
+        }
+        return false;
     }
 
     private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {

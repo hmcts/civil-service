@@ -239,6 +239,46 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                            .getData().get("respondent1ResponseDeadline").toString())
                 .isEqualTo(newDeadline);
         }
+
+        @Test
+        void aboutToSubmit_NewResponseDeadline1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .respondent1Copy(Party.builder().partyName("Party 2").primaryAddress(
+                        Address
+                            .builder()
+                            .addressLine1("Triple street")
+                            .postCode("Postcode")
+                            .build())
+                                     .build())
+                .respondent2Copy(Party.builder().partyName("Respondent 2").primaryAddress(
+                        Address
+                            .builder()
+                            .addressLine1("Triple street")
+                            .postCode("Postcode")
+                            .build())
+                                     .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+            CallbackRequest request = CallbackRequest.builder()
+                .build();
+            params = params.toBuilder().request(request).build();
+
+            Mockito.when(deadlinesCalculator.plus14DaysAt4pmDeadline(caseData.getRespondent1ResponseDeadline()))
+                .thenReturn(caseData.getRespondent1ResponseDeadline()
+                                .plusDays(14)
+                                .withHour(16)
+                                .withMinute(0)
+                                .withSecond(1));
+
+            String newDeadline = LocalDateTime.now().plusDays(28).withHour(16).withMinute(0).withSecond(1).truncatedTo(ChronoUnit.SECONDS).toString();
+
+            CallbackResponse response = handler.handle(params);
+            assertThat(((AboutToStartOrSubmitCallbackResponse) response)
+                           .getData().get("respondent1ResponseDeadline").toString())
+                .isEqualTo(newDeadline);
+        }
     }
 
     @Nested
