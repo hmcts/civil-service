@@ -11,11 +11,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
@@ -45,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -81,6 +84,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final LocationRefDataUtil locationRefDataUtil;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final ToggleConfiguration toggleConfiguration;
     private final AssignCategoryId assignCategoryId;
 
     @Override
@@ -108,6 +112,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         updatedData.claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        updatedData.featureToggleWA(toggleConfiguration.getFeatureToggle());
 
         // add document from defendant response documents, to placeholder field for preview during event.
         caseData.getDefendantResponseDocuments().forEach(document -> {
@@ -279,8 +284,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             currentApplicant1DQ.setApplicant1DQDraftDirections(null);
             builder.applicant1DQ(currentApplicant1DQ);
             Applicant2DQ currentApplicant2DQ = caseData.getApplicant2DQ();
-            currentApplicant2DQ.setApplicant2DQDraftDirections(null);
-            builder.applicant2DQ(currentApplicant2DQ);
+            if (Objects.nonNull(currentApplicant2DQ)) {
+                currentApplicant2DQ.setApplicant2DQDraftDirections(null);
+                builder.applicant2DQ(currentApplicant2DQ);
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -412,12 +419,17 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                                       DocumentType.CLAIMANT_DRAFT_DIRECTIONS
                 )));
         if (!claimantUploads.isEmpty()) {
-            updatedCaseData.claimantResponseDocuments(claimantUploads);
             assignCategoryId.assignCategoryIdToCollection(
                 claimantUploads,
                 document -> document.getValue().getDocumentLink(),
-                "directionsQuestionnaire"
+                DocCategory.APP1_DQ.getValue()
             );
+            List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
+                    claimantUploads, "DQApplicant");
+            if (Objects.nonNull(copy)) {
+                claimantUploads.addAll(copy);
+            }
+            updatedCaseData.claimantResponseDocuments(claimantUploads);
         }
     }
 
