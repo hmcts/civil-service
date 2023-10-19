@@ -42,7 +42,7 @@ public class BundleCreationTriggerEventHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
-    
+
     /**
      * This method will call bundle API and save required details in case data.
      * If there is any existing bundle then new bundle will be added to existing list of bundles.

@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -70,6 +71,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -122,6 +124,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService featureToggleService;
+
+    @MockBean
+    private ToggleConfiguration toggleConfiguration;
 
     @Nested
     class AboutToStartCallback {
@@ -544,6 +549,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(time.now()).thenReturn(localDateTime);
+            given(toggleConfiguration.getFeatureToggle()).willReturn("WA 3.5");
         }
 
         @ParameterizedTest
