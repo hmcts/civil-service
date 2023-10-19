@@ -20,16 +20,25 @@ import java.util.concurrent.Executors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.reform.civil.handler.ReviewHearingExceptionHandler;
+import uk.gov.hmcts.reform.civil.handler.HmcMessageHandler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.nexthearingdate.NextHearingDateVariables;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
+import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
 
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
+import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
+import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.COMPLETED;
+import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.EXCEPTION;
+import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 
 @Configuration
 @Slf4j
@@ -58,8 +67,12 @@ public class ServiceBusConfiguration {
     private int threadCount;
 
     private final ObjectMapper objectMapper;
-    private final ReviewHearingExceptionHandler handler;
+    private final HmcMessageHandler handler;
+    private final RuntimeService runtimeService;
     private final FeatureToggleService featureToggleService;
+
+    private static final List<HmcStatus> PROCESS_MESSAGE_STATUSES = List.of(LISTED, COMPLETED, ADJOURNED, CANCELLED);
+    private static final String CAMUNDA_MESSAGE = "HANDLE_HMC_MESSAGE";
 
     @Bean
     @ConditionalOnProperty("azure.service-bus.hmc-to-hearings-api.enabled")
@@ -91,7 +104,6 @@ public class ServiceBusConfiguration {
                     @SneakyThrows
                     @Override
                     public CompletableFuture<Void> onMessageAsync(IMessage message) {
-                        boolean exceptionEventTriggered = false;
                         log.info("message received");
                         List<byte[]> body = message.getMessageBody().getBinaryData();
 
@@ -103,11 +115,12 @@ public class ServiceBusConfiguration {
                                 ofNullable(hmcMessage.getHearingUpdate()).map(update -> update.getHmcStatus().name())
                                         .orElse("-")
                         );
-                        exceptionEventTriggered = handler.handleExceptionEvent(hmcMessage);
-                        if (exceptionEventTriggered) {
-                            return receiveClient.completeAsync(message.getLockToken());
+                        if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+                            handler.handleExceptionEvent(hmcMessage);
+                        } else if (statusShouldTriggerCamundaMessage(hmcMessage)) {
+                            triggerHandleHmcMessageEvent(hmcMessage);
                         }
-                        return receiveClient.abandonAsync(message.getLockToken());
+                        return receiveClient.completeAsync(message.getLockToken());
                     }
 
                     @Override
@@ -130,5 +143,22 @@ public class ServiceBusConfiguration {
             return null;
         }
         return null;
+    }
+
+    private void triggerHandleHmcMessageEvent(HmcMessage hmcMessage) {
+        NextHearingDateVariables messageVars = NextHearingDateVariables.builder()
+            .hearingId(hmcMessage.getHearingId())
+            .caseId(hmcMessage.getCaseId())
+            .hmcStatus(hmcMessage.getHearingUpdate().getHmcStatus())
+            .nextHearingDate(DateUtils.convertFromUTC(hmcMessage.getHearingUpdate().getNextHearingDate()))
+            .build();
+        runtimeService
+            .createMessageCorrelation(CAMUNDA_MESSAGE)
+            .setVariables(messageVars.toMap(objectMapper))
+            .correlateStartMessage();
+    }
+
+    private boolean statusShouldTriggerCamundaMessage(HmcMessage message) {
+        return PROCESS_MESSAGE_STATUSES.contains(message.getHearingUpdate().getHmcStatus());
     }
 }

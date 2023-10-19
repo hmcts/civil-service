@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.hmc.model.messaging.HearingUpdate;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -22,12 +21,12 @@ import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.HEARING_REQUESTE
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-    ReviewHearingExceptionHandler.class
+    HmcMessageHandler.class
 })
-class ReviewHearingExceptionHandlerTest {
+class HmcMessageHandlerTest {
 
     @Autowired
-    private ReviewHearingExceptionHandler handler;
+    private HmcMessageHandler handler;
     @MockBean
     private CoreCaseDataService coreCaseDataService;
     @MockBean
@@ -40,7 +39,7 @@ class ReviewHearingExceptionHandlerTest {
     }
 
     @Test
-    void shouldReturnTrue_whenMessageRelevantForServiceAndHearingException() {
+    void shouldTriggerEvent_whenMessageRelevantForServiceAndHearingException() {
         HmcMessage hmcMessage = HmcMessage.builder()
             .caseId(1234L)
             .hearingId("HER1234")
@@ -50,14 +49,13 @@ class ReviewHearingExceptionHandlerTest {
                                .build())
             .build();
 
-        boolean actual = handler.handleExceptionEvent(hmcMessage);
+        handler.handleExceptionEvent(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, REVIEW_HEARING_EXCEPTION);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenMessageRelevantForServiceNoHearingException() {
+    void shouldNotTriggerEvent_whenMessageRelevantForServiceNoHearingException() {
         HmcMessage hmcMessage = HmcMessage.builder()
             .caseId(1234L)
             .hearingId("HER1234")
@@ -67,14 +65,13 @@ class ReviewHearingExceptionHandlerTest {
                                .build())
             .build();
 
-        boolean actual = handler.handleExceptionEvent(hmcMessage);
+        handler.handleExceptionEvent(hmcMessage);
 
-        assertThat(actual).isTrue();
         verifyNoInteractions(coreCaseDataService);
     }
 
     @Test
-    void shouldReturnTrue_whenMessageNotRelevantForServiceHearingException() {
+    void shouldNotTriggerEvent_whenMessageNotRelevantForServiceHearingException() {
         HmcMessage hmcMessage = HmcMessage.builder()
             .caseId(1234L)
             .hearingId("HER1234")
@@ -84,9 +81,8 @@ class ReviewHearingExceptionHandlerTest {
                                .build())
             .build();
 
-        boolean actual = handler.handleExceptionEvent(hmcMessage);
+        handler.handleExceptionEvent(hmcMessage);
 
-        assertThat(actual).isTrue();
         verifyNoInteractions(coreCaseDataService);
     }
 }
