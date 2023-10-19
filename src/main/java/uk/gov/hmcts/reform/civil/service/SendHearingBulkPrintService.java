@@ -23,7 +23,7 @@ public class SendHearingBulkPrintService {
 
     public void sendHearingToDefendantLIP(String authorisation, CaseData caseData) {
         if (caseData.getSystemGeneratedCaseDocuments() != null && !caseData.getSystemGeneratedCaseDocuments().isEmpty()) {
-            Optional<Element<CaseDocument>> caseDocument = caseData.getHearingDocuments().stream().findFirst();
+            Optional<Element<CaseDocument>> caseDocument = Optional.ofNullable(caseData.getHearingDocuments().get(0));
 
             if (caseDocument.isPresent()) {
                 String documentUrl = caseDocument.get().getValue().getDocumentLink().getDocumentUrl();
