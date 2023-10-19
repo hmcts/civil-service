@@ -703,18 +703,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (!defendantUploads.isEmpty()) {
             updatedCaseData.defendantResponseDocuments(defendantUploads);
         }
-        // these documents are added to defendantUploads, if we do not remove/null the original,
-        // case file view will show duplicate documents
-        if (toggleService.isCaseFileViewEnabled()) {
-            updatedCaseData.respondent1ClaimResponseDocument(null);
-            updatedCaseData.respondent2ClaimResponseDocument(null);
-            // Respondent1DQ currentRespondent1DQ = caseData.getRespondent1DQ();
-            // currentRespondent1DQ.setRespondent1DQDraftDirections(null);
-            // updatedCaseData.respondent1DQ(currentRespondent1DQ);
-            // Respondent2DQ currentRespondent2DQ = caseData.getRespondent2DQ();
-            // currentRespondent2DQ.setRespondent2DQDraftDirections(null);
-            // updatedCaseData.respondent2DQ(currentRespondent2DQ);
-        }
     }
 
     private boolean applicant2Present(CaseData caseData) {
@@ -739,6 +727,20 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         CaseData caseData = callbackParams.getCaseData();
         String claimNumber = caseData.getLegacyCaseReference();
         String body;
+
+        CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+        // these documents are added to defendantUploads, if we do not remove/null the original,
+        // case file view will show duplicate documents
+        if (toggleService.isCaseFileViewEnabled()) {
+            updatedCaseData.respondent1ClaimResponseDocument(null);
+            updatedCaseData.respondent2ClaimResponseDocument(null);
+            Respondent1DQ currentRespondent1DQ = caseData.getRespondent1DQ();
+            currentRespondent1DQ.setRespondent1DQDraftDirections(null);
+            updatedCaseData.respondent1DQ(currentRespondent1DQ);
+            Respondent2DQ currentRespondent2DQ = caseData.getRespondent2DQ();
+            currentRespondent2DQ.setRespondent2DQDraftDirections(null);
+            updatedCaseData.respondent2DQ(currentRespondent2DQ);
+        }
 
         //catch scenario 1v2 Diff Sol - 1 Response Received
         //responseDeadline has not been set yet
