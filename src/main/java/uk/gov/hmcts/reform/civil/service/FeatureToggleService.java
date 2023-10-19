@@ -29,7 +29,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCaseFlagsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-flags");
+        return true;
     }
 
     public boolean isPinInPostEnabled() {
