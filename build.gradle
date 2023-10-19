@@ -75,8 +75,8 @@ allprojects {
 
   dependencyManagement {
     dependencies {
-      //CVE-2022-41881
-      dependencySet(group: 'io.netty', version: '4.1.99.Final') {
+      //CVE-2023-44487
+      dependencySet(group: 'io.netty', version: '4.1.100.Final') {
         entry 'netty-handler'
         entry 'netty-handler-proxy'
         entry 'netty-transport-native-epoll'
