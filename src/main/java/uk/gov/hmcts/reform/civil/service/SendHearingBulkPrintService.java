@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +31,7 @@ public class SendHearingBulkPrintService {
                 byte[] letterContent;
                 try {
                     letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     log.error("Failed getting letter content for Hearing ");
                     throw new DocumentDownloadException(caseDocument.get().getValue().getDocumentName(), e);
                 }

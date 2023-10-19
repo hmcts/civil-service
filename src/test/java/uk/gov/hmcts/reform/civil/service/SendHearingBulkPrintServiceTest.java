@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadServ
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -47,7 +50,7 @@ class SendHearingBulkPrintServiceTest {
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
-        CaseData caseData = CaseDataBuilder.builder() // TODO: check document type
+        CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).documentLink(DOCUMENT_LINK).build()))
             .respondent1(respondent1)
             .build().toBuilder()
@@ -81,7 +84,7 @@ class SendHearingBulkPrintServiceTest {
     }
 
     @Test
-    void shouldNotDownloadDocument_whenSDOOrderAbsent() {
+    void shouldNotDownloadDocument_whenHearingOrderAbsent() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build())).build();
@@ -91,5 +94,47 @@ class SendHearingBulkPrintServiceTest {
 
         // then
         verifyNoInteractions(bulkPrintService);
+    }
+
+    @Test
+    void shouldNotDownloadDocument_whenSystemGeneratedCaseDocumentsisNull() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(null).build();
+
+        // when
+        sendHearingBulkPrintService.sendHearingToDefendantLIP(BEARER_TOKEN, caseData);
+
+        // then
+        verifyNoInteractions(bulkPrintService);
+    }
+
+    @Test
+    void shouldNotDownloadDocument_whenSystemGeneratedCaseDocumentsIsEmpty() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(Lists.emptyList()).build();
+
+        // when
+        sendHearingBulkPrintService.sendHearingToDefendantLIP(BEARER_TOKEN, caseData);
+
+        // then
+        verifyNoInteractions(bulkPrintService);
+    }
+
+    @Test
+    void shouldReturnException_whenBulkPrintServiceReturnsIOException() {
+        // given
+        Party respondent1 = PartyBuilder.builder().soleTrader().build();
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).documentLink(DOCUMENT_LINK).build()))
+            .respondent1(respondent1)
+            .build().toBuilder()
+            .hearingDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).documentLink(DOCUMENT_LINK).build())).build();
+        given(documentDownloadService.downloadDocument(any(), any())).willReturn(new DownloadedDocumentResponse(null, null, null));
+
+        // when // then
+        assertThrows(DocumentDownloadException.class, () -> sendHearingBulkPrintService.sendHearingToDefendantLIP(BEARER_TOKEN, caseData));
+
     }
 }
