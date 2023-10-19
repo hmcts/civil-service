@@ -403,7 +403,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
-            claim));
+            claim, featureToggleService));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
     }
