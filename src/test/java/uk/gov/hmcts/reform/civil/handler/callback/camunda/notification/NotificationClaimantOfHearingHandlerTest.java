@@ -154,13 +154,17 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
-                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(0)).build())
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+                .hearingFeePaymentDetails(PaymentDetails.builder()
+                                              .status(SUCCESS)
+                                              .build())
                 .hearingDueDate(null)
                 .hearingTimeHourMinute("1530")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .solicitorReferences(null)
                 .build();
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
             // When
@@ -224,6 +228,8 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("1530")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+                .hearingDueDate(LocalDate.of(2022, 10, 6))
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .solicitorReferences(SolicitorReferences.builder().build())
@@ -235,8 +241,8 @@ public class NotificationClaimantOfHearingHandlerTest {
             // Then
             verify(notificationService).sendMail(
                 "applicantemail@hmcts.net",
-                "test-template-no-fee-claimant-id",
-                getNotificationNoFeeDatePMDataMap(caseData),
+                "test-template-fee-claimant-id",
+                getNotificationFeeDatePMDataMap(caseData),
                 "notification-of-hearing-000HN001"
             );
         }
@@ -306,7 +312,11 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("0830")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
+                .hearingFeePaymentDetails(PaymentDetails.builder()
+                                              .status(SUCCESS)
+                                              .build())
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .build();
@@ -333,7 +343,11 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor2EmailAddress("respondent2email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("0830")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
+                .hearingFeePaymentDetails(PaymentDetails.builder()
+                                              .status(SUCCESS)
+                                              .build())
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.YES)
                 .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
@@ -360,7 +374,11 @@ public class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("0830")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
+                .hearingFeePaymentDetails(PaymentDetails.builder()
+                                              .status(SUCCESS)
+                                              .build())
                 .addApplicant2(YesOrNo.YES)
                 .addRespondent2(YesOrNo.NO)
                 .build();
@@ -424,8 +442,7 @@ public class NotificationClaimantOfHearingHandlerTest {
     private Map<String, String> getNotificationNoFeeDataMap(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            "claimantReferenceNumber", "12345", "hearingFee", "£0.00",
-            "hearingDate", "07-10-2022", "hearingTime", "08:30am", "hearingDueDate", "23-11-2022"
+            "claimantReferenceNumber", "12345", "hearingDate", "07-10-2022", "hearingTime", "08:30am"
         );
     }
 
@@ -438,11 +455,19 @@ public class NotificationClaimantOfHearingHandlerTest {
     }
 
     @NotNull
+    private Map<String, String> getNotificationFeeDatePMDataMap(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            "claimantReferenceNumber", "", "hearingFee", "£300.00",
+            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", "06-10-2022"
+        );
+    }
+
+    @NotNull
     private Map<String, String> getNotificationNoFeeDatePMDataMap(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            "claimantReferenceNumber", "", "hearingFee", "£0.00",
-            "hearingDate", "07-10-2022", "hearingTime", "03:30pm", "hearingDueDate", ""
+            "claimantReferenceNumber", "", "hearingDate", "07-10-2022", "hearingTime", "03:30pm"
         );
     }
 

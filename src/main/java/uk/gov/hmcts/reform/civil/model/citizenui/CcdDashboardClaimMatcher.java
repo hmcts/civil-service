@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -21,6 +22,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
     private CaseData caseData;
+    private FeatureToggleService featureToggleService;
 
     @Override
     public boolean hasResponsePending() {
@@ -209,7 +211,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isMoreDetailsRequired() {
-        return hasSdoBeenDrawn() && isBeforeHearing();
+        return hasSdoBeenDrawn() && isBeforeHearing() && featureToggleService.isCaseProgressionEnabled();
     }
 
     @Override
@@ -276,7 +278,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isSDOOrderCreated() {
-        return hasSdoBeenDrawn() && noHearingScheduled() && caseData.getHearingDate() == null
+        return caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
     }
 
