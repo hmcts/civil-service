@@ -41,7 +41,7 @@ public class HmcMessageHandler implements BaseExternalTaskHandler {
     private static final List<HmcStatus> UPDATE_STATUSES = List.of(LISTED);
     private static final List<HmcStatus> DELETE_STATUSES = List.of(COMPLETED, CANCELLED, ADJOURNED);
 
-    private static final String CAMUNDA_MESAGE = "NEXT_HEARING_DATE_UPDATE";
+    private static final String UPDATE_NEXT_HEARING_INFO = "UpdateNextHearingInfo";
 
     public void handleExceptionEvent(HmcMessage hmcMessage) {
         if (isMessageRelevantForService(hmcMessage)) {
@@ -55,18 +55,16 @@ public class HmcMessageHandler implements BaseExternalTaskHandler {
         }
     }
 
-    private boolean triggerReviewHearingExceptionEvent(Long caseId, String hearingId) {
+    private void triggerReviewHearingExceptionEvent(Long caseId, String hearingId) {
         // trigger event for WA
         try {
             coreCaseDataService.triggerEvent(caseId, REVIEW_HEARING_EXCEPTION);
             log.info(
                 "Triggered REVIEW_HEARING_EXCEPTION event for Case ID {}, and Hearing ID {}.",
                 caseId, hearingId);
-            return true;
         } catch (Exception e) {
             log.info("Error triggering CCD event {}", e.getMessage());
         }
-        return false;
     }
 
     private boolean isMessageRelevantForService(HmcMessage hmcMessage) {
@@ -111,7 +109,7 @@ public class HmcMessageHandler implements BaseExternalTaskHandler {
 
     private void triggerMessage(NextHearingDateVariables messageVars) {
         runtimeService
-            .createMessageCorrelation(CAMUNDA_MESAGE)
+            .createMessageCorrelation(UPDATE_NEXT_HEARING_INFO)
             .setVariables(messageVars.toMap(objectMapper))
             .correlateStartMessage();
     }
