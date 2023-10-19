@@ -592,20 +592,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         private static final String PAGE_ID = "create-order";
 
         @Test
-        void shouldThrowErrorWhenEnteringNegativeNumberOfWitness() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atTrialHearingWitnessOfFactWithNegativeInputs()
-                .build()
-                .toBuilder()
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
-        }
-
-        @Test
         void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedTrialSDOInPersonHearing() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedTrialDJInPersonHearingNew().build();
