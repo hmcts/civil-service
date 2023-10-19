@@ -70,8 +70,8 @@ public class BundleCreationTriggerEventHandler {
         Bundle result = Bundle.builder()
             .bundleHearingDate(Optional.of(caseData.getHearingDate()))
             .stitchedDocument(Optional.ofNullable(
-                deepCopyWithCategoryId(bundle.getValue().getStitchedDocument(),
-                                       DocCategory.BUNDLES.getValue())))
+                    deepCopyWithCategoryId(bundle.getValue().getStitchedDocument(),
+                            DocCategory.BUNDLES.getValue())))
             .fileName(bundle.getValue().getFileName())
             .title(bundle.getValue().getTitle())
             .description(null != bundle.getValue().getDescription()
@@ -79,18 +79,17 @@ public class BundleCreationTriggerEventHandler {
             .stitchStatus(Optional.ofNullable(bundle.getValue().getStitchStatus()))
             .createdOn(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
             .id(bundle.getValue().getId()).build();
-        result.getStitchedDocument().ifPresent(x -> x.setCategoryID(DocCategory.BUNDLES.getValue()));
         return new IdValue<>(result.getId(), result);
     }
 
     private Document deepCopyWithCategoryId(Document sourceDocument, String theID) {
         return Document.builder()
-            .categoryID(theID)
-            .documentFileName(sourceDocument.getDocumentFileName())
-            .documentBinaryUrl(sourceDocument.getDocumentBinaryUrl())
-            .documentHash(sourceDocument.getDocumentHash())
-            .documentUrl(sourceDocument.getDocumentUrl())
-            .build();
+                .categoryID(theID)
+                .documentFileName(sourceDocument.getDocumentFileName())
+                .documentBinaryUrl(sourceDocument.getDocumentBinaryUrl())
+                .documentHash(sourceDocument.getDocumentHash())
+                .documentUrl(sourceDocument.getDocumentUrl())
+                .build();
     }
 
     CaseDataContent prepareCaseContent(List<IdValue<Bundle>> caseBundles, StartEventResponse startEventResponse) {
