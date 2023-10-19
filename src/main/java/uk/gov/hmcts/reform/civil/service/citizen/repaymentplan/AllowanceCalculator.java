@@ -26,7 +26,7 @@ public class AllowanceCalculator {
 
     public double calculateAllowance(CaseData caseData) {
         Optional<PartnerAndDependentsLRspec> partnerAndDependantInformation = Optional.ofNullable(caseData.getRespondent1PartnerAndDependent());
-        FinancialDetailsLiP defendantFinancialDetailsLiP = caseData.getCaseDataLiP().getRespondent1LiPFinancialDetails();
+        Optional<FinancialDetailsLiP> defendantFinancialDetailsLiP = Optional.ofNullable(caseData.getCaseDataLiP().getRespondent1LiPFinancialDetails());
         double personalAllowance = calculatePersonalAllowance(
             partnerAndDependantInformation,
             caseData.getRespondent1()
@@ -70,10 +70,10 @@ public class AllowanceCalculator {
                                                 YesOrNo disabilityPremiumPayments,
                                                 YesOrNo severeDisability,
                                                 Respondent1DQ respondent1DQ,
-                                                FinancialDetailsLiP financialDetailsLiP) {
+                                                Optional<FinancialDetailsLiP> financialDetailsLiP) {
         boolean disabled = YesOrNo.YES == disabilityPremiumPayments;
         boolean severelyDisabled = YesOrNo.YES == severeDisability
-            || YesOrNo.YES == financialDetailsLiP.getPartnerSevereDisabilityLiP();
+            || YesOrNo.YES == financialDetailsLiP.map(FinancialDetailsLiP::getPartnerSevereDisabilityLiP).orElse(YesOrNo.NO);
         boolean hasPartner = getHasPartner(partnerAndDependantInformation);
         boolean dependantDisabled = YesOrNo.YES == partnerAndDependantInformation.map(PartnerAndDependentsLRspec::getReceiveDisabilityPayments).orElse(
             YesOrNo.NO);
@@ -98,9 +98,9 @@ public class AllowanceCalculator {
             .orElse(respondent1DQ.getRespondent1DQCarerAllowanceCredit());
     }
 
-    private double calculatePensionerAllowance(FinancialDetailsLiP financialDetailsLiP, UnemployedComplexTypeLRspec uneployedType) {
-        boolean partnerPensioner = YesOrNo.YES == financialDetailsLiP.getPartnerPensionLiP();
-        boolean defendantPensioner = RETIRED.equals(Optional.ofNullable(uneployedType)
+    private double calculatePensionerAllowance(Optional<FinancialDetailsLiP> financialDetailsLiP, UnemployedComplexTypeLRspec unemployedType) {
+        boolean partnerPensioner = YesOrNo.YES == financialDetailsLiP.map(FinancialDetailsLiP::getPartnerPensionLiP).orElse(YesOrNo.NO);
+        boolean defendantPensioner = RETIRED.equals(Optional.ofNullable(unemployedType)
             .map(UnemployedComplexTypeLRspec::getUnemployedComplexTypeRequired).orElse(""));
         return PensionerAllowance.getPensionerAllowance(defendantPensioner, partnerPensioner);
     }
