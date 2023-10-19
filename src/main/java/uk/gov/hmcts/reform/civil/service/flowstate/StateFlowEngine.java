@@ -95,6 +95,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.responde
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterNotSuitableForSdo;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
@@ -105,6 +106,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterDefendantResponse;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterSDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeMediationUnsuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
@@ -571,7 +573,9 @@ public class StateFlowEngine {
             .state(FULL_DEFENCE_PROCEED)
                 .transitionTo(IN_HEARING_READINESS).onlyIf(isInHearingReadiness)
                 .transitionTo(CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE).onlyIf(caseDismissedPastHearingFeeDue)
-                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimantResponseBeforeSDO)
+                .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterClaimantResponseBeforeSDO
+                                                                 .or(takenOfflineByStaffAfterSDO)
+                                                                 .or(takenOfflineAfterNotSuitableForSdo))
                 .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawn)
             .state(FULL_DEFENCE_NOT_PROCEED)
