@@ -708,12 +708,12 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (toggleService.isCaseFileViewEnabled()) {
             updatedCaseData.respondent1ClaimResponseDocument(null);
             updatedCaseData.respondent2ClaimResponseDocument(null);
-            Respondent1DQ currentRespondent1DQ = caseData.getRespondent1DQ();
-            currentRespondent1DQ.setRespondent1DQDraftDirections(null);
-            updatedCaseData.respondent1DQ(currentRespondent1DQ);
-            Respondent2DQ currentRespondent2DQ = caseData.getRespondent2DQ();
-            currentRespondent2DQ.setRespondent2DQDraftDirections(null);
-            updatedCaseData.respondent2DQ(currentRespondent2DQ);
+            // Respondent1DQ currentRespondent1DQ = caseData.getRespondent1DQ();
+            // currentRespondent1DQ.setRespondent1DQDraftDirections(null);
+            // updatedCaseData.respondent1DQ(currentRespondent1DQ);
+            // Respondent2DQ currentRespondent2DQ = caseData.getRespondent2DQ();
+            // currentRespondent2DQ.setRespondent2DQDraftDirections(null);
+            // updatedCaseData.respondent2DQ(currentRespondent2DQ);
         }
     }
 
