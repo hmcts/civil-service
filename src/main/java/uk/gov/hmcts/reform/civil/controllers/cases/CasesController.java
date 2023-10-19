@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
 import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +61,8 @@ import static java.util.Collections.emptyList;
 )
 public class CasesController {
 
+    @Resource(name = "userCacheManager")
+    CacheManager userCacheManager;
     private final RoleAssignmentsService roleAssignmentsService;
     private final CoreCaseDataService coreCaseDataService;
     private final DashboardClaimInfoService dashboardClaimInfoService;
