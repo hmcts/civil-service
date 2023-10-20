@@ -12,6 +12,7 @@ import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -146,11 +147,13 @@ public class ServiceBusConfiguration {
     }
 
     private void triggerHandleHmcMessageEvent(HmcMessage hmcMessage) {
+        LocalDateTime nextHearingDate = hmcMessage.getHearingUpdate().getNextHearingDate() != null
+            ? DateUtils.convertFromUTC(hmcMessage.getHearingUpdate().getNextHearingDate()) : null;
         NextHearingDateVariables messageVars = NextHearingDateVariables.builder()
             .hearingId(hmcMessage.getHearingId())
             .caseId(hmcMessage.getCaseId())
             .hmcStatus(hmcMessage.getHearingUpdate().getHmcStatus())
-            .nextHearingDate(DateUtils.convertFromUTC(hmcMessage.getHearingUpdate().getNextHearingDate()))
+            .nextHearingDate(nextHearingDate)
             .hearingListingStatus(hmcMessage.getHearingUpdate().getListingStatus())
             .build();
         runtimeService
