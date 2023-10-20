@@ -5,12 +5,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.util.List;
-import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 @Service
@@ -23,17 +22,16 @@ public class SendHearingBulkPrintService {
 
     public void sendHearingToDefendantLIP(String authorisation, CaseData caseData) {
         if (caseData.getSystemGeneratedCaseDocuments() != null && !caseData.getSystemGeneratedCaseDocuments().isEmpty()) {
-            Optional<Element<CaseDocument>> caseDocument = Optional.ofNullable(caseData.getHearingDocuments().get(0));
-
-            if (caseDocument.isPresent()) {
-                String documentUrl = caseDocument.get().getValue().getDocumentLink().getDocumentUrl();
+            if (nonNull(caseData.getHearingDocuments()) && !caseData.getHearingDocuments().isEmpty()) {
+                CaseDocument caseDocument = caseData.getHearingDocuments().get(0).getValue();
+                String documentUrl = caseDocument.getDocumentLink().getDocumentUrl();
                 String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
                 byte[] letterContent;
                 try {
                     letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
                 } catch (Exception e) {
                     log.error("Failed getting letter content for Hearing ");
-                    throw new DocumentDownloadException(caseDocument.get().getValue().getDocumentName(), e);
+                    throw new DocumentDownloadException(caseDocument.getDocumentName(), e);
                 }
                 List<String> recipients = List.of(caseData.getRespondent1().getPartyName());
                 bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
