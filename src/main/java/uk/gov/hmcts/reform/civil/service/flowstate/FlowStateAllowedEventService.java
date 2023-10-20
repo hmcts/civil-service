@@ -762,7 +762,8 @@ public class FlowStateAllowedEventService {
                 GENERATE_DIRECTIONS_ORDER,
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                asyncStitchingComplete
             )
         )
     );
@@ -1228,7 +1229,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                asyncStitchingComplete
             )
         ),
          entry(
