@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -51,6 +52,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final ToggleConfiguration toggleConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -81,6 +83,7 @@ public class DefendantClaimDetailsNotificationHandler extends CallbackHandler im
 
     private CallbackResponse notifyRespondentSolicitorForClaimDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         String recipient = getRecipientEmail(caseData, caseEvent);
         String emailTemplate = notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate();
