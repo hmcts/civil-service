@@ -1,5 +1,4 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.trialready;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -20,9 +18,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-
 import java.time.LocalDate;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -32,14 +28,12 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.TR
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.TRIAL_READY;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     TrialReadyFormGenerator.class,
     JacksonAutoConfiguration.class
 })
 public class TrialReadyFormGeneratorTest {
-
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String fileName_application = String.format(
@@ -48,16 +42,12 @@ public class TrialReadyFormGeneratorTest {
         .documentName(fileName_application)
         .documentType(TRIAL_READY_DOCUMENT)
         .build();
-
     @MockBean
     private UnsecuredDocumentManagementService documentManagementService;
-
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
-
     @Autowired
     private TrialReadyFormGenerator generator;
-
     @Test
     void shouldTrialReadyFormGeneratorOneForm_whenValidDataIsProvided() {
         // Given
@@ -73,14 +63,12 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.YES)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormApplicant", CaseRole.APPLICANTSOLICITORONE);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormApplicant");
         // Then
         assertThat(caseDocument).isNotNull();
-        assertThat(caseDocument.getOwnedBy()).isEqualTo(CaseRole.APPLICANTSOLICITORONE);
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, TRIAL_READY_DOCUMENT));
-        assertThat(caseDocument.getOwnedBy()).isEqualTo(CaseRole.APPLICANTSOLICITORONE);
     }
 
     @Test
@@ -100,15 +88,13 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.YES)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent1", CaseRole.RESPONDENTSOLICITORONE);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent1");
         // Then
         assertThat(caseDocument).isNotNull();
-        assertThat(caseDocument.getOwnedBy()).isEqualTo(CaseRole.RESPONDENTSOLICITORONE);
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT));
     }
-
     @Test
     void shouldTrialReadyFormGeneratorOneForm_whenRespondent2GenerateDocs() {
         // Given
@@ -127,15 +113,13 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.YES)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2", CaseRole.RESPONDENTSOLICITORTWO);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2");
         // Then
         assertThat(caseDocument).isNotNull();
-        assertThat(caseDocument.getOwnedBy()).isEqualTo(CaseRole.RESPONDENTSOLICITORTWO);
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT));
     }
-
     @Test
     void shouldTrialReadyFormGeneratorOneForm_whenRespondent2OrganisationGenerateDocs() {
         // Given
@@ -154,10 +138,9 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.NO)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2", CaseRole.RESPONDENTSOLICITORTWO);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2");
         // Then
         assertThat(caseDocument).isNotNull();
-        assertThat(caseDocument.getOwnedBy()).isEqualTo(CaseRole.RESPONDENTSOLICITORTWO);
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT));

@@ -27,14 +27,6 @@ public class UserRoleUtils {
         return hasRole(roles, RESPONDENTSOLICITORTWO);
     }
 
-    public static boolean isLIPClaimant(List<String> roles) {
-        return hasRole(roles, CLAIMANT);
-    }
-
-    public static boolean isLIPDefendant(List<String> roles) {
-        return hasRole(roles, DEFENDANT);
-    }
-
     private static boolean hasRole(List<String> roles, CaseRole role) {
         return roles.stream().anyMatch(role.getFormattedName()::contains);
     }

@@ -106,7 +106,7 @@ public class ResponseDeadlineExtensionClaimantNotificationHandler
 
     private String getTemplate(CaseData caseData) {
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-            return notificationsProperties.getClaimantLipDeadlineExtension();
+            return notificationsProperties.getClaimantDeadlineExtension();
         }
         return notificationsProperties.getClaimantDeadlineExtension();
     }
