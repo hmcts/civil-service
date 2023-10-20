@@ -219,7 +219,7 @@ class BundleCreationTriggerEventHandlerTest {
                                 generatedBundle.getValue().getStitchedDocument().get().getDocumentFileName());
         Assertions.assertEquals(caseData.getHearingDate(), generatedBundle.getValue().getBundleHearingDate().get());
         Assertions.assertNotNull(generatedBundle.getValue().getCreatedOn());
-        Assertions.assertEquals("bundles", bundle.getValue().getStitchedDocument().getCategoryID());
+        Assertions.assertEquals("bundles", generatedBundle.getValue().getStitchedDocument().get().getCategoryID());
     }
 
     @Test
