@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
@@ -603,6 +604,15 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                                                                  .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
                                                                                                                  .build()).build()).build()).build(),
                     "The date in Appeal notice date may not be before the established date"
+                ),
+                Arguments.of(
+                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
+                                .finalOrderFurtherHearingComplex(
+                                        FinalOrderFurtherHearing.builder().lengthList(HearingLengthFinalOrderList.OTHER)
+                                                .build()).build(),
+                        "Further hearing, Length of new hearing, Other is empty"
                 )
             );
         }
@@ -775,7 +785,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Then
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
-                           .getValue().getDocumentLink().getCategoryID().equals("finalOrders"));
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("finalOrders");
         }
 
         @Test
