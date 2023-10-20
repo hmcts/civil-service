@@ -79,7 +79,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
             given(notificationsProperties.getClaimantDeadlineExtension()).willReturn(emailTemplate);
-            given(notificationsProperties.getClaimantLipDeadlineExtension()).willReturn(emailLipTemplate);
+            given(notificationsProperties.getClaimantDeadlineExtension()).willReturn(emailLipTemplate);
             when(toggleService.isLipVLipEnabled()).thenReturn(false);
             when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("url");
 
