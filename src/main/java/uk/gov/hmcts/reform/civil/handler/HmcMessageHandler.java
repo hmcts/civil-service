@@ -74,12 +74,6 @@ public class HmcMessageHandler implements BaseExternalTaskHandler {
     }
 
     @Override
-    public void completeTask(ExternalTask externalTask, ExternalTaskService externalTaskService) throws CompleteTaskException {
-        BaseExternalTaskHandler.super.completeTask(externalTask, externalTaskService);
-    }
-
-    @Async("asyncHandlerExecutor")
-    @EventListener
     public void handleTask(ExternalTask externalTask) {
         log.info("message received from camunda");
         NextHearingDateVariables nextHearingDateVariables = objectMapper.convertValue(externalTask.getAllVariables(), NextHearingDateVariables.class);
