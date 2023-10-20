@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.nexthearingdate.UpdateType;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.hmc.model.hearing.ListingStatus;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
 
 import java.time.LocalDateTime;
@@ -19,4 +20,5 @@ public class NextHearingDateVariables implements MappableObject {
     public LocalDateTime nextHearingDate;
     public HmcStatus hmcStatus;
     public UpdateType updateType;
+    public ListingStatus hearingListingStatus;
 }

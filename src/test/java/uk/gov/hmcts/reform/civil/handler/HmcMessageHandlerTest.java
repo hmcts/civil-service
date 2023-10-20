@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +33,10 @@ class HmcMessageHandlerTest {
     private CoreCaseDataService coreCaseDataService;
     @MockBean
     private PaymentsConfiguration paymentsConfiguration;
+    @MockBean
+    private RuntimeService runtimeService;
+    @MockBean
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {

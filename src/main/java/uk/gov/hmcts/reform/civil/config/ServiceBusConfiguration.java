@@ -151,6 +151,7 @@ public class ServiceBusConfiguration {
             .caseId(hmcMessage.getCaseId())
             .hmcStatus(hmcMessage.getHearingUpdate().getHmcStatus())
             .nextHearingDate(DateUtils.convertFromUTC(hmcMessage.getHearingUpdate().getNextHearingDate()))
+            .hearingListingStatus(hmcMessage.getHearingUpdate().getListingStatus())
             .build();
         runtimeService
             .createMessageCorrelation(CAMUNDA_MESSAGE)

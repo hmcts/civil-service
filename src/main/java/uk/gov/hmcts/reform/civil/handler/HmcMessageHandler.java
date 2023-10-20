@@ -22,6 +22,7 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REVIEW_HEARING_EXCEPTION;
 import static uk.gov.hmcts.reform.civil.enums.nexthearingdate.UpdateType.DELETE;
 import static uk.gov.hmcts.reform.civil.enums.nexthearingdate.UpdateType.UPDATE;
+import static uk.gov.hmcts.reform.hmc.model.hearing.ListingStatus.FIXED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.COMPLETED;
@@ -82,7 +83,7 @@ public class HmcMessageHandler implements BaseExternalTaskHandler {
     public void handleTask(ExternalTask externalTask) {
         NextHearingDateVariables nextHearingDateVariables = objectMapper.convertValue(externalTask.getAllVariables(), NextHearingDateVariables.class);
         HmcStatus hmcStatus = nextHearingDateVariables.getHmcStatus();
-        if (UPDATE_STATUSES.contains(hmcStatus)) {
+        if (UPDATE_STATUSES.contains(hmcStatus) && FIXED.equals(nextHearingDateVariables.getHearingListingStatus())) {
             triggerUpdateNextHearingDateMessage(nextHearingDateVariables);
         } else if (DELETE_STATUSES.contains(hmcStatus)) {
             triggerDeleteMessage(nextHearingDateVariables);
