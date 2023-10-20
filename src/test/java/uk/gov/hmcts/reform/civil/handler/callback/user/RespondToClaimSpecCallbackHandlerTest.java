@@ -123,6 +123,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -1241,6 +1242,121 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldUpdateExpertEvents_whenInvokedAndUpdateContactDetailsEnabled_For2DivergeResponse() {
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQExperts(Experts.builder()
+                                                         .details(wrapElements(Expert.builder().build())).build())
+                               .build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .claimant1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .claimant2ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .ccdCaseReference(354L)
+            .respondent1ResponseDate(dateTime).build().toBuilder()
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1DQExperts")).isNotNull();
+        assertThat(response.getData().get("respondent2DQExperts")).isNull();
+
+    }
+
+    @Test
+    void shouldUpdateExpertEvents_whenInvokedAndUpdateContactDetailsEnabled_CanAddApplicant2() {
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQExperts(Experts.builder()
+                                                         .details(wrapElements(Expert.builder().build())).build())
+                               .build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .claimant1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .claimant2ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .ccdCaseReference(354L)
+            .respondent1ResponseDate(dateTime).build().toBuilder()
+            .addApplicant2(YES)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1DQExperts")).isNotNull();
+        assertThat(response.getData().get("respondent2DQExperts")).isNull();
+
+    }
+    @Test
+    void shouldUpdateExpertEvents_whenInvokedAndUpdateContactDetailsEnabled_FullAdmission() {
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQExperts(Experts.builder()
+                                                         .details(wrapElements(Expert.builder().build())).build())
+                               .build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .ccdCaseReference(354L)
+            .respondent1ResponseDate(dateTime).build().toBuilder()
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1DQExperts")).isNotNull();
+        assertThat(response.getData().get("respondent2DQExperts")).isNull();
+
+    }
+
+    @Test
     void shouldUpdateExpertEvents_whenInvokedAndUpdateContactDetailsEnabled() {
         // Given
         LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
@@ -1275,6 +1391,45 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         // Then
         assertThat(response.getData().get("respondent1DQExperts")).isNotNull();
         assertThat(response.getData().get("respondent2DQExperts")).isNull();
+
+    }
+
+    @Test
+    void shouldUpdateWitnessEvents_whenInvokedAndUpdateContactDetailsEnabled() {
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQWitnesses(Witnesses.builder()
+                                                         .details(wrapElements(Witness.builder().build())).build())
+                               .build())
+
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .ccdCaseReference(354L)
+            .respondent1ResponseDate(dateTime).build().toBuilder()
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1DQWitnesses")).isNotNull();
+        assertThat(response.getData().get("respondent2DQWitnesses")).isNull();
 
     }
 
