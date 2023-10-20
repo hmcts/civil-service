@@ -32,12 +32,15 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     TrialReadinessCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
+
 public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
+
     @Autowired
     private TrialReadinessCallbackHandler handler;
 
@@ -58,10 +61,12 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
         + "unless a judge makes an order changing the date of the hearing. "
         + "If you want the date of the hearing to be changed (or any other order to make the case ready for trial)"
         + "you will need to make an application to the court and pay the appropriate fee.";
+
     @BeforeEach
     public void setup() {
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
     }
+
     @Nested
     class AboutToStartCallback {
         @Test
@@ -79,6 +84,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //then: no error is given
             assertThat(response.getErrors()).isEmpty();
         }
+
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvoked_RespondentSolicitor1() {
             //given: respondent 1 solicitor logs in more than 3 weeks before hearing
@@ -94,6 +100,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //then: no error is given
             assertThat(response.getErrors()).isEmpty();
         }
+
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvoked_RespondentSolicitor2() {
             //given: respondent 2 solicitor logs in more than 3 weeks before hearing
@@ -109,6 +116,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //then: no error is given
             assertThat(response.getErrors()).isEmpty();
         }
+
         @Test
         void shouldReturnError_WhenAboutToStartIsInvokedWithinThreeWeeksOfHearingDate_ApplicantSolicitor() {
             //given: applicant solicitor logs in less than 3 weeks before the hearing
@@ -125,6 +133,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //then: an error is returned
             assertThat(response.getErrors()).isNotEmpty();
         }
+
         @Test
         void shouldReturnError_WhenAboutToStartIsInvokedWithinThreeWeeksOfHearingDate_RespondentSolicitor1() {
             //given: respondent 1 solicitor logs in less than 3 weeks before the hearing
@@ -141,6 +150,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //then: an error is returned
             assertThat(response.getErrors()).isNotEmpty();
         }
+
         @Test
         void shouldReturnError_WhenAboutToStartIsInvokedWithinThreeWeeksOfHearingDate_RespondentSolicitor2() {
             //given: respondent 2 solicitor logs in less than 3 weeks before the hearing
@@ -158,6 +168,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).isNotEmpty();
         }
     }
+
     @Nested
     class AboutToSubmitCallback {
         @Test
@@ -176,6 +187,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.APPLICANT_TRIAL_READY_NOTIFY_OTHERS.name(), "READY");
         }
+
         @Test
         void shouldTriggerRespondent1NotifyOthers_WhenAboutToSubmitIsInvoked_Respondent1Solicitor() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
@@ -194,6 +206,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS.name(), "READY");
         }
+
         @Test
         void shouldTriggerRespondent2NotifyOthers_WhenAboutToSubmitIsInvoked_Respondent2Solicitor() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
@@ -212,6 +225,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.RESPONDENT2_TRIAL_READY_NOTIFY_OTHERS.name(), "READY");
         }
+
         @Test
         void shouldTriggerApplicantDocument_WhenAboutToSubmitIsInvoked_ApplicantSolicitor() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
@@ -228,6 +242,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_APPLICANT.name(), "READY");
         }
+
         @Test
         void shouldTriggerRespondent1Document_WhenAboutToSubmitIsInvoked_Respondent1Solicitor() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
@@ -246,6 +261,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1.name(), "READY");
         }
+
         @Test
         void shouldTriggerRespondent2Document_WhenAboutToSubmitIsInvoked_Respondent2Solicitor() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
@@ -265,6 +281,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsOnly(CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT2.name(), "READY");
         }
     }
+
     @Nested
     class SubmittedCallback {
         @Test
@@ -286,6 +303,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build()
             );
         }
+
         @Test
         void shouldReturnConfirmationScreen_when1v1NotReadySubmitted_ApplicantSolicitor() {
             //given: applicant solicitor selects Not Ready
@@ -305,6 +323,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build()
             );
         }
+
         @Test
         void shouldReturnConfirmationScreen_when1v1ReadySubmitted_Respondent1Solicitor() {
             //given: respondent 1 solicitor selects Ready
@@ -324,6 +343,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build()
             );
         }
+
         @Test
         void shouldReturnConfirmationScreen_when1v1NotReadySubmitted_Respondent1Solicitor() {
             //given: respondent 1 solicitor selects Not Ready
@@ -343,6 +363,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build()
             );
         }
+
         @Test
         void shouldReturnConfirmationScreen_when1v1ReadySubmitted_Respondent2Solicitor() {
             //given: Respondent 2 selects Ready
@@ -362,6 +383,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build()
             );
         }
+
         @Test
         void shouldReturnConfirmationScreen_when1v1NotReadySubmitted_Respondent2Solicitor() {
             //given: Respondent 2 solicitor selects Not Ready

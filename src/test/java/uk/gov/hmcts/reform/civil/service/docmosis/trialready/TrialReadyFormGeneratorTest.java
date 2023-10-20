@@ -1,4 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.trialready;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,9 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+
 import java.time.LocalDate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -28,12 +31,15 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.TR
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.TRIAL_READY;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     TrialReadyFormGenerator.class,
     JacksonAutoConfiguration.class
 })
+
 public class TrialReadyFormGeneratorTest {
+
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
     private static final String fileName_application = String.format(
@@ -48,6 +54,7 @@ public class TrialReadyFormGeneratorTest {
     private DocumentGeneratorService documentGeneratorService;
     @Autowired
     private TrialReadyFormGenerator generator;
+
     @Test
     void shouldTrialReadyFormGeneratorOneForm_whenValidDataIsProvided() {
         // Given
@@ -95,6 +102,7 @@ public class TrialReadyFormGeneratorTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT));
     }
+
     @Test
     void shouldTrialReadyFormGeneratorOneForm_whenRespondent2GenerateDocs() {
         // Given
@@ -120,6 +128,7 @@ public class TrialReadyFormGeneratorTest {
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT));
     }
+
     @Test
     void shouldTrialReadyFormGeneratorOneForm_whenRespondent2OrganisationGenerateDocs() {
         // Given
