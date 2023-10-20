@@ -85,7 +85,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
 
         }
 
-         void shouldSendEmailToClaimantLR() {
+        void shouldSendEmailToClaimantLR() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
