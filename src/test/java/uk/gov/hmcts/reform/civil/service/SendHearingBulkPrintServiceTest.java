@@ -97,6 +97,19 @@ class SendHearingBulkPrintServiceTest {
     }
 
     @Test
+    void shouldNotDownloadDocument_whenHearingOrderDocumentIsNull() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
+            .build().toBuilder().hearingDocuments(null).build();
+        // when
+        sendHearingBulkPrintService.sendHearingToDefendantLIP(BEARER_TOKEN, caseData);
+
+        // then
+        verifyNoInteractions(bulkPrintService);
+    }
+
+    @Test
     void shouldNotDownloadDocument_whenSystemGeneratedCaseDocumentsisNull() {
         // given
         CaseData caseData = CaseDataBuilder.builder()

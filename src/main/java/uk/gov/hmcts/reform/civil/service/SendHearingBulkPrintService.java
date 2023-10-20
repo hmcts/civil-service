@@ -39,7 +39,7 @@ public class SendHearingBulkPrintService {
     }
 
     private boolean checkHearingDocumentAvailable(CaseData caseData) {
-        return caseData.getSystemGeneratedCaseDocuments() != null
+        return nonNull(caseData.getSystemGeneratedCaseDocuments())
             && !caseData.getSystemGeneratedCaseDocuments().isEmpty()
             && nonNull(caseData.getHearingDocuments())
             && !caseData.getHearingDocuments().isEmpty();
