@@ -119,6 +119,11 @@ public class ServiceBusConfiguration {
                         if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
                             handler.handleExceptionEvent(hmcMessage);
                         } else if (statusShouldTriggerCamundaMessage(hmcMessage)) {
+                            log.info("Handling message via camunda for case {}, hearing id {} with status {}",
+                                     hmcMessage.getCaseId(),
+                                     hmcMessage.getHearingId(),
+                                     ofNullable(hmcMessage.getHearingUpdate()).map(update -> update.getHmcStatus().name())
+                                         .orElse("-"));
                             triggerHandleHmcMessageEvent(hmcMessage);
                         }
                         return receiveClient.completeAsync(message.getLockToken());
@@ -160,6 +165,7 @@ public class ServiceBusConfiguration {
             .createMessageCorrelation(CAMUNDA_MESSAGE)
             .setVariables(messageVars.toMap(objectMapper))
             .correlateStartMessage();
+        log.info("message sent to camunda");
     }
 
     private boolean statusShouldTriggerCamundaMessage(HmcMessage message) {

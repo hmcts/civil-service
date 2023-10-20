@@ -81,11 +81,14 @@ public class HmcMessageHandler implements BaseExternalTaskHandler {
     @Async("asyncHandlerExecutor")
     @EventListener
     public void handleTask(ExternalTask externalTask) {
+        log.info("message received from camunda");
         NextHearingDateVariables nextHearingDateVariables = objectMapper.convertValue(externalTask.getAllVariables(), NextHearingDateVariables.class);
         HmcStatus hmcStatus = nextHearingDateVariables.getHmcStatus();
         if (UPDATE_STATUSES.contains(hmcStatus) && FIXED.equals(nextHearingDateVariables.getHearingListingStatus())) {
+            log.info("sending update message");
             triggerUpdateNextHearingDateMessage(nextHearingDateVariables);
         } else if (DELETE_STATUSES.contains(hmcStatus)) {
+            log.info("sending delete message");
             triggerDeleteMessage(nextHearingDateVariables);
         }
     }
