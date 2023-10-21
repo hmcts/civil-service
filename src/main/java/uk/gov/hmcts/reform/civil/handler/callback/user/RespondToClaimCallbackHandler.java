@@ -571,9 +571,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             Respondent1DQ currentRespondent1DQ = caseData.getRespondent1DQ();
             currentRespondent1DQ.setRespondent1DQDraftDirections(null);
             updatedData.respondent1DQ(currentRespondent1DQ);
-            Respondent2DQ currentRespondent2DQ = caseData.getRespondent2DQ();
-            currentRespondent2DQ.setRespondent2DQDraftDirections(null);
-            updatedData.respondent2DQ(currentRespondent2DQ);
+//            Respondent2DQ currentRespondent2DQ = caseData.getRespondent2DQ();
+//            currentRespondent2DQ.setRespondent2DQDraftDirections(null);
+//            updatedData.respondent2DQ(currentRespondent2DQ);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
