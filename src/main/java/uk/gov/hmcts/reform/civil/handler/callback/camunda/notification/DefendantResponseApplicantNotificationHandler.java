@@ -198,8 +198,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             || caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == BY_SET_DATE
             || caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == SUGGESTION_OF_REPAYMENT_PLAN)
             &&
-            (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
+            (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
         ) {
             emailTemplate = notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction();
         } else {
