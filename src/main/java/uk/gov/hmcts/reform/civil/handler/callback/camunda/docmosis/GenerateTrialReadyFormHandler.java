@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT2;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Service
 @RequiredArgsConstructor
@@ -54,9 +54,9 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        if (isApplicant(callbackParams, GENERATE_TRIAL_READY_FORM_APPLICANT)) {
+        if (isEvent(callbackParams, GENERATE_TRIAL_READY_FORM_APPLICANT)) {
             return TASK_ID_APPLICANT;
-        } else if (isRespondent1(callbackParams, GENERATE_TRIAL_READY_FORM_RESPONDENT1)) {
+        } else if (isEvent(callbackParams, GENERATE_TRIAL_READY_FORM_RESPONDENT1)) {
             return TASK_ID_RESPONDENT1;
         } else {
             return TASK_ID_RESPONDENT2;
@@ -93,11 +93,6 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
         var documents = caseData.getTrialReadyDocuments();
         documents.add(element(caseDocument));
         caseDataBuilder.trialReadyDocuments(documents);
-    }
-
-    private boolean isApplicant(CallbackParams callbackParams, CaseEvent matchEvent) {
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        return caseEvent.equals(matchEvent);
     }
 
 }
