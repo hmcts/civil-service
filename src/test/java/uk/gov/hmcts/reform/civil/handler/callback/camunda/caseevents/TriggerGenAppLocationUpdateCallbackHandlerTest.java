@@ -8,10 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 
@@ -27,9 +30,9 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_LOCATION_UPDATE;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOCATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -49,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOC
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(TRIGGER_UPDATE_GA_LOCATION);
+        assertThat(handler.handledEvents()).contains(TRIGGER_TASK_RECONFIG_GA);
     }
 
     @Test
@@ -61,7 +65,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOC
                                         getOriginalStatusOfGeneralApplication()
             );
         when(helperService.updateApplicationLocationDetailsInClaim(caseData)).thenReturn(caseData);
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        CallbackParams params = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder()
+                         .eventId(TRIGGER_UPDATE_GA_LOCATION.name())
+                         .build())
+            .build();
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNull();
@@ -102,6 +111,27 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOC
 
         assertThat(response.getErrors()).isNotNull();
         assertThat(response.getErrors()).contains(expectedErrorMessage);
+    }
+
+    @Test
+    void shouldTriggerReconfigureWhenCallbackEventIsReconfigGA() {
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDetails(CaseData.builder().build(),
+                                        true,
+                                        true,
+                                        true, true,
+                                        getOriginalStatusOfGeneralApplication()
+            );
+        when(helperService.updateApplicationLocationDetailsInClaim(caseData)).thenReturn(caseData);
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder()
+                         .eventId(TRIGGER_TASK_RECONFIG_GA.name())
+                         .build())
+            .build();
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+        assertThat(response.getErrors()).isNull();
+        verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_TASK_RECONFIG);
     }
 
     private Map<String, String> getOriginalStatusOfGeneralApplication() {
