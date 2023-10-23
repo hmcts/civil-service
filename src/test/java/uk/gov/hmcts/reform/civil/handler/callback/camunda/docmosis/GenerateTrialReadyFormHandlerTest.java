@@ -46,7 +46,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     ValidationAutoConfiguration.class,
     CaseDetailsConverter.class,
 })
-public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
+class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -56,7 +56,7 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
     private TrialReadyFormGenerator trialReadyFormGenerator;
 
     @Test
-    public void shouldGenerateForm_when1v1() {
+    void shouldGenerateForm_when1v1() {
         // Given
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
@@ -89,7 +89,7 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    public void shouldGenerateForm_when1v1AndRespondent1() {
+    void shouldGenerateForm_when1v1AndRespondent1() {
         // Given
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
@@ -122,7 +122,7 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    public void shouldGenerateForm_when1v2AndOneSeveralPartiesGeneratesDocument() {
+    void shouldGenerateForm_when1v2AndOneSeveralPartiesGeneratesDocument() {
         // Given
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")

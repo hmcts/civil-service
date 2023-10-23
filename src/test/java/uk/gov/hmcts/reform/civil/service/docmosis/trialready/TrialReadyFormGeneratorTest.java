@@ -38,8 +38,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.TRIAL
     TrialReadyFormGenerator.class,
     JacksonAutoConfiguration.class
 })
-
-public class TrialReadyFormGeneratorTest {
+class TrialReadyFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
