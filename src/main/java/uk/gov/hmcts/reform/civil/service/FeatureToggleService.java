@@ -80,4 +80,8 @@ public class FeatureToggleService {
     public boolean isTransferOnlineCaseEnabled() {
         return featureToggleApi.isFeatureEnabled("isTransferOnlineCaseEnabled");
     }
+
+    public boolean isCaseProgressionEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-case-progression");
+    }
 }
