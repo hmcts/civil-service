@@ -83,7 +83,7 @@ public class DynamicList {
         return fromList(list, null, toLabel, value, sort);
     }
 
-        public static DynamicList fromDynamicListElementList(List<DynamicListElement> list) {
+    public static DynamicList fromDynamicListElementList(List<DynamicListElement> list) {
         return DynamicList.builder().listItems(list).value(DynamicListElement.EMPTY).build();
     }
 }
