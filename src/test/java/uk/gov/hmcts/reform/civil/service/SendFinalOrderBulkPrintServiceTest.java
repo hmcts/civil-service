@@ -24,25 +24,25 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
-    SendHearingBulkPrintService.class,
+    SendFinalOrderBulkPrintService.class,
     JacksonAutoConfiguration.class
 })
-class SendHearingBulkPrintServiceTest {
+class SendFinalOrderBulkPrintServiceTest {
 
     @MockBean
     private DocumentDownloadService documentDownloadService;
     @MockBean
     private BulkPrintService bulkPrintService;
     @Autowired
-    private SendHearingBulkPrintService sendHearingBulkPrintService;
-    private static final String SDO_HEARING_PACK_LETTER_TYPE = "hearing-document-pack";
-    public static final String TASK_ID_DEFENDANT = "SendHearingToDefendantLIP";
-    public static final String TASK_ID_CLAIMANT = "SendHearingToClaimantLIP";
+    private SendFinalOrderBulkPrintService sendFinalOrderBulkPrintService;
+    private static final String FINAL_ORDER_PACK_LETTER_TYPE = "final-order-document-pack";
+    public static final String TASK_ID_DEFENDANT = "SendFinalOrderToDefendantLIP";
+    public static final String TASK_ID_CLAIMANT = "SendFinalOrderToClaimantLIP";
     private static final String TEST = "test";
     private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST);
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
@@ -53,21 +53,21 @@ class SendHearingBulkPrintServiceTest {
         // given
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).documentLink(DOCUMENT_LINK).build()))
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(JUDGE_FINAL_ORDER).documentLink(DOCUMENT_LINK).build()))
             .respondent1(respondent1)
             .build().toBuilder()
-            .hearingDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).documentLink(DOCUMENT_LINK).build())).build();
+            .finalOrderDocument(DOCUMENT_LINK).build();
         given(documentDownloadService.downloadDocument(any(), any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
         // then
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
                 caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(),
-                SDO_HEARING_PACK_LETTER_TYPE,
+                FINAL_ORDER_PACK_LETTER_TYPE,
                 List.of(caseData.getRespondent1().getPartyName())
             );
     }
@@ -77,21 +77,21 @@ class SendHearingBulkPrintServiceTest {
         // given
         Party claimant = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).documentLink(DOCUMENT_LINK).build()))
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(JUDGE_FINAL_ORDER).documentLink(DOCUMENT_LINK).build()))
             .applicant1(claimant)
             .build().toBuilder()
-            .hearingDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).documentLink(DOCUMENT_LINK).build())).build();
+            .finalOrderDocument(DOCUMENT_LINK).build();
         given(documentDownloadService.downloadDocument(any(), any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
+        sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_CLAIMANT);
         // then
         verify(bulkPrintService)
             .printLetter(
                 LETTER_CONTENT,
                 caseData.getLegacyCaseReference(),
                 caseData.getLegacyCaseReference(),
-                SDO_HEARING_PACK_LETTER_TYPE,
+                FINAL_ORDER_PACK_LETTER_TYPE,
                 List.of(caseData.getApplicant1().getPartyName())
             );
     }
@@ -103,31 +103,31 @@ class SendHearingBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(null).build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
         // then
         verifyNoInteractions(bulkPrintService);
     }
 
     @Test
-    void shouldNotDownloadDocument_whenHearingOrderAbsent() {
+    void shouldNotDownloadDocument_whenFinalOrderOrderAbsent() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build())).build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
         // then
         verifyNoInteractions(bulkPrintService);
     }
 
     @Test
-    void shouldNotDownloadDocument_whenHearingOrderDocumentIsNull() {
+    void shouldNotDownloadDocument_whenFinalOrderOrderDocumentIsNull() {
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
-            .build().toBuilder().hearingDocuments(null).build();
+            .build().toBuilder().finalOrderDocument(null).build();
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -140,7 +140,7 @@ class SendHearingBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(null).build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -153,7 +153,7 @@ class SendHearingBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(Lists.emptyList()).build();
 
         // when
-        sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
+        sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
         // then
         verifyNoInteractions(bulkPrintService);
@@ -164,14 +164,14 @@ class SendHearingBulkPrintServiceTest {
         // given
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).documentLink(DOCUMENT_LINK).build()))
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(JUDGE_FINAL_ORDER).documentLink(DOCUMENT_LINK).build()))
             .respondent1(respondent1)
             .build().toBuilder()
-            .hearingDocuments(wrapElements(CaseDocument.builder().documentType(HEARING_FORM).documentLink(DOCUMENT_LINK).build())).build();
+            .finalOrderDocument(DOCUMENT_LINK).build();
         given(documentDownloadService.downloadDocument(any(), any())).willReturn(new DownloadedDocumentResponse(null, null, null));
 
         // when // then
-        assertThrows(DocumentDownloadException.class, () -> sendHearingBulkPrintService.sendHearingToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT));
+        assertThrows(DocumentDownloadException.class, () -> sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT));
 
     }
 }

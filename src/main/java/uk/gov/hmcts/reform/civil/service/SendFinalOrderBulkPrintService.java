@@ -3,47 +3,46 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
 import java.util.List;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendHearingToLiPCallbackHandler.TASK_ID_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents.SendFinalOrderToLiPCallbackHandler.TASK_ID_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 @Service
 @RequiredArgsConstructor
-public class SendHearingBulkPrintService {
+public class SendFinalOrderBulkPrintService {
 
     private final BulkPrintService bulkPrintService;
     private final DocumentDownloadService documentDownloadService;
-    private static final String HEARING_PACK_LETTER_TYPE = "hearing-document-pack";
+    private static final String FINAL_ORDER_PACK_LETTER_TYPE = "final-order-document-pack";
 
-    public void sendHearingToLIP(String authorisation, CaseData caseData, String task) {
-        if (checkHearingDocumentAvailable(caseData)) {
-            CaseDocument caseDocument = caseData.getHearingDocuments().get(0).getValue();
-            String documentUrl = caseDocument.getDocumentLink().getDocumentUrl();
+    public void sendFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
+        if (checkFinalOrderDocumentAvailable(caseData)) {
+            Document document = caseData.getFinalOrderDocument();
+            String documentUrl = document.getDocumentUrl();
             String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
             byte[] letterContent;
             try {
                 letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
             } catch (Exception e) {
-                log.error("Failed getting letter content for Hearing ");
-                throw new DocumentDownloadException(caseDocument.getDocumentName(), e);
+                log.error("Failed getting letter content for Final Order ");
+                throw new DocumentDownloadException(document.getDocumentFileName(), e);
             }
             List<String> recipients = getRecipientsList(caseData, task);
             bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                         caseData.getLegacyCaseReference(), HEARING_PACK_LETTER_TYPE, recipients);
+                                         caseData.getLegacyCaseReference(), FINAL_ORDER_PACK_LETTER_TYPE, recipients);
         }
     }
 
-    private boolean checkHearingDocumentAvailable(CaseData caseData) {
+    private boolean checkFinalOrderDocumentAvailable(CaseData caseData) {
         return nonNull(caseData.getSystemGeneratedCaseDocuments())
             && !caseData.getSystemGeneratedCaseDocuments().isEmpty()
-            && nonNull(caseData.getHearingDocuments())
-            && !caseData.getHearingDocuments().isEmpty();
+            && nonNull(caseData.getFinalOrderDocument());
     }
 
     private boolean isDefendantPrint(String task) {
