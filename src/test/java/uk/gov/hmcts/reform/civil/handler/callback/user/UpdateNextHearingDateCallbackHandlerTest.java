@@ -38,6 +38,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.nexthearingdate.UpdateType.DELETE;
 import static uk.gov.hmcts.reform.civil.enums.nexthearingdate.UpdateType.UPDATE;
+import static uk.gov.hmcts.reform.hmc.model.hearing.ListAssistCaseStatus.LISTED;
 
 @SpringBootTest(classes = {
     UpdateNextHearingDateCallbackHandler.class,
@@ -123,6 +124,7 @@ class UpdateNextHearingDateCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .hmctsServiceCode("AAA7")
                                 .caseHearings(List.of(
                                     CaseHearing.builder()
+                                        .hmcStatus(LISTED.name())
                                         .hearingId(Long.valueOf(hearingId))
                                         .hearingDaySchedule(List.of(
                                             HearingDaySchedule.builder().hearingStartDateTime(previousHearingDate).build(),
@@ -159,10 +161,9 @@ class UpdateNextHearingDateCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(hearingsService.getHearings(anyString(), eq(caseId), eq("LISTED")))
                 .thenReturn(HearingsResponse.builder()
-                                .caseRef("reference")
-                                .hmctsServiceCode("AAA7")
                                 .caseHearings(List.of(
                                     CaseHearing.builder()
+                                        .hmcStatus(LISTED.name())
                                         .hearingId(Long.valueOf(hearingId))
                                         .hearingDaySchedule(List.of(
                                             HearingDaySchedule.builder().hearingStartDateTime(previousHearingDate).build(),
@@ -204,6 +205,7 @@ class UpdateNextHearingDateCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .hmctsServiceCode("AAA7")
                                 .caseHearings(List.of(
                                     CaseHearing.builder()
+                                        .hmcStatus(LISTED.name())
                                         .hearingId(Long.valueOf(hearingId))
                                         .hearingDaySchedule(List.of(
                                             HearingDaySchedule.builder().hearingStartDateTime(previousHearingDate).build(),
@@ -245,6 +247,7 @@ class UpdateNextHearingDateCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 .hmctsServiceCode("AAA7")
                                 .caseHearings(List.of(
                                     CaseHearing.builder()
+                                        .hmcStatus(LISTED.name())
                                         .hearingId(Long.valueOf(hearingId))
                                         .hearingDaySchedule(List.of(
                                             HearingDaySchedule.builder().hearingStartDateTime(previousHearingDate).build(),
