@@ -96,6 +96,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDispo
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
@@ -135,9 +136,13 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearin
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
@@ -469,12 +474,19 @@ public class CaseDataBuilder {
     private YesOrNo specDefenceFullAdmitted2Required;
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
+    private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private FastTrackWitnessOfFact fastTrackWitnessOfFact;
+    private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
     private IdamUserDetails claimantUserDetails;
 
     private UpdateDetailsForm updateDetailsForm;
+
+    private TocTransferCaseReason tocTransferCaseReason;
+
+    private NotSuitableSdoOptions notSuitableSdoOptions;
 
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
@@ -4540,6 +4552,20 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateBeforeTransferCaseSDONotDrawn() {
+
+        atStateApplicantRespondToDefenceAndProceed();
+
+        ccdState = JUDICIAL_REFERRAL;
+        notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
+
+        tocTransferCaseReason = TocTransferCaseReason.builder()
+            .reasonForCaseTransferJudgeTxt("unforeseen complexities")
+            .build();
+        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder atStateTakenOfflineSDONotDrawn(MultiPartyScenario mpScenario) {
 
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
@@ -6009,6 +6035,56 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atSmallClaimsWitnessStatementWithNegativeInputs() {
+        atStateClaimNotified();
+        this.smallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+            .input2("-3")
+            .input3("-3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atFastTrackWitnessOfFactWithNegativeInputs() {
+        atStateClaimNotified();
+        this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
+            .input2("-3")
+            .input3("-3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atSmallClaimsWitnessStatementWithPositiveInputs() {
+        atStateClaimNotified();
+        this.smallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+            .input2("3")
+            .input3("3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atFastTrackWitnessOfFactWithPositiveInputs() {
+        atStateClaimNotified();
+        this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
+            .input2("3")
+            .input3("3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atTrialHearingWitnessOfFactWithNegativeInputs() {
+        atStateClaimNotified();
+        this.trialHearingWitnessOfFactDJ = TrialHearingWitnessOfFact.builder()
+            .input2("-3")
+            .input3("-3")
+            .build();
+
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -6285,6 +6361,12 @@ public class CaseDataBuilder {
             .claimantUserDetails(claimantUserDetails)
             .updateDetailsForm(updateDetailsForm)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
+            .smallClaimsWitnessStatement(smallClaimsWitnessStatement)
+            .fastTrackWitnessOfFact(fastTrackWitnessOfFact)
+            .trialHearingWitnessOfFactDJ(trialHearingWitnessOfFactDJ)
+            //Transfer Online Case
+            .notSuitableSdoOptions(notSuitableSdoOptions)
+            .tocTransferCaseReason(tocTransferCaseReason)
             .build();
     }
 }
