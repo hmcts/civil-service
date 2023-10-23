@@ -422,7 +422,7 @@ public class InitiateGeneralApplicationService {
         if (isDefendant1RespondedFirst(caseData) & !(caseData.getRespondent1DQ() == null
             || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null)) {
             log.info("getDefendantPreferredLocation  caseData.getRespondent1DQ is not null, "
-                         + "and court should be  "+ caseData.getRespondent1DQ().getRespondent1DQRequestedCourt());
+                         + "and court should be  " + caseData.getRespondent1DQ().getRespondent1DQRequestedCourt());
             return CaseLocationCivil.builder()
                 .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                             .getCaseLocation().getRegion())
