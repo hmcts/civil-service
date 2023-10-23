@@ -421,7 +421,8 @@ public class InitiateGeneralApplicationService {
     private CaseLocationCivil getDefendantPreferredLocation(CaseData caseData) {
         if (isDefendant1RespondedFirst(caseData) & !(caseData.getRespondent1DQ() == null
             || caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() == null)) {
-            log.info("getDefendantPreferredLocation  caseData.getRespondent1DQ is not null");
+            log.info("getDefendantPreferredLocation  caseData.getRespondent1DQ is not null, "
+                         + "and court should be  "+ caseData.getRespondent1DQ().getRespondent1DQRequestedCourt());
             return CaseLocationCivil.builder()
                 .region(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt()
                             .getCaseLocation().getRegion())
@@ -430,7 +431,8 @@ public class InitiateGeneralApplicationService {
                 .build();
         } else if (!(isDefendant1RespondedFirst(caseData)) || !(caseData.getRespondent2DQ() == null
             || caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() == null)) {
-            log.info("getDefendantPreferredLocation  caseData.getRespondent2DQ is not null");
+            log.info("getDefendantPreferredLocation  caseData.getRespondent2DQ is not null, and court should be "
+                         + caseData.getRespondent2DQ().getRespondent2DQRequestedCourt());
             return CaseLocationCivil.builder()
                 .region(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt()
                             .getCaseLocation().getRegion())
@@ -438,6 +440,7 @@ public class InitiateGeneralApplicationService {
                                   .getCaseLocation().getBaseLocation())
                 .build();
         } else {
+            log.info("else statement aseLocationCivil.builder().build()");
             return CaseLocationCivil.builder().build();
         }
     }

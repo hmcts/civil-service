@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -91,6 +92,7 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @SuppressWarnings("unchecked")
 public class RespondToClaimCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
 
@@ -563,6 +565,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .build();
         }
 
+        log.info("respondent 1 before nulling " + caseData.getRespondent1DQ());
+        if (caseData.getRespondent2DQ() != null) {
+            log.info("respondent 2 before nulling " + caseData.getRespondent2DQ());
+        }
+
         // these documents are added to defendantUploads, if we do not remove/null the original,
         // case file view will show duplicate documents
         if (toggleService.isCaseFileViewEnabled()) {
@@ -571,7 +578,15 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             Respondent1DQ currentRespondent1DQ = caseData.getRespondent1DQ();
             currentRespondent1DQ.setRespondent1DQDraftDirections(null);
             updatedData.respondent1DQ(currentRespondent1DQ);
+            Respondent2DQ currentRespondent2DQ = caseData.getRespondent2DQ();
+            currentRespondent2DQ.setRespondent2DQDraftDirections(null);
+            updatedData.respondent2DQ(currentRespondent2DQ);
         }
+        log.info("respondent 1 After nulling " + caseData.getRespondent1DQ());
+        if (caseData.getRespondent2DQ() != null) {
+            log.info("respondent 2 after nulling " + caseData.getRespondent2DQ());
+        }
+
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
