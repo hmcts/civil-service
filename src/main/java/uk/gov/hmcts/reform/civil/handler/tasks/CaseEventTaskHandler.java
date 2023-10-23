@@ -63,7 +63,8 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             BusinessProcess businessProcess = startEventData.getBusinessProcess()
                 .updateActivityId(externalTask.getActivityId());
 
-            if (featureToggleService.isAutomatedHearingNoticeEnabled()
+            if ((featureToggleService.isAutomatedHearingNoticeEnabled()
+                || featureToggleService.isNextHearingDateEnabled())
                 && !businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
                 businessProcess.updateProcessInstanceId(externalTask.getProcessInstanceId());
             }

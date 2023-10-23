@@ -4,18 +4,27 @@ import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
+import uk.gov.hmcts.reform.civil.model.NextHearingDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
+import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
+import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 
 import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 
 public class HearingUtils {
 
@@ -135,5 +144,48 @@ public class HearingUtils {
             case SOLE_TRADER -> party.getSoleTraderLastName();
             default -> party.getOrganisationName();
         };
+    }
+
+    public static CaseHearing getActiveHearing(HearingsResponse hearingsResponse) {
+        List<CaseHearing> caseHearings = hearingsResponse.getCaseHearings()
+            .stream().filter(hearing -> hearing.getHmcStatus().equals(LISTED.name())).collect(Collectors.toList());
+
+        if (caseHearings.size() < 1) {
+            throw new IllegalArgumentException("No listed hearing was found.");
+        }
+
+        // At time of writing this it's understood that there is only one hearing per case that is listed
+        // so it is safe to retrieve just the first result. This will need to be refactored in future to support multiple
+        // active hearings
+        return  caseHearings.get(0);
+    }
+
+    public static LocalDateTime getNextHearingDate(CaseHearing caseHearing) {
+        LocalDateTime yesterday = LocalDateTime.now()
+            .minusDays(1)
+            .withHour(23)
+            .withMinute(59)
+            .withSecond(59);
+
+        Optional<HearingDaySchedule> nextHearingDay = caseHearing
+            .getHearingDaySchedule()
+            .stream().filter(hearingDay -> hearingDay.getHearingStartDateTime().isAfter(yesterday))
+            .min(Comparator.comparing(HearingDaySchedule::getHearingStartDateTime));
+
+        return nextHearingDay.isPresent() ? nextHearingDay.get().getHearingStartDateTime() : null;
+    }
+
+    public static NextHearingDetails getNextHearingDetails(HearingsResponse hearingsResponse) {
+        CaseHearing activeHearing = getActiveHearing(hearingsResponse);
+        LocalDateTime nextHearingDate = getNextHearingDate(activeHearing);
+
+        if (nextHearingDate != null) {
+            return NextHearingDetails.builder()
+                .hearingID(activeHearing.getHearingId().toString())
+                .hearingDateTime(nextHearingDate)
+                .build();
+        }
+
+        return null;
     }
 }

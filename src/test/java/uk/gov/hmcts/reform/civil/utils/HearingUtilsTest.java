@@ -1,30 +1,57 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
+import uk.gov.hmcts.reform.civil.model.NextHearingDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
+import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
+import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mockStatic;
+import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
+import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.EXCEPTION;
+import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 
 public class HearingUtilsTest {
+
+    private static final LocalDateTime CURRENT_DATE = LocalDateTime.of(2024, 01, 06, 0, 0, 0);
+    private static MockedStatic currentDateMock;
+
+    @SuppressWarnings("unchecked")
+    @BeforeAll
+    static void setupSuite() {
+        currentDateMock = mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
+        currentDateMock.when(LocalDateTime::now).thenReturn(CURRENT_DATE);
+    }
 
     @Test
     void shouldThrowNullException_whenGivenNullDate() {
@@ -181,4 +208,191 @@ public class HearingUtilsTest {
         // Then
         assertThat(claimantVDefendant).isEqualTo("Doe v Company");
     }
+
+    @Nested
+    class GetActiveHearing {
+        @Test
+        void shouldReturnActiveHearing_whenAListedHearingExists() {
+            CaseHearing canceledHearing = CaseHearing.builder()
+                .hmcStatus(CANCELLED.name())
+                .build();
+            CaseHearing exceptionHearing = CaseHearing.builder()
+                .hmcStatus(EXCEPTION.name())
+                .build();
+            CaseHearing listedHearing = CaseHearing.builder()
+                .hmcStatus(LISTED.name())
+                .build();
+
+            HearingsResponse hearingsResponse = HearingsResponse.builder()
+                .caseHearings(
+                    List.of(
+                        canceledHearing,
+                        exceptionHearing,
+                        listedHearing
+                    )
+                ).build();
+
+            CaseHearing actual = HearingUtils.getActiveHearing(hearingsResponse);
+
+            assertEquals(listedHearing, actual);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldThrowIllegalArgumentException_whenAListedHearingDoesNotExist() {
+            CaseHearing canceledHearing = CaseHearing.builder()
+                .hmcStatus(CANCELLED.name())
+                .build();
+            CaseHearing exceptionHearing = CaseHearing.builder()
+                .hmcStatus(EXCEPTION.name())
+                .build();
+
+            HearingsResponse hearingsResponse = HearingsResponse.builder()
+                .caseHearings(
+                    List.of(
+                        canceledHearing,
+                        exceptionHearing
+                    )
+                ).build();
+
+            assertThrows(IllegalArgumentException.class, () -> {
+                HearingUtils.getActiveHearing(hearingsResponse);
+            }, "No listed hearing was found.");
+        }
+    }
+
+    @Nested
+    class GetNextHearingDate {
+
+        private final String hearingId = "12345";
+
+        @Test
+        void shouldReturnNull_forGivenHearingWithElapsedHearingDays() {
+            LocalDateTime firstElapsedHearingDate = LocalDateTime.of(2024, 01, 04, 9, 00, 00);
+            LocalDateTime secondElapsedHearingDate = LocalDateTime.of(2024, 01, 05, 9, 00, 00);
+
+            CaseHearing hearing =
+                CaseHearing.builder()
+                    .hearingId(Long.valueOf(hearingId))
+                    .hearingDaySchedule(List.of(
+                        HearingDaySchedule.builder().hearingStartDateTime(firstElapsedHearingDate).build(),
+                        HearingDaySchedule.builder().hearingStartDateTime(secondElapsedHearingDate).build()
+                    ))
+                    .build();
+
+            LocalDateTime actual = HearingUtils.getNextHearingDate(hearing);
+
+            assertNull(actual);
+        }
+
+        @Test
+        void shouldReturnExpectedNextHearingDate_forGivenHearingWithANextHearingDateOfToday() {
+            LocalDateTime elapsedHearingDate = LocalDateTime.of(2024, 01, 04, 9, 00, 00);
+            LocalDateTime nextHearingDate = LocalDateTime.of(2024, 01, 10, 9, 00, 00);
+            LocalDateTime futureHearingDate = LocalDateTime.of(2024, 01, 11, 9, 00, 00);
+
+            CaseHearing hearing =
+                CaseHearing.builder()
+                    .hearingId(Long.valueOf(hearingId))
+                    .hearingDaySchedule(List.of(
+                        HearingDaySchedule.builder().hearingStartDateTime(elapsedHearingDate).build(),
+                        HearingDaySchedule.builder().hearingStartDateTime(nextHearingDate).build(),
+                        HearingDaySchedule.builder().hearingStartDateTime(futureHearingDate).build()
+                    ))
+                    .build();
+
+            LocalDateTime actual = HearingUtils.getNextHearingDate(hearing);
+
+            assertEquals(nextHearingDate, actual);
+        }
+
+        @Test
+        void shouldReturnExpectedNextHearingDate_forGivenHearingWithFutureHearings() {
+            LocalDateTime elapsedHearingDate = LocalDateTime.of(2024, 01, 04, 9, 00, 00);
+            LocalDateTime nextHearingDate = LocalDateTime.of(2024, 01, 11, 9, 00, 00);
+            LocalDateTime futureHearingDate = LocalDateTime.of(2024, 01, 12, 9, 00, 00);
+
+            CaseHearing hearing =
+                CaseHearing.builder()
+                    .hearingId(Long.valueOf(hearingId))
+                    .hearingDaySchedule(List.of(
+                        HearingDaySchedule.builder().hearingStartDateTime(elapsedHearingDate).build(),
+                        HearingDaySchedule.builder().hearingStartDateTime(nextHearingDate).build(),
+                        HearingDaySchedule.builder().hearingStartDateTime(futureHearingDate).build()
+                    ))
+                    .build();
+
+            LocalDateTime actual = HearingUtils.getNextHearingDate(hearing);
+
+            assertEquals(nextHearingDate, actual);
+        }
+    }
+
+    @Nested
+    class GetNextHearingDetails {
+
+        private final String hearingId = "12345";
+
+        @Test
+        void shouldReturnExpectedNextHearingDetails_forGivenHearingsWithFutureHearings() {
+            LocalDateTime previousHearingDate = LocalDateTime.of(2024, 01, 5, 9, 00, 00);
+            LocalDateTime nextHearingDate = LocalDateTime.of(2024, 01, 7, 9, 00, 00);
+
+            HearingsResponse hearingsResponse = HearingsResponse.builder()
+                .caseHearings(List.of(
+                    CaseHearing.builder()
+                        .hearingId(Long.valueOf(hearingId))
+                        .hmcStatus(LISTED.name())
+                        .hearingDaySchedule(List.of(
+                            HearingDaySchedule.builder().hearingStartDateTime(previousHearingDate).build(),
+                            HearingDaySchedule.builder().hearingStartDateTime(nextHearingDate).build()
+                        )).build()))
+                .build();
+
+            NextHearingDetails actual = HearingUtils.getNextHearingDetails(hearingsResponse);
+            NextHearingDetails expected = NextHearingDetails.builder()
+                .hearingID(hearingId)
+                .hearingDateTime(nextHearingDate)
+                .build();
+
+            assertEquals(expected, actual);
+        }
+
+        @Test
+        void shouldReturnNull_forGivenHearingsWithElapsedHearings() {
+            LocalDateTime firstElapsedHearingDay = LocalDateTime.of(2024, 01, 4, 9, 00, 00);
+            LocalDateTime secondElapsedHearingDay = LocalDateTime.of(2024, 01, 5, 9, 00, 00);
+
+            HearingsResponse hearingsResponse = HearingsResponse.builder()
+                .caseHearings(List.of(
+                    CaseHearing.builder()
+                        .hearingId(Long.valueOf(hearingId))
+                        .hmcStatus(LISTED.name())
+                        .hearingDaySchedule(List.of(
+                            HearingDaySchedule.builder().hearingStartDateTime(firstElapsedHearingDay).build(),
+                            HearingDaySchedule.builder().hearingStartDateTime(secondElapsedHearingDay).build()
+                        )).build()))
+                .build();
+
+            NextHearingDetails actual = HearingUtils.getNextHearingDetails(hearingsResponse);
+
+            assertNull(actual);
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldThrowIllegalArgumentException_whenNoListedHearingsExist() {
+            HearingsResponse hearingsResponse = HearingsResponse.builder()
+                .caseHearings(List.of(
+                    CaseHearing.builder()
+                        .hearingId(Long.valueOf(hearingId))
+                        .hmcStatus(CANCELLED.name()).build()
+                )).build();
+
+            assertThrows(IllegalArgumentException.class, () -> {
+                HearingUtils.getNextHearingDetails(hearingsResponse);
+            }, "No listed hearing was found.");
+        }
+    }
 }
+

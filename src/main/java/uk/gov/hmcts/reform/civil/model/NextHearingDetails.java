@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Builder
 @Data
-public class ScheduledHearing {
+public class NextHearingDetails {
 
     private final String hearingID;
     private final LocalDateTime hearingDateTime;
