@@ -63,6 +63,7 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
     private static final String LEGACY_REFERENCE = "create-sdo-respondent-1-notification-000DC001";
     private static final String DEFENDANT_NAME = "respondent";
     private static final String TEMPLATE_ID = "template-id";
+    private static final String TEMPLATE_ID_EA = "template-id-EA";
     private static final String ORG_NAME = "Signer Name";
 
     @Nested
@@ -71,8 +72,10 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
         @BeforeEach
         void setup() {
             when(notificationsProperties.getSdoOrdered()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getSdoOrderedEA()).thenReturn(TEMPLATE_ID_EA);
             when(notificationsProperties.getSdoOrderedSpecBilingual()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getSdoOrderedSpec()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getSdoOrderedSpecEA()).thenReturn(TEMPLATE_ID_EA);
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
         }
@@ -99,6 +102,28 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
         }
 
         @Test
+        void shouldNotifyRespondentSolicitor_whenInvokedEA() {
+            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                TEMPLATE_ID_EA,
+                getNotificationDataMap(caseData),
+                LEGACY_REFERENCE
+            );
+        }
+
+        @Test
         void shouldNotifyRespondentLiP_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
@@ -118,6 +143,32 @@ public class CreateSDORespondent1NotificationHandlerTest extends BaseCallbackHan
             verify(notificationService).sendMail(
                 caseData.getRespondent1().getPartyEmail(),
                 TEMPLATE_ID,
+                getNotificationDataLipMap1(caseData),
+                LEGACY_REFERENCE
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondentLiP_whenInvokedEA() {
+            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
+                .toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .build();
+            CallbackParams params = CallbackParams.builder()
+                .caseData(caseData)
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_SDO_TRIGGERED.name())
+                             .build())
+                .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                caseData.getRespondent1().getPartyEmail(),
+                TEMPLATE_ID_EA,
                 getNotificationDataLipMap1(caseData),
                 LEGACY_REFERENCE
             );
