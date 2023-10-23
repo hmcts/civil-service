@@ -36,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 @AllArgsConstructor
 public class BundleCreationTriggerEventHandler {
 
-    @Autowired
     private BundleCreationService bundleCreationService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
