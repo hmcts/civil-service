@@ -709,15 +709,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             ));
         DynamicList locationsList;
         if (matchingLocation.isPresent()) {
-            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
                                                  matchingLocation.get(), true
             );
         } else {
-            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
                                                  null, true
             );
         }
         return locationsList;
+    }
+
+    private String getLocationEpimms(LocationRefData location) {
+        return location.getEpimmsId();
     }
 
     private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
@@ -835,7 +839,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
         if (featureToggleService.isLocationWhiteListedForCaseProgression(
-            caseData.getCaseManagementLocation().getBaseLocation())) {
+            getEpimmsId(caseData))) {
             log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
             dataBuilder.eaCourtLocation(YesOrNo.YES);
         } else {
@@ -846,6 +850,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private String getEpimmsId(CaseData caseData) {
+        if (caseData.getFastTrackMethodInPerson().getValue() != null) {
+            return caseData.getFastTrackMethodInPerson().getValue().getCode();
+        } else if (caseData.getDisposalHearingMethodInPerson() != null) {
+            return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
+        } else if (caseData.getSmallClaimsMethodInPerson() != null) {
+            return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
+        }
+        throw new IllegalArgumentException("Epimms Id is not provided");
     }
 
     private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
