@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -16,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 import uk.gov.hmcts.reform.civil.utils.HmcDataUtils;
@@ -38,6 +41,7 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
     private final DocumentGeneratorService documentGeneratorService;
     private final LocationRefDataService locationRefDataService;
     private final HearingFeesService hearingFeesService;
+    private final AssignCategoryId assignCategoryId;
 
     public List<CaseDocument> generate(CaseData caseData, HearingGetResponse hearing, String authorisation) {
 
@@ -51,7 +55,9 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
             document.getBytes(),
             DocumentType.HEARING_FORM
         );
-        caseDocuments.add(documentManagementService.uploadDocument(authorisation, pdf));
+        CaseDocument caseDocument = documentManagementService.uploadDocument(authorisation, pdf);
+        assignCategoryId.assignCategoryIdToCaseDocument(caseDocument, DocCategory.HEARING_NOTICES.getValue());
+        caseDocuments.add(caseDocument);
         return caseDocuments;
     }
 
@@ -63,10 +69,14 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         var hearingDueDate = paymentFailed ? HearingFeeUtils
             .calculateHearingDueDate(LocalDate.now(), HmcDataUtils.getHearingStartDay(hearing)
                 .getHearingStartDateTime().toLocalDate()) : null;
-        var hearingLocation = getHearingLocation(HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(), bearerToken);
+        LocationRefData hearingLocation = getLocationRefData(
+            HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(),
+            bearerToken);
+        LocationRefData caseManagementLocation =
+            getLocationRefData(caseData.getCaseManagementLocation().getBaseLocation(), bearerToken);
 
         return HearingNoticeHmc.builder()
-            .hearingSiteName(nonNull(hearingLocation) ? hearingLocation.getSiteName() : null)
+            .hearingSiteName(nonNull(caseManagementLocation) ? caseManagementLocation.getSiteName() : null)
             .hearingLocation(LocationRefDataService.getDisplayEntry(hearingLocation))
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
@@ -97,7 +107,8 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return HEARING_NOTICE_HMC;
     }
 
-    private LocationRefData getHearingLocation(String venueId, String bearerToken) {
+    @Nullable
+    private LocationRefData getLocationRefData(String venueId, String bearerToken) {
         List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(bearerToken);
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
         return matchedLocations.size() > 0 ? matchedLocations.get(0) : null;

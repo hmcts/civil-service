@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.controllers.cases;
 
+import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -9,11 +10,15 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
+import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
+import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
+import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
@@ -23,6 +28,9 @@ import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
+import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
+import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
+import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -53,9 +61,13 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String CLAIMANT_CLAIMS_URL = "/cases/claimant/{submitterId}";
     private static final String DEFENDANT_CLAIMS_URL = "/cases/defendant/{submitterId}?page=1";
     private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
-    private static final String CASEWORKER_SUBMIT_EVENT_URL = "/cases/caseworkers/{userId}/jurisdictions/{jurisdictionId}/case-types/{caseType}/cases";
+    private static final String CASEWORKER_SUBMIT_EVENT_URL = "/cases/caseworkers/create-case/{userId}";
+    private static final String CASEWORKER_SEARCH_CASE_URL = "/cases/caseworker/searchCaseForSDT/{userId}?sdtRequestId=isUnique";
+    private static final String VALIDATE_POSTCODE_URL = "/cases/caseworker/validatePin/?postCode=rfft";
+
     private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
     private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
+    private static final String USER_CASE_ROLES = "/cases/{caseId}/userCaseRoles";
     private static final List<DashboardClaimInfo> claimResults =
         Collections.singletonList(DashboardClaimInfo.builder()
                                       .claimAmount(new BigDecimal(
@@ -90,12 +102,20 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private CaseworkerCaseEventService caseworkerCaseEventService;
+    @MockBean
+    private CaseSdtRequestSearchService caseSdtRequestSearchService;
 
     @MockBean
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
     @MockBean
     CoreCaseDataApi coreCaseDataApi;
+
+    @MockBean
+    PostcodeValidator postcodeValidator;
+
+    @MockBean
+    private UserInformationService userInformationService;
 
     @Test
     @SneakyThrows
@@ -159,16 +179,17 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnClaimsForClaimantSuccessfully() {
-        when(dashboardClaimInfoService.getClaimsForClaimant(any(), any())).thenReturn(claimResults);
+        var dashBoardResponse = DashboardResponse.builder().totalPages(1).claims(claimResults).build();
+        when(dashboardClaimInfoService.getDashboardClaimantResponse(any(), any(), eq(1))).thenReturn(dashBoardResponse);
         doGet(BEARER_TOKEN, CLAIMANT_CLAIMS_URL, "123")
-            .andExpect(content().json(toJson(claimResults)))
+            .andExpect(content().json(toJson(dashBoardResponse)))
             .andExpect(status().isOk());
     }
 
     @Test
     @SneakyThrows
     void shouldReturnClaimsForDefendantSuccessfully() {
-        var dashBoardResponse = DashboardDefendantResponse.builder().totalPages(1).claims(claimResults).build();
+        var dashBoardResponse = DashboardResponse.builder().totalPages(1).claims(claimResults).build();
         when(dashboardClaimInfoService.getDashboardDefendantResponse(
             any(),
             any(),
@@ -259,15 +280,132 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .thenThrow(CaseDataInvalidException.class);
 
         doPost(
-             BEARER_TOKEN,
-             CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
-             CASEWORKER_SUBMIT_EVENT_URL,
-             "userId",
-             "jurisdictionId",
-             "caseTypeId"
+            BEARER_TOKEN,
+            CaseworkerSubmitEventDTo.builder().event(CaseEvent.CREATE_CLAIM_SPEC).data(Map.of()).build(),
+            CASEWORKER_SUBMIT_EVENT_URL,
+            "userId",
+            "jurisdictionId",
+            "caseTypeId"
         )
             .andExpect(status().isUnprocessableEntity())
             .andExpect(content().string("Submit claim unsuccessful, Invalid Case data"))
+            .andReturn();
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSearchCaseSuccessfullyForCaseWorker_whenCaseExists() {
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
+        when(caseSdtRequestSearchService.searchCaseForSdtRequest(any())).thenReturn(Arrays.asList(caseDetails));
+
+        doGet(
+            BEARER_TOKEN,
+            CASEWORKER_SEARCH_CASE_URL,
+            "sdtRequest",
+            "userId"
+
+        )
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString().equals(false);
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSearchCaseSuccessfullyForCaseWorker_whenCaseNotExists() {
+
+        when(caseSdtRequestSearchService.searchCaseForSdtRequest(any())).thenReturn(Lists.newArrayList());
+
+        doGet(
+            BEARER_TOKEN,
+            CASEWORKER_SEARCH_CASE_URL,
+            "sdtRequest",
+            "userId"
+
+        )
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString().equals(true);
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldValidatePostCodeSuccessfullyWhenInEnglandOrWales() {
+
+        when(postcodeValidator.validate(any())).thenReturn(Lists.newArrayList());
+
+        doGet(
+            BEARER_TOKEN,
+            VALIDATE_POSTCODE_URL
+        )
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString().equals(Lists.newArrayList());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldValidatePostCodeAndSendErrorsWhenNotInEnglandOrWales() {
+
+        when(postcodeValidator.validate(any())).thenReturn(
+            Lists.newArrayList("Postcode must be in England or Wales"));
+
+        doGet(
+            BEARER_TOKEN,
+            VALIDATE_POSTCODE_URL
+        )
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString().equals(
+                Arrays.asList("Postcode must be in England or Wales"));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGetUserInfoSuccessfully() {
+        List<String> expectedRoles = List.of("role1", "role2");
+        when(userInformationService.getUserCaseRoles(anyString(), anyString()))
+            .then(invocation -> expectedRoles);
+        doGet(
+            BEARER_TOKEN,
+            USER_CASE_ROLES,
+            "1"
+        )
+            .andExpect(status().isOk())
+            .andExpect(content().json(toJson(expectedRoles)))
+            .andReturn();
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowNotFoundExceptionWhenGetUserInfo() {
+        when(userInformationService.getUserCaseRoles(anyString(), anyString()))
+            .thenThrow(CaseNotFoundException.class);
+
+        doGet(
+            BEARER_TOKEN,
+            USER_CASE_ROLES,
+            "1"
+        )
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string("Case was not found"))
+            .andReturn();
+
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowUserNotFoundOnCaseExceptionWhenRolesIsEmpty() {
+        when(userInformationService.getUserCaseRoles(anyString(), anyString()))
+            .thenThrow(new UserNotFoundOnCaseException("111"));
+
+        doGet(
+            BEARER_TOKEN,
+            USER_CASE_ROLES,
+            "1"
+        )
+            .andExpect(status().isNotFound())
+            .andExpect(content().string("User with Id: 111 was not found on case"))
             .andReturn();
 
     }

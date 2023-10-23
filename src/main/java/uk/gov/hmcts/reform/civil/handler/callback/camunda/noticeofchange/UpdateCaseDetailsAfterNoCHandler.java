@@ -12,9 +12,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Collections;
@@ -39,6 +41,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     public static final String TASK_ID = "UpdateCaseDetailsAfterNoC";
 
     private final ObjectMapper objectMapper;
+    private final CoreCaseUserService coreCaseUserService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -90,6 +93,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         if (isApplicantSolicitorRole) {
             updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails);
         } else {
+            unassignCaseFromDefendantLip(caseData);
             if (replacedSolicitorCaseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
                 updateRespondentSolicitor1Details(caseDataBuilder, addedOrganisation, addedSolicitorDetails);
             } else {
@@ -116,6 +120,12 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void unassignCaseFromDefendantLip(CaseData caseData) {
+        if (caseData.isRespondent1LiP() && caseData.getDefendantUserDetails() != null) {
+            coreCaseUserService.unassignCase(caseData.getCcdCaseReference().toString(), caseData.getDefendantUserDetails().getId(), null, CaseRole.DEFENDANT);
+        }
     }
 
     private void updateOrgPolicyReferences(CaseData caseData,
@@ -151,7 +161,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         caseDataBuilder.respondent2OrgRegistered(YES)
             .respondentSolicitor2OrganisationDetails(null)
-            .respondent2Represented(YES);
+            .respondent2Represented(YES)
+            .defendant2LIPAtClaimIssued(NO);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor2ServiceAddress(null)
@@ -160,6 +171,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
                 .respondent2OrganisationIDCopy(addedOrganisation);
         } else {
             caseDataBuilder.specRespondent2Represented(YES)
+                .specRespondent2CorrespondenceAddressRequired(null)
+                .specRespondent2CorrespondenceAddressdetails(Address.builder().build())
                 .specAoSRespondentCorrespondenceAddressdetails(null);
         }
 
@@ -176,7 +189,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         caseDataBuilder.respondent1OrgRegistered(YES)
             .respondentSolicitor1OrganisationDetails(null)
-            .respondent1Represented(YES);
+            .respondent1Represented(YES)
+            .defendant1LIPAtClaimIssued(NO);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor1ServiceAddress(null)

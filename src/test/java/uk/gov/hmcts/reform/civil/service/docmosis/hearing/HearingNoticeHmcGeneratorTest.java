@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingNoticeHmc;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
@@ -83,6 +85,8 @@ class HearingNoticeHmcGeneratorTest {
     private LocationRefDataService locationRefDataService;
     @MockBean
     private HearingFeesService hearingFeesService;
+    @MockBean
+    private AssignCategoryId assignCategoryId;
 
     @BeforeEach
     void setupTest() {
@@ -135,6 +139,9 @@ class HearingNoticeHmcGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation(EPIMS)
+                                        .build())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
                                  .build())
             .hearingTimeHourMinute("0800")
@@ -185,6 +192,9 @@ class HearingNoticeHmcGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation(EPIMS)
+                                        .build())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
                                  .build())
             .hearingTimeHourMinute("0800")
@@ -235,6 +245,9 @@ class HearingNoticeHmcGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation(EPIMS)
+                                        .build())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
                                  .build())
             .hearingTimeHourMinute("0800")
@@ -289,6 +302,9 @@ class HearingNoticeHmcGeneratorTest {
             .atStateBothApplicantsRespondToDefenceAndProceed_2v1()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation(EPIMS)
+                                        .build())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
                                  .build())
             .hearingTimeHourMinute("0800")
@@ -341,6 +357,9 @@ class HearingNoticeHmcGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder()
+                                        .baseLocation(EPIMS)
+                                        .build())
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
                                  .build())
             .hearingTimeHourMinute("0800")

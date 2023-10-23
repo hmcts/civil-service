@@ -189,6 +189,25 @@ class SealedClaimLipResponseFormGeneratorTest {
     }
 
     @Test
+    void shouldNotBuildRepaymentPlan_whenRespondent1RepaymentPlanisNull() {
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(individual("B"))
+            .respondent2(company("C"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .specDefenceAdmittedRequired(YesOrNo.NO)
+            .respondToAdmittedClaimOwingAmount(BigDecimal.valueOf(2000))
+            .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim")
+            .defenceAdmitPartPaymentTimeRouteRequired(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
+        CaseData caseData = timeline(financialDetails(builder))
+            .build();
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(caseData);
+        assertThat(templateData.getCommonDetails().getRepaymentPlan()).isNull();
+    }
+
+    @Test
     void partAdmitPayInstalments() {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
@@ -212,6 +231,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
+        assertThat(templateData.getCommonDetails().getRepaymentPlan()).isNotNull();
     }
 
     @Test

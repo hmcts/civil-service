@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -9,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -21,11 +21,10 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PROCESS_CLAIM_ISSUE;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ClaimIssueCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(PROCESS_CLAIM_ISSUE);
@@ -54,9 +53,6 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
 
         clearSubmitterId(caseData, caseDataUpdated);
 
-        // don't display cases in unassigned case list before claim notified workaround.
-        clearOrganisationPolicyId(caseData, caseDataUpdated);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
             .build();
@@ -67,34 +63,6 @@ public class ClaimIssueCallbackHandler extends CallbackHandler {
         caseDataBuilder
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(userDetails.getEmail()).build())
             .build();
-    }
-
-    private void clearOrganisationPolicyId(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        if (YES.equals(caseData.getRespondent1OrgRegistered())) {
-            caseDataBuilder.respondent1OrganisationIDCopy(
-                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID());
-
-            caseDataBuilder.respondent1OrganisationPolicy(
-                caseData
-                    .getRespondent1OrganisationPolicy()
-                    .toBuilder()
-                    .organisation(Organisation.builder().build())
-                    .build()
-            );
-        }
-
-        if (NO.equals(caseData.getRespondent2SameLegalRepresentative())) {
-            caseDataBuilder.respondent2OrganisationIDCopy(
-                caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID());
-
-            caseDataBuilder.respondent2OrganisationPolicy(
-                caseData
-                    .getRespondent2OrganisationPolicy()
-                    .toBuilder()
-                    .organisation(Organisation.builder().build())
-                    .build()
-            );
-        }
     }
 
     @Override

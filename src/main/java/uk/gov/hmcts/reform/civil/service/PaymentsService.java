@@ -27,6 +27,7 @@ import java.util.UUID;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
 @Service
 @RequiredArgsConstructor
@@ -113,17 +114,11 @@ public class PaymentsService {
         }
     }
 
-    private PBAServiceRequestDTO buildRequest1(CaseData caseData) {
+    private PBAServiceRequestDTO buildPbaPaymentRequestBulkClaim(CaseData caseData) {
         SRPbaDetails serviceRequestPBADetails = null;
         FeeDto srFee = null;
-
-        if (caseData.getHearingDate() == null) {
-            serviceRequestPBADetails = caseData.getClaimIssuedPBADetails();
-            srFee = caseData.getClaimFee().toFeeDto();
-        } else {
-            serviceRequestPBADetails = caseData.getHearingFeePBADetails();
-            srFee = caseData.getHearingFee().toFeeDto();
-        }
+        serviceRequestPBADetails = caseData.getClaimIssuedPBADetails();
+        srFee = caseData.getClaimFee().toFeeDto();
 
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         var organisationName = organisationService.findOrganisationById(organisationId)
@@ -135,10 +130,11 @@ public class PaymentsService {
                 .accountNumber(serviceRequestPBADetails.getApplicantsPbaAccounts()
                                    .getValue().getLabel())
                 .amount(srFee.getCalculatedAmount())
-                .customerReference(serviceRequestPBADetails.getPbaReference())
+                .customerReference("bulk claim issuer")
                 .organisationName(organisationName)
                 .idempotencyKey(String.valueOf(UUID.randomUUID()))
                 .build();
+            log.info(pbaServiceRequestDTO.getCustomerReference());
             return pbaServiceRequestDTO;
 
         } else {
@@ -147,14 +143,14 @@ public class PaymentsService {
 
     }
 
-    public PBAServiceRequestResponse createCreditAccountPayment1(CaseData caseData, String authToken) {
+    public PBAServiceRequestResponse createPbaPayment(CaseData caseData, String authToken) {
         String serviceReqReference = null;
         if (caseData.getHearingDate() == null) {
             serviceReqReference = caseData.getClaimIssuedPBADetails().getServiceReqReference();
         } else {
             serviceReqReference = caseData.getHearingFeePBADetails().getServiceReqReference();
         }
-        return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildRequest1(caseData));
+        return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildPbaPaymentRequestBulkClaim(caseData));
     }
 
     public PaymentServiceResponse createServiceRequest(CaseData caseData, String authToken) {

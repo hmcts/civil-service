@@ -95,7 +95,7 @@ public class InitiateGeneralApplicationService {
         + "you must provide at least one valid Date from";
     public static final String INVALID_UNAVAILABILITY_RANGE = "Unavailability Date From cannot be after "
         + "Unavailability Date to. Please enter valid range.";
-    public static final String INVALID_SETTLE_OR_DISCONTINUE_CONSENT = "Settle or Discontinue by consent " +
+    public static final String INVALID_SETTLE_BY_CONSENT = "Settle by consent " +
             "must have been agreed with the respondent " +
             "before raising the application";
 

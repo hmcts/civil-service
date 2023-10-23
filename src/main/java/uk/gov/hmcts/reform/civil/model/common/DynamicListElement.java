@@ -34,4 +34,11 @@ public class DynamicListElement {
             .label(label)
             .build();
     }
+
+    public static DynamicListElement dynamicElementFromCode(String code, String label) {
+        return DynamicListElement.builder()
+            .code(code)
+            .label(label)
+            .build();
+    }
 }

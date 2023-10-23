@@ -11,6 +11,15 @@ import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
+import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +36,8 @@ import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_TWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class PartyUtils {
 
@@ -78,7 +89,7 @@ public class PartyUtils {
                 return party.getOrganisationName();
             case INDIVIDUAL:
                 return ofNullable(litigationFriend)
-                    .map(lf -> getIndividualName(party) + " L/F " + lf.getFullName())
+                    .map(lf -> getIndividualName(party) + " L/F " + lf.getFirstName() + " " + lf.getLastName())
                     .orElse(getIndividualName(party));
             case SOLE_TRADER:
                 return ofNullable(party.getSoleTraderTradingAs())
@@ -101,10 +112,14 @@ public class PartyUtils {
     }
 
     private static String getIndividualName(Party party, boolean omitTitle) {
+        if (party.getBulkClaimPartyName() != null) {
+            return party.getBulkClaimPartyName();
+        }
         return (omitTitle ? "" : getTitle(party.getIndividualTitle()))
-            + party.getIndividualFirstName()
-            + " "
-            + party.getIndividualLastName();
+                + party.getIndividualFirstName()
+                + " "
+                + party.getIndividualLastName();
+
     }
 
     private static String getIndividualName(Party party) {
@@ -362,6 +377,81 @@ public class PartyUtils {
         ).collect(Collectors.toList()) : null;
     }
 
+    public static ExpertDetails appendWithNewPartyIds(ExpertDetails expert) {
+        return expert != null && expert.getPartyID() == null ? expert.toBuilder().partyID(createPartyId()).build() : expert;
+    }
+
+    public static Expert appendWithNewPartyIds(Expert expert) {
+        return expert != null && expert.getPartyID() == null ? expert.toBuilder().partyID(createPartyId()).build() : expert;
+    }
+
+    public static Experts appendWithNewPartyIds(Experts experts) {
+        if (experts == null || experts.getDetails() == null) {
+            return experts;
+        }
+
+        return experts.toBuilder().details(
+            wrapElements(unwrapElements(
+                experts.getDetails()).stream().map(
+                    expert ->  appendWithNewPartyIds(expert)).collect(Collectors.toList()))).build();
+    }
+
+    public static Witness appendWithNewPartyIds(Witness witness) {
+        return witness != null && witness.getPartyID() == null ? witness.toBuilder().partyID(createPartyId()).build() : witness;
+    }
+
+    public static Witnesses appendWithNewPartyIds(Witnesses witnesses) {
+        if (witnesses == null || witnesses.getDetails() == null) {
+            return witnesses;
+        }
+
+        return witnesses.toBuilder().details(
+            wrapElements(unwrapElements(
+                witnesses.getDetails()).stream().map(
+                    witness ->  appendWithNewPartyIds(witness)).collect(Collectors.toList()))).build();
+    }
+
+    public static Applicant1DQ appendWithNewPartyIds(Applicant1DQ applicant1DQ) {
+        return applicant1DQ != null ? applicant1DQ.toBuilder()
+            .applicant1DQExperts(appendWithNewPartyIds(applicant1DQ.getApplicant1DQExperts()))
+            .applicant1RespondToClaimExperts(appendWithNewPartyIds(applicant1DQ.getApplicant1RespondToClaimExperts()))
+            .applicant1DQWitnesses(appendWithNewPartyIds(applicant1DQ.getApplicant1DQWitnesses()))
+            .build() : null;
+    }
+
+    public static Applicant2DQ appendWithNewPartyIds(Applicant2DQ applicant2DQ) {
+        return applicant2DQ != null ? applicant2DQ.toBuilder()
+            .applicant2DQExperts(appendWithNewPartyIds(applicant2DQ.getApplicant2DQExperts()))
+            .applicant2RespondToClaimExperts(appendWithNewPartyIds(applicant2DQ.getApplicant2RespondToClaimExperts()))
+            .applicant2DQWitnesses(appendWithNewPartyIds(applicant2DQ.getApplicant2DQWitnesses()))
+            .build() : null;
+    }
+
+    public static Respondent1DQ appendWithNewPartyIds(Respondent1DQ respondent1DQ) {
+        return respondent1DQ != null ? respondent1DQ.toBuilder()
+            .respondent1DQExperts(appendWithNewPartyIds(respondent1DQ.getRespondent1DQExperts()))
+            .respondToClaimExperts(appendWithNewPartyIds(respondent1DQ.getRespondToClaimExperts()))
+            .respondent1DQWitnesses(appendWithNewPartyIds(respondent1DQ.getRespondent1DQWitnesses()))
+            .build() : null;
+    }
+
+    public static Respondent2DQ appendWithNewPartyIds(Respondent2DQ respondent2DQ) {
+        return respondent2DQ != null ? respondent2DQ.toBuilder()
+            .respondent2DQExperts(appendWithNewPartyIds(respondent2DQ.getRespondent2DQExperts()))
+            .respondToClaimExperts2(appendWithNewPartyIds(respondent2DQ.getRespondToClaimExperts2()))
+            .respondent2DQWitnesses(appendWithNewPartyIds(respondent2DQ.getRespondent2DQWitnesses()))
+            .build() : null;
+    }
+
+    public static void populateDQPartyIds(CaseData.CaseDataBuilder builder) {
+        CaseData caseData = builder.build();
+        builder
+            .applicant1DQ(appendWithNewPartyIds(caseData.getApplicant1DQ()))
+            .applicant2DQ(appendWithNewPartyIds(caseData.getApplicant2DQ()))
+            .respondent1DQ(appendWithNewPartyIds(caseData.getRespondent1DQ()))
+            .respondent2DQ(appendWithNewPartyIds(caseData.getRespondent2DQ()));
+    }
+
     @SuppressWarnings("unchecked")
     public static void populateWithPartyIds(CaseData.CaseDataBuilder builder) {
         CaseData caseData = builder.build();
@@ -373,12 +463,6 @@ public class PartyUtils {
             .applicant1LitigationFriend(appendWithNewPartyId(caseData.getApplicant1LitigationFriend()))
             .applicant2LitigationFriend(appendWithNewPartyId(caseData.getApplicant2LitigationFriend()))
             .respondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()))
-            .respondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()))
-            .applicantExperts(appendWithNewPartyIds(caseData.getApplicantExperts()))
-            .respondent1Experts(appendWithNewPartyIds(caseData.getRespondent1Experts()))
-            .respondent2Experts(appendWithNewPartyIds(caseData.getRespondent2Experts()))
-            .applicantWitnesses(appendWithNewPartyIds(caseData.getApplicantWitnesses()))
-            .respondent1Witnesses(appendWithNewPartyIds(caseData.getRespondent1Witnesses()))
-            .respondent2Witnesses(appendWithNewPartyIds(caseData.getRespondent2Witnesses()));
+            .respondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
     }
 }

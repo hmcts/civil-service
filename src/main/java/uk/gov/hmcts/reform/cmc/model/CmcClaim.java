@@ -25,7 +25,6 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT_CMC;
 
 @Data
 @Builder
@@ -77,10 +76,10 @@ public class CmcClaim implements Claim {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate admissionPayImmediatelyPastPaymentDate;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_CMC)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime intentionToProceedDeadline;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate intentionToProceedDeadline;
     private ClaimantResponse claimantResponse;
     private ClaimState state;
     private ProceedOfflineReasonType proceedOfflineReason;
@@ -171,7 +170,7 @@ public class CmcClaim implements Claim {
     @Override
     @JsonIgnore
     public boolean isSettled() {
-        return moneyReceivedOn != null || claimantAcceptedDefendantResponse();
+        return moneyReceivedOn != null || (claimantAcceptedDefendantResponse() && !hasCCJByRedetermination());
     }
 
     @Override
@@ -231,7 +230,7 @@ public class CmcClaim implements Claim {
     @JsonIgnore
     public boolean hasClaimantAcceptedPartialAdmissionAmount() {
         return hasResponse() && response.isPartAdmitPayImmediately()
-            && claimantAcceptedDefendantResponse();
+            && claimantAcceptedDefendantResponse() && !hasCCJByRedetermination();
     }
 
     @Override
@@ -255,7 +254,7 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean defendantRespondedWithPartAdmit() {
-        return hasResponse() && response.isPartAdmit();
+        return hasResponse() && response.isPartAdmit() && !hasClaimantResponse();
     }
 
     @Override
@@ -266,7 +265,9 @@ public class CmcClaim implements Claim {
     @JsonIgnore
     public boolean claimantAcceptedDefendantResponse() {
         return hasClaimantResponse()
-            && claimantResponse.getType() != null && claimantResponse.getType() == ClaimantResponseType.ACCEPTATION;
+            && claimantResponse.getType() != null
+            && claimantResponse.getType() == ClaimantResponseType.ACCEPTATION;
+
     }
 
     @JsonIgnore
@@ -302,7 +303,7 @@ public class CmcClaim implements Claim {
 
     private boolean isApplicant1ResponseDeadlineEnded() {
         return Optional.ofNullable(getIntentionToProceedDeadline()).filter(deadline ->
-                                                                               deadline.isBefore(LocalDateTime.now()))
+                                                                               deadline.isBefore(LocalDate.now()))
             .isPresent() && !hasClaimantResponse();
 
     }

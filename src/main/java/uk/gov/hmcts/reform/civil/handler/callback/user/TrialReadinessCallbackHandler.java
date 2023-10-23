@@ -54,14 +54,15 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         + "you will need to make an application as soon as possible and pay the appropriate fee.";
     public static final String NOT_READY_HEADER = "## You have said this case is not ready for trial or hearing";
     public static final String NOT_READY_BODY = "### What happens next \n\n"
-            + "You can view your and other party's trial arrangements in documents in the case details. "
-            + "If there are any additional changes between now and the hearing date, "
-            + "you will need to make an application as soon as possible and pay the appropriate fee.\n\n"
-            + "The trial will go ahead on the specified date "
-            + "unless a judge makes an order changing the date of the hearing. "
-            + "If you want the date of the hearing to be changed (or any other order to make the case ready for trial)"
-            + "you will need to make an application to the court and pay the appropriate fee.";
+        + "You can view your and other party's trial arrangements in documents in the case details. "
+        + "If there are any additional changes between now and the hearing date, "
+        + "you will need to make an application as soon as possible and pay the appropriate fee.\n\n"
+        + "The trial will go ahead on the specified date "
+        + "unless a judge makes an order changing the date of the hearing. "
+        + "If you want the date of the hearing to be changed (or any other order to make the case ready for trial)"
+        + "you will need to make an application to the court and pay the appropriate fee.";
     private final ObjectMapper objectMapper;
+
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
 
@@ -74,7 +75,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         );
     }
 
-    private CallbackResponse populateValues(CallbackParams callbackParams) {
+    CallbackResponse populateValues(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
@@ -108,22 +109,27 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
-            .data(errors.size() == 0
-                      ? updatedData.build().toMap(objectMapper) : null)
+            .data(errors.isEmpty() ? updatedData.build().toMap(objectMapper) : null)
             .build();
     }
 
-    private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
+    CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
 
-        if (checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE)) {
+        if (checkUserRoles(callbackParams, CaseRole.APPLICANTSOLICITORONE) || checkUserRoles(
+            callbackParams,
+            CaseRole.CLAIMANT
+        )) {
             if (caseData.getTrialReadyApplicant() == YesOrNo.YES) {
                 updatedData.businessProcess(BusinessProcess.ready(APPLICANT_TRIAL_READY_NOTIFY_OTHERS));
             } else {
                 updatedData.businessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_APPLICANT));
             }
-        } else if (checkUserRoles(callbackParams, CaseRole.RESPONDENTSOLICITORONE)) {
+        } else if (checkUserRoles(callbackParams, CaseRole.RESPONDENTSOLICITORONE) || checkUserRoles(
+            callbackParams,
+            CaseRole.DEFENDANT
+        )) {
             if (caseData.getTrialReadyRespondent1() == YesOrNo.YES) {
                 updatedData.businessProcess(BusinessProcess.ready(RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS));
             } else {
@@ -165,7 +171,8 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     private boolean checkUserRoles(CallbackParams callbackParams, CaseRole userRole) {
         UserInfo userInfo = userService.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         return coreCaseUserService.userHasCaseRole(callbackParams.getCaseData().getCcdCaseReference().toString(),
-            userInfo.getUid(), userRole);
+                                                   userInfo.getUid(), userRole
+        );
     }
 
     @Override
