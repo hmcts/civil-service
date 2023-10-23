@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -67,6 +68,12 @@ class UpdateNextHearingDateCallbackHandlerTest extends BaseCallbackHandlerTest {
     static void setupSuite() {
         currentDateMock = mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
         currentDateMock.when(LocalDateTime::now).thenReturn(CURRENT_DATE);
+    }
+
+    @SuppressWarnings("unchecked")
+    @AfterAll
+    static void tearDown() {
+        currentDateMock.reset();
     }
 
     @Nested

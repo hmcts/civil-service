@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -51,6 +52,12 @@ public class HearingUtilsTest {
     static void setupSuite() {
         currentDateMock = mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
         currentDateMock.when(LocalDateTime::now).thenReturn(CURRENT_DATE);
+    }
+
+    @SuppressWarnings("unchecked")
+    @AfterAll
+    static void tearDown() {
+        currentDateMock.reset();
     }
 
     @Test
