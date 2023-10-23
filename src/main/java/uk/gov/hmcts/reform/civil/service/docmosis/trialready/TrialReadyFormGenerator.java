@@ -96,16 +96,12 @@ public class TrialReadyFormGenerator {
     }
 
     private String getTypeUserLastName(Party party) {
-        switch (party.getType()) {
-            case INDIVIDUAL:
-                return party.getIndividualLastName();
-            case COMPANY:
-                return party.getCompanyName();
-            case SOLE_TRADER:
-                return party.getSoleTraderLastName();
-            default:
-                return party.getOrganisationName();
-        }
+        return switch (party.getType()) {
+            case INDIVIDUAL -> party.getIndividualLastName();
+            case COMPANY -> party.getCompanyName();
+            case SOLE_TRADER -> party.getSoleTraderLastName();
+            default -> party.getOrganisationName();
+        };
     }
 
     private TrialReadyForm.TrialReadyFormBuilder completeTrialReadyFormWithOptionalFields(
