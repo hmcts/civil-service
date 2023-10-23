@@ -586,8 +586,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (caseData.getRespondent2DQ() != null) {
             log.info("respondent 2 after nulling " + caseData.getRespondent2DQ());
         }
-
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .state("AWAITING_APPLICANT_INTENTION")
