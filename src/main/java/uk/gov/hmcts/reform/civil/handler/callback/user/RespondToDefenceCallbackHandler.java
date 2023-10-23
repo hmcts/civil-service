@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -83,6 +84,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final LocationRefDataUtil locationRefDataUtil;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final ToggleConfiguration toggleConfiguration;
     private final AssignCategoryId assignCategoryId;
 
     @Override
@@ -110,6 +112,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         updatedData.claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        updatedData.featureToggleWA(toggleConfiguration.getFeatureToggle());
 
         // add document from defendant response documents, to placeholder field for preview during event.
         caseData.getDefendantResponseDocuments().forEach(document -> {

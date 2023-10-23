@@ -372,7 +372,8 @@ public class FlowPredicate {
     public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
         caseData.getReasonNotSuitableSDO() != null
             && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
-            && caseData.getTakenOfflineDate() != null;
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getTakenOfflineByStaffDate() == null;
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension =
         FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt;
@@ -462,7 +463,8 @@ public class FlowPredicate {
     public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
         caseData.getDrawDirectionsOrderRequired() != null
             && caseData.getReasonNotSuitableSDO() == null
-            && caseData.getTakenOfflineDate() != null;
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getTakenOfflineByStaffDate() == null;
 
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
         caseData.getTakenOfflineByStaffDate() != null;
@@ -472,6 +474,17 @@ public class FlowPredicate {
         && caseData.getApplicant1ResponseDate() != null
         && caseData.getDrawDirectionsOrderRequired() == null
         && caseData.getReasonNotSuitableSDO() == null;
+
+    public static final Predicate<CaseData> takenOfflineByStaffAfterSDO = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getDrawDirectionsOrderRequired() != null
+            && caseData.getReasonNotSuitableSDO() == null;
+
+    public static final Predicate<CaseData> takenOfflineAfterNotSuitableForSdo = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getDrawDirectionsOrderRequired() == null
+            && caseData.getReasonNotSuitableSDO() != null
+            && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput());
 
     public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse = caseData ->
         getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(caseData);

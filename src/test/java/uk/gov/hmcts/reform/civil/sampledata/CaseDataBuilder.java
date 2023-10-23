@@ -4679,6 +4679,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateTakenOfflineByStaffAfterSDO(MultiPartyScenario mpScenario) {
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
+            atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+        } else if (mpScenario == TWO_V_ONE) {
+            atStateBothApplicantsRespondToDefenceAndProceed_2v1();
+        }
+
+        drawDirectionsOrderRequired = NO;
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = applicant1ResponseDate.plusDays(1);
+        takenOfflineByStaffDate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder atStateApplicantProceedAllMediation(MultiPartyScenario mpScenario) {
 
         applicant1ClaimMediationSpecRequired = new SmallClaimMedicalLRspec(YES);

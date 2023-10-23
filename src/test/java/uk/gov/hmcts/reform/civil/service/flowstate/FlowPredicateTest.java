@@ -100,6 +100,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.responde
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterNotSuitableForSdo;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
@@ -110,6 +111,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOff
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterDefendantResponse;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterSDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeClaimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeMediationUnsuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
@@ -3010,6 +3012,27 @@ class FlowPredicateTest {
                 .build();
             assertFalse(takenOfflineSDONotDrawn.test(caseData));
             assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffAfterSdoDrawn() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaffAfterSDO(MultiPartyScenario.ONE_V_ONE)
+                .build();
+            assertFalse(takenOfflineSDONotDrawn.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+            assertTrue(takenOfflineByStaffAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffAfterNotSuitableSdo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build();
+            assertFalse(takenOfflineSDONotDrawn.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+            assertTrue(takenOfflineAfterNotSuitableForSdo.test(caseData));
         }
     }
 
