@@ -394,6 +394,8 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @Test
     void givenClaimStatusInProcessHeritageSystem_WhenGetStatus_thenReturnResponseByPost() {
+        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
