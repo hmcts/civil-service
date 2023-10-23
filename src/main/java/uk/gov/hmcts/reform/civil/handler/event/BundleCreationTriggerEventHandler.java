@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -43,7 +41,7 @@ public class BundleCreationTriggerEventHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
 
-    
+
     /**
      * This method will call bundle API and save required details in case data.
      * If there is any existing bundle then new bundle will be added to existing list of bundles.
@@ -69,9 +67,7 @@ public class BundleCreationTriggerEventHandler {
     IdValue<Bundle> prepareNewBundle(uk.gov.hmcts.reform.civil.model.bundle.Bundle bundle, CaseData caseData) {
         Bundle result = Bundle.builder()
             .bundleHearingDate(Optional.of(caseData.getHearingDate()))
-            .stitchedDocument(Optional.ofNullable(
-                    deepCopyWithCategoryId(bundle.getValue().getStitchedDocument(),
-                            DocCategory.BUNDLES.getValue())))
+            .stitchedDocument(Optional.ofNullable(bundle.getValue().getStitchedDocument()))
             .fileName(bundle.getValue().getFileName())
             .title(bundle.getValue().getTitle())
             .description(null != bundle.getValue().getDescription()
@@ -80,16 +76,6 @@ public class BundleCreationTriggerEventHandler {
             .createdOn(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
             .id(bundle.getValue().getId()).build();
         return new IdValue<>(result.getId(), result);
-    }
-
-    private Document deepCopyWithCategoryId(Document sourceDocument, String theID) {
-        return Document.builder()
-                .categoryID(theID)
-                .documentFileName(sourceDocument.getDocumentFileName())
-                .documentBinaryUrl(sourceDocument.getDocumentBinaryUrl())
-                .documentHash(sourceDocument.getDocumentHash())
-                .documentUrl(sourceDocument.getDocumentUrl())
-                .build();
     }
 
     CaseDataContent prepareCaseContent(List<IdValue<Bundle>> caseBundles, StartEventResponse startEventResponse) {
