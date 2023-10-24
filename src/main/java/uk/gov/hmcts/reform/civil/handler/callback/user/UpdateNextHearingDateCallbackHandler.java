@@ -14,10 +14,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.NextHearingDetails;
 import uk.gov.hmcts.reform.civil.service.nexthearingdate.NextHearingDateCamundaService;
 import uk.gov.hmcts.reform.civil.service.nexthearingdate.NextHearingDateVariables;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +36,7 @@ public class UpdateNextHearingDateCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(UPDATE_NEXT_HEARING_DETAILS);
     private final HearingsService hearingsService;
     private final NextHearingDateCamundaService camundaService;
+    private final DateUtils dateUtils;
 
     private final ObjectMapper objectMapper;
 
@@ -61,7 +64,8 @@ public class UpdateNextHearingDateCallbackHandler extends CallbackHandler {
                 callbackParams.getRequest().getCaseDetails().getId(),
                 "LISTED"
             );
-            updatedData.nextHearingDetails(HearingUtils.getNextHearingDetails(hearingsResponse));
+            LocalDateTime today = dateUtils.now();
+            updatedData.nextHearingDetails(HearingUtils.getNextHearingDetails(hearingsResponse, today));
         } else if (variables.getUpdateType().equals(UPDATE)) {
             // Process was triggered via the hmc message bus with updateType UPDATE so next hearing details are provided.
             updatedData.nextHearingDetails(

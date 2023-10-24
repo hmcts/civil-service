@@ -160,8 +160,8 @@ public class HearingUtils {
         return  caseHearings.get(0);
     }
 
-    public static LocalDateTime getNextHearingDate(CaseHearing caseHearing) {
-        LocalDateTime yesterday = LocalDateTime.now()
+    public static LocalDateTime getNextHearingDate(CaseHearing caseHearing, LocalDateTime currentDate) {
+        LocalDateTime yesterday = currentDate
             .minusDays(1)
             .withHour(23)
             .withMinute(59)
@@ -175,14 +175,14 @@ public class HearingUtils {
         return nextHearingDay.isPresent() ? nextHearingDay.get().getHearingStartDateTime() : null;
     }
 
-    public static NextHearingDetails getNextHearingDetails(HearingsResponse hearingsResponse) {
+    public static NextHearingDetails getNextHearingDetails(HearingsResponse hearingsResponse, LocalDateTime currentDate) {
         CaseHearing activeHearing = getActiveHearing(hearingsResponse);
-        LocalDateTime nextHearingDate = getNextHearingDate(activeHearing);
+        LocalDateTime nextHearingDate = getNextHearingDate(activeHearing, currentDate);
 
         if (nextHearingDate != null) {
             return NextHearingDetails.builder()
                 .hearingID(activeHearing.getHearingId().toString())
-                .hearingDateTime(nextHearingDate)
+                .hearingDateTime(DateUtils.convertFromUTC(nextHearingDate))
                 .build();
         }
 

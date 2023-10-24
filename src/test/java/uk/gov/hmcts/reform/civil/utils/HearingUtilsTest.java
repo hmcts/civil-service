@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -9,8 +8,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -36,22 +33,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mockStatic;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.EXCEPTION;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 
 public class HearingUtilsTest {
-
-    private static final LocalDateTime CURRENT_DATE = LocalDateTime.of(2024, 01, 06, 0, 0, 0);
-    private static MockedStatic currentDateMock;
-
-    @SuppressWarnings("unchecked")
-    @BeforeAll
-    static void setupSuite() {
-        currentDateMock = mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
-        currentDateMock.when(LocalDateTime::now).thenReturn(CURRENT_DATE);
-    }
 
     @Test
     void shouldThrowNullException_whenGivenNullDate() {
@@ -211,6 +197,8 @@ public class HearingUtilsTest {
 
     @Nested
     class GetActiveHearing {
+        private final LocalDateTime currentDate = LocalDateTime.of(2024, 01, 06, 0, 0, 0);
+
         @Test
         void shouldReturnActiveHearing_whenAListedHearingExists() {
             CaseHearing canceledHearing = CaseHearing.builder()
@@ -265,6 +253,7 @@ public class HearingUtilsTest {
     class GetNextHearingDate {
 
         private final String hearingId = "12345";
+        private final LocalDateTime currentDate = LocalDateTime.of(2024, 01, 06, 0, 0, 0);
 
         @Test
         void shouldReturnNull_forGivenHearingWithElapsedHearingDays() {
@@ -280,7 +269,7 @@ public class HearingUtilsTest {
                     ))
                     .build();
 
-            LocalDateTime actual = HearingUtils.getNextHearingDate(hearing);
+            LocalDateTime actual = HearingUtils.getNextHearingDate(hearing, currentDate);
 
             assertNull(actual);
         }
@@ -301,7 +290,7 @@ public class HearingUtilsTest {
                     ))
                     .build();
 
-            LocalDateTime actual = HearingUtils.getNextHearingDate(hearing);
+            LocalDateTime actual = HearingUtils.getNextHearingDate(hearing, currentDate);
 
             assertEquals(nextHearingDate, actual);
         }
@@ -322,7 +311,7 @@ public class HearingUtilsTest {
                     ))
                     .build();
 
-            LocalDateTime actual = HearingUtils.getNextHearingDate(hearing);
+            LocalDateTime actual = HearingUtils.getNextHearingDate(hearing, currentDate);
 
             assertEquals(nextHearingDate, actual);
         }
@@ -332,6 +321,7 @@ public class HearingUtilsTest {
     class GetNextHearingDetails {
 
         private final String hearingId = "12345";
+        private final LocalDateTime currentDate = LocalDateTime.of(2024, 01, 06, 0, 0, 0);
 
         @Test
         void shouldReturnExpectedNextHearingDetails_forGivenHearingsWithFutureHearings() {
@@ -349,7 +339,7 @@ public class HearingUtilsTest {
                         )).build()))
                 .build();
 
-            NextHearingDetails actual = HearingUtils.getNextHearingDetails(hearingsResponse);
+            NextHearingDetails actual = HearingUtils.getNextHearingDetails(hearingsResponse, currentDate);
             NextHearingDetails expected = NextHearingDetails.builder()
                 .hearingID(hearingId)
                 .hearingDateTime(nextHearingDate)
@@ -374,7 +364,7 @@ public class HearingUtilsTest {
                         )).build()))
                 .build();
 
-            NextHearingDetails actual = HearingUtils.getNextHearingDetails(hearingsResponse);
+            NextHearingDetails actual = HearingUtils.getNextHearingDetails(hearingsResponse, currentDate);
 
             assertNull(actual);
         }
@@ -390,7 +380,7 @@ public class HearingUtilsTest {
                 )).build();
 
             assertThrows(IllegalArgumentException.class, () -> {
-                HearingUtils.getNextHearingDetails(hearingsResponse);
+                HearingUtils.getNextHearingDetails(hearingsResponse, currentDate);
             }, "No listed hearing was found.");
         }
     }

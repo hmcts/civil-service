@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.springframework.stereotype.Component;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+@Component
 public class DateUtils {
 
     private DateUtils() {
@@ -28,5 +31,9 @@ public class DateUtils {
             }
         }
         return result;
+    }
+
+    public LocalDateTime now() {
+        return LocalDateTime.now();
     }
 }

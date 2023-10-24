@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.nexthearingdate.NextHearingDateCamundaService;
 import uk.gov.hmcts.reform.civil.service.nexthearingdate.NextHearingDateVariables;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
@@ -32,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -56,17 +54,16 @@ class UpdateNextHearingDateCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private NextHearingDateCamundaService camundaService;
 
+    @MockBean
+    private DateUtils dateUtils;
+
     @Autowired
     private ObjectMapper objectMapper;
 
-    private static final LocalDateTime CURRENT_DATE = LocalDateTime.of(2024, 01, 06, 0, 0, 0);
-    private static MockedStatic currentDateMock;
-
     @SuppressWarnings("unchecked")
-    @BeforeAll
-    static void setupSuite() {
-        currentDateMock = mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
-        currentDateMock.when(LocalDateTime::now).thenReturn(CURRENT_DATE);
+    @BeforeEach
+    void setupSuite() {
+        when(dateUtils.now()).thenReturn(LocalDateTime.of(2024, 01, 06, 0, 0, 0));
     }
 
     @Nested
