@@ -336,10 +336,10 @@ public class BundleRequestMapper {
                                                                         boolean sortByCreatedDate) {
         log.error("boolean : " + sortByCreatedDate);
         uploadEvidenceDocType.forEach(uploadEvidenceDocumentTypeElement -> {
-            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
-            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
-            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
-            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
+            log.error("element doc : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
+            log.error("element created date : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
+            log.error("element issue date : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
+            log.error("element type of doc : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
         });
         if (sortByCreatedDate) {
             uploadEvidenceDocType.sort(Comparator.comparing(
@@ -536,10 +536,10 @@ public class BundleRequestMapper {
         boolean doesNotMatchType) {
         log.error("list : " + documentEvidenceForTrial.size());
         documentEvidenceForTrial.forEach(uploadEvidenceDocumentTypeElement -> {
-            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
-            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
-            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
-            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
+            log.error("element doc : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
+            log.error("element created date : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
+            log.error("element issue date : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
+            log.error("element type of doc : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
         });
         sortEvidenceUploadByDate(documentEvidenceForTrial, false);
         return documentEvidenceForTrial.stream().filter(uploadEvidenceDocumentTypeElement -> matchType(
