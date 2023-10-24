@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.handler.HmcMessageHandler;
 
 public class HandleHMCMessageTaskListener {
 
-    private static final String TOPIC = "HANDLE_HMC_MESSAGE";
+    private static final String TOPIC = "HANDLE_HMC_MESSAGE_TASK";
 
     @Autowired
     private HandleHMCMessageTaskListener(HmcMessageHandler hmcMessageHandler,
