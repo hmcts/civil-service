@@ -1318,6 +1318,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData().get("respondent2DQExperts")).isNull();
 
     }
+
     @Test
     void shouldUpdateExpertEvents_whenInvokedAndUpdateContactDetailsEnabled_FullAdmission() {
         // Given
@@ -1376,6 +1377,45 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2Copy(PartyBuilder.builder().individual().build())
             .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .ccdCaseReference(354L)
+            .respondent1ResponseDate(dateTime).build().toBuilder()
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1DQExperts")).isNotNull();
+        assertThat(response.getData().get("respondent2DQExperts")).isNull();
+
+    }
+
+    @Test
+    void shouldUpdateExpertEvents_whenInvokedAndUpdateContactDetailsEnabled_V2DraftDirections() {
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQExperts(Experts.builder()
+                                                         .details(wrapElements(Expert.builder().build())).build())
+                               .build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder()
+                               .respondent2DQDraftDirections(Document.builder().build()).build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .ccdCaseReference(354L)
@@ -1652,6 +1692,66 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldUpdateCorrespondence1_whenProvided1v2ss_withSameResponse_withv2copyAndNoTempAdr() {
+        // Given
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        var testDocument = ResponseDocument.builder()
+            .file(Document.builder().documentUrl("fake-url").documentFileName("file-name").documentBinaryUrl("binary-url").build()).build();
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .ccdCaseReference(354L)
+            .respondent1SpecDefenceResponseDocument(testDocument)
+            .respondent2SpecDefenceResponseDocument(testDocument)
+            .isRespondent1(YesOrNo.YES)
+            .respondentResponseIsSame(YES)
+            .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+            .respondentSolicitor1ServiceAddress(
+                Address.builder()
+                    .postCode("new postcode")
+                    .build()
+            )
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("Company 3")
+                             .build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(YES)
+            .tempAddress2Required(NO)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
+            .extracting("PostCode")
+            .isEqualTo("new postcode");
+        assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
+            .extracting("PostCode")
+            .isNull();
+        assertEquals(
+            response.getData().get("specRespondentCorrespondenceAddressdetails"),
+            response.getData().get("specRespondent2CorrespondenceAddressdetails")
+        );
+        assertEquals(
+            response.getData().get("specRespondentCorrespondenceAddressRequired"),
+            response.getData().get("specRespondent2CorrespondenceAddressRequired")
+        );
+    }
+
+    @Test
     void shouldUpdateCorrespondence2_whenProvided() {
         // Given
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -1834,6 +1934,26 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
                 .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
         }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination2_CanAddApplicant2() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_CounterClaimX2()
+                .addApplicant2(YES)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
+        }
+
 
         /**
          * if solicitor says that each defendant gets their response but then chooses the same
@@ -2666,6 +2786,50 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1DQ(Respondent1DQ.builder()
                                    .respondent1DQHearingSmallClaim(SmallClaimHearing.builder().unavailableDatesRequired(
                                        YES).build()).build())
+                .build();
+            List<String> errors = Collections.singletonList("error 1");
+            Mockito.when(dateValidator.validateSmallClaimsHearing(any())).thenReturn(errors);
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-unavailable-dates");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
+        public void shouldThrowError_whenValidateRespondentExpertsMultipartyWithNoUnavailableDates_DisputesTheClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQHearingSmallClaim(SmallClaimHearing.builder().unavailableDatesRequired(
+                                       YES).build()).build())
+                .build();
+            List<String> errors = Collections.singletonList("error 1");
+            Mockito.when(dateValidator.validateFastClaimHearing(any())).thenReturn(errors);
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-unavailable-dates");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
+        public void shouldThrowError_whenValidateRespondentExpertsMultipartyWithNoUnavailableDates_V2() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQHearingSmallClaim(SmallClaimHearing.builder().unavailableDatesRequired(
+                                       YES).build()).build())
+                .respondent2DQ(Respondent2DQ.builder()
+                                   .respondent2DQHearingSmallClaim(SmallClaimHearing.builder().unavailableDatesRequired(
+                                       YES).build()).build())
+                .isRespondent2(YES)
                 .build();
             List<String> errors = Collections.singletonList("error 1");
             Mockito.when(dateValidator.validateSmallClaimsHearing(any())).thenReturn(errors);
