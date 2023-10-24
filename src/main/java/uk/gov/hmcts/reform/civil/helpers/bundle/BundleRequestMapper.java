@@ -527,6 +527,13 @@ public class BundleRequestMapper {
     public List<Element<UploadEvidenceDocumentType>> filterDocumentaryEvidenceForTrialDocs(
         List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial, List<String> displayNames,
         boolean doesNotMatchType) {
+        log.error("list : " + documentEvidenceForTrial.size());
+        documentEvidenceForTrial.forEach(uploadEvidenceDocumentTypeElement -> {
+            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
+            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
+            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
+            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
+        });
         sortEvidenceUploadByDate(documentEvidenceForTrial, false);
         return documentEvidenceForTrial.stream().filter(uploadEvidenceDocumentTypeElement -> matchType(
             uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument(),
