@@ -56,7 +56,7 @@ class SendFinalOrderBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(JUDGE_FINAL_ORDER).documentLink(DOCUMENT_LINK).build()))
             .respondent1(respondent1)
             .build().toBuilder()
-            .finalOrderDocument(DOCUMENT_LINK).build();
+            .finalOrderDocumentCollection(wrapElements(CaseDocument.builder().documentType(JUDGE_FINAL_ORDER).documentLink(DOCUMENT_LINK).build())).build();
         given(documentDownloadService.downloadDocument(any(), any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
 
         // when
@@ -80,7 +80,7 @@ class SendFinalOrderBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(JUDGE_FINAL_ORDER).documentLink(DOCUMENT_LINK).build()))
             .applicant1(claimant)
             .build().toBuilder()
-            .finalOrderDocument(DOCUMENT_LINK).build();
+            .finalOrderDocumentCollection(wrapElements(CaseDocument.builder().documentType(JUDGE_FINAL_ORDER).documentLink(DOCUMENT_LINK).build())).build();
         given(documentDownloadService.downloadDocument(any(), any())).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
 
         // when
@@ -167,7 +167,7 @@ class SendFinalOrderBulkPrintServiceTest {
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(JUDGE_FINAL_ORDER).documentLink(DOCUMENT_LINK).build()))
             .respondent1(respondent1)
             .build().toBuilder()
-            .finalOrderDocument(DOCUMENT_LINK).build();
+            .finalOrderDocumentCollection(wrapElements(CaseDocument.builder().documentType(JUDGE_FINAL_ORDER).documentLink(DOCUMENT_LINK).build())).build();
         given(documentDownloadService.downloadDocument(any(), any())).willReturn(new DownloadedDocumentResponse(null, null, null));
 
         // when // then

@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
@@ -23,15 +23,15 @@ public class SendFinalOrderBulkPrintService {
 
     public void sendFinalOrderToLIP(String authorisation, CaseData caseData, String task) {
         if (checkFinalOrderDocumentAvailable(caseData)) {
-            Document document = caseData.getFinalOrderDocument();
-            String documentUrl = document.getDocumentUrl();
+            CaseDocument caseDocument = caseData.getFinalOrderDocumentCollection().get(0).getValue();
+            String documentUrl = caseDocument.getDocumentLink().getDocumentUrl();
             String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
             byte[] letterContent;
             try {
                 letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
             } catch (Exception e) {
                 log.error("Failed getting letter content for Final Order ");
-                throw new DocumentDownloadException(document.getDocumentFileName(), e);
+                throw new DocumentDownloadException(caseDocument.getDocumentName(), e);
             }
             List<String> recipients = getRecipientsList(caseData, task);
             bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
@@ -42,7 +42,8 @@ public class SendFinalOrderBulkPrintService {
     private boolean checkFinalOrderDocumentAvailable(CaseData caseData) {
         return nonNull(caseData.getSystemGeneratedCaseDocuments())
             && !caseData.getSystemGeneratedCaseDocuments().isEmpty()
-            && nonNull(caseData.getFinalOrderDocument());
+            && nonNull(caseData.getFinalOrderDocumentCollection())
+            && !caseData.getFinalOrderDocumentCollection().isEmpty();
     }
 
     private boolean isDefendantPrint(String task) {
