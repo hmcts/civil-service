@@ -348,7 +348,8 @@ public class BundleRequestMapper {
                 Comparator.reverseOrder()
             ));
         } else {
-            uploadEvidenceDocType.stream().filter(uploadEvidenceDocumentTypeElement -> Objects.nonNull(uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate())).collect(
+            uploadEvidenceDocType.stream().filter(uploadEvidenceDocumentTypeElement ->
+                                                      Objects.nonNull(uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate())).collect(
                 Collectors.toList()).sort(Comparator.comparing(
                 uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getDocumentIssuedDate(),
                 Comparator.reverseOrder()
