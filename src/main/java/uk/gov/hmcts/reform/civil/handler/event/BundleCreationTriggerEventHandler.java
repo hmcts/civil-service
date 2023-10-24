@@ -2,14 +2,11 @@ package uk.gov.hmcts.reform.civil.handler.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.event.BundleCreationTriggerEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -38,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 @AllArgsConstructor
 public class BundleCreationTriggerEventHandler {
 
-    @Autowired
     private BundleCreationService bundleCreationService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -69,9 +65,7 @@ public class BundleCreationTriggerEventHandler {
     IdValue<Bundle> prepareNewBundle(uk.gov.hmcts.reform.civil.model.bundle.Bundle bundle, CaseData caseData) {
         Bundle result = Bundle.builder()
             .bundleHearingDate(Optional.of(caseData.getHearingDate()))
-            .stitchedDocument(Optional.ofNullable(
-                    deepCopyWithCategoryId(bundle.getValue().getStitchedDocument(),
-                            DocCategory.BUNDLES.getValue())))
+            .stitchedDocument(Optional.ofNullable(bundle.getValue().getStitchedDocument()))
             .fileName(bundle.getValue().getFileName())
             .title(bundle.getValue().getTitle())
             .description(null != bundle.getValue().getDescription()
@@ -80,16 +74,6 @@ public class BundleCreationTriggerEventHandler {
             .createdOn(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
             .id(bundle.getValue().getId()).build();
         return new IdValue<>(result.getId(), result);
-    }
-
-    private Document deepCopyWithCategoryId(Document sourceDocument, String theID) {
-        return Document.builder()
-                .categoryID(theID)
-                .documentFileName(sourceDocument.getDocumentFileName())
-                .documentBinaryUrl(sourceDocument.getDocumentBinaryUrl())
-                .documentHash(sourceDocument.getDocumentHash())
-                .documentUrl(sourceDocument.getDocumentUrl())
-                .build();
     }
 
     CaseDataContent prepareCaseContent(List<IdValue<Bundle>> caseBundles, StartEventResponse startEventResponse) {
