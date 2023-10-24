@@ -171,6 +171,7 @@ public class TestingSupportController {
         try {
             bundleCreationTriggerEventHandler.sendBundleCreationTrigger(event);
         } catch (Exception e) {
+            log.error("Error in bundle " + e);
             responseMsg = "failed";
         }
         return new ResponseEntity<>(responseMsg, HttpStatus.OK);
