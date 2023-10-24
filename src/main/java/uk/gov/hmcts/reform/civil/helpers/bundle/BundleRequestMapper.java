@@ -28,13 +28,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -340,9 +334,10 @@ public class BundleRequestMapper {
                 Comparator.reverseOrder()
             ));
         } else {
-            uploadEvidenceDocType.sort(Comparator.comparing(
-                uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getDocumentIssuedDate(),
-                Comparator.reverseOrder()
+            uploadEvidenceDocType.stream().filter(uploadEvidenceDocumentTypeElement ->
+                                                      Objects.nonNull(uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate())).collect(
+                Collectors.toList()).sort(Comparator.comparing(
+                uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getDocumentIssuedDate(), Comparator.reverseOrder()
             ));
         }
     }
