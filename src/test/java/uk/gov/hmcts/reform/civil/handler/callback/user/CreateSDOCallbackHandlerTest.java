@@ -194,8 +194,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
             caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .build().toBuilder()
+                .disposalHearingMethodInPerson(options)
+                .fastTrackMethodInPerson(options)
+                .smallClaimsMethodInPerson(options)
                 .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
@@ -249,6 +255,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
                 .disposalHearingMethodInPerson(options)
+                .fastTrackMethodInPerson(options)
+                .smallClaimsMethodInPerson(options)
                 .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
                 .caseManagementLocation(previousManagementLocation)
                 .build();
@@ -314,6 +322,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+                .disposalHearingMethodInPerson(options)
+                .fastTrackMethodInPerson(options)
                 .smallClaimsMethodInPerson(options)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .caseManagementLocation(previousManagementLocation)
@@ -372,7 +382,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotUpdateCaseLocation_whenSmallClaimsAndOrderRequired() {
             List<String> items = List.of("label 1", "label 2", "label 3");
-            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
+            DynamicList options = DynamicList.fromList(items, Object::toString, Object::toString, items.get(0), false);
             CaseLocationCivil previousManagementLocation = CaseLocationCivil.builder()
                 .region("previous region")
                 .baseLocation("previous base location")
@@ -380,6 +390,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+                .fastTrackMethodInPerson(options)
+                .disposalHearingMethodInPerson(options)
                 .smallClaimsMethodInPerson(options)
                 .drawDirectionsOrderRequired(YesOrNo.YES)
                 .drawDirectionsOrderSmallClaims(YesOrNo.YES)
@@ -404,8 +416,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnNullDocument_whenInvokedAboutToSubmit() {
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, Object::toString, items.get(0), false);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .build().toBuilder()
+                .fastTrackMethodInPerson(options)
+                .disposalHearingMethodInPerson(options)
+                .smallClaimsMethodInPerson(options)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
