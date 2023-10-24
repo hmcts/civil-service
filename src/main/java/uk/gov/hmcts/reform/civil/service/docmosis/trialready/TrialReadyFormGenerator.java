@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -36,12 +35,12 @@ public class TrialReadyFormGenerator {
     private static final String TASK_ID_APPLICANT = "GenerateTrialReadyFormApplicant";
     private static final String TASK_ID_RESPONDENT1 = "GenerateTrialReadyFormRespondent1";
 
-    public CaseDocument generate(CaseData caseData, String authorisation, String camundaActivity, CaseRole userRole) {
+    public CaseDocument generate(CaseData caseData, String authorisation, String camundaActivity) {
         TrialReadyForm templateData = getTemplateData(caseData, camundaActivity);
 
         DocmosisTemplates template = TRIAL_READY;
         DocmosisDocument document = documentGeneratorService.generateDocmosisDocument(templateData, template);
-        CaseDocument trialReadyDocument = documentManagementService.uploadDocument(
+        return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
                 getFileName(caseData, template, camundaActivity),
@@ -49,8 +48,6 @@ public class TrialReadyFormGenerator {
                 DocumentType.TRIAL_READY_DOCUMENT
             )
         );
-
-        return trialReadyDocument.toBuilder().ownedBy(userRole).build();
     }
 
     private TrialReadyForm getTemplateData(CaseData caseData, String camundaActivity) {
