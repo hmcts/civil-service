@@ -561,13 +561,14 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         }
 
         if (selectedRole.equals(RESPONDENTSOLICITORONE.name()) || selectedRole.equals(SELECTED_VALUE_DEF_BOTH)) {
-            caseData.getDocumentEvidenceForTrialRes().forEach(uploadEvidenceDocumentTypeElement -> {
-                log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
-                log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
-                log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
-                log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
-            });
-
+            if (caseData.getDocumentEvidenceForTrialRes() != null) {
+                caseData.getDocumentEvidenceForTrialRes().forEach(uploadEvidenceDocumentTypeElement -> {
+                    log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
+                    log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
+                    log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
+                    log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
+                });
+            }
             setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureListRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_DISCLOSURE_LIST);
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosureRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_DISCLOSURE);
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatementRes(), document -> document.getValue().getWitnessOptionDocument(), RESPONDENT_ONE_WITNESS_STATEMENT);
@@ -588,13 +589,14 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             }
         }
         if (selectedRole.equals(RESPONDENTSOLICITORTWO.name())) {
-            caseData.getDocumentEvidenceForTrialRes2().forEach(uploadEvidenceDocumentTypeElement -> {
-                log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
-                log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
-                log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
-                log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
-            });
-
+            if (caseData.getDocumentEvidenceForTrialRes2() != null) {
+                caseData.getDocumentEvidenceForTrialRes2().forEach(uploadEvidenceDocumentTypeElement -> {
+                    log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
+                    log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
+                    log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
+                    log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
+                });
+            }
             setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureListRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_DISCLOSURE_LIST);
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosureRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_DISCLOSURE);
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatementRes2(), document -> document.getValue().getWitnessOptionDocument(), RESPONDENT_TWO_WITNESS_STATEMENT);
@@ -613,12 +615,14 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         }
 
         if (selectedRole.equals(CaseRole.APPLICANTSOLICITORONE.name()) || selectedRole.equals(SELECTED_VALUE_APP_BOTH)) {
-            caseData.getDocumentEvidenceForTrial().forEach(uploadEvidenceDocumentTypeElement -> {
-                log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
-                log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
-                log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
-                log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
-            });
+            if (caseData.getDocumentEvidenceForTrial() != null) {
+                caseData.getDocumentEvidenceForTrial().forEach(uploadEvidenceDocumentTypeElement -> {
+                    log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
+                    log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
+                    log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
+                    log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
+                });
+            }
             setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureList(), document -> document.getValue().getDocumentUpload(), APPLICANT_DISCLOSURE_LIST);
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosure(), document -> document.getValue().getDocumentUpload(), APPLICANT_DISCLOSURE);
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatement(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_WITNESS_STATEMENT);
