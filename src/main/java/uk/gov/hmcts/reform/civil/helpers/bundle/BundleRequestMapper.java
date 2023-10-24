@@ -351,8 +351,7 @@ public class BundleRequestMapper {
             uploadEvidenceDocType.stream().filter(uploadEvidenceDocumentTypeElement ->
                                                       Objects.nonNull(uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate())).collect(
                 Collectors.toList()).sort(Comparator.comparing(
-                uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getDocumentIssuedDate(),
-                Comparator.reverseOrder()
+                    uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getDocumentIssuedDate(), Comparator.reverseOrder()
             ));
         }
     }
