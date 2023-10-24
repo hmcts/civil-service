@@ -334,6 +334,13 @@ public class BundleRequestMapper {
 
     private void  sortEvidenceUploadByDate(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocType,
                                                                         boolean sortByCreatedDate) {
+        log.error("boolean : " + sortByCreatedDate);
+        uploadEvidenceDocType.forEach(uploadEvidenceDocumentTypeElement -> {
+            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
+            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
+            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
+            log.error("element : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
+        });
         if (sortByCreatedDate) {
             uploadEvidenceDocType.sort(Comparator.comparing(
                 uploadEvidenceWitnessElement -> uploadEvidenceWitnessElement.getValue().getCreatedDatetime(),
