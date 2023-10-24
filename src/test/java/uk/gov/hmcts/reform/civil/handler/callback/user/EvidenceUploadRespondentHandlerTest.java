@@ -119,8 +119,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setup() {
         given(time.now()).willReturn(LocalDateTime.now());
-        given(userRoleCaching.getUserRoles(anyString(), anyString()))
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
             .willReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()));
+        given(userRoleCaching.getCacheKeyToken(anyString())).willReturn("1234");
     }
 
     @Test
@@ -209,7 +210,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
             .build();
-        given(userRoleCaching.getUserRoles(anyString(), anyString()))
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
             .willReturn(List.of(RESPONDENTSOLICITORTWO.getFormattedName()));
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
@@ -228,7 +229,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
             .build();
-        given(userRoleCaching.getUserRoles(anyString(), anyString()))
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
             .willReturn(List.of(RESPONDENTSOLICITORTWO.getFormattedName()));
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
@@ -998,7 +999,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .documentForDisclosureRes2(documentList)
             .build();
-        given(userRoleCaching.getUserRoles(anyString(), anyString()))
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
             .willReturn(List.of(RESPONDENTSOLICITORTWO.getFormattedName()));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1024,7 +1025,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .documentForDisclosureRes2(documentList)
             .build();
-        given(userRoleCaching.getUserRoles(anyString(), anyString()))
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
             .willReturn(List.of(RESPONDENTSOLICITORTWO.getFormattedName()));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1087,7 +1088,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(YES)
             .build();
-        given(userRoleCaching.getUserRoles(anyString(), anyString()))
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
             .willReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1414,7 +1415,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                 .documentCostsRes2(createEvidenceDocs(null, null))
                 .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        given(userRoleCaching.getUserRoles(anyString(), anyString()))
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
             .willReturn(List.of(RESPONDENTSOLICITORTWO.getFormattedName()));
 
         // When handle is called

@@ -103,7 +103,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setup() {
         given(time.now()).willReturn(LocalDateTime.now());
-        given(userRoleCaching.getUserRoles(anyString(), anyString()))
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
             .willReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
     }
 

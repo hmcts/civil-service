@@ -212,8 +212,10 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     CallbackResponse createShow(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        List<String> userRoles = userRoleCaching.getUserRoles(callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                     caseData.getCcdCaseReference().toString());
+        String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
+        String keyToken = userRoleCaching.getCacheKeyToken(bearerToken);
+        List<String> userRoles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef, keyToken);
 
         return createShowCondition(callbackParams.getCaseData(), userRoles);
     }
@@ -1061,9 +1063,10 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             }
             return CaseRole.APPLICANTSOLICITORONE.name();
         } else {
-            List<String> userRoles =
-                userRoleCaching.getUserRoles(callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                                                             caseData.getCcdCaseReference().toString());
+            String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+            String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
+            String keyToken = userRoleCaching.getCacheKeyToken(bearerToken);
+            List<String> userRoles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef, keyToken);
             if (isResp2(multiParts, caseData, userRoles)) {
                 return CaseRole.RESPONDENTSOLICITORTWO.name();
             }
