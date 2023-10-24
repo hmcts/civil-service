@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -21,4 +22,5 @@ public class UserRoleCaching {
         UserInfo userInfo = userService.getUserInfo(bearerToken);
         return coreCaseUserService.getUserCaseRoles(ccdCaseRef, userInfo.getUid());
     }
+
 }

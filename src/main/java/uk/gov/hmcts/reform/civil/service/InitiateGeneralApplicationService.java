@@ -4,10 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
-import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRolesResource;
-import uk.gov.hmcts.reform.civil.config.CrossAccessUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -32,9 +28,9 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -62,6 +58,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
 @Service
 @RequiredArgsConstructor
@@ -71,14 +69,8 @@ public class InitiateGeneralApplicationService {
 
     private final InitiateGeneralApplicationServiceHelper helper;
     private final GeneralAppsDeadlinesCalculator deadlinesCalculator;
-    private final CaseAccessDataStoreApi caseAccessDataStoreApi;
-    private final UserService userService;
-    private final CrossAccessUserConfiguration crossAccessUserConfiguration;
-
-    private final OrganisationApi organisationApi;
-    private final AuthTokenGenerator authTokenGenerator;
+    private final UserRoleCaching userRoleCaching;
     private final LocationRefDataService locationRefDataService;
-    private final FeatureToggleService featureToggleService;
 
     private static final int NUMBER_OF_DEADLINE_DAYS = 5;
     public static final String GA_DOC_CATEGORY_ID = "applications";
@@ -301,35 +293,20 @@ public class InitiateGeneralApplicationService {
         }
     }
 
-    public boolean respondentAssigned(CaseData caseData) {
+    public boolean respondentAssigned(CaseData caseData, String authToken) {
         String caseId = caseData.getCcdCaseReference().toString();
-        CaseAssignedUserRolesResource userRoles = getUserRolesOnCase(caseId);
+        List<String> userRoles = userRoleCaching.getUserRoles(authToken, caseId);
         List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
-
-        for (String respondentCaseRole : respondentCaseRoles) {
-            if (userRoles.getCaseAssignedUserRoles() == null
-                    || userRoles.getCaseAssignedUserRoles().stream()
-                    .noneMatch(a -> a.getCaseRole() != null && respondentCaseRole.equals(a.getCaseRole()))) {
+        if (userRoles.isEmpty() || !isRespondentSolicitorOne(respondentCaseRoles)
+            || (respondentCaseRoles.size() > 1 && !isRespondentSolicitorTwo(respondentCaseRoles))) {
                 return false;
             }
-        }
+
         return true;
     }
 
     public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails) {
         return helper.isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
-    }
-
-    private CaseAssignedUserRolesResource getUserRolesOnCase(String caseId) {
-        String accessToken = userService.getAccessToken(
-                crossAccessUserConfiguration.getUserName(),
-                crossAccessUserConfiguration.getPassword()
-        );
-        return caseAccessDataStoreApi.getUserRoles(
-                accessToken,
-                authTokenGenerator.generate(),
-                List.of(caseId)
-        );
     }
 
     private List<String> getRespondentCaseRoles(CaseData caseData) {
