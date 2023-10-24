@@ -133,7 +133,7 @@ public class DashboardClaimInfoService {
             .claimAmount(nonNull(caseData.getTotalClaimAmount()) ? caseData.getTotalClaimAmount() : null)
             .admittedAmount(caseData.getPartAdmitPaidValuePounds())
             .responseDeadlineTime(caseData.getRespondent1ResponseDeadline())
-            .status(dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(caseData)))
+            .status(dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(caseData, featureToggleService)))
             .build();
         if (caseData.getRespondent1ResponseDeadline() != null) {
             item.setResponseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate());
