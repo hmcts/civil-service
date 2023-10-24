@@ -14,6 +14,7 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -56,6 +57,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
+@Slf4j
 abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private final List<CaseEvent> events;
@@ -553,13 +555,19 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         String selectedRole = getSelectedRole(callbackParams);
-
         applyDocumentUploadDate(caseDataBuilder, time.now());
         if (nonNull(caseData.getCaseBundles()) && !caseData.getCaseBundles().isEmpty()) {
             updateDocumentListUploadedAfterBundle(caseDataBuilder, caseData);
         }
 
         if (selectedRole.equals(RESPONDENTSOLICITORONE.name()) || selectedRole.equals(SELECTED_VALUE_DEF_BOTH)) {
+            caseData.getDocumentEvidenceForTrialRes().forEach(uploadEvidenceDocumentTypeElement -> {
+                log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
+                log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
+                log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
+                log.error("res1 : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
+            });
+
             setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureListRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_DISCLOSURE_LIST);
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosureRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_DISCLOSURE);
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatementRes(), document -> document.getValue().getWitnessOptionDocument(), RESPONDENT_ONE_WITNESS_STATEMENT);
@@ -580,6 +588,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             }
         }
         if (selectedRole.equals(RESPONDENTSOLICITORTWO.name())) {
+            caseData.getDocumentEvidenceForTrialRes2().forEach(uploadEvidenceDocumentTypeElement -> {
+                log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
+                log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
+                log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
+                log.error("res2 : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
+            });
+
             setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureListRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_DISCLOSURE_LIST);
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosureRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_DISCLOSURE);
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatementRes2(), document -> document.getValue().getWitnessOptionDocument(), RESPONDENT_TWO_WITNESS_STATEMENT);
@@ -598,6 +613,12 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         }
 
         if (selectedRole.equals(CaseRole.APPLICANTSOLICITORONE.name()) || selectedRole.equals(SELECTED_VALUE_APP_BOTH)) {
+            caseData.getDocumentEvidenceForTrial().forEach(uploadEvidenceDocumentTypeElement -> {
+                log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentUpload());
+                log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getCreatedDatetime());
+                log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getDocumentIssuedDate());
+                log.error("app1 : " + uploadEvidenceDocumentTypeElement.getValue().getTypeOfDocument());
+            });
             setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureList(), document -> document.getValue().getDocumentUpload(), APPLICANT_DISCLOSURE_LIST);
             setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosure(), document -> document.getValue().getDocumentUpload(), APPLICANT_DISCLOSURE);
             setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatement(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_WITNESS_STATEMENT);
