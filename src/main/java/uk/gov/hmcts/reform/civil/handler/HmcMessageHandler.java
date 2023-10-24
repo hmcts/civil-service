@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.RuntimeService;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.COMPLETED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.EXCEPTION;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 
-@Service
+@Component
 @Slf4j
 @RequiredArgsConstructor
 public class HmcMessageHandler implements BaseExternalTaskHandler {
