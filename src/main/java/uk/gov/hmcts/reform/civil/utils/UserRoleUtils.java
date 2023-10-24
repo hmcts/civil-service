@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
-
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
@@ -29,4 +28,5 @@ public class UserRoleUtils {
     private static boolean hasRole(List<String> roles, CaseRole role) {
         return roles.stream().anyMatch(role.getFormattedName()::contains);
     }
+
 }

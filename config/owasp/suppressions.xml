@@ -9,6 +9,7 @@
     <notes>False positive. We don't have any reference to json-java_project:json-java
       nor any reference to hutool:hutool:5.8.10. Suppressed long-term to re-assess and possibly delete.</notes>
     <cve>CVE-2022-45688</cve>
+    <cve>CVE-2023-5072</cve>
   </suppress>
   <suppress>
     <notes>Temporarily suppressing it as the latest camunda connector 1.5.6 seem to have the vulnerability.</notes>
@@ -30,7 +31,7 @@
     <cve>CVE-2021-42306</cve>
     <cve>CVE-2023-20861</cve>
     <cve>CVE-2023-20883</cve>
-
+    <cve>CVE-2023-4586</cve>
   </suppress>
 
 </suppressions>
