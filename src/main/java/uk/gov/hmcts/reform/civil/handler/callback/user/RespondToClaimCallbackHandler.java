@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -569,6 +568,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (toggleService.isCaseFileViewEnabled()) {
             updatedData.respondent1ClaimResponseDocument(null);
             updatedData.respondent2ClaimResponseDocument(null);
+            updatedData.build().getRespondent1DQ().setRespondent1DQDraftDirections(null);
+            Respondent2DQ currentRespondent2DQ = updatedData.build().getRespondent2DQ();
+            if (Objects.nonNull(currentRespondent2DQ)) {
+                updatedData.build().getRespondent2DQ().setRespondent2DQDraftDirections(null);
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -664,8 +668,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 if (Objects.nonNull(copy)) {
                     defendantUploads.add(ElementUtils.element(copy));
                 }
-                // this documents are added to defendantUploads, if we do not remove/null the original, will show duplicate
-                respondent1DQ.setRespondent1DQDraftDirections(null);
             }
         }
 
@@ -706,8 +708,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 if (Objects.nonNull(copy)) {
                     defendantUploads.add(ElementUtils.element(copy));
                 }
-                // this documents are added to defendantUploads, if we do not remove/null the original, will show duplicate
-                respondent2DQ.setRespondent2DQDraftDirections(null);
             }
         }
 
