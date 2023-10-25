@@ -684,6 +684,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
+        var response = (AboutToStartOrSubmitCallbackResponse) validateInputValue(callbackParams);
+        if (response.getErrors() != null) {
+            return response;
+        }
+
         CaseData caseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
             : callbackParams.getCaseData();
@@ -801,5 +806,29 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         } else {
             return null;
         }
+    }
+
+    private CallbackResponse validateInputValue(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        if (nonNull(caseData.getTrialHearingWitnessOfFactDJ())) {
+            String inputValue1 = caseData.getTrialHearingWitnessOfFactDJ().getInput2();
+            String inputValue2 = caseData.getTrialHearingWitnessOfFactDJ().getInput3();
+            List<String> errors = new ArrayList<>();
+            if (inputValue1 != null && inputValue2 != null) {
+                int number1 = Integer.parseInt(inputValue1);
+                int number2 = Integer.parseInt(inputValue2);
+                if (number1 < 0 || number2 < 0) {
+                    errors.add("The number entered cannot be less than zero");
+                    return AboutToStartOrSubmitCallbackResponse.builder()
+                        .errors(errors)
+                        .build();
+                }
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 }
