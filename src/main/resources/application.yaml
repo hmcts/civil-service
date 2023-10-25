@@ -313,8 +313,7 @@ notifications:
 
   notifyLiPApplicantBreathingSpaceLifted: "b6dbc714-210e-475d-a1db-bf5ea28de98b"
   notifyLiPRespondentBreathingSpaceLifted: "4ca3017b-b2fa-4ac0-a867-9bfada50a80c"
-  claimantLipDeadlineExtension: "77cc47b1-4a9a-4baf-9313-98542698d32a"
-
+  
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
