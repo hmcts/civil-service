@@ -38,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
     TrialReadinessCallbackHandler.class,
     JacksonAutoConfiguration.class
 })
+
 public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
@@ -68,7 +69,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToStartCallback {
-
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvoked_ApplicantSolicitor() {
             //given: applicant solicitor logs in more than 3 weeks before hearing
@@ -76,12 +76,11 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.userHasCaseRole(anyString(), anyString(), eq(CaseRole.APPLICANTSOLICITORONE)))
-                                                                                                .thenReturn(true);
+                .thenReturn(true);
 
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-
             //then: no error is given
             assertThat(response.getErrors()).isEmpty();
         }
@@ -98,7 +97,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-
             //then: no error is given
             assertThat(response.getErrors()).isEmpty();
         }
@@ -115,7 +113,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-
             //then: no error is given
             assertThat(response.getErrors()).isEmpty();
         }
@@ -133,7 +130,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-
             //then: an error is returned
             assertThat(response.getErrors()).isNotEmpty();
         }
@@ -151,7 +147,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-
             //then: an error is returned
             assertThat(response.getErrors()).isNotEmpty();
         }
@@ -169,7 +164,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-
             //then: an error is returned
             assertThat(response.getErrors()).isNotEmpty();
         }
@@ -177,7 +171,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
-
         @Test
         void shouldTriggerApplicantNotifyOthers_WhenAboutToSubmitIsInvoked_ApplicantSolicitor() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
@@ -193,7 +186,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.APPLICANT_TRIAL_READY_NOTIFY_OTHERS.name(), "READY");
-
         }
 
         @Test
@@ -213,7 +205,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS.name(), "READY");
-
         }
 
         @Test
@@ -250,7 +241,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_APPLICANT.name(), "READY");
-
         }
 
         @Test
@@ -270,7 +260,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("camundaEvent", "status")
                 .containsOnly(CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1.name(), "READY");
-
         }
 
         @Test
@@ -295,7 +284,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class SubmittedCallback {
-
         @Test
         void shouldReturnConfirmationScreen_when1v1ReadySubmitted_ApplicantSolicitor() {
             //given: applicant solicitor selects Ready
@@ -307,7 +295,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
             //then: header + body for the ready status get used in the confirmation
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -328,7 +315,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
             //then: header + body for the not ready status get used in the confirmation
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -349,7 +335,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
             //then: header + body for the ready status get used in the confirmation
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -370,7 +355,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
             //then: header + body for the not ready status get used in the confirmation
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -391,7 +375,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
             //then: head + body for ready status are used in confirmation
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -412,7 +395,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
             //then: head + body for not ready status are used in confirmation
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()

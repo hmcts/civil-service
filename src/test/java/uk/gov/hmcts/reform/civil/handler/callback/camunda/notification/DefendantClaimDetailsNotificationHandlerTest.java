@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -59,6 +61,9 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
 
+    @MockBean
+    private ToggleConfiguration toggleConfiguration;
+
     @Nested
     class AboutToSubmitCallback {
         private LocalDateTime responseDeadline;
@@ -69,6 +74,7 @@ class DefendantClaimDetailsNotificationHandlerTest extends BaseCallbackHandlerTe
             when(notificationsProperties.getRespondentSolicitorClaimDetailsEmailTemplate())
                 .thenReturn(templateId);
             when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
+            given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
         }
 
         @Test
