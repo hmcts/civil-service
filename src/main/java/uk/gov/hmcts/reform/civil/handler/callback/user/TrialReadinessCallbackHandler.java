@@ -119,8 +119,6 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             errors.add(format(NO_SMALL_CLAIMS));
         }
 
-        log.info("End of populateValues");
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty() ? updatedData.build().toMap(objectMapper) : null)

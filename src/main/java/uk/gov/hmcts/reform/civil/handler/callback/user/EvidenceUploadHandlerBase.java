@@ -159,7 +159,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     abstract CallbackResponse validateValues(CallbackParams callbackParams, CaseData caseData);
 
-    abstract CallbackResponse createShowCondition(CaseData caseData, List<String> userInfo);
+    abstract CallbackResponse createShowCondition(CaseData caseData, List<String> userRoles);
 
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);
 
