@@ -675,8 +675,8 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 if (Objects.nonNull(copy)) {
                     defendantUploads.add(ElementUtils.element(copy));
                 }
+                respondent1DQ.setRespondent1DQDraftDirections(null);
             }
-            respondent1DQ.setRespondent1DQDraftDirections(null);
         }
 
         ResponseDocument respondent2ClaimResponseDocument = caseData.getRespondent2ClaimResponseDocument();
@@ -716,6 +716,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 if (Objects.nonNull(copy)) {
                     defendantUploads.add(ElementUtils.element(copy));
                 }
+                respondent2DQ.setRespondent2DQDraftDirections(null);
             }
         }
 
