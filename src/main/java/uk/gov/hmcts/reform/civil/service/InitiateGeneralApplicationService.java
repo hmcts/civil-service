@@ -115,6 +115,8 @@ public class InitiateGeneralApplicationService {
             .generalAppPBADetails(GAPbaDetails.builder().build())
             .generalAppDetailsOfOrder(EMPTY)
             .generalAppReasonsOfOrder(EMPTY)
+            .generalAppParentClaimantIsApplicant(null)
+            .generalAppVaryJudgementType(null)
             .generalAppN245FormUpload(Document.builder().build())
             .generalAppHearingDate(GAHearingDateGAspec.builder().build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().build())
