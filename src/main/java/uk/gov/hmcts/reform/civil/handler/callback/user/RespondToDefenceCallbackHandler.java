@@ -315,10 +315,8 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             return switch (multiPartyScenario) {
                 case ONE_V_ONE -> caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
                 case TWO_V_ONE -> caseData.getApplicant1ProceedWithClaimSpec2v1() == YesOrNo.YES;
-                case ONE_V_TWO_ONE_LEGAL_REP -> addRespondent2
-                    && YES.equals(caseData.getRespondent2SameLegalRepresentative());
-                case ONE_V_TWO_TWO_LEGAL_REP -> addRespondent2
-                    && NO.equals(caseData.getRespondent2SameLegalRepresentative());
+                case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP -> addRespondent2
+                    && caseData.getApplicant1ProceedWithClaim() == YesOrNo.YES;
             };
         } else {
             AllocatedTrack allocatedTrack =
