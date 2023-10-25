@@ -576,12 +576,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (toggleService.isCaseFileViewEnabled()) {
             updatedData.respondent1ClaimResponseDocument(null);
             updatedData.respondent2ClaimResponseDocument(null);
-            Respondent1DQ currentRespondent1DQ = caseData.getRespondent1DQ();
-            currentRespondent1DQ.setRespondent1DQDraftDirections(null);
-            updatedData.respondent1DQ(currentRespondent1DQ);
-            Respondent2DQ currentRespondent2DQ = caseData.getRespondent2DQ();
-            currentRespondent2DQ.setRespondent2DQDraftDirections(null);
-            updatedData.respondent2DQ(currentRespondent2DQ);
         }
         log.info("respondent 1 After nulling " + caseData.getRespondent1DQ());
         if (caseData.getRespondent2DQ() != null) {
@@ -682,6 +676,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     defendantUploads.add(ElementUtils.element(copy));
                 }
             }
+            respondent1DQ.setRespondent1DQDraftDirections(null);
         }
 
         ResponseDocument respondent2ClaimResponseDocument = caseData.getRespondent2ClaimResponseDocument();
