@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.handler.callback.user.claimantlip.casestate.ClaimantLipSateManagement;
+import uk.gov.hmcts.reform.civil.handler.callback.user.claimantlip.casestate.ClaimantLiPCaseStateManagment;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI
 public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_CUI);
-    private final ClaimantLipSateManagement claimantLipSateManagement;
+    private final ClaimantLiPCaseStateManagment claimantLiPCaseStateManagment;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -56,7 +56,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.toMap(objectMapper)).build();
 
-        return claimantLipSateManagement.caseStateHandlerForClaimantResponse(response, caseData);
+        return claimantLiPCaseStateManagment.caseStateHandlerForClaimantResponse(response, caseData);
     }
 
 }

@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.user.claimantlip.casestate.ClaimantLipSateManagement;
+import uk.gov.hmcts.reform.civil.handler.callback.user.claimantlip.casestate.ClaimantLiPCaseStateManagment;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
@@ -32,7 +32,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @SpringBootTest(classes = {
     ClaimantResponseCuiCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    ClaimantLipSateManagement.class
+    ClaimantLiPCaseStateManagment.class
 })
 class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 

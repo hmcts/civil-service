@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 
 @Component
 @AllArgsConstructor
-public class ClaimantLipSateManagement {
+public class ClaimantLiPCaseStateManagment {
 
     public AboutToStartOrSubmitCallbackResponse caseStateHandlerForClaimantResponse(
         AboutToStartOrSubmitCallbackResponse response, CaseData caseData) {
