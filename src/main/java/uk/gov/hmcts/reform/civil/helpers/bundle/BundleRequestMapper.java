@@ -278,9 +278,17 @@ public class BundleRequestMapper {
             list.addAll(getExpertDocsByPartyAndDocType(PartyType.DEFENDANT1,
                                                           evidenceUploadFileType, caseData));
             list.addAll(getExpertDocsByPartyAndDocType(PartyType.DEFENDANT2, evidenceUploadFileType, caseData));
+            list.forEach(expertElement -> {
+                log.info(" party is claimant and expert is " + expertElement.getValue().getExpertOptionOtherParty());
+                log.info(" party is claimant and expert is " + expertElement.getValue().getExpertOptionName());
+            });
         } else  {
             list.addAll(getExpertDocsByPartyAndDocType(PartyType.CLAIMANT1, evidenceUploadFileType, caseData));
             list.addAll(getExpertDocsByPartyAndDocType(PartyType.CLAIMANT2, evidenceUploadFileType, caseData));
+            list.forEach(expertElement -> {
+                log.info(" party is defendant and expert is " + expertElement.getValue().getExpertOptionOtherParty());
+                log.info(" party is defendant and expert is " + expertElement.getValue().getExpertOptionName());
+            });
         }
         return list;
     }
