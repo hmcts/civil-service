@@ -133,6 +133,7 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
             .build();
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(document));
+
         when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString())).thenReturn(document);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .trialReadyDocuments(systemGeneratedCaseDocuments).build();
