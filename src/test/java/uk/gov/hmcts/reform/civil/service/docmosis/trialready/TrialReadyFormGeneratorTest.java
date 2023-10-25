@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.TRIAL
     TrialReadyFormGenerator.class,
     JacksonAutoConfiguration.class
 })
+
 public class TrialReadyFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
@@ -47,13 +48,10 @@ public class TrialReadyFormGeneratorTest {
         .documentName(fileName_application)
         .documentType(TRIAL_READY_DOCUMENT)
         .build();
-
     @MockBean
     private UnsecuredDocumentManagementService documentManagementService;
-
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
-
     @Autowired
     private TrialReadyFormGenerator generator;
 

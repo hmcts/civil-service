@@ -11,6 +11,8 @@ public abstract class MediationCSVService {
     private static final String CASE_TYPE = "1";
     private static final String CHECK_LIST = "4";
     private static final String PARTY_STATUS = "5";
+    private static final String CLAIMANT = "1";
+    private static final String RESPONDENT = "2";
 
     public String generateCSVContent(CaseData caseData) {
         MediationParams mediationParams = getMediationParams(caseData);
@@ -26,7 +28,7 @@ public abstract class MediationCSVService {
         String totalClaimAmount = data.getTotalClaimAmount().toString();
         String[] claimantData = {
             SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
-            data.getApplicant1().getType().toString(), getCsvCompanyName(data.getApplicant1()),
+            CLAIMANT, getCsvCompanyName(data.getApplicant1()),
             applicantContactDetails.getApplicantContactName(params), applicantContactDetails.getApplicantContactNumber(params),
             CHECK_LIST, PARTY_STATUS, applicantContactDetails.getApplicantContactEmail(params),
             isPilot(data.getTotalClaimAmount())
@@ -34,7 +36,7 @@ public abstract class MediationCSVService {
 
         String[] respondentData = {
             SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
-            data.getRespondent1().getType().toString(), getCsvCompanyName(data.getRespondent1()),
+            RESPONDENT, getCsvCompanyName(data.getRespondent1()),
             defendantContactDetails.getDefendantContactName(params), defendantContactDetails.getDefendantContactNumber(params),
             CHECK_LIST, PARTY_STATUS, defendantContactDetails.getDefendantContactEmail(params),
             isPilot(data.getTotalClaimAmount())

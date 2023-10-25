@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -44,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
@@ -89,6 +92,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String NOT_ALLOWED_DATE_RANGE = "The date range in %s may not have a 'from date', that is after the 'date to'";
     public static final String NOT_ALLOWED_DATE_PAST = "The date in %s may not be before the established date";
     public static final String JUDGE_HEARD_FROM_EMPTY = "Judge Heard from: 'Claimant(s) and defendant(s)' section for %s, requires a selection to be made";
+    public static final String FURTHER_HEARING_OTHER_EMPTY = "Further hearing, Length of new hearing, Other is empty";
     public String defendantTwoPartyName;
     public String claimantTwoPartyName;
     public static final String APPEAL_NOTICE_DATE = "Appeal notice date";
@@ -138,6 +142,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
             checkJudgeHeardFrom(caseData, errors);
             checkFieldDate(caseData, errors);
+            checkFurtherHearingOther(caseData, errors);
         }
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
@@ -148,6 +153,18 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
+    }
+
+    private void checkFurtherHearingOther(final CaseData caseData, final List<String> errors) {
+        if (caseData.getFinalOrderFurtherHearingToggle() != null
+            && !caseData.getFinalOrderFurtherHearingToggle().isEmpty()
+            && caseData.getFinalOrderFurtherHearingToggle().get(0).equals(FinalOrderToggle.SHOW)
+            && caseData.getFinalOrderFurtherHearingComplex().getLengthList()
+                .equals(HearingLengthFinalOrderList.OTHER)
+            && Objects.isNull(caseData.getFinalOrderFurtherHearingComplex()
+                .getLengthListOther())) {
+            errors.add(FURTHER_HEARING_OTHER_EMPTY);
+        }
     }
 
     private void checkJudgeHeardFrom(CaseData caseData, List<String> errors) {
@@ -270,7 +287,9 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                                         AppealChoiceSecondDropdown.builder()
                                                                             .appealGrantedRefusedDate(LocalDate.now().plusDays(21))
                                                                             .build())
-                                                                    .build()).build());
+
+                                                                    .build()).build())
+            .finalOrderGiveReasonsYesNo(YesOrNo.NO);
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
