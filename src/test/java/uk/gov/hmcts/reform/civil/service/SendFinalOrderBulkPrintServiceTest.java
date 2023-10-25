@@ -125,7 +125,7 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build()))
-            .build().toBuilder().finalOrderDocument(null).build();
+            .build().toBuilder().finalOrderDocumentCollection(null).build();
         // when
         sendFinalOrderBulkPrintService.sendFinalOrderToLIP(BEARER_TOKEN, caseData, TASK_ID_DEFENDANT);
 
