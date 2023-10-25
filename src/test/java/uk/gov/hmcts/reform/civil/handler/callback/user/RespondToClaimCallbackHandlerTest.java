@@ -1316,6 +1316,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData().get("respondent2DocumentGeneration")).isNull();
         }
 
+        @Test
         void shouldNotPopulateRespondent2Flag_WhenInvoked() {
             // Given
             given(featureToggleService.isCaseFileViewEnabled()).willReturn(true);
@@ -1500,6 +1501,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
 
+        @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondent2NotPresent() {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
@@ -1532,6 +1534,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
 
+        @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondentIsNull() {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
@@ -1558,6 +1561,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsExactly(DEFENDANT_RESPONSE.name(), "READY");
         }
 
+        @Test
         void shouldSetApplicantResponseDeadlineAndSetBusinessProcess_whenDiffLegalRepAndRespondent2Present() {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
@@ -1922,6 +1926,7 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getState()).isNull();
         }
 
+        @Test
         void shouldNotSetApplicantResponseDeadlineOrTransitionCcdState_when2ndRespondentAnsweringBefore1st() {
             //Given
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
