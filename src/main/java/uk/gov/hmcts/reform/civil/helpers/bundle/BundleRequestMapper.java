@@ -246,8 +246,6 @@ public class BundleRequestMapper {
         List<Element<UploadEvidenceExpert>> questionsFromOtherPartyDocs = getAllDocsFromOtherParty(partyType, caseData,
                                                                                                    EvidenceUploadFiles.QUESTIONS_FOR_EXPERTS
         );
-        log.info("in getAllOtherPartyQuestions : " + partyType);
-        log.info("all expertnames : " + allExpertsNames);
         if (!questionsFromOtherPartyDocs.isEmpty()) {
             List<Element<UploadEvidenceExpert>> tempList = questionsFromOtherPartyDocs.stream().filter(expertElement -> matchType(
                     expertElement.getValue().getExpertOptionName(), allExpertsNames, false
@@ -266,8 +264,6 @@ public class BundleRequestMapper {
     }
 
     private boolean matchParty(String expertOptionOtherParty, Party party) {
-        log.info("in match party " + expertOptionOtherParty);
-        log.info("in match party " + party.getPartyName());
         if (party != null && party.getPartyName() != null && expertOptionOtherParty.equalsIgnoreCase(party.getPartyName())) {
             return true;
         }
@@ -282,17 +278,9 @@ public class BundleRequestMapper {
             list.addAll(getExpertDocsByPartyAndDocType(PartyType.DEFENDANT1,
                                                           evidenceUploadFileType, caseData));
             list.addAll(getExpertDocsByPartyAndDocType(PartyType.DEFENDANT2, evidenceUploadFileType, caseData));
-            list.forEach(expertElement -> {
-                log.info(" party is claimant and expert is " + expertElement.getValue().getExpertOptionOtherParty());
-                log.info(" party is claimant and expert is " + expertElement.getValue().getExpertOptionName());
-            });
         } else  {
             list.addAll(getExpertDocsByPartyAndDocType(PartyType.CLAIMANT1, evidenceUploadFileType, caseData));
             list.addAll(getExpertDocsByPartyAndDocType(PartyType.CLAIMANT2, evidenceUploadFileType, caseData));
-            list.forEach(expertElement -> {
-                log.info(" party is defendant and expert is " + expertElement.getValue().getExpertOptionOtherParty());
-                log.info(" party is defendant and expert is " + expertElement.getValue().getExpertOptionName());
-            });
         }
         return list;
     }
@@ -650,7 +638,6 @@ public class BundleRequestMapper {
     }
 
     private boolean matchType(String name, Collection<String> displayNames, boolean doesNotMatchType) {
-        log.info("In match type " + name + "list" + displayNames + "boolean " + doesNotMatchType);
         if (doesNotMatchType) {
             return displayNames.stream().noneMatch(s -> s.equalsIgnoreCase(name.trim()));
         } else {
