@@ -4,29 +4,38 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.user.claimantlip.casestate.ClaimantLipSateManagement;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(SpringExtension.class)
+
 @SpringBootTest(classes = {
     ClaimantResponseCuiCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    ClaimantLipSateManagement.class
 })
 class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -101,6 +110,68 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
+
+        }
+
+        @Test
+        void shouldUpdateCaseStateToJudicialReferral_WhenPartAdmitNoSettle_NoMediation() {
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                             .hasAgreedFreeMediation(MediationDecision.No).build())
+                .build();
+            CaseData caseData =
+                CaseDataBuilder.builder().caseDataLip(caseDataLiP).applicant1AcceptAdmitAmountPaidSpec(NO).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
+
+        }
+
+        @Test
+        void shouldUpdateCaseStateToJudicialReferral_WhenNotReceivedPayment_NoMediation_ForPartAdmit() {
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                             .hasAgreedFreeMediation(MediationDecision.No).build())
+                .build();
+            CaseData caseData =
+                CaseDataBuilder.builder().caseDataLip(caseDataLiP).applicant1PartAdmitConfirmAmountPaidSpec(NO).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
+
+        }
+
+        @Test
+        void shouldUpdateCaseStateToJudicialReferral_WhenFullDefence_NotPaid_NoMediation() {
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                             .hasAgreedFreeMediation(MediationDecision.No).build())
+                .build();
+            CaseData caseData =
+                CaseDataBuilder.builder().caseDataLip(caseDataLiP).applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
+
+        }
+
+        @Test
+        void shouldUpdateCaseStateToJudicialReferral_WhenFullDefence() {
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                             .hasAgreedFreeMediation(MediationDecision.No).build())
+                .build();
+            CaseData caseData =
+                CaseDataBuilder.builder().caseDataLip(caseDataLiP).applicant1ProceedWithClaim(YES)
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
 
         }
     }
