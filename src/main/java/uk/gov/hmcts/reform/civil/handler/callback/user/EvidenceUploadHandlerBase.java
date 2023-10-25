@@ -491,15 +491,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         documentUpload.forEach(x -> {
             UploadEvidenceWitness type = (UploadEvidenceWitness) x.getValue();
             String ext = FilenameUtils.getExtension(type.getWitnessOptionDocument().getDocumentFileName());
-            if (type.getWitnessOptionUploadDate() != null) {
-                String newName = prefix
+            String newName = prefix
                     + SPACE
                     + type.getWitnessOptionName()
                     + (date ? SPACE + type.getWitnessOptionUploadDate()
-                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK)) : "")
+                        .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK)) : "")
                     + END + ext;
-                type.getWitnessOptionDocument().setDocumentFileName(newName);
-            }
+            type.getWitnessOptionDocument().setDocumentFileName(newName);
         });
     }
 
@@ -508,18 +506,16 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         documentUpload.forEach(x -> {
             UploadEvidenceExpert type = (UploadEvidenceExpert) x.getValue();
             String ext = FilenameUtils.getExtension(type.getExpertDocument().getDocumentFileName());
-            if (type.getExpertOptionUploadDate() != null) {
-                String newName = prefix
+            String newName = prefix
                     + SPACE
                     + type.getExpertOptionName()
                     + SPACE
                     + (single ? type.getExpertOptionExpertise() : type.getExpertOptionExpertises())
                     + SPACE
                     + type.getExpertOptionUploadDate()
-                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
+                        .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
                     + END + ext;
-                type.getExpertDocument().setDocumentFileName(newName);
-            }
+            type.getExpertDocument().setDocumentFileName(newName);
         });
     }
 
@@ -541,16 +537,14 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         documentUpload.forEach(x -> {
             UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
             String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
-            if (type.getDocumentIssuedDate() != null) {
-                String newName = prefix
+            String newName = prefix
                     + SPACE
                     + type.getTypeOfDocument()
                     + SPACE
                     + type.getDocumentIssuedDate()
-                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
+                        .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
                     + END + ext;
-                type.getDocumentUpload().setDocumentFileName(newName);
-            }
+            type.getDocumentUpload().setDocumentFileName(newName);
         });
     }
 

@@ -92,7 +92,6 @@ import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedT
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 @SuppressWarnings("unchecked")
 public class RespondToClaimCallbackHandler extends CallbackHandler implements ExpertsValidator, WitnessesValidator {
 
@@ -516,7 +515,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .respondent1DQStatementOfTruth(statementOfTruth);
             handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             updatedData.respondent1DQ(dq.build());
-            log.info("handleCourtLocationForRespondent1DQ  " + dq.build().toString());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
@@ -566,20 +564,11 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .build();
         }
 
-        log.info("respondent 1 before nulling " + caseData.getRespondent1DQ());
-        if (caseData.getRespondent2DQ() != null) {
-            log.info("respondent 2 before nulling " + caseData.getRespondent2DQ());
-        }
-
         // these documents are added to defendantUploads, if we do not remove/null the original,
         // case file view will show duplicate documents
         if (toggleService.isCaseFileViewEnabled()) {
             updatedData.respondent1ClaimResponseDocument(null);
             updatedData.respondent2ClaimResponseDocument(null);
-        }
-        log.info("respondent 1 After nulling " + caseData.getRespondent1DQ());
-        if (caseData.getRespondent2DQ() != null) {
-            log.info("respondent 2 after nulling " + caseData.getRespondent2DQ());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -675,6 +664,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 if (Objects.nonNull(copy)) {
                     defendantUploads.add(ElementUtils.element(copy));
                 }
+                // this documents are added to defendantUploads, if we do not remove/null the original, will show duplicate
                 respondent1DQ.setRespondent1DQDraftDirections(null);
             }
         }
@@ -716,6 +706,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 if (Objects.nonNull(copy)) {
                     defendantUploads.add(ElementUtils.element(copy));
                 }
+                // this documents are added to defendantUploads, if we do not remove/null the original, will show duplicate
                 respondent2DQ.setRespondent2DQDraftDirections(null);
             }
         }
