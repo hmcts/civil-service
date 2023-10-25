@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.docmosis.trialready.TrialReadyFormGenerator;
 
@@ -76,19 +75,10 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                CaseData caseData) {
-        String activityID = camundaActivityId(callbackParams);
-        CaseRole role = switch (activityID) {
-            case TASK_ID_APPLICANT -> CaseRole.CLAIMANT;
-            case TASK_ID_RESPONDENT1 -> CaseRole.DEFENDANT;
-            case TASK_ID_RESPONDENT2 -> CaseRole.RESPONDENTSOLICITORTWO;
-            default -> null;
-        };
-
         CaseDocument caseDocument = trialReadyFormGenerator.generate(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
-            camundaActivityId(callbackParams),
-            role
+            camundaActivityId(callbackParams)
         );
         var documents = caseData.getTrialReadyDocuments();
         documents.add(element(caseDocument));
