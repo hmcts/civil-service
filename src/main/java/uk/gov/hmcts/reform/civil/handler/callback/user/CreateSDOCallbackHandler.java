@@ -852,6 +852,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
     }
 
+    private DynamicList getEmptyDynamicList(DynamicList listToBeEmptied) {
+        return listToBeEmptied != null
+            ? DynamicList.builder().value(listToBeEmptied.getValue()).listItems(null).build()
+            : null;
+    }
+
     private boolean nonNull(Object object) {
         if (object != null) {
             return true;
