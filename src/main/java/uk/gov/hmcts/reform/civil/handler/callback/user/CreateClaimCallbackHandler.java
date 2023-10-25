@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -141,6 +142,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final CourtLocationUtils courtLocationUtils;
     private final AssignCategoryId assignCategoryId;
     private final CaseFlagsInitialiser caseFlagInitialiser;
+    private final ToggleConfiguration toggleConfiguration;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
 
     @Value("${court-location.unspecified-claim.region-id}")
@@ -182,6 +184,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         caseDataBuilder
             .claimStarted(YES)
+            .featureToggleWA(toggleConfiguration.getFeatureToggle())
             .courtLocation(CourtLocation.builder()
                                .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
                                .build());
