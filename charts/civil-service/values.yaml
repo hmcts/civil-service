@@ -64,6 +64,7 @@ java:
     DOCUMENT_MANAGEMENT_SECURED: true
     REST_TEMPLATE_TIMEOUT: 30000
     POLLING_EVENT_EMITTER_ENABLED: false
+    WA_TOGGLE: Prod
     HMC_HEARINGS_TOPIC_NAMESPACE: 'hmc-servicebus-{{ .Values.global.environment }}'
     HMC_HEARINGS_TOPIC_NAME: 'hmc-to-cft-{{ .Values.global.environment }}'
     HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: 'hmc-to-civil-subscription-{{ .Values.global.environment }}'
