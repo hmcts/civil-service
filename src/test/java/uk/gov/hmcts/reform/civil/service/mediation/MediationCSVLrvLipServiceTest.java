@@ -39,6 +39,7 @@ public class MediationCSVLrvLipServiceTest {
     private static final String RESPONDENT_INDIVIDUAL_SOLE_TRADER_LAST_NAME = "Respondent Sole Trader Last Name";
     private static final String TOTAL_AMOUNT = "9000";
     private static final String ID = "123456789";
+    private static final String RESPONDENT = "2";
 
     @Mock
     private uk.gov.hmcts.reform.civil.prd.model.Organisation organisation;
@@ -64,7 +65,7 @@ public class MediationCSVLrvLipServiceTest {
         String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(ID);
-        assertThat(result).contains(Party.Type.COMPANY.name());
+        assertThat(result).contains(RESPONDENT);
         assertThat(result).contains(RESPONDENT_COMPANY_NAME);
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
@@ -79,7 +80,7 @@ public class MediationCSVLrvLipServiceTest {
         String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(ID);
-        assertThat(result).contains("ORGANISATION");
+        assertThat(result).contains(RESPONDENT);
         assertThat(result).contains(RESPONDENT_ORGANISATION_NAME);
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
@@ -94,7 +95,7 @@ public class MediationCSVLrvLipServiceTest {
         String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(ID);
-        assertThat(result).contains(Party.Type.INDIVIDUAL.name());
+        assertThat(result).contains(RESPONDENT);
         assertThat(result).contains(RESPONDENT_INDIVIDUAL_FIST_NAME + " " + RESPONDENT_INDIVIDUAL_LAST_NAME);
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
@@ -109,7 +110,7 @@ public class MediationCSVLrvLipServiceTest {
         String result = service.generateCSVContent(caseData);
         //Then
         assertThat(result).contains(ID);
-        assertThat(result).contains("SOLE_TRADER");
+        assertThat(result).contains(RESPONDENT);
         assertThat(result).contains(RESPONDENT_INDIVIDUAL_SOLE_TRADER_FIRST_NAME + " " + RESPONDENT_INDIVIDUAL_SOLE_TRADER_LAST_NAME);
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
