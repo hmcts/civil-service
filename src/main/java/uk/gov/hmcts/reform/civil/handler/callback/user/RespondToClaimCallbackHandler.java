@@ -516,6 +516,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 .respondent1DQStatementOfTruth(statementOfTruth);
             handleCourtLocationForRespondent1DQ(caseData, dq, callbackParams);
             updatedData.respondent1DQ(dq.build());
+            log.info("handleCourtLocationForRespondent1DQ  "+ dq.build().toString());
             // resetting statement of truth to make sure it's empty the next time it appears in the UI.
             updatedData.uiStatementOfTruth(StatementOfTruth.builder().build());
         }
