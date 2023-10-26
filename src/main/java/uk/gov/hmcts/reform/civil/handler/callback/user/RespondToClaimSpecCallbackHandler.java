@@ -1280,9 +1280,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse validateDateOfBirth(CallbackParams callbackParams) {
-        Party respondent = callbackParams.getCaseData().getRespondent1();
-        if (respondent == null && callbackParams.getCaseData().getRespondent2() != null) {
-            respondent = callbackParams.getCaseData().getRespondent2();
+        Party respondent = callbackParams.getCaseData().getRespondent1Copy();
+        if (respondent == null && callbackParams.getCaseData().getRespondent2Copy() != null) {
+            respondent = callbackParams.getCaseData().getRespondent2Copy();
         }
         List<String> errors = dateOfBirthValidator.validate(respondent);
 
