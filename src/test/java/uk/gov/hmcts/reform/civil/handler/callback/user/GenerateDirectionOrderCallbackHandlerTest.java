@@ -18,9 +18,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
@@ -28,10 +32,12 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
 import uk.gov.hmcts.reform.civil.model.finalorders.ClaimantAndDefendantHeard;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
@@ -135,6 +141,61 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNullPreviousSubmittedEventSelections_whenInvokedFreeForm() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .freeFormRecordedTextArea("text")
+                .freeFormOrderedTextArea("text")
+                .orderOnCourtsList(OrderOnCourtsList.ORDER_ON_COURT_INITIATIVE)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("finalOrderSelection")).isNull();
+            assertThat(response.getData().get("freeFormRecordedTextArea")).isNull();
+            assertThat(response.getData().get("freeFormOrderedTextArea")).isNull();
+            assertThat(response.getData().get("orderOnCourtsList")).isNull();
+        }
+
+        @Test
+        void shouldNullPreviousSubmittedEventSelections_whenInvokedAssisted() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderMadeSelection(YES).finalOrderDateHeardComplex(OrderMade.builder().build())
+                .finalOrderJudgePapers(List.of(FinalOrdersJudgePapers.CONSIDERED))
+                .finalOrderJudgeHeardFrom(List.of(FinalOrderToggle.SHOW)).finalOrderRepresentation(FinalOrderRepresentation.builder().build())
+                .finalOrderRecitals(List.of(FinalOrderToggle.SHOW)).finalOrderRecitalsRecorded(FinalOrderRecitalsRecorded.builder().text("text").build())
+                .finalOrderOrderedThatText("text")
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW)).finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().build())
+                .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS).assistedOrderCostsReserved(AssistedOrderCostDetails.builder().build())
+                .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder().build()).assistedOrderCostsBespoke(AssistedOrderCostDetails.builder().build())
+                .finalOrderAppealToggle(List.of(FinalOrderToggle.SHOW)).finalOrderAppealComplex(FinalOrderAppeal.builder().build())
+                .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
+                .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("text").build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("finalOrderSelection")).isNull();
+            assertThat(response.getData().get("finalOrderMadeSelection")).isNull();
+            assertThat(response.getData().get("finalOrderDateHeardComplex")).isNull();
+            assertThat(response.getData().get("finalOrderJudgePapers")).isNull();
+            assertThat(response.getData().get("finalOrderJudgeHeardFrom")).isNull();
+            assertThat(response.getData().get("finalOrderRepresentation")).isNull();
+            assertThat(response.getData().get("finalOrderRecitals")).isNull();
+            assertThat(response.getData().get("finalOrderRecitalsRecorded")).isNull();
+            assertThat(response.getData().get("finalOrderOrderedThatText")).isNull();
+            assertThat(response.getData().get("finalOrderFurtherHearingToggle")).isNull();
+            assertThat(response.getData().get("finalOrderFurtherHearingComplex")).isNull();
+            assertThat(response.getData().get("assistedOrderCostList")).isNull();
+            assertThat(response.getData().get("assistedOrderCostsReserved")).isNull();
+            assertThat(response.getData().get("assistedOrderMakeAnOrderForCosts")).isNull();
+            assertThat(response.getData().get("assistedOrderCostsBespoke")).isNull();
+            assertThat(response.getData().get("finalOrderAppealToggle")).isNull();
+            assertThat(response.getData().get("finalOrderAppealComplex")).isNull();
+            assertThat(response.getData().get("orderMadeOnDetailsList")).isNull();
+            assertThat(response.getData().get("finalOrderGiveReasonsComplex")).isNull();
         }
     }
 
