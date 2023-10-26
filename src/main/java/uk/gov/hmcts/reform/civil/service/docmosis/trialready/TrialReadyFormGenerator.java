@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -35,12 +36,12 @@ public class TrialReadyFormGenerator {
     private static final String TASK_ID_APPLICANT = "GenerateTrialReadyFormApplicant";
     private static final String TASK_ID_RESPONDENT1 = "GenerateTrialReadyFormRespondent1";
 
-    public CaseDocument generate(CaseData caseData, String authorisation, String camundaActivity) {
+    public CaseDocument generate(CaseData caseData, String authorisation, String camundaActivity, CaseRole userRole) {
         TrialReadyForm templateData = getTemplateData(caseData, camundaActivity);
 
         DocmosisTemplates template = TRIAL_READY;
         DocmosisDocument document = documentGeneratorService.generateDocmosisDocument(templateData, template);
-        return documentManagementService.uploadDocument(
+        CaseDocument trialReadyDocument = documentManagementService.uploadDocument(
             authorisation,
             new PDF(
                 getFileName(caseData, template, camundaActivity),
@@ -48,6 +49,8 @@ public class TrialReadyFormGenerator {
                 DocumentType.TRIAL_READY_DOCUMENT
             )
         );
+
+        return trialReadyDocument.toBuilder().ownedBy(userRole).build();
     }
 
     private TrialReadyForm getTemplateData(CaseData caseData, String camundaActivity) {
@@ -93,16 +96,12 @@ public class TrialReadyFormGenerator {
     }
 
     private String getTypeUserLastName(Party party) {
-        switch (party.getType()) {
-            case INDIVIDUAL:
-                return party.getIndividualLastName();
-            case COMPANY:
-                return party.getCompanyName();
-            case SOLE_TRADER:
-                return party.getSoleTraderLastName();
-            default:
-                return party.getOrganisationName();
-        }
+        return switch (party.getType()) {
+            case INDIVIDUAL -> party.getIndividualLastName();
+            case COMPANY -> party.getCompanyName();
+            case SOLE_TRADER -> party.getSoleTraderLastName();
+            default -> party.getOrganisationName();
+        };
     }
 
     private TrialReadyForm.TrialReadyFormBuilder completeTrialReadyFormWithOptionalFields(
