@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.handler.callback.user.claimantlip.casestate.ClaimantLiPCaseStateManagment;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
@@ -29,7 +29,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI
 public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_CUI);
-    private final ClaimantLiPCaseStateManagment claimantLiPCaseStateManagment;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -52,11 +51,19 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
             .build();
 
-        AboutToStartOrSubmitCallbackResponse response =
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.toMap(objectMapper)).build();
-
-        return claimantLiPCaseStateManagment.caseStateHandlerForClaimantResponse(response, caseData);
+                .data(updatedData.toMap(objectMapper));
+        updateClaimStateJudicialReferral(response, updatedData);
+        return response.build();
     }
 
+    private void updateClaimStateJudicialReferral(
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response,
+        CaseData caseData) {
+        if ((caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence())
+            && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation()) {
+            response.state(CaseState.JUDICIAL_REFERRAL.name());
+        }
+    }
 }
