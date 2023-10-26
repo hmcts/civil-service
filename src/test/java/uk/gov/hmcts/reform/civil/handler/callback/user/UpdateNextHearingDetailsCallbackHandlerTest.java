@@ -39,14 +39,14 @@ import static uk.gov.hmcts.reform.civil.enums.nexthearingdate.UpdateType.UPDATE;
 import static uk.gov.hmcts.reform.hmc.model.hearing.ListAssistCaseStatus.LISTED;
 
 @SpringBootTest(classes = {
-    UpdateNextHearingDateCallbackHandler.class,
+    UpdateNextHearingDetailsCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
-class UpdateNextHearingDateCallbackHandlerTest extends BaseCallbackHandlerTest {
+class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private UpdateNextHearingDateCallbackHandler handler;
+    private UpdateNextHearingDetailsCallbackHandler handler;
 
     @MockBean
     private HearingsService hearingsService;

@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.nexthearingdate.UpdateType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.NextHearingDetails;
 import uk.gov.hmcts.reform.civil.service.nexthearingdate.NextHearingDateCamundaService;
@@ -19,19 +20,17 @@ import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
-import static uk.gov.hmcts.reform.civil.enums.nexthearingdate.UpdateType.DELETE;
-import static uk.gov.hmcts.reform.civil.enums.nexthearingdate.UpdateType.UPDATE;
+import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 
 @Service
 @RequiredArgsConstructor
-public class UpdateNextHearingDateCallbackHandler extends CallbackHandler {
+public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(UPDATE_NEXT_HEARING_DETAILS);
     private final HearingsService hearingsService;
@@ -55,34 +54,38 @@ public class UpdateNextHearingDateCallbackHandler extends CallbackHandler {
     private CallbackResponse updateNextHearingDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         NextHearingDateVariables variables = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
-
-        if (variables.getUpdateType() == null) {
-            //Process was triggered via hmc next hearing date scheduler so call hmc to work out the next hearing date
-            HearingsResponse hearingsResponse = hearingsService.getHearings(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
-                callbackParams.getRequest().getCaseDetails().getId(),
-                "LISTED"
-            );
-            LocalDateTime today = dateUtils.now();
-            updatedData.nextHearingDetails(HearingUtils.getNextHearingDetails(hearingsResponse, today));
-        } else if (variables.getUpdateType().equals(UPDATE)) {
-            // Process was triggered via the hmc message bus with updateType UPDATE so next hearing details are provided.
-            updatedData.nextHearingDetails(
-                NextHearingDetails.builder()
-                    .hearingID(variables.hearingId)
-                    .hearingDateTime(variables.nextHearingDate)
-                    .build());
-        } else if (variables.getUpdateType().equals(DELETE)) {
-            // Process was triggered via the hmc message bus with updateType DELETE so next hearing details will be cleared.
-            updatedData.nextHearingDetails(null);
-        } else {
-            throw new CallbackException("An invalid 'updateType' was provided in the process variables.");
-        }
+        NextHearingDetails nextHearingDetails = variables.getUpdateType() == null
+                ? buildNextHearingDetailsFromHmc(callbackParams) : buildNextHearingDetailsFromVariables(variables);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .build();
+                .data(caseData.toBuilder().nextHearingDetails(nextHearingDetails).build().toMap(objectMapper))
+                .build();
+    }
 
+    private NextHearingDetails buildNextHearingDetailsFromHmc(CallbackParams callbackParams) {
+        HearingsResponse hearingsResponse = hearingsService.getHearings(
+                callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                callbackParams.getRequest().getCaseDetails().getId(),
+                LISTED.name()
+        );
+        return HearingUtils.getNextHearingDetails(hearingsResponse, dateUtils.now());
+    }
+
+    private NextHearingDetails buildNextHearingDetailsFromVariables(NextHearingDateVariables variables) {
+        UpdateType updateType = variables.getUpdateType();
+        switch (updateType) {
+            case UPDATE: {
+                return NextHearingDetails.builder()
+                        .hearingID(variables.hearingId)
+                        .hearingDateTime(variables.nextHearingDate)
+                        .build();
+            }
+            case DELETE: {
+                return null;
+            }
+            default: {
+                throw new CallbackException("An invalid 'updateType' was provided in the process variables.");
+            }
+        }
     }
 }
