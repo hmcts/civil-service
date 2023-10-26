@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -43,9 +42,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private TrialReadinessCallbackHandler handler;
-
-    @MockBean
-    private CoreCaseUserService coreCaseUserService;
 
     @MockBean
     private UserRoleCaching userRoleCaching;
@@ -354,7 +350,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .trialReadyApplicant(YesOrNo.NO).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+            when(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.CLAIMANT.getFormattedName()));
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
