@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 
 import java.time.LocalDate;
