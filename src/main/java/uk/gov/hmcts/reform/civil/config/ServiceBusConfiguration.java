@@ -32,14 +32,11 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.nexthearingdate.NextHearingDateVariables;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
-import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
-import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
-import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.COMPLETED;
-import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.EXCEPTION;
-import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
+import static uk.gov.hmcts.reform.civil.utils.HmcServiceBusMessageUtils.isMessageRelevantForService;
+import static uk.gov.hmcts.reform.civil.utils.HmcServiceBusMessageUtils.statusShouldReviewHearingException;
+import static uk.gov.hmcts.reform.civil.utils.HmcServiceBusMessageUtils.statusShouldTriggerCamundaMessage;
 
 @Configuration
 @Slf4j
@@ -71,8 +68,8 @@ public class ServiceBusConfiguration {
     private final HmcMessageHandler handler;
     private final RuntimeService runtimeService;
     private final FeatureToggleService featureToggleService;
+    private final PaymentsConfiguration paymentsConfiguration;
 
-    private static final List<HmcStatus> PROCESS_MESSAGE_STATUSES = List.of(LISTED, COMPLETED, ADJOURNED, CANCELLED);
     private static final String CAMUNDA_MESSAGE = "HANDLE_HMC_MESSAGE";
 
     @Bean
@@ -116,15 +113,17 @@ public class ServiceBusConfiguration {
                                 ofNullable(hmcMessage.getHearingUpdate()).map(update -> update.getHmcStatus().name())
                                         .orElse("-")
                         );
-                        if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
-                            handler.handleExceptionEvent(hmcMessage);
-                        } else if (statusShouldTriggerCamundaMessage(hmcMessage)) {
-                            log.info("Handling message via camunda for case {}, hearing id {} with status {}",
-                                     hmcMessage.getCaseId(),
-                                     hmcMessage.getHearingId(),
-                                     ofNullable(hmcMessage.getHearingUpdate()).map(update -> update.getHmcStatus().name())
-                                         .orElse("-"));
-                            triggerHandleHmcMessageEvent(hmcMessage);
+                        if (isMessageRelevantForService(hmcMessage, paymentsConfiguration)) {
+                            if (statusShouldReviewHearingException(hmcMessage)) {
+                                handler.handleExceptionEvent(hmcMessage);
+                            } else if (statusShouldTriggerCamundaMessage(hmcMessage)) {
+                                log.info("Handling message via camunda for case {}, hearing id {} with status {}",
+                                         hmcMessage.getCaseId(),
+                                         hmcMessage.getHearingId(),
+                                         ofNullable(hmcMessage.getHearingUpdate()).map(update -> update.getHmcStatus().name())
+                                             .orElse("-"));
+                                triggerHandleHmcMessageEvent(hmcMessage);
+                            }
                         }
                         return receiveClient.completeAsync(message.getLockToken());
                     }
@@ -166,9 +165,5 @@ public class ServiceBusConfiguration {
             .setVariables(messageVars.toMap(objectMapper))
             .correlateStartMessage();
         log.info("message sent to camunda");
-    }
-
-    private boolean statusShouldTriggerCamundaMessage(HmcMessage message) {
-        return PROCESS_MESSAGE_STATUSES.contains(message.getHearingUpdate().getHmcStatus());
     }
 }

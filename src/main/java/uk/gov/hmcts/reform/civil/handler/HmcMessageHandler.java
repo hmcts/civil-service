@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.nexthearingdate.NextHearingDateVariables;
@@ -18,7 +17,6 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REVIEW_HEARING_EXCEPTION;
 import static uk.gov.hmcts.reform.civil.enums.nexthearingdate.UpdateType.DELETE;
 import static uk.gov.hmcts.reform.civil.enums.nexthearingdate.UpdateType.UPDATE;
-import static uk.gov.hmcts.reform.hmc.model.hearing.ListingStatus.FIXED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.COMPLETED;
@@ -31,7 +29,6 @@ import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 public class HmcMessageHandler implements BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
-    private final PaymentsConfiguration paymentsConfiguration;
     private final RuntimeService runtimeService;
     private final ObjectMapper objectMapper;
 
@@ -41,14 +38,12 @@ public class HmcMessageHandler implements BaseExternalTaskHandler {
     private static final String UPDATE_NEXT_HEARING_INFO = "UpdateNextHearingInfo";
 
     public void handleExceptionEvent(HmcMessage hmcMessage) {
-        if (isMessageRelevantForService(hmcMessage)) {
-            if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
-                log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
-                         hmcMessage.getHearingId(),
-                         hmcMessage.getCaseId()
-                );
-                triggerReviewHearingExceptionEvent(hmcMessage.getCaseId(), hmcMessage.getHearingId());
-            }
+        if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+            log.info("Hearing ID: {} for case {} in EXCEPTION status, triggering REVIEW_HEARING_EXCEPTION event",
+                     hmcMessage.getHearingId(),
+                     hmcMessage.getCaseId()
+            );
+            triggerReviewHearingExceptionEvent(hmcMessage.getCaseId(), hmcMessage.getHearingId());
         }
     }
 
@@ -64,22 +59,19 @@ public class HmcMessageHandler implements BaseExternalTaskHandler {
         }
     }
 
-    private boolean isMessageRelevantForService(HmcMessage hmcMessage) {
-        return paymentsConfiguration.getSpecSiteId().equals(hmcMessage.getHmctsServiceCode())
-            || paymentsConfiguration.getSiteId().equals(hmcMessage.getHmctsServiceCode());
-    }
-
     @Override
     public void handleTask(ExternalTask externalTask) {
         log.info("message received from camunda");
         NextHearingDateVariables nextHearingDateVariables = objectMapper.convertValue(externalTask.getAllVariables(), NextHearingDateVariables.class);
         HmcStatus hmcStatus = nextHearingDateVariables.getHmcStatus();
-        if (UPDATE_STATUSES.contains(hmcStatus) && FIXED.equals(nextHearingDateVariables.getHearingListingStatus())) {
-            log.info("sending update message");
-            triggerUpdateNextHearingDateMessage(nextHearingDateVariables);
-        } else if (DELETE_STATUSES.contains(hmcStatus)) {
-            log.info("sending delete message");
-            triggerDeleteMessage(nextHearingDateVariables);
+        if (hmcStatus != null) {
+            if (UPDATE_STATUSES.contains(hmcStatus)) {
+                log.info("sending update message");
+                triggerUpdateNextHearingDateMessage(nextHearingDateVariables);
+            } else if (DELETE_STATUSES.contains(hmcStatus)) {
+                log.info("sending delete message");
+                triggerDeleteMessage(nextHearingDateVariables);
+            }
         }
     }
 

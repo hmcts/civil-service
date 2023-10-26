@@ -7,13 +7,13 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.handler.HmcMessageHandler;
 
 @Component
-public class HandleHMCMessageTaskListener {
+public class HandleHMCMessageExternalTaskListener {
 
     private static final String TOPIC = "HANDLE_HMC_MESSAGE_TASK";
 
     @Autowired
-    private HandleHMCMessageTaskListener(HmcMessageHandler hmcMessageHandler,
-                                         ExternalTaskClient client) {
+    private HandleHMCMessageExternalTaskListener(HmcMessageHandler hmcMessageHandler,
+                                                 ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
         subscriptionBuilder.handler(hmcMessageHandler).open();
     }
