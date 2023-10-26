@@ -74,6 +74,14 @@ public class FeatureToggleService {
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", locationEpimms,
-                                                            false);
+                                                            true);
+    }
+
+    public boolean isTransferOnlineCaseEnabled() {
+        return featureToggleApi.isFeatureEnabled("isTransferOnlineCaseEnabled");
+    }
+
+    public boolean isCaseProgressionEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-case-progression");
     }
 }
