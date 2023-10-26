@@ -695,7 +695,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldFinishBusinessProcess() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+                .toBuilder()
+                .disposalHearingMethodInPersonDJ(options)
+                .trialHearingMethodInPersonDJ(options)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
@@ -717,9 +723,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .build();
             List<Element<CaseDocument>> documentList = new ArrayList<>();
             documentList.add(element(testDocument));
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
             //Given
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .trialHearingMethodInPersonDJ(options)
+                .disposalHearingMethodInPersonDJ(options)
                 .orderSDODocumentDJCollection(documentList)
                 .build();
 
