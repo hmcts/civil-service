@@ -73,6 +73,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToStartCallback {
+
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvoked_ApplicantSolicitor() {
             //given: applicant solicitor logs in more than 3 weeks before hearing
@@ -90,6 +91,21 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvoked_Claimant() {
+            //given: claimant logs in more than 3 weeks before hearing
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            when(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.CLAIMANT.getFormattedName()));
+
+            //when: Event is started
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //then: no error is given
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
         void shouldNotReturnError_WhenAboutToStartIsInvoked_RespondentSolicitor1() {
             //given: respondent 1 solicitor logs in more than 3 weeks before hearing
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
@@ -97,6 +113,21 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()));
+
+            //when: Event is started
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //then: no error is given
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldNotReturnError_WhenAboutToStartIsInvoked_Defendant() {
+            //given: defendant logs in more than 3 weeks before hearing
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            when(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.DEFENDANT.getFormattedName()));
 
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -139,6 +170,22 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldReturnError_WhenAboutToStartIsInvokedWithinThreeWeeksOfHearingDate_Claimant() {
+            //given: claimant logs in less than 3 weeks before the hearing
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
+                .hearingDate(LocalDate.now().plusWeeks(2).plusDays(6)).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            when(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.CLAIMANT.getFormattedName()));
+
+            //when: Event is started
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //then: an error is returned
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
         void shouldReturnError_WhenAboutToStartIsInvokedWithinThreeWeeksOfHearingDate_RespondentSolicitor1() {
             //given: respondent 1 solicitor logs in less than 3 weeks before the hearing
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
@@ -147,6 +194,22 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()));
+
+            //when: Event is started
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+            //then: an error is returned
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
+        void shouldReturnError_WhenAboutToStartIsInvokedWithinThreeWeeksOfHearingDate_Defendant() {
+            //given: respondent 1 solicitor logs in less than 3 weeks before the hearing
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
+                .hearingDate(LocalDate.now().plusWeeks(2).plusDays(6)).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
+            when(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.DEFENDANT.getFormattedName()));
 
             //when: Event is started
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -175,6 +238,12 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
+
+        @BeforeEach
+        public void setup() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        }
+
         @Test
         void shouldTriggerApplicantNotifyOthers_WhenAboutToSubmitIsInvoked_ApplicantSolicitor() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
@@ -197,6 +266,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .trialReadyApplicant(YesOrNo.YES).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
             when(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.CLAIMANT.getFormattedName()));
 
@@ -232,6 +302,7 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .trialReadyRespondent1(YesOrNo.YES).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
             when(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.DEFENDANT.getFormattedName()));
 
@@ -278,6 +349,23 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldTriggerApplicantDocument_WhenAboutToSubmitIsInvoked_Claimant() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .trialReadyApplicant(YesOrNo.NO).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.CLAIMANT.getFormattedName()));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_APPLICANT.name(), "READY");
+        }
+
+        @Test
         void shouldTriggerRespondent1Document_WhenAboutToSubmitIsInvoked_Respondent1Solicitor() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .trialReadyRespondent1(YesOrNo.NO).build();
@@ -285,6 +373,23 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
                 .thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()));
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).extracting("businessProcess")
+                .extracting("camundaEvent", "status")
+                .containsOnly(CaseEvent.GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT1.name(), "READY");
+        }
+
+        @Test
+        void shouldTriggerRespondent1Document_WhenAboutToSubmitIsInvoked_Defendant() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .trialReadyRespondent1(YesOrNo.NO).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            when(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+                .thenReturn(List.of(CaseRole.DEFENDANT.getFormattedName()));
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -314,6 +419,12 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class SubmittedCallback {
+
+        @BeforeEach
+        public void setup() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        }
+
         @Test
         void shouldReturnConfirmationScreen_when1v1ReadySubmitted_ApplicantSolicitor() {
             //given: applicant solicitor selects Ready
@@ -325,7 +436,6 @@ public class TrialReadinessCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //when: Event is submitted
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
             //then: header + body for the ready status get used in the confirmation
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
