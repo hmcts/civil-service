@@ -491,6 +491,9 @@ public class CaseDataBuilder {
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
 
+    private DynamicList transferCourtLocationList;
+    private String reasonForTransfer;
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -5149,6 +5152,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder transferCourtLocationList(DynamicList transferCourtLocationList) {
+        this.transferCourtLocationList = transferCourtLocationList;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForTransfer(String reasonForTransfer) {
+        this.reasonForTransfer = reasonForTransfer;
+        return this;
+    }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -6382,6 +6395,9 @@ public class CaseDataBuilder {
             //Transfer Online Case
             .notSuitableSdoOptions(notSuitableSdoOptions)
             .tocTransferCaseReason(tocTransferCaseReason)
+            .transferCourtLocationList(transferCourtLocationList)
+            .reasonForTransfer(reasonForTransfer)
+
             .build();
     }
 }
