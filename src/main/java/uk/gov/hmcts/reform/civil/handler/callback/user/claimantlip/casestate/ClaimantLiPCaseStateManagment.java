@@ -12,8 +12,7 @@ public class ClaimantLiPCaseStateManagment {
 
     public AboutToStartOrSubmitCallbackResponse caseStateHandlerForClaimantResponse(
         AboutToStartOrSubmitCallbackResponse response, CaseData caseData) {
-        if ((caseData.isClaimantConfirmAmountNotPaidPartAdmit() || caseData.isSettlementDeclinedByClaimant()
-            || caseData.isClaimantRejectsClaimAmount() || caseData.isFullDefence())
+        if ((caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence())
             && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation()) {
             response.setState(CaseState.JUDICIAL_REFERRAL.name());
         }
