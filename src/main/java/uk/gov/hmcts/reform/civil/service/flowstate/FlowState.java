@@ -83,7 +83,9 @@ public interface FlowState {
         IN_MEDIATION,
         IN_HEARING_READINESS,
         MEDIATION_UNSUCCESSFUL_PROCEED,
-        All_FINAL_ORDERS_ISSUED;
+        All_FINAL_ORDERS_ISSUED,
+
+        SIGN_SETTLEMENT_AGREEMENT;
 
         public static final String FLOW_NAME = "MAIN";
 

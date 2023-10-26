@@ -1074,4 +1074,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
         }
         return null;
     }
+    @JsonIgnore
+    public boolean isRespondentSignSettlementAgreement() {
+        return true;
+        //return getCaseDataLiP() != null && getCaseDataLiP().getRespondentSignSettlementAgreement() != null;
+    }
 }

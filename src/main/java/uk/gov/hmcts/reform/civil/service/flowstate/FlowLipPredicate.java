@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 
 import java.util.function.Predicate;
 
@@ -23,5 +24,8 @@ public class FlowLipPredicate {
 
     public static final Predicate<CaseData> ccjRequestJudgmentByAdmission =
         CaseData::isCcjRequestJudgmentByAdmission;
+
+    public static final Predicate<CaseData> isRespondentSignSettlementAgreement =
+        CaseData::isRespondentSignSettlementAgreement;
 
 }
