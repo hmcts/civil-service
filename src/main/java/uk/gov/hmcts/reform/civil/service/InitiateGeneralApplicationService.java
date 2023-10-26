@@ -299,14 +299,14 @@ public class InitiateGeneralApplicationService {
         List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
         if (userRoles.isEmpty() || !isRespondentSolicitorOne(respondentCaseRoles)
             || (respondentCaseRoles.size() > 1 && !isRespondentSolicitorTwo(respondentCaseRoles))) {
-                return false;
-            }
+            return false;
+        }
 
         return true;
     }
 
-    public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails) {
-        return helper.isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
+    public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, String authToken) {
+        return helper.isGAApplicantSameAsParentCaseClaimant(caseData, authToken);
     }
 
     private List<String> getRespondentCaseRoles(CaseData caseData) {

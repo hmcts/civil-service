@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
+import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils.getRespondent2Solic
 public class InitiateGeneralApplicationServiceHelper {
 
     private final CaseAccessDataStoreApi caseAccessDataStoreApi;
+    private final UserRoleCaching userRoleCaching;
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
@@ -228,22 +231,21 @@ public class InitiateGeneralApplicationServiceHelper {
         return EMPTY;
     }
 
-    public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, UserDetails userDetails) {
+    public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, String authToken) {
         String parentCaseId = caseData.getCcdCaseReference().toString();
+        List<String> userRolesCaching = userRoleCaching.getUserRoles(authToken, parentCaseId);
 
-        CaseAssignedUserRolesResource userRoles = getUserRoles(parentCaseId);
-
-        List<CaseAssignedUserRole> applicantSolicitor = getApplicantSolicitor(userRoles, userDetails);
+        boolean isApplicantSolicitor = UserRoleUtils.isApplicantSolicitor(userRolesCaching);
 
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
-        if (!CollectionUtils.isEmpty(applicantSolicitor) && applicantSolicitor.size() == 1) {
+        if (!CollectionUtils.isEmpty(userRolesCaching) && userRolesCaching.size() == 1 && isApplicantSolicitor) {
 
-            CaseAssignedUserRole applnSol = applicantSolicitor.get(0);
+            String applnSol = userRolesCaching.get(0);
 
-            if (applnSol.getCaseRole() != null) {
+            if (applnSol != null) {
 
-                if (applnSol.getCaseRole().equals(applicant1OrgCaseRole)) {
+                if (applnSol.equals(applicant1OrgCaseRole)) {
                     return true;
                 }
             }
@@ -255,13 +257,6 @@ public class InitiateGeneralApplicationServiceHelper {
     public CaseAssignedUserRolesResource getUserRoles(String parentCaseId) {
         return caseAccessDataStoreApi.getUserRoles(
             getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
-    }
-
-    public List<CaseAssignedUserRole> getApplicantSolicitor(CaseAssignedUserRolesResource userRoles,
-                                                            UserDetails userDetails) {
-        return userRoles.getCaseAssignedUserRoles().stream()
-            .filter(CA -> CA.getUserId().equals(userDetails.getId()))
-            .collect(Collectors.toList());
     }
 
     public String getCaaAccessToken() {

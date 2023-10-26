@@ -100,8 +100,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
-
-
         caseDataBuilder
                 .generalAppHearingDetails(
                     GAHearingDetails
@@ -165,10 +163,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         } else {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.NO);
         }
-
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        String token = callbackParams.getParams().get(BEARER_TOKEN).toString();
         boolean isGAApplicantSameAsParentCaseClaimant = initiateGeneralApplicationService
-                .isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
+                .isGAApplicantSameAsParentCaseClaimant(caseData, token);
         caseDataBuilder
             .generalAppParentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant ? YES : YesOrNo.NO).build();
 
