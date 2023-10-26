@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 
@@ -65,9 +64,6 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         + "If you want the date of the hearing to be changed (or any other order to make the case ready for trial)"
         + "you will need to make an application to the court and pay the appropriate fee.";
     private final ObjectMapper objectMapper;
-
-    private final UserService userService;
-    private final CoreCaseUserService coreCaseUserService;
 
     private final UserRoleCaching userRoleCaching;
 
