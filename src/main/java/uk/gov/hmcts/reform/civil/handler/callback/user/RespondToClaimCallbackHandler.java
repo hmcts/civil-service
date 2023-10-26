@@ -531,7 +531,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                                                                         toggleService.isUpdateContactDetailsEnabled());
 
         updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1().toBuilder().flags(null).build());
-
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2().toBuilder().flags(null).build());
         }
@@ -669,7 +668,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 if (Objects.nonNull(copy)) {
                     defendantUploads.add(ElementUtils.element(copy));
                 }
-                respondent1DQ.setRespondent1DQDraftDirections(null);
             }
         }
 
@@ -710,7 +708,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 if (Objects.nonNull(copy)) {
                     defendantUploads.add(ElementUtils.element(copy));
                 }
-                respondent2DQ.setRespondent2DQDraftDirections(null);
             }
         }
 
