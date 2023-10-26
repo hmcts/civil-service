@@ -15,14 +15,6 @@ public class UserRoleUtils {
         // NO-OP
     }
 
-    public static boolean isLIPClaimant(List<String> roles) {
-        return hasRole(roles, CLAIMANT);
-    }
-
-    public static boolean isLIPDefendant(List<String> roles) {
-        return hasRole(roles, DEFENDANT);
-    }
-
     public static boolean isApplicantSolicitor(List<String> roles) {
         return hasRole(roles, APPLICANTSOLICITORONE);
     }
@@ -33,6 +25,14 @@ public class UserRoleUtils {
 
     public static boolean isRespondentSolicitorTwo(List<String> roles) {
         return hasRole(roles, RESPONDENTSOLICITORTWO);
+    }
+
+    public static boolean isLIPClaimant(List<String> roles) {
+        return hasRole(roles, CLAIMANT);
+    }
+
+    public static boolean isLIPDefendant(List<String> roles) {
+        return hasRole(roles, DEFENDANT);
     }
 
     private static boolean hasRole(List<String> roles, CaseRole role) {

@@ -80,8 +80,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         );
     }
 
-    CallbackResponse populateValues(CallbackParams callbackParams) {
-
+    private CallbackResponse populateValues(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
@@ -124,10 +123,9 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
-
+    private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder updatedData = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
@@ -159,6 +157,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(checkUserReady(callbackParams).equals(YesOrNo.YES) ? READY_HEADER : NOT_READY_HEADER)
             .confirmationBody(checkUserReady(callbackParams).equals(YesOrNo.YES) ? READY_BODY : NOT_READY_BODY)
