@@ -708,6 +708,8 @@ public class CaseDataParent implements MappableObject {
     private String pcqId;
 
     // TOC
+    private String reasonForTransfer;
+    private DynamicList transferCourtLocationList;
     private NotSuitableSdoOptions notSuitableSdoOptions;
     private TocTransferCaseReason tocTransferCaseReason;
 
