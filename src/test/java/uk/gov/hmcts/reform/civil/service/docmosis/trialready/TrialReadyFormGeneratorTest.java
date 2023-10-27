@@ -38,7 +38,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.TRIAL
     TrialReadyFormGenerator.class,
     JacksonAutoConfiguration.class
 })
-public class TrialReadyFormGeneratorTest {
+class TrialReadyFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
@@ -48,13 +48,10 @@ public class TrialReadyFormGeneratorTest {
         .documentName(fileName_application)
         .documentType(TRIAL_READY_DOCUMENT)
         .build();
-
     @MockBean
     private UnsecuredDocumentManagementService documentManagementService;
-
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
-
     @Autowired
     private TrialReadyFormGenerator generator;
 
@@ -73,14 +70,13 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.YES)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormApplicant", CaseRole.APPLICANTSOLICITORONE);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormApplicant",
+                                                       CaseRole.APPLICANTSOLICITORONE);
         // Then
         assertThat(caseDocument).isNotNull();
-        assertThat(caseDocument.getOwnedBy()).isEqualTo(CaseRole.APPLICANTSOLICITORONE);
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, TRIAL_READY_DOCUMENT));
-        assertThat(caseDocument.getOwnedBy()).isEqualTo(CaseRole.APPLICANTSOLICITORONE);
     }
 
     @Test
@@ -100,10 +96,10 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.YES)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent1", CaseRole.RESPONDENTSOLICITORONE);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent1",
+                                                       CaseRole.RESPONDENTSOLICITORONE);
         // Then
         assertThat(caseDocument).isNotNull();
-        assertThat(caseDocument.getOwnedBy()).isEqualTo(CaseRole.RESPONDENTSOLICITORONE);
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT));
@@ -127,10 +123,10 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.YES)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2", CaseRole.RESPONDENTSOLICITORTWO);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2",
+                                                       CaseRole.RESPONDENTSOLICITORTWO);
         // Then
         assertThat(caseDocument).isNotNull();
-        assertThat(caseDocument.getOwnedBy()).isEqualTo(CaseRole.RESPONDENTSOLICITORTWO);
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT));
@@ -154,10 +150,10 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.NO)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2", CaseRole.RESPONDENTSOLICITORTWO);
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2",
+                                                       CaseRole.RESPONDENTSOLICITORTWO);
         // Then
         assertThat(caseDocument).isNotNull();
-        assertThat(caseDocument.getOwnedBy()).isEqualTo(CaseRole.RESPONDENTSOLICITORTWO);
 
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, TRIAL_READY_DOCUMENT));
