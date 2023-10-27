@@ -675,13 +675,15 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isLocationWhiteListedForCaseProgression(
-            getEpimmsId(caseData))) {
-            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-            caseDataBuilder.eaCourtLocation(YesOrNo.YES);
-        } else {
-            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-            caseDataBuilder.eaCourtLocation(YesOrNo.NO);
+        if (featureToggleService.isEarlyAdoptersEnabled()) {
+            if (featureToggleService.isLocationWhiteListedForCaseProgression(
+                getEpimmsId(caseData))) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(YesOrNo.YES);
+            } else {
+                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(YesOrNo.NO);
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
