@@ -691,7 +691,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     private String getEpimmsId(CaseData caseData) {
-        if (caseData.getTrialHearingMethodInPersonDJ().getValue() != null) {
+        if (caseData.getTrialHearingMethodInPersonDJ() != null) {
             return caseData.getTrialHearingMethodInPersonDJ().getValue().getCode();
         } else if (caseData.getDisposalHearingMethodInPersonDJ() != null) {
             return caseData.getDisposalHearingMethodInPersonDJ().getValue().getCode();
