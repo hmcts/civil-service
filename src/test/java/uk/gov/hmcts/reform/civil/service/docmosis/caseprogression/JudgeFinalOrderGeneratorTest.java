@@ -212,7 +212,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(FREE_FROM_ORDER);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .ccdState(CaseState.CASE_PROGRESSION)
             .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("test without notice")
                                     .withoutNoticeSelectionDate(LocalDate.now()).build())
             .respondent2(PartyBuilder.builder().individual().build().toBuilder()
@@ -241,7 +241,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(ASSISTED_FROM_ORDER);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .ccdState(CaseState.CASE_PROGRESSION)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             // Order made section
             .finalOrderMadeSelection(NO)
@@ -288,7 +288,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(ASSISTED_FROM_ORDER);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .ccdState(CaseState.JUDICIAL_REFERRAL)
+            .ccdState(CaseState.CASE_PROGRESSION)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             // Order made section
             .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
