@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -29,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getResponseIntentionForEmail;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandler implements NotificationData {
@@ -67,12 +69,16 @@ public class AcknowledgeClaimApplicantNotificationHandler extends CallbackHandle
             ? getRespondentSolicitorEmailAddress(caseData)
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
 
-        notificationService.sendMail(
-            recipient,
-            notificationsProperties.getRespondentSolicitorAcknowledgeClaim(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (recipient != null) {
+            notificationService.sendMail(
+                recipient,
+                notificationsProperties.getRespondentSolicitorAcknowledgeClaim(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        } else {
+            log.info(String.format("Email address is null for %s", caseData.getLegacyCaseReference()));
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
