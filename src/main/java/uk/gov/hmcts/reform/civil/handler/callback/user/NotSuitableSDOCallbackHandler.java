@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
-import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TransferCaseDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
@@ -73,10 +73,10 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         if (toggleService.isTransferOnlineCaseEnabled()) {
             if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION) {
                 dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.CHANGE_LOCATION);
-                TocTransferCaseReason tocTransferCaseReason = TocTransferCaseReason.builder()
-                    .reasonForCaseTransferJudgeTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
+                TransferCaseDetails transferCaseDetails = TransferCaseDetails.builder()
+                    .reasonForTransferCaseTxt(callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt())
                     .build();
-                dataBuilder.tocTransferCaseReason(tocTransferCaseReason).build();
+                dataBuilder.transferCaseDetails(transferCaseDetails).build();
             } else {
                 dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);
                 tempOtherDetails.setReasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput());
@@ -95,7 +95,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         String reason;
         if (isTransferOnlineCase(callbackParams.getCaseData())) {
-            reason = ""; //Change to ReasonForCaseTransferJudgeTxt if validation also needed for this field
+            reason = callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt();
         } else {
             reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
         }
