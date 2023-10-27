@@ -320,7 +320,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
-                    "spec-claimant-template-id",
+                    "spec-respondent-template-id",
                     getNotificationDataMapSpec(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
@@ -343,7 +343,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
-                    "spec-claimant-template-id",
+                    "spec-respondent-template-id",
                     getNotificationDataMapPartAdmissionSpec(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );
@@ -366,7 +366,7 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
 
                 verify(notificationService).sendMail(
                     "respondentsolicitor@example.com",
-                    "spec-claimant-template-id",
+                    "spec-respondent-template-id",
                     getNotificationDataMapSpec(caseData),
                     "defendant-response-applicant-notification-000DC001"
                 );

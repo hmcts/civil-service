@@ -202,7 +202,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         ) {
             emailTemplate = notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction();
         } else {
-            emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
         }
 
         return emailTemplate;
