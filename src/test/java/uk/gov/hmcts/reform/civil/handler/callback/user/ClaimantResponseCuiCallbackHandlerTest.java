@@ -167,7 +167,22 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
-
         }
-    }
+
+      @Test
+        void shouldChangeCaseState_whenApplicantRejectClaimSettlementAndAgreeToMediation() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                    MediationDecision.Yes).build())
+                            .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.IN_MEDIATION.name());
+        }
+    
 }
