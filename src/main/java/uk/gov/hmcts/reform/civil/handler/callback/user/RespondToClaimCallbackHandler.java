@@ -80,6 +80,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
@@ -566,6 +567,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         // these documents are added to defendantUploads, if we do not remove/null the original,
         // case file view will show duplicate documents
         if (toggleService.isCaseFileViewEnabled()) {
+            log.info("Null placeholder documents");
             updatedData.respondent1ClaimResponseDocument(null);
             updatedData.respondent2ClaimResponseDocument(null);
             updatedData.respondent1DQ(updatedData.build().getRespondent1DQ().toBuilder().respondent1DQDraftDirections(null).build());
