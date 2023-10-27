@@ -61,7 +61,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_O
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -104,7 +103,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_START), this::nullPreviousSelections,
             callbackKey(MID, "populate-form-values"), this::populateFormValues,
             callbackKey(MID, "validate-and-generate-document"), this::validateFormAndGeneratePreviewDocument,
             callbackKey(ABOUT_TO_SUBMIT), this::addGeneratedDocumentToCollection,
@@ -115,6 +114,38 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    // Final orders can be submitted multiple times, we want each one to be a "clean slate"
+    // so we remove previously selected options from both Free form orders and assisted orders.
+    // Exception is fields which we specifically prepopulate e.g. date fields, or specific text.
+    private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder.finalOrderSelection(null);
+        // Free form orders
+        caseDataBuilder
+            .freeFormRecordedTextArea(null)
+            .freeFormOrderedTextArea(null)
+            .orderOnCourtsList(null);
+        // Assisted orders
+        caseDataBuilder
+            .finalOrderMadeSelection(null).finalOrderDateHeardComplex(null)
+            .finalOrderJudgePapers(null)
+            .finalOrderJudgeHeardFrom(null)
+            .finalOrderRepresentation(null)
+            .finalOrderRecitals(null)
+            .finalOrderRecitalsRecorded(null)
+            .finalOrderOrderedThatText(null)
+            .finalOrderFurtherHearingToggle(null).finalOrderFurtherHearingComplex(null)
+            .assistedOrderCostList(null).assistedOrderCostsReserved(null).assistedOrderMakeAnOrderForCosts(null).assistedOrderCostsBespoke(null)
+            .finalOrderAppealToggle(null).finalOrderAppealComplex(null)
+            .orderMadeOnDetailsList(null).finalOrderGiveReasonsComplex(null);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private CallbackResponse populateFormValues(CallbackParams callbackParams) {
@@ -208,12 +239,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private DynamicList populateCurrentHearingLocation(CaseData caseData, String authorisation) {
-        LocationRefData locationRefData;
-        if (hasSDOBeenMade(caseData.getCcdState())) {
-            locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
-        } else {
-            locationRefData = locationRefDataService.getCcmccLocation(authorisation);
-        }
+        LocationRefData locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
+
         return DynamicList.builder().listItems(List.of(DynamicListElement.builder()
                                    .code("LOCATION_LIST")
                                    .label(locationRefData.getSiteName())
@@ -227,10 +254,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                        .label(locationRefData.getSiteName())
                        .build())
             .build();
-    }
-
-    private boolean hasSDOBeenMade(CaseState state) {
-        return !JUDICIAL_REFERRAL.equals(state);
     }
 
     private CaseData.CaseDataBuilder<?, ?> populateFields(
