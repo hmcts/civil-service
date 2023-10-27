@@ -89,8 +89,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                 .applicant1AcceptAdmitAmountPaidSpec(NO)
-                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                        MediationDecision.No).build())
+                .caseDataLip(CaseDataLiP.builder()
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                                              .hasAgreedFreeMediation(
+                                                                                  MediationDecision.No).build())
                                  .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -169,14 +171,16 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
         }
 
-      @Test
+        @Test
         void shouldChangeCaseState_whenApplicantRejectClaimSettlementAndAgreeToMediation() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                    MediationDecision.Yes).build())
-                            .build())
+                .caseDataLip(CaseDataLiP.builder()
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                                              .hasAgreedFreeMediation(
+                                                                                  MediationDecision.Yes).build())
+                                 .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -184,5 +188,5 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getState()).isEqualTo(CaseState.IN_MEDIATION.name());
         }
-    
+    }
 }
