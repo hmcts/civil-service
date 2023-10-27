@@ -28,7 +28,7 @@ public class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandler 
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_APPLICANT1_FOR_REQUEST_JUDGEMENT_BY_ADMISSION_LIP_CLAIMANT);
     public static final String TASK_ID = "RequestJudgementByAdmissionLipClaimantNotifyRespondent1";
-    private static final String REFERENCE_TEMPLATE = "request-judgement-by-admission-respondent-notification-%s";
+    private static final String REFERENCE_TEMPLATE = "request-judgement-by-admission-applicant-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
