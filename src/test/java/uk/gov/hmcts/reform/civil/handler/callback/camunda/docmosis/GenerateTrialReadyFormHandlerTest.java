@@ -46,7 +46,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     ValidationAutoConfiguration.class,
     CaseDetailsConverter.class,
 })
-public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
+class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -56,7 +56,7 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
     private TrialReadyFormGenerator trialReadyFormGenerator;
 
     @Test
-    public void shouldGenerateForm_when1v1() {
+    void shouldGenerateForm_when1v1() {
         // Given
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
@@ -69,10 +69,10 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
                               .documentFileName("file-name")
                               .documentBinaryUrl("binary-url")
                               .build())
-            .ownedBy(CaseRole.CLAIMANT)
             .build();
 
-        when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class))).thenReturn(document);
+        when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class)))
+            .thenReturn(document);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_TRIAL_READY_FORM_APPLICANT.name());
@@ -80,7 +80,8 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
         verify(trialReadyFormGenerator).generate(
-            any(CaseData.class), eq("BEARER_TOKEN"), eq("GenerateTrialReadyFormApplicant"), eq(CaseRole.CLAIMANT));
+            any(CaseData.class), eq("BEARER_TOKEN"), eq("GenerateTrialReadyFormApplicant"),
+            eq(CaseRole.CLAIMANT));
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getTrialReadyDocuments()).hasSize(1);
@@ -88,7 +89,7 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    public void shouldGenerateForm_when1v1AndRespondent1() {
+    void shouldGenerateForm_when1v1AndRespondent1() {
         // Given
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
@@ -101,10 +102,10 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
                               .documentFileName("file-name")
                               .documentBinaryUrl("binary-url")
                               .build())
-            .ownedBy(CaseRole.DEFENDANT)
             .build();
 
-        when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class))).thenReturn(document);
+        when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class)))
+            .thenReturn(document);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_TRIAL_READY_FORM_RESPONDENT1.name());
@@ -112,7 +113,8 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
         verify(trialReadyFormGenerator).generate(
-            any(CaseData.class), eq("BEARER_TOKEN"), eq("GenerateTrialReadyFormRespondent1"), eq(CaseRole.DEFENDANT));
+            any(CaseData.class), eq("BEARER_TOKEN"), eq("GenerateTrialReadyFormRespondent1"),
+            eq(CaseRole.DEFENDANT));
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getTrialReadyDocuments()).hasSize(1);
@@ -120,7 +122,7 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
-    public void shouldGenerateForm_when1v2AndOneSeveralPartiesGeneratesDocument() {
+    void shouldGenerateForm_when1v2AndOneSeveralPartiesGeneratesDocument() {
         // Given
         CaseDocument document = CaseDocument.builder()
             .createdBy("John")
@@ -133,12 +135,12 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
                               .documentFileName("file-name")
                               .documentBinaryUrl("binary-url")
                               .build())
-            .ownedBy(CaseRole.RESPONDENTSOLICITORTWO)
             .build();
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(document));
 
-        when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class))).thenReturn(document);
+        when(trialReadyFormGenerator.generate(any(CaseData.class), anyString(), anyString(), any(CaseRole.class)))
+            .thenReturn(document);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .trialReadyDocuments(systemGeneratedCaseDocuments).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -147,7 +149,8 @@ public class GenerateTrialReadyFormHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
         verify(trialReadyFormGenerator).generate(
-            any(CaseData.class), eq("BEARER_TOKEN"), eq("GenerateTrialReadyFormRespondent2"), eq(CaseRole.RESPONDENTSOLICITORTWO));
+            any(CaseData.class), eq("BEARER_TOKEN"), eq("GenerateTrialReadyFormRespondent2"),
+            eq(CaseRole.RESPONDENTSOLICITORTWO));
 
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         assertThat(updatedData.getTrialReadyDocuments()).hasSize(2);
