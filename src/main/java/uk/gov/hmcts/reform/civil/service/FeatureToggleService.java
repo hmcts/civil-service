@@ -45,7 +45,7 @@ public class FeatureToggleService {
     }
 
     public boolean isRPAEmailEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("enable-rpa-emails");
+        return true;
     }
 
     public boolean isHmcEnabled() {
