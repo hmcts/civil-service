@@ -62,13 +62,19 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private void updateClaimStateJudicialReferral(
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response,
         CaseData caseData) {
-        if ((caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence())
-            && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation()) {
+        if (isJudicialReferralAllowed(caseData)) {
             response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
     }
-    
-    private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
+
+    private boolean isJudicialReferralAllowed(CaseData caseData) {
+        return (caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence())
+            && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation();
+    }
+
+    private void updateClaimEndState(
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response,
+        CaseData updatedData) {
         if (updatedData.hasClaimantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
         }
