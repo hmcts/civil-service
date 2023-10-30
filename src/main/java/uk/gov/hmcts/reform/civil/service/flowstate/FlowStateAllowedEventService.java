@@ -137,7 +137,6 @@ public class FlowStateAllowedEventService {
 
     private final StateFlowEngine stateFlowEngine;
     private final CaseDetailsConverter caseDetailsConverter;
-    private final FeatureToggleService toggleService;
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
         entry(
@@ -1305,6 +1304,76 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES
+            )
+        ),
+        entry(
+            TAKEN_OFFLINE_BY_STAFF.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                APPLICATION_OFFLINE_UPDATE_CLAIM,
+                migrateCase
+            )
+        ),
+        entry(
+            TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                APPLICATION_OFFLINE_UPDATE_CLAIM,
+                migrateCase
+            )
+        ),
+        entry(
+            TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                APPLICATION_OFFLINE_UPDATE_CLAIM,
+                migrateCase
+            )
+        ),
+        entry(
+            TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                APPLICATION_OFFLINE_UPDATE_CLAIM,
+                migrateCase
+            )
+        ),
+        entry(
+            TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                APPLICATION_OFFLINE_UPDATE_CLAIM,
+                migrateCase
+            )
+        ),
+        entry(
+            TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                APPLICATION_OFFLINE_UPDATE_CLAIM,
+                migrateCase
+            )
+        ),
+        entry(
+            TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                APPLICATION_OFFLINE_UPDATE_CLAIM,
+                migrateCase
+            )
+        ),
+        entry(
+            TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                migrateCase
+            )
+        ),
+        entry(
+            TAKEN_OFFLINE_AFTER_SDO.fullName(),
+            List.of(
+                ADD_CASE_NOTE,
+                AMEND_PARTY_DETAILS
             )
         )
     );
