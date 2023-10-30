@@ -22,4 +22,14 @@ public class Party {
     private final String litigationFriendPhoneNumber;
     private final String litigationFriendEmailAddress;
     private final String legalRepHeading;
+
+    public static Party toLipParty(uk.gov.hmcts.reform.civil.model.Party party) {
+        return Party.builder()
+            .name(party.getPartyName())
+            .emailAddress(party.getPartyEmail())
+            .type(party.getType().getDisplayValue())
+            .phoneNumber(party.getPartyPhone())
+            .primaryAddress(party.getPrimaryAddress())
+            .build();
+    }
 }
