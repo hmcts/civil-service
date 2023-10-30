@@ -66,7 +66,7 @@ class PartyTest {
         Party party = Party.builder().type(Party.Type.COMPANY)
             .build();
 
-        assertThat(party.isCompanyOROrganistaion()).isTrue();
+        assertThat(party.isCompanyOROrganisation()).isTrue();
     }
 
     @Test
@@ -74,7 +74,7 @@ class PartyTest {
         Party party = Party.builder().type(Party.Type.ORGANISATION)
             .build();
 
-        assertThat(party.isCompanyOROrganistaion()).isTrue();
+        assertThat(party.isCompanyOROrganisation()).isTrue();
     }
 
     @Test
@@ -82,7 +82,7 @@ class PartyTest {
         Party party = Party.builder().type(Party.Type.INDIVIDUAL)
             .build();
 
-        assertThat(party.isCompanyOROrganistaion()).isFalse();
+        assertThat(party.isCompanyOROrganisation()).isFalse();
     }
 
 }

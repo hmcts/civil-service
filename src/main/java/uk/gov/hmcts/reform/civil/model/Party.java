@@ -104,7 +104,7 @@ public class Party {
     }
 
     @JsonIgnore
-    public boolean isCompanyOROrganistaion() {
+    public boolean isCompanyOROrganisation() {
         return this.isCompany() || this.isOrganisation();
     }
 
