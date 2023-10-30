@@ -91,6 +91,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTi
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TransferCaseDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -526,6 +527,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
+    private String featureToggleWA;
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
@@ -571,7 +573,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentWithName>> documentAndName;
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
-    private final String caseNoteTypeNoteTA;
+    private final String caseNoteTA;
+    private final List<Element<CaseNote>> caseNotesTA;
     private final LocalDateTime noteAdditionDateTime;
     private final String caseTypeFlag;
     private final String witnessStatementFlag;
@@ -624,6 +627,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo joIsLiveJudgmentExists;
     private LocalDate joSetAsideDate;
     private JudgmentPaidInFull joJudgmentPaidInFull;
+
+    private final TransferCaseDetails transferCaseDetails;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending

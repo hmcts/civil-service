@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -53,9 +54,22 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
             .applicant1ResponseDate(time.now())
             .build();
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.toMap(objectMapper))
-            .build();
+
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(updatedData.toMap(objectMapper));
+
+        updateClaimEndState(response, updatedData);
+
+        return response.build();
     }
 
+    private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
+
+        if (updatedData.hasClaimantAgreedToFreeMediation()) {
+            response.state(CaseState.IN_MEDIATION.name());
+        } else {
+            response.state(CaseState.JUDICIAL_REFERRAL.name());
+        }
+    }
 }
