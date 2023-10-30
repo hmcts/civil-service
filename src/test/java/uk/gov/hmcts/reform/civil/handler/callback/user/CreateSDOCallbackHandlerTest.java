@@ -252,6 +252,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .disposalHearingMethodInPerson(options)
                 .fastTrackMethodInPerson(options)
                 .smallClaimsMethodInPerson(options)
+                .setFastTrackFlag(YES)
                 .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
@@ -508,6 +509,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .smallClaimsMethodInPerson(options)
             .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
             .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
+            .orderType(OrderType.DISPOSAL)
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -550,6 +552,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .fastTrackMethodInPerson(options)
             .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .setSmallClaimsFlag(YES)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
@@ -591,6 +594,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .fastTrackMethodInPerson(options.toBuilder().value(selectedCourt).build())
             .disposalHearingMethodInPerson(options)
             .claimsTrack(ClaimsTrack.fastTrack)
+            .setFastTrackFlag(YES)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
@@ -612,7 +616,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     @SneakyThrows
-    void shouldThrowIllegalArgumentException_whenSelectedCourtValueIsNotDefined() {
+    void shouldThrowIllegalArgumentException_whenClaimTrackCannotDefined() {
         DynamicList options = DynamicList.builder()
             .listItems(List.of(
                            DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),

@@ -98,6 +98,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
+import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
@@ -219,7 +222,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackMethodInPerson(locationsList);
         updatedData.smallClaimsMethodInPerson(locationsList);
 
-        List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
+        List<OrderDetailsPagesSectionsToggle> checkList = List.of(SHOW);
         setCheckList(updatedData, checkList);
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
@@ -736,9 +739,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.setFastTrackFlag(YesOrNo.NO).build();
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            updatedData.setSmallClaimsFlag(YesOrNo.YES).build();
+            updatedData.setSmallClaimsFlag(YES).build();
         } else if (SdoHelper.isFastTrack(caseData)) {
-            updatedData.setFastTrackFlag(YesOrNo.YES).build();
+            updatedData.setFastTrackFlag(YES).build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -844,7 +847,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             if (featureToggleService.isLocationWhiteListedForCaseProgression(
                 getEpimmsId(caseData))) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(YesOrNo.YES);
+                dataBuilder.eaCourtLocation(YES);
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(YesOrNo.NO);
@@ -857,14 +860,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private String getEpimmsId(CaseData caseData) {
-        if (caseData.getFastTrackMethodInPerson().getValue() != null) {
-            return caseData.getFastTrackMethodInPerson().getValue().getCode();
-        } else if (caseData.getDisposalHearingMethodInPerson().getValue() != null) {
+
+        if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
             return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
-        } else if (caseData.getSmallClaimsMethodInPerson().getValue() != null) {
+        }
+        if (caseData.getSetFastTrackFlag() != null && caseData.getSetFastTrackFlag().equals(YES)) {
+            return caseData.getFastTrackMethodInPerson().getValue().getCode();
+        }
+        if (caseData.getSetSmallClaimsFlag() != null && caseData.getSetSmallClaimsFlag().equals(YES)) {
             return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
         }
-        throw new IllegalArgumentException("Epimms Id is not provided");
+        throw new IllegalArgumentException("Could not determine claim track");
     }
 
     private boolean nonNull(Object object) {
