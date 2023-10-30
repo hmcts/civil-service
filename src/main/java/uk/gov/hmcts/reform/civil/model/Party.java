@@ -104,6 +104,11 @@ public class Party {
     }
 
     @JsonIgnore
+    public boolean isCompanyOROrganistaion() {
+        return this.isCompany() || this.isOrganisation();
+    }
+
+    @JsonIgnore
     public LocalDate getDateOfBirth() {
         return Optional.ofNullable(individualDateOfBirth).orElse(soleTraderDateOfBirth);
     }
