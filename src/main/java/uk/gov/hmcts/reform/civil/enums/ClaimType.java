@@ -13,7 +13,7 @@ public enum ClaimType {
     CONSUMER(FeeType.HIGHER),
     CONSUMER_CREDIT(FeeType.HIGHER),
     OTHER(FeeType.HIGHER),
-    FLIGHT_DELAY(FeeType.LOWER);    //TODO is feeType lower or higher???
+    FLIGHT_DELAY(null);
 
     private final FeeType feeType;
 
