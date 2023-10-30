@@ -60,7 +60,6 @@ public class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandler 
 
         notificationService.sendMail(
             addEmail(caseData),
-            // Change Template Name
             notificationsProperties.getNotifyApplicantLipRequestJudgementByAdmissionNotificationTemplate(),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
