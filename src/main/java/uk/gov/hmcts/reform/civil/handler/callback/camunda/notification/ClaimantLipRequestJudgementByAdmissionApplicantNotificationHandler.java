@@ -37,7 +37,7 @@ public class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandler 
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::notifyRespondent1ForRequestJudgementByAdmission
+            this::notifyApplicant1ForRequestJudgementByAdmission
         );
     }
 
@@ -51,7 +51,7 @@ public class ClaimantLipRequestJudgementByAdmissionApplicantNotificationHandler 
         return EVENTS;
     }
 
-    private CallbackResponse notifyRespondent1ForRequestJudgementByAdmission(CallbackParams callbackParams) {
+    private CallbackResponse notifyApplicant1ForRequestJudgementByAdmission(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         if (!caseData.isLipvLipOneVOne() || caseData.getApplicant1Email() == null) {
