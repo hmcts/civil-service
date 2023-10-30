@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
@@ -87,6 +88,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_ASIDE_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
@@ -276,7 +279,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_RESPONDENT,
                 GENERATE_DIRECTIONS_ORDER,
                 TRIAL_READINESS,
-                BUNDLE_CREATION_NOTIFICATION
+                BUNDLE_CREATION_NOTIFICATION,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -535,7 +539,8 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
-                RECORD_JUDGMENT
+                RECORD_JUDGMENT,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -759,7 +764,8 @@ public class FlowStateAllowedEventService {
                 GENERATE_DIRECTIONS_ORDER,
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                asyncStitchingComplete
             )
         )
     );
@@ -1081,7 +1087,8 @@ public class FlowStateAllowedEventService {
                 SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
                 RECORD_JUDGMENT,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -1225,7 +1232,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                asyncStitchingComplete
             )
         ),
          entry(
@@ -1304,6 +1312,12 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES
+            )
+        ),
+        entry(
+            PREPARE_FOR_HEARING_CONDUCT_HEARING.fullName(),
+            List.of(
+                asyncStitchingComplete
             )
         ),
         entry(

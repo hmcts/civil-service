@@ -61,7 +61,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_O
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
@@ -240,12 +239,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private DynamicList populateCurrentHearingLocation(CaseData caseData, String authorisation) {
-        LocationRefData locationRefData;
-        if (hasSDOBeenMade(caseData.getCcdState())) {
-            locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
-        } else {
-            locationRefData = locationRefDataService.getCcmccLocation(authorisation);
-        }
+        LocationRefData locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
+
         return DynamicList.builder().listItems(List.of(DynamicListElement.builder()
                                    .code("LOCATION_LIST")
                                    .label(locationRefData.getSiteName())
@@ -259,10 +254,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                        .label(locationRefData.getSiteName())
                        .build())
             .build();
-    }
-
-    private boolean hasSDOBeenMade(CaseState state) {
-        return !JUDICIAL_REFERRAL.equals(state);
     }
 
     private CaseData.CaseDataBuilder<?, ?> populateFields(
