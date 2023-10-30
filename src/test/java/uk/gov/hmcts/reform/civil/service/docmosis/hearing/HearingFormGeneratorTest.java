@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -72,6 +73,7 @@ public class HearingFormGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.LISTING)
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())

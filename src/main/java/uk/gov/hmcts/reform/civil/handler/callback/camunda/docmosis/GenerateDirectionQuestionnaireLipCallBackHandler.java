@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
-import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireLipGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +32,7 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
     );
 
     private final ObjectMapper objectMapper;
-    private final DirectionsQuestionnaireLipGenerator directionsQuestionnaireLipGenerator;
+    private final DirectionQuestionnaireLipGeneratorFactory directionQuestionnaireLipGeneratorFactory;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
 
     @Override
@@ -52,15 +52,12 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
                 .build();
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        CaseDocument sealedDQForm = directionsQuestionnaireLipGenerator.generate(
-            caseData,
-            callbackParams.getParams().get(
-                BEARER_TOKEN).toString()
-        );
-        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-            sealedDQForm,
-            caseData
-        ));
+        CaseDocument sealedDQForm = directionQuestionnaireLipGeneratorFactory
+            .getDirectionQuestionnaire()
+            .generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        caseDataBuilder
+            .systemGeneratedCaseDocuments(systemGeneratedDocumentService
+                                              .getSystemGeneratedDocumentsWithAddedDocument(sealedDQForm, caseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
