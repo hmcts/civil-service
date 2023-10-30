@@ -230,6 +230,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             )
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
+            .put(callbackKey(MID, "is-flight-delay-claim"), this::isFlightDelayClaim)
             .build();
     }
 
@@ -897,6 +898,18 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validateEmailService.validate(caseData.getRespondentSolicitor2EmailAddress()))
+            .build();
+    }
+
+    private CallbackResponse isFlightDelayClaim(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+
+        if (toggleService.isSdoR2Enabled()) {
+            caseDataBuilder.isFlightDelayClaim(callbackParams.getCaseData().getIsFlightDelayClaim());
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
