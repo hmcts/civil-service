@@ -60,8 +60,6 @@ public class BundlingCaseData {
     private final List<Element<BundlingRequestDocument>> defendant2CostsBudgets;
     @JsonProperty("systemGeneratedCaseDocuments")
     private final List<Element<BundlingRequestDocument>> systemGeneratedCaseDocuments;
-    @JsonProperty("courtLocation")
-    private final String courtLocation;
     @JsonProperty("applicant1")
     private final Party applicant1;
     @JsonProperty("hasApplicant2")
