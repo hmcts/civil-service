@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.toList;
  */
 @Data
 @Jacksonized
-@Builder
+@Builder(toBuilder = true)
 public class DynamicList {
 
     /**

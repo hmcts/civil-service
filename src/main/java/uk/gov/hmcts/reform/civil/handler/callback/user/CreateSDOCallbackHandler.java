@@ -859,9 +859,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private String getEpimmsId(CaseData caseData) {
         if (caseData.getFastTrackMethodInPerson().getValue() != null) {
             return caseData.getFastTrackMethodInPerson().getValue().getCode();
-        } else if (caseData.getDisposalHearingMethodInPerson() != null) {
+        } else if (caseData.getDisposalHearingMethodInPerson().getValue() != null) {
             return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
-        } else if (caseData.getSmallClaimsMethodInPerson() != null) {
+        } else if (caseData.getSmallClaimsMethodInPerson().getValue() != null) {
             return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
         }
         throw new IllegalArgumentException("Epimms Id is not provided");
