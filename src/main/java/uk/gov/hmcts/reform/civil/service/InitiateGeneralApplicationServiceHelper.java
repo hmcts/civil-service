@@ -243,11 +243,8 @@ public class InitiateGeneralApplicationServiceHelper {
 
             String applnSol = userRolesCaching.get(0);
 
-            if (applnSol != null) {
-
-                if (applnSol.equals(applicant1OrgCaseRole)) {
-                    return true;
-                }
+            if (applnSol != null && applnSol.equals(applicant1OrgCaseRole)) {
+                return true;
             }
         }
 

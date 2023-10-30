@@ -299,12 +299,8 @@ public class InitiateGeneralApplicationService {
         String caseId = caseData.getCcdCaseReference().toString();
         List<String> userRoles = userRoleCaching.getUserRoles(authToken, caseId);
         List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
-        if (userRoles.isEmpty() || !isRespondentSolicitorOne(respondentCaseRoles)
-            || (respondentCaseRoles.size() > 1 && !isRespondentSolicitorTwo(respondentCaseRoles))) {
-            return false;
-        }
-
-        return true;
+        return (userRoles.isEmpty() || !isRespondentSolicitorOne(respondentCaseRoles)
+            || (respondentCaseRoles.size() > 1 && !isRespondentSolicitorTwo(respondentCaseRoles)));
     }
 
     public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, String authToken) {
