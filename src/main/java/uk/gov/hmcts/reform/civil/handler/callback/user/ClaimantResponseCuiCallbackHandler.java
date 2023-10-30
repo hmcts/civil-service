@@ -51,6 +51,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         CaseData updatedData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
             .build();
+
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.toMap(objectMapper));
