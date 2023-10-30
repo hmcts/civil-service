@@ -863,6 +863,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private String getEpimmsId(CaseData caseData) {
         System.out.println("get Epimms");
+        System.out.println("getOrderType = " + caseData.getOrderType());
+        System.out.println("setFastTrackFlag = " + caseData.getSetFastTrackFlag());
+        System.out.println("setSmallClaimsFlag = " + caseData.getSetSmallClaimsFlag());
 
         if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
             System.out.println("disposal epimms" + caseData.getDisposalHearingMethodInPerson().getValue().getCode());
