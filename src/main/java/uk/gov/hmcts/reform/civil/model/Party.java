@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.validation.groups.DateOfBirthGroup;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
@@ -100,5 +101,10 @@ public class Party {
     @JsonIgnore
     public boolean isOrganisation() {
         return ORGANISATION.equals(getType());
+    }
+
+    @JsonIgnore
+    public LocalDate getDateOfBirth() {
+        return Optional.ofNullable(individualDateOfBirth).orElse(soleTraderDateOfBirth);
     }
 }
