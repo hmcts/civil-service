@@ -28,10 +28,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.is1v1Or2v1Case;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
 
@@ -85,21 +81,7 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
         //Use 1v1 Template
         if (is1v1Or2v1Case(caseData)) {
             recipient = caseData.getRespondentSolicitor1EmailAddress();
-            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_ONE)) {
-                templateID = notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction();
-            } else {
-                if ((caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
-                    || caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == BY_SET_DATE
-                    || caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == SUGGESTION_OF_REPAYMENT_PLAN)
-                    &&
-                    (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                        || RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
-                ) {
-                    templateID = notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction();
-                } else {
-                    templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
-                }
-            }
+            templateID = notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline();
         } else {
             //Use Multiparty Template as there are 2 defendant responses
             if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
