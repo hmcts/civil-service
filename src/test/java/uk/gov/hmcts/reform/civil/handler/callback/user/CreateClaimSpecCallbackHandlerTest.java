@@ -1656,6 +1656,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).doesNotHaveToString("isFlightDelayClaim");
         }
     }
+
     @Nested
     class AboutToSubmitCallbackV1 {
 
