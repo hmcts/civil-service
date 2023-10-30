@@ -854,22 +854,29 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             }
         }
 
+        System.out.println("before about to submit");
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
 
     private String getEpimmsId(CaseData caseData) {
+        System.out.println("get Epimms");
 
         if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
+            System.out.println("disposal epimms" + caseData.getDisposalHearingMethodInPerson().getValue().getCode());
             return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
         }
         if (caseData.getSetFastTrackFlag() != null && caseData.getSetFastTrackFlag().equals(YES)) {
+            System.out.println("fast track epimms" + caseData.getFastTrackMethodInPerson().getValue().getCode());
             return caseData.getFastTrackMethodInPerson().getValue().getCode();
         }
         if (caseData.getSetSmallClaimsFlag() != null && caseData.getSetSmallClaimsFlag().equals(YES)) {
+            System.out.println("small claim epimms" + caseData.getSmallClaimsMethodInPerson().getValue().getCode());
             return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
         }
+        System.out.println("get epimms exception");
         throw new IllegalArgumentException("Could not determine claim track");
     }
 
