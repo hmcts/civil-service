@@ -299,7 +299,7 @@ public class InitiateGeneralApplicationService {
         String caseId = caseData.getCcdCaseReference().toString();
         List<String> userRoles = userRoleCaching.getUserRoles(authToken, caseId);
         List<String> respondentCaseRoles = getRespondentCaseRoles(caseData);
-        return (userRoles.isEmpty() || !isRespondentSolicitorOne(respondentCaseRoles)
+        return !(userRoles.isEmpty() || !isRespondentSolicitorOne(respondentCaseRoles)
             || (respondentCaseRoles.size() > 1 && !isRespondentSolicitorTwo(respondentCaseRoles)));
     }
 
