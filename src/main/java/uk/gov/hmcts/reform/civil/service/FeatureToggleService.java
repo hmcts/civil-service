@@ -82,6 +82,6 @@ public class FeatureToggleService {
     }
 
     public boolean isCaseProgressionEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-progression");
+        return true;
     }
 }
