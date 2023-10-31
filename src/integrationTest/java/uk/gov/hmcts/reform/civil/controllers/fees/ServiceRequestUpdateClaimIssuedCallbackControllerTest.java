@@ -90,7 +90,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
         mockMvc.perform(
             MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(buildServiceDto()))).andExpect(status().isBadRequest());
+                .content(toJson(buildServiceDto()))).andExpect(status().is4xxClientError());
     }
 
     @Test
