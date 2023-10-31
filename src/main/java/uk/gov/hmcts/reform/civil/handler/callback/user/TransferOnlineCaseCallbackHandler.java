@@ -42,6 +42,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
     private static final String ERROR_SELECT_DIFF_LOCATION = "Select a different hearing court location to transfer!";
+    private static final String CONFIRMATION_HEADER = "# Case transferred to new location";
 
     @Override
     protected Map<String, Callback> callbacks() {
