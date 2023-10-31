@@ -126,13 +126,13 @@ public class BundleRequestMapper {
             caseData.getServedDocumentFiles()
                     .getParticularsOfClaimDocument()
                     .forEach(poc -> bundlingRequestDocuments.add(
-                            buildBundlingRequestDoc(getParticularsOfClaimDate(caseData),
+                            buildBundlingRequestDoc(getParticularsOfClaimName(caseData),
                             poc.getValue(), "")));
         }
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
-    private String getParticularsOfClaimDate(CaseData caseData) {
+    private String getParticularsOfClaimName(CaseData caseData) {
         LocalDate pocDate;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             pocDate = caseData.getIssueDate();
