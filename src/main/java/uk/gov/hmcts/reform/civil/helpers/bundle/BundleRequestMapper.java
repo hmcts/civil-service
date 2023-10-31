@@ -35,9 +35,11 @@ import java.util.HashMap;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getExpertDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getWitnessDocsByPartyAndDocType;
@@ -83,6 +85,7 @@ public class BundleRequestMapper {
                     bundleConfigFileName)
                     .trialDocuments(mapTrialDocuments(caseData))
                     .statementsOfCaseDocuments(mapStatementOfcaseDocs(caseData))
+                    .particularsOfClaim(mapParticularsOfClaimDocs(caseData))
                     .ordersDocuments(mapOrdersDocument(caseData))
                     .claimant1WitnessStatements(mapWitnessStatements(caseData, PartyType.CLAIMANT1))
                     .claimant2WitnessStatements(mapWitnessStatements(caseData, PartyType.CLAIMANT2))
@@ -110,6 +113,32 @@ public class BundleRequestMapper {
                 .build();
         bundlingCaseData = mapRespondent2Applicant2Details(bundlingCaseData, caseData);
         return bundlingCaseData;
+    }
+
+    private List<Element<BundlingRequestDocument>> mapParticularsOfClaimDocs(CaseData caseData) {
+        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+        if (Objects.nonNull(caseData.getServedDocumentFiles())
+                && Objects.nonNull((caseData.getServedDocumentFiles().getParticularsOfClaimDocument()))) {
+            caseData.getServedDocumentFiles()
+                    .getParticularsOfClaimDocument()
+                    .forEach(poc -> bundlingRequestDocuments.add(
+                            buildBundlingRequestDoc(getParticularsOfClaimDate(caseData),
+                            poc.getValue(), "")));
+        }
+        return ElementUtils.wrapElements(bundlingRequestDocuments);
+    }
+
+    private String getParticularsOfClaimDate(CaseData caseData) {
+        LocalDate pocDate;
+        if(SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            pocDate = caseData.getIssueDate();
+        } else if(Objects.nonNull(caseData.getClaimDetailsNotificationDate())) {
+            pocDate = caseData.getClaimDetailsNotificationDate().toLocalDate();
+        } else {
+            pocDate = caseData.getSubmittedDate().toLocalDate();
+        }
+        return generateDocName(BundleFileNameList.PARTICULARS_OF_CLAIM.getDisplayName(),
+                null, null, pocDate);
     }
 
     private List<Element<BundlingRequestDocument>> mapJointStatementOfExperts(CaseData caseData) {
