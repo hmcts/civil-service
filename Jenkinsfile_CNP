@@ -8,7 +8,7 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "fix/CIV-11226"
+def ccdBranch = "master"
 def camundaBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
@@ -43,10 +43,7 @@ def secrets = [
     secret('ccd-importer-username', 'CCD_CONFIGURER_IMPORTER_USERNAME'),
     secret('ccd-importer-password', 'CCD_CONFIGURER_IMPORTER_PASSWORD'),
     secret('postgres-user', 'POSTGRES_USER'),
-    secret('postgres-password', 'POSTGRES_PASSWORD'),
-    secret('default-password','DEFAULT_PASSWORD'),
-    secret('judge-default-password','JUDGE_DEFAULT_PASSWORD'),
-    secret('iac-default-password','IAC_DEFAULT_PASSWORD')
+    secret('postgres-password', 'POSTGRES_PASSWORD')
   ]
 ]
 
