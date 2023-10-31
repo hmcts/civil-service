@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -90,6 +91,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTi
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TransferCaseDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -106,6 +108,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -525,6 +528,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
+    private String featureToggleWA;
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
@@ -570,7 +574,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<DocumentWithName>> documentAndName;
     private final List<Element<DocumentAndNote>> documentAndNote;
     private final CaseNoteType caseNoteType;
-    private final String caseNoteTypeNoteTA;
+    private final String caseNoteTA;
+    private final List<Element<CaseNote>> caseNotesTA;
     private final LocalDateTime noteAdditionDateTime;
     private final String caseTypeFlag;
     private final String witnessStatementFlag;
@@ -623,6 +628,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo joIsLiveJudgmentExists;
     private LocalDate joSetAsideDate;
     private JudgmentPaidInFull joJudgmentPaidInFull;
+
+    private final TransferCaseDetails transferCaseDetails;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1038,12 +1045,27 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public String getApplicant1Email() {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
-    
+
     @JsonIgnore
     public String getHelpWithFeesReferenceNumber() {
         return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getHelpWithFees)
+            .map(HelpWithFees::getHelpWithFeesReferenceNumber).orElse(null);
+    }
+
+    @JsonIgnore
+    public Address getRespondent1CorrespondenceAddress() {
+        return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
-            .map(RespondentLiPResponse::getHelpWithFeesReferenceNumberLip).orElse(null);
+            .map(RespondentLiPResponse::getRespondent1LiPCorrespondenceAddress)
+            .orElse(null);
+    }
+
+    @JsonIgnore
+    public String getCurrentCamundaBusinessProcessName() {
+        return ofNullable(getBusinessProcess())
+            .map(BusinessProcess::getCamundaEvent)
+            .orElse(null);
     }
 
     @JsonIgnore
