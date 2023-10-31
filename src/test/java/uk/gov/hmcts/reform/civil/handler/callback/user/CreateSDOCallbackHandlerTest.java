@@ -67,6 +67,7 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -193,7 +194,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+                .build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
@@ -201,6 +204,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
+
+            given(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).willReturn(true);
         }
 
         @Test
@@ -241,6 +246,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .baseLocation("previous base location")
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
                 .disposalHearingMethodInPerson(options)
                 .disposalHearingMethodToggle(Collections.singletonList(OrderDetailsPagesSectionsToggle.SHOW))
@@ -273,6 +279,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .baseLocation("previous base location")
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
                 .fastTrackMethodInPerson(options)
                 .claimsTrack(ClaimsTrack.fastTrack)
@@ -305,6 +312,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .baseLocation("previous base location")
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
                 .smallClaimsMethodInPerson(options)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
@@ -337,6 +345,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .baseLocation("previous base location")
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
                 .fastTrackMethodInPerson(options)
                 .drawDirectionsOrderRequired(YesOrNo.YES)
@@ -369,6 +378,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .baseLocation("previous base location")
                 .build();
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
                 .smallClaimsMethodInPerson(options)
                 .drawDirectionsOrderRequired(YesOrNo.YES)
@@ -395,6 +405,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNullDocument_whenInvokedAboutToSubmit() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1479,5 +1490,77 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(CREATE_SDO);
+    }
+
+    @Nested
+    class MidEventNegativeNumberOfWitness {
+        private static final String PAGE_ID = "validateInputValue";
+
+        @Test
+        void shouldThrowErrorWhenEnteringNegativeNumberOfWitnessSmallClaim() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atSmallClaimsWitnessStatementWithNegativeInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
+        }
+
+        @Test
+        void shouldThrowErrorWhenEnteringNegativeNumberOfWitnessFastTrack() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atFastTrackWitnessOfFactWithNegativeInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
+        }
+
+        @Test
+        void shouldNotThrowErrorWhenEnteringPositiveNumberOfWitnessSmallClaim() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atSmallClaimsWitnessStatementWithPositiveInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotThrowErrorWhenEnteringPositiveNumberOfWitnessFastTrack() {
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atFastTrackWitnessOfFactWithPositiveInputs()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+            assertThat(response.getErrors()).isNull();
+
+        }
     }
 }

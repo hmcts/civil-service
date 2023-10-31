@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -21,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -56,7 +58,8 @@ public class HearingFormGeneratorTest {
 
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
-
+    @MockBean
+    private AssignCategoryId assignCategoryId;
     @Autowired
     private HearingFormGenerator generator;
 
@@ -70,6 +73,7 @@ public class HearingFormGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.LISTING)
             .totalClaimAmount(new BigDecimal(2000))
             .build().toBuilder()
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
