@@ -20,9 +20,11 @@ import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrationTest {
@@ -40,6 +42,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
 
     @BeforeEach
     void bareMinimumToMakeAPositiveRequest() {
+        when(authorisationService.isServiceAuthorized(any())).thenReturn(true);
         CaseData
             caseData = CaseData.builder().businessProcess(BusinessProcess.builder().processInstanceId("instance").camundaEvent("camunda event").build()).build();
         CaseDetails caseDetails = CaseDetails.builder().build();
@@ -75,6 +78,30 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             // Then: the result status must be an HTTP-5xx
             .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void whenValidPaymentCallbackIsReceivedReturnSuccess() throws Exception {
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void whenPaymentCallbackIsReceivedWithoutServiceAuthorisationReturn400() throws Exception {
+        mockMvc.perform(
+            MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(buildServiceDto()))).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButreturnsfalseReturn400() throws Exception {
+        when(authorisationService.isServiceAuthorized(any())).thenReturn(false);
+
+        doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
+            // Then: the result status must be an HTTP-4xx
+            .andExpect(status().is4xxClientError());
+
     }
 
     private ServiceRequestUpdateDto buildServiceDto() {
