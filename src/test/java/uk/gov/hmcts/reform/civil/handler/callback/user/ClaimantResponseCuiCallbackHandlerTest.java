@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -121,12 +122,27 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldChangeCaseState_whenApplicantProceedWithTheClaim() {
+        void shouldChangeCaseState_whenApplicantSettleTheClaimFullDefence() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
+                .applicant1ProceedWithClaim(NO)
+                .build();
+
+            caseData = caseData.toBuilder()
+                .defenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
+        }
+
+        @Test
+        void shouldChangeCaseState_whenApplicantSettleTheClaimPartAdmit() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1ProceedWithClaim(NO).applicant1PartAdmitConfirmAmountPaidSpec(YES)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
