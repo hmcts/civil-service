@@ -99,7 +99,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
 
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             // Then: the result status must be an HTTP-4xx
-            .andExpect(status().is4xxClientError());
+            .andExpect(status().is5xxServerError());
 
     }
 

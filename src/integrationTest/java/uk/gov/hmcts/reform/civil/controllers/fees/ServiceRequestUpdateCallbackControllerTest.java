@@ -43,6 +43,7 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
 
     @BeforeEach
     void bareMinimumToMakeAPositiveRequest() {
+        when(authorisationService.isServiceAuthorized(any())).thenReturn(true);
         CaseData caseData = CaseData.builder().businessProcess(BusinessProcess.builder().processInstanceId("instance").camundaEvent("camunda event").build()).build();
         CaseDetails caseDetails = CaseDetails.builder().build();
         caseDetails.setData(caseData.toMap(objectMapper));
