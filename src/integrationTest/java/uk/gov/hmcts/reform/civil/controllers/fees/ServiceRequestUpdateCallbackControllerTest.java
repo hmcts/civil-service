@@ -18,10 +18,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
-import javax.servlet.ServletException;
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
@@ -73,14 +71,11 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
     @Test
     public void whenPaymentCallbackIsReceivedWithServiceAuthorisationButreturnsfalseReturn400() throws Exception {
         when(authorisationService.isServiceAuthorized(any())).thenReturn(false);
-        Exception e = assertThrows(
-            ServletException.class,
-            () -> mockMvc.perform(
-                MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
-                    .header("ServiceAuthorization", s2sToken)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(toJson(buildServiceDto()))).andExpect(status().isBadRequest()));
-
+        mockMvc.perform(
+            MockMvcRequestBuilders.put(PAYMENT_CALLBACK_URL, "")
+                .header("ServiceAuthorization", s2sToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(buildServiceDto()))).andExpect(status().is5xxServerError());
     }
 
     @Test
