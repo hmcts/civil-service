@@ -1639,6 +1639,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData()).containsEntry("isFlightDelayClaim", toggleStat ? "Yes" : "No");
+            if (toggleStat) {
+                assertThat(response.getData()).containsEntry("claimType", "FLIGHT_DELAY");
+            } else {
+                assertThat(response.getData()).doesNotHaveToString("claimType");
+            }
         }
 
         @Test
@@ -1654,6 +1659,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData()).doesNotHaveToString("isFlightDelayClaim");
+            assertThat(response.getData()).doesNotHaveToString("claimType");
         }
     }
 

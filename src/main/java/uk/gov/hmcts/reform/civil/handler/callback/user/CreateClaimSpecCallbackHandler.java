@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -906,6 +907,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         if (toggleService.isSdoR2Enabled()) {
             caseDataBuilder.isFlightDelayClaim(callbackParams.getCaseData().getIsFlightDelayClaim());
+            if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
+                caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
+            } else {
+                caseDataBuilder.claimType(null);
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
