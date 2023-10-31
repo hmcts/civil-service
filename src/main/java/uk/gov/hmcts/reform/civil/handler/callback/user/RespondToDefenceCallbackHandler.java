@@ -280,13 +280,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             builder.applicant1DefenceResponseDocument(null);
             builder.respondent1ClaimResponseDocument(null);
             builder.respondentSharedClaimResponseDocument(null);
-            Applicant1DQ currentApplicant1DQ = caseData.getApplicant1DQ();
-            currentApplicant1DQ.setApplicant1DQDraftDirections(null);
-            builder.applicant1DQ(currentApplicant1DQ);
-            Applicant2DQ currentApplicant2DQ = caseData.getApplicant2DQ();
-            if (Objects.nonNull(currentApplicant2DQ)) {
-                currentApplicant2DQ.setApplicant2DQDraftDirections(null);
-                builder.applicant2DQ(currentApplicant2DQ);
+            builder.applicant1DQ(builder.build().getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
+            if (caseData.getApplicant2DQ() != null) {
+                builder.applicant2DQ(builder.build().getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
             }
         }
 
