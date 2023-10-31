@@ -571,7 +571,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     //case progression
     private final List<Element<DocumentWithName>> documentAndName;
+    private final List<Element<DocumentWithName>> documentAndNameToAdd;
     private final List<Element<DocumentAndNote>> documentAndNote;
+    private final List<Element<DocumentAndNote>> documentAndNoteToAdd;
     private final CaseNoteType caseNoteType;
     private final String caseNoteTA;
     private final List<Element<CaseNote>> caseNotesTA;
