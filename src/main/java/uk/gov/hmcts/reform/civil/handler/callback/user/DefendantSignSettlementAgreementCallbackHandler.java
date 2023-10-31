@@ -46,8 +46,9 @@ public class DefendantSignSettlementAgreementCallbackHandler extends CallbackHan
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-           // .businessProcess(BusinessProcess.ready(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT))
+            .businessProcess(BusinessProcess.ready(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT))
             .build();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
             .build();
