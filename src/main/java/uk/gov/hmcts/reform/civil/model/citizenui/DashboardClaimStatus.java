@@ -33,6 +33,9 @@ public enum DashboardClaimStatus {
     CLAIM_ENDED(
         Claim::hasClaimEnded
     ),
+    RESPONSE_BY_POST(
+        Claim::isPaperResponse
+    ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
     ),
@@ -93,9 +96,6 @@ public enum DashboardClaimStatus {
     ),
     PROCEED_OFFLINE(
         Claim::isProceedOffline
-    ),
-    RESPONSE_BY_POST(
-        Claim::isPaperResponse
     ),
     CHANGE_BY_DEFENDANT(
         Claim::hasChangeRequestFromDefendant
