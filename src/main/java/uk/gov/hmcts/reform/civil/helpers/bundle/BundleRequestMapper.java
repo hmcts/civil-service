@@ -90,6 +90,7 @@ public class BundleRequestMapper {
                     bundleConfigFileName)
                     .trialDocuments(mapTrialDocuments(caseData))
                     .statementsOfCaseDocuments(mapStatementOfcaseDocs(caseData))
+                    .particularsOfClaim(mapParticularsOfClaimDocs(caseData))
                     .ordersDocuments(mapOrdersDocument(caseData))
                     .claimant1WitnessStatements(mapWitnessStatements(caseData, PartyType.CLAIMANT1))
                     .claimant2WitnessStatements(mapWitnessStatements(caseData, PartyType.CLAIMANT2))
@@ -133,9 +134,9 @@ public class BundleRequestMapper {
 
     private String getParticularsOfClaimDate(CaseData caseData) {
         LocalDate pocDate;
-        if(SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             pocDate = caseData.getIssueDate();
-        } else if(Objects.nonNull(caseData.getClaimDetailsNotificationDate())) {
+        } else if (Objects.nonNull(caseData.getClaimDetailsNotificationDate())) {
             pocDate = caseData.getClaimDetailsNotificationDate().toLocalDate();
         } else {
             pocDate = caseData.getSubmittedDate().toLocalDate();
