@@ -59,10 +59,7 @@ public class DirectionsQuestionnaireLipGenerator extends DirectionsQuestionnaire
             caseData,
             authorisation
         );
-        builder.respondent1LiPCorrespondenceAddress(Optional.ofNullable(caseData.getCaseDataLiP())
-                                                        .map(CaseDataLiP::getRespondent1LiPResponse)
-                                                        .map(RespondentLiPResponse::getRespondent1LiPCorrespondenceAddress)
-                                                        .orElse(null))
+        builder.respondent1LiPCorrespondenceAddress(caseData.getRespondent1CorrespondenceAddress())
             .hearingLipSupportRequirements(Optional.ofNullable(
                     caseData.getCaseDataLiP())
                                                .map(
