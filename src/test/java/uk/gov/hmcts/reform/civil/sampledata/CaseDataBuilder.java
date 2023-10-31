@@ -4569,6 +4569,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateBeforeTransferCaseSDONotDrawnOverLimit() {
+
+        atStateApplicantRespondToDefenceAndProceed();
+
+        ccdState = JUDICIAL_REFERRAL;
+        notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
+
+        tocTransferCaseReason = TocTransferCaseReason.builder()
+            .reasonForCaseTransferJudgeTxt("This is more than 150 111111111111111111111111111111111111111111111111111111111111111111111111111"
+                       + "111111111111111111111111111111111111111111111111111111")
+            .build();
+        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder atStateTakenOfflineSDONotDrawn(MultiPartyScenario mpScenario) {
 
         atStateApplicantRespondToDefenceAndProceed(mpScenario);

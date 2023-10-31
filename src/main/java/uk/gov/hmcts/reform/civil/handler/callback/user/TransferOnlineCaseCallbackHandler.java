@@ -23,9 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -71,9 +68,12 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        String newCourtLocationSiteName = courtLocationUtils.findPreferredLocationData(
+            fetchLocationData(callbackParams),
+            callbackParams.getCaseData().getTransferCourtLocationList()).getSiteName();
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(getHeader())
-            .confirmationBody(getBody())
+            .confirmationHeader(CONFIRMATION_HEADER)
+            .confirmationBody(getBody(newCourtLocationSiteName))
             .build();
     }
 
@@ -92,15 +92,14 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
                 .append(" - ").append(location.getCourtAddress())
                 .append(" - ").append(location.getPostcode()).toString())
-                            .collect(Collectors.toList()));
+                            .toList());
     }
 
-    private String getHeader() {
-        return format("# Case transferred to new location");
-    }
-
-    private String getBody() {
-        return format("# Case transferred to new location");
+    private String getBody(String siteName) {
+        return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                           + "The case has now been transferred to "
+                           + siteName
+                           + ". If the case has moved out of your region, you will no longer see it.<br><br>";
     }
 
     private CallbackResponse saveTransferOnlineCase(CallbackParams callbackParams) {
@@ -128,15 +127,13 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
             callbackParams.getCaseData().getTransferCourtLocationList());
         LocationRefData caseManagementLocation =
             getLocationRefData(callbackParams);
-        if (caseManagementLocation != null && newCourtLocation.getCourtLocationCode().equals(caseManagementLocation.getCourtLocationCode())) {
-            return true;
-        }
-        return false;
+        return caseManagementLocation != null && newCourtLocation.getCourtLocationCode().equals(caseManagementLocation.getCourtLocationCode());
     }
 
     private LocationRefData getLocationRefData(CallbackParams callbackParams) {
         List<LocationRefData> locations = fetchLocationData(callbackParams);
-        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(callbackParams.getCaseData().getCaseManagementLocation().getBaseLocation())).toList();
+        String baseLocation = callbackParams.getCaseData().getCaseManagementLocation() == null ? null : callbackParams.getCaseData().getCaseManagementLocation().getBaseLocation();
+        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(baseLocation)).toList();
         return matchedLocations.size() > 0 ? matchedLocations.get(0) : null;
     }
 
