@@ -269,7 +269,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                params.toBuilder()
+                    .caseData(params.getCaseData().toBuilder()
+                                  .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                                  .drawDirectionsOrderRequired(NO)
+                                  .build())
+                    .build()
+            );
 
             assertThat(response.getData())
                 .extracting("businessProcess")
@@ -553,6 +560,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
             .setSmallClaimsFlag(YES)
+            .drawDirectionsOrderRequired(NO)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
@@ -595,6 +603,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .disposalHearingMethodInPerson(options)
             .claimsTrack(ClaimsTrack.fastTrack)
             .setFastTrackFlag(YES)
+            .drawDirectionsOrderRequired(NO)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
