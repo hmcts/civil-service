@@ -1380,11 +1380,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getDocumentAuthoritiesRes2().get(0).getValue()
                     .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
             assertThat(updatedData.getDocumentAuthoritiesRes2().get(0).getValue()
-                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_TRIAL_AUTHORITIES);
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_PRECEDENT_H);
             assertThat(updatedData.getDocumentCostsRes2().get(0).getValue()
                     .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
             assertThat(updatedData.getDocumentCostsRes2().get(0).getValue()
-                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_TRIAL_COSTS);
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_ANY_PRECEDENT_H);
         }
     }
 
