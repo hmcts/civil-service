@@ -21,6 +21,8 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
 
     public void notifyApplicantEvidenceUpload(CaseData caseData) throws NotificationException {
 
+        System.out.println("TESSSTEEEEEEEEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+
         boolean isApplicantLip = isApplicantLip(caseData);
 
         //Send email to Applicant

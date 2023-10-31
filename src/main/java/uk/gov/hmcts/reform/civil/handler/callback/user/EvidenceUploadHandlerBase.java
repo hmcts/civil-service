@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -132,6 +134,39 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String APPLICANT_TWO_TRIAL_SKELETON = "ApplicantTwoTrialSkeleton";
     protected static final String APPLICANT_TWO_PRECEDENT_H = "ApplicantTwoUploadedPrecedentH";
     protected static final String APPLICANT_TWO_ANY_PRECEDENT_H = "ApplicantTwoAnyPrecedentH";
+
+    protected static final StringBuilder NOTIFICATION_STRING = new StringBuilder(
+        "Documentation that has been uploaded: \n\n");
+    protected static final String APPLICANT_DISCLOSURE_LIST_TEXT = "%s - Disclosure list \n";
+    protected static final String APPLICANT_DISCLOSURE_TEXT = "%s - Documents for disclosure \n";
+    protected static final String APPLICANT_WITNESS_STATEMENT_TEXT = "%s - Witness statement \n";
+    protected static final String APPLICANT_WITNESS_SUMMARY_TEXT = "%s - Witness summary \n";
+    protected static final String APPLICANT_WITNESS_HEARSAY_TEXT = "%s - Notice of the intention to rely on hearsay evidence \n";
+    protected static final String APPLICANT_WITNESS_REFERRED_TEXT = "%s - Documents referred to in the statement \n";
+    protected static final String APPLICANT_EXPERT_REPORT_TEXT = "%s - Expert's report \n";
+    protected static final String APPLICANT_EXPERT_JOINT_STATEMENT_TEXT = "%s - Joint Statement of Experts / Single Joint Expert Report \n";
+    protected static final String APPLICANT_EXPERT_QUESTIONS_TEXT = "%s - Questions for other party's expert or joint experts \n";
+    protected static final String APPLICANT_EXPERT_ANSWERS_TEXT = "%s - Answer to questions asked \n";
+    protected static final String APPLICANT_PRE_TRIAL_SUMMARY_TEXT = "%s - Case Summary \n";
+    protected static final String APPLICANT_TRIAL_SKELETON_TEXT = "%s - Skeleton argument \n";
+    protected static final String APPLICANT_TRIAL_AUTHORITIES_TEXT = "%s - Authorities \n";
+    protected static final String APPLICANT_TRIAL_COSTS_TEXT = "%s - Costs \n";
+    protected static final String APPLICANT_TRIAL_DOC_CORRESPONDENCE_TEXT = "%s - Documentary evidence for trial \n";
+    protected static final String APPLICANT_TWO_DISCLOSURE_LIST_TEXT = "Claimant 2 - Disclosure list \n";
+    protected static final String APPLICANT_TWO_DISCLOSURE_TEXT = "Claimant 2 - Documents for disclosure \n";
+    protected static final String APPLICANT_TWO_WITNESS_STATEMENT_TEXT = "Claimant 2 - Witness statement \n";
+    protected static final String APPLICANT_TWO_WITNESS_SUMMARY_TEXT = "Claimant 2 - Witness summary \n";
+    protected static final String APPLICANT_TWO_WITNESS_HEARSAY_TEXT = "Claimant 2 - Notice of the intention to rely on hearsay evidence \n";
+    protected static final String APPLICANT_TWO_WITNESS_REFERRED_TEXT = "Claimant 2 - Documents referred to in the statement \n";
+    protected static final String APPLICANT_TWO_EXPERT_REPORT_TEXT = "Claimant 2 - Expert's report \n";
+    protected static final String APPLICANT_TWO_EXPERT_JOINT_STATEMENT_TEXT = "Claimant 2 - Joint Statement of Experts / Single Joint Expert Report \n";
+    protected static final String APPLICANT_TWO_EXPERT_QUESTIONS_TEXT = "Claimant 2 - Questions for other party's expert or joint experts \n";
+    protected static final String APPLICANT_TWO_EXPERT_ANSWERS_TEXT = "Claimant 2 - Answer to questions asked \n";
+    protected static final String APPLICANT_TWO_PRE_TRIAL_SUMMARY_TEXT = "Claimant 2 - Case Summary \n";
+    protected static final String APPLICANT_TWO_TRIAL_SKELETON_TEXT = "Claimant 2 - Skeleton argument \n";
+    protected static final String APPLICANT_TWO_TRIAL_AUTHORITIES_TEXT = "Claimant 2 - Authorities \n";
+    protected static final String APPLICANT_TWO_TRIAL_COSTS_TEXT = "Claimant 2 - Costs \n";
+    protected static final String APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE_TEXT = "Claimant 2 - Documentary evidence for trial \n";
 
     protected static final String OPTION_APP1 = "Claimant 1 - ";
     protected static final String OPTION_APP2 = "Claimant 2 - ";
@@ -399,14 +434,23 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     }
 
     public <T> void setCategoryIdAndRenameDoc(List<Element<T>> documentUpload, Function<Element<T>,
-        Document> documentExtractor, String theID) {
+        Document> documentExtractor, String theID, String docNotificationText, Function<Element<T>,
+        LocalDateTime> documentDateTimeExtractor, String  claimantDefendantString) {
         if (documentUpload == null || documentUpload.isEmpty()) {
             return;
         }
+        LocalDateTime midnight = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT);
         renameDocuments(documentUpload, theID);
         documentUpload.forEach(document -> {
             Document documentToAddId = documentExtractor.apply(document);
             documentToAddId.setCategoryID(theID);
+            LocalDateTime dateTime = documentDateTimeExtractor.apply(document);
+            if (dateTime.isAfter(midnight)) {
+                String notificationText = format(docNotificationText, claimantDefendantString);
+                if (!NOTIFICATION_STRING.toString().contains(notificationText)) {
+                    NOTIFICATION_STRING.append(notificationText);
+                }
+            }
         });
     }
 
@@ -598,42 +642,83 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         }
 
         if (selectedRole.equals(CaseRole.APPLICANTSOLICITORONE.name()) || selectedRole.equals(SELECTED_VALUE_APP_BOTH)) {
-            setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureList(), document -> document.getValue().getDocumentUpload(), APPLICANT_DISCLOSURE_LIST);
-            setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosure(), document -> document.getValue().getDocumentUpload(), APPLICANT_DISCLOSURE);
-            setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatement(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_WITNESS_STATEMENT);
-            setCategoryIdAndRenameDoc(caseData.getDocumentWitnessSummary(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_WITNESS_SUMMARY);
-            setCategoryIdAndRenameDoc(caseData.getDocumentHearsayNotice(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_WITNESS_HEARSAY);
-            setCategoryIdAndRenameDoc(caseData.getDocumentReferredInStatement(), document -> document.getValue().getDocumentUpload(), APPLICANT_WITNESS_REFERRED);
-            setCategoryIdAndRenameDoc(caseData.getDocumentExpertReport(), document -> document.getValue().getExpertDocument(), APPLICANT_EXPERT_REPORT);
-            setCategoryIdAndRenameDoc(caseData.getDocumentJointStatement(), document -> document.getValue().getExpertDocument(), APPLICANT_EXPERT_JOINT_STATEMENT);
-            setCategoryIdAndRenameDoc(caseData.getDocumentQuestions(), document -> document.getValue().getExpertDocument(), APPLICANT_EXPERT_QUESTIONS);
-            setCategoryIdAndRenameDoc(caseData.getDocumentAnswers(), document -> document.getValue().getExpertDocument(), APPLICANT_EXPERT_ANSWERS);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummary(), document -> document.getValue().getDocumentUpload(), APPLICANT_PRE_TRIAL_SUMMARY);
-            setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgument(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_SKELETON);
-            setCategoryIdAndRenameDoc(caseData.getDocumentAuthorities(), document -> document.getValue().getDocumentUpload(), APPLICANT_PRECEDENT_H);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), APPLICANT_ANY_PRECEDENT_H);
-            setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrial(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_DOC_CORRESPONDENCE);
+            System.out.println("discolure uploaded on " + caseData.getDocumentDisclosureList().get(0).getValue().getCreatedDatetime());
+            LocalDateTime midnight = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT);
+            System.out.println("midght   +" + midnight);
+            if(caseData.getDocumentDisclosureList().get(0).getValue().getCreatedDatetime().isAfter(midnight)) {
+                System.out.println("nanabababababababab");
+            };
+            String claimantString = "Claimant 1";
+            if (selectedRole.equals(SELECTED_VALUE_APP_BOTH)) {
+                claimantString = "Both claimants";
+            }
+            setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureList(), document -> document.getValue().getDocumentUpload(),  APPLICANT_DISCLOSURE_LIST,
+                                      APPLICANT_DISCLOSURE_LIST_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosure(), document -> document.getValue().getDocumentUpload(), APPLICANT_DISCLOSURE,
+                                      APPLICANT_DISCLOSURE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatement(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_WITNESS_STATEMENT,
+                                      APPLICANT_WITNESS_STATEMENT_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentWitnessSummary(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_WITNESS_SUMMARY,
+                                      APPLICANT_WITNESS_SUMMARY_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentHearsayNotice(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_WITNESS_HEARSAY,
+                                      APPLICANT_WITNESS_HEARSAY_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentReferredInStatement(), document -> document.getValue().getDocumentUpload(), APPLICANT_WITNESS_REFERRED,
+                                      APPLICANT_WITNESS_REFERRED_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentExpertReport(), document -> document.getValue().getExpertDocument(), APPLICANT_EXPERT_REPORT,
+                                      APPLICANT_EXPERT_REPORT_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentJointStatement(), document -> document.getValue().getExpertDocument(), APPLICANT_EXPERT_JOINT_STATEMENT,
+                                      APPLICANT_EXPERT_JOINT_STATEMENT_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentQuestions(), document -> document.getValue().getExpertDocument(), APPLICANT_EXPERT_QUESTIONS,
+                                      APPLICANT_EXPERT_QUESTIONS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentAnswers(), document -> document.getValue().getExpertDocument(), APPLICANT_EXPERT_ANSWERS,
+                                      APPLICANT_EXPERT_ANSWERS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummary(), document -> document.getValue().getDocumentUpload(), APPLICANT_PRE_TRIAL_SUMMARY,
+                                      APPLICANT_PRE_TRIAL_SUMMARY_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgument(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_SKELETON,
+                                      APPLICANT_TRIAL_SKELETON_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentAuthorities(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_AUTHORITIES,
+                                      APPLICANT_TRIAL_AUTHORITIES_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_COSTS,
+                                      APPLICANT_TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrial(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_DOC_CORRESPONDENCE,
+                                      APPLICANT_TRIAL_DOC_CORRESPONDENCE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             if (selectedRole.equals(SELECTED_VALUE_APP_BOTH)) {
                 caseData = copyApp1ChangesToApp2(caseData, caseDataBuilder);
             }
         }
 
         if (selectedRole.equals("APPLICANTSOLICITORTWO")) {
-            setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureListApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_DISCLOSURE_LIST);
-            setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosureApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_DISCLOSURE);
-            setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatementApp2(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_TWO_WITNESS_STATEMENT);
-            setCategoryIdAndRenameDoc(caseData.getDocumentWitnessSummaryApp2(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_TWO_WITNESS_SUMMARY);
-            setCategoryIdAndRenameDoc(caseData.getDocumentHearsayNoticeApp2(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_TWO_WITNESS_HEARSAY);
-            setCategoryIdAndRenameDoc(caseData.getDocumentReferredInStatementApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_WITNESS_REFERRED);
-            setCategoryIdAndRenameDoc(caseData.getDocumentExpertReportApp2(), document -> document.getValue().getExpertDocument(), APPLICANT_TWO_EXPERT_REPORT);
-            setCategoryIdAndRenameDoc(caseData.getDocumentJointStatementApp2(), document -> document.getValue().getExpertDocument(), APPLICANT_TWO_EXPERT_JOINT_STATEMENT);
-            setCategoryIdAndRenameDoc(caseData.getDocumentQuestionsApp2(), document -> document.getValue().getExpertDocument(), APPLICANT_TWO_EXPERT_QUESTIONS);
-            setCategoryIdAndRenameDoc(caseData.getDocumentAnswersApp2(), document -> document.getValue().getExpertDocument(), APPLICANT_TWO_EXPERT_ANSWERS);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummaryApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_PRE_TRIAL_SUMMARY);
-            setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgumentApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_SKELETON);
-            setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_PRECEDENT_H);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCostsApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_ANY_PRECEDENT_H);
-            setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE);
+            String claimantString =  "Claimant 2";
+            setCategoryIdAndRenameDoc(caseData.getDocumentDisclosureListApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_DISCLOSURE_LIST,
+                                      APPLICANT_TWO_DISCLOSURE_LIST_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentForDisclosureApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_DISCLOSURE,
+                                      APPLICANT_TWO_DISCLOSURE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentWitnessStatementApp2(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_TWO_WITNESS_STATEMENT,
+                                      APPLICANT_TWO_WITNESS_STATEMENT_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentWitnessSummaryApp2(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_TWO_WITNESS_SUMMARY,
+                                      APPLICANT_TWO_WITNESS_SUMMARY_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentHearsayNoticeApp2(), document -> document.getValue().getWitnessOptionDocument(), APPLICANT_TWO_WITNESS_HEARSAY,
+                                      APPLICANT_TWO_WITNESS_HEARSAY_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentReferredInStatementApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_WITNESS_REFERRED,
+                                      APPLICANT_TWO_WITNESS_REFERRED_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentExpertReportApp2(), document -> document.getValue().getExpertDocument(), APPLICANT_TWO_EXPERT_REPORT,
+                                      APPLICANT_TWO_EXPERT_REPORT_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentJointStatementApp2(), document -> document.getValue().getExpertDocument(), APPLICANT_TWO_EXPERT_JOINT_STATEMENT,
+                                      APPLICANT_TWO_EXPERT_JOINT_STATEMENT_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentQuestionsApp2(), document -> document.getValue().getExpertDocument(), APPLICANT_TWO_EXPERT_QUESTIONS,
+                                      APPLICANT_TWO_EXPERT_QUESTIONS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentAnswersApp2(), document -> document.getValue().getExpertDocument(), APPLICANT_TWO_EXPERT_ANSWERS,
+                                      APPLICANT_TWO_EXPERT_ANSWERS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummaryApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_PRE_TRIAL_SUMMARY,
+                                      APPLICANT_TWO_PRE_TRIAL_SUMMARY_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgumentApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_SKELETON,
+                                      APPLICANT_TWO_TRIAL_SKELETON_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_AUTHORITIES,
+                                      APPLICANT_TWO_TRIAL_AUTHORITIES_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentCostsApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_COSTS,
+                                      APPLICANT_TWO_TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
+            setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE,
+                                      APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
         }
 
         // null the values of the lists, so that on future retriggers of the event, they are blank
@@ -651,6 +736,9 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         caseDataBuilder.trialSelectionEvidenceSmallClaim(null);
         caseDataBuilder.trialSelectionEvidenceRes(null);
         caseDataBuilder.trialSelectionEvidenceSmallClaimRes(null);
+
+        caseDataBuilder.notificationText(NOTIFICATION_STRING.toString());
+        System.out.println("textstst    " + NOTIFICATION_STRING.toString());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
