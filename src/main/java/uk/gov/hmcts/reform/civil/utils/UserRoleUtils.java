@@ -4,10 +4,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
-import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.DEFENDANT;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
 public class UserRoleUtils {
 
