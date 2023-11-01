@@ -1922,7 +1922,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                               .respondent1OrganisationPolicy(null)
                               .build())
                 .build();
-            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(true);
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
@@ -1939,7 +1938,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var callbackParams = params.toBuilder()
                 .caseData(params.getCaseData().toBuilder().build())
                 .build();
-            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(true);
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);

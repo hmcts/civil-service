@@ -103,11 +103,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (!featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(List.of(ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT))
-                .build();
-        }
         List<String> dynamicListOptions = new ArrayList<>();
         dynamicListOptions.add("Both");
         dynamicListOptions.add("Defendant One: " + caseData.getRespondent1().getPartyName());
@@ -190,7 +185,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         // workaround for hiding cases in CAA list before case notify
         setOrganisationPolicy(caseData, caseDataBuilder);
         LocalDateTime claimDetailsNotificationDeadline;
-        if (featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
+        if (areAnyRespondentsLitigantInPerson(caseData)) {
             claimDetailsNotificationDeadline = getDeadline(getServiceDate(caseData));
             if (Objects.nonNull(caseData.getCosNotifyClaimDefendant1())) {
                 caseDataBuilder
@@ -254,7 +249,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         String header = "";
         String body = "";
 
-        if (featureToggleService.isCertificateOfServiceEnabled() && isConfirmationForLip(caseData)) {
+        if (isConfirmationForLip(caseData)) {
             String formattedDeadline = formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(),
                                                        DATE);
             header = String.format(CONFIRMATION_COS_HEADER, caseData.getLegacyCaseReference());

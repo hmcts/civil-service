@@ -68,7 +68,6 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.PartyRole.RESPONDENT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
-import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED_NOTICE_OF_CHANGE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -1633,12 +1632,7 @@ public class EventHistoryMapper {
     private void buildUnregisteredDefendant(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
         List<String> unregisteredDefendantsNames;
 
-        // NOC: Revert after NOC is live
-        if (featureToggleService.isNoticeOfChangeEnabled()) {
-            unregisteredDefendantsNames = getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData);
-        } else {
-            unregisteredDefendantsNames = getDefendantNames(UNREGISTERED, caseData);
-        }
+        unregisteredDefendantsNames = getDefendantNames(UNREGISTERED, caseData);
 
         List<Event> events = IntStream.range(0, unregisteredDefendantsNames.size())
             .mapToObj(index -> {
@@ -1672,13 +1666,7 @@ public class EventHistoryMapper {
                                                             CaseData caseData) {
         String localDateTime = time.now().toLocalDate().toString();
 
-        // NOC: Revert after NOC is live
-        List<String> unregisteredDefendantsNames;
-        if (featureToggleService.isNoticeOfChangeEnabled()) {
-            unregisteredDefendantsNames = getDefendantNames(UNREGISTERED_NOTICE_OF_CHANGE, caseData);
-        } else {
-            unregisteredDefendantsNames = getDefendantNames(UNREGISTERED, caseData);
-        }
+        List<String> unregisteredDefendantsNames = getDefendantNames(UNREGISTERED, caseData);
 
         String unrepresentedEventText = format(
             "RPA Reason: [1 of 2 - %s] Unrepresented defendant and unregistered "
