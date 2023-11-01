@@ -175,7 +175,8 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     private boolean isLRvLipToDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && caseData.isLRvLipOneVOne()
+            && (caseData.isLRvLipOneVOne()
+            || caseData.isLipvLipOneVOne())
             && !isCcNotification(callbackParams);
     }
 }
