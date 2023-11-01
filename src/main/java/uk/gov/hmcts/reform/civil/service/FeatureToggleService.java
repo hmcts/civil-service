@@ -84,4 +84,8 @@ public class FeatureToggleService {
     public boolean isCaseProgressionEnabled() {
         return true;
     }
+
+    public boolean isEarlyAdoptersEnabled() {
+        return featureToggleApi.isFeatureEnabled("early-adopters");
+    }
 }
