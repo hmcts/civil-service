@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
@@ -15,15 +16,17 @@ import java.math.RoundingMode;
 public class DebtTemplateData {
 
     private final String debtOwedTo;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal poundsOwed;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private final BigDecimal paidPerMonth;
 
     @JsonIgnore
     public static DebtTemplateData loanDebtFrom(final LoanCardDebtLRspec debt) {
         return DebtTemplateData.builder()
             .debtOwedTo(debt.getLoanCardDebtDetail())
-            .paidPerMonth(MonetaryConversions.penniesToPounds(debt.getMonthlyPayment()).setScale(2))
-            .poundsOwed(MonetaryConversions.penniesToPounds(debt.getTotalOwed()).setScale(2))
+            .paidPerMonth((MonetaryConversions.penniesToPounds(debt.getMonthlyPayment())).setScale(2, RoundingMode.CEILING))
+            .poundsOwed((MonetaryConversions.penniesToPounds(debt.getTotalOwed())).setScale(2, RoundingMode.CEILING))
             .build();
     }
 
@@ -33,19 +36,22 @@ public class DebtTemplateData {
             .debtOwedTo(debtLRspec.getDebtType().getLabel());
         switch (debtLRspec.getPaymentFrequency()) {
             case ONCE_THREE_WEEKS:
-                builder.paidPerMonth(MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()
+                builder.paidPerMonth((MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()
                                          .multiply(BigDecimal.valueOf(4))
-                                         .divide(BigDecimal.valueOf(3), RoundingMode.CEILING))
-                                         .setScale(2));
+                                         .divide(BigDecimal.valueOf(3), RoundingMode.CEILING)))
+                                         .setScale(2, RoundingMode.CEILING));
                 break;
             case ONCE_TWO_WEEKS:
-                builder.paidPerMonth(MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(2))).setScale(2));
+                builder.paidPerMonth((MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(2))))
+                                         .setScale(2, RoundingMode.CEILING));
                 break;
             case ONCE_ONE_WEEK:
-                builder.paidPerMonth(MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(4))).setScale(2));
+                builder.paidPerMonth((MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(4))))
+                                         .setScale(2, RoundingMode.CEILING));
                 break;
             default:
-                builder.paidPerMonth(MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()).setScale(2));
+                builder.paidPerMonth((MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()))
+                                         .setScale(2, RoundingMode.CEILING));
                 break;
         }
         return builder.build();
