@@ -90,12 +90,12 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(caseNoteService.buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note"))
                 .thenReturn(expectedCaseNote);
-            when(caseNoteService.addNoteToList(expectedCaseNote, caseData.getCaseNotes())).thenReturn(updatedCaseNotes);
+            when(caseNoteService.addNoteToListStart(expectedCaseNote, caseData.getCaseNotes())).thenReturn(updatedCaseNotes);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             verify(caseNoteService).buildCaseNote(params.getParams().get(BEARER_TOKEN).toString(), "Example case note");
-            verify(caseNoteService).addNoteToList(expectedCaseNote, caseData.getCaseNotes());
+            verify(caseNoteService).addNoteToListStart(expectedCaseNote, caseData.getCaseNotes());
 
             assertThat(response.getData())
                 .doesNotHaveToString("caseNote");

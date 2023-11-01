@@ -322,7 +322,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         return builder;
     }
 
-    private List<Party> getApplicants(CaseData caseData) {
+    protected List<Party> getApplicants(CaseData caseData) {
         var legalRepHeading = caseData.getCaseAccessCategory().equals(SPEC_CLAIM) ? "Name" : "Organisation name";
         var applicant = caseData.getApplicant1();
         var applicant2 = caseData.getApplicant2();
@@ -558,12 +558,12 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     }
 
     public static boolean isClaimantResponse(CaseData caseData) {
-        return "CLAIMANT_RESPONSE".equals(ofNullable(caseData.getBusinessProcess())
-                                              .map(BusinessProcess::getCamundaEvent)
-                                              .orElse(null))
-                || "CLAIMANT_RESPONSE_SPEC".equals(ofNullable(caseData.getBusinessProcess())
-                                              .map(BusinessProcess::getCamundaEvent)
-                                              .orElse(null));
+        var businessProcess = ofNullable(caseData.getBusinessProcess())
+            .map(BusinessProcess::getCamundaEvent)
+            .orElse(null);
+        return "CLAIMANT_RESPONSE".equals(businessProcess)
+                || "CLAIMANT_RESPONSE_SPEC".equals(businessProcess)
+            || "CLAIMANT_RESPONSE_CUI".equals(businessProcess);
     }
 
     private boolean isClaimantMultipartyProceed(CaseData caseData) {
