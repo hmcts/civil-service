@@ -91,6 +91,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -843,19 +844,23 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
         }
 
-        dataBuilder.disposalHearingMethodInPerson(getEmptyDynamicList(caseData.getDisposalHearingMethodInPerson()));
-        dataBuilder.fastTrackMethodInPerson(getEmptyDynamicList(caseData.getFastTrackMethodInPerson()));
-        dataBuilder.smallClaimsMethodInPerson(getEmptyDynamicList(caseData.getSmallClaimsMethodInPerson()));
+        dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
+            caseData.getDisposalHearingMethodInPerson()));
+        dataBuilder.fastTrackMethodInPerson(deleteLocationList(
+            caseData.getFastTrackMethodInPerson()));
+        dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
+            caseData.getSmallClaimsMethodInPerson()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private DynamicList getEmptyDynamicList(DynamicList listToBeEmptied) {
-        return listToBeEmptied != null
-            ? DynamicList.builder().value(listToBeEmptied.getValue()).listItems(null).build()
-            : null;
+    private DynamicList deleteLocationList(DynamicList list) {
+        if (isNull(list)) {
+            return null;
+        }
+        return DynamicList.builder().value(list.getValue()).build();
     }
 
     private boolean nonNull(Object object) {
