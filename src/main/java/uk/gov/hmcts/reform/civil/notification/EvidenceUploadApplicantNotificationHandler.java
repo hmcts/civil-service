@@ -21,17 +21,18 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
 
     public void notifyApplicantEvidenceUpload(CaseData caseData) throws NotificationException {
 
-        System.out.println("TESSSTEEEEEEEEDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-
         boolean isApplicantLip = isApplicantLip(caseData);
 
         //Send email to Applicant
-        notificationService.sendMail(
-            getEmail(caseData, isApplicantLip),
-            getTemplate(caseData, isApplicantLip),
-            addProperties(caseData),
-            getReference(caseData)
-        );
+        if (!caseData.getNotificationText().equals("NULLED")) {
+            System.out.println("applicant email text " + caseData.getNotificationText());
+            notificationService.sendMail(
+                getEmail(caseData, isApplicantLip),
+                getTemplate(caseData, isApplicantLip),
+                addProperties(caseData),
+                getReference(caseData)
+            );
+        }
     }
 
     private static String getReference(CaseData caseData) {
@@ -55,7 +56,8 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            UPLOADED_DOCUMENTS, caseData.getNotificationText()
         );
     }
 }
