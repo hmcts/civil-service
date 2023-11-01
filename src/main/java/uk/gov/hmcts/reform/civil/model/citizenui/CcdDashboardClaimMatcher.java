@@ -77,7 +77,8 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isEligibleForCCJ() {
         return caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM));
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getPaymentTypeSelection() == null;
     }
 
     @Override
@@ -284,6 +285,13 @@ public class CcdDashboardClaimMatcher implements Claim {
     public boolean isSDOOrderCreated() {
         return caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
+    }
+
+    @Override
+    public boolean isClaimantDefaultJudgement() {
+        return caseData.getRespondent1ResponseDeadline() != null
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getPaymentTypeSelection() != null;
     }
 
 }
