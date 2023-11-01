@@ -24,6 +24,9 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingChannel;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -40,6 +43,7 @@ import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -72,6 +76,34 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         given(time.now()).willReturn(LocalDateTime.now());
         given(feesService.getFeeForHearingSmallClaims(any())).willReturn(Fee.builder().build());
         given(feesService.getFeeForHearingFastTrackClaims(any())).willReturn(Fee.builder().build());
+    }
+
+    @Test
+    void shouldNullPreviousSubmittedEventSelections_whenInvoked() {
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .hearingNoticeList(HearingNoticeList.OTHER)
+            .hearingNoticeListOther("hearing notice list other")
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .hearingLocation(DynamicList.builder().listItems(List.of(
+                DynamicListElement.builder().label("element 1").code("E0").build(),
+                DynamicListElement.builder().label("element 2").code("E1").build())).build())
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDate(LocalDate.now())
+            .hearingTimeHourMinute("hearingTimeHourMinute")
+            .hearingDuration(HearingDuration.DAY_1)
+            .information("hearing info")
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        assertThat(response.getData().get("hearingNoticeList")).isNull();
+        assertThat(response.getData().get("listingOrRelisting")).isNull();
+        assertThat(response.getData().get("hearingLocation")).isNull();
+        assertThat(response.getData().get("channel")).isNull();
+        assertThat(response.getData().get("hearingDate")).isNull();
+        assertThat(response.getData().get("hearingTimeHourMinute")).isNull();
+        assertThat(response.getData().get("hearingDuration")).isNull();
+        assertThat(response.getData().get("information")).isNull();
+        assertThat(response.getData().get("hearingNoticeListOther")).isNull();
     }
 
     @ParameterizedTest
