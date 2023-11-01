@@ -80,4 +80,6 @@ public interface Claim {
 
     boolean isSDOOrderCreated();
 
+    boolean isClaimantDefaultJudgement();
+
 }
