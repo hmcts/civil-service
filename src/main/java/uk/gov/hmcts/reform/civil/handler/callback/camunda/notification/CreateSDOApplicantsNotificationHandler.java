@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
@@ -34,6 +35,7 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final OrganisationService organisationService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -55,11 +57,17 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
     private CallbackResponse notifyApplicantsSolicitorSDOTriggered(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        String unspecTemplate = featureToggleService.isEarlyAdoptersEnabled()
+            ? notificationsProperties.getSdoOrderedEA() : notificationsProperties.getSdoOrdered();
+
+        String specTemplate = featureToggleService.isEarlyAdoptersEnabled()
+            ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
+
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
-                ? notificationsProperties.getSdoOrderedSpec()
-                : notificationsProperties.getSdoOrdered(),
+                ? specTemplate
+                : unspecTemplate,
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
