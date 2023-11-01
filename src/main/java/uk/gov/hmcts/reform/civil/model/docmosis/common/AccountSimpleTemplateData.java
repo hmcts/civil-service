@@ -15,7 +15,7 @@ public class AccountSimpleTemplateData extends AccountSimple {
     public AccountSimpleTemplateData(AccountSimple data, int index) {
         setAccountType(data.getAccountType());
         setJointAccount(data.getJointAccount());
-        setBalance(data.getBalance());
+        setBalance(data.getBalance().setScale(2));
         this.index = index;
     }
 

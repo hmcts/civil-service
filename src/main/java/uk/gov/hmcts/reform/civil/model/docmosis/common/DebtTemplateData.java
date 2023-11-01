@@ -22,8 +22,8 @@ public class DebtTemplateData {
     public static DebtTemplateData loanDebtFrom(final LoanCardDebtLRspec debt) {
         return DebtTemplateData.builder()
             .debtOwedTo(debt.getLoanCardDebtDetail())
-            .paidPerMonth(MonetaryConversions.penniesToPounds(debt.getMonthlyPayment()))
-            .poundsOwed(MonetaryConversions.penniesToPounds(debt.getTotalOwed()))
+            .paidPerMonth(MonetaryConversions.penniesToPounds(debt.getMonthlyPayment()).setScale(2))
+            .poundsOwed(MonetaryConversions.penniesToPounds(debt.getTotalOwed()).setScale(2))
             .build();
     }
 
@@ -35,16 +35,17 @@ public class DebtTemplateData {
             case ONCE_THREE_WEEKS:
                 builder.paidPerMonth(MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()
                                          .multiply(BigDecimal.valueOf(4))
-                                         .divide(BigDecimal.valueOf(3), RoundingMode.CEILING)));
+                                         .divide(BigDecimal.valueOf(3), RoundingMode.CEILING))
+                                         .setScale(2));
                 break;
             case ONCE_TWO_WEEKS:
-                builder.paidPerMonth(MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(2))));
+                builder.paidPerMonth(MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(2))).setScale(2));
                 break;
             case ONCE_ONE_WEEK:
-                builder.paidPerMonth(MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(4))));
+                builder.paidPerMonth(MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount().multiply(BigDecimal.valueOf(4))).setScale(2));
                 break;
             default:
-                builder.paidPerMonth(MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()));
+                builder.paidPerMonth(MonetaryConversions.penniesToPounds(debtLRspec.getPaymentAmount()).setScale(2));
                 break;
         }
         return builder.build();

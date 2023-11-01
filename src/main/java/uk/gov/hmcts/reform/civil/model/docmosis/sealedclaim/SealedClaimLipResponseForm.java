@@ -116,10 +116,10 @@ public class SealedClaimLipResponseForm implements MappableObject {
                            builder.selfEmployment(Respondent1SelfEmploymentLRspec.builder()
                                                       .amountOwed(selfEmployDetails.getAmountOwed() != null
                                                                       ? MonetaryConversions.penniesToPounds(
-                                                          selfEmployDetails.getAmountOwed())
+                                                          selfEmployDetails.getAmountOwed().setScale(2))
                                                                       : null)
                                                       .annualTurnover(MonetaryConversions.penniesToPounds(
-                                                          selfEmployDetails.getAnnualTurnover()))
+                                                          selfEmployDetails.getAnnualTurnover()).setScale(2))
                                                       .jobTitle(selfEmployDetails.getJobTitle())
                                                       .reason(selfEmployDetails.getReason())
                                                       .build())
