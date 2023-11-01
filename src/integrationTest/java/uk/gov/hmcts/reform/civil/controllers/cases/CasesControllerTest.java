@@ -20,10 +20,12 @@ import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
+import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
 import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
+import uk.gov.hmcts.reform.civil.service.citizen.repaymentplan.RepaymentPlanDecisionService;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentResponse;
@@ -42,9 +44,12 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT;
 
 public class CasesControllerTest extends BaseIntegrationTest {
 
@@ -68,6 +73,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
     private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
     private static final String USER_CASE_ROLES = "/cases/{caseId}/userCaseRoles";
+    private static final String COURT_DECISION_URL = "/cases/{caseId}/courtDecision";
     private static final List<DashboardClaimInfo> claimResults =
         Collections.singletonList(DashboardClaimInfo.builder()
                                       .claimAmount(new BigDecimal(
@@ -116,6 +122,9 @@ public class CasesControllerTest extends BaseIntegrationTest {
 
     @MockBean
     private UserInformationService userInformationService;
+
+    @MockBean
+    private RepaymentPlanDecisionService repaymentPlanDecisionService;
 
     @Test
     @SneakyThrows
@@ -408,6 +417,16 @@ public class CasesControllerTest extends BaseIntegrationTest {
             .andExpect(content().string("User with Id: 111 was not found on case"))
             .andReturn();
 
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnDecisionMadeForTheClaimantRepaymentPlan() {
+        //Given
+        given(repaymentPlanDecisionService.getCalculatedDecision(any(), any())).willReturn(IN_FAVOUR_OF_CLAIMANT);
+        //When
+        doPost(BEARER_TOKEN, ClaimantProposedPlan.builder().proposedRepaymentType(IMMEDIATELY).build(), COURT_DECISION_URL, "1")
+            .andExpect(status().isOk());
     }
 
 }
