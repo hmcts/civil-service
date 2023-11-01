@@ -26,7 +26,7 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean hasResponsePending() {
-        return caseData.getRespondent1ResponseDate() == null;
+        return caseData.getRespondent1ResponseDate() == null && !isPaperResponse();
     }
 
     @Override
@@ -77,7 +77,8 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isEligibleForCCJ() {
         return caseData.getRespondent1ResponseDeadline() != null
-            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM));
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getPaymentTypeSelection() == null;
     }
 
     @Override
@@ -119,7 +120,12 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean isPaperResponse() {
-        return false;
+        if (!featureToggleService.isLipVLipEnabled()) {
+            return false;
+        }
+
+        return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
+            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }
 
     @Override
@@ -279,6 +285,13 @@ public class CcdDashboardClaimMatcher implements Claim {
     public boolean isSDOOrderCreated() {
         return caseData.getHearingDate() == null
             && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState());
+    }
+
+    @Override
+    public boolean isClaimantDefaultJudgement() {
+        return caseData.getRespondent1ResponseDeadline() != null
+            && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
+            && caseData.getPaymentTypeSelection() != null;
     }
 
 }
