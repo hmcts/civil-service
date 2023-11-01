@@ -1070,6 +1070,7 @@ public class FlowStateAllowedEventService {
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
+                CLAIMANT_RESPONSE_CUI,
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
                 REFER_TO_JUDGE,
