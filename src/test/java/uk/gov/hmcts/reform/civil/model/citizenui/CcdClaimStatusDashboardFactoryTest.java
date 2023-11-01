@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
@@ -43,6 +45,11 @@ class CcdClaimStatusDashboardFactoryTest {
     @InjectMocks
     private DashboardClaimStatusFactory ccdClaimStatusDashboardFactory;
 
+    @BeforeEach
+    void setUp() {
+        ccdClaimStatusDashboardFactory = new DashboardClaimStatusFactory();
+    }
+
     @Test
     void given_hasResponsePending_whenGetStatus_thenReturnNoResponse() {
         CaseData claim = CaseData.builder()
@@ -64,6 +71,19 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.ELIGIBLE_FOR_CCJ);
+    }
+
+    @Test
+    void given_isEligibleForCCJ_whenGetStatus_thenReturnDefaultJudgementStatus() {
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ResponseDeadline(LocalDateTime.of(2022, 2, 2, 16, 0))
+            .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim, featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT);
     }
 
     @Test
@@ -384,5 +404,23 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
+    }
+
+    @Test
+    void givenClaimStatusInProcessHeritageSystem_WhenGetStatus_thenReturnResponseByPost() {
+        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .takenOfflineDate(LocalDateTime.now())
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
     }
 }
