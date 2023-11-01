@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
 
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @Getter
 public class AccountSimpleTemplateData extends AccountSimple {
