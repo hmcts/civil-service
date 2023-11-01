@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -42,6 +43,11 @@ class CcdClaimStatusDashboardFactoryTest {
 
     @InjectMocks
     private DashboardClaimStatusFactory ccdClaimStatusDashboardFactory;
+
+    @BeforeEach
+    void setUp() {
+        ccdClaimStatusDashboardFactory = new DashboardClaimStatusFactory();
+    }
 
     @Test
     void given_hasResponsePending_whenGetStatus_thenReturnNoResponse() {
@@ -384,5 +390,23 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
+    }
+
+    @Test
+    void givenClaimStatusInProcessHeritageSystem_WhenGetStatus_thenReturnResponseByPost() {
+        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+
+        CaseData claim = CaseData.builder()
+            .respondent1ResponseDate(LocalDateTime.now())
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .takenOfflineDate(LocalDateTime.now())
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            claim, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
     }
 }
