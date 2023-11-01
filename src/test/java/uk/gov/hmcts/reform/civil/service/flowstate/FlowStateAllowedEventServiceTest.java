@@ -567,7 +567,8 @@ class FlowStateAllowedEventServiceTest {
                         SET_ASIDE_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
                         RECORD_JUDGMENT,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        CLAIMANT_RESPONSE_CUI
                     }
                 ),
                 of(

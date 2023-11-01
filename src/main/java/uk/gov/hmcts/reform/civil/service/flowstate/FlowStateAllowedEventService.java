@@ -541,7 +541,8 @@ public class FlowStateAllowedEventService {
                 SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
                 RECORD_JUDGMENT,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                CLAIMANT_RESPONSE_CUI
             )
         ),
 
@@ -1070,7 +1071,6 @@ public class FlowStateAllowedEventService {
                 TRIAL_READY_CHECK,
                 TRIAL_READY_NOTIFICATION,
                 MOVE_TO_DECISION_OUTCOME,
-                CLAIMANT_RESPONSE_CUI,
                 HEARING_FEE_UNPAID,
                 HEARING_FEE_PAID,
                 REFER_TO_JUDGE,
@@ -1090,7 +1090,9 @@ public class FlowStateAllowedEventService {
                 JUDGMENT_PAID_IN_FULL,
                 RECORD_JUDGMENT,
                 LIP_CLAIM_SETTLED,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                CLAIMANT_RESPONSE_CUI
+
             )
         ),
 
