@@ -19,9 +19,19 @@ import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementLocationDetailsService;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,10 +40,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -41,18 +47,20 @@ import java.util.List;
     JacksonAutoConfiguration.class,
     CourtLocationUtils.class,
     LocationRefDataService.class,
-    LocationHelper.class
+    LocationHelper.class,
+    UpdateCaseManagementLocationDetailsService.class
 })
 class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private CourtLocationUtils courtLocationUtility;
-    @Autowired
+    @MockBean
     private LocationHelper locationHelper;
     @MockBean
     private LocationRefDataService locationRefDataService;
     @Autowired
     private ClaimantResponseCuiCallbackHandler handler;
+    private static final String  courtLocation = "Site 1 - Adr 1 - AAA 111";
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -76,8 +84,13 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void before() {
+            LocationRefData locationRefData = LocationRefData.builder().siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
+                .courtName("Court Name").region("Region").regionId("1").courtVenueId("1")
+                .courtTypeId("10").courtLocationCode("court1")
+                .epimmsId("111").build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
+            given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(locationRefData));
         }
 
         @Test
@@ -134,9 +147,28 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldChangeCaseState_whenApplicantRejectClaimSettlementAndAgreeToMediation() {
+            Applicant1DQ applicant1DQ =
+                Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
+                                                                      .responseCourtCode("applicant1DQRequestedCourt")
+                                                                      .caseLocation(CaseLocationCivil.builder()
+                                                                                        .region(courtLocation)
+                                                                                        .baseLocation(courtLocation)
+                                                                                        .build())
+                                                                      .build()).build();
+            Respondent1DQ respondent1DQ =
+                Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                        .responseCourtCode("respondent1DQRequestedCourt")
+                                                                        .caseLocation(CaseLocationCivil.builder()
+                                                                                          .region(courtLocation)
+                                                                                          .baseLocation(courtLocation)
+                                                                                          .build())
+                                                                        .build()).build();
+
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
                 .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
                     MediationDecision.Yes).build())
                             .build())
@@ -144,7 +176,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
             assertThat(response.getState()).isEqualTo(CaseState.IN_MEDIATION.name());
         }
 
@@ -162,4 +193,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             ));
         }
     }
+
+    @Test
+    void handleEventsReturnsTheExpectedCallbackEvents() {
+        assertThat(handler.handledEvents()).containsOnly(CLAIMANT_RESPONSE_CUI);
+    }
+
 }
