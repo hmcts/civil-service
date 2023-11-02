@@ -1357,6 +1357,10 @@ public class FlowStateAllowedEventService {
             return true;
         }
 
+        if (caseEvent.equals(CASE_PROCEEDS_IN_CASEMAN)) {
+            return true;
+        }
+
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             || CREATE_CLAIM_SPEC.equals(caseEvent) || CREATE_LIP_CLAIM.equals(caseEvent)) {
