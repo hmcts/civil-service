@@ -15,10 +15,9 @@ import uk.gov.hmcts.reform.civil.notification.EvidenceUploadApplicantNotificatio
 import uk.gov.hmcts.reform.civil.notification.EvidenceUploadRespondentNotificationHandler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_CHECK;
 
 @Slf4j
 @Service
