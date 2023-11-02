@@ -77,20 +77,22 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getTrialDocuments().get(11).getValue().getDocumentFileName());
         assertEquals("Claim Form 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(0).getValue().getDocumentFileName());
-        assertEquals("DF 1 Defence 10/02/2023",
+        assertEquals("Particulars Of Claim 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(1).getValue().getDocumentFileName());
-        assertEquals("CL's reply 10/02/2023",
+        assertEquals("DF 1 Defence 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(2).getValue().getDocumentFileName());
-        assertEquals("CL 1 reply to part 18 request 12/01/2023",
+        assertEquals("CL's reply 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(3).getValue().getDocumentFileName());
-        assertEquals("CL 2 reply to part 18 request 12/01/2023",
+        assertEquals("CL 1 reply to part 18 request 12/01/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(4).getValue().getDocumentFileName());
-        assertEquals("DF 1 reply to part 18 request 12/01/2023",
+        assertEquals("CL 2 reply to part 18 request 12/01/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(5).getValue().getDocumentFileName());
-        assertEquals("DF 2 reply to part 18 request 12/01/2023",
+        assertEquals("DF 1 reply to part 18 request 12/01/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(6).getValue().getDocumentFileName());
-        assertEquals("Directions Questionnaire 10/02/2023",
+        assertEquals("DF 2 reply to part 18 request 12/01/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(7).getValue().getDocumentFileName());
+        assertEquals("Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(8).getValue().getDocumentFileName());
         assertEquals("Directions Order 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("Order 10/02/2023",
@@ -149,8 +151,7 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getDefendant1CostsBudgets().get(0).getValue().getDocumentFileName());
         assertEquals("testFileName 12/12/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2CostsBudgets().get(0).getValue().getDocumentFileName());
-        assertEquals("Particulars Of Claim 10/02/2023",
-                bundleCreateRequest.getCaseDetails().getCaseData().getParticularsOfClaim().get(0).getValue().getDocumentFileName());
+
     }
 
     private CaseData getCaseData() {

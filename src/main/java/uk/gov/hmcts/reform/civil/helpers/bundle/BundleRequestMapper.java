@@ -90,7 +90,6 @@ public class BundleRequestMapper {
                     bundleConfigFileName)
                     .trialDocuments(mapTrialDocuments(caseData))
                     .statementsOfCaseDocuments(mapStatementOfcaseDocs(caseData))
-                    .particularsOfClaim(mapParticularsOfClaimDocs(caseData))
                     .ordersDocuments(mapOrdersDocument(caseData))
                     .claimant1WitnessStatements(mapWitnessStatements(caseData, PartyType.CLAIMANT1))
                     .claimant2WitnessStatements(mapWitnessStatements(caseData, PartyType.CLAIMANT2))
@@ -119,7 +118,7 @@ public class BundleRequestMapper {
         return bundlingCaseData;
     }
 
-    private List<Element<BundlingRequestDocument>> mapParticularsOfClaimDocs(CaseData caseData) {
+    private List<BundlingRequestDocument> mapParticularsOfClaimDocs(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         if (Objects.nonNull(caseData.getServedDocumentFiles())
                 && Objects.nonNull((caseData.getServedDocumentFiles().getParticularsOfClaimDocument()))) {
@@ -129,7 +128,7 @@ public class BundleRequestMapper {
                             buildBundlingRequestDoc(getParticularsOfClaimName(caseData),
                             poc.getValue(), "")));
         }
-        return ElementUtils.wrapElements(bundlingRequestDocuments);
+        return bundlingRequestDocuments;
     }
 
     private String getParticularsOfClaimName(CaseData caseData) {
@@ -547,6 +546,7 @@ public class BundleRequestMapper {
                                                                                && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"))
                                                                            .collect(Collectors.toList()),
                                                                        BundleFileNameList.CLAIM_FORM.getDisplayName()));
+        bundlingRequestDocuments.addAll(mapParticularsOfClaimDocs(caseData));
         List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
         clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
