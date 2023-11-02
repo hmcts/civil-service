@@ -98,18 +98,6 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     private final UploadEvidenceDocumentType uploadEvidenceDate3 = new UploadEvidenceDocumentType();
     private static final String NotificationWhenBothClaimant = "Documentation that has been uploaded: \n"
         + "\n"
-        + "Claimant 1 - Disclosure list \n"
-        + "Claimant 1 - Documents for disclosure \n"
-        + "Claimant 1 - Documents referred to in the statement \n"
-        + "Claimant 1 - Expert's report \n"
-        + "Claimant 1 - Joint Statement of Experts / Single Joint Expert Report \n"
-        + "Claimant 1 - Questions for other party's expert or joint experts \n"
-        + "Claimant 1 - Answer to questions asked \n"
-        + "Claimant 1 - Case Summary \n"
-        + "Claimant 1 - Skeleton argument \n"
-        + "Claimant 1 - Authorities \n"
-        + "Claimant 1 - Costs \n"
-        + "Claimant 1 - Documentary evidence for trial \n"
         + "Both claimants - Disclosure list \n"
         + "Both claimants - Documents for disclosure \n"
         + "Both claimants - Documents referred to in the statement \n"
@@ -701,8 +689,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({"0", "2"})
     void should_do_naming_convention(String selected) {
+        handler.notificationString = new StringBuilder("Documentation that has been uploaded: \n\n");
         LocalDateTime createdDate = LocalDateTime.of(2022, 05, 10, 12, 13, 12);
-
         String witnessName = "AppWitness";
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
         List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_APP1,

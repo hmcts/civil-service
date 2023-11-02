@@ -136,8 +136,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String APPLICANT_TWO_ANY_PRECEDENT_H = "ApplicantTwoAnyPrecedentH";
 
     // Notification Strings used for email
-    protected static final StringBuilder NOTIFICATION_STRING = new StringBuilder(
-        "Documentation that has been uploaded: \n\n");
+    public StringBuilder notificationString = new StringBuilder("Documentation that has been uploaded: \n\n");
     protected static final String DISCLOSURE_LIST_TEXT = "%s - Disclosure list \n";
     protected static final String DISCLOSURE_TEXT = "%s - Documents for disclosure \n";
     protected static final String WITNESS_STATEMENT_TEXT = "%s - Witness statement \n";
@@ -229,6 +228,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
         }
         caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
+
+        // was unable to null value properly in EvidenceUploadNotificationEventHandler after emails are sent,
+        // so do it here if required.
+        if(nonNull(caseData.getNotificationText()) && caseData.getNotificationText().equals("NULLED")) {
+            caseDataBuilder.notificationText(null);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
@@ -421,7 +427,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     public <T> void setCategoryIdAndRenameDoc(List<Element<T>> documentUpload, Function<Element<T>,
         Document> documentExtractor, String theID, String docNotificationText, Function<Element<T>,
-        LocalDateTime> documentDateTimeExtractor, String  claimantDefendantString) {
+        LocalDateTime> documentDateTimeExtractor, String claimantDefendantString) {
         if (documentUpload == null || documentUpload.isEmpty()) {
             return;
         }
@@ -432,9 +438,9 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             documentToAddId.setCategoryID(theID);
             LocalDateTime dateTime = documentDateTimeExtractor.apply(document);
             if (dateTime.isAfter(midnight)) {
-                String notificationText = format(docNotificationText, claimantDefendantString);
-                if (!NOTIFICATION_STRING.toString().contains(notificationText)) {
-                    NOTIFICATION_STRING.append(notificationText);
+                String updateNotificationText = format(docNotificationText, claimantDefendantString);
+                if (!notificationString.toString().contains(updateNotificationText)) {
+                    notificationString.append(updateNotificationText);
                 }
             }
         });
@@ -581,9 +587,10 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     CallbackResponse documentUploadTime(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
         String selectedRole = getSelectedRole(callbackParams);
-
+        if (caseData.getNotificationText() != null) {
+            notificationString = new StringBuilder(caseData.getNotificationText());
+        }
         applyDocumentUploadDate(caseDataBuilder, time.now());
         if (nonNull(caseData.getCaseBundles()) && !caseData.getCaseBundles().isEmpty()) {
             updateDocumentListUploadedAfterBundle(caseDataBuilder, caseData);
@@ -751,9 +758,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         caseDataBuilder.trialSelectionEvidenceSmallClaim(null);
         caseDataBuilder.trialSelectionEvidenceRes(null);
         caseDataBuilder.trialSelectionEvidenceSmallClaimRes(null);
-
-        caseDataBuilder.notificationText(NOTIFICATION_STRING.toString());
-
+        caseDataBuilder.notificationText(notificationString.toString());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

@@ -113,18 +113,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     private final UploadEvidenceDocumentType uploadEvidenceDate3 = new UploadEvidenceDocumentType();
     private static final String NotificationWhenBothDefendant = "Documentation that has been uploaded: \n"
         + "\n"
-        + "Defendant 1 - Disclosure list \n"
-        + "Defendant 1 - Documents for disclosure \n"
-        + "Defendant 1 - Documents referred to in the statement \n"
-        + "Defendant 1 - Expert's report \n"
-        + "Defendant 1 - Joint Statement of Experts / Single Joint Expert Report \n"
-        + "Defendant 1 - Questions for other party's expert or joint experts \n"
-        + "Defendant 1 - Answer to questions asked \n"
-        + "Defendant 1 - Case Summary \n"
-        + "Defendant 1 - Skeleton argument \n"
-        + "Defendant 1 - Authorities \n"
-        + "Defendant 1 - Costs \n"
-        + "Defendant 1 - Documentary evidence for trial \n"
         + "Both defendants - Disclosure list \n"
         + "Both defendants - Documents for disclosure \n"
         + "Both defendants - Documents referred to in the statement \n"
@@ -137,6 +125,20 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         + "Both defendants - Authorities \n"
         + "Both defendants - Costs \n"
         + "Both defendants - Documentary evidence for trial \n";
+    private static final String NotificationWhenDefendantTwo = "Documentation that has been uploaded: \n"
+        + "\n"
+        + "Defendant 2 - Disclosure list \n"
+        + "Defendant 2 - Documents for disclosure \n"
+        + "Defendant 2 - Documents referred to in the statement \n"
+        + "Defendant 2 - Expert's report \n"
+        + "Defendant 2 - Joint Statement of Experts / Single Joint Expert Report \n"
+        + "Defendant 2 - Questions for other party's expert or joint experts \n"
+        + "Defendant 2 - Answer to questions asked \n"
+        + "Defendant 2 - Case Summary \n"
+        + "Defendant 2 - Skeleton argument \n"
+        + "Defendant 2 - Authorities \n"
+        + "Defendant 2 - Costs \n"
+        + "Defendant 2 - Documentary evidence for trial \n";
     private static final String PAGE_ID = "validateValuesRespondent";
 
     @BeforeEach
@@ -148,6 +150,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void givenAboutToStart_assignCaseProgAllocatedTrackUnSpec() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .notificationText("NULLED")
             .claimType(ClaimType.CLINICAL_NEGLIGENCE)
             .claimValue(ClaimValue.builder()
                             .statementOfValueInPennies(BigDecimal.valueOf(5000))
@@ -161,12 +164,14 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .handle(params);
         // Then
         assertThat(response.getData()).extracting("caseProgAllocatedTrack").isEqualTo("SMALL_CLAIM");
+        assertThat(response.getData()).extracting("notificationText").isNull();
     }
 
     @Test
     void givenAboutToStart_assignCaseProgAllocatedTrackSpec() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .notificationText("NULLED")
             .claimType(null)
             .totalClaimAmount(BigDecimal.valueOf(12500))
             .build();
@@ -178,6 +183,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .handle(params);
         // Then
         assertThat(response.getData()).extracting("caseProgAllocatedTrack").isEqualTo("FAST_CLAIM");
+        assertThat(response.getData()).extracting("notificationText").isNull();
     }
 
     @Test
@@ -1305,8 +1311,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({"0", "2"})
     void should_do_naming_convention_resp1(String selected) {
+        handler.notificationString = new StringBuilder("Documentation that has been uploaded: \n\n");
         LocalDateTime createdDate = LocalDateTime.of(2022, 05, 10, 12, 13, 12);
-
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         String witnessName = "ResOneWitness";
         List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_DEF1,
@@ -1453,6 +1459,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void should_do_naming_convention_resp2() {
+        handler.notificationString = new StringBuilder("Documentation that has been uploaded: \n\n");
         LocalDateTime createdDate = LocalDateTime.of(2022, 05, 10, 12, 13, 12);
 
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
@@ -1518,6 +1525,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCostsRes2().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
+        assertThat(updatedData.getNotificationText()).isEqualTo(NotificationWhenDefendantTwo);
     }
 
     @Test
