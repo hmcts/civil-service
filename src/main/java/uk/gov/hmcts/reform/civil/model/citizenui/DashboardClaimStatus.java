@@ -33,6 +33,9 @@ public enum DashboardClaimStatus {
     CLAIM_ENDED(
         Claim::hasClaimEnded
     ),
+    RESPONSE_BY_POST(
+        Claim::isPaperResponse
+    ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
     ),
@@ -64,6 +67,9 @@ public enum DashboardClaimStatus {
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
     ),
+    DEFAULT_JUDGEMENT(
+        Claim::isClaimantDefaultJudgement
+    ),
     RESPONSE_OVERDUE(
         Claim::hasResponsePendingOverdue
     ),
@@ -90,9 +96,6 @@ public enum DashboardClaimStatus {
     ),
     PROCEED_OFFLINE(
         Claim::isProceedOffline
-    ),
-    RESPONSE_BY_POST(
-        Claim::isPaperResponse
     ),
     CHANGE_BY_DEFENDANT(
         Claim::hasChangeRequestFromDefendant
