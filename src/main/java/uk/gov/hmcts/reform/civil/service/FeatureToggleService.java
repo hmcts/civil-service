@@ -37,7 +37,7 @@ public class FeatureToggleService {
     }
 
     public boolean isPbaV3Enabled() {
-        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
+        return true;
     }
 
     public boolean isCertificateOfServiceEnabled() {
@@ -53,7 +53,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCaseFileViewEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("case-file-view");
+        return true;
     }
 
     public boolean isAutomatedHearingNoticeEnabled() {
@@ -83,9 +83,5 @@ public class FeatureToggleService {
 
     public boolean isCaseProgressionEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-case-progression");
-    }
-
-    public boolean isEarlyAdoptersEnabled() {
-        return featureToggleApi.isFeatureEnabled("early-adopters");
     }
 }

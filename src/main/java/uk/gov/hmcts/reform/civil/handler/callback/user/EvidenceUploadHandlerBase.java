@@ -117,23 +117,23 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String RESPONDENT_ONE_DISCLOSURE_LIST = "RespondentOneDisclosureList";
     protected static final String RESPONDENT_ONE_PRE_TRIAL_SUMMARY = "RespondentOnePreTrialSummary";
     protected static final String RESPONDENT_ONE_TRIAL_SKELETON = "RespondentOneTrialSkeleton";
-    protected static final String RESPONDENT_ONE_PRECEDENT_H = "RespondentOneUploadedPrecedentH";
-    protected static final String RESPONDENT_ONE_ANY_PRECEDENT_H = "respondentOneAnyPrecedentH";
+    protected static final String RESPONDENT_ONE_TRIAL_AUTHORITIES = "RespondentOneTrialAuthorities";
+    protected static final String RESPONDENT_ONE_TRIAL_COSTS = "respondentOneTrialCosts";
     protected static final String RESPONDENT_TWO_DISCLOSURE_LIST = "RespondentTwoDisclosureList";
     protected static final String RESPONDENT_TWO_PRE_TRIAL_SUMMARY = "RespondentTwoPreTrialSummary";
     protected static final String RESPONDENT_TWO_TRIAL_SKELETON = "RespondentTwoTrialSkeleton";
-    protected static final String RESPONDENT_TWO_PRECEDENT_H = "RespondentTwoUploadedPrecedentH";
-    protected static final String RESPONDENT_TWO_ANY_PRECEDENT_H = "respondentTwoAnyPrecedentH";
+    protected static final String RESPONDENT_TWO_TRIAL_AUTHORITIES = "RespondentTwoTrialAuthorities";
+    protected static final String RESPONDENT_TWO_TRIAL_COSTS = "respondentTwoTrialCosts";
     protected static final String APPLICANT_DISCLOSURE_LIST = "ApplicantDisclosureList";
     protected static final String APPLICANT_PRE_TRIAL_SUMMARY = "ApplicantPreTrialSummary";
     protected static final String APPLICANT_TRIAL_SKELETON = "ApplicantTrialSkeleton";
-    protected static final String APPLICANT_PRECEDENT_H = "ApplicantUploadedPrecedentH";
-    protected static final String APPLICANT_ANY_PRECEDENT_H = "ApplicantAnyPrecedentH";
+    protected static final String APPLICANT_TRIAL_AUTHORITIES = "ApplicantTrialAuthorities";
+    protected static final String APPLICANT_TRIAL_COSTS = "ApplicantTrialCosts";
     protected static final String APPLICANT_TWO_DISCLOSURE_LIST = "ApplicantTwoDisclosureList";
     protected static final String APPLICANT_TWO_PRE_TRIAL_SUMMARY = "ApplicantTwoPreTrialSummary";
     protected static final String APPLICANT_TWO_TRIAL_SKELETON = "ApplicantTwoTrialSkeleton";
-    protected static final String APPLICANT_TWO_PRECEDENT_H = "ApplicantTwoUploadedPrecedentH";
-    protected static final String APPLICANT_TWO_ANY_PRECEDENT_H = "ApplicantTwoAnyPrecedentH";
+    protected static final String APPLICANT_TWO_TRIAL_AUTHORITIES = "ApplicantTwoTrialAuthorities";
+    protected static final String APPLICANT_TWO_TRIAL_COSTS = "ApplicantTwoTrialCosts";
 
     // Notification Strings used for email
     protected static final StringBuilder NOTIFICATION_STRING = new StringBuilder(
@@ -164,6 +164,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private static final String SELECTED_VALUE_DEF_BOTH = "RESPONDENTBOTH";
     private static final String SELECTED_VALUE_APP_BOTH = "APPLICANTBOTH";
+
+    private static String NO_UPLOAD_ERROR = null;
 
     protected EvidenceUploadHandlerBase(UserService userService, CoreCaseUserService coreCaseUserService,
                                         CaseDetailsConverter caseDetailsConverter,
@@ -853,13 +855,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentAuthoritiesRes(),
                 caseData.getDocumentAuthoritiesRes(),
                 caseData.getDocumentAuthoritiesRes2());
-        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, RESPONDENT_TWO_PRECEDENT_H);
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, RESPONDENT_TWO_TRIAL_AUTHORITIES);
         builder.documentAuthoritiesRes2(evidenceDocToAdd);
 
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentCostsRes(),
                 caseData.getDocumentCostsRes(),
                 caseData.getDocumentCostsRes2());
-        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, RESPONDENT_TWO_ANY_PRECEDENT_H);
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, RESPONDENT_TWO_TRIAL_COSTS);
         builder.documentCostsRes2(evidenceDocToAdd);
 
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentEvidenceForTrialRes(),
@@ -965,13 +967,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentAuthorities(),
                 caseData.getDocumentAuthorities(),
                 caseData.getDocumentAuthoritiesApp2());
-        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, APPLICANT_TWO_PRECEDENT_H);
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, APPLICANT_TWO_TRIAL_AUTHORITIES);
         builder.documentAuthoritiesApp2(evidenceDocToAdd);
 
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentCosts(),
                 caseData.getDocumentCosts(),
                 caseData.getDocumentCostsApp2());
-        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, APPLICANT_TWO_ANY_PRECEDENT_H);
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, APPLICANT_TWO_TRIAL_COSTS);
         builder.documentCostsApp2(evidenceDocToAdd);
 
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentEvidenceForTrial(),
@@ -1086,7 +1088,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         return target;
     }
 
-    private String getSelectedRole(CallbackParams callbackParams) {
+    public String getSelectedRole(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean multiParts = Objects.nonNull(caseData.getEvidenceUploadOptions())
                 && !caseData.getEvidenceUploadOptions().getListItems().isEmpty();

@@ -96,7 +96,32 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
     private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
     private final UploadEvidenceDocumentType uploadEvidenceDate3 = new UploadEvidenceDocumentType();
-
+    private static final String NotificationWhenBothClaimant = "Documentation that has been uploaded: \n"
+        + "\n"
+        + "Claimant 1 - Disclosure list \n"
+        + "Claimant 1 - Documents for disclosure \n"
+        + "Claimant 1 - Documents referred to in the statement \n"
+        + "Claimant 1 - Expert's report \n"
+        + "Claimant 1 - Joint Statement of Experts / Single Joint Expert Report \n"
+        + "Claimant 1 - Questions for other party's expert or joint experts \n"
+        + "Claimant 1 - Answer to questions asked \n"
+        + "Claimant 1 - Case Summary \n"
+        + "Claimant 1 - Skeleton argument \n"
+        + "Claimant 1 - Authorities \n"
+        + "Claimant 1 - Costs \n"
+        + "Claimant 1 - Documentary evidence for trial \n"
+        + "Both claimants - Disclosure list \n"
+        + "Both claimants - Documents for disclosure \n"
+        + "Both claimants - Documents referred to in the statement \n"
+        + "Both claimants - Expert's report \n"
+        + "Both claimants - Joint Statement of Experts / Single Joint Expert Report \n"
+        + "Both claimants - Questions for other party's expert or joint experts \n"
+        + "Both claimants - Answer to questions asked \n"
+        + "Both claimants - Case Summary \n"
+        + "Both claimants - Skeleton argument \n"
+        + "Both claimants - Authorities \n"
+        + "Both claimants - Costs \n"
+        + "Both claimants - Documentary evidence for trial \n";
     private static final String PAGE_ID = "validateValuesApplicant";
 
     @BeforeEach
@@ -496,6 +521,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                                              "hash", null);
         var documentUpload = UploadEvidenceWitness.builder()
                 .witnessOptionUploadDate(LocalDate.of(2023, 2, 10))
+                .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
                 .witnessOptionDocument(testDocument).build();
         List<Element<UploadEvidenceWitness>> documentList = new ArrayList<>();
         documentList.add(Element.<UploadEvidenceWitness>builder().value(documentUpload).build());
@@ -810,11 +836,12 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getDocumentAuthoritiesApp2().get(0).getValue()
                     .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
             assertThat(updatedData.getDocumentAuthoritiesApp2().get(0).getValue()
-                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_PRECEDENT_H);
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_TRIAL_AUTHORITIES);
             assertThat(updatedData.getDocumentCostsApp2().get(0).getValue()
                     .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
             assertThat(updatedData.getDocumentCostsApp2().get(0).getValue()
-                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_ANY_PRECEDENT_H);
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_TRIAL_COSTS);
+            assertThat(updatedData.getNotificationText()).isEqualTo(NotificationWhenBothClaimant);
         }
     }
 

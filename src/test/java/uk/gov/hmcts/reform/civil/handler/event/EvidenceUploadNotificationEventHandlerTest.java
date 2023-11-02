@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.event.EvidenceUploadNotificationEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -15,9 +16,11 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_CHECK;
 
 @ExtendWith(SpringExtension.class)
 class EvidenceUploadNotificationEventHandlerTest {
@@ -43,6 +46,8 @@ class EvidenceUploadNotificationEventHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(caseId.toString(), EVIDENCE_UPLOAD_CHECK))
+            .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
         EvidenceUploadNotificationEvent event = new EvidenceUploadNotificationEvent(caseId);
         //when: Evidence upload Notification handler is called
         handler.sendEvidenceUploadNotification(event);
@@ -62,6 +67,8 @@ class EvidenceUploadNotificationEventHandlerTest {
         //when: Exception is thrown from applicant notification handler
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(caseId.toString(), EVIDENCE_UPLOAD_CHECK))
+            .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
         doThrow(new RuntimeException()).when(applicantNotificationHandler).notifyApplicantEvidenceUpload(caseData);
         EvidenceUploadNotificationEvent event = new EvidenceUploadNotificationEvent(caseId);
         handler.sendEvidenceUploadNotification(event);
@@ -80,6 +87,8 @@ class EvidenceUploadNotificationEventHandlerTest {
         //when: Exception is thrown for repondent1 notification handler
         when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(caseId.toString(), EVIDENCE_UPLOAD_CHECK))
+            .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
         doThrow(new RuntimeException()).when(respondentNotificationHandler).notifyRespondentEvidenceUpload(caseData,
                                                                                                            true);
         EvidenceUploadNotificationEvent event = new EvidenceUploadNotificationEvent(caseId);

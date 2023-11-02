@@ -111,7 +111,32 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
     private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
     private final UploadEvidenceDocumentType uploadEvidenceDate3 = new UploadEvidenceDocumentType();
-
+    private static final String NotificationWhenBothDefendant = "Documentation that has been uploaded: \n"
+        + "\n"
+        + "Defendant 1 - Disclosure list \n"
+        + "Defendant 1 - Documents for disclosure \n"
+        + "Defendant 1 - Documents referred to in the statement \n"
+        + "Defendant 1 - Expert's report \n"
+        + "Defendant 1 - Joint Statement of Experts / Single Joint Expert Report \n"
+        + "Defendant 1 - Questions for other party's expert or joint experts \n"
+        + "Defendant 1 - Answer to questions asked \n"
+        + "Defendant 1 - Case Summary \n"
+        + "Defendant 1 - Skeleton argument \n"
+        + "Defendant 1 - Authorities \n"
+        + "Defendant 1 - Costs \n"
+        + "Defendant 1 - Documentary evidence for trial \n"
+        + "Both defendants - Disclosure list \n"
+        + "Both defendants - Documents for disclosure \n"
+        + "Both defendants - Documents referred to in the statement \n"
+        + "Both defendants - Expert's report \n"
+        + "Both defendants - Joint Statement of Experts / Single Joint Expert Report \n"
+        + "Both defendants - Questions for other party's expert or joint experts \n"
+        + "Both defendants - Answer to questions asked \n"
+        + "Both defendants - Case Summary \n"
+        + "Both defendants - Skeleton argument \n"
+        + "Both defendants - Authorities \n"
+        + "Both defendants - Costs \n"
+        + "Both defendants - Documentary evidence for trial \n";
     private static final String PAGE_ID = "validateValuesRespondent";
 
     @BeforeEach
@@ -997,7 +1022,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
         var documentUpload = UploadEvidenceDocumentType.builder()
-                .documentIssuedDate(LocalDate.of(2023, 2, 10))
+                .documentIssuedDate(LocalDate.of(2022, 2, 10))
+                .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
                 .documentUpload(testDocument).build();
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
         documentList.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
@@ -1023,7 +1049,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
         var documentUpload = UploadEvidenceDocumentType.builder()
-                .documentIssuedDate(LocalDate.of(2023, 2, 10))
+                .documentIssuedDate(LocalDate.of(2022, 2, 10))
+                .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
                 .documentUpload(testDocument).build();
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
         documentList.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
@@ -1048,7 +1075,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
-        var documentUpload = UploadEvidenceExpert.builder().expertDocument(testDocument).build();
+        var documentUpload = UploadEvidenceExpert.builder()
+            .expertDocument(testDocument)
+            .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
+            .build();
         List<Element<UploadEvidenceExpert>> documentList = new ArrayList<>();
         documentList.add(Element.<UploadEvidenceExpert>builder().value(documentUpload).build());
         // Given
@@ -1073,7 +1103,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
-        var documentUpload = UploadEvidenceExpert.builder().expertDocument(testDocument).build();
+        var documentUpload = UploadEvidenceExpert.builder()
+            .expertDocument(testDocument)
+            .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
+            .build();
         List<Element<UploadEvidenceExpert>> documentList = new ArrayList<>();
         documentList.add(Element.<UploadEvidenceExpert>builder().value(documentUpload).build());
         // Given
@@ -1409,11 +1442,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getDocumentAuthoritiesRes2().get(0).getValue()
                     .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
             assertThat(updatedData.getDocumentAuthoritiesRes2().get(0).getValue()
-                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_PRECEDENT_H);
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_TRIAL_AUTHORITIES);
             assertThat(updatedData.getDocumentCostsRes2().get(0).getValue()
                     .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
             assertThat(updatedData.getDocumentCostsRes2().get(0).getValue()
-                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_ANY_PRECEDENT_H);
+                    .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_TRIAL_COSTS);
+            assertThat(updatedData.getNotificationText()).contains(NotificationWhenBothDefendant);
+
         }
     }
 
@@ -1425,6 +1460,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         String witnessName = "ResTwoWitness";
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .notificationText(null)
                 .documentWitnessSummaryRes2(
                         createWitnessDocs(witnessName, createdDate, witnessDate))
                 .documentWitnessStatementRes2(
@@ -1484,6 +1520,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCostsRes2().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
+
     }
 
     @Test
