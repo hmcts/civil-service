@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -107,6 +108,9 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     protected LocationRefDataService locationRefDataService;
+
+    @MockBean
+    protected UserRoleCaching userRoleCaching;
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
@@ -980,7 +984,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
             given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            given(initiateGeneralAppService.respondentAssigned(any())).willReturn(true);
+            given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -1005,7 +1009,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                               .courtName("Court Name").region("Region").build());
             given(locationRefDataService.getCourtLocationsForGeneralApplication(any())).willReturn(locations);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
-            given(initiateGeneralAppService.respondentAssigned(any())).willReturn(false);
+            given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(false);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
