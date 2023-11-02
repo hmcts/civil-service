@@ -231,7 +231,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
         // was unable to null value properly in EvidenceUploadNotificationEventHandler after emails are sent,
         // so do it here if required.
-        if(nonNull(caseData.getNotificationText()) && caseData.getNotificationText().equals("NULLED")) {
+        if (nonNull(caseData.getNotificationText()) && caseData.getNotificationText().equals("NULLED")) {
             caseDataBuilder.notificationText(null);
         }
 
@@ -587,7 +587,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     CallbackResponse documentUploadTime(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        String selectedRole = getSelectedRole(callbackParams);
         if (caseData.getNotificationText() != null) {
             notificationString = new StringBuilder(caseData.getNotificationText());
         }
@@ -595,7 +594,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         if (nonNull(caseData.getCaseBundles()) && !caseData.getCaseBundles().isEmpty()) {
             updateDocumentListUploadedAfterBundle(caseDataBuilder, caseData);
         }
-
+        String selectedRole = getSelectedRole(callbackParams);
         if (selectedRole.equals(RESPONDENTSOLICITORONE.name()) || selectedRole.equals(SELECTED_VALUE_DEF_BOTH)) {
             String defendantString = "Defendant 1";
             if (selectedRole.equals(SELECTED_VALUE_DEF_BOTH)) {
