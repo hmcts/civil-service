@@ -102,14 +102,14 @@ public class UpdateCaseManagementDetailsService {
 
         } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
             participantString.append(caseData.getApplicant1().getPartyName())
-                .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
-                .append(caseData.getRespondent1()
-                            .getPartyName());
+                .append(" and ").append(caseData.getApplicant2().getPartyName())
+                .append(" v ")
+                .append(caseData.getRespondent1().getPartyName());
 
         } else {
-            participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
-                .append(caseData.getRespondent1()
-                            .getPartyName());
+            participantString.append(caseData.getApplicant1().getPartyName())
+                .append(" v ")
+                .append(caseData.getRespondent1().getPartyName());
         }
         return participantString;
 
