@@ -491,6 +491,11 @@ public class CaseDataBuilder {
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
 
+    private YesOrNo drawDirectionsOrderRequired;
+
+    private DynamicList transferCourtLocationList;
+    private String reasonForTransfer;
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
         return this;
@@ -4566,6 +4571,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateBeforeTransferCaseSDONotDrawnOverLimit() {
+
+        atStateApplicantRespondToDefenceAndProceed();
+
+        ccdState = JUDICIAL_REFERRAL;
+        notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
+
+        tocTransferCaseReason = TocTransferCaseReason.builder()
+            .reasonForCaseTransferJudgeTxt("This is more than 150 111111111111111111111111111111111111111111111111111111111111111111111111111"
+                       + "111111111111111111111111111111111111111111111111111111")
+            .build();
+        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder atStateTakenOfflineSDONotDrawn(MultiPartyScenario mpScenario) {
 
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
@@ -4671,8 +4691,24 @@ public class CaseDataBuilder {
             atStateBothApplicantsRespondToDefenceAndProceed_2v1();
         }
 
+        drawDirectionsOrderRequired = NO;
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineByStaffAfterSDO(MultiPartyScenario mpScenario) {
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
+            atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+        } else if (mpScenario == TWO_V_ONE) {
+            atStateBothApplicantsRespondToDefenceAndProceed_2v1();
+        }
+
+        drawDirectionsOrderRequired = NO;
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = applicant1ResponseDate.plusDays(1);
+        takenOfflineByStaffDate = applicant1ResponseDate.plusDays(1);
         return this;
     }
 
@@ -5131,6 +5167,16 @@ public class CaseDataBuilder {
     public CaseDataBuilder removeSolicitorReferences() {
         this.solicitorReferences = null;
         this.respondentSolicitor2Reference = null;
+        return this;
+    }
+
+    public CaseDataBuilder transferCourtLocationList(DynamicList transferCourtLocationList) {
+        this.transferCourtLocationList = transferCourtLocationList;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForTransfer(String reasonForTransfer) {
+        this.reasonForTransfer = reasonForTransfer;
         return this;
     }
 
@@ -6367,6 +6413,9 @@ public class CaseDataBuilder {
             //Transfer Online Case
             .notSuitableSdoOptions(notSuitableSdoOptions)
             .tocTransferCaseReason(tocTransferCaseReason)
+            .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
+            .transferCourtLocationList(transferCourtLocationList)
+            .reasonForTransfer(reasonForTransfer)
             .build();
     }
 }

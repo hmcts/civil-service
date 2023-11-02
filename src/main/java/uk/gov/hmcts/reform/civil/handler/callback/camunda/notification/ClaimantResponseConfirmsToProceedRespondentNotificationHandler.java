@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,7 +25,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED;
@@ -41,9 +41,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
     private static final List<CaseEvent> EVENTS = List.of(
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED,
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_CLAIMANT_CONFIRMS_TO_PROCEED,
-        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC,
-        NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED
-    );
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED_CC);
 
     public static final String TASK_ID = "ClaimantConfirmsToProceedNotifyRespondentSolicitor1";
     public static final String Task_ID_RESPONDENT_SOL2 = "ClaimantConfirmsToProceedNotifyRespondentSolicitor2";
@@ -87,12 +85,12 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             recipient = caseData.getRespondentSolicitor2EmailAddress();
         }
 
-        if (isLiPDefendant(callbackParams)) {
+        if (isLRvLipToDefendant(callbackParams)) {
             if (caseData.getRespondent1().getPartyEmail() != null) {
                 notificationService.sendMail(
                     caseData.getRespondent1().getPartyEmail(),
                     notificationsProperties.getRespondent1LipClaimUpdatedTemplate(),
-                    addPropertiesForLiPDefendant(caseData),
+                    addPropertiesLRvLip(caseData),
                     String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
                 );
             }
@@ -190,7 +188,7 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
         );
     }
 
-    public Map<String, String> addPropertiesForLiPDefendant(CaseData caseData) {
+    public Map<String, String> addPropertiesLRvLip(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
@@ -222,10 +220,11 @@ public class ClaimantResponseConfirmsToProceedRespondentNotificationHandler exte
             caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 
-    private boolean isLiPDefendant(CallbackParams callbackParams) {
+    private boolean isLRvLipToDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && caseData.isLRvLipOneVOne()
+            && (caseData.isLRvLipOneVOne()
+            || caseData.isLipvLipOneVOne())
             && !isCcNotification(callbackParams);
     }
 }
