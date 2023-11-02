@@ -26,31 +26,24 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UpdateCaseManagementLocationDetailsService {
+public class UpdateCaseManagementDetailsService {
 
     private final LocationHelper locationHelper;
     private final LocationRefDataService locationRefDataService;
     private final CourtLocationUtils courtLocationUtils;
 
-    public void updateCaseManagementLocationDetails(CaseData.CaseDataBuilder<?, ?> builder, CallbackParams callbackParams) {
+    public void updateCaseManagementDetails(CaseData.CaseDataBuilder<?, ?> builder, CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         final List<LocationRefData> availableLocations = fetchLocationData(callbackParams);
 
-        Optional.ofNullable(caseData.getApplicant1DQ())
-            .ifPresent(dq -> Optional.ofNullable(dq.getApplicant1DQRequestedCourt())
-                .ifPresent(requestedCourt -> builder.applicant1DQ(dq.toBuilder()
-                                                                      .applicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
-                                                                      .build())));
-        Optional.ofNullable(caseData.getRespondent1DQ())
-            .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
-                .ifPresent(requestedCourt -> builder.respondent1DQ(dq.toBuilder()
-                                                                       .respondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
-                                                                       .build())));
+        updateApplicant1RequestedCourtDetails(caseData, builder, availableLocations);
+        updateRespondent1RequestedCourtDetails(caseData, builder, availableLocations);
 
+        caseData = builder.build();
         locationHelper.getCaseManagementLocation(caseData)
             .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                 builder,
-                correctCaseLocation(requestedCourt, availableLocations),
+                requestedCourt,
                 () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
                     CallbackParams.Params.BEARER_TOKEN).toString())
             ));
@@ -66,12 +59,31 @@ public class UpdateCaseManagementLocationDetailsService {
 
     }
 
+    private void updateApplicant1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
+        Optional.ofNullable(caseData.getApplicant1DQ())
+            .ifPresent(dq -> Optional.ofNullable(dq.getApplicant1DQRequestedCourt())
+                .ifPresent(requestedCourt -> builder.applicant1DQ(
+                    dq.toBuilder().applicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
+                        .build())));
+    }
+
+    private void updateRespondent1RequestedCourtDetails(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder, List<LocationRefData> availableLocations) {
+        Optional.ofNullable(caseData.getRespondent1DQ())
+            .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
+                .ifPresent(requestedCourt -> builder.respondent1DQ(
+                    dq.toBuilder().respondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
+                        .build())));
+    }
+
     private RequestedCourt correctCaseLocation(RequestedCourt requestedCourt, List<LocationRefData> locations) {
         String locationLabel = requestedCourt.getCaseLocation().getBaseLocation();
         LocationRefData preferredLocation = locations.stream()
             .filter(locationRefData -> courtLocationUtils.checkLocation(locationRefData, locationLabel))
             .findFirst().orElseThrow(RuntimeException::new);
-        return requestedCourt.toBuilder().caseLocation(LocationHelper.buildCaseLocation(preferredLocation)).build();
+        return requestedCourt.toBuilder()
+            .responseCourtCode(preferredLocation.getCourtLocationCode())
+            .caseLocation(LocationHelper.buildCaseLocation(preferredLocation))
+            .build();
     }
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {

@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementLocationDetailsService;
+import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
     CourtLocationUtils.class,
     LocationRefDataService.class,
     LocationHelper.class,
-    UpdateCaseManagementLocationDetailsService.class
+    UpdateCaseManagementDetailsService.class
 })
 class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -121,10 +121,28 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation() {
+            Applicant1DQ applicant1DQ =
+                Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
+                                                                      .responseCourtCode("court1")
+                                                                      .caseLocation(CaseLocationCivil.builder()
+                                                                                        .region(courtLocation)
+                                                                                        .baseLocation(courtLocation)
+                                                                                        .build())
+                                                                      .build()).build();
+            Respondent1DQ respondent1DQ =
+                Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                        .responseCourtCode("court2")
+                                                                        .caseLocation(CaseLocationCivil.builder()
+                                                                                          .region(courtLocation)
+                                                                                          .baseLocation(courtLocation)
+                                                                                          .build())
+                                                                        .build()).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
                 .applicant1AcceptAdmitAmountPaidSpec(NO)
                 .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
                         MediationDecision.No).build())
@@ -143,32 +161,17 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("status")
                 .isEqualTo("READY");
 
+            assertThat(response.getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+            CaseData data = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(data.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()).isEqualTo("court1");
+            assertThat(data.getCaseNameHmctsInternal()).isEqualTo(data.getApplicant1().getPartyName() + " v " + data.getRespondent1().getPartyName());
         }
 
         @Test
         void shouldChangeCaseState_whenApplicantRejectClaimSettlementAndAgreeToMediation() {
-            Applicant1DQ applicant1DQ =
-                Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
-                                                                      .responseCourtCode("applicant1DQRequestedCourt")
-                                                                      .caseLocation(CaseLocationCivil.builder()
-                                                                                        .region(courtLocation)
-                                                                                        .baseLocation(courtLocation)
-                                                                                        .build())
-                                                                      .build()).build();
-            Respondent1DQ respondent1DQ =
-                Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
-                                                                        .responseCourtCode("respondent1DQRequestedCourt")
-                                                                        .caseLocation(CaseLocationCivil.builder()
-                                                                                          .region(courtLocation)
-                                                                                          .baseLocation(courtLocation)
-                                                                                          .build())
-                                                                        .build()).build();
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
                 .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
                     MediationDecision.Yes).build())
                             .build())
