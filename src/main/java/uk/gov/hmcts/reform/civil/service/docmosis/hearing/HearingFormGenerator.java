@@ -64,6 +64,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     public HearingForm getTemplateData(CaseData caseData) {
 
         return HearingForm.builder()
+            .listingOrRelisting(caseData.getListingOrRelisting().toString())
             .court(caseData.getHearingLocation().getValue().getLabel())
             .caseNumber(caseData.getLegacyCaseReference())
             .creationDate(getDateFormatted(LocalDate.now()))

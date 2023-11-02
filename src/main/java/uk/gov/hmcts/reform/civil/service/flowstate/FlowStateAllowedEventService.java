@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
@@ -811,6 +812,7 @@ public class FlowStateAllowedEventService {
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
+                LIFT_BREATHING_SPACE_LIP,
                 RESUBMIT_CLAIM,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -828,6 +830,7 @@ public class FlowStateAllowedEventService {
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
+                LIFT_BREATHING_SPACE_LIP,
                 NOTIFY_DEFENDANT_OF_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 CASE_PROCEEDS_IN_CASEMAN,
@@ -871,6 +874,7 @@ public class FlowStateAllowedEventService {
                 ACKNOWLEDGEMENT_OF_SERVICE,
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 INFORM_AGREED_EXTENSION_DATE,
                 INFORM_AGREED_EXTENSION_DATE_SPEC,
@@ -909,6 +913,7 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE,
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
@@ -932,6 +937,7 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE,
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 WITHDRAW_CLAIM,
@@ -956,6 +962,7 @@ public class FlowStateAllowedEventService {
                 CLAIMANT_RESPONSE_SPEC,
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -981,6 +988,7 @@ public class FlowStateAllowedEventService {
                 CLAIMANT_RESPONSE_SPEC,
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -1007,6 +1015,7 @@ public class FlowStateAllowedEventService {
                 CLAIMANT_RESPONSE_CUI,
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -1038,6 +1047,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -1059,6 +1069,7 @@ public class FlowStateAllowedEventService {
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -1102,6 +1113,7 @@ public class FlowStateAllowedEventService {
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -1168,6 +1180,7 @@ public class FlowStateAllowedEventService {
                 ACKNOWLEDGE_CLAIM,
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 INFORM_AGREED_EXTENSION_DATE,
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -1210,6 +1223,7 @@ public class FlowStateAllowedEventService {
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -1246,6 +1260,7 @@ public class FlowStateAllowedEventService {
                 ADD_DEFENDANT_LITIGATION_FRIEND,
                 ENTER_BREATHING_SPACE_SPEC,
                 ENTER_BREATHING_SPACE_LIP,
+                LIFT_BREATHING_SPACE_LIP,
                 LIFT_BREATHING_SPACE_SPEC,
                 WITHDRAW_CLAIM,
                 DISCONTINUE_CLAIM,
@@ -1357,6 +1372,10 @@ public class FlowStateAllowedEventService {
         }
 
         if (caseEvent.equals(MANAGE_CONTACT_INFORMATION)) {
+            return true;
+        }
+
+        if (caseEvent.equals(CASE_PROCEEDS_IN_CASEMAN)) {
             return true;
         }
 
