@@ -45,9 +45,7 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     private CallbackResponse notifyApplicantForClaimSubmitted(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (Objects.isNull(caseData.getHelpWithFeesReferenceNumber())) {
-            generateEmail(caseData);
-        }
+        generateEmail(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
@@ -69,7 +67,9 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
         if (Objects.nonNull(caseData.getApplicant1Email())) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate(),
+                Objects.isNull(caseData.getHelpWithFeesReferenceNumber()) ?
+                    notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate() :
+                    notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate(),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
