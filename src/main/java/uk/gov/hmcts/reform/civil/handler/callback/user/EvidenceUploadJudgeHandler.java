@@ -61,7 +61,11 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        caseDataBuilder.caseNoteType(null).build();
+        caseDataBuilder
+            .caseNoteType(null)
+            .documentAndNameToAdd(null)
+            .documentAndNoteToAdd(null)
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -83,8 +87,6 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
             caseDataBuilder
                 .caseNotesTA(caseNotesTa)
                 .caseNoteTA(null)
-                .documentAndNameToAdd(null)
-                .documentAndNoteToAdd(null)
                 .build();
         }
 
