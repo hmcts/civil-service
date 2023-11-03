@@ -1529,6 +1529,33 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void shouldNotAddSameNotificationIfAlreadyAdded_notificationText() {
+        // If we populate notification string with an entry, we do not want to duplicate that on further uploads of same type.
+        handler.notificationString = new StringBuilder("Documentation that has been uploaded: \n\n");
+        List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_DEF1,
+                                       EvidenceUploadHandlerBase.OPTION_DEF2,
+                                       EvidenceUploadHandlerBase.OPTION_DEF_BOTH);
+        LocalDate witnessDate = LocalDate.of(2023, 2, 10);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .notificationText("Documentation that has been uploaded: \n\n Defendant 1 - Joint Statement of Experts / Single Joint Expert Report \n")
+            .applicant1(PartyBuilder.builder().individual().build())
+            .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(0), false))
+            .documentJointStatementRes(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseDataService.getCase(anyLong())).willReturn(CaseDetails.builder().build());
+        // When handle is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then Notificcation should not have a duplicate entry
+        assertThat(updatedData.getNotificationText())
+            .isEqualTo("Documentation that has been uploaded: \n\n Defendant 1 - Joint Statement of Experts / Single Joint Expert Report \n");
+    }
+
+    @Test
     void should_compareAndCopy() {
         List<Element<Object>> before = null;
         List<Element<Object>> after = null;

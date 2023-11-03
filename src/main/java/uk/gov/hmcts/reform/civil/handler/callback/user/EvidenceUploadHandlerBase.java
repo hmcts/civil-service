@@ -136,7 +136,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String APPLICANT_TWO_ANY_PRECEDENT_H = "ApplicantTwoAnyPrecedentH";
 
     // Notification Strings used for email
-    public StringBuilder notificationString = new StringBuilder("Documentation that has been uploaded: \n\n");
+    protected static StringBuilder notificationString = new StringBuilder("Documentation that has been uploaded: \n\n");
     protected static final String DISCLOSURE_LIST_TEXT = "%s - Disclosure list \n";
     protected static final String DISCLOSURE_TEXT = "%s - Documents for disclosure \n";
     protected static final String WITNESS_STATEMENT_TEXT = "%s - Witness statement \n";
@@ -185,8 +185,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     abstract CallbackResponse createShowCondition(CaseData caseData, UserInfo userInfo);
 
     abstract void applyDocumentUploadDate(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, LocalDateTime now);
-
-    abstract void updateDocumentListUploadedAfterBundle(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData);
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -584,16 +582,28 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         });
     }
 
-    CallbackResponse documentUploadTime(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+    private void getNotificationText(CaseData caseData) {
         if (caseData.getNotificationText() != null) {
             notificationString = new StringBuilder(caseData.getNotificationText());
         }
-        applyDocumentUploadDate(caseDataBuilder, time.now());
+    }
+
+    abstract void updateDocumentListUploadedAfterBundle(CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData caseData);
+
+    private void updateDocumentListUploadedAfterBundle(CaseData caseData, CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
         if (nonNull(caseData.getCaseBundles()) && !caseData.getCaseBundles().isEmpty()) {
             updateDocumentListUploadedAfterBundle(caseDataBuilder, caseData);
         }
+    }
+
+    CallbackResponse documentUploadTime(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        // If notification has already been populated in current day, we want to append to that existing notification
+        getNotificationText(caseData);
+        applyDocumentUploadDate(caseDataBuilder, time.now());
+        updateDocumentListUploadedAfterBundle(caseData, caseDataBuilder);
+
         String selectedRole = getSelectedRole(callbackParams);
         if (selectedRole.equals(RESPONDENTSOLICITORONE.name()) || selectedRole.equals(SELECTED_VALUE_DEF_BOTH)) {
             String defendantString = "Defendant 1";

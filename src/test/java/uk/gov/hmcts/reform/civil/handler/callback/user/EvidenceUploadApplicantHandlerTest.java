@@ -121,6 +121,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     void givenAboutToStart_assignCaseProgAllocatedTrackUnSpec() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .notificationText(null)
             .claimType(ClaimType.CLINICAL_NEGLIGENCE)
             .claimValue(ClaimValue.builder()
                             .statementOfValueInPennies(BigDecimal.valueOf(5000))
@@ -134,12 +135,14 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             .handle(params);
         // Then
         assertThat(response.getData()).extracting("caseProgAllocatedTrack").isEqualTo("SMALL_CLAIM");
+        assertThat(response.getData()).extracting("notificationText").isNull();
     }
 
     @Test
     void givenAboutToStart_assignCaseProgAllocatedTrackSpec() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .notificationText(null)
             .claimType(null)
             .totalClaimAmount(BigDecimal.valueOf(12500))
             .build();
@@ -151,6 +154,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
             .handle(params);
         // Then
         assertThat(response.getData()).extracting("caseProgAllocatedTrack").isEqualTo("FAST_CLAIM");
+        assertThat(response.getData()).extracting("notificationText").isNull();
     }
 
     @Test
@@ -831,6 +835,33 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
                     .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.APPLICANT_TWO_ANY_PRECEDENT_H);
             assertThat(updatedData.getNotificationText()).isEqualTo(NotificationWhenBothClaimant);
         }
+    }
+
+    @Test
+    void shouldNotAddSameNotificationIfAlreadyAdded_notificationText() {
+        // If we populate notification string with an entry, we do not want to duplicate that on further uploads of same type.
+        handler.notificationString = new StringBuilder("Documentation that has been uploaded: \n\n");
+        List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_APP1,
+                                       EvidenceUploadHandlerBase.OPTION_APP2,
+                                       EvidenceUploadHandlerBase.OPTION_APP_BOTH);
+        LocalDate witnessDate = LocalDate.of(2023, 2, 10);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .notificationText("Documentation that has been uploaded: \n\n Claimant 1 - Joint Statement of Experts / Single Joint Expert Report \n")
+            .applicant1(PartyBuilder.builder().individual().build())
+            .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(0), false))
+            .documentJointStatement(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseDataService.getCase(anyLong())).willReturn(CaseDetails.builder().build());
+        // When handle is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then Notificcation should not have a duplicate entry
+        assertThat(updatedData.getNotificationText())
+            .isEqualTo("Documentation that has been uploaded: \n\n Claimant 1 - Joint Statement of Experts / Single Joint Expert Report \n");
     }
 
     private List<Element<UploadEvidenceDocumentType>> createEvidenceDocs(String type, LocalDate issuedDate) {
