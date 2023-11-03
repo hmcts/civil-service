@@ -582,7 +582,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         });
     }
 
-    private void getNotificationText(CaseData caseData) {
+    static void getNotificationText(CaseData caseData) {
         if (caseData.getNotificationText() != null) {
             notificationString = new StringBuilder(caseData.getNotificationText());
         }
