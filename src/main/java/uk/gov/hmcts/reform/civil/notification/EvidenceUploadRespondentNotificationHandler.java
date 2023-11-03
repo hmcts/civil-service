@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.notification;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -12,6 +11,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @Service
@@ -21,7 +21,6 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
     private static final String REFERENCE_TEMPLATE = "evidence-upload-notification-%s";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    protected final ObjectMapper objectMapper;
 
     public void notifyRespondentEvidenceUpload(CaseData caseData, boolean isForRespondentSolicitor1) throws NotificationException {
 
@@ -43,8 +42,7 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
             isRespondentLip = true;
         }
 
-        if (null != email && !caseData.getNotificationText().equals("NULLED")) {
-            System.out.println("respondent email text " + caseData.getNotificationText());
+        if (null != email && nonNull(caseData.getNotificationText()) && !caseData.getNotificationText().equals("NULLED")) {
             notificationService.sendMail(
                 email,
                 getTemplate(isRespondentLip),

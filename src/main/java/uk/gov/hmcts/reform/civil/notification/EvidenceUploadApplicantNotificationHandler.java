@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
+
 @Service
 @RequiredArgsConstructor
 public class EvidenceUploadApplicantNotificationHandler implements NotificationData {
@@ -24,8 +26,7 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
         boolean isApplicantLip = isApplicantLip(caseData);
 
         //Send email to Applicant
-        if (!caseData.getNotificationText().equals("NULLED")) {
-            System.out.println("applicant email text " + caseData.getNotificationText());
+        if (nonNull(caseData.getNotificationText()) && !caseData.getNotificationText().equals("NULLED")) {
             notificationService.sendMail(
                 getEmail(caseData, isApplicantLip),
                 getTemplate(caseData, isApplicantLip),
