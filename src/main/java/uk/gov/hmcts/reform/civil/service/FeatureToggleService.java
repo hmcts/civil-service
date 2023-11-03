@@ -69,7 +69,7 @@ public class FeatureToggleService {
     }
 
     public boolean isLipVLipEnabled() {
-        return true;
+        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
@@ -83,5 +83,9 @@ public class FeatureToggleService {
 
     public boolean isCaseProgressionEnabled() {
         return featureToggleApi.isFeatureEnabled("cui-case-progression");
+    }
+
+    public boolean isEarlyAdoptersEnabled() {
+        return featureToggleApi.isFeatureEnabled("early-adopters");
     }
 }
