@@ -15,9 +15,11 @@ import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_PROCEEDS_IN_CASEMAN;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 
@@ -25,7 +27,10 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 @RequiredArgsConstructor
 public class CaseProceedsInCasemanRespondentNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN);
+    private static final List<CaseEvent> EVENTS = List.of(
+        NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN,
+        NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_PROCEEDS_IN_CASEMAN
+    );
 
     public static final String TASK_ID = "CaseProceedsInCasemanNotifyRespondentSolicitor1";
     private static final String REFERENCE_TEMPLATE = "case-proceeds-in-caseman-respondent-notification-%s";
@@ -55,12 +60,24 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
         CaseData caseData = callbackParams.getCaseData();
 
         if (stateFlowEngine.hasTransitionedTo(callbackParams.getRequest().getCaseDetails(), CLAIM_NOTIFIED)) {
-            notificationService.sendMail(
-                caseData.getRespondentSolicitor1EmailAddress(),
-                notificationsProperties.getSolicitorCaseTakenOffline(),
-                addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-            );
+
+            String emailAddress;
+            if (NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN.name()
+                .equals(callbackParams.getRequest().getEventId())) {
+                emailAddress = caseData.getRespondentSolicitor1EmailAddress();
+            } else {
+                emailAddress = caseData.getRespondentSolicitor2EmailAddress();
+            }
+            Optional.ofNullable(emailAddress).ifPresent(
+                email -> notificationService.sendMail(
+                    email,
+                    notificationsProperties.getSolicitorCaseTakenOffline(),
+                    addProperties(caseData),
+                    String.format(
+                        REFERENCE_TEMPLATE,
+                        caseData.getLegacyCaseReference()
+                    )
+                ));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
