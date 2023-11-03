@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
@@ -618,6 +619,7 @@ public class CaseDataParent implements MappableObject {
 
     private YesOrNo finalOrderMadeSelection;
     private OrderMade finalOrderDateHeardComplex;
+    private List<FinalOrdersJudgePapers> finalOrderJudgePapers;
     private List<FinalOrderToggle> finalOrderJudgeHeardFrom;
     private FinalOrderRepresentation finalOrderRepresentation;
     private List<FinalOrderToggle> finalOrderRecitals;
@@ -704,6 +706,8 @@ public class CaseDataParent implements MappableObject {
     private String pcqId;
 
     // TOC
+    private String reasonForTransfer;
+    private DynamicList transferCourtLocationList;
     private NotSuitableSdoOptions notSuitableSdoOptions;
     private TocTransferCaseReason tocTransferCaseReason;
 

@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -83,6 +84,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private final LocationRefDataUtil locationRefDataUtil;
     private final LocationHelper locationHelper;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
+    private final ToggleConfiguration toggleConfiguration;
     private final AssignCategoryId assignCategoryId;
 
     @Override
@@ -110,6 +112,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         updatedData.claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        updatedData.featureToggleWA(toggleConfiguration.getFeatureToggle());
 
         // add document from defendant response documents, to placeholder field for preview during event.
         caseData.getDefendantResponseDocuments().forEach(document -> {
@@ -277,13 +280,9 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             builder.applicant1DefenceResponseDocument(null);
             builder.respondent1ClaimResponseDocument(null);
             builder.respondentSharedClaimResponseDocument(null);
-            Applicant1DQ currentApplicant1DQ = caseData.getApplicant1DQ();
-            currentApplicant1DQ.setApplicant1DQDraftDirections(null);
-            builder.applicant1DQ(currentApplicant1DQ);
-            Applicant2DQ currentApplicant2DQ = caseData.getApplicant2DQ();
-            if (Objects.nonNull(currentApplicant2DQ)) {
-                currentApplicant2DQ.setApplicant2DQDraftDirections(null);
-                builder.applicant2DQ(currentApplicant2DQ);
+            builder.applicant1DQ(builder.build().getApplicant1DQ().toBuilder().applicant1DQDraftDirections(null).build());
+            if (caseData.getApplicant2DQ() != null) {
+                builder.applicant2DQ(builder.build().getApplicant2DQ().toBuilder().applicant2DQDraftDirections(null).build());
             }
         }
 

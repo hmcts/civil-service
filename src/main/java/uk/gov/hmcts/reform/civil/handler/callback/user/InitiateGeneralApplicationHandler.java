@@ -20,11 +20,11 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -64,15 +64,15 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             + "respondent solicitor are assigned to the case.";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
-    private final OrganisationService organisationService;
     private final IdamClient idamClient;
+    private final UserRoleCaching userRoleCaching;
     private final GeneralAppFeesService feesService;
     private final LocationRefDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::aboutToStartValidattionAndSetup,
+            callbackKey(ABOUT_TO_START), this::aboutToStartValidationAndSetup,
             callbackKey(MID, VALIDATE_GA_TYPE), this::gaValidateType,
             callbackKey(MID, VALIDATE_HEARING_DATE), this::gaValidateHearingDate,
             callbackKey(MID, VALIDATE_GA_CONSENT), this::gaValidateConsent,
@@ -89,16 +89,15 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse aboutToStartValidattionAndSetup(CallbackParams callbackParams) {
+    private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-        if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
-            errors.add(RESP_NOT_ASSIGNED_ERROR);
-        }
-
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<String> errors = new ArrayList<>();
+        if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
+            errors.add(RESP_NOT_ASSIGNED_ERROR);
+        }
         caseDataBuilder
                 .generalAppHearingDetails(
                     GAHearingDetails
@@ -162,10 +161,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         } else {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.NO);
         }
-
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        String token = callbackParams.getParams().get(BEARER_TOKEN).toString();
         boolean isGAApplicantSameAsParentCaseClaimant = initiateGeneralApplicationService
-                .isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
+                .isGAApplicantSameAsParentCaseClaimant(caseData, token);
         caseDataBuilder
             .generalAppParentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant ? YES : YesOrNo.NO).build();
 

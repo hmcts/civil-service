@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
@@ -31,16 +30,17 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.FREE_FORM_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.AppealList.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.CIRCUIT_COURT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.GRANTED;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.REFUSED;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
 
@@ -60,6 +60,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         + "reasonable to proceed in their absence.";
     private static final String NOTICE_NOT_RECIEVED_CANNOT_PROCEED =     "The Judge was not satisfied that they had received notice of the hearing "
         + "and it was not reasonable to proceed in their absence.";
+    private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         JudgeFinalOrderForm templateData = getFinalOrderType(caseData, authorisation);
@@ -82,7 +83,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private String getFileName(DocmosisTemplates docmosisTemplate) {
-        return format(docmosisTemplate.getDocumentTitle(), LocalDate.now());
+        return format(docmosisTemplate.getDocumentTitle(),  formatLocalDate(LocalDate.now(), DATE_FORMAT));
     }
 
     private JudgeFinalOrderForm getFinalOrderType(CaseData caseData, String authorisation) {
@@ -94,13 +95,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-        LocationRefData locationRefData;
-
-        if (hasSDOBeenMade(caseData.getCcdState())) {
-            locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
-        } else {
-            locationRefData = locationRefDataService.getCcmccLocation(authorisation);
-        }
+        LocationRefData locationRefData = locationRefDataService.getCcmccLocation(authorisation);
 
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
@@ -108,6 +103,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
             .defendant1Name(caseData.getRespondent1().getPartyName())
             .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
+            .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
+            .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
             .caseName(caseData.getCaseNameHmctsInternal())
             .claimantReference(nonNull(caseData.getSolicitorReferences())
                                    ? caseData.getSolicitorReferences().getApplicantSolicitor1Reference() : null)
@@ -132,19 +129,16 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private JudgeFinalOrderForm getAssistedOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-        LocationRefData locationRefData;
+        LocationRefData locationRefData = locationRefDataService.getCcmccLocation(authorisation);
 
-        if (hasSDOBeenMade(caseData.getCcdState())) {
-            locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
-        } else {
-            locationRefData = locationRefDataService.getCcmccLocation(authorisation);
-        }
         var assistedFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
             .claimant1Name(caseData.getApplicant1().getPartyName())
             .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
             .defendant1Name(caseData.getRespondent1().getPartyName())
             .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
+            .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
+            .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
             .courtName(locationRefData.getVenueName())
             .finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
             .orderMadeDate(orderMadeDateBuilder(caseData))
@@ -202,8 +196,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     }
 
     private String isJudgeConsideredPapers(CaseData caseData) {
-        return nonNull(caseData.getFinalOrderRepresentation())
-            && nonNull(caseData.getFinalOrderRepresentation().getTypeRepresentationJudgePapersList()) ? "true" : null;
+        return nonNull(caseData.getFinalOrderJudgePapers()) ? "true" : null;
     }
 
     private LocalDate getDatesToAvoid(CaseData caseData) {
@@ -434,12 +427,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 case HOUR_2:
                     return "2 hours";
                 case OTHER:
-                    StringBuilder otherLength = new StringBuilder();
-                    otherLength.append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays() + " days ").append(
-                        caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours()).append(
-                        " hours ").append(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes()).append(
-                        " minutes");
-                    return otherLength.toString();
+                    return getOtherLength(caseData);
                 default:
                     return "";
             }
@@ -447,8 +435,17 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         return "";
     }
 
-    private boolean hasSDOBeenMade(CaseState state) {
-        return !JUDICIAL_REFERRAL.equals(state);
+    private String getOtherLength(CaseData caseData) {
+        StringBuilder otherLength = new StringBuilder();
+        if (Objects.nonNull(caseData.getFinalOrderFurtherHearingComplex().getLengthListOther())) {
+            String otherDay = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherDays();
+            String otherHour = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherHours();
+            String otherMinute = caseData.getFinalOrderFurtherHearingComplex().getLengthListOther().getLengthListOtherMinutes();
+            otherLength.append(Objects.nonNull(otherDay) ? (otherDay + " days ") : "")
+                    .append(Objects.nonNull(otherHour) ? (otherHour + " hours ") : "")
+                    .append(Objects.nonNull(otherMinute) ? (otherMinute + " minutes") : "");
+        }
+        return otherLength.toString();
     }
 
     public String orderMadeDateBuilder(CaseData caseData) {

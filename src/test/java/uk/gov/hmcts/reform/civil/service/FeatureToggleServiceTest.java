@@ -161,6 +161,24 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
+        var caseFileKey = "cui-case-progression";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
+        var caseFileKey = "early-adopters";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
