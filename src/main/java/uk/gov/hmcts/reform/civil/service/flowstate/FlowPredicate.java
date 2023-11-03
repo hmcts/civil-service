@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -371,7 +372,8 @@ public class FlowPredicate {
     public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
         caseData.getReasonNotSuitableSDO() != null
             && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
-            && caseData.getTakenOfflineDate() != null;
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getTakenOfflineByStaffDate() == null;
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension =
         FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt;
@@ -459,13 +461,59 @@ public class FlowPredicate {
         caseData.getTakenOfflineDate() != null;
 
     public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
-        caseData.getReasonNotSuitableSDO() == null && caseData.getTakenOfflineDate() != null;
+        caseData.getDrawDirectionsOrderRequired() != null
+            && caseData.getReasonNotSuitableSDO() == null
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getTakenOfflineByStaffDate() == null;
 
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
         caseData.getTakenOfflineByStaffDate() != null;
 
+    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimantResponseBeforeSDO = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+        && caseData.getApplicant1ResponseDate() != null
+        && caseData.getDrawDirectionsOrderRequired() == null
+        && caseData.getReasonNotSuitableSDO() == null;
+
+    public static final Predicate<CaseData> takenOfflineByStaffAfterSDO = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getDrawDirectionsOrderRequired() != null
+            && caseData.getReasonNotSuitableSDO() == null;
+
+    public static final Predicate<CaseData> takenOfflineAfterNotSuitableForSdo = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getDrawDirectionsOrderRequired() == null
+            && caseData.getReasonNotSuitableSDO() != null
+            && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput());
+
+    public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse = caseData ->
+        getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(caseData);
+
     public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = caseData ->
         getPredicateTakenOfflineByStaffAfterClaimIssue(caseData);
+
+    public static final Predicate<CaseData> takenOfflineByStaffBeforeClaimIssued = caseData ->
+        getPredicateTakenOfflineByStaffBeforeClaimIssue(caseData);
+
+    public static final boolean getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(CaseData caseData) {
+        boolean basePredicate = caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getApplicant1ResponseDate() == null;
+
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && YES.equals(caseData.getAddApplicant2())) {
+            return basePredicate && caseData.getApplicant2ResponseDate() == null;
+        }
+
+        return basePredicate;
+    }
+
+    public static final boolean getPredicateTakenOfflineByStaffBeforeClaimIssue(CaseData caseData) {
+        // In case of SPEC and UNSPEC claim ClaimNotificationDeadline will be set when the case is issued
+        return caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getClaimNotificationDeadline() == null
+            && caseData.getClaimNotificationDate() == null
+            && caseData.getSubmittedDate() != null;
+    }
 
     public static final boolean getPredicateTakenOfflineByStaffAfterClaimIssue(CaseData caseData) {
         // In case of SPEC claim ClaimNotificationDate will be set even when the case is issued
@@ -977,4 +1025,8 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> casemanMarksMediationUnsuccessful = caseData ->
         Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason());
+
+    public static final Predicate<CaseData> takenOfflineByStaffBeforeMediationUnsuccessful = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+        && Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason());
 }
