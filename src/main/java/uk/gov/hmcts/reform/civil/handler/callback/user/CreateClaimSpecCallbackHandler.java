@@ -177,6 +177,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private static final String ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST = "Scheduled date of flight must be today or in the past";
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -232,6 +233,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
             .put(callbackKey(MID, "is-flight-delay-claim"), this::isFlightDelayClaim)
+            .put(callbackKey(MID, "get-airline-list"), this::getAirlineList)
+            .put(callbackKey(MID, "validate-date-of-flight"), this::validateDateOfFlight)
             .build();
     }
 
@@ -916,6 +919,36 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse getAirlineList(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+            DynamicList airlineList = DynamicList.builder()
+                .value(DynamicListElement.builder().build())
+                .listItems(List.of(
+                    DynamicListElement.builder().label("British Airways").code("BRITISH_AIRWAYS").build(),
+                    DynamicListElement.builder().label("OTHER").code("OTHER").build()
+                ))
+                              .build();
+                caseDataBuilder.flightDetailsAirlineList(airlineList);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse validateDateOfFlight(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        List<String> errors = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        LocalDate scheduledDate = callbackParams.getCaseData().getFlightDetailsScheduledDate();
+        if (scheduledDate.isAfter(today)) {
+            errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
