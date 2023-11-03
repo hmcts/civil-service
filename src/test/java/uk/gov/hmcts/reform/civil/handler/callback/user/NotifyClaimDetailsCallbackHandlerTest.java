@@ -546,7 +546,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             "Date of service must be no greater than 2 working days in the future";
 
         public static final String DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS =
-            "On what day did you serve should not be more than 14 days old";
+            "Date of service must be no greater than 2 working days in the future";
 
         public static final String DATE_OF_SERVICE_DATE_IS_WORKING_DAY =
             "For the date of service please enter a working day";
@@ -793,10 +793,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
             when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
                 .thenReturn(LocalDate.of(2023, 10, 16));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(16, 0)))
-                .thenReturn(LocalDateTime.of(deemedServedDate, LocalTime.of(16, 0)));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(currentDate.atTime(16, 0)))
                 .thenReturn(LocalDateTime.of(currentDate, LocalTime.of(16, 0)));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(16, 0)))
+                .thenReturn(LocalDateTime.of(deemedServedDate, LocalTime.of(16, 0)));
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()

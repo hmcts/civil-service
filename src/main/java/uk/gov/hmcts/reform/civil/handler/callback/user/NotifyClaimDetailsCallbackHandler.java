@@ -85,13 +85,13 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             "Date you served the documents must be today or in the past";
 
     public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
-        "Date of Service should not be more than 14 days old";
+        "On what day did you serve should not be more than 14 days old";
 
     public static final String DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS =
         "Date of service must be no greater than 2 working days in the future";
 
     public static final String DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS =
-        "On what day did you serve should not be more than 14 days old";
+        "The date of service should not be more than 14 days old";
 
     public static final String DATE_OF_SERVICE_DATE_IS_WORKING_DAY =
         "For the date of service please enter a working day";
@@ -209,17 +209,17 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
         if (featureToggleService.isCertificateOfServiceEnabled()) {
             if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
-                && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) {
+                && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant())) {
                 LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
-                        .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
+                        .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
                 if (cosDate1.isBefore(date)) {
                     date = cosDate1;
                 }
             }
             if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
-                && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
+                && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant())) {
                 LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
-                        .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
+                        .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
                 if (cosDate2.isBefore(date)) {
                     date = cosDate2;
                 }
