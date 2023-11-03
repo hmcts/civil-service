@@ -67,6 +67,9 @@ public enum DashboardClaimStatus {
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
     ),
+    DEFAULT_JUDGEMENT(
+        Claim::isClaimantDefaultJudgement
+    ),
     RESPONSE_OVERDUE(
         Claim::hasResponsePendingOverdue
     ),
