@@ -171,7 +171,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void givenAboutToStart_assignCaseProgAllocatedTrackSpec() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .notificationText("NULLED")
+            .notificationText(null)
             .claimType(null)
             .totalClaimAmount(BigDecimal.valueOf(12500))
             .build();
@@ -190,6 +190,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void givenAboutToStart_1v2SameSolicitor_shouldShowOptions() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .notificationText("existing notification")
                 .claimType(null)
                 .totalClaimAmount(BigDecimal.valueOf(12500))
                 .addRespondent2(YES)
@@ -203,6 +204,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
         // Then
         assertThat(response.getData()).extracting("evidenceUploadOptions").isNotNull();
+        assertThat(response.getData()).extracting("notificationText").isEqualTo("existing notification");
     }
 
     @ParameterizedTest
