@@ -50,7 +50,7 @@ public enum DocmosisTemplates {
     DQ_RESPONSE_2V1_FAST_TRACK_INT("CV-UNS-HRN-ENG-01348.docx", "%s_directions_questionnaire_form_%s.pdf"),
     DQ_LR_V_LIP_RESPONSE("CV-SPC-HRN-ENG-LIP-01282.docx", "%s_directions_questionnaire_form_%s.pdf"),
     DQ_LIP_RESPONSE("CV-SPC-HRN-ENG-LIP-01283.docx", "%s_directions_questionnaire_form_%s.pdf"),
-    TRIAL_READY("CV-UNS-HRN-ENG-01247.docx", "%s_%s_Trial_Arrangements.pdf"),
+    TRIAL_READY("CV-UNS-HRN-ENG-01247-10180.docx", "%s_%s_Trial_Arrangements.pdf"),
     HEARING_NOTICE_HMC("CV-UNS-HNO-ENG-01200.docx", "hearing_notice_%s.pdf"),
     // judge final Order
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
