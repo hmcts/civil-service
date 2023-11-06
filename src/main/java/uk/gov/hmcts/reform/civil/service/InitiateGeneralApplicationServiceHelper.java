@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.util.Strings.EMPTY;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -233,7 +234,8 @@ public class InitiateGeneralApplicationServiceHelper {
 
     public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, String authToken) {
         String parentCaseId = caseData.getCcdCaseReference().toString();
-        List<String> userRolesCaching = userRoleCaching.getUserRoles(authToken, parentCaseId);
+        String keyToken = userRoleCaching.getCacheKeyToken(authToken);
+        List<String> userRolesCaching = userRoleCaching.getUserRoles(authToken, parentCaseId, keyToken);
 
         boolean isApplicantSolicitor = UserRoleUtils.isApplicantSolicitor(userRolesCaching);
 
