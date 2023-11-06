@@ -331,7 +331,7 @@ os-postcode-lookup:
 stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
-  enabled: ${STITCHING_API_ENABLED:false}
+  enabled: ${STITCHING_API_ENABLED:true}
 
 bundle:
   api:
