@@ -16,6 +16,8 @@ properties([
       description: 'The URL of ccd data store'),
     string(name: 'CIVIL_SERVICE_URL', defaultValue: 'http://civil-service-aat.service.core-compute-aat.internal',
       description: 'The URL of civil service'),
+    string(name: 'AAC_API_URL', defaultValue: 'http://aac-manage-case-assignment-aat.service.core-compute-aat.internal',
+      description: 'The URL of AAC service'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
       defaultValue: '120000',
       description: 'Functional tests waitForTimeout value'),
@@ -58,6 +60,7 @@ withNightlyPipeline(type, product, component) {
   env.CIVIL_SERVICE_URL = params.CIVIL_SERVICE_URL
   env.WAIT_FOR_TIMEOUT_MS = params.WAIT_FOR_TIMEOUT_MS
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
+  env.AAC_API_URL = params.AAC_API_URL
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
   overrideVaultEnvironments([
