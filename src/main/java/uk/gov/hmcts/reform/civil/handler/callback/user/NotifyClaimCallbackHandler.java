@@ -72,13 +72,13 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         "Date you served the documents must be today or in the past";
 
     public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
-        "Date of Service should not be more than 14 days old";
+        "On what day did you serve should not be more than 14 days old";
 
     public static final String DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS =
         "Date of service must be no greater than 2 working days in the future";
 
     public static final String DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS =
-        "On what day did you serve should not be more than 14 days old";
+        "Date of Service should not be more than 14 days old";
 
     public static final String DATE_OF_SERVICE_DATE_IS_WORKING_DAY =
         "For the date of service please enter a working day";

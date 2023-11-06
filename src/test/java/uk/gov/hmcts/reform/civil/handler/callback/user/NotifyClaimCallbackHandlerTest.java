@@ -93,13 +93,13 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         + " been completed or another action must be completed first.";
 
     public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
-        "Date of Service should not be more than 14 days old";
+        "On what day did you serve should not be more than 14 days old";
 
     public static final String DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS =
         "Date of service must be no greater than 2 working days in the future";
 
     public static final String DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS =
-        "On what day did you serve should not be more than 14 days old";
+        "Date of Service should not be more than 14 days old";
 
     public static final String DATE_OF_SERVICE_DATE_IS_WORKING_DAY =
         "For the date of service please enter a working day";
@@ -306,7 +306,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
             when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
-                .thenReturn(LocalDate.of(2023, 10, 16));
+                .thenReturn(LocalDate.now().plusDays(2));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(16, 0)))
                 .thenReturn(LocalDateTime.of(deemedServedDate, LocalTime.of(16, 0)));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(currentDate.atTime(16, 0)))
@@ -528,7 +528,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
             when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
-                .thenReturn(LocalDate.of(2023, 10, 16));
+                .thenReturn(LocalDate.now().plusDays(2));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(16, 0)))
                 .thenReturn(LocalDateTime.of(deemedServedDate, LocalTime.of(16, 0)));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(currentDate.atTime(16, 0)))
