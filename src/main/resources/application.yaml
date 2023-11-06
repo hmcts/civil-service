@@ -215,6 +215,7 @@ notifications:
   claimantSolicitorDefendantResponseForSpec: "28ea1d53-93b1-4e48-a7e5-7a876f910f86"
   claimantSolicitorImmediatelyDefendantResponseForSpec: "263d7737-933d-4d0b-9f08-23847613f6a4"
   respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
+  respondentSolicitorDefResponseSpecWithClaimantAction: "efbd38e8-3fe7-4db6-ad55-b751b96477b1"
   respondentDefendantResponseForSpec: "94c71894-9590-4995-aae0-edea94fc4594"
   sdoOrdered: "90667080-6b20-48f2-b9ea-349fa8ec78e4"
   sdoOrderedSpec: "1c1a200c-b3c1-45eb-9768-aeea56857420"
@@ -228,6 +229,8 @@ notifications:
   respondentSolicitorNotifyNotToProceedSpec: "4dc0b5bb-674f-401e-8a39-05686dc0302e"
   claimantSolicitorConfirmsToProceedSpec: "99786d26-ab90-43c7-aa20-9d450d8ce4eb"
   respondentSolicitorNotifyToProceedSpec: "ea6cb18e-ebba-4759-8df3-426e00f2f09c"
+  claimantSolicitorConfirmsToProceedSpecWithAction: "d454e5a9-8c56-4a1d-acce-53a1686376bc"
+  respondentSolicitorNotifyToProceedSpecWithAction: "c1bb435e-0300-4e51-89ec-56dd7f77ef27"
   applicantSolicitor1DefaultJudgmentReceived: "14a43ad4-e337-490a-bf8b-1288520dc9eb"
   claimantSolicitorCounterClaimForSpec: "256b6cf4-6201-48f0-bf1e-88a187712196"
   respondentSolicitorCounterClaimForSpec: "6cb3b3d5-f1aa-4236-ad03-685605a9235e"
@@ -312,6 +315,10 @@ notifications:
 
   notifyApplicant1EnteredBreathingSpaceLip: "7e34af74-ec20-476b-aea5-6a6508d3acaf"
   notifyEnteredBreathingSpaceForDefendantLip: "e551a04f-9da1-4654-a7be-2040e02925aa"
+
+  notifyLiPApplicantBreathingSpaceLifted: "b6dbc714-210e-475d-a1db-bf5ea28de98b"
+  notifyLiPRespondentBreathingSpaceLifted: "4ca3017b-b2fa-4ac0-a867-9bfada50a80c"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
