@@ -68,6 +68,7 @@ import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
+import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -128,7 +129,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     LocationHelper.class,
     LocationRefDataService.class,
     JudgementService.class,
-    PaymentDateService.class
+    PaymentDateService.class,
+    ResponseOneVOneShowTagService.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -143,6 +145,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private PaymentDateService paymentDateService;
+
+    @Autowired
+    private ResponseOneVOneShowTagService responseOneVOneShowTagService;
 
     @MockBean
     private UnavailableDateValidator unavailableDateValidator;
@@ -1079,6 +1084,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(YES)
                 .respondentResponseIsSame(YES)
                 .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1ProceedWithClaim(YES)
                 .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
                     ExpertDetails.builder().build()).build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
@@ -1099,6 +1105,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(NO)
                 .addRespondent2(YES)
                 .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1ProceedWithClaim(YES)
                 .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
                     ExpertDetails.builder().build()).build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
