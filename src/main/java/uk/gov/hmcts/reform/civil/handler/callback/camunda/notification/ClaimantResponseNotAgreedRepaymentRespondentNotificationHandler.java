@@ -72,7 +72,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
         return caseData.isApplicant1NotRepresented() ?
             new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, getPartyNameBasedOnType(caseData.getApplicant1())
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             ))
             : new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
