@@ -15,6 +15,7 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -58,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
+@Slf4j
 abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     private final List<CaseEvent> events;
@@ -227,9 +229,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         }
         caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
 
+
+        log.info("BEFORE SHOULD NULL notificationText");
         // was unable to null value properly in EvidenceUploadNotificationEventHandler after emails are sent,
         // so do it here if required.
         if (nonNull(caseData.getNotificationText()) && caseData.getNotificationText().equals("NULLED")) {
+
+            log.info("SHOULD NULL notificationText");
             caseDataBuilder.notificationText(null);
         }
 
