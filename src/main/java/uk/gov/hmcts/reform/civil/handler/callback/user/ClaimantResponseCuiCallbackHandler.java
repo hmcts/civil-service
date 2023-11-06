@@ -87,14 +87,13 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         return (caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence())
             && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation();
     }
-
-   
+    
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
         if (updatedData.hasClaimantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
         } else if (updatedData.hasApplicantRejectedRepaymentPlan() && updatedData.getRespondent1().isCompanyOROrganisation()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-        } 
+        }
     }
 
 }
