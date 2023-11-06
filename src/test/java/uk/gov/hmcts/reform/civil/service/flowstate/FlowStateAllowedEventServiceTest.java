@@ -137,6 +137,8 @@ class FlowStateAllowedEventServiceTest {
     @Autowired
     FlowStateAllowedEventService flowStateAllowedEventService;
 
+    // used by StateFlowEngine bean
+    @SuppressWarnings("unused")
     @MockBean
     private FeatureToggleService toggleService;
 
