@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,7 @@ public class InitiateGeneralApplicationServiceHelper {
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
+    public  CaseAssignedUserRolesResource userRoles;
 
     public boolean isGAApplicantSameAsPCClaimant(CaseData caseData, String organisationIdentifier) {
 
@@ -56,14 +58,12 @@ public class InitiateGeneralApplicationServiceHelper {
                 || (YES.equals(caseData.getAddRespondent2()) && caseData.getRespondent2OrganisationPolicy() == null)) {
             throw new IllegalArgumentException("Solicitor Org details are not set correctly.");
         }
-        GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
-
         String parentCaseId = caseData.getCcdCaseReference().toString();
 
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
-        CaseAssignedUserRolesResource userRoles = getUserRoles(parentCaseId);
+        userRoles = getUserRoles(parentCaseId);
 
         /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
         List<CaseAssignedUserRole> respondentSolicitors = userRoles.getCaseAssignedUserRoles().stream()
@@ -75,7 +75,7 @@ public class InitiateGeneralApplicationServiceHelper {
          * */
         GASolicitorDetailsGAspec.GASolicitorDetailsGAspecBuilder applicantBuilder = GASolicitorDetailsGAspec
             .builder();
-
+        GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
         applicantBuilder
             .id(userDetails.getId())
             .email(userDetails.getEmail())
@@ -234,15 +234,10 @@ public class InitiateGeneralApplicationServiceHelper {
     public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, String authToken) {
         String parentCaseId = caseData.getCcdCaseReference().toString();
         List<String> userRolesCaching = userRoleCaching.getUserRoles(authToken, parentCaseId);
-
         boolean isApplicantSolicitor = UserRoleUtils.isApplicantSolicitor(userRolesCaching);
-
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
-
         if (!CollectionUtils.isEmpty(userRolesCaching) && userRolesCaching.size() == 1 && isApplicantSolicitor) {
-
             String applnSol = userRolesCaching.get(0);
-
             if (applnSol != null && applnSol.equals(applicant1OrgCaseRole)) {
                 return true;
             }
@@ -252,8 +247,11 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     public CaseAssignedUserRolesResource getUserRoles(String parentCaseId) {
-        return caseAccessDataStoreApi.getUserRoles(
-            getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
+        if (Objects.isNull(userRoles)) {
+            userRoles = caseAccessDataStoreApi.getUserRoles(
+                getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
+        }
+        return userRoles;
     }
 
     public String getCaaAccessToken() {
