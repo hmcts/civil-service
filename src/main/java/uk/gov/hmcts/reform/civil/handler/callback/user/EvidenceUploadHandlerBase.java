@@ -228,17 +228,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
         }
         caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
-
-
         log.info("BEFORE SHOULD NULL notificationText");
         // was unable to null value properly in EvidenceUploadNotificationEventHandler after emails are sent,
         // so do it here if required.
-        if (nonNull(caseData.getNotificationText()) && caseData.getNotificationText().equals("NULLED")) {
-
+        if (nonNull(caseData.getNotificationText()) && caseData.getNotificationText().contains("NULLED")) {
             log.info("SHOULD NULL notificationText");
             caseDataBuilder.notificationText(null);
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
@@ -590,6 +586,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     static void getNotificationText(CaseData caseData) {
         if (caseData.getNotificationText() != null) {
+            log.info("EXISTING CASEDATA  " + caseData.getNotificationText());
             notificationString = new StringBuilder(caseData.getNotificationText());
         }
     }
