@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.HashMap;
@@ -30,6 +31,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     private static final String REFERENCE_TEMPLATE = "claimant-reject-repayment-respondent-notification-%s";
     public static final String TASK_ID_CLAIMANT = "ClaimantDisAgreeRepaymentPlanNotifyApplicant";
     private final OrganisationDetailsService organisationDetailsService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -56,8 +58,8 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     }
 
     private String addTemplate(CaseData caseData) {
-        return caseData.isApplicant1NotRepresented() ?
-            notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()
+        return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
+            ? notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()
             : notificationsProperties.getNotifyClaimantLrTemplate();
 
     }
@@ -69,8 +71,8 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        return caseData.isApplicant1NotRepresented() ?
-            new HashMap<>(Map.of(
+        return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
+            ? new HashMap<>(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
             ))
@@ -81,7 +83,8 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     }
 
     private String addEmail(CaseData caseData) {
-        return caseData.isApplicant1NotRepresented() ? caseData.getApplicant1Email()
+        return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
+            ? caseData.getApplicant1Email()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 }
