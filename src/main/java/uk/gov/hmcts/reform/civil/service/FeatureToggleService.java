@@ -25,7 +25,7 @@ public class FeatureToggleService {
     }
 
     public boolean isNoticeOfChangeEnabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("notice-of-change");
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -33,11 +33,11 @@ public class FeatureToggleService {
     }
 
     public boolean isPinInPostEnabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("pin-in-post");
     }
 
     public boolean isPbaV3Enabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("pba-version-3-ways-to-pay");
     }
 
     public boolean isCertificateOfServiceEnabled() {
@@ -53,7 +53,7 @@ public class FeatureToggleService {
     }
 
     public boolean isCaseFileViewEnabled() {
-        return true;
+        return this.featureToggleApi.isFeatureEnabled("case-file-view");
     }
 
     public boolean isAutomatedHearingNoticeEnabled() {
