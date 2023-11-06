@@ -71,10 +71,8 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
         }
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_LEGAL_ORG_NAME_SPEC, caseData.isApplicant1NotRepresented() ? getPartyNameBasedOnType(caseData.getApplicant1())
-                : organisationDetailsService.getRespondentLegalOrganizationName(caseData)
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
         );
-
     }
 
     private String addTemplate(CaseData caseData) {

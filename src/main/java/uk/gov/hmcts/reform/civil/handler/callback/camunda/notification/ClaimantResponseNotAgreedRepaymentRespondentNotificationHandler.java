@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +56,9 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     }
 
     private String addTemplate(CaseData caseData) {
-        return notificationsProperties.getNotifyClaimantLrTemplate();
+        return caseData.isApplicant1NotRepresented() ? null
+            : notificationsProperties.getNotifyClaimantLrTemplate();
+
     }
 
     @Override
@@ -65,13 +68,19 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganizationName(caseData)
-        ));
+        return caseData.isApplicant1NotRepresented() ?
+            new HashMap<>(Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, getPartyNameBasedOnType(caseData.getApplicant1())
+            ))
+            : new HashMap<>(Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganizationName(caseData)
+            ));
     }
 
     private String addEmail(CaseData caseData) {
-        return caseData.getApplicantSolicitor1UserDetails().getEmail();
+        return caseData.isApplicant1NotRepresented() ? caseData.getApplicant1Email()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 }

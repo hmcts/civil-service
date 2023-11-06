@@ -272,6 +272,7 @@ notifications:
   generateOrderNotificationTemplate: "78532d45-aadf-4223-89fd-4932b4cbe411"
 
   notifyClaimantLrTemplate: "adcf4c5f-2b9c-482d-8311-a4b8ffe7ef45"
+  notifyClaimantLipTemplateManualDetermination: "bdc1b126-4137-43b0-a637-6d3874053ac0"
   notifyDefendantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
   notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
   notifyDefendantLipWelshTemplate : "d63b744a-97c8-42bd-95a2-3d86dd703c3d"
@@ -327,7 +328,7 @@ os-postcode-lookup:
 stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
-  enabled: ${STITCHING_API_ENABLED:true}
+  enabled: ${STITCHING_API_ENABLED:false}
 
 bundle:
   api:
