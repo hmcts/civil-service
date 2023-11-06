@@ -1623,7 +1623,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class IsFlightDelayClaimMidCallback {
+    class FlightDelayClaimMidCallbacks {
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Enabled(Boolean toggleStat) {
@@ -1660,6 +1660,54 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData()).doesNotHaveToString("isFlightDelayClaim");
             assertThat(response.getData()).doesNotHaveToString("claimType");
+        }
+
+        @Test
+        void shouldGetAirlineList_whenRequired() {
+            // Given
+            CaseData caseData = CaseData.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData()).extracting("flightDetailsAirlineList")
+                .extracting("list_items").asList().extracting("label")
+                .contains("British Airways");
+
+            assertThat(response.getData()).extracting("flightDetailsAirlineList")
+                .extracting("list_items").asList().extracting("label")
+                .contains("OTHER");
+        }
+
+        @Test
+        void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
+            // Given
+            CaseData caseData = CaseData.builder().flightDetailsScheduledDate(LocalDate.now().plusDays(1))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).contains("Scheduled date of flight must be today or in the past");
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = {0, 1})
+        void shouldNotReturnErrorWhenDateOfFlightIsTodayOrInThePast(Integer days) {
+            // Given
+            CaseData caseData = CaseData.builder().flightDetailsScheduledDate(LocalDate.now().minusDays(days))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 

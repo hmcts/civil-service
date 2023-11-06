@@ -924,14 +924,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse getAirlineList(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-            DynamicList airlineList = DynamicList.builder()
-                .value(DynamicListElement.builder().build())
-                .listItems(List.of(
-                    DynamicListElement.builder().label("British Airways").code("BRITISH_AIRWAYS").build(),
-                    DynamicListElement.builder().label("OTHER").code("OTHER").build()
-                ))
-                              .build();
-                caseDataBuilder.flightDetailsAirlineList(airlineList);
+        DynamicList airlineList = DynamicList.builder()
+            .value(DynamicListElement.builder().build())
+            .listItems(List.of(
+                DynamicListElement.builder().label("British Airways").code("BRITISH_AIRWAYS").build(),
+                DynamicListElement.builder().label("OTHER").code("OTHER").build())).build();
+        caseDataBuilder.flightDetailsAirlineList(airlineList);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
