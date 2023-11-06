@@ -42,7 +42,10 @@ static Map<String, Object> secret(String secretName, String envVariable) {
 
 def secrets = [
   'civil-${env}': [
-    secret('microservicekey-civil-service', 'S2S_SECRET')
+    secret('microservicekey-civil-service', 'S2S_SECRET'),
+    secret('default-password', 'DEFAULT_PASSWORD'),
+    secret('judge-default-password', 'JUDGE_DEFAULT_PASSWORD'),
+    secret('iac-default-password', 'IAC_DEFAULT_PASSWORD')
   ]
 ]
 
