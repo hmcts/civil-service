@@ -56,7 +56,8 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     }
 
     private String addTemplate(CaseData caseData) {
-        return caseData.isApplicant1NotRepresented() ? null
+        return caseData.isApplicant1NotRepresented() ?
+            notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()
             : notificationsProperties.getNotifyClaimantLrTemplate();
 
     }
