@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -43,6 +44,7 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getExpertDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getWitnessDocsByPartyAndDocType;
@@ -114,6 +116,32 @@ public class BundleRequestMapper {
                 .build();
         bundlingCaseData = mapRespondent2Applicant2Details(bundlingCaseData, caseData);
         return bundlingCaseData;
+    }
+
+    private List<BundlingRequestDocument> mapParticularsOfClaimDocs(CaseData caseData) {
+        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+        if (Objects.nonNull(caseData.getServedDocumentFiles())
+                && Objects.nonNull((caseData.getServedDocumentFiles().getParticularsOfClaimDocument()))) {
+            caseData.getServedDocumentFiles()
+                    .getParticularsOfClaimDocument()
+                    .forEach(poc -> bundlingRequestDocuments.add(
+                            buildBundlingRequestDoc(getParticularsOfClaimName(caseData),
+                            poc.getValue(), "")));
+        }
+        return bundlingRequestDocuments;
+    }
+
+    private String getParticularsOfClaimName(CaseData caseData) {
+        LocalDate pocDate;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            pocDate = caseData.getIssueDate();
+        } else if (Objects.nonNull(caseData.getClaimDetailsNotificationDate())) {
+            pocDate = caseData.getClaimDetailsNotificationDate().toLocalDate();
+        } else {
+            pocDate = caseData.getSubmittedDate().toLocalDate();
+        }
+        return generateDocName(BundleFileNameList.PARTICULARS_OF_CLAIM.getDisplayName(),
+                null, null, pocDate);
     }
 
     private List<Element<BundlingRequestDocument>> mapJointStatementOfExperts(CaseData caseData) {
@@ -516,6 +544,7 @@ public class BundleRequestMapper {
                                                                                && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"))
                                                                            .collect(Collectors.toList()),
                                                                        BundleFileNameList.CLAIM_FORM.getDisplayName()));
+        bundlingRequestDocuments.addAll(mapParticularsOfClaimDocs(caseData));
         List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
         clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
