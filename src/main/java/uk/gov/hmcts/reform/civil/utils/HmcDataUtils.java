@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.jetbrains.annotations.Nullable;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
@@ -203,5 +206,17 @@ public class HmcDataUtils {
         return hasHearings(hearings)
             && hearings.getCaseHearings().stream()
             .filter(hearing -> includesVideoHearing(hearing)).count() > 0;
+    }
+
+    @Nullable
+    public static LocationRefData getLocationRefData(String hearingId, String venueId,
+                                                     String bearerToken, LocationRefDataService locationRefDataService) {
+        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(bearerToken);
+        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(venueId)).toList();
+        if (matchedLocations.size() > 0) {
+            return matchedLocations.get(0);
+        } else {
+            throw new IllegalArgumentException("Hearing location data not available for hearing " + hearingId);
+        }
     }
 }

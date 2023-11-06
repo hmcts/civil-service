@@ -2,6 +2,11 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
@@ -20,10 +25,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.includesVideoHearing;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
@@ -945,6 +953,42 @@ class HmcDataUtilsTest {
             boolean actual = includesVideoHearing(hearings);
 
             assertTrue(actual);
+        }
+    }
+
+    @Nested
+    @ExtendWith(SpringExtension.class)
+    class GetHearingLocation {
+
+        @MockBean
+        private LocationRefDataService locationRefDataService;
+
+        @Test
+        void shouldReturnLocation_whenInvoked() {
+            List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId("venue").build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments("authToken"))
+                .thenReturn(locations);
+            LocationRefData locationRefData = HmcDataUtils.getLocationRefData(
+                "HER123",
+                "venue",
+                "authToken",
+                locationRefDataService
+            );
+
+            assertThat(locationRefData).isEqualTo(LocationRefData.builder().epimmsId("venue").build());
+        }
+
+        @Test
+        void shouldThrowException_whenLocationIsNull() {
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments("abc"))
+                .thenReturn(null);
+            assertThrows(
+                IllegalArgumentException.class,
+                () -> HmcDataUtils.getLocationRefData(
+                    "HER123",
+                    "abc",
+                    "authToken",
+                    locationRefDataService));
         }
     }
 }
