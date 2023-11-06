@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -77,6 +78,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @MockBean
     protected IdamClient idamClient;
+
+    @MockBean
+    protected UserRoleCaching userRoleCaching;
 
     public UserDetails getUserDetails(String id, String email) {
         return UserDetails.builder().id(id)
