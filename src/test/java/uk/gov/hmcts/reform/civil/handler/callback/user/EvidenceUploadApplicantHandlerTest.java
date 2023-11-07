@@ -96,30 +96,32 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
     private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
     private final UploadEvidenceDocumentType uploadEvidenceDate3 = new UploadEvidenceDocumentType();
-    private static final String NotificationWhenBothClaimant = "Both claimants - Disclosure list \n"
-        + "Both claimants - Documents for disclosure \n"
-        + "Both claimants - Documents referred to in the statement \n"
-        + "Both claimants - Expert's report \n"
-        + "Both claimants - Joint Statement of Experts / Single Joint Expert Report \n"
-        + "Both claimants - Questions for other party's expert or joint experts \n"
-        + "Both claimants - Answer to questions asked \n"
-        + "Both claimants - Case Summary \n"
-        + "Both claimants - Skeleton argument \n"
-        + "Both claimants - Authorities \n"
-        + "Both claimants - Costs \n"
-        + "Both claimants - Documentary evidence for trial \n";
-    private static final String NotificationWhenClaimantTwo = "Claimant 2 - Disclosure list \n"
-        + "Claimant 2 - Documents for disclosure \n"
-        + "Claimant 2 - Documents referred to in the statement \n"
-        + "Claimant 2 - Expert's report \n"
-        + "Claimant 2 - Joint Statement of Experts / Single Joint Expert Report \n"
-        + "Claimant 2 - Questions for other party's expert or joint experts \n"
-        + "Claimant 2 - Answer to questions asked \n"
-        + "Claimant 2 - Case Summary \n"
-        + "Claimant 2 - Skeleton argument \n"
-        + "Claimant 2 - Authorities \n"
-        + "Claimant 2 - Costs \n"
-        + "Claimant 2 - Documentary evidence for trial \n";
+    private static final String NotificationWhenBothClaimant = "\n"
+        + "Both claimants - Disclosure list\n"
+        + "Both claimants - Documents for disclosure\n"
+        + "Both claimants - Documents referred to in the statement\n"
+        + "Both claimants - Expert's report\n"
+        + "Both claimants - Joint Statement of Experts / Single Joint Expert Report\n"
+        + "Both claimants - Questions for other party's expert or joint experts\n"
+        + "Both claimants - Answer to questions asked\n"
+        + "Both claimants - Case Summary\n"
+        + "Both claimants - Skeleton argument\n"
+        + "Both claimants - Authorities\n"
+        + "Both claimants - Costs\n"
+        + "Both claimants - Documentary evidence for trial";
+    private static final String NotificationWhenClaimantTwo = "\n"
+        + "Claimant 2 - Disclosure list\n"
+        + "Claimant 2 - Documents for disclosure\n"
+        + "Claimant 2 - Documents referred to in the statement\n"
+        + "Claimant 2 - Expert's report\n"
+        + "Claimant 2 - Joint Statement of Experts / Single Joint Expert Report\n"
+        + "Claimant 2 - Questions for other party's expert or joint experts\n"
+        + "Claimant 2 - Answer to questions asked\n"
+        + "Claimant 2 - Case Summary\n"
+        + "Claimant 2 - Skeleton argument\n"
+        + "Claimant 2 - Authorities\n"
+        + "Claimant 2 - Costs\n"
+        + "Claimant 2 - Documentary evidence for trial";
     private static final String PAGE_ID = "validateValuesApplicant";
 
     @BeforeEach
@@ -969,7 +971,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
         // Then Notification should not have old entry (witness statement)
-        assertThat(updatedData.getNotificationText()).isEqualTo("Claimant 1 - Witness summary \n");
+        assertThat(updatedData.getNotificationText()).isEqualTo("\nClaimant 1 - Witness summary");
     }
 
     private List<Element<UploadEvidenceDocumentType>> createEvidenceDocs(String type, LocalDate issuedDate) {

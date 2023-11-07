@@ -139,21 +139,21 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     // Notification Strings used for email
     protected static StringBuilder notificationString = new StringBuilder();
-    protected static final String DISCLOSURE_LIST_TEXT = "%s - Disclosure list \n";
-    protected static final String DISCLOSURE_TEXT = "%s - Documents for disclosure \n";
-    protected static final String WITNESS_STATEMENT_TEXT = "%s - Witness statement \n";
-    protected static final String WITNESS_SUMMARY_TEXT = "%s - Witness summary \n";
-    protected static final String WITNESS_HEARSAY_TEXT = "%s - Notice of the intention to rely on hearsay evidence \n";
-    protected static final String WITNESS_REFERRED_TEXT = "%s - Documents referred to in the statement \n";
-    protected static final String EXPERT_REPORT_TEXT = "%s - Expert's report \n";
-    protected static final String EXPERT_JOINT_STATEMENT_TEXT = "%s - Joint Statement of Experts / Single Joint Expert Report \n";
-    protected static final String EXPERT_QUESTIONS_TEXT = "%s - Questions for other party's expert or joint experts \n";
-    protected static final String EXPERT_ANSWERS_TEXT = "%s - Answer to questions asked \n";
-    protected static final String PRE_TRIAL_SUMMARY_TEXT = "%s - Case Summary \n";
-    protected static final String TRIAL_SKELETON_TEXT = "%s - Skeleton argument \n";
-    protected static final String TRIAL_AUTHORITIES_TEXT = "%s - Authorities \n";
-    protected static final String TRIAL_COSTS_TEXT = "%s - Costs \n";
-    protected static final String TRIAL_DOC_CORRESPONDENCE_TEXT = "%s - Documentary evidence for trial \n";
+    protected static final String DISCLOSURE_LIST_TEXT = "%s - Disclosure list";
+    protected static final String DISCLOSURE_TEXT = "%s - Documents for disclosure";
+    protected static final String WITNESS_STATEMENT_TEXT = "%s - Witness statement";
+    protected static final String WITNESS_SUMMARY_TEXT = "%s - Witness summary";
+    protected static final String WITNESS_HEARSAY_TEXT = "%s - Notice of the intention to rely on hearsay evidence";
+    protected static final String WITNESS_REFERRED_TEXT = "%s - Documents referred to in the statement";
+    protected static final String EXPERT_REPORT_TEXT = "%s - Expert's report";
+    protected static final String EXPERT_JOINT_STATEMENT_TEXT = "%s - Joint Statement of Experts / Single Joint Expert Report";
+    protected static final String EXPERT_QUESTIONS_TEXT = "%s - Questions for other party's expert or joint experts";
+    protected static final String EXPERT_ANSWERS_TEXT = "%s - Answer to questions asked";
+    protected static final String PRE_TRIAL_SUMMARY_TEXT = "%s - Case Summary";
+    protected static final String TRIAL_SKELETON_TEXT = "%s - Skeleton argument";
+    protected static final String TRIAL_AUTHORITIES_TEXT = "%s - Authorities";
+    protected static final String TRIAL_COSTS_TEXT = "%s - Costs";
+    protected static final String TRIAL_DOC_CORRESPONDENCE_TEXT = "%s - Documentary evidence for trial";
 
     protected static final String OPTION_APP1 = "Claimant 1 - ";
     protected static final String OPTION_APP2 = "Claimant 2 - ";
@@ -438,7 +438,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             if (dateTime.isAfter(midnight)) {
                 String updateNotificationText = format(docNotificationText, claimantDefendantString);
                 if (!notificationString.toString().contains(updateNotificationText)) {
-                    notificationString.append(updateNotificationText);
+                    notificationString.append("\n").append(updateNotificationText);
                 }
             }
         });
