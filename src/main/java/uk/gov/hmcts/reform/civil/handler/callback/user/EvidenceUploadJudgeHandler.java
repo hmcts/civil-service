@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
+import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
 
 import java.util.Collections;
@@ -59,7 +61,11 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        caseDataBuilder.caseNoteType(null).build();
+        caseDataBuilder
+            .caseNoteType(null)
+            .documentAndNameToAdd(null)
+            .documentAndNoteToAdd(null)
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -82,6 +88,39 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
                 .caseNotesTA(caseNotesTa)
                 .caseNoteTA(null)
                 .build();
+        }
+
+        if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
+            List<Element<DocumentWithName>> documentAndNameToAdd = caseData.getDocumentAndNameToAdd();
+            List<Element<DocumentWithName>> documentAndNameCurrent = caseData.getDocumentAndName();
+
+            if (documentAndNameCurrent == null) {
+                documentAndNameCurrent = documentAndNameToAdd;
+            } else {
+                for (Element<DocumentWithName> document : documentAndNameToAdd) {
+                    documentAndNameCurrent.add(document);
+                }
+            }
+            caseDataBuilder
+                .documentAndName(documentAndNameCurrent)
+                .build();
+        }
+
+        if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_AND_NOTE)) {
+            List<Element<DocumentAndNote>> documentAndNoteToAdd = caseData.getDocumentAndNoteToAdd();
+            List<Element<DocumentAndNote>> documentAndNoteCurrent = caseData.getDocumentAndNote();
+
+            if (documentAndNoteCurrent == null) {
+                documentAndNoteCurrent = documentAndNoteToAdd;
+            } else {
+                for (Element<DocumentAndNote> document : documentAndNoteToAdd) {
+                    documentAndNoteCurrent.add(document);
+                }
+            }
+            caseDataBuilder
+                .documentAndNote(documentAndNoteCurrent)
+                .build();
+
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -115,16 +154,16 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
     private String getBody(CaseData caseData) {
         StringBuilder stringBuilder = new StringBuilder();
         if (null != caseData.getCaseNoteType() && caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
-            IntStream.range(0, caseData.getDocumentAndName()
+            IntStream.range(0, caseData.getDocumentAndNameToAdd()
                 .size()).forEachOrdered(i -> stringBuilder.append("* ").append(
-                caseData.getDocumentAndName().get(i).getValue().getDocument().getDocumentFileName()).append("\n"));
+                caseData.getDocumentAndNameToAdd().get(i).getValue().getDocument().getDocumentFileName()).append("\n"));
 
             return format(EVIDENCE_UPLOAD_BODY_ONE, stringBuilder);
         }
         if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_AND_NOTE)) {
-            IntStream.range(0, caseData.getDocumentAndNote()
+            IntStream.range(0, caseData.getDocumentAndNoteToAdd()
                 .size()).forEachOrdered(i -> stringBuilder.append("* ").append(
-                caseData.getDocumentAndNote().get(i)
+                caseData.getDocumentAndNoteToAdd().get(i)
                     .getValue()
                     .getDocument()
                     .getDocumentFileName()).append("\n"));
