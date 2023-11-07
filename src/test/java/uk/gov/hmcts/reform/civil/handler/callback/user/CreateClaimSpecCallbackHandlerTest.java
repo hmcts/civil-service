@@ -29,21 +29,8 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
-import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
-import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
-import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
@@ -1684,8 +1671,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
             // Given
-            CaseData caseData = CaseData.builder().flightDetailsScheduledDate(LocalDate.now().plusDays(1))
-                .build();
+            CaseData caseData = CaseData.builder()
+                .flightDelay(FlightDelay.builder().flightDetailsScheduledDate(now().plusDays(1)).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
             // When
@@ -1699,8 +1686,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @ValueSource(ints = {0, 1})
         void shouldNotReturnErrorWhenDateOfFlightIsTodayOrInThePast(Integer days) {
             // Given
-            CaseData caseData = CaseData.builder().flightDetailsScheduledDate(LocalDate.now().minusDays(days))
-                .build();
+            CaseData caseData = CaseData.builder()
+                .flightDelay(FlightDelay.builder().flightDetailsScheduledDate(now().minusDays(days)).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
             // When

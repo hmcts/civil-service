@@ -20,19 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
-import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
-import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
-import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -929,7 +917,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .listItems(List.of(
                 DynamicListElement.builder().label("British Airways").code("BRITISH_AIRWAYS").build(),
                 DynamicListElement.builder().label("OTHER").code("OTHER").build())).build();
-        caseDataBuilder.flightDetailsAirlineList(airlineList);
+        FlightDelay flightDelay = FlightDelay.builder().flightDetailsAirlineList(airlineList).build();
+        caseDataBuilder.flightDelay(flightDelay);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -940,7 +929,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         List<String> errors = new ArrayList<>();
         LocalDate today = LocalDate.now();
-        LocalDate scheduledDate = callbackParams.getCaseData().getFlightDetailsScheduledDate();
+        LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelay().getFlightDetailsScheduledDate();
         if (scheduledDate.isAfter(today)) {
             errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
         }

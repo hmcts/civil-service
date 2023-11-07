@@ -633,8 +633,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     //SDO-R2
     private YesOrNo isFlightDelayClaim;
-    private DynamicList flightDetailsAirlineList;
-    private LocalDate flightDetailsScheduledDate;
+    private FlightDelay flightDelay;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
