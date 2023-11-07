@@ -96,9 +96,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
     private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
     private final UploadEvidenceDocumentType uploadEvidenceDate3 = new UploadEvidenceDocumentType();
-    private static final String NotificationWhenBothClaimant = "Documentation that has been uploaded: \n"
-        + "\n"
-        + "Both claimants - Disclosure list \n"
+    private static final String NotificationWhenBothClaimant = "Both claimants - Disclosure list \n"
         + "Both claimants - Documents for disclosure \n"
         + "Both claimants - Documents referred to in the statement \n"
         + "Both claimants - Expert's report \n"
@@ -110,9 +108,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         + "Both claimants - Authorities \n"
         + "Both claimants - Costs \n"
         + "Both claimants - Documentary evidence for trial \n";
-    private static final String NotificationWhenClaimantTwo = "Documentation that has been uploaded: \n"
-        + "\n"
-        + "Claimant 2 - Disclosure list \n"
+    private static final String NotificationWhenClaimantTwo = "Claimant 2 - Disclosure list \n"
         + "Claimant 2 - Documents for disclosure \n"
         + "Claimant 2 - Documents referred to in the statement \n"
         + "Claimant 2 - Expert's report \n"
@@ -707,7 +703,6 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({"0", "2"})
     void should_do_naming_convention(String selected) {
-        handler.notificationString = new StringBuilder("Documentation that has been uploaded: \n\n");
         LocalDateTime createdDate = LocalDateTime.of(2022, 05, 10, 12, 13, 12);
         String witnessName = "AppWitness";
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
@@ -853,7 +848,6 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void should_do_naming_convention_app2() {
-        handler.notificationString = new StringBuilder("Documentation that has been uploaded: \n\n");
         LocalDateTime createdDate = LocalDateTime.of(2022, 05, 10, 12, 13, 12);
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         String witnessName = "appTwoWitness";
@@ -929,7 +923,6 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldNotAddSameNotificationIfAlreadyAdded_notificationText() {
         // If we populate notification string with an entry, we do not want to duplicate that on further uploads of same type.
-        handler.notificationString = new StringBuilder("Documentation that has been uploaded: \n\n");
         List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_APP1,
                                        EvidenceUploadHandlerBase.OPTION_APP2,
                                        EvidenceUploadHandlerBase.OPTION_APP_BOTH);
@@ -951,6 +944,32 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         // Then Notificcation should not have a duplicate entry
         assertThat(updatedData.getNotificationText())
             .isEqualTo("Documentation that has been uploaded: \n\n Claimant 1 - Joint Statement of Experts / Single Joint Expert Report \n");
+    }
+
+    @Test
+    void shouldNotPopulateNotificationWithOldDocument_whenNewDocumentUploadAdded() {
+        // When evidence upload is retriggered we do not send a notification for old content i.e uploaded before midnight of current day
+        List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_APP1,
+                                       EvidenceUploadHandlerBase.OPTION_APP2,
+                                       EvidenceUploadHandlerBase.OPTION_APP_BOTH);
+        LocalDate witnessDate = LocalDate.of(2023, 2, 10);
+        String witnessName = "Witness";
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .notificationText(null)
+            .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(0), false))
+            .documentWitnessStatement(createWitnessDocs(witnessName, LocalDateTime.now().minusDays(2), witnessDate))
+            .documentWitnessSummary(createWitnessDocs(witnessName, LocalDateTime.now(), witnessDate))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(coreCaseDataService.getCase(anyLong())).willReturn(CaseDetails.builder().build());
+        // When handle is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then Notification should not have old entry (witness statement)
+        assertThat(updatedData.getNotificationText()).isEqualTo("Claimant 1 - Witness summary \n");
     }
 
     private List<Element<UploadEvidenceDocumentType>> createEvidenceDocs(String type, LocalDate issuedDate) {
