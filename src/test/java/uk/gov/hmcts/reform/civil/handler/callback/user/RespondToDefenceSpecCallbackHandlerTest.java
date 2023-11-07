@@ -69,6 +69,7 @@ import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -170,7 +171,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RespondentMediationService respondentMediationService;
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
-
+    @MockBean
+    private DeadlineExtensionCalculatorService deadlineCalculatorService;
     @Nested
     class AboutToStart {
 

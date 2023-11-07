@@ -34,12 +34,12 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
-        return SealedClaimLipResponseForm.toTemplate(caseData);
+        SealedClaimLipResponseForm templateData = SealedClaimLipResponseForm.toTemplate(caseData);
+        return getRespondent1RepaymentDate(caseData, templateData);
     }
 
     public CaseDocument generate(final CaseData caseData, final String authorization) {
         SealedClaimLipResponseForm templateData = getTemplateData(caseData);
-        templateData = getRespondent1RepaymentDate(caseData, templateData);
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
             DEFENDANT_RESPONSE_LIP_SPEC
@@ -57,24 +57,23 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
     private SealedClaimLipResponseForm getRespondent1RepaymentDate(final CaseData caseData, SealedClaimLipResponseForm templateData) {
         if (!Objects.isNull(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-            if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) && caseData.isPayImmediately()) {
+            if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) || (PART_ADMISSION.equals(
+                caseData.getRespondent1ClaimResponseTypeForSpec()) && caseData.getSpecDefenceAdmittedRequired() == YesOrNo.NO)) {
                 return addPayByDatePayImmediately(caseData, templateData);
-            }
-            if (PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) && caseData.isPayImmediately()) {
-                if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.NO) {
-                    return addPayByDatePayImmediately(caseData, templateData);
-                }
             }
         }
         return templateData;
     }
 
     private SealedClaimLipResponseForm addPayByDatePayImmediately(CaseData caseData, SealedClaimLipResponseForm templateData) {
-        LocalDate payDeadlineDate = deadlineCalculatorService.calculateExtendedDeadline(LocalDate.now().plusDays(
-            RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY));
-        ResponseRepaymentDetailsForm responseRepaymentDetailsForm = templateData.getCommonDetails().toBuilder().payBy(
-            payDeadlineDate).build();
-        SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder templateFormData = templateData.toBuilder();
-        return templateFormData.commonDetails(responseRepaymentDetailsForm).build();
+        if (caseData.isPayImmediately()) {
+            LocalDate payDeadlineDate = deadlineCalculatorService.calculateExtendedDeadline(LocalDate.now().plusDays(
+                RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY));
+            ResponseRepaymentDetailsForm responseRepaymentDetailsForm = templateData.getCommonDetails().toBuilder().payBy(
+                payDeadlineDate).build();
+            SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder templateFormData = templateData.toBuilder();
+            return templateFormData.commonDetails(responseRepaymentDetailsForm).build();
+        }
+        return templateData;
     }
 }
