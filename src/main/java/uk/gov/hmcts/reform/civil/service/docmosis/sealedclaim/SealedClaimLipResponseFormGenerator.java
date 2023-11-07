@@ -57,8 +57,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
     private SealedClaimLipResponseForm getRespondent1RepaymentDate(final CaseData caseData, SealedClaimLipResponseForm templateData) {
         if (!Objects.isNull(caseData.getRespondent1ClaimResponseTypeForSpec())) {
-            if (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) || (PART_ADMISSION.equals(
-                caseData.getRespondent1ClaimResponseTypeForSpec()) && caseData.getSpecDefenceAdmittedRequired() == YesOrNo.NO)) {
+            if (hasPayByDatePayImmediately(caseData)) {
                 return addPayByDatePayImmediately(caseData, templateData);
             }
         }
@@ -67,13 +66,18 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
     private SealedClaimLipResponseForm addPayByDatePayImmediately(CaseData caseData, SealedClaimLipResponseForm templateData) {
         if (caseData.isPayImmediately()) {
-            LocalDate payDeadlineDate = deadlineCalculatorService.calculateExtendedDeadline(LocalDate.now().plusDays(
-                RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY));
+            LocalDate extendedDate = LocalDate.now().plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
+            LocalDate payDeadlineDate = deadlineCalculatorService.calculateExtendedDeadline(extendedDate);
             ResponseRepaymentDetailsForm responseRepaymentDetailsForm = templateData.getCommonDetails().toBuilder().payBy(
                 payDeadlineDate).build();
             SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder templateFormData = templateData.toBuilder();
             return templateFormData.commonDetails(responseRepaymentDetailsForm).build();
         }
         return templateData;
+    }
+
+    private boolean hasPayByDatePayImmediately(CaseData caseData) {
+        return (FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()) || (PART_ADMISSION.equals(
+            caseData.getRespondent1ClaimResponseTypeForSpec()) && caseData.getSpecDefenceAdmittedRequired() == YesOrNo.NO));
     }
 }

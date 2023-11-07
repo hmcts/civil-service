@@ -67,8 +67,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (caseData.isJudgementDateNotPermitted()) {
-            LocalDate extendedRespondent1ResponseDate = deadlineCalculatorService.calculateExtendedDeadline(
-                caseData.getRespondent1ResponseDate().toLocalDate().plusDays(5));
+            LocalDate extendedResponseDate = caseData.getRespondent1ResponseDate().toLocalDate().plusDays(5);
+            LocalDate extendedRespondent1ResponseDate = deadlineCalculatorService.calculateExtendedDeadline(extendedResponseDate);
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(extendedRespondent1ResponseDate)));
         }
 
