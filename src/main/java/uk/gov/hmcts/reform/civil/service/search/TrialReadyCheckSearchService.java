@@ -13,6 +13,7 @@ import java.util.List;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 
 @Service
@@ -30,7 +31,10 @@ public class TrialReadyCheckSearchService extends ElasticSearchService {
                             .must(rangeQuery("data.hearingDate").lt(LocalDate.now()
                                                                             .atTime(LocalTime.MIN).plusWeeks(3)
                                                                             .toString()))
-                            .must(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))
+                            .must(boolQuery()
+                                      .minimumShouldMatch(1)
+                                      .should(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))
+                                      .should(beState(HEARING_READINESS)))
                             .mustNot(matchQuery("data.allocatedTrack", "SMALL_CLAIM"))
                             .mustNot(matchQuery("data.trialReadyChecked", "Yes"))),
             List.of("reference"),
