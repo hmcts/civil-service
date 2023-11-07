@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
@@ -171,6 +172,8 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RespondentMediationService respondentMediationService;
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
+    @MockBean
+    private WorkingDayIndicator workingDayIndicator;
     @MockBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
 
@@ -1365,7 +1368,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetUpPaymentDateToString() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
+            given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any())).willReturn(whenWillPay);
 
             RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec =
                 RespondToClaimAdmitPartLRspec.builder()
@@ -1392,7 +1397,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetUpPaymentDateToStringForPartAdmitPaid() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
+            given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any())).willReturn(whenWillPay);
 
             RespondToClaim respondToAdmittedClaim =
                 RespondToClaim.builder()
@@ -1420,7 +1427,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetUpPaymentDateForResponseDateToString() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
+            given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any())).willReturn(whenWillPay);
 
             CaseData caseData = CaseData.builder()
                 .respondent1ResponseDate(LocalDateTime.now())
