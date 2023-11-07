@@ -361,6 +361,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         //Then
         assertThat(result).isEqualTo(caseDocument);
     }
+    
     @Test
     void shouldGenerateDocumentSuccessfullyForPartAdmit() {
         //Given

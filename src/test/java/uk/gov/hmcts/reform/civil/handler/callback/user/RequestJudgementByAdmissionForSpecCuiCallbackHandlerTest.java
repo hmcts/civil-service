@@ -74,6 +74,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
     @MockBean
     private WorkingDayIndicator workingDayIndicator;
+
     @Nested
     class AboutToStartCallback {
         @Test

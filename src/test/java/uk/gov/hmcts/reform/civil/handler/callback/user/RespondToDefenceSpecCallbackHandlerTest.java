@@ -173,6 +173,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DeadlinesCalculator deadlinesCalculator;
     @MockBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
+
     @Nested
     class AboutToStart {
 
