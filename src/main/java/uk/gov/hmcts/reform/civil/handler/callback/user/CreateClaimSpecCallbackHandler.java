@@ -928,8 +928,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         DynamicList airlineList = DynamicList.builder()
             .value(DynamicListElement.builder().build())
             .listItems(List.of(
-                DynamicListElement.builder().label("British Airways").code("BRITISH_AIRWAYS").build(),
-                DynamicListElement.builder().label("OTHER").code("OTHER").build())).build();
+                DynamicListElement.builder().code("BRITISH_AIRWAYS").label("British Airways").build(),
+                DynamicListElement.builder().code("AIR_INDIA").label("Air India").build(),
+                DynamicListElement.builder().code("GULF_AIR").label("Gulf Air").build(),
+                DynamicListElement.builder().code("OTHER").label("OTHER").build())).build();
         FlightDelay flightDelay = FlightDelay.builder().flightDetailsAirlineList(airlineList).build();
         caseDataBuilder.flightDelay(flightDelay);
 
