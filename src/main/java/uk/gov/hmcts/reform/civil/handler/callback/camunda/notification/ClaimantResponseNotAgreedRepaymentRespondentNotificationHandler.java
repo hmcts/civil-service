@@ -49,7 +49,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            addEmail(caseData),
+            getEmail(caseData),
             addTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -82,7 +82,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
             ));
     }
 
-    private String addEmail(CaseData caseData) {
+    private String getEmail(CaseData caseData) {
         return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
             ? caseData.getApplicant1Email()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
