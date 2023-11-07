@@ -132,15 +132,15 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getState()).isEqualTo(CaseState.IN_MEDIATION.name());
         }
 
-       @Test
-       void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsCompany_toAllFinalOrdersIssued() {
+        @Test
+        void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsCompany_toAllFinalOrdersIssued() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
                 .respondent1(Party.builder()
-                                   .type(COMPANY)
-                                   .companyName("Test Inc")
-                                   .build())
+                                 .type(COMPANY)
+                                 .companyName("Test Inc")
+                                 .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -166,7 +166,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
 
-		    @Test
+        @Test
         void shouldChangeCaseState_whenApplicantAcceptRepaymentPlanAndChooseSettlementAgreement() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
