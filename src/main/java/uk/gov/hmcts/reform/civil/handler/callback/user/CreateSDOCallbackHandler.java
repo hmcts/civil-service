@@ -98,6 +98,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
+import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
@@ -219,7 +222,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackMethodInPerson(locationsList);
         updatedData.smallClaimsMethodInPerson(locationsList);
 
-        List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
+        List<OrderDetailsPagesSectionsToggle> checkList = List.of(SHOW);
         setCheckList(updatedData, checkList);
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
@@ -711,15 +714,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             ));
         DynamicList locationsList;
         if (matchingLocation.isPresent()) {
-            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
                                                  matchingLocation.get(), true
             );
         } else {
-            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
                                                  null, true
             );
         }
         return locationsList;
+    }
+
+    private String getLocationEpimms(LocationRefData location) {
+        return location.getEpimmsId();
     }
 
     private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
@@ -732,9 +739,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.setFastTrackFlag(YesOrNo.NO).build();
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            updatedData.setSmallClaimsFlag(YesOrNo.YES).build();
+            updatedData.setSmallClaimsFlag(YES).build();
         } else if (SdoHelper.isFastTrack(caseData)) {
-            updatedData.setFastTrackFlag(YesOrNo.YES).build();
+            updatedData.setFastTrackFlag(YES).build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -836,16 +843,36 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isLocationWhiteListedForCaseProgression(
-            caseData.getCaseManagementLocation().getBaseLocation())) {
-            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-        } else {
-            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+        if (featureToggleService.isEarlyAdoptersEnabled()) {
+            if (featureToggleService.isLocationWhiteListedForCaseProgression(
+                getEpimmsId(caseData))) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YES);
+            } else {
+                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YesOrNo.NO);
+            }
         }
+
+        System.out.println("before about to submit");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private String getEpimmsId(CaseData caseData) {
+
+        if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
+            return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
+        }
+        if (SdoHelper.isFastTrack(caseData)) {
+            return caseData.getFastTrackMethodInPerson().getValue().getCode();
+        }
+        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
+        }
+        throw new IllegalArgumentException("Could not determine claim track");
     }
 
     private boolean nonNull(Object object) {
