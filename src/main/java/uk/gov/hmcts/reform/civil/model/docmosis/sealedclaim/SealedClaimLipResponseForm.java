@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormPartyDefence;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -115,11 +116,11 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .ifPresent(selfEmployDetails ->
                            builder.selfEmployment(Respondent1SelfEmploymentLRspec.builder()
                                                       .amountOwed(selfEmployDetails.getAmountOwed() != null
-                                                                      ? MonetaryConversions.penniesToPounds(
-                                                          selfEmployDetails.getAmountOwed())
+                                                                      ? (MonetaryConversions.penniesToPounds(
+                                                          selfEmployDetails.getAmountOwed())).setScale(2, RoundingMode.CEILING)
                                                                       : null)
-                                                      .annualTurnover(MonetaryConversions.penniesToPounds(
-                                                          selfEmployDetails.getAnnualTurnover()))
+                                                      .annualTurnover((MonetaryConversions.penniesToPounds(
+                                                          selfEmployDetails.getAnnualTurnover())).setScale(2, RoundingMode.CEILING))
                                                       .jobTitle(selfEmployDetails.getJobTitle())
                                                       .reason(selfEmployDetails.getReason())
                                                       .build())
