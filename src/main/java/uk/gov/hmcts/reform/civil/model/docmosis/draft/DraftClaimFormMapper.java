@@ -1,14 +1,16 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.draft;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
+import uk.gov.hmcts.reform.civil.model.docmosis.common.Timeline;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
@@ -17,6 +19,9 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE;
@@ -39,19 +44,20 @@ public class DraftClaimFormMapper {
             caseDataLip.map(CaseDataLiP::getApplicant1AdditionalLipPartyDetails);
         Optional<AdditionalLipPartyDetails> defendantDetails =
             caseDataLip.map(CaseDataLiP::getRespondent1AdditionalLipPartyDetails);
-
+        caseData.getApplicant1().setPartyEmail(caseData.getClaimantUserDetails() != null
+                                                   ? caseData.getClaimantUserDetails().getEmail() : null);
         return DraftClaimForm.builder()
             .totalInterestAmount(interest != null ? interest.toString() : null)
             .howTheInterestWasCalculated(Optional.ofNullable(caseData.getInterestClaimOptions()).map(
                 InterestClaimOptions::getDescription).orElse(null))
             .interestRate(getInterestRate(caseData))
-            .interestExplanationText(generateInterestRateExplanation(caseData))
-            .interestFromDate(getInterestFromDate(caseData))
-            .interestEndDate(getInterestEndDate(caseData))
-            .interestEndDateDescription(Optional.ofNullable(caseData.getBreakDownInterestDescription())
-                                            .orElse(null))
-            .whenAreYouClaimingInterestFrom(generateWhenAreYouPlanningInterestFrom(caseData))
-            .timelineEvents(EventTemplateData.toEventTemplateDataList(caseData.getTimelineOfEvents()))
+            .interestExplanationText(interest != null ? generateInterestRateExplanation(caseData) : null)
+            .interestFromDate(interest != null ? getInterestFromDate(caseData) : null)
+            .interestEndDate(interest != null ? getInterestEndDate(caseData) : null)
+            .interestEndDateDescription(interest != null ? caseData.getBreakDownInterestDescription() : null)
+            .whenAreYouClaimingInterestFrom(interest != null ? generateWhenAreYouPlanningInterestFrom(
+                caseData) : null)
+            .timelineEvents(getTimeLine(caseData.getTimelineOfEvents()))
             .totalClaimAmount(Optional.ofNullable(caseData.getTotalClaimAmount())
                                   .map(BigDecimal::toString)
                                   .orElse("0"))
@@ -130,5 +136,19 @@ public class DraftClaimFormMapper {
         }
         return Optional.ofNullable(caseData.getTotalClaimAmount()).orElse(BigDecimal.ZERO)
             .add(MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence())).toString();
+    }
+
+    @JsonIgnore
+    public List<Timeline> getTimeLine(List<TimelineOfEvents> timelineOfEvents) {
+        return Optional.ofNullable(timelineOfEvents)
+            .map(Collection::stream)
+            .map(timelineOfEventsStream -> timelineOfEventsStream
+                .map(item -> new Timeline(
+                    item.getValue().getTimelineDate(),
+                    item.getValue().getTimelineDescription()
+                ))
+                .toList())
+            .orElse(Collections.emptyList());
+
     }
 }

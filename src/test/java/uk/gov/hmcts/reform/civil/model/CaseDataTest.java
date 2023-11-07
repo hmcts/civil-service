@@ -686,6 +686,23 @@ public class CaseDataTest {
     }
 
     @Test
+    void shouldReturnClaimAmountBreakupDetails_whenExists() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .claimAmountBreakup(List.of(ClaimAmountBreakup.builder()
+                                            .id("1").value(ClaimAmountBreakupDetails.builder()
+                                                               .claimAmount(new BigDecimal("122"))
+                                                               .claimReason("Reason")
+                                                               .build())
+                                            .build()))
+            .build();
+        //When
+        List<ClaimAmountBreakupDetails> result = caseData.getClaimAmountBreakupDetails();
+        //Then
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
     void shouldReturnZero_whenClaimFeeIsNull() {
         //Given
         CaseData caseData = CaseData.builder().build();

@@ -7,7 +7,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
+import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
@@ -19,9 +22,12 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DraftClaimFormMapperTest {
@@ -59,6 +65,13 @@ class DraftClaimFormMapperTest {
                             .partyEmail(EMAIL)
                             .type(Party.Type.INDIVIDUAL)
                             .build())
+            .timelineOfEvents(List.of(
+                TimelineOfEvents.builder().id("1").value(
+                        TimelineOfEventDetails.builder()
+                            .timelineDate(LocalDate.now())
+                            .timelineDescription("desc")
+                            .build())
+                    .build()))
             .respondent1(Party.builder()
                              .individualLastName(INDIVIDUAL_LAST_NAME)
                              .individualFirstName(INDIVIDUAL_FIRST_NAME)
@@ -113,6 +126,9 @@ class DraftClaimFormMapperTest {
                             .partyEmail(EMAIL)
                             .type(Party.Type.COMPANY)
                             .build())
+            .claimantUserDetails(
+                IdamUserDetails.builder().email(EMAIL).build()
+            )
             .respondent1(Party.builder()
                              .companyName(COMPANY)
                              .partyEmail(EMAIL)
@@ -135,6 +151,9 @@ class DraftClaimFormMapperTest {
                             .partyEmail(EMAIL)
                             .type(Party.Type.ORGANISATION)
                             .build())
+            .claimantUserDetails(
+                IdamUserDetails.builder().email(EMAIL).build()
+            )
             .respondent1(Party.builder()
                              .organisationName(ORGANISATION)
                              .partyEmail(EMAIL)
@@ -231,6 +250,8 @@ class DraftClaimFormMapperTest {
             .sameRateInterestSelection(SameRateInterestSelection.builder()
                                            .build())
             .build();
+        when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
+
         //When
         DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
         //Then
@@ -245,6 +266,7 @@ class DraftClaimFormMapperTest {
                                            .differentRateReason(DIFFERENT_RATE_EXPLANATION)
                                            .build())
             .build();
+        when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
         DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
         //Then
@@ -265,6 +287,7 @@ class DraftClaimFormMapperTest {
         CaseData caseData = getCaseData().toBuilder()
             .interestFromSpecificDate(INTEREST_FROM_SPECIFIC_DATE)
             .build();
+        when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
         DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
         //Then
@@ -277,6 +300,7 @@ class DraftClaimFormMapperTest {
         CaseData caseData = getCaseData().toBuilder()
             .submittedDate(SUBMITTED_DATE)
             .build();
+        when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
         DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
         //Then
@@ -306,6 +330,7 @@ class DraftClaimFormMapperTest {
             .submittedDate(SUBMITTED_DATE)
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .build();
+        when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
         DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
         //Then
@@ -321,6 +346,7 @@ class DraftClaimFormMapperTest {
             .interestClaimFrom(InterestClaimFromType.FROM_A_SPECIFIC_DATE)
             .interestFromSpecificDateDescription(DIFFERENT_RATE_EXPLANATION)
             .build();
+        when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
         DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
         //Then
@@ -331,7 +357,10 @@ class DraftClaimFormMapperTest {
     @Test
     void shouldReturnZeroForTotalClaimAmount_whenTotalClaimAmountIsNull() {
         //Given
-        CaseData caseData = CASE_DATA.toBuilder().totalClaimAmount(null).build();
+        CaseData caseData = CASE_DATA.toBuilder()
+            .claimantUserDetails(
+                IdamUserDetails.builder().email(EMAIL).build()
+            ).totalClaimAmount(null).build();
         //When
         DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
         //Then
@@ -367,6 +396,7 @@ class DraftClaimFormMapperTest {
         CaseData caseData = getCaseData().toBuilder()
             .submittedDate(SUBMITTED_DATE)
             .build();
+        when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
         DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
         //Then
@@ -393,6 +423,8 @@ class DraftClaimFormMapperTest {
             .submittedDate(SUBMITTED_DATE)
             .breakDownInterestDescription(DIFFERENT_RATE_EXPLANATION)
             .build();
+
+        when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
         DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
         //Then
