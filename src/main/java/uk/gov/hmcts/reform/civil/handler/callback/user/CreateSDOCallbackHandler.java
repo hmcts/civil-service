@@ -890,33 +890,33 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (nonNull(caseData.getSmallClaimsWitnessStatement())) {
             String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
             String inputValue2 = caseData.getSmallClaimsWitnessStatement().getInput3();
-            if (validateNegativeWitness(errors, inputValue1, inputValue2)) {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
+            final String witnessValidationErrorMessage = validateNegativeWitness(inputValue1, inputValue2);
+            if (!witnessValidationErrorMessage.isEmpty()) {
+                errors.add(witnessValidationErrorMessage);
             }
         } else if (nonNull(caseData.getFastTrackWitnessOfFact())) {
             String inputValue1 = caseData.getFastTrackWitnessOfFact().getInput2();
             String inputValue2 = caseData.getFastTrackWitnessOfFact().getInput3();
-            if (validateNegativeWitness(errors, inputValue1, inputValue2)) {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
+            final String witnessValidationErrorMessage = validateNegativeWitness(inputValue1, inputValue2);
+            if (!witnessValidationErrorMessage.isEmpty()) {
+                errors.add(witnessValidationErrorMessage);
             }
         }
-        return generateSdoOrder(callbackParams);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
+            .build();
     }
 
-    private boolean validateNegativeWitness(List<String> errors, String inputValue1, String inputValue2) {
+    private String validateNegativeWitness(String inputValue1, String inputValue2) {
+        final String errorMessage = "";
         if (inputValue1 != null && inputValue2 != null) {
             int number1 = Integer.parseInt(inputValue1);
             int number2 = Integer.parseInt(inputValue2);
             if (number1 < 0 || number2 < 0) {
-                errors.add("The number entered cannot be less than zero");
-                return true;
+                return "The number entered cannot be less than zero";
             }
         }
-        return false;
+        return errorMessage;
     }
 
     private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {

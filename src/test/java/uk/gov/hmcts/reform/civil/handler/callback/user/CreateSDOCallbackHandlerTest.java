@@ -1826,7 +1826,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isNull();
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -1843,7 +1843,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isNull();
+            assertThat(response.getErrors()).isEmpty();
 
         }
     }
