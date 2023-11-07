@@ -122,6 +122,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String RESPONDENT_TWO_TRIAL_SKELETON = "RespondentTwoTrialSkeleton";
     protected static final String RESPONDENT_TWO_PRECEDENT_H = "RespondentTwoUploadedPrecedentH";
     protected static final String RESPONDENT_TWO_ANY_PRECEDENT_H = "respondentTwoAnyPrecedentH";
+    protected static final String RESPONDENT_ONE_SCHEDULE_OF_COSTS = "RespondentSchedulesOfCost";
+    protected static final String RESPONDENT_TWO_SCHEDULE_OF_COSTS = "RespondentTwoSchedulesOfCost";
     protected static final String APPLICANT_DISCLOSURE_LIST = "ApplicantDisclosureList";
     protected static final String APPLICANT_PRE_TRIAL_SUMMARY = "ApplicantPreTrialSummary";
     protected static final String APPLICANT_TRIAL_SKELETON = "ApplicantTrialSkeleton";
@@ -132,6 +134,9 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String APPLICANT_TWO_TRIAL_SKELETON = "ApplicantTwoTrialSkeleton";
     protected static final String APPLICANT_TWO_PRECEDENT_H = "ApplicantTwoUploadedPrecedentH";
     protected static final String APPLICANT_TWO_ANY_PRECEDENT_H = "ApplicantTwoAnyPrecedentH";
+    protected static final String APPLICANT_SCHEDULE_OF_COSTS = "ApplicantSchedulesOfCost";
+    protected static final String APPLICANT_TWO_SCHEDULE_OF_COSTS = "ApplicantTwoSchedulesOfCost";
+
 
     protected static final String OPTION_APP1 = "Claimant 1 - ";
     protected static final String OPTION_APP2 = "Claimant 2 - ";
@@ -573,7 +578,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummaryRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_PRE_TRIAL_SUMMARY);
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgumentRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_TRIAL_SKELETON);
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_PRECEDENT_H);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_ANY_PRECEDENT_H);
+            setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_SCHEDULE_OF_COSTS);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE);
             if (selectedRole.equals(SELECTED_VALUE_DEF_BOTH)) {
                 caseData = copyResp1ChangesToResp2(caseData, caseDataBuilder);
@@ -593,7 +598,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummaryRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_PRE_TRIAL_SUMMARY);
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgumentRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_TRIAL_SKELETON);
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_PRECEDENT_H);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_ANY_PRECEDENT_H);
+            setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_SCHEDULE_OF_COSTS);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE);
         }
 
@@ -611,7 +616,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummary(), document -> document.getValue().getDocumentUpload(), APPLICANT_PRE_TRIAL_SUMMARY);
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgument(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_SKELETON);
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthorities(), document -> document.getValue().getDocumentUpload(), APPLICANT_PRECEDENT_H);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), APPLICANT_ANY_PRECEDENT_H);
+            setCategoryIdAndRenameDoc(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), APPLICANT_SCHEDULE_OF_COSTS);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrial(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_DOC_CORRESPONDENCE);
             if (selectedRole.equals(SELECTED_VALUE_APP_BOTH)) {
                 caseData = copyApp1ChangesToApp2(caseData, caseDataBuilder);
@@ -632,7 +637,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             setCategoryIdAndRenameDoc(caseData.getDocumentCaseSummaryApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_PRE_TRIAL_SUMMARY);
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgumentApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_SKELETON);
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_PRECEDENT_H);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCostsApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_ANY_PRECEDENT_H);
+            setCategoryIdAndRenameDoc(caseData.getDocumentCostsApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_SCHEDULE_OF_COSTS);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE);
         }
 
@@ -757,7 +762,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentCostsRes(),
                 caseData.getDocumentCostsRes(),
                 caseData.getDocumentCostsRes2());
-        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, RESPONDENT_TWO_ANY_PRECEDENT_H);
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, RESPONDENT_TWO_SCHEDULE_OF_COSTS);
         builder.documentCostsRes2(evidenceDocToAdd);
 
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentEvidenceForTrialRes(),
@@ -869,7 +874,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentCosts(),
                 caseData.getDocumentCosts(),
                 caseData.getDocumentCostsApp2());
-        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, APPLICANT_TWO_ANY_PRECEDENT_H);
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, APPLICANT_TWO_SCHEDULE_OF_COSTS);
         builder.documentCostsApp2(evidenceDocToAdd);
 
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentEvidenceForTrial(),
