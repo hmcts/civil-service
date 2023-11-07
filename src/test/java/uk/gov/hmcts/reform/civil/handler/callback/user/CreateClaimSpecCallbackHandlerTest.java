@@ -1673,11 +1673,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
-            assertThat(response.getData()).extracting("flightDetailsAirlineList")
+            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
                 .extracting("list_items").asList().extracting("label")
                 .contains("British Airways");
 
-            assertThat(response.getData()).extracting("flightDetailsAirlineList")
+            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
                 .extracting("list_items").asList().extracting("label")
                 .contains("OTHER");
         }
