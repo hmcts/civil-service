@@ -4,7 +4,7 @@
 *.class
 bin/main/application.yaml
 **/target
-
+bin/
 ### STS ###
 .apt_generated
 .classpath
@@ -36,3 +36,4 @@ smokeTest/
 infrastructure/.terraform/**
 infrastructure/.terraform.lock.hcl
 infrastructure/override.tf
+bin/main/application-dev.yaml

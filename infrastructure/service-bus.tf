@@ -1,17 +1,29 @@
 #HMC to Hearings API
+
+locals {
+  sql_filters = {
+    "hmc-servicebus-${var.env}-subscription-rule-civil" : {
+      sql_filter = "hmctsServiceId IN ('AAA7','AAA6')"
+    }
+  }
+
+  correlation_filters = {
+    correlation_filter1 : {
+      properties = {
+        hmctsProperty = "any"
+      }
+    }
+  }
+}
+
 module "servicebus-subscription" {
-  source              = "git@github.com:hmcts/terraform-module-servicebus-subscription?ref=master"
+  source              = "git@github.com:hmcts/terraform-module-servicebus-subscription?ref=DTSPO-15347-add-subscription_rule"
   name                = "hmc-to-civil-subscription-${var.env}"
   namespace_name      = "hmc-servicebus-${var.env}"
   topic_name          = "hmc-to-cft-${var.env}"
   resource_group_name = "hmc-shared-${var.env}"
-}
-
-resource "azurerm_servicebus_subscription_rule" "topic_filter_rule_civil" {
-  name            = "hmc-servicebus-${var.env}-subscription-rule-civil"
-  subscription_id = module.servicebus-subscription.id
-  filter_type     = "SqlFilter"
-  sql_filter      = "hmctsServiceId IN ('AAA7','AAA6')"
+  sql_filters         = local.sql_filters
+  correlation_filters = local.correlation_filters
 }
 
 data "azurerm_key_vault" "hmc-key-vault" {
