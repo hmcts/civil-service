@@ -46,6 +46,14 @@ public class DraftClaimFormMapper {
             caseDataLip.map(CaseDataLiP::getRespondent1AdditionalLipPartyDetails);
         caseData.getApplicant1().setPartyEmail(caseData.getClaimantUserDetails() != null
                                                    ? caseData.getClaimantUserDetails().getEmail() : null);
+        LipFormParty claimant = LipFormParty.toLipFormParty(
+            caseData.getApplicant1(),
+            getCorrespondenceAddress(applicantDetails),
+            getContactPerson(applicantDetails)
+        );
+        String totalClaimAmount = Optional.ofNullable(caseData.getTotalClaimAmount())
+            .map(BigDecimal::toString)
+            .orElse("0");
         return DraftClaimForm.builder()
             .totalInterestAmount(interest != null ? interest.toString() : null)
             .howTheInterestWasCalculated(Optional.ofNullable(caseData.getInterestClaimOptions()).map(
@@ -58,20 +66,14 @@ public class DraftClaimFormMapper {
             .whenAreYouClaimingInterestFrom(interest != null ? generateWhenAreYouPlanningInterestFrom(
                 caseData) : null)
             .timelineEvents(getTimeLine(caseData.getTimelineOfEvents()))
-            .totalClaimAmount(Optional.ofNullable(caseData.getTotalClaimAmount())
-                                  .map(BigDecimal::toString)
-                                  .orElse("0"))
+            .totalClaimAmount(totalClaimAmount)
             .interestAmount(interest != null ? interest.toString() : null)
             .claimAmount(caseData.getClaimAmountBreakupDetails())
             .claimFee(MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence())
                           .toString())
             .totalAmountOfClaim(calculateTotalAmountOfClaim(caseData, interest))
             .descriptionOfClaim(caseData.getDetailsOfClaim())
-            .claimant(LipFormParty.toLipFormParty(
-                caseData.getApplicant1(),
-                getCorrespondenceAddress(applicantDetails),
-                getContactPerson(applicantDetails)
-            ))
+            .claimant(claimant)
             .defendant(LipFormParty.toLipFormParty(
                 caseData.getRespondent1(),
                 getCorrespondenceAddress(defendantDetails),
