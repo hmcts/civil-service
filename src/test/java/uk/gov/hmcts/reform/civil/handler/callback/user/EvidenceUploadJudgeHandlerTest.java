@@ -97,20 +97,115 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("caseNotesTA")
                 .isEqualTo(objectMapper.convertValue(updatedCaseNotes, new TypeReference<>() {}));
+            assertThat(response.getData()).extracting("documentAndName").isNull();
+            assertThat(response.getData()).extracting("documentAndNote").isNull();
+        }
+
+        @Test
+        void shouldCopyDocumentAndNameToAdd_whenDocumentWithNameIsNull() {
+            Document document = Document.builder().documentFileName("fileName").build();
+            DocumentWithName testDocument = DocumentWithName.builder()
+                .documentName("testDocument")
+                .document(document)
+                .build();
+            List<Element<DocumentWithName>> documentWithNameToAdd = wrapElements(testDocument);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
+                .documentAndNameToAdd(documentWithNameToAdd)
+                .caseNoteTA(null)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("documentAndName")
+                .isEqualTo(objectMapper.convertValue(documentWithNameToAdd, new TypeReference<>() {}));
+            assertThat(response.getData()).extracting("caseNotesTA").isNull();
+            assertThat(response.getData()).extracting("documentAndNote").isNull();
 
         }
 
         @Test
-        void shouldNotPopulateNoteDateTime_whenNoteIsAddedToCase() {
+        void shouldAddDocument_whenDocumentWithNameIsNotNull() {
+            Document document = Document.builder().documentFileName("fileName").build();
+            DocumentWithName testDocument = DocumentWithName.builder()
+                .documentName("testDocument")
+                .document(document)
+                .build();
+            List<Element<DocumentWithName>> documentWithNameToAdd = wrapElements(testDocument);
+            List<Element<DocumentWithName>> documentWithNameStart = wrapElements(testDocument);
+            List<Element<DocumentWithName>> documentWithNameEnd = wrapElements(testDocument, testDocument);
+
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
+                .documentAndNameToAdd(documentWithNameToAdd)
+                .documentAndName(documentWithNameStart)
                 .caseNoteTA(null)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("documentAndName")
+                .isEqualTo(objectMapper.convertValue(documentWithNameEnd, new TypeReference<>() {}));
+            assertThat(response.getData()).extracting("caseNotesTA").isNull();
+            assertThat(response.getData()).extracting("documentAndNote").isNull();
+
+        }
+
+        @Test
+        void shouldAddNote_whenDocumentWithNoteIsNotNull() {
+            Document document = Document.builder().documentFileName("fileName").build();
+            DocumentAndNote testDocument = DocumentAndNote.builder()
+                .documentName("testDocument")
+                .document(document)
+                .documentNote("Note")
+                .build();
+            List<Element<DocumentAndNote>> documentAndNoteToAdd = wrapElements(testDocument);
+            List<Element<DocumentAndNote>> documentAndNoteStart = wrapElements(testDocument);
+            List<Element<DocumentAndNote>> documentAndNoteEnd = wrapElements(testDocument, testDocument);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .caseNoteType(CaseNoteType.DOCUMENT_AND_NOTE)
+                .documentAndNoteToAdd(documentAndNoteToAdd)
+                .documentAndNote(documentAndNoteStart)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            assertThat(response.getData()).extracting("documentAndNote")
+                .isEqualTo(objectMapper.convertValue(documentAndNoteEnd, new TypeReference<>() {}));
             assertThat(response.getData()).extracting("caseNotesTA").isNull();
+            assertThat(response.getData()).extracting("documentAndName").isNull();
+
+        }
+
+        @Test
+        void shouldCopyDocumentAndNoteToAdd_whenDocumentWithNoteIsNull() {
+            Document document = Document.builder().documentFileName("fileName").build();
+            DocumentAndNote testDocument = DocumentAndNote.builder()
+                .documentName("testDocument")
+                .document(document)
+                .documentNote("Note")
+                .build();
+            List<Element<DocumentAndNote>> documentAndNoteToAdd = wrapElements(testDocument);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .caseNoteType(CaseNoteType.DOCUMENT_AND_NOTE)
+                .documentAndNoteToAdd(documentAndNoteToAdd)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("documentAndNote")
+                .isEqualTo(objectMapper.convertValue(documentAndNoteToAdd, new TypeReference<>() {}));
+            assertThat(response.getData()).extracting("caseNotesTA").isNull();
+            assertThat(response.getData()).extracting("documentAndName").isNull();
 
         }
     }
@@ -133,7 +228,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             documentList.add(Element.<DocumentAndNote>builder().value(documentAndNote).build());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .documentAndNote(documentList)
+                .documentAndNoteToAdd(documentList)
                 .caseNoteType(CaseNoteType.DOCUMENT_AND_NOTE)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
@@ -162,7 +257,7 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             documentList.add(Element.<DocumentWithName>builder().value(documentAndNote).build());
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .documentAndName(documentList)
+                .documentAndNameToAdd(documentList)
                 .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
