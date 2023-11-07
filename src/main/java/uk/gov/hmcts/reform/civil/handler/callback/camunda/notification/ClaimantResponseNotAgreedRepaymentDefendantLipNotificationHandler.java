@@ -73,6 +73,7 @@ public class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandler e
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
         );
+
     }
 
     private String addTemplate(CaseData caseData) {
