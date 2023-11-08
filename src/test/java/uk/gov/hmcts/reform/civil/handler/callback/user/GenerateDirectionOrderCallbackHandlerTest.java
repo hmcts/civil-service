@@ -334,7 +334,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         }
     }
-  
+
     @Nested
     class MidEventValidateAndGenerateOrderDocumentPreview {
         private static final String PAGE_ID = "validate-and-generate-document";
@@ -847,6 +847,23 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
+        void shouldRePopulateHearingNotes_whenFreeFormHearingNotesExist() {
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .freeFormHearingNotes("test text hearing notes free form order")
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("test text hearing notes free form order");
+        }
+
+        @Test
         void shouldNotRePopulateHearingNotes_whenAssistedHearingNotesDoNotExist() {
             // Given
             List<FinalOrderToggle> toggle = new ArrayList<>();
@@ -859,6 +876,24 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("preexisting hearing notes");
+        }
+
+        @Test
+        void shouldNotRePopulateHearingNotes_whenFreeFormHearingNotesDoNotExist() {
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .finalOrderFurtherHearingToggle(toggle)
+                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("preexisting hearing notes");
