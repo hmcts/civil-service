@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     public static final String TASK_ID_Applicant1 = "NotifyApplicant1ClaimSubmitted";
     private static final String REFERENCE_TEMPLATE = "claim-submitted-notification-%s";
     private final NotificationService notificationService;
+    private final FeatureToggleService toggleService;
     private final PinInPostConfiguration pipInPostConfiguration;
     private final NotificationsProperties notificationsProperties;
     private final Map<String, Callback> callBackMap = Map.of(
@@ -47,7 +49,9 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     private CallbackResponse notifyApplicantForClaimSubmitted(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        generateEmail(caseData);
+        if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
+            generateEmail(caseData);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
