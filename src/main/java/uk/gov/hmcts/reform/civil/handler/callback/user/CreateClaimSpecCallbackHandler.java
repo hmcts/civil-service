@@ -566,7 +566,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             getAirlineCourtLocation(callbackParams.getCaseData()
                                         .getFlightDelay()
                                         .getFlightDetailsAirlineList().getValue()
-                                        .getCode(),callbackParams)).build());
+                                        .getCode(), callbackParams)).build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -1016,7 +1016,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     }
 
-    private LocationRefData getAirlineCourtLocation (String airline, CallbackParams callbackParams) {
+    private LocationRefData getAirlineCourtLocation(String airline, CallbackParams callbackParams) {
         String locationEpimmsId = switch (airline) {
             case "BA/CITYFLYER" -> "111";
             case "AIR_INDIA" -> "222";
