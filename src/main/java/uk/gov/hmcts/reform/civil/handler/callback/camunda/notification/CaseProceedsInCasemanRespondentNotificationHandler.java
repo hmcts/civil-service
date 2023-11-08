@@ -32,7 +32,8 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_PROCEEDS_IN_CASEMAN
     );
 
-    public static final String TASK_ID = "CaseProceedsInCasemanNotifyRespondentSolicitor1";
+    public static final String TASK_ID1 = "CaseProceedsInCasemanNotifyRespondentSolicitor1";
+    public static final String TASK_ID2 = "CaseProceedsInCasemanNotifyRespondentSolicitor2";
     private static final String REFERENCE_TEMPLATE = "case-proceeds-in-caseman-respondent-notification-%s";
 
     private final NotificationService notificationService;
@@ -48,7 +49,12 @@ public class CaseProceedsInCasemanRespondentNotificationHandler extends Callback
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        if (NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN.name()
+            .equals(callbackParams.getRequest().getEventId())) {
+            return TASK_ID1;
+        } else {
+            return TASK_ID2;
+        }
     }
 
     @Override

@@ -51,19 +51,27 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
     @Autowired
     private CaseProceedsInCasemanRespondentNotificationHandler handler;
 
-    private final CaseEvent eventId = CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN;
+    private final CaseEvent eventId1 = CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_PROCEEDS_IN_CASEMAN;
+    private final CaseEvent eventId2 = CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_PROCEEDS_IN_CASEMAN;
 
-    private final String taskId = "CaseProceedsInCasemanNotifyRespondentSolicitor1";
+    private final String taskId1 = "CaseProceedsInCasemanNotifyRespondentSolicitor1";
+    private final String taskId2 = "CaseProceedsInCasemanNotifyRespondentSolicitor2";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(eventId);
+        assertThat(handler.handledEvents()).contains(eventId1);
     }
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            eventId.toString()).build()).build())).isEqualTo(taskId);
+            eventId1.toString()).build()).build())).isEqualTo(taskId1);
+    }
+
+    @Test
+    void shouldReturnCorrectCamundaActivityId2_whenInvoked() {
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
+            eventId2.toString()).build()).build())).isEqualTo(taskId2);
     }
 
     @Nested
