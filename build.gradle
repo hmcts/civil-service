@@ -247,7 +247,7 @@ task contract(type: Test) {
 }
 
 task pullTestAsset(type: Exec, description: 'Installs Yarn dependencies.') {
-  commandLine './bin/pull-latest-ccd-files.sh', 'fix/nigtly-apis'
+  commandLine './bin/pull-latest-ccd-files.sh', 'master'
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.')  {
