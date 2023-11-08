@@ -562,11 +562,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     caseData.getSpecRespondentCorrespondenceAddressdetails());
         }
 
-        dataBuilder.flightDelay(FlightDelay.builder().flightCourtLocation(
-            getAirlineCourtLocation(callbackParams.getCaseData()
-                                        .getFlightDelay()
-                                        .getFlightDetailsAirlineList().getValue()
-                                        .getCode(), callbackParams)).build());
+        if (callbackParams.getCaseData().getFlightDelay() != null) {
+            dataBuilder.flightDelay(FlightDelay.builder().flightCourtLocation(
+                getAirlineCourtLocation(callbackParams.getCaseData()
+                                            .getFlightDelay()
+                                            .getFlightDetailsAirlineList().getValue()
+                                            .getCode(), callbackParams)).build());
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
