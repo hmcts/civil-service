@@ -142,6 +142,36 @@ class StateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnTakenOffline_whenCaseTakenOfflineBeforeIssue() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
+                .takenOfflineByStaff()
+                .build();
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(TAKEN_OFFLINE_BY_STAFF.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(3)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName());
+
+            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
+                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true)
+            );
+        }
+
+        @Test
         void shouldReturnClaimSubmitted_whenCaseDataAtStateClaimSubmittedTwoRespondentRepresentatives() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
@@ -2415,7 +2445,8 @@ class StateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
                 .takenOfflineDate(LocalDateTime.now())
-                .build();
+                .build().toBuilder()
+                .drawDirectionsOrderRequired(NO).build();
 
             // When
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);

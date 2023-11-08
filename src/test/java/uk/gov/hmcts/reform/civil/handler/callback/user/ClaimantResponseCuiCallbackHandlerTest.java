@@ -120,8 +120,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssued()
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                        MediationDecision.Yes).build())
-                                 .build())
+                    MediationDecision.Yes).build())
+                            .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -136,9 +136,9 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssued()
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
                 .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
+                                   .type(COMPANY)
+                                   .companyName("Test Inc")
+                                   .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
