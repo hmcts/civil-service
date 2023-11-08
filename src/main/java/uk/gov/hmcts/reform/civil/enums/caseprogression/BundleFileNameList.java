@@ -26,7 +26,8 @@ public enum BundleFileNameList {
     QUESTIONS_TO("Questions to %s %s"),
     REPLIES_FROM("Replies from %s %s"),
     JOINT_STATEMENTS_OF_EXPERTS("Joint statement of experts %s %s %s"),
-    SKELETON_ARGUMENT("%s Skeleton argument %s");
+    SKELETON_ARGUMENT("%s Skeleton argument %s"),
+    PARTICULARS_OF_CLAIM("Particulars Of Claim %s");
     String displayName;
 
     public String getDisplayName() {
