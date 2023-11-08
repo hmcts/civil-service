@@ -163,7 +163,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .put(callbackKey(ABOUT_TO_START), this::prePopulateOrderDetailsPages)
             .put(callbackKey(V_1, ABOUT_TO_START), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
-            .put(callbackKey(MID, "validateInputValue"), this::validateInputValue)
             .put(callbackKey(MID, "generate-sdo-order"), this::generateSdoOrder)
             .put(callbackKey(V_1, MID, "generate-sdo-order"), this::generateSdoOrder)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
@@ -755,17 +754,37 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             : callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        CaseDocument document = sdoGeneratorService.generate(
-            caseData,
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
-
-        if (document != null) {
-            updatedData.sdoOrderDocument(document);
+        List<String> errors = new ArrayList<>();
+        if (nonNull(caseData.getSmallClaimsWitnessStatement())) {
+            String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
+            String inputValue2 = caseData.getSmallClaimsWitnessStatement().getInput3();
+            final String witnessValidationErrorMessage = validateNegativeWitness(inputValue1, inputValue2);
+            if (!witnessValidationErrorMessage.isEmpty()) {
+                errors.add(witnessValidationErrorMessage);
+            }
+        } else if (nonNull(caseData.getFastTrackWitnessOfFact())) {
+            String inputValue1 = caseData.getFastTrackWitnessOfFact().getInput2();
+            String inputValue2 = caseData.getFastTrackWitnessOfFact().getInput3();
+            final String witnessValidationErrorMessage = validateNegativeWitness(inputValue1, inputValue2);
+            if (!witnessValidationErrorMessage.isEmpty()) {
+                errors.add(witnessValidationErrorMessage);
+            }
         }
-        assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
+
+        if (errors.isEmpty()) {
+            CaseDocument document = sdoGeneratorService.generate(
+                caseData,
+                callbackParams.getParams().get(BEARER_TOKEN).toString()
+            );
+
+            if (document != null) {
+                updatedData.sdoOrderDocument(document);
+            }
+            assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .data(updatedData.build().toMap(objectMapper))
             .build();
     }
@@ -881,31 +900,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else {
             return false;
         }
-    }
-
-    private CallbackResponse validateInputValue(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        //CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        List<String> errors = new ArrayList<>();
-        if (nonNull(caseData.getSmallClaimsWitnessStatement())) {
-            String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
-            String inputValue2 = caseData.getSmallClaimsWitnessStatement().getInput3();
-            final String witnessValidationErrorMessage = validateNegativeWitness(inputValue1, inputValue2);
-            if (!witnessValidationErrorMessage.isEmpty()) {
-                errors.add(witnessValidationErrorMessage);
-            }
-        } else if (nonNull(caseData.getFastTrackWitnessOfFact())) {
-            String inputValue1 = caseData.getFastTrackWitnessOfFact().getInput2();
-            String inputValue2 = caseData.getFastTrackWitnessOfFact().getInput3();
-            final String witnessValidationErrorMessage = validateNegativeWitness(inputValue1, inputValue2);
-            if (!witnessValidationErrorMessage.isEmpty()) {
-                errors.add(witnessValidationErrorMessage);
-            }
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
     }
 
     private String validateNegativeWitness(String inputValue1, String inputValue2) {
