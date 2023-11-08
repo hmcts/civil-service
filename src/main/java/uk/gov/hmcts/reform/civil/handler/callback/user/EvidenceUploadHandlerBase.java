@@ -137,7 +137,6 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String APPLICANT_SCHEDULE_OF_COSTS = "ApplicantSchedulesOfCost";
     protected static final String APPLICANT_TWO_SCHEDULE_OF_COSTS = "ApplicantTwoSchedulesOfCost";
 
-
     protected static final String OPTION_APP1 = "Claimant 1 - ";
     protected static final String OPTION_APP2 = "Claimant 2 - ";
     protected static final String OPTION_APP_BOTH = "Claimants 1 and 2";
