@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
+
 @Service
 @RequiredArgsConstructor
 public class EvidenceUploadApplicantNotificationHandler implements NotificationData {
@@ -24,12 +26,14 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
         boolean isApplicantLip = isApplicantLip(caseData);
 
         //Send email to Applicant
-        notificationService.sendMail(
-            getEmail(caseData, isApplicantLip),
-            getTemplate(caseData, isApplicantLip),
-            addProperties(caseData),
-            getReference(caseData)
-        );
+        if (nonNull(caseData.getNotificationText()) && !caseData.getNotificationText().equals("NULLED")) {
+            notificationService.sendMail(
+                getEmail(caseData, isApplicantLip),
+                getTemplate(caseData, isApplicantLip),
+                addProperties(caseData),
+                getReference(caseData)
+            );
+        }
     }
 
     private static String getReference(CaseData caseData) {
@@ -53,7 +57,8 @@ public class EvidenceUploadApplicantNotificationHandler implements NotificationD
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            UPLOADED_DOCUMENTS, caseData.getNotificationText()
         );
     }
 }
