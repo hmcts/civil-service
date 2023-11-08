@@ -179,7 +179,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.finalOrderDocument(finalDocument.getDocumentLink());
+        caseDataBuilder.finalOrderDocument(finalDocument);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -405,8 +405,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
-            caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        CaseDocument finalDocument = caseData.getFinalOrderDocument();
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
