@@ -535,7 +535,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             populateWithPartyIds(dataBuilder);
         }
 
-        List<String> errors = new ArrayList<>();
         if (caseData.getSdtRequestIdFromSdt() != null) {
             // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
             List<Element<String>> stdRequestIdList = new ArrayList<>();
@@ -552,6 +551,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                                                       .build()).build());
         }
 
+        List<String> errors = new ArrayList<>();
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP
             && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
             // to keep with heading tab
