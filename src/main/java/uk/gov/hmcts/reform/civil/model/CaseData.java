@@ -607,8 +607,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final FreeFormOrderValues orderOnCourtInitiative;
     private final FreeFormOrderValues orderWithoutNotice;
     private final OrderOnCourtsList orderOnCourtsList;
+    private final String freeFormHearingNotes;
 
-    private Document finalOrderDocument;
+    private CaseDocument finalOrderDocument;
+
     @Builder.Default
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
 
