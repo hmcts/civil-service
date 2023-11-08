@@ -30,6 +30,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.FlightDelay;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -207,6 +209,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private ToggleConfiguration toggleConfiguration;
+
+    @MockBean
+    protected LocationRefDataService locationRefDataService;
 
     @Nested
     class AboutToStartCallback {
@@ -2148,6 +2153,52 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("uiStatementOfTruth")
                     .doesNotHaveToString("name")
                     .doesNotHaveToString("role");
+            }
+        }
+
+        @Nested
+        class GetAirlineCourtLocation extends LocationRefSampleDataBuilder {
+
+            @Test
+            void shouldReturnExpectedCourtLocation_whenAirlineExists() {
+                // Given
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .flightDelay(FlightDelay.builder()
+                                     .flightDetailsAirlineList(
+                                         DynamicList.builder()
+                                             .value(DynamicListElement.builder().code("GULF_AIR").label("Gulf Air")
+                                                        .build()).build()).build()).build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .willReturn(getSampleCourLocationsRefObject());
+
+                // When
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                // Then
+                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").extracting("site_name").isEqualTo("Site 3");
+            }
+
+            @Test
+            void shouldReturnExpectedCourtLocation_whenOtherAirlineSelected() {
+                // Given
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .flightDelay(FlightDelay.builder()
+                                     .flightDetailsAirlineList(
+                                         DynamicList.builder()
+                                             .value(DynamicListElement.builder().code("OTHER").label("OTHER")
+                                                        .build()).build()).build()).build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .willReturn(getSampleCourLocationsRefObject());
+
+                // When
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                // Then
+                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").extracting("site_name").isEqualTo("Site 1");
             }
         }
     }

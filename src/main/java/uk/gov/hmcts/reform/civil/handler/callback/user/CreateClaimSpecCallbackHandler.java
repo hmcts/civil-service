@@ -55,7 +55,6 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
-import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -566,9 +565,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.flightDelay(FlightDelay.builder().flightCourtLocation(
             getAirlineCourtLocation(callbackParams.getCaseData()
                                         .getFlightDelay()
-                                        .getFlightDetailsAirlineList()
-                                        .getListItems()
-                                        .get(0).getCode(),callbackParams)).build());
+                                        .getFlightDetailsAirlineList().getValue()
+                                        .getCode(),callbackParams)).build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -1020,10 +1018,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private LocationRefData getAirlineCourtLocation (String airline, CallbackParams callbackParams) {
         String locationEpimmsId = switch (airline) {
-            case "BA/CITYFLYER" -> "000000";
-            case "AIR_INDIA" -> "111100";
-            case "GULF_AIR" -> "222200";
-            case "OTHER" -> "333300";
+            case "BA/CITYFLYER" -> "111";
+            case "AIR_INDIA" -> "222";
+            case "GULF_AIR" -> "333";
+            case "OTHER" -> "111";
             default -> throw new CallbackException(String.format(AIRLINE_NOT_FOUND_MESSAGE, airline));
         };
 
