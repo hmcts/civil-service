@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -39,6 +40,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -52,6 +55,7 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
@@ -157,6 +161,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
+    private static final String AIRLINE_NOT_FOUND_MESSAGE = "Airline code not found: %s";
+
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
     private final ReferenceNumberRepository referenceNumberRepository;
@@ -177,6 +183,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final StateFlowEngine stateFlowEngine;
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
+    private final LocationRefDataService locationRefDataService;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
     private static final String ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST = "Scheduled date of flight must be today or in the past";
 
@@ -556,6 +563,13 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     caseData.getSpecRespondentCorrespondenceAddressdetails());
         }
 
+        dataBuilder.flightDelay(FlightDelay.builder().flightCourtLocation(
+            getAirlineCourtLocation(callbackParams.getCaseData()
+                                        .getFlightDelay()
+                                        .getFlightDetailsAirlineList()
+                                        .getListItems()
+                                        .get(0).getCode(),callbackParams)).build());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(dataBuilder.build().toMap(objectMapper))
@@ -928,13 +942,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         DynamicList airlineList = DynamicList.builder()
             .value(DynamicListElement.builder().build())
             .listItems(List.of(
-                DynamicListElement.builder().code("BRITISH_AIRWAYS").label("British Airways").build(),
+                DynamicListElement.builder().code("BA/CITYFLYER").label("BA/Cityflyer").build(),
                 DynamicListElement.builder().code("AIR_INDIA").label("Air India").build(),
                 DynamicListElement.builder().code("GULF_AIR").label("Gulf Air").build(),
                 DynamicListElement.builder().code("OTHER").label("OTHER").build())).build();
         FlightDelay flightDelay = FlightDelay.builder().flightDetailsAirlineList(airlineList).build();
         caseDataBuilder.flightDelay(flightDelay);
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -1003,5 +1016,24 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         }
         return participantString;
 
+    }
+
+    private LocationRefData getAirlineCourtLocation (String airline, CallbackParams callbackParams) {
+        String locationEpimmsId = switch (airline) {
+            case "BA/CITYFLYER" -> "000000";
+            case "AIR_INDIA" -> "111100";
+            case "GULF_AIR" -> "222200";
+            case "OTHER" -> "333300";
+            default -> throw new CallbackException(String.format(AIRLINE_NOT_FOUND_MESSAGE, airline));
+        };
+
+        List<LocationRefData> locations = fetchLocationData(callbackParams);
+        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList();
+        return !matchedLocations.isEmpty() ? matchedLocations.get(0) : null;
+    }
+
+    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 }

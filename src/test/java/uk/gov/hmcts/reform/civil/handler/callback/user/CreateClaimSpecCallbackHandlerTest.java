@@ -1675,7 +1675,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
                 .extracting("list_items").asList().extracting("label")
-                .contains("British Airways");
+                .contains("BA/Cityflyer");
 
             assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
                 .extracting("list_items").asList().extracting("label")

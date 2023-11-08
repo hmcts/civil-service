@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
 
@@ -16,4 +17,5 @@ public class FlightDelay {
 
     private DynamicList flightDetailsAirlineList;
     private LocalDate flightDetailsScheduledDate;
+    private LocationRefData flightCourtLocation;
 }
