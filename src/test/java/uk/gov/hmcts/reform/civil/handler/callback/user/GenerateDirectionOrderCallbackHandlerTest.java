@@ -854,10 +854,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .freeFormHearingNotes("test text hearing notes free form order")
+                .finalOrderDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
-            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("test text hearing notes free form order");
@@ -890,10 +890,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .finalOrderDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
-            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("preexisting hearing notes");
