@@ -311,6 +311,8 @@ public class CaseDataParent implements MappableObject {
 
     private CaseDocument sdoOrderDocument;
 
+    private final YesOrNo eaCourtLocation;
+
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
     private final YesOrNo setFastTrackFlag;
@@ -441,6 +443,7 @@ public class CaseDataParent implements MappableObject {
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
 
+    private final String notificationText;
     private final List<EvidenceUploadDisclosure> disclosureSelectionEvidence;
     private final List<EvidenceUploadDisclosure> disclosureSelectionEvidenceRes;
     private final List<EvidenceUploadWitness> witnessSelectionEvidence;
