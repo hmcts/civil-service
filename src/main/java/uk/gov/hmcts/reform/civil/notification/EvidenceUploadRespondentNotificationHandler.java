@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationService;
 
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @Service
@@ -41,7 +42,7 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
             isRespondentLip = true;
         }
 
-        if (null != email) {
+        if (null != email && nonNull(caseData.getNotificationText()) && !caseData.getNotificationText().equals("NULLED")) {
             notificationService.sendMail(
                 email,
                 getTemplate(isRespondentLip),
@@ -62,7 +63,8 @@ public class EvidenceUploadRespondentNotificationHandler implements Notification
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
-            );
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            UPLOADED_DOCUMENTS, caseData.getNotificationText()
+        );
     }
 }
