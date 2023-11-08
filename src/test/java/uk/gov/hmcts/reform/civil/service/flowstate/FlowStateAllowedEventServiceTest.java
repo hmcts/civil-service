@@ -137,6 +137,8 @@ class FlowStateAllowedEventServiceTest {
     @Autowired
     FlowStateAllowedEventService flowStateAllowedEventService;
 
+    // used by StateFlowEngine bean
+    @SuppressWarnings("unused")
     @MockBean
     private FeatureToggleService toggleService;
 
@@ -318,7 +320,8 @@ class FlowStateAllowedEventServiceTest {
                         GENERATE_DIRECTIONS_ORDER,
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        asyncStitchingComplete
                     }
                 ),
                 of(
@@ -567,7 +570,8 @@ class FlowStateAllowedEventServiceTest {
                         SET_ASIDE_JUDGMENT,
                         JUDGMENT_PAID_IN_FULL,
                         RECORD_JUDGMENT,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        asyncStitchingComplete
                     }
                 ),
                 of(
