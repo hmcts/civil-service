@@ -163,8 +163,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .put(callbackKey(ABOUT_TO_START), this::prePopulateOrderDetailsPages)
             .put(callbackKey(V_1, ABOUT_TO_START), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
-            .put(callbackKey(MID, "generate-sdo-order"), this::generateSdoOrder)
             .put(callbackKey(MID, "validateInputValue"), this::validateInputValue)
+            .put(callbackKey(MID, "generate-sdo-order"), this::generateSdoOrder)
             .put(callbackKey(V_1, MID, "generate-sdo-order"), this::generateSdoOrder)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -902,6 +902,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 errors.add(witnessValidationErrorMessage);
             }
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
