@@ -69,6 +69,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -145,7 +146,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void setup() {
         given(time.now()).willReturn(LocalDateTime.now());
         given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
-            .willReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()));
+            .willReturn(List.of(RESPONDENTSOLICITORONE.getFormattedName()));
         given(userRoleCaching.getCacheKeyToken(anyString())).willReturn("1234");
     }
 
@@ -1509,9 +1510,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .documentJointStatementRes(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(RESPONDENTSOLICITORONE.getFormattedName()));
         given(coreCaseDataService.getCase(anyLong())).willReturn(CaseDetails.builder().build());
         // When handle is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1536,9 +1536,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .documentWitnessSummaryRes(createWitnessDocs(witnessName, LocalDateTime.now(), witnessDate))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(RESPONDENTSOLICITORONE.getFormattedName()));
         given(coreCaseDataService.getCase(anyLong())).willReturn(CaseDetails.builder().build());
         // When handle is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
