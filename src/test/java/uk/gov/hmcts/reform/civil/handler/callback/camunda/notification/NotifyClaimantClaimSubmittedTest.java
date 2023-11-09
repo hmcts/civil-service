@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
@@ -39,6 +41,8 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
     private NotificationService notificationService;
     @MockBean
     private NotificationsProperties notificationsProperties;
+    @MockBean
+    private FeatureToggleService toggleService;
     @MockBean
     private PinInPostConfiguration pinInPostConfiguration;
     @Autowired
@@ -63,6 +67,7 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
             when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate()).thenReturn(
                 EMAIL_TEMPLATE_HWF);
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test
@@ -74,6 +79,9 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                                 .build())
                 .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                                  .build())
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -98,6 +106,9 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                                 .build())
                 .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                                  .build())
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -115,7 +126,7 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSendEmail_whenHFWReferanceNumberPresent() {
+        void shouldSendEmail_whenHFWReferenceNumberPresent() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
                 .applicant1(PartyBuilder.builder().individual().build().toBuilder()
@@ -123,6 +134,9 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                 .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                                  .build())
                 .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("1111").build()).build())
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -147,6 +161,9 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                                 .build())
                 .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                                  .build())
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
                 .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
