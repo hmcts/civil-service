@@ -144,7 +144,6 @@ public class HearingScheduledHandler extends CallbackHandler {
                                     "The Date must be in the past");
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
