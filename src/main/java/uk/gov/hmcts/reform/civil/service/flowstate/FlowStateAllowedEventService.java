@@ -282,7 +282,8 @@ public class FlowStateAllowedEventService {
                 GENERATE_DIRECTIONS_ORDER,
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                asyncStitchingComplete
             )
         ),
 
@@ -542,7 +543,8 @@ public class FlowStateAllowedEventService {
                 SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
                 RECORD_JUDGMENT,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                asyncStitchingComplete
             )
         ),
 
@@ -864,7 +866,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_RESPONDENT,
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                asyncStitchingComplete
             )
         ),
         entry(
@@ -903,7 +906,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_RESPONDENT,
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                asyncStitchingComplete
             )
         ),
         entry(
@@ -1100,7 +1104,8 @@ public class FlowStateAllowedEventService {
                 JUDGMENT_PAID_IN_FULL,
                 RECORD_JUDGMENT,
                 LIP_CLAIM_SETTLED,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                asyncStitchingComplete
             )
         ),
 
@@ -1285,7 +1290,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                asyncStitchingComplete
             )
         ),
         entry(
@@ -1327,7 +1333,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                asyncStitchingComplete
             )
         ),
         entry(
