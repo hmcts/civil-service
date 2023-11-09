@@ -132,8 +132,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
                 default:
                     return HEARING_OTHER;
             }
-        }
-        else {
+        } else {
             switch (caseData.getHearingNoticeList()) {
                 case SMALL_CLAIMS:
                     return HEARING_SMALL_CLAIMS_AHN;
