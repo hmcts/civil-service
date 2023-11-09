@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
@@ -34,7 +33,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 })
 class UploadTranslatedDocumentDefaultStrategyTest {
 
-    private static final String FILE_NAME = "Some file";
+    private static final String FILE_NAME_1 = "Some file 1";
+    private static final String FILE_NAME_2 = "Some file 2";
 
     @Autowired
     private UploadTranslatedDocumentDefaultStrategy uploadTranslatedDocumentDefaultStrategy;
@@ -45,11 +45,22 @@ class UploadTranslatedDocumentDefaultStrategyTest {
     @Test
     void shouldReturnDocumentListWithTranslatedDocument() {
         //Given
-        TranslatedDocument translatedDocument = TranslatedDocument
+        TranslatedDocument translatedDocument1 = TranslatedDocument
             .builder()
             .documentType(DEFENDANT_RESPONSE)
-            .file(Document.builder().documentFileName(FILE_NAME).build())
+            .file(Document.builder().documentFileName(FILE_NAME_1).build())
             .build();
+        TranslatedDocument translatedDocument2 = TranslatedDocument
+            .builder()
+            .documentType(DEFENDANT_RESPONSE)
+            .file(Document.builder().documentFileName(FILE_NAME_2).build())
+            .build();
+
+        List<Element<TranslatedDocument>> translatedDocument = List.of(
+            element(translatedDocument1),
+            element(translatedDocument2)
+        );
+
         CaseData caseData = CaseDataBuilder
             .builder()
             .atStatePendingClaimIssued()
@@ -57,13 +68,14 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .builder()
             .caseDataLiP(CaseDataLiP
                              .builder()
-                             .translatedDocument(translatedDocument)
+                             .translatedDocuments(translatedDocument)
                              .build())
             .build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
-        List<Element<CaseDocument>> documents = List.of(element(CaseDocument.builder().documentName(FILE_NAME).build()));
-        given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(Document.class), any(
-            DocumentType.class), any(CallbackParams.class))).willReturn(documents);
+        List<Element<CaseDocument>> documents = List.of(
+            element(CaseDocument.builder().documentName(FILE_NAME_1).build()),
+            element(CaseDocument.builder().documentName(FILE_NAME_2).build()));
+        given(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(any(), any(CallbackParams.class))).willReturn(documents);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -73,8 +85,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .extracting("value")
             .extracting("documentName")
             .isNotNull();
-        assertThat(response.getData()).extracting("respondent1ClaimResponseDocumentSpec")
-            .isNotNull();
+
     }
 
     @Test
@@ -90,8 +101,6 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             callbackParams);
         //Then
         assertThat(response.getData()).extracting("systemGeneratedCaseDocuments")
-            .isNull();
-        assertThat(response.getData()).extracting("respondent1ClaimResponseDocumentSpec")
-            .isNull();
+            .isNotNull();
     }
 }

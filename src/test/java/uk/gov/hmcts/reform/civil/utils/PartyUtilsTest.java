@@ -154,8 +154,11 @@ class PartyUtilsTest {
                 .individualFirstName("Jacob")
                 .individualLastName("Martin")
                 .type(Party.Type.INDIVIDUAL).build();
-            LitigationFriend litigationFriend = LitigationFriend.builder().fullName("Mr Litigious Friend").build();
-            assertEquals("Mr Jacob Martin L/F Mr Litigious Friend",
+            LitigationFriend litigationFriend = LitigationFriend.builder()
+                .firstName("Litigious")
+                .lastName("Friend")
+                .build();
+            assertEquals("Mr Jacob Martin L/F Litigious Friend",
                          PartyUtils.getLitigiousPartyName(individual, litigationFriend));
         }
 

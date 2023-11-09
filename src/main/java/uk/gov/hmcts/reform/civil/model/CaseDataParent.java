@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
@@ -140,11 +141,14 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -307,6 +311,8 @@ public class CaseDataParent implements MappableObject {
 
     private CaseDocument sdoOrderDocument;
 
+    private final YesOrNo eaCourtLocation;
+
     // sdo ui flags
     private final YesOrNo setSmallClaimsFlag;
     private final YesOrNo setFastTrackFlag;
@@ -437,6 +443,7 @@ public class CaseDataParent implements MappableObject {
     private final CertificateOfService cosNotifyClaimDefendant1;
     private final CertificateOfService cosNotifyClaimDefendant2;
 
+    private final String notificationText;
     private final List<EvidenceUploadDisclosure> disclosureSelectionEvidence;
     private final List<EvidenceUploadDisclosure> disclosureSelectionEvidenceRes;
     private final List<EvidenceUploadWitness> witnessSelectionEvidence;
@@ -619,6 +626,7 @@ public class CaseDataParent implements MappableObject {
 
     private YesOrNo finalOrderMadeSelection;
     private OrderMade finalOrderDateHeardComplex;
+    private List<FinalOrdersJudgePapers> finalOrderJudgePapers;
     private List<FinalOrderToggle> finalOrderJudgeHeardFrom;
     private FinalOrderRepresentation finalOrderRepresentation;
     private List<FinalOrderToggle> finalOrderRecitals;
@@ -702,6 +710,13 @@ public class CaseDataParent implements MappableObject {
     private List<Element<UnavailableDate>> applicant2UnavailableDatesForTab;
     private List<Element<UnavailableDate>> respondent1UnavailableDatesForTab;
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
+    private String pcqId;
+
+    // TOC
+    private String reasonForTransfer;
+    private DynamicList transferCourtLocationList;
+    private NotSuitableSdoOptions notSuitableSdoOptions;
+    private TocTransferCaseReason tocTransferCaseReason;
 
     @JsonUnwrapped
     private final UpdateDetailsForm updateDetailsForm;
@@ -753,8 +768,10 @@ public class CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public Optional<TranslatedDocument> getTranslatedDocument() {
-        return Optional.ofNullable(getCaseDataLiP()).map(CaseDataLiP::getTranslatedDocument);
+    public List<Element<TranslatedDocument>> getTranslatedDocuments() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getTranslatedDocuments)
+            .orElse(Collections.emptyList());
     }
 
     @JsonIgnore
@@ -762,10 +779,5 @@ public class CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantNotAgreedToFreeMediation).isPresent();
-    }
-
-    @JsonIgnore
-    public boolean isTranslatedDocumentUploaded() {
-        return getCaseDataLiP() != null && getCaseDataLiP().getTranslatedDocument() != null;
     }
 }

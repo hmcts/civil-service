@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +19,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -48,6 +51,8 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -56,6 +61,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.ACKNOWLEDGEMENT_OF_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -64,7 +70,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
     DefaultJudgmentOrderFormGenerator.class,
     StandardDirectionOrderDJ.class,
     JacksonAutoConfiguration.class,
-    AssignCategoryId.class
+    AssignCategoryId.class,
+    LocationHelper.class
 })
 
 public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
@@ -542,6 +549,44 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
+            assertThat(response.getData()).extracting("trialHearingVariationsDirectionsDJToggle").isNotNull();
+        }
+
+        @Test
+        void shouldPopulateLocationListsWithPreselectedCourt() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .atStateClaimIssuedTrialHearing()
+                .build();
+
+            String preSelectedCourt = "214320";
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            List<LocationRefData> locations = List.of(
+                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
+                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
+                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
+                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
+                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
+                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+            );
+
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString())).thenReturn(locations);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            DynamicList expected = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
+                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                           )
+                )
+                .value(DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build())
+                .build();
+
+            assertThat(responseCaseData.getTrialHearingMethodInPersonDJ()).isEqualTo(expected);
+            assertThat(responseCaseData.getDisposalHearingMethodInPersonDJ()).isEqualTo(expected);
         }
 
         @Test
@@ -588,6 +633,20 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventCreateOrderCallback {
         private static final String PAGE_ID = "create-order";
+
+        @Test
+        void shouldThrowErrorWhenEnteringNegativeNumberOfWitness() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atTrialHearingWitnessOfFactWithNegativeInputs()
+                .build()
+                .toBuilder()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
+        }
 
         @Test
         void shouldCreateAndSaveSDOOrder_whenStateClaimIssuedTrialSDOInPersonHearing() {
@@ -677,54 +736,24 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToSubmitCallback {
+
+        @BeforeEach
+        void setup() {
+            given(featureToggleService.isEarlyAdoptersEnabled()).willReturn(true);
+        }
+
         @Test
         void shouldFinishBusinessProcess() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, Object::toString, items.get(0), false);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+                .toBuilder()
+                .disposalHearingMethodInPersonDJ(options)
+                .trialHearingMethodInPersonDJ(options)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("businessProcess").isNotNull();
-        }
-
-        @Test
-        void shouldReturnCaseManagementListFromTrialHearing() {
-            List<DynamicListElement> temporaryLocationList = List.of(
-                DynamicListElement.builder().label("Loc 1").build());
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                .toBuilder().trialHearingMethodInPersonDJ(DynamicList.builder().listItems(temporaryLocationList)
-                                                              .value(DynamicListElement.builder().label("Loc - 1 - 1")
-                                                                         .build()).build()).build();
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
-                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
-                              .epimmsId("123").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("caseManagementLocation").extracting("region")
-                .isEqualTo(locations.get(0).getRegionId());
-            assertThat(response.getData()).extracting("caseManagementLocation").extracting("baseLocation")
-                .isEqualTo(locations.get(0).getEpimmsId());
-        }
-
-        @Test
-        void shouldReturnCaseManagementListFromDisposalHearing() {
-            List<DynamicListElement> temporaryLocationList = List.of(
-                DynamicListElement.builder().label("Loc 1").build());
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                .toBuilder().disposalHearingMethodInPersonDJ(DynamicList.builder().listItems(temporaryLocationList)
-                                                              .value(DynamicListElement.builder().label("Loc - 1 - 1")
-                                                                         .build()).build()).build();
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
-                              .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
-                              .epimmsId("123").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("caseManagementLocation").extracting("region")
-                .isEqualTo(locations.get(0).getRegionId());
-            assertThat(response.getData()).extracting("caseManagementLocation").extracting("baseLocation")
-                .isEqualTo(locations.get(0).getEpimmsId());
         }
 
         @Test
@@ -743,9 +772,13 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                 .build();
             List<Element<CaseDocument>> documentList = new ArrayList<>();
             documentList.add(element(testDocument));
+            List<String> items = List.of("label 1", "label 2", "label 3");
+            DynamicList options = DynamicList.fromList(items, Object::toString, items.get(0), false);
             //Given
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                .trialHearingMethodInPersonDJ(options)
+                .disposalHearingMethodInPersonDJ(options)
                 .orderSDODocumentDJCollection(documentList)
                 .build();
 
@@ -756,6 +789,88 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(updatedData.getOrderSDODocumentDJCollection().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("sdo");
         }
+
+        @ParameterizedTest
+        @CsvSource({"true", "false"})
+        void shouldPopulateEarlyAdoptersFlag_whenDisposalHearingMethodInPersonDJIsSet(Boolean isLocationWhiteListed) {
+            DynamicList options = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                               DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                           )
+                )
+                .value(DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build())
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+                .toBuilder()
+                .disposalHearingMethodInPersonDJ(options)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(
+                isLocationWhiteListed);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+        }
+
+        @Test
+        void shouldNotPopulateEarlyAdoptersFlag_whenEarlyAdoptersToggleIsOff() {
+            DynamicList options = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                               DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                           )
+                )
+                .value(DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build())
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+                .toBuilder()
+                .disposalHearingMethodInPersonDJ(options)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode())))
+                .thenReturn(true);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(responseCaseData.getEaCourtLocation()).isNull();
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldPopulateEarlyAdoptersFlag_whenTrialHearingMethodInPersonDJIsSet(Boolean isLocationWhiteListed) {
+        DynamicList options = DynamicList.builder()
+            .listItems(List.of(
+                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                       )
+            )
+            .value(DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build())
+            .build();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
+            .toBuilder()
+            .trialHearingMethodInPersonDJ(options)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(
+            isLocationWhiteListed);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
     }
 
     @Nested

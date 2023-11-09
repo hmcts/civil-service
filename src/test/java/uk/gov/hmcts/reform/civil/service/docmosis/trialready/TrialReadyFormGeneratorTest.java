@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -37,7 +38,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.TRIAL
     TrialReadyFormGenerator.class,
     JacksonAutoConfiguration.class
 })
-public class TrialReadyFormGeneratorTest {
+class TrialReadyFormGeneratorTest {
 
     private static final String BEARER_TOKEN = "Bearer Token";
     private static final byte[] bytes = {1, 2, 3, 4, 5, 6};
@@ -47,13 +48,10 @@ public class TrialReadyFormGeneratorTest {
         .documentName(fileName_application)
         .documentType(TRIAL_READY_DOCUMENT)
         .build();
-
     @MockBean
     private UnsecuredDocumentManagementService documentManagementService;
-
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
-
     @Autowired
     private TrialReadyFormGenerator generator;
 
@@ -72,7 +70,8 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.YES)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormApplicant");
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormApplicant",
+                                                       CaseRole.APPLICANTSOLICITORONE);
         // Then
         assertThat(caseDocument).isNotNull();
 
@@ -97,7 +96,8 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.YES)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent1");
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent1",
+                                                       CaseRole.RESPONDENTSOLICITORONE);
         // Then
         assertThat(caseDocument).isNotNull();
 
@@ -123,7 +123,8 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.YES)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2");
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2",
+                                                       CaseRole.RESPONDENTSOLICITORTWO);
         // Then
         assertThat(caseDocument).isNotNull();
 
@@ -149,7 +150,8 @@ public class TrialReadyFormGeneratorTest {
                     .revisedHearingRequirements(YesOrNo.NO)
                     .revisedHearingComments("Revised Hearing Comments").build()).build();
         // When
-        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2");
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN, "GenerateTrialReadyFormRespondent2",
+                                                       CaseRole.RESPONDENTSOLICITORTWO);
         // Then
         assertThat(caseDocument).isNotNull();
 
