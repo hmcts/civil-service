@@ -91,6 +91,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -873,11 +874,25 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             }
         }
 
+        dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
+            caseData.getDisposalHearingMethodInPerson()));
+        dataBuilder.fastTrackMethodInPerson(deleteLocationList(
+            caseData.getFastTrackMethodInPerson()));
+        dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
+            caseData.getSmallClaimsMethodInPerson()));
+
         System.out.println("before about to submit");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private DynamicList deleteLocationList(DynamicList list) {
+        if (isNull(list)) {
+            return null;
+        }
+        return DynamicList.builder().value(list.getValue()).build();
     }
 
     private String getEpimmsId(CaseData caseData) {
