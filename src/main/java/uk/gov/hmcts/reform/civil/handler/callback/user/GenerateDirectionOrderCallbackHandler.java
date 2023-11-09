@@ -128,7 +128,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseDataBuilder
             .freeFormRecordedTextArea(null)
             .freeFormOrderedTextArea(null)
-            .orderOnCourtsList(null);
+            .orderOnCourtsList(null)
+            .freeFormHearingNotes(null);
         // Assisted orders
         caseDataBuilder
             .finalOrderMadeSelection(null).finalOrderDateHeardComplex(null)
@@ -178,7 +179,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.finalOrderDocument(finalDocument.getDocumentLink());
+        caseDataBuilder.finalOrderDocument(finalDocument);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -404,8 +405,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
-            caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        CaseDocument finalDocument = caseData.getFinalOrderDocument();
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
@@ -426,12 +426,22 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             state = CASE_PROGRESSION;
         }
 
-        if (caseData.getFinalOrderFurtherHearingComplex() != null
-            && caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText() != null) {
-            caseDataBuilder.hearingNotes(HearingNotes.builder()
-                                             .date(LocalDate.now())
-                                             .notes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText())
-                                             .build());
+        // populate hearing notes in listing tab with hearing notes from either assisted or freeform order, if either exist.
+        if (caseData.getFinalOrderSelection().equals(ASSISTED_ORDER)) {
+            if (caseData.getFinalOrderFurtherHearingComplex() != null
+                && caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText() != null) {
+                caseDataBuilder.hearingNotes(HearingNotes.builder()
+                                                 .date(LocalDate.now())
+                                                 .notes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText())
+                                                 .build());
+            }
+        } else {
+            if (nonNull(caseData.getFreeFormHearingNotes())) {
+                caseDataBuilder.hearingNotes(HearingNotes.builder()
+                                                 .date(LocalDate.now())
+                                                 .notes(caseData.getFreeFormHearingNotes())
+                                                 .build());
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
