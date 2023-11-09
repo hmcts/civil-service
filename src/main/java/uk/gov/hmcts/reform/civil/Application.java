@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil;
 import org.camunda.bpm.extension.rest.EnableCamundaRestClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
@@ -17,6 +18,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
     "uk.gov.hmcts.reform.civil.crd",
     "uk.gov.hmcts.reform.hmc"
 })
+
+@EnableCaching
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application {
 
