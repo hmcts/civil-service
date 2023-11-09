@@ -28,8 +28,6 @@ java:
     MANAGE_CASE_UI_BASE_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
     ACA_SERVICE_API_BASEURL: http://aac-manage-case-assignment-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SPRING_SECURITY_ENABLED: true
-    CMC_DB_USERNAME: 'cmc@cmc-db-v11-{{ .Values.global.environment }}'
-    CMC_DB_HOST: cmc-db-v11-{{ .Values.global.environment }}.postgres.database.azure.com
     CMC_DB_CONNECTION_OPTIONS: '?sslmode=require&gssEncMode=disable'
     CMC_DB_NAME: cmc
     CMC_DB_PORT: 5432
@@ -79,6 +77,9 @@ java:
     civil:
       resourceGroup: civil
       secrets:
+        - cmc-db-password-v15
+        - cmc-db-username-v15
+        - cmc-db-host-v15
         - civil-idam-client-secret
         - microservicekey-civil-service
         - system-update-user-username
@@ -89,7 +90,6 @@ java:
         - prd-admin-user-password
         - appinsights-connection-string
         - docmosis-api-key
-        - cmc-db-password-v11
         - gov-notify-api-key
         - sendgrid-api-key
         - robotics-notification-sender
