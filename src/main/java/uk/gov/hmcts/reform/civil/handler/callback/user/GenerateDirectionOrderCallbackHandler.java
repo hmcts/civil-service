@@ -376,6 +376,14 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                          .map(DatesFinalOrders::getDatesToAvoidDates).orElse(null),
                      "Further hearing", NOT_ALLOWED_DATE_PAST, errors, true);
 
+        if (nonNull(caseData.getFinalOrderFurtherHearingComplex())) {
+            if (nonNull(caseData.getFinalOrderFurtherHearingComplex().getDateToDate())
+                    && caseData.getFinalOrderFurtherHearingComplex().getDateToDate()
+                    .isBefore(caseData.getFinalOrderFurtherHearingComplex().getListFromDate())) {
+                errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Further hearing"));
+            }
+        }
+
         validateDate(Optional.ofNullable(caseData.getAssistedOrderMakeAnOrderForCosts())
                          .map(AssistedOrderCostDetails::getAssistedOrderCostsFirstDropdownDate).orElse(null),
                      "Make an order for detailed/summary costs", NOT_ALLOWED_DATE_PAST, errors, true);
