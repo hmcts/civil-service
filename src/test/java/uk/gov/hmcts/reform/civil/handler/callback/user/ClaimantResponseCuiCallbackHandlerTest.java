@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
+import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
 import java.util.ArrayList;
@@ -40,10 +42,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     ClaimantResponseCuiCallbackHandler.class,
+    JacksonAutoConfiguration.class,
+    ResponseOneVOneShowTagService.class,
     JacksonAutoConfiguration.class,
     CourtLocationUtils.class,
     LocationRefDataService.class,
@@ -64,6 +70,9 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
+
+    @MockBean
+    private ResponseOneVOneShowTagService responseOneVOneShowTagService;
 
     @Nested
     class AboutToStartCallback {
@@ -179,6 +188,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
             assertThat(response.getState()).isEqualTo(CaseState.IN_MEDIATION.name());
         }
 
@@ -194,6 +204,40 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
                     .courtLocationCode("court3").build()
             ));
+        }
+
+        @Test
+        void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsCompany_toAllFinalOrdersIssued() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+                .respondent1(Party.builder()
+                                   .type(COMPANY)
+                                   .companyName("Test Inc")
+                                   .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+        }
+
+        @Test
+        void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsOrganisation_toAllFinalOrdersIssued() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+                .respondent1(Party.builder()
+                                 .type(ORGANISATION)
+                                 .companyName("Test Inc")
+                                 .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
     }
 
