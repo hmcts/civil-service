@@ -233,7 +233,8 @@ public class InitiateGeneralApplicationServiceHelper {
 
     public boolean isGAApplicantSameAsParentCaseClaimant(CaseData caseData, String authToken) {
         String parentCaseId = caseData.getCcdCaseReference().toString();
-        List<String> userRolesCaching = userRoleCaching.getUserRoles(authToken, parentCaseId);
+        String keyToken = userRoleCaching.getCacheKeyToken(authToken);
+        List<String> userRolesCaching = userRoleCaching.getUserRoles(authToken, parentCaseId, keyToken);
 
         boolean isApplicantSolicitor = UserRoleUtils.isApplicantSolicitor(userRolesCaching);
 
