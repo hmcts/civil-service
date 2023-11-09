@@ -22,27 +22,25 @@ import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 
 @Service
 public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
 
-    public EvidenceUploadApplicantHandler(UserService userService, CoreCaseUserService coreCaseUserService,
-                                          CaseDetailsConverter caseDetailsConverter,
+    public EvidenceUploadApplicantHandler(CaseDetailsConverter caseDetailsConverter,
                                           CoreCaseDataService coreCaseDataService,
+                                          UserRoleCaching userRoleCaching,
                                           ObjectMapper objectMapper, Time time) {
-        super(userService, coreCaseUserService, caseDetailsConverter, coreCaseDataService,
+        super(caseDetailsConverter, coreCaseDataService, userRoleCaching,
                 objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_APPLICANT),
               "validateValuesApplicant", "createShowCondition");
     }
 
     @Override
-    CallbackResponse createShowCondition(CaseData caseData, UserInfo userInfo) {
+    CallbackResponse createShowCondition(CaseData caseData, List<String> userRoles) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         //For case which are 1v1, 2v1  we show respondent fields for documents to be uploaded,
         //if a case is 1v2 and different solicitors we want to show separate fields for each respondent solicitor i.e.
