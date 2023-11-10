@@ -71,13 +71,17 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
         );
     }
 
+    private String addTemplate(CaseData caseData) {
+        return Objects.isNull(caseData.getHelpWithFeesReferenceNumber())
+            ? notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate()
+            : notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate();
+    }
+
     private void generateEmail(CaseData caseData) {
         if (Objects.nonNull(caseData.getApplicant1Email())) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                Objects.isNull(caseData.getHelpWithFeesReferenceNumber())
-                    ? notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate()
-                    : notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate(),
+                addTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
