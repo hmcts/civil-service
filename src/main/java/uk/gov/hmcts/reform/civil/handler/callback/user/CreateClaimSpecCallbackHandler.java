@@ -22,6 +22,8 @@ import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsDataLoader;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsID;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
@@ -70,6 +72,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -184,6 +187,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final ToggleConfiguration toggleConfiguration;
     private final LocationRefDataService locationRefDataService;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private final AirlineEpimsDataLoader airlineEpimsDataLoader;
     private static final String ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST = "Scheduled date of flight must be today or in the past";
 
     @Value("${court-location.specified-claim.region-id}")
@@ -939,14 +943,14 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse getAirlineList(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        DynamicList airlineList = DynamicList.builder()
-            .value(DynamicListElement.builder().build())
-            .listItems(List.of(
-                DynamicListElement.builder().code("BA/CITYFLYER").label("BA/Cityflyer").build(),
-                DynamicListElement.builder().code("AIR_INDIA").label("Air India").build(),
-                DynamicListElement.builder().code("GULF_AIR").label("Gulf Air").build(),
-                DynamicListElement.builder().code("OTHER").label("OTHER").build())).build();
-        FlightDelay flightDelay = FlightDelay.builder().flightDetailsAirlineList(airlineList).build();
+        List<AirlineEpimsID> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
+        AirlineEpimsID otherAirlineEpimsID = new AirlineEpimsID("OTHER",null);
+        airlineEpimsIDList.add(otherAirlineEpimsID);
+        DynamicList airlineList = DynamicList.fromList(airlineEpimsIDList.stream().map(AirlineEpimsID::getAirline).toList());
+        DynamicList dropdownAirlineList = DynamicList.builder()
+            .listItems(airlineList.getListItems()).build();
+
+        FlightDelay flightDelay = FlightDelay.builder().flightDetailsAirlineList(dropdownAirlineList).build();
         caseDataBuilder.flightDelay(flightDelay);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -1023,10 +1027,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             case "BA/CITYFLYER" -> "111";
             case "AIR_INDIA" -> "222";
             case "GULF_AIR" -> "333";
-            case "OTHER" -> "111";
             default -> throw new CallbackException(String.format(AIRLINE_NOT_FOUND_MESSAGE, airline));
         };
-
+        if (airline.equals("OTHER")) {
+            return null;
+        }
         List<LocationRefData> locations = fetchLocationData(callbackParams);
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList();
         return !matchedLocations.isEmpty() ? matchedLocations.get(0) : null;
