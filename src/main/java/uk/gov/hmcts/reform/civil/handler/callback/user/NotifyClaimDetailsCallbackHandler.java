@@ -139,6 +139,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             updatedCaseData = caseData.toBuilder()
                     .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
                     .claimDetailsNotificationDate(currentDateTime)
+                    .addLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
+                    .addLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
                     .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
                     .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
                     .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
@@ -164,12 +166,14 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
             if (Objects.nonNull(caseData.getRespondent1())) {
                 builder.respondent1ResponseDeadline(
-                        deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
+                        deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
+                    .addLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
             }
             if (Objects.nonNull(caseData.getRespondent2())
                 && YES.equals(caseData.getAddRespondent2())) {
                 builder.respondent2ResponseDeadline(
-                        deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
+                        deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
+                    .addLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
             }
             if (featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
                 if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
