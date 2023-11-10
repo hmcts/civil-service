@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadExpert;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadTrial;
@@ -52,7 +53,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +62,6 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -105,60 +105,94 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
 
+    @MockBean
+    private UserRoleCaching userRoleCaching;
+
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
 
     private final UploadEvidenceExpert uploadEvidenceDate = new UploadEvidenceExpert();
     private final UploadEvidenceWitness uploadEvidenceDate2 = new UploadEvidenceWitness();
     private final UploadEvidenceDocumentType uploadEvidenceDate3 = new UploadEvidenceDocumentType();
-
+    private static final String NotificationWhenBothDefendant = "\n"
+        + "Both defendants - Disclosure list\n"
+        + "Both defendants - Documents for disclosure\n"
+        + "Both defendants - Documents referred to in the statement\n"
+        + "Both defendants - Expert's report\n"
+        + "Both defendants - Joint Statement of Experts / Single Joint Expert Report\n"
+        + "Both defendants - Questions for other party's expert or joint experts\n"
+        + "Both defendants - Answer to questions asked\n"
+        + "Both defendants - Case Summary\n"
+        + "Both defendants - Skeleton argument\n"
+        + "Both defendants - Authorities\n"
+        + "Both defendants - Costs\n"
+        + "Both defendants - Documentary evidence for trial";
+    private static final String NotificationWhenDefendantTwo = "\n"
+        + "Defendant 2 - Disclosure list\n"
+        + "Defendant 2 - Documents for disclosure\n"
+        + "Defendant 2 - Documents referred to in the statement\n"
+        + "Defendant 2 - Expert's report\n"
+        + "Defendant 2 - Joint Statement of Experts / Single Joint Expert Report\n"
+        + "Defendant 2 - Questions for other party's expert or joint experts\n"
+        + "Defendant 2 - Answer to questions asked\n"
+        + "Defendant 2 - Case Summary\n"
+        + "Defendant 2 - Skeleton argument\n"
+        + "Defendant 2 - Authorities\n"
+        + "Defendant 2 - Costs\n"
+        + "Defendant 2 - Documentary evidence for trial";
     private static final String PAGE_ID = "validateValuesRespondent";
 
     @BeforeEach
     void setup() {
         given(time.now()).willReturn(LocalDateTime.now());
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(RESPONDENTSOLICITORONE.getFormattedName()));
+        given(userRoleCaching.getCacheKeyToken(anyString())).willReturn("1234");
     }
 
     @Test
     void givenAboutToStart_assignCaseProgAllocatedTrackUnSpec() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .notificationText("NULLED")
             .claimType(ClaimType.CLINICAL_NEGLIGENCE)
             .claimValue(ClaimValue.builder()
                             .statementOfValueInPennies(BigDecimal.valueOf(5000))
                             .build())
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), any())).willReturn(false);
+
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
         // Then
         assertThat(response.getData()).extracting("caseProgAllocatedTrack").isEqualTo("SMALL_CLAIM");
+        assertThat(response.getData()).extracting("notificationText").isNull();
     }
 
     @Test
     void givenAboutToStart_assignCaseProgAllocatedTrackSpec() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .notificationText(null)
             .claimType(null)
             .totalClaimAmount(BigDecimal.valueOf(12500))
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), any())).willReturn(false);
+
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
             .handle(params);
         // Then
         assertThat(response.getData()).extracting("caseProgAllocatedTrack").isEqualTo("FAST_CLAIM");
+        assertThat(response.getData()).extracting("notificationText").isNull();
     }
 
     @Test
     void givenAboutToStart_1v2SameSolicitor_shouldShowOptions() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .notificationText("existing notification")
                 .claimType(null)
                 .totalClaimAmount(BigDecimal.valueOf(12500))
                 .addRespondent2(YES)
@@ -172,6 +206,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
         // Then
         assertThat(response.getData()).extracting("evidenceUploadOptions").isNotNull();
+        assertThat(response.getData()).extracting("notificationText").isEqualTo("existing notification");
     }
 
     @ParameterizedTest
@@ -207,8 +242,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(RESPONDENTSOLICITORTWO.getFormattedName()));
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -226,8 +261,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .respondent2(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(NO)
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(RESPONDENTSOLICITORTWO.getFormattedName()));
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -241,8 +276,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
         // When
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -302,8 +336,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldSetWitnessFlag_whenWitnessOptionsAreSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -317,8 +350,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotSetWitnessFlag_whenWitnessOptionsAreNotSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -332,8 +364,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldSetExpertFlag_whenExpertOptionsAreSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -346,8 +377,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotSetExpertFlag_whenExpertOptionsAreNotSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -360,8 +390,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldSetTrialFlag_whenTrialOptionsAreSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -375,8 +404,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotSetTrialFlag_whenTrialOptionsAreNotSelected(CaseData caseData) {
         // Given
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
+
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // Then
@@ -978,9 +1006,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -997,7 +1022,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
         var documentUpload = UploadEvidenceDocumentType.builder()
-                .documentIssuedDate(LocalDate.of(2023, 2, 10))
+                .documentIssuedDate(LocalDate.of(2022, 2, 10))
+                .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
                 .documentUpload(testDocument).build();
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
         documentList.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
@@ -1006,8 +1032,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .documentForDisclosureRes2(documentList)
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(RESPONDENTSOLICITORTWO.getFormattedName()));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // When
@@ -1023,7 +1049,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
         var documentUpload = UploadEvidenceDocumentType.builder()
-                .documentIssuedDate(LocalDate.of(2023, 2, 10))
+                .documentIssuedDate(LocalDate.of(2022, 2, 10))
+                .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
                 .documentUpload(testDocument).build();
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
         documentList.add(Element.<UploadEvidenceDocumentType>builder().value(documentUpload).build());
@@ -1032,8 +1059,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(YES)
             .documentForDisclosureRes2(documentList)
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(RESPONDENTSOLICITORTWO.getFormattedName()));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // When
@@ -1048,7 +1075,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
-        var documentUpload = UploadEvidenceExpert.builder().expertDocument(testDocument).build();
+        var documentUpload = UploadEvidenceExpert.builder()
+            .expertDocument(testDocument)
+            .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
+            .build();
         List<Element<UploadEvidenceExpert>> documentList = new ArrayList<>();
         documentList.add(Element.<UploadEvidenceExpert>builder().value(documentUpload).build());
         // Given
@@ -1056,9 +1086,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .documentAnswersRes(documentList)
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
+
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // When
@@ -1073,7 +1101,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         Document testDocument = new Document("testurl",
                                              "testBinUrl", "A Fancy Name",
                                              "hash", null);
-        var documentUpload = UploadEvidenceExpert.builder().expertDocument(testDocument).build();
+        var documentUpload = UploadEvidenceExpert.builder()
+            .expertDocument(testDocument)
+            .createdDatetime(LocalDateTime.of(2022, 05, 10, 12, 13, 12))
+            .build();
         List<Element<UploadEvidenceExpert>> documentList = new ArrayList<>();
         documentList.add(Element.<UploadEvidenceExpert>builder().value(documentUpload).build());
         // Given
@@ -1081,9 +1112,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .documentQuestionsRes(documentList)
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
+
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // When
@@ -1099,8 +1128,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(YES)
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName()));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // When
@@ -1115,9 +1144,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
             .build();
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
+
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         // When
@@ -1177,9 +1204,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 10, 12, 12, 12))).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
 
         // When handle is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1198,9 +1222,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .caseBundles(prepareCaseBundles(LocalDateTime.of(2022, 05, 15, 12, 12, 12))).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
 
         // When handle is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1229,9 +1250,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .caseBundles(caseBundles)
             .build();
 
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         // When: handler is called
@@ -1257,9 +1275,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             .caseBundles(caseBundles)
             .build();
 
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         // When: handler is called
@@ -1273,7 +1288,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @CsvSource({"0", "2"})
     void should_do_naming_convention_resp1(String selected) {
         LocalDateTime createdDate = LocalDateTime.of(2022, 05, 10, 12, 13, 12);
-
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         String witnessName = "ResOneWitness";
         List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_DEF1,
@@ -1309,10 +1323,6 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
         given(coreCaseDataService.getCase(anyLong())).willReturn(CaseDetails.builder().build());
         given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
@@ -1414,6 +1424,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                     .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
             assertThat(updatedData.getDocumentCostsRes2().get(0).getValue()
                     .getDocumentUpload().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_ANY_PRECEDENT_H);
+            assertThat(updatedData.getNotificationText()).contains(NotificationWhenBothDefendant);
         }
     }
 
@@ -1444,10 +1455,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                 .documentCostsRes2(createEvidenceDocs(null, null))
                 .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
-        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(RESPONDENTSOLICITORTWO.getFormattedName()));
 
         // When handle is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1484,6 +1493,57 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
         assertThat(updatedData.getDocumentCostsRes2().get(0).getValue()
                 .getDocumentUpload().getDocumentFileName()).isEqualTo(TEST_FILE_NAME);
+        assertThat(updatedData.getNotificationText()).isEqualTo(NotificationWhenDefendantTwo);
+    }
+
+    @Test
+    void shouldNotAddSameNotificationIfAlreadyAdded_notificationText() {
+        // If we populate notification string with an entry, we do not want to duplicate that on further uploads of same type.
+        List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_DEF1,
+                                       EvidenceUploadHandlerBase.OPTION_DEF2,
+                                       EvidenceUploadHandlerBase.OPTION_DEF_BOTH);
+        LocalDate witnessDate = LocalDate.of(2023, 2, 10);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .notificationText("Documentation that has been uploaded: \n\n Defendant 1 - Joint Statement of Experts / Single Joint Expert Report \n")
+            .applicant1(PartyBuilder.builder().individual().build())
+            .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(0), false))
+            .documentJointStatementRes(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(RESPONDENTSOLICITORONE.getFormattedName()));
+        given(coreCaseDataService.getCase(anyLong())).willReturn(CaseDetails.builder().build());
+        // When handle is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then Notificcation should not have a duplicate entry
+        assertThat(updatedData.getNotificationText())
+            .isEqualTo("Documentation that has been uploaded: \n\n Defendant 1 - Joint Statement of Experts / Single Joint Expert Report \n");
+    }
+
+    @Test
+    void shouldNotPopulateNotificationWithOldDocument_whenNewDocumentUploadAdded() {
+        // When evidence upload is retriggered we do not send a notification for old content i.e uploaded before midnight of current day
+        List<String> options = List.of(EvidenceUploadHandlerBase.OPTION_DEF1,
+                                       EvidenceUploadHandlerBase.OPTION_DEF2,
+                                       EvidenceUploadHandlerBase.OPTION_DEF_BOTH);
+        LocalDate witnessDate = LocalDate.of(2023, 2, 10);
+        String witnessName = "Witness";
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .notificationText(null)
+            .evidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(0), false))
+            .documentWitnessStatementRes(createWitnessDocs(witnessName, LocalDateTime.now().minusDays(2), witnessDate))
+            .documentWitnessSummaryRes(createWitnessDocs(witnessName, LocalDateTime.now(), witnessDate))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        given(userRoleCaching.getUserRoles(anyString(), anyString(), anyString()))
+            .willReturn(List.of(RESPONDENTSOLICITORONE.getFormattedName()));
+        given(coreCaseDataService.getCase(anyLong())).willReturn(CaseDetails.builder().build());
+        // When handle is called
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then Notification should not have old entry (witness statement)
+        assertThat(updatedData.getNotificationText()).isEqualTo("\nDefendant 1 - Witness summary");
     }
 
     @Test

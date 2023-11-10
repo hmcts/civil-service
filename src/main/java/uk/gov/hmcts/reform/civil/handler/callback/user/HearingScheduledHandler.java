@@ -131,6 +131,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
                 .append(" - ").append(location.getCourtAddress())
                 .append(" - ").append(location.getPostcode()).toString())
+                            .sorted()
                             .collect(Collectors.toList()));
     }
 
@@ -144,7 +145,6 @@ public class HearingScheduledHandler extends CallbackHandler {
                                     "The Date must be in the past");
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
