@@ -568,8 +568,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         if (caseData.getRespondent1ResponseDate() != null) {
-            LocalDate extendedResponseDate = caseData.getRespondent1ResponseDate().toLocalDate().plusDays(5);
-            return deadlineCalculatorService.calculateExtendedDeadline(extendedResponseDate).format(DateTimeFormatter.ofPattern(
+            return deadlineCalculatorService.calculateExtendedDeadline(caseData.getRespondent1ResponseDate().toLocalDate(), 5).format(DateTimeFormatter.ofPattern(
                 datePattern,
                 Locale.ENGLISH
             ));

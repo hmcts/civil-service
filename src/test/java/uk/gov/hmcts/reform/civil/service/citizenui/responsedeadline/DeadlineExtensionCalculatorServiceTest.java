@@ -30,7 +30,7 @@ public class DeadlineExtensionCalculatorServiceTest {
         LocalDate proposedExtensionDeadline = LocalDate.now();
 
         LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(
-            proposedExtensionDeadline);
+            proposedExtensionDeadline, 1);
 
         assertThat(calculatedDeadline).isEqualTo(proposedExtensionDeadline);
         verify(workingDayIndicator).isWorkingDay(proposedExtensionDeadline);
@@ -45,7 +45,7 @@ public class DeadlineExtensionCalculatorServiceTest {
         LocalDate proposedExtensionDeadline = LocalDate.of(2022, 6, 3);
 
         LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(
-            proposedExtensionDeadline);
+            proposedExtensionDeadline, 1);
 
         assertThat(calculatedDeadline).isEqualTo(calculatedNextWorkingDay);
         verify(workingDayIndicator).isWorkingDay(proposedExtensionDeadline);

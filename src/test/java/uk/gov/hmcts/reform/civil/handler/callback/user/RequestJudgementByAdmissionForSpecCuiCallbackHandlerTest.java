@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,7 +87,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .build();
             given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate proposedExtensionDeadline = LocalDate.now();
-            given(deadlineCalculatorService.calculateExtendedDeadline(any())).willReturn(proposedExtensionDeadline);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(proposedExtensionDeadline);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);

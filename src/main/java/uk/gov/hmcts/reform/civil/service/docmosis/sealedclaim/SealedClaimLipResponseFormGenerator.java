@@ -67,7 +67,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
     private SealedClaimLipResponseForm addPayByDatePayImmediately(CaseData caseData, SealedClaimLipResponseForm templateData) {
         if (caseData.isPayImmediately()) {
             LocalDate extendedDate = LocalDate.now().plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
-            LocalDate payDeadlineDate = deadlineCalculatorService.calculateExtendedDeadline(extendedDate);
+            LocalDate payDeadlineDate = deadlineCalculatorService.calculateExtendedDeadline(extendedDate, 5);
             ResponseRepaymentDetailsForm responseRepaymentDetailsForm = templateData.getCommonDetails().toBuilder().payBy(
                 payDeadlineDate).build();
             SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder templateFormData = templateData.toBuilder();

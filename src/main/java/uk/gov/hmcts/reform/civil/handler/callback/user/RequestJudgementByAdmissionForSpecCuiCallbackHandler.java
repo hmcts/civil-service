@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -63,12 +64,12 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
 
+        final WorkingDayIndicator workingDayIndicator = null;
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (caseData.isJudgementDateNotPermitted()) {
-            LocalDate extendedResponseDate = caseData.getRespondent1ResponseDate().toLocalDate().plusDays(5);
-            LocalDate extendedRespondent1ResponseDate = deadlineCalculatorService.calculateExtendedDeadline(extendedResponseDate);
+            LocalDate extendedRespondent1ResponseDate = deadlineCalculatorService.calculateExtendedDeadline(caseData.getRespondent1ResponseDate().toLocalDate(), 5);
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(extendedRespondent1ResponseDate)));
         }
 

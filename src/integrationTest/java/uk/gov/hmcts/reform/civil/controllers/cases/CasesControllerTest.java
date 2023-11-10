@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -228,7 +229,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldCalculateDeadlineSuccessfully() {
         LocalDate extensionDate = LocalDate.of(2022, 6, 6);
-        when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any())).thenReturn(extensionDate);
+        when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).thenReturn(extensionDate);
         doPost(
             BEARER_TOKEN,
             extensionDate,
