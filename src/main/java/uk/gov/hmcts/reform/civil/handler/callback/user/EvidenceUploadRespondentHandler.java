@@ -20,19 +20,21 @@ import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 
 @Service
 public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
 
-    public EvidenceUploadRespondentHandler(CaseDetailsConverter caseDetailsConverter,
+    public EvidenceUploadRespondentHandler(UserService userService, CoreCaseUserService coreCaseUserService,
+                                           CaseDetailsConverter caseDetailsConverter,
                                            CoreCaseDataService coreCaseDataService,
-                                           UserRoleCaching userRoleCaching,
                                            ObjectMapper objectMapper, Time time) {
-        super(caseDetailsConverter, coreCaseDataService, userRoleCaching,
+        super(userService, coreCaseUserService, caseDetailsConverter, coreCaseDataService,
                 objectMapper, time, Collections.singletonList(EVIDENCE_UPLOAD_RESPONDENT),
               "validateValuesRespondent", "createShowCondition");
     }
@@ -64,9 +66,9 @@ public class EvidenceUploadRespondentHandler extends EvidenceUploadHandlerBase {
     }
 
     @Override
-    CallbackResponse createShowCondition(CaseData caseData, List<String> userRoles) {
+    CallbackResponse createShowCondition(CaseData caseData, UserInfo userInfo) {
 
-        return showCondition(caseData, userRoles, caseData.getWitnessSelectionEvidenceRes(),
+        return showCondition(caseData, userInfo, caseData.getWitnessSelectionEvidenceRes(),
                              caseData.getWitnessSelectionEvidenceSmallClaimRes(),
                              caseData.getWitnessSelectionEvidenceRes(),
                              caseData.getWitnessSelectionEvidenceSmallClaimRes(),
