@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 
 import com.google.common.collect.Lists;
 import lombok.SneakyThrows;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -229,10 +230,14 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldCalculateDeadlineSuccessfully() {
         LocalDate extensionDate = LocalDate.of(2022, 6, 6);
+        System.out.println("Ex :"+extensionDate);
         when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).thenReturn(extensionDate);
+        String jsonString = "{\"extendedDeadline\":\"2022-06-06\", \"plusDays\":5}";
+        JSONObject json = new JSONObject(jsonString);
+        System.out.println("Ex :"+json);
         doPost(
             BEARER_TOKEN,
-            extensionDate,
+            json,
             CALCULATE_DEADLINE_URL
         )
             .andExpect(content().json(toJson(extensionDate)))

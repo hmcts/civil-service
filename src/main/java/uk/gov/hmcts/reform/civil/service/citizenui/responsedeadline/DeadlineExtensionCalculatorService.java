@@ -22,7 +22,7 @@ public class DeadlineExtensionCalculatorService {
 
     public LocalDate calculateWorkingDays(LocalDate responseDate, int plusDays) {
         if (plusDays <= 0) {
-            return responseDate;
+            return workingDayIndicator.getNextWorkingDay(responseDate);
         }
         if (workingDayIndicator.isWorkingDay(responseDate)) {
             workingDaysCounter++;
