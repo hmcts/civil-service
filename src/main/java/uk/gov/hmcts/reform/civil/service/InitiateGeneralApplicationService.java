@@ -381,7 +381,7 @@ public class InitiateGeneralApplicationService {
     public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken) {
         List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(authToken, baseLocation);
         if (locationDetails != null && !locationDetails.isEmpty()) {
-            return (LocationRefData)locationDetails.get(0);
+            return locationDetails.get(0);
         } else {
             return LocationRefData.builder().build();
         }
