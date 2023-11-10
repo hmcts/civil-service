@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.HEARING_FORM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -55,11 +57,12 @@ public class HearingFormGeneratorTest {
 
     @MockBean
     private UnsecuredDocumentManagementService documentManagementService;
-
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
     @MockBean
     private AssignCategoryId assignCategoryId;
+    @MockBean
+    FeatureToggleService featureToggleService;
     @Autowired
     private HearingFormGenerator generator;
 
@@ -71,6 +74,37 @@ public class HearingFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
+
+        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .totalClaimAmount(new BigDecimal(2000))
+            .build().toBuilder()
+            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build())
+                                 .build())
+            .hearingTimeHourMinute("0800")
+            .channel(HearingChannel.IN_PERSON)
+            .hearingDuration(HearingDuration.DAY_1)
+            .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION).build();
+        List<CaseDocument> caseDocuments = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocuments.size()).isEqualTo(1);
+
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM));
+    }
+
+    @Test
+    void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided_AHN() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_APPLICATION_AHN)))
+            .thenReturn(new DocmosisDocument(HEARING_APPLICATION_AHN.getDocumentTitle(), bytes));
+
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
+            .thenReturn(CASE_DOCUMENT);
+
+        when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.LISTING)
