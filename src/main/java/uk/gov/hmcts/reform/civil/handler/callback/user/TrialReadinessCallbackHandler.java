@@ -13,7 +13,9 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -64,7 +66,8 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         + "you will need to make an application to the court and pay the appropriate fee.";
     private final ObjectMapper objectMapper;
 
-    private final UserRoleCaching userRoleCaching;
+    private final UserService userService;
+    private final CoreCaseUserService coreCaseUserService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -78,11 +81,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     private CallbackResponse populateValues(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-
-        String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
-        String keyToken = userRoleCaching.getCacheKeyToken(bearerToken);
-        List<String> userRoles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef, keyToken);
+        List<String> userRoles = getUserRoles(callbackParams);
 
         var isApplicant = YesOrNo.NO;
         var isRespondent1 = YesOrNo.NO;
@@ -121,19 +120,15 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
     private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+        List<String> userRoles = getUserRoles(callbackParams);
 
-        String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
-        String keyToken = userRoleCaching.getCacheKeyToken(bearerToken);
-        List<String> roles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef, keyToken);
-
-        if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
+        if (isApplicantSolicitor(userRoles) || isLIPClaimant(userRoles)) {
             if (caseData.getTrialReadyApplicant() == YesOrNo.YES) {
                 updatedData.businessProcess(BusinessProcess.ready(APPLICANT_TRIAL_READY_NOTIFY_OTHERS));
             } else {
                 updatedData.businessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_APPLICANT));
             }
-        } else if (isRespondentSolicitorOne(roles) || isLIPDefendant(roles)) {
+        } else if (isRespondentSolicitorOne(userRoles) || isLIPDefendant(userRoles)) {
             if (caseData.getTrialReadyRespondent1() == YesOrNo.YES) {
                 updatedData.businessProcess(BusinessProcess.ready(RESPONDENT1_TRIAL_READY_NOTIFY_OTHERS));
             } else {
@@ -146,26 +141,23 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
                 updatedData.businessProcess(BusinessProcess.ready(GENERATE_TRIAL_READY_DOCUMENT_RESPONDENT2));
             }
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        List<String> userRoles = getUserRoles(callbackParams);
 
         return SubmittedCallbackResponse.builder()
-            .confirmationHeader(checkUserReady(callbackParams).equals(YesOrNo.YES) ? READY_HEADER : NOT_READY_HEADER)
-            .confirmationBody(checkUserReady(callbackParams).equals(YesOrNo.YES) ? READY_BODY : NOT_READY_BODY)
+            .confirmationHeader(checkUserReady(callbackParams, userRoles).equals(YesOrNo.YES) ? READY_HEADER : NOT_READY_HEADER)
+            .confirmationBody(checkUserReady(callbackParams, userRoles).equals(YesOrNo.YES) ? READY_BODY : NOT_READY_BODY)
             .build();
     }
 
-    private YesOrNo checkUserReady(CallbackParams callbackParams) {
+    private YesOrNo checkUserReady(CallbackParams callbackParams, List<String> userRoles) {
         var caseData = callbackParams.getCaseData();
-
-        String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
-        String keyToken = userRoleCaching.getCacheKeyToken(bearerToken);
-        List<String> userRoles = userRoleCaching.getUserRoles(bearerToken, ccdCaseRef, keyToken);
 
         if (isApplicantSolicitor(userRoles) || isLIPClaimant(userRoles)) {
             return caseData.getTrialReadyApplicant();
@@ -174,6 +166,13 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
         } else {
             return caseData.getTrialReadyRespondent2();
         }
+    }
+
+    private List<String> getUserRoles(CallbackParams callbackParams) {
+        String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String ccdCaseRef = callbackParams.getCaseData().getCcdCaseReference().toString();
+        UserInfo userInfo = userService.getUserInfo(bearerToken);
+        return coreCaseUserService.getUserCaseRoles(ccdCaseRef, userInfo.getUid());
     }
 
     @Override
