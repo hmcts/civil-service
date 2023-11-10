@@ -17,8 +17,10 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataException;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
@@ -29,6 +31,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -54,6 +57,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private final IdamClient idamClient;
     private final LocationRefDataService locationRefDataService;
     private final DocumentHearingLocationHelper locationHelper;
+    private final FeatureToggleService featureToggleService;
 
     private static final String NOTICE_RECIEVED_CAN_PROCEED = "received notice of the trial and determined that it was reasonable to proceed in their absence.";
     private static final String NOTICE_RECIEVED_CANNOT_PROCEED =     "received notice of the trial, the Judge was not satisfied that it was "
@@ -123,7 +127,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
             .judgeNameTitle(userDetails.getFullName())
             .courtName(locationRefData.getVenueName())
-            .courtLocation(LocationRefDataService.getDisplayEntry(locationRefData));
+            .courtLocation(featureToggleService.isHmcEnabled()
+                               ? getHearingLocationText(caseData, authorisation)
+                               : LocationRefDataService.getDisplayEntry(locationRefData));
         return freeFormOrderBuilder.build();
     }
 
@@ -602,5 +608,27 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         }
         return "";
     }
-}
 
+    private String getCaseManagementLocationText(CaseData caseData, String authorisation) {
+        String locationEpimms = caseData.getCaseManagementLocation().getBaseLocation();
+        List<LocationRefData> matchingLocations = locationRefDataService.getCourtLocationsByEpimmsId(
+            authorisation, caseData.getCaseManagementLocation().getBaseLocation());
+
+        if (matchingLocations.size() != 1) {
+            throw new LocationRefDataException(
+                String.format(
+                    "Unexpected amount of locations (%d) where matched against location epimms id: %s",
+                    matchingLocations.size(),
+                    locationEpimms
+                ));
+        }
+
+        return LocationRefDataService.getDisplayEntry(matchingLocations.get(0));
+    }
+
+    private String getHearingLocationText(CaseData caseData, String authorisation) {
+        return caseData.getHearingLocationText() != null ? caseData.getHearingLocationText()
+            : getCaseManagementLocationText(caseData, authorisation);
+    }
+
+}

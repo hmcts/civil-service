@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -11,6 +12,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
@@ -25,6 +28,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
@@ -667,6 +671,37 @@ public class CaseDataTest {
         assertThat(caseData.getManageDocumentsList()).isNotNull();
         assertThat(caseData.getManageDocumentsList()).isEmpty();
 
+    }
+
+    @Nested
+    class GetHearingLocationText {
+
+        @Test
+        public void shouldReturnNull_whenHearingLocationIsNull() {
+            CaseData caseData = CaseData.builder().build();
+            String actual = caseData.getHearingLocationText();
+
+            assertNull(actual);
+        }
+
+        @Test
+        public void shouldReturnNull_whenHearingLocationValueIsNull() {
+            CaseData caseData = CaseData.builder()
+                .hearingLocation(DynamicList.builder().value(DynamicListElement.EMPTY).build()).build();
+            String actual = caseData.getHearingLocationText();
+
+            assertNull(actual);
+        }
+
+        @Test
+        public void shouldExpectedString_whenHearingLocationValueLabelIsNotNull() {
+            CaseData caseData = CaseData.builder()
+                .hearingLocation(DynamicList.builder().value(
+                    DynamicListElement.dynamicElement("label")).build()).build();
+            String actual = caseData.getHearingLocationText();
+
+            assertEquals("label", actual);
+        }
     }
 }
 
