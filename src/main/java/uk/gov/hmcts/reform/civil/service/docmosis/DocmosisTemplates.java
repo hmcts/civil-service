@@ -55,7 +55,7 @@ public enum DocmosisTemplates {
     HEARING_SMALL_CLAIMS_AHN("CV-UNS-HNO-ENG-01202.docx", "hearing_small_claim_%s.pdf"),
     HEARING_FAST_TRACK_AHN("CV-UNS-HNO-ENG-01203.docx", "hearing_fast_track_%s.pdf"),
     HEARING_APPLICATION_AHN("CV-UNS-HNO-ENG-01204.docx", "hearing_application_%s.pdf"),
-    HEARING_OTHER_AHN("CV-UNS-HNO-ENG-01201.docx", "hearing_other_%s.pdf"),
+    HEARING_OTHER_AHN("CV-UNS-HNO-ENG-01201.docx", "hearing_other_claim_%s.pdf"),
     // judge final Order
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
     ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf");
