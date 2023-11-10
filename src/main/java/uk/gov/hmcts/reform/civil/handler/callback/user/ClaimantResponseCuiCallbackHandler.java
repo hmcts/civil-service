@@ -12,6 +12,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 
@@ -33,6 +36,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_CUI);
 
     private final ResponseOneVOneShowTagService responseOneVOneService;
+    private final FeatureToggleService featureToggleService;
+    private final JudgementService judgementService;
 
     private final ObjectMapper objectMapper;
 
@@ -62,6 +67,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        caseData = getCCJaRequestUpdatedCaseData(caseData);
         CaseData updatedData = caseData.toBuilder()
             .applicant1ResponseDate(LocalDateTime.now())
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
@@ -84,6 +90,20 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         } else {
             response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
+    }
+
+    private CaseData getCCJaRequestUpdatedCaseData(CaseData caseData) {
+        if (hasCCJRequest(caseData)) {
+            CCJPaymentDetails ccjPaymentDetails = judgementService.buildJudgmentAmountSummaryDetails(caseData);
+            CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+            return updatedData.ccjPaymentDetails(ccjPaymentDetails).build();
+        }
+        return caseData;
+    }
+
+    private boolean hasCCJRequest(CaseData caseData) {
+        return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled() &&
+            caseData.hasApplicant1AcceptACCJ() && caseData.isCcjRequestJudgmentByAdmission());
     }
 
 }
