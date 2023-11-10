@@ -10,6 +10,7 @@ def product = "civil"
 def component = "service"
 def ccdBranch = "Test-CIV-10896-V2"
 def camundaBranch = "master"
+def dmnBranch = "CIV-10896_trial_and_error"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 AppPipelineConfig pipelineConf
