@@ -404,14 +404,12 @@ class GenAppStateHelperServiceTest {
 
         @Test
          void updateApplicationLocationDetailsLists() {
-            when(locationRefDataService.getCourtLocationsByEpimmsId(any(),any()))
+            when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject());
-            when(genAppService.getWorkAllocationLocationDetails(any(),any()))
+            when(genAppService.getWorkAllocationLocationDetails(any(), any()))
                 .thenReturn(getSampleCourLocationsRefObject1());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
-
-
                                             true,
                                             true,
                                             true, true,
@@ -424,7 +422,7 @@ class GenAppStateHelperServiceTest {
                                                                         .address("Prince William House, Peel Cross Road, Salford")
                                                                         .postcode("M5 4RR")
                                                          .build(), false);
-            CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData,authToken);
+            CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData, authToken);
 
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, "1234")).isNotNull();
             assertThat(updatedData.getGeneralApplications().get(0).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
@@ -451,8 +449,6 @@ class GenAppStateHelperServiceTest {
                     .postcode("M5 4RR")
                     .courtLocationCode("court1").build();
         }
-
-
 
         @Test
          void noLocationUpdatesToCaseDataIfThereAreNoGeneralApplications() {
