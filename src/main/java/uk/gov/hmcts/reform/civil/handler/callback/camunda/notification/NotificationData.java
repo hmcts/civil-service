@@ -84,6 +84,9 @@ public interface NotificationData {
     String OTHER_SOL_NAME = "other solicitor name";
     String EXTERNAL_ID = "externalId";
 
+    // evidence upload
+    String UPLOADED_DOCUMENTS = "uploaded documents";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }
