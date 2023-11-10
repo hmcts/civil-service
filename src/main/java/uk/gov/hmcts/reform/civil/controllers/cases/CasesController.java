@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.DeadlineDateDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
@@ -174,9 +175,9 @@ public class CasesController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
-    public ResponseEntity<LocalDate> calculateNewResponseDeadline(@RequestBody LocalDate extendedDeadline,
-                                                                  @RequestBody int plusDays) {
-        LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(extendedDeadline, plusDays);
+    public ResponseEntity<LocalDate> calculateNewResponseDeadline(@RequestBody DeadlineDateDetails deadlineDateDetails) {
+        LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(
+            deadlineDateDetails.getResponseDate(), deadlineDateDetails.getPlusDays());
         return new ResponseEntity<>(calculatedDeadline, HttpStatus.OK);
     }
 
