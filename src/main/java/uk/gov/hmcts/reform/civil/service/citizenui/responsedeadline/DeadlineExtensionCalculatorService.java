@@ -13,9 +13,10 @@ import static java.util.Objects.requireNonNull;
 public class DeadlineExtensionCalculatorService {
 
     private final WorkingDayIndicator workingDayIndicator;
-    int workingDaysCounter = 0;
+    int workingDaysCounter;
 
     public LocalDate calculateExtendedDeadline(LocalDate responseDate, int plusDays) {
+        workingDaysCounter = 0;
         requireNonNull(responseDate);
         return calculateWorkingDays(responseDate.plusDays(1), plusDays);
     }
