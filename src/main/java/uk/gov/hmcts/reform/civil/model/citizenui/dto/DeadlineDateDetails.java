@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeadlineDateDetails {
+
     private LocalDate responseDate;
     private Integer plusDays;
 }
