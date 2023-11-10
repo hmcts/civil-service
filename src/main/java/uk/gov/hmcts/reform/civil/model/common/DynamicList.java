@@ -16,7 +16,7 @@ import static java.util.stream.Collectors.toList;
  */
 @Data
 @Jacksonized
-@Builder
+@Builder(toBuilder = true)
 public class DynamicList {
 
     /**
@@ -39,18 +39,20 @@ public class DynamicList {
     }
 
     /**
-     * Sometimes a dynamic list can be prepopulated with a value.
+     * A dynamic list can be pre-populated with a code and value.
      *
      * @param list    the original list of items
+     * @param toCode  (optional) how to populate the DynamicListElement code, defaults to random UUID
      * @param toLabel how to create the label
      * @param value   (optional) value to be selected
      * @param <T>     type of element
      * @return dynamic list, possibly with value set
      */
-    public static <T> DynamicList fromList(List<T> list, Function<T, String> toLabel, T value, boolean sort) {
+    public static <T> DynamicList fromList(List<T> list, Function<T, String> toCode, Function<T, String> toLabel, T value, boolean sort) {
         List<DynamicListElement> items = list.stream()
-            .map(toLabel)
-            .map(DynamicListElement::dynamicElement)
+            .map(item -> toCode != null
+                ? DynamicListElement.dynamicElementFromCode(toCode.apply(item), toLabel.apply(item))
+                : DynamicListElement.dynamicElement(toLabel.apply(item)))
             .collect(toList());
 
         int index = value != null ? list.indexOf(value) : -1;
@@ -66,5 +68,22 @@ public class DynamicList {
         }
 
         return DynamicList.builder().listItems(items).value(chosen).build();
+    }
+
+    /**
+     * Sometimes a dynamic list can be pre-populated with a value.
+     *
+     * @param list    the original list of items
+     * @param toLabel how to create the label
+     * @param value   (optional) value to be selected
+     * @param <T>     type of element
+     * @return dynamic list, possibly with value set
+     */
+    public static <T> DynamicList fromList(List<T> list, Function<T, String> toLabel, T value, boolean sort) {
+        return fromList(list, null, toLabel, value, sort);
+    }
+
+    public static DynamicList fromDynamicListElementList(List<DynamicListElement> list) {
+        return DynamicList.builder().listItems(list).value(DynamicListElement.EMPTY).build();
     }
 }

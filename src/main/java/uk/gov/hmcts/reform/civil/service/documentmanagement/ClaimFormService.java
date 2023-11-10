@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
@@ -17,19 +18,17 @@ import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGen
 @ComponentScan("uk.gov.hmcts.reform")
 public class ClaimFormService {
 
+    private final DocumentDownloadService documentDownloadService;
+
+    @Autowired
+    private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
+
     public CaseDocument uploadSealedDocument(
          String authorisation, CaseData caseData) {
         return sealedClaimFormGeneratorForSpec.generate(caseData, authorisation);
     }
 
-    @Autowired
-    private final SealedClaimFormGeneratorForSpec sealedClaimFormGeneratorForSpec;
-
-    public byte[] downloadSealedDocument(String authorisation, CaseDocument caseDocument) {
-        return sealedClaimFormGeneratorForSpec.downloadDocument(caseDocument, authorisation);
-    }
-
-    public byte[] downloadSealedDocument(CaseDocument caseDocument) {
-        return sealedClaimFormGeneratorForSpec.downloadDocument(caseDocument);
+    public DownloadedDocumentResponse downloadDocumentById(String authorisation, String caseDocumentId) {
+        return documentDownloadService.downloadDocument(authorisation, caseDocumentId);
     }
 }

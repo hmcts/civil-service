@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -77,6 +78,9 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
     @MockBean
     protected IdamClient idamClient;
+
+    @MockBean
+    protected UserRoleCaching userRoleCaching;
 
     public UserDetails getUserDetails(String id, String email) {
         return UserDetails.builder().id(id)
@@ -421,9 +425,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
                        .getOrganisationIdentifier()).isEqualTo("345");
         assertThat(result.getApplicantPartyName()).isEqualTo("Applicant1");
         assertThat(result.getGaApplicantDisplayName()).isEqualTo("Applicant1 - Claimant");
-        CaseData updateData = cdBuilder.build();
-        assertThat(updateData.getGaEvidenceDocClaimant().size()).isEqualTo(1);
-        assertThat(updateData.getGaEvidenceDocStaff().size()).isEqualTo(1);
     }
 
     @Test
@@ -476,9 +477,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent1");
         assertThat(result.getGaApplicantDisplayName()).isEqualTo("Respondent1 - Defendant");
-        CaseData updateData = cdBuilder.build();
-        assertThat(updateData.getGaEvidenceDocRespondentSol().size()).isEqualTo(1);
-        assertThat(updateData.getGaEvidenceDocStaff().size()).isEqualTo(1);
     }
 
     @Test
@@ -544,8 +542,6 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .stream().filter(e -> org.equals(e.getValue().getOrganisationIdentifier()))
                 .count()).isEqualTo(1));
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent2");
-        CaseData updateData = cdBuilder.build();
-        assertThat(updateData.getGaEvidenceDocStaff().size()).isEqualTo(1);
     }
 
     public CaseData getTestCaseData(CaseData caseData, boolean respondentExits) {

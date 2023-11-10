@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.civil.model.finalorders;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -15,17 +19,18 @@ import java.time.LocalDate;
 public class AssistedOrderCostDetails {
 
     private String detailsRepresentationText;
-    private String claimantCostStandardText;
-    private LocalDate claimantCostStandardDate;
-    private YesOrNo claimantCostStandardProtectionOption;
-    private String defendantCostStandardText;
-    private LocalDate defendantCostStandardDate;
-    private YesOrNo defendantCostStandardProtectionOption;
-    private String claimantCostSummarilyText;
-    private LocalDate claimantCostSummarilyDate;
-    private YesOrNo claimantCostSummarilyProtectionOption;
-    private String defendantCostSummarilyText;
-    private LocalDate defendantCostSummarilyDate;
-    private YesOrNo defendantCostSummarilyProtectionOption;
+    private LocalDate assistedOrderCostsFirstDropdownDate;
+    private LocalDate assistedOrderAssessmentThirdDropdownDate;
+    @JsonProperty("makeAnOrderForCostsQOCSYesOrNo")
+    private YesOrNo makeAnOrderForCostsYesOrNo;
     private String besPokeCostDetailsText;
+    private CostEnums makeAnOrderForCostsList;
+    private CostEnums assistedOrderClaimantDefendantFirstDropdown;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private BigDecimal assistedOrderCostsFirstDropdownAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private BigDecimal assistedOrderAssessmentThirdDropdownAmount;
+    private CostEnums assistedOrderAssessmentSecondDropdownList1;
+    private CostEnums assistedOrderAssessmentSecondDropdownList2;
+
 }

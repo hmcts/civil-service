@@ -11,9 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_DEFENDANT_PART_ADMIT_CLAIM_SETTLED;
@@ -29,6 +31,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final OrganisationDetailsService organisationDetailsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -49,27 +52,38 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+        if (caseData.isRespondent1NotRepresented()) {
+            return Map.of(
+                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            );
+        }
         return Map.of(
-            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
         );
     }
 
     private CallbackResponse notifyDefendantForPartAdmitClaimSettled(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (!caseData.isLRvLipOneVOne() || caseData.getRespondent1().getPartyEmail() == null) {
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                .build();
+        if (Objects.nonNull(caseData.getRespondent1Email())) {
+            notificationService.sendMail(
+                caseData.getRespondent1Email(),
+                setUpEmailTemplate(caseData),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
         }
-
-        notificationService.sendMail(
-            caseData.getRespondent1().getPartyEmail(),
-            notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
+    }
+
+    private String setUpEmailTemplate(CaseData caseData) {
+        if (caseData.isRespondent1NotRepresented()) {
+            return caseData.isRespondentResponseBilingual()
+                ? notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()
+                : notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate();
+        }
+        return notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate();
     }
 }

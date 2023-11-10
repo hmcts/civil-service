@@ -15,7 +15,6 @@ public class RespondentLiPResponse {
     private String timelineComment;
     private String evidenceComment;
     private MediationLiP respondent1MediationLiPResponse;
-    private FinancialDetailsLiP respondent1LiPFinancialDetails;
     private String respondent1LiPContactPerson;
     private Address respondent1LiPCorrespondenceAddress;
     private DQExtraDetailsLip respondent1DQExtraDetails;

@@ -5,12 +5,12 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -18,11 +18,23 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class SystemGeneratedDocumentService {
 
-    public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(Document document, DocumentType documentType, CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+    public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(CaseDocument caseDocument, CaseData caseData) {
         List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
-        CaseDocument caseDocument = CaseDocument.toCaseDocument(document, documentType);
         systemGeneratedDocuments.add(element(caseDocument));
         return systemGeneratedDocuments;
     }
+
+    public List<Element<CaseDocument>> getSystemGeneratedDocumentsWithAddedDocument(List<Element<TranslatedDocument>> translatedDocuments, CallbackParams callbackParams) {
+
+        CaseData caseData = callbackParams.getCaseData();
+        List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
+        if (Objects.nonNull(translatedDocuments)) {
+            for (Element<TranslatedDocument> translateDocument : translatedDocuments) {
+                CaseDocument caseDocument = CaseDocument.toCaseDocument(translateDocument.getValue().getFile(), translateDocument.getValue().getCorrespondingDocumentType());
+                systemGeneratedDocuments.add(element(caseDocument));
+            }
+        }
+        return systemGeneratedDocuments;
+    }
+
 }

@@ -43,7 +43,10 @@ def secrets = [
     secret('ccd-importer-username', 'CCD_CONFIGURER_IMPORTER_USERNAME'),
     secret('ccd-importer-password', 'CCD_CONFIGURER_IMPORTER_PASSWORD'),
     secret('postgres-user', 'POSTGRES_USER'),
-    secret('postgres-password', 'POSTGRES_PASSWORD')
+    secret('postgres-password', 'POSTGRES_PASSWORD'),
+    secret('default-password','DEFAULT_PASSWORD'),
+    secret('judge-default-password','JUDGE_DEFAULT_PASSWORD'),
+    secret('iac-default-password','IAC_DEFAULT_PASSWORD')
   ]
 ]
 
@@ -61,7 +64,7 @@ def publishRpaContract() {
 }
 
 def checkForEnableHelmLabel(branch_name) {
-    return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
+   return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
 }
 
 withPipeline(type, product, component) {
@@ -70,9 +73,6 @@ withPipeline(type, product, component) {
     env.ENVIRONMENT = "preview"
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     loadVaultSecrets(secrets)
-    if (!checkForEnableHelmLabel(env.BRANCH_NAME)) {
-      enableCleanupOfHelmReleaseAlways();
-    }
   }
   onMaster {
     loadVaultSecrets(secrets)
@@ -81,8 +81,6 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
   }
 
-  syncBranchesWithMaster(['demo'])
-
   before('smoketest:preview') {
     validateRpaContract()
     sh """
@@ -90,7 +88,7 @@ withPipeline(type, product, component) {
       ./bin/add-roles.sh
       ./bin/pull-latest-camunda-files.sh ${camundaBranch}
       ./bin/pull-latest-ccd-files.sh ${ccdBranch}
-      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,*CUI-nonprod.json,*CUI.json,AuthorisationCaseType-shuttered.json"
+      ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
     """
 
     env.URL="https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -146,7 +144,7 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.CIVIL_SERVICE_URL="https://civil-service-staging.aat.platform.hmcts.net"
-    env.AAC_API_URL="https://manage-case-assignment-civil-service-staging.preview.platform.hmcts.net"
+    env.AAC_API_URL="https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
   }
 
   afterAlways('functionalTest:aat') {

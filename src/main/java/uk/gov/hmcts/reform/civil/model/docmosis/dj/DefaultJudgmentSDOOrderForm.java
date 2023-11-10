@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTi
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.util.List;
 
@@ -75,6 +76,8 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
     private final TrialRoadTrafficAccident trialRoadTrafficAccident;
     private final TrialHousingDisrepair trialHousingDisrepair;
     private final List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
+    private final LocationRefData hearingLocation;
+    private final LocationRefData caseManagementLocation;
 
     //additional data for hearings
     private final boolean disposalHearingDisclosureOfDocumentsDJAddSection;
@@ -122,8 +125,9 @@ public class DefaultJudgmentSDOOrderForm implements MappableObject {
 
     //hnl fields for trial
     private TrialHearingTimeDJ trialHearingTimeDJ;
+    private final boolean disposalHearingDateToToggle;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
     private String trialHearingTimeEstimateDJ;
-
+    private final boolean writtenByJudge;
 
 }

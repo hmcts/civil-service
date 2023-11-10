@@ -38,7 +38,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.ADJOURN_VACATE_HEARING;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.ADJOURN_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 
 @SpringBootTest(classes = {GeneralAppFeesService.class, RestTemplate.class, GeneralAppFeesConfiguration.class})
@@ -57,8 +57,6 @@ class GeneralAppFeesServiceTest {
             + "jurisdiction2=civil&service=general&keyword=GeneralAppWithoutNotice";
     private static final String GAOnNotice = "dummy_urlgeneral%20application?channel=default&event&jurisdiction1=civil&"
             + "jurisdiction2=civil&service=general&keyword=GAOnNotice";
-    private static final String GAFree = "dummy_urlgeneral%20application?channel=default&event=copies&jurisdiction1=civil&"
-            + "jurisdiction2=civil&service=insolvency&keyword=CopyPagesUpTo10";
     private static final FeeLookupResponseDto FEE_POUNDS_108 = FeeLookupResponseDto.builder()
             .feeAmount(TEST_FEE_AMOUNT_POUNDS_108).code("test_fee_code").version(1).build();
     private static final Fee FEE_PENCE_108 = Fee.builder()
@@ -73,8 +71,9 @@ class GeneralAppFeesServiceTest {
             .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_14).code("test_fee_code").version("2").build();
     private static final FeeLookupResponseDto FEE_POUNDS_0 = FeeLookupResponseDto.builder()
             .feeAmount(BigDecimal.ZERO).code("test_fee_code").version(2).build();
+    public static final String FREE_REF = "FREE";
     private static final Fee FEE_PENCE_0 = Fee.builder()
-            .calculatedAmountInPence(BigDecimal.ZERO).code("test_fee_code").version("2").build();
+            .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
 
     @Captor
     private ArgumentCaptor<URI> queryCaptor;
@@ -100,8 +99,6 @@ class GeneralAppFeesServiceTest {
         when(feesConfiguration.getWithNoticeKeyword()).thenReturn("GAOnNotice");
         when(feesConfiguration.getConsentedOrWithoutNoticeKeyword()).thenReturn("GeneralAppWithoutNotice");
         when(feesConfiguration.getAppnToVaryOrSuspend()).thenReturn("AppnToVaryOrSuspend");
-        //TODO set to actual ga free keyword
-        when(feesConfiguration.getFreeKeyword()).thenReturn("CopyPagesUpTo10");
     }
 
     @Test
@@ -166,7 +163,7 @@ class GeneralAppFeesServiceTest {
     @Test
     void shouldPay_whenConsentedWithin14DaysAdjournVacateApplicationIsBeingMade() {
         CaseData caseData = getFeeCase(
-                List.of(ADJOURN_VACATE_HEARING),
+                List.of(ADJOURN_HEARING),
                 YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(14));
 
         assertThat(feesService.isFreeApplication(caseData)).isFalse();
@@ -175,7 +172,7 @@ class GeneralAppFeesServiceTest {
     @Test
     void shouldBeFree_whenConsentedLateThan14DaysAdjournVacateApplicationIsBeingMade() {
         CaseData caseData = getFeeCase(
-                List.of(ADJOURN_VACATE_HEARING),
+                List.of(ADJOURN_HEARING),
                 YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));
 
         assertThat(feesService.isFreeApplication(caseData)).isTrue();
@@ -219,16 +216,6 @@ class GeneralAppFeesServiceTest {
                 .isEqualTo("No Fees returned by fee-service while creating General Application");
     }
 
-    //TODO remove this after we have real free fee for GA
-    @Test
-    void fake_freeFee_getFeeForGA() {
-        when(restTemplate.getForObject(queryCaptor.capture(), eq(FeeLookupResponseDto.class)))
-                .thenReturn(FEE_POUNDS_275);
-
-        Fee feeDto = feesService.getFeeForGA(feesConfiguration.getFreeKeyword(), "copies", "insolvency");
-        assertThat(feeDto).isEqualTo(FEE_PENCE_275);
-    }
-
     private CaseData getFeeCase(List<GeneralApplicationTypes> types, YesOrNo hasAgreed,
                                 YesOrNo isWithNotice, LocalDate hearingScheduledDate) {
         CaseData.CaseDataBuilder builder = CaseData.builder();
@@ -259,8 +246,6 @@ class GeneralAppFeesServiceTest {
                         .thenReturn(FEE_POUNDS_275);
                 when(restTemplate.getForObject(new URI(AppnToVaryOrSuspend), FeeLookupResponseDto.class))
                         .thenReturn(FEE_POUNDS_14);
-                when(restTemplate.getForObject(new URI(GAFree), FeeLookupResponseDto.class))
-                        .thenReturn(FEE_POUNDS_0);
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }
@@ -313,17 +298,17 @@ class GeneralAppFeesServiceTest {
         @Test
         void adjourn_should_pay_default_or_free_fee() {
             CaseData caseDataWithin14DaysWithNotice = getFeeCase(
-                    List.of(GeneralApplicationTypes.ADJOURN_VACATE_HEARING),
+                    List.of(GeneralApplicationTypes.ADJOURN_HEARING),
                     YesOrNo.NO, YesOrNo.YES, LocalDate.now().plusDays(1));
             assertThat(feesService.getFeeForGA(caseDataWithin14DaysWithNotice))
                     .isEqualTo(FEE_PENCE_275);
             CaseData caseDataWithin14DaysWithoutNotice = getFeeCase(
-                    List.of(GeneralApplicationTypes.ADJOURN_VACATE_HEARING),
+                    List.of(GeneralApplicationTypes.ADJOURN_HEARING),
                     YesOrNo.NO, YesOrNo.NO, LocalDate.now().plusDays(1));
             assertThat(feesService.getFeeForGA(caseDataWithin14DaysWithoutNotice))
                     .isEqualTo(FEE_PENCE_108);
             CaseData caseDataOutside14Days = getFeeCase(
-                    List.of(GeneralApplicationTypes.ADJOURN_VACATE_HEARING),
+                    List.of(GeneralApplicationTypes.ADJOURN_HEARING),
                     YesOrNo.YES, YesOrNo.NO, LocalDate.now().plusDays(15));
             assertThat(feesService.getFeeForGA(caseDataOutside14Days))
                     .isEqualTo(FEE_PENCE_0);
@@ -348,7 +333,7 @@ class GeneralAppFeesServiceTest {
         @Test
         void settle_should_be_108() {
             CaseData caseDataWithNotice = getFeeCase(
-                    List.of(GeneralApplicationTypes.SETTLE_OR_DISCONTINUE_CONSENT),
+                    List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT),
                     YesOrNo.YES, YesOrNo.YES, null);
             Fee feeDto = feesService.getFeeForGA(caseDataWithNotice);
             assertThat(feeDto).isEqualTo(FEE_PENCE_108);
@@ -371,7 +356,7 @@ class GeneralAppFeesServiceTest {
         @Test
         void mix_default_adjourn_should_not_free() {
             List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
-            randomList.add(GeneralApplicationTypes.ADJOURN_VACATE_HEARING);
+            randomList.add(GeneralApplicationTypes.ADJOURN_HEARING);
             CaseData caseDataOutside14Days = getFeeCase(
                     randomList,
                     YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));

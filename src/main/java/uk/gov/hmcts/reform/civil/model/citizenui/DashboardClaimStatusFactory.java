@@ -13,5 +13,4 @@ public class DashboardClaimStatusFactory {
             .findFirst()
             .orElse(DashboardClaimStatus.NO_STATUS);
     }
-
 }

@@ -14,4 +14,14 @@ public class FlowLipPredicate {
         caseData.isApplicantNotRepresented();
 
     public static final Predicate<CaseData> agreedToMediation = CaseData::hasClaimantAgreedToFreeMediation;
+
+    public static final Predicate<CaseData> declinedMediation = CaseData::hasClaimantNotAgreedToFreeMediation;
+
+    public static final Predicate<CaseData> isTranslatedDocumentUploaded = CaseData::isTranslatedDocumentUploaded;
+
+    public static final Predicate<CaseData> partAdmitPayImmediately = CaseData::isPartAdmitPayImmediatelyAccepted;
+
+    public static final Predicate<CaseData> ccjRequestJudgmentByAdmission =
+        CaseData::isCcjRequestJudgmentByAdmission;
+
 }

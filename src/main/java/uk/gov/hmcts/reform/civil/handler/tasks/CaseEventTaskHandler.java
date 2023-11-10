@@ -63,6 +63,11 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
             BusinessProcess businessProcess = startEventData.getBusinessProcess()
                 .updateActivityId(externalTask.getActivityId());
 
+            if (featureToggleService.isAutomatedHearingNoticeEnabled()
+                && !businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
+                businessProcess.updateProcessInstanceId(externalTask.getProcessInstanceId());
+            }
+
             String flowState = externalTask.getVariable(FLOW_STATE);
             CaseDataContent caseDataContent = caseDataContent(
                 startEventResponse,
@@ -105,40 +110,36 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
     private String getSummary(String eventId, String state) {
         if (Objects.equals(eventId, CaseEvent.PROCEEDS_IN_HERITAGE_SYSTEM.name())) {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
-            switch (flowState) {
-                case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE:
-                case DIVERGENT_RESPOND_GO_OFFLINE:
-                    return "RPA Reason: Divergent respond.";
-                case FULL_ADMISSION:
-                    return "RPA Reason: Defendant fully admits.";
-                case PART_ADMISSION:
-                    return "RPA Reason: Defendant partial admission.";
-                case COUNTER_CLAIM:
-                    return "RPA Reason: Defendant rejects and counter claims.";
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC:
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT:
-                    return "RPA Reason: Unrepresented defendant(s).";
-                case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
-                    return "RPA Reason: Unregistered defendant solicitor firm(s).";
-                case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
-                    return "RPA Reason: Unrepresented defendant and unregistered defendant solicitor firm";
-                case FULL_DEFENCE_PROCEED:
-                case FULL_ADMIT_PROCEED:
-                case FULL_ADMIT_PAY_IMMEDIATELY:
-                case PART_ADMIT_PROCEED:
-                    return "RPA Reason: Claimant(s) proceeds.";
-                case FULL_DEFENCE_NOT_PROCEED:
-                case FULL_ADMIT_NOT_PROCEED:
-                case PART_ADMIT_NOT_PROCEED:
-                    return "RPA Reason: Claimant(s) intends not to proceed.";
-                case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED:
-                case TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED:
-                    return "RPA Reason: Only one of the defendants is notified.";
-                case TAKEN_OFFLINE_BY_STAFF:
-                    return "RPA Reason: Case taken offline by staff.";
-                default:
-                    throw new IllegalStateException("Unexpected flow state " + flowState.fullName());
-            }
+            return switch (flowState) {
+                case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, DIVERGENT_RESPOND_GO_OFFLINE ->
+                    "RPA Reason: Divergent respond.";
+                case FULL_ADMISSION -> "RPA Reason: Defendant fully admits.";
+                case PART_ADMISSION -> "RPA Reason: Defendant partial admission.";
+                case COUNTER_CLAIM -> "RPA Reason: Defendant rejects and counter claims.";
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
+                    "RPA Reason: Unrepresented defendant(s).";
+                case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT ->
+                    "RPA Reason: Unregistered defendant solicitor firm(s).";
+                case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT ->
+                    "RPA Reason: Unrepresented defendant and unregistered defendant solicitor firm";
+                case FULL_DEFENCE_PROCEED, FULL_ADMIT_PROCEED, FULL_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PROCEED ->
+                    "RPA Reason: Claimant(s) proceeds.";
+                case FULL_DEFENCE_NOT_PROCEED, FULL_ADMIT_NOT_PROCEED, PART_ADMIT_NOT_PROCEED ->
+                    "RPA Reason: Claimant(s) intends not to proceed.";
+                case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED ->
+                    "RPA Reason: Only one of the defendants is notified.";
+                case TAKEN_OFFLINE_BY_STAFF -> "RPA Reason: Case taken offline by staff.";
+                case CLAIM_DETAILS_NOTIFIED, NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
+                    CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, NOTIFICATION_ACKNOWLEDGED,
+                    PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA ->
+                    "RPA Reason: Not suitable for SDO.";
+                case FULL_ADMIT_AGREE_REPAYMENT, PART_ADMIT_AGREE_REPAYMENT, FULL_ADMIT_JUDGMENT_ADMISSION ->
+                    "RPA Reason: Judgement by Admission requested and claim moved offline.";
+                default -> {
+                    log.info("Unexpected flow state " + flowState.fullName());
+                    yield null;
+                }
+            };
         }
         return null;
     }

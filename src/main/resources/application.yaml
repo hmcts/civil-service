@@ -30,6 +30,11 @@ spring:
     password: ${CMC_DB_PASSWORD:-}
     url: jdbc:postgresql://${CMC_DB_HOST:}:${CMC_DB_PORT:}/${CMC_DB_NAME:cmc}${CMC_DB_CONNECTION_OPTIONS:}
 
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
   security:
     oauth2:
       client:
@@ -65,6 +70,8 @@ serviceRequestClaimIssued:
     site_id: AAA7
     service: CIVIL
 
+wa:
+  feature-toggle: ${WA_TOGGLE:Prod}
 
 send-letter:
   url: ${SEND_LETTER_URL:http://localhost:8765}
@@ -74,6 +81,7 @@ fees:
     service: civil money claims
     jurisdiction1: civil
     jurisdiction2: county court
+    jurisdiction-fast-track-claim: civil
     channel: default
     event: issue
     hearingEvent: hearing
@@ -89,7 +97,6 @@ genApp:
     keywords:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
-      free: CopyPagesUpTo10
       appnToVaryOrSuspend: AppnToVaryOrSuspend
   lrd:
     endpoint: /refdata/location/court-venues
@@ -134,11 +141,11 @@ nonworking-days:
   datafile: /data/non-working_days.dat
 
 civil:
-  response-pack-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9-eng.pdf
-  n9a-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9a-eng.pdf
-  n9b-url: https://formfinder.hmctsformfinder.justice.gov.uk/n9b-eng.pdf
-  n215-url: https://formfinder.hmctsformfinder.justice.gov.uk/n215-eng.pdf
-  n225-url: https://formfinder.hmctsformfinder.justice.gov.uk/n225-eng.pdf
+  response-pack-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/772450/n9-eng.pdf
+  n9a-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/867255/n9a-eng.pdf
+  n9b-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/866787/N9B_web_0818_save.pdf
+  n215-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/952023/n215-eng.pdf
+  n225-url: https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/961368/n225-eng.pdf
   system-update:
     username: ${CIVIL_SYSTEM_UPDATE_USERNAME:civil-system-update@mailnesia.com}
     password: ${CIVIL_SYSTEM_UPDATE_PASSWORD:Password12!}
@@ -176,19 +183,19 @@ notifications:
   breathingSpaceLiftedApplicantEmailTemplate: "bd717149-5cba-40e8-ba93-1257033e5e86"
   breathingSpaceLiftedRespondentEmailTemplate: "a9975259-be57-482f-8a31-0c5583ad0779"
   respondentSolicitorClaimIssueMultipartyEmailTemplate: "6e63242f-a26a-442e-ad2c-f201072195e2"
-  respondentSolicitorClaimDetailsEmailTemplate: "a565e057-8ad0-413d-aa78-2c21705853fd"
-  solicitorDefendantResponseCaseTakenOffline: "e41ab7af-71ab-4e87-a636-25c134a2d11d"
-  claimantSolicitorDefendantResponseFullDefence: "9a31a29f-85cf-4402-b188-e65cf628fff2"
-  solicitorDefendantResponseCaseTakenOfflineMultiparty: "7e1e7b92-84aa-4231-92c1-a61516e93c31"
+  respondentSolicitorClaimDetailsEmailTemplate: "f6cfc731-e891-4fe2-b974-31e8fabd4d28"
+  solicitorDefendantResponseCaseTakenOffline: "d67b7c10-8cde-4bfe-946b-7e99867694cd"
+  claimantSolicitorDefendantResponseFullDefence: "84f0955b-a542-42d0-9825-a845c4f9799e"
+  solicitorDefendantResponseCaseTakenOfflineMultiparty: "19bd6722-7c58-484e-b5a0-264ba66ad55e"
   respondentSolicitorAcknowledgeClaim: "b7ade9ca-da8b-4605-a296-ccee3d7d7a93"
   failedPayment: "b7b98d09-6794-4d8d-8550-cc219c91ee8c"
-  solicitorClaimDismissedWithin4Months: "2775485e-aaeb-49c6-a2c8-07a15f628e8a"
-  solicitorClaimDismissedWithin14Days: "1ca6bd16-61b9-4e3d-b7c4-ab726dc8abdd"
-  solicitorClaimDismissedWithinDeadline: "847f080c-998b-4483-865f-72353f518d85"
+  solicitorClaimDismissedWithin4Months: "5f415268-b48c-49b1-9dd0-3784a62b64aa"
+  solicitorClaimDismissedWithin14Days: "1bd4b095-e812-4677-a0f4-0f91ed9f6515"
+  solicitorClaimDismissedWithinDeadline: "7da39b72-f772-46a7-8296-35bef9521f43"
   claimantSolicitorCaseWillProgressOffline: "d004304d-a7f4-4440-a13b-753cb2d57a74"
-  claimantSolicitorAgreedExtensionDate: "9a09dde2-dfe3-4770-b98e-3ce920fb5a6e"
+  claimantSolicitorAgreedExtensionDate: "0b731d97-bba5-4994-944b-10dfbed2ce6b"
   claimantSolicitorConfirmsToProceed: "bf16b060-17b6-4d06-8367-e26a538a4911"
-  claimantSolicitorConfirmsNotToProceed: "8d2b0c8c-7cb2-4559-ba2c-a2ed5f7982be"
+  claimantSolicitorConfirmsNotToProceed: "25988b85-dafc-40be-970f-45fbb7d0f860"
   claimantSolicitorClaimContinuingOnline: "d6c71e08-a9c3-405c-8873-4370d4bdcca3"
   claimantSolicitorSpecCaseWillProgressOffline: "cf44ff15-4958-4c0d-b0d4-fed9a7692d00"
   claimantSolicitorClaimContinuingOnlineCos: "4825eb5d-4678-496e-8d19-203288dd598f"
@@ -204,32 +211,42 @@ notifications:
   respondentSolicitorAcknowledgeClaimForSpec: "16b86d3b-f370-4dc1-b25b-871e7470ebf1"
   claimantSolicitorAgreedExtensionDateForSpec: "5b6d65ea-a3b5-4e40-94e0-69dc7100c982"
   respondentSolicitorAgreedExtensionDateForSpec: "fbf3ed5e-3726-4009-8561-f856fb5dbda0"
-  claimantSolicitorDefendantResponseForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
+  claimantSolicitorDefendantResponse1v2DSForSpec: "635e7509-9fb6-4c80-9f0b-0476f96aad5c"
+  claimantSolicitorDefendantResponseForSpec: "28ea1d53-93b1-4e48-a7e5-7a876f910f86"
   claimantSolicitorImmediatelyDefendantResponseForSpec: "263d7737-933d-4d0b-9f08-23847613f6a4"
   respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
+  respondentSolicitorDefResponseSpecWithClaimantAction: "efbd38e8-3fe7-4db6-ad55-b751b96477b1"
   respondentDefendantResponseForSpec: "94c71894-9590-4995-aae0-edea94fc4594"
-  sdoOrdered: "1518a883-d035-46c8-9dc0-a52538ca4545"
+  sdoOrdered: "90667080-6b20-48f2-b9ea-349fa8ec78e4"
   sdoOrderedSpec: "1c1a200c-b3c1-45eb-9768-aeea56857420"
+  sdoOrderedEA: "837d3f5e-e1f8-4d6b-b053-719392fe556c"
+  sdoOrderedSpecEA: "7224780e-416c-4c0b-a718-056cd93abe06"
+  sdoOrderedSpecBilingual: "0ae860e7-80b5-46f8-95b7-8f19d6f974cf"
   claimantSolicitorConfirmsNotToProceedSpec: "156b71f5-30ac-4398-aad2-72dfd424c6f2"
-  claimantSolicitorConfirmsNotToProceedSpecLip: "8d2b0c8c-7cb2-4559-ba2c-a2ed5f7982be"
+  claimantSolicitorConfirmsNotToProceedSpecLip: "25988b85-dafc-40be-970f-45fbb7d0f860"
+  notifyRespondentLipPartAdmitPayImmediatelyAcceptedSpec: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
+  notifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec: "5047af9d-bf50-4476-b41b-24fc96b8a7d8"
   respondentSolicitorNotifyNotToProceedSpec: "4dc0b5bb-674f-401e-8a39-05686dc0302e"
   claimantSolicitorConfirmsToProceedSpec: "99786d26-ab90-43c7-aa20-9d450d8ce4eb"
   respondentSolicitorNotifyToProceedSpec: "ea6cb18e-ebba-4759-8df3-426e00f2f09c"
+  claimantSolicitorConfirmsToProceedSpecWithAction: "d454e5a9-8c56-4a1d-acce-53a1686376bc"
+  respondentSolicitorNotifyToProceedSpecWithAction: "c1bb435e-0300-4e51-89ec-56dd7f77ef27"
   applicantSolicitor1DefaultJudgmentReceived: "14a43ad4-e337-490a-bf8b-1288520dc9eb"
   claimantSolicitorCounterClaimForSpec: "256b6cf4-6201-48f0-bf1e-88a187712196"
   respondentSolicitorCounterClaimForSpec: "6cb3b3d5-f1aa-4236-ad03-685605a9235e"
   respondentSolicitor1DefaultJudgmentReceived: "3f09399e-b76b-4ea4-8084-c27693e6fd28"
   respondentSolicitor1DefaultJudgmentRequested: "9a974b63-6d0f-4714-8e5d-488554fdc8a0"
   applicantSolicitor1DefaultJudgmentRequested: "cd0486ac-cc6a-4429-865a-7746f64bf4dd"
-  interimJudgmentRequestedClaimant: "60ef146b-96c4-4630-942c-336aee5e9359"
-  interimJudgmentApprovalClaimant: "b678fa7d-2a37-4d54-8163-b79b733d20d9"
-  standardDirectionOrderDJTemplate: "1518a883-d035-46c8-9dc0-a52538ca4545"
-  interimJudgmentRequestedDefendant: "d9e33565-ecdc-4475-a77b-e50cd4c07b61"
-  interimJudgmentApprovalDefendant: "2e98fa16-ba9e-4229-b99f-fc72d40303f8"
+  interimJudgmentRequestedClaimant: "7c6d0840-3f38-4fc5-a26b-676f27bb8fe2"
+  interimJudgmentApprovalClaimant: "d0deee08-edc8-4a25-8b04-6a5ba52267b8"
+  standardDirectionOrderDJTemplate: "90667080-6b20-48f2-b9ea-349fa8ec78e4"
+  interimJudgmentRequestedDefendant: "0a926106-b8cf-4d07-be6b-1b451c7895e9"
+  interimJudgmentApprovalDefendant: "184567ca-9013-4685-adae-18b8d329f72e"
   caseworkerDefaultJudgmentRequested: "b20f34f4-39c3-4488-9961-f6d4ae7247f4"
   respondentDeadlineExtension: "13514e8a-8621-4d3a-a317-8fd0ba7a184f"
   respondentDeadlineExtensionWelsh: "5fb6d574-e1b8-42bc-9d97-fcd8042f36d3"
   claimantDeadlineExtension: "74e33576-487f-4c63-bdef-fe12c4279faa"
+  claimantLipDeadlineExtension: "77cc47b1-4a9a-4baf-9313-98542698d32a"
   respondentChangeOfAddressNotificationTemplate: "174a9566-6ce2-4df5-9ffd-265bbd4787cc"
   respondentLipFullAdmitOrPartAdmitTemplate: "d41a95de-ab84-4442-b6d1-33db03b5e1b0"
   respondentLipFullDefenceWithMediationTemplate: "2177f3b0-3833-4788-bd7f-a473e32950af"
@@ -237,9 +254,13 @@ notifications:
   applicantHearingFeeUnpaid: "e732acf5-7ac8-49f5-8e20-cc8fa86aeef8"
   respondentHearingFeeUnpaid: "39c3f921-00e7-47ea-b297-6632643e438d"
   respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
+  respondentLipResponseSubmissionBilingualTemplate: "37da53f4-2453-4d45-9910-b33d28274aa5"
   hearingListedFeeClaimantLrTemplate: "193b245b-63fd-4a02-93b6-1acfb6e99fe5"
   hearingListedNoFeeClaimantLrTemplate: "03763ce1-de17-4a9a-b1c6-d2e9ccffe9d7"
+  hearingListedFeeClaimantLrTemplateHMC: "2c7862fb-230f-4e8e-912c-07d265c8dd86"
+  hearingListedNoFeeClaimantLrTemplateHMC: "b68825c4-fcca-48eb-85ce-2f5d7c2e6428"
   hearingListedNoFeeDefendantLrTemplate: "81216268-36e6-4e0e-b510-24067ad32f24"
+  hearingListedNoFeeDefendantLrTemplateHMC: "aecaafde-fdf0-471f-8eca-a75534ac36aa"
   solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
   otherPartyTrialReady: "a44c9235-c009-4d1c-9e0e-36e1769dc0e6"
   respondentCcjNotificationTemplate: "98ca0ea8-ee90-46b4-a361-dcca12a2ff47"
@@ -249,19 +270,54 @@ notifications:
   noticeOfChangeFormerSolicitor: "de751f1b-9348-40be-b3c5-a275616a7cf5"
   noticeOfChangeOtherParties: "80a327da-8124-40a5-bec4-fe0d64e28a91"
   evidenceUploadTemplate: "bd1c9ee5-92a4-49a9-a61f-ff671960b029"
+  evidenceUploadLipTemplate: "3495a863-338f-49cf-99e8-b94bc457a9d4"
   bundleCreationTemplate: "0280b3c7-ad4e-4c43-8974-72b5a5501b02"
   generateOrderNotificationTemplate: "78532d45-aadf-4223-89fd-4932b4cbe411"
 
-  notifyClaimantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
+  notifyClaimantLrTemplate: "adcf4c5f-2b9c-482d-8311-a4b8ffe7ef45"
+  notifyDefendantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
   notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
+  notifyDefendantLipWelshTemplate : "d63b744a-97c8-42bd-95a2-3d86dd703c3d"
 
   notifyApplicantLRMediationAgreementTemplate: "d5e927f6-3fde-42cf-b30f-6b833c66bf70"
   notifyRespondentLiPMediationAgreementTemplate: "a623c1df-2187-4663-b9eb-31d4ace175d6"
+  notifyRespondentLiPMediationAgreementTemplateWelsh: "07a98d47-91a3-4806-a6e2-9e75366556af"
   notifyRespondentLRMediationAgreementTemplate: "998d0355-7aa8-4bd3-87b2-537eb31c9db5"
   respondentLipPartAdmitSettleClaimTemplate: "81745979-5330-4771-816c-aa78085e741a"
+  respondentLrPartAdmitSettleClaimTemplate: "6a1f4ef9-5334-4f2c-9e43-b292753929fb"
   respondent1DefaultJudgmentRequestedTemplate: "d4cf381f-a2b3-4a81-a442-eb2aa5deb210"
   respondent1LipClaimUpdatedTemplate: "9c44f3fb-a340-49e5-bf64-32a3187d7dcd"
+  claimantLipClaimUpdatedTemplate: "0abdcb29-edd3-418a-aeab-a102da4ad441"
+  applicantLiPDefaultJudgmentRequested: "668d4703-e97f-4e2f-8d07-1a697aac6d0b"
 
+  hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
+
+  mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
+  mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
+  mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
+
+  respondentLipPartAdmitSettleClaimBilingualTemplate: "59ea18ee-1b30-4e80-9a7e-89ae7e940aed"
+  notifyClaimantTranslatedDocumentUploaded: "a4b1051f-9f66-4f35-9674-e70b413a598a"
+  notifyDefendantTranslatedDocumentUploaded: "279b6997-2a04-4428-921b-c699c190f558"
+
+  notifyApplicantLRMediationSuccessfulTemplate: "df1b8b70-31d3-4c68-91e9-7b4c14ebf90a"
+  notifyRespondentLiPMediationSuccessfulTemplate: "38600a69-c147-451c-a0ea-40c212fda8bc"
+  notifyRespondentLiPMediationSuccessfulTemplateWelsh: "aaa19fef-2b16-42fa-a1b9-5af699fcaa58"
+  notifyDefendantLIPClaimantSettleTheClaimTemplate: "cb89ea18-782b-4bc6-be44-2789d02ab6aa"
+
+  notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+
+  hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
+
+  notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "3d302844-ecdc-47e6-8aed-971c3f42a059"
+  notifyLiPClaimantDefendantResponded: "4b1325dd-51ed-4dc2-bcc6-d9afb01a3f29"
+  notifyLiPClaimantDefendantChangedContactDetails: "72a14146-c897-4fc6-be4f-474266da7398"
+
+  notifyApplicant1EnteredBreathingSpaceLip: "7e34af74-ec20-476b-aea5-6a6508d3acaf"
+  notifyEnteredBreathingSpaceForDefendantLip: "e551a04f-9da1-4654-a7be-2040e02925aa"
+
+  notifyLiPApplicantBreathingSpaceLifted: "b6dbc714-210e-475d-a1db-bf5ea28de98b"
+  notifyLiPRespondentBreathingSpaceLifted: "4ca3017b-b2fa-4ac0-a867-9bfada50a80c"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -306,6 +362,23 @@ exit-survey:
   applicant-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Claimant/
   respondent-link: https://www.smartsurvey.co.uk/s/CivilDamages_ExitSurvey_Defendant/
 
+azure:
+  service-bus:
+    connection-postfix: ${HMC_HEARINGS_TOPIC_CONNECTION_POSTFIX:.servicebus.windows.net}
+    thread-count: ${HMC_HEARINGS_TOPIC_THREAD_COUNT:4}
+    hmc-to-hearings-api:
+      namespace: ${HMC_HEARINGS_TOPIC_NAMESPACE:dummyNamespace}
+      topicName: ${HMC_HEARINGS_TOPIC_NAME:dummyTopicName}
+      subscriptionName: ${HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME:dummySubscriptionName}
+      username: ${HMC_HEARINGS_TOPIC_POLICY_NAME:}
+      password: ${HMC_HEARINGS_TOPIC_ACCESS_KEY:}
+      enabled: ${HMC_HEARINGS_SUBSCRIPTION_ENABLED:false}
+
+async:
+  handler:
+    corePoolSize: ${ASYNC_HANDLER_CORE_POOL_SIZE:7}
+    maxPoolSize: ${ASYNC_HANDLER_MAX_POOL_SIZE:42}
+    queueCapacity: ${ASYNC_HANDLER_QUEUE_CAPACITY:10}
 ---
 
 spring:
@@ -404,11 +477,19 @@ robotics:
     recipient: hmcts.civil.multiparty.robotics@gmail.com
     multipartyrecipient: hmcts.civil.multiparty.robotics@gmail.com
     specRecipient: hmcts.civil.multiparty.robotics@gmail.com
+    lipJRecipient: civilmoneyclaimsdemo@gmail.com
 
 notification:
   caseworker:
     spec:
       receiver: civilmoneyclaimsdemo@gmail.com
+
+mediation:
+  emails:
+    sender: hmcts.civil@gmail.com
+    recipient: civilmoneyclaimsdemo@gmail.com
+
+
 ---
 
 spring:

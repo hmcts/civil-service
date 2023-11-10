@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -54,6 +55,7 @@ public class SdoDocumentFormSmall implements MappableObject {
 
     private final boolean hasCreditHire;
     private final boolean hasRoadTrafficAccident;
+    private final boolean writtenByJudge;
 
     private final SmallClaimsJudgesRecital smallClaimsJudgesRecital;
     private final SmallClaimsHearing smallClaimsHearing;
@@ -64,7 +66,8 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final String smallClaimsMethodVideoConferenceHearing;
     private final SmallClaimsDocuments smallClaimsDocuments;
     private final SmallClaimsWitnessStatement smallClaimsWitnessStatement;
-
+    private final LocationRefData hearingLocation;
+    private final LocationRefData caseManagementLocation;
     private final SmallClaimsCreditHire smallClaimsCreditHire;
     private final SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
 
@@ -72,9 +75,9 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final List<Element<SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
 
     private final SmallClaimsNotes smallClaimsNotes;
-
     private final boolean smallClaimsHearingToggle;
     private final boolean smallClaimsMethodToggle;
     private final boolean smallClaimsDocumentsToggle;
     private final boolean smallClaimsWitnessStatementToggle;
+    private final boolean smallClaimsNumberOfWitnessesToggle;
 }

@@ -44,29 +44,11 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHearingAndListingSDOEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "hearing-and-listing-sdo";
+    void shouldReturnCorrectValue_whenAutomatedHearingNoticeEnabledInvoked(Boolean toggleStat) {
+        var hearingAndListingKey = "ahn";
         givenToggle(hearingAndListingKey, toggleStat);
 
-        assertThat(featureToggleService.isHearingAndListingSDOEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsHearingAndListingLegalRepEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "hearing-and-listing-legal-rep";
-        givenToggle(hearingAndListingKey, toggleStat);
-
-        assertThat(featureToggleService.isHearingAndListingLegalRepEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenisCourtLocationDynamicListEnabledInvoked(Boolean toggleStat) {
-        var courtLocationDynamicListKey = "court-location-dynamic-list";
-        givenToggle(courtLocationDynamicListKey, toggleStat);
-
-        assertThat(featureToggleService.isCourtLocationDynamicListEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -94,15 +76,6 @@ class FeatureToggleServiceTest {
         givenToggle(pinInPostKey, toggleStat);
 
         assertThat(featureToggleService.isPinInPostEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsSDOEnabledInvoked(Boolean toggleStat) {
-        var enableSDOKey = "enableSDO";
-        givenToggle(enableSDOKey, toggleStat);
-
-        assertThat(featureToggleService.isSDOEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
@@ -148,6 +121,62 @@ class FeatureToggleServiceTest {
         givenToggle(caseFileKey, toggleStat);
 
         assertThat(featureToggleService.isCaseFileViewEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenFastTrackUpliftsEnabled(Boolean toggleStat) {
+        var caseFileKey = "fast-track-uplifts";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isFastTrackUpliftsEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenUpdateContactDetailsEnabled(Boolean toggleStat) {
+        var caseFileKey = "update-contact-details";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isUpdateContactDetailsEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
+        final String feature = "case-progression-location-whitelist";
+        String location = "000000";
+        when(featureToggleApi.isFeatureEnabledForLocation(eq(feature), eq(location), eq(true)))
+            .thenReturn(toggleStat);
+
+        assertThat(featureToggleService.isLocationWhiteListedForCaseProgression(location)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
+        var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
+        givenToggle(transferCaseOnlineKey, toggleStat);
+
+        assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
+        var caseFileKey = "cui-case-progression";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
+        var caseFileKey = "early-adopters";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {

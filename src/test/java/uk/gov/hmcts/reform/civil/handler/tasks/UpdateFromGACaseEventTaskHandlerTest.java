@@ -44,7 +44,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_PDF_TO_MAIN_CASE;
@@ -436,6 +435,37 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         verify(externalTaskService).complete(mockExternalTask);
     }
 
+    @Test
+    void testShouldAddGaDraftApplicationDocument() {
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftApplicationPDFDocument(CaseData.builder().build());
+
+        CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDraftStaffPDFDocument(CaseData.builder().build());
+
+        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+            .thenReturn(generalCaseData);
+
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
+
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class))).thenReturn(updatedCaseData);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask);
+    }
+
     private StartEventResponse startEventResponse(CaseDetails caseDetails) {
         return StartEventResponse.builder()
             .token("1594901956117591")
@@ -490,6 +520,50 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         verify(externalTaskService).complete(mockExternalTask);
     }
 
+    @Test
+    void shouldNotAddgaResponseDocument() {
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        String uid1 = "f000aa01-0451-4000-b000-000000000111";
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
+            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .build();
+        CaseData updatedCaseData = caseData.toBuilder()
+            .directionOrderDocument(singletonList(Element.<CaseDocument>builder()
+                                                      .id(UUID.fromString(uid))
+                                                      .value(pdfDocument).build())).build();
+        CaseData updatedCaseData1 = caseData.toBuilder()
+            .gaRespDocStaff(singletonList(Element.<Document>builder().id(UUID.fromString(uid1))
+                                              .value(pdfDocument1).build()))
+            .gaRespDocClaimant(singletonList(Element.<Document>builder().id(UUID.fromString(uid1))
+                                           .value(pdfDocument1).build())).build();
+        CaseDetails caseDetails = CaseDetailsBuilder.builder().data(updatedCaseData).build();
+        StartEventResponse startEventResponse = startEventResponse(caseDetails);
+
+        CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
+            .getTestCaseDataWithDirectionResponseDocument(CaseData.builder().build());
+
+        when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
+            .thenReturn(generalCaseData);
+
+        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
+
+        when(caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails())).thenReturn(updatedCaseData);
+
+        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class)))
+            .thenReturn(updatedCaseData1);
+
+        handler.execute(mockExternalTask, externalTaskService);
+
+        assertThat(updatedCaseData1.getGaRespDocClaimant().size())
+            .isEqualTo(generalCaseData.getGaRespDocument().size());
+        assertThat(updatedCaseData1.getGaRespDocStaff().size())
+            .isEqualTo(generalCaseData.getGaRespDocument().size());
+
+        verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE);
+        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
+        verify(externalTaskService).complete(mockExternalTask);
+    }
+
     @Nested
     class NotRetryableFailureTest {
         @Test
@@ -502,7 +576,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -523,7 +597,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -543,7 +617,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
             handler.execute(mockExternalTask, externalTaskService);
 
             //then: Retry should not happen in this case
-            verify(externalTaskService, never()).handleFailure(
+            verify(externalTaskService).handleFailure(
                 any(ExternalTask.class),
                 anyString(),
                 anyString(),
@@ -555,13 +629,27 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
     @Test
     void checkIfDocumentExists() {
-        Element same = Element.builder().id(UUID.randomUUID())
-                .value(CaseDocument.builder().build()).build();
+        Element<?> same = Element.<CaseDocument>builder().id(UUID.randomUUID())
+            .value(CaseDocument.builder().documentLink(Document.builder().documentUrl("string").build())
+                       .build()).build();
         List<Element<?>> civilCaseDocumentList = new ArrayList<>();
-        civilCaseDocumentList.add(same);
         List<Element<?>> gaDocumentList = new ArrayList<>();
-        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isNotPositive();
         gaDocumentList.add(same);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isNotPositive();
+        civilCaseDocumentList.add(same);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
+    }
+
+    @Test
+    void checkIfDocumentExists_whenDocumentTypeIsDocumentClass() {
+        Element<Document> documentElement = Element.<Document>builder()
+            .id(UUID.randomUUID())
+            .value(Document.builder().documentUrl("string").build()).build();
+        List<Element<?>> gaDocumentList = new ArrayList<>();
+        List<Element<?>> civilCaseDocumentList = new ArrayList<>();
+        gaDocumentList.add(documentElement);
+        assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(0);
+        civilCaseDocumentList.add(documentElement);
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
     }
 
@@ -576,5 +664,11 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                           .documentFileName("file-name")
                           .documentBinaryUrl("binary-url")
                           .build())
+        .build();
+
+    public final Document pdfDocument1 = Document.builder()
+        .documentUrl("fake-url")
+        .documentFileName("file-name")
+        .documentBinaryUrl("binary-url")
         .build();
 }

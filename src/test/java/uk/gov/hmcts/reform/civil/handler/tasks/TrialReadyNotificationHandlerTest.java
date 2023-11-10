@@ -93,7 +93,7 @@ class TrialReadyNotificationHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(2),
-            eq(500L)
+            eq(1000L)
         );
     }
 

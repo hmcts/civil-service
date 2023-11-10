@@ -43,8 +43,8 @@ java:
     GENAPP_LRD_URL: http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     GENAPP_JRD_URL: http://rd-judicial-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    SERVICE_REQUEST_UPDATE: https://civil-service-{{ .Values.global.environment }}.platform.hmcts.net/service-request-update
-    SERVICE_REQUEST_UPDATE_CLAIM_ISSUED: https://civil-service-{{ .Values.global.environment }}.platform.hmcts.net/service-request-update-claim-issued
+    SERVICE_REQUEST_UPDATE: http://civil-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/service-request-update
+    SERVICE_REQUEST_UPDATE_CLAIM_ISSUED: http://civil-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/service-request-update-claim-issued
     DOCMOSIS_TORNADO_URL: https://docmosis.{{ .Values.global.environment }}.platform.hmcts.net
     SEND_LETTER_URL: http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
@@ -64,6 +64,16 @@ java:
     DOCUMENT_MANAGEMENT_SECURED: true
     REST_TEMPLATE_TIMEOUT: 30000
     POLLING_EVENT_EMITTER_ENABLED: false
+    WA_TOGGLE: Prod
+    HMC_HEARINGS_TOPIC_NAMESPACE: 'hmc-servicebus-{{ .Values.global.environment }}'
+    HMC_HEARINGS_TOPIC_NAME: 'hmc-to-cft-{{ .Values.global.environment }}'
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: 'hmc-to-civil-subscription-{{ .Values.global.environment }}'
+    HMC_HEARINGS_TOPIC_POLICY_NAME: SendAndListenSharedAccessKey
+    HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
+    HMC_HEARINGS_TOPIC_THREAD_COUNT: 4
+    ASYNC_HANDLER_CORE_POOL_SIZE: 7
+    ASYNC_HANDLER_MAX_POOL_SIZE: 42
+    ASYNC_HANDLER_QUEUE_CAPACITY: 10
 
   keyVaults:
     civil:
@@ -87,6 +97,10 @@ java:
         - launch-darkly-sdk-key
         - robotics-notification-multipartyrecipient
         - robotics-notification-recipient-spec
+        - robotics-notification-recipient-lipj
         - ordnance-survey-api-key
         - notification-caseworker-spec-receiver
-
+        - mediation-notification-sender
+        - mediation-notification-recipient
+        - name: hmc-servicebus-shared-access-key-tf
+          alias: HMC_HEARINGS_TOPIC_ACCESS_KEY

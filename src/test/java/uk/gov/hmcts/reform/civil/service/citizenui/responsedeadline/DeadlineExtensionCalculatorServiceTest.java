@@ -51,4 +51,5 @@ public class DeadlineExtensionCalculatorServiceTest {
         verify(workingDayIndicator).isWorkingDay(proposedExtensionDeadline);
         verify(workingDayIndicator).getNextWorkingDay(proposedExtensionDeadline);
     }
+
 }

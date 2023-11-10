@@ -116,7 +116,7 @@ class PollingEventEmitterHandlerTest {
             eq(errorMessage),
             anyString(),
             eq(0),
-            eq(500L)
+            eq(1000L)
         );
 
         verifyNoMoreInteractions(eventEmitterService);

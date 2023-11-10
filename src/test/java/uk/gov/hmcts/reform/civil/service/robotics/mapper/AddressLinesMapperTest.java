@@ -97,6 +97,22 @@ class AddressLinesMapperTest {
         }
 
         @Test
+        void shouldSplitAndTrimExtraSpace_whenMutipleSpaceWithinText() {
+            Address address = Address.builder()
+                .addressLine1("123456 6 78   91011 12131415 16171819")
+                .build();
+
+            Address result = mapper.splitLongerLines(address);
+
+            assertThat(result).extracting("addressLine1")
+                .isEqualTo("123456 6 78 91011 12131415");
+            assertThat(result).extracting("addressLine2")
+                .isEqualTo("16171819, ");
+            assertThat(result).extracting("addressLine3")
+                .isNull();
+        }
+
+        @Test
         void shouldSplitAddressBySpace_Line2MissingButLine3Present() {
             Address address = Address.builder()
                 .addressLine1("21 Belgian Place")
@@ -278,7 +294,7 @@ class AddressLinesMapperTest {
         void shouldSplitAddressBySpace_whenSplittingSpreadsOverThreeLinesWithSpaces() {
             Address address = Address.builder()
                 .addressLine1("1234567890 1234567890")
-                .addressLine2("I am the    second   line")
+                .addressLine2("I am the second line")
                 .addressLine3("abcdefghijk 1234567890   1234567890 1234567899,zxcvbnmzxcvbnm 12345")
                 .build();
 

@@ -2,10 +2,16 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+
+import java.util.Optional;
 
 /**
  * When an SDO is created it is notified to applicants and defendants.
@@ -19,8 +25,9 @@ public class CreateSDORespondent2LRNotificationSender extends AbstractCreateSDOR
     public CreateSDORespondent2LRNotificationSender(
         NotificationService notificationService,
         NotificationsProperties notificationsProperties,
-        OrganisationService organisationService) {
-        super(notificationService, notificationsProperties, organisationService);
+        OrganisationService organisationService,
+        FeatureToggleService featureToggleService) {
+        super(notificationService, notificationsProperties, organisationService, featureToggleService);
     }
 
     @Override
@@ -40,6 +47,10 @@ public class CreateSDORespondent2LRNotificationSender extends AbstractCreateSDOR
 
     @Override
     protected String getLROrganisationId(CaseData caseData) {
-        return caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
+        return Optional.ofNullable(caseData.getRespondent2SameLegalRepresentative() == YesOrNo.NO
+                                       ? caseData.getRespondent2OrganisationPolicy()
+                                       : caseData.getRespondent1OrganisationPolicy())
+            .map(OrganisationPolicy::getOrganisation).map(Organisation::getOrganisationID).orElse(null);
+
     }
 }

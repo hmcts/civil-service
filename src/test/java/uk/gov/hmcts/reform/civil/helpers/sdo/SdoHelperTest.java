@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.helpers.sdo;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
@@ -23,16 +23,25 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
+import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.OTHER;
 
 public class SdoHelperTest {
 
@@ -44,7 +53,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .build();
 
@@ -57,8 +66,8 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(YesOrNo.YES)
+                .drawDirectionsOrderRequired(YES)
+                .drawDirectionsOrderSmallClaims(YES)
                 .build();
 
             assertThat(SdoHelper.isSmallClaimsTrack(caseData)).isTrue();
@@ -82,7 +91,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
 
@@ -95,8 +104,8 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.YES)
-                .drawDirectionsOrderSmallClaims(YesOrNo.NO)
+                .drawDirectionsOrderRequired(YES)
+                .drawDirectionsOrderSmallClaims(NO)
                 .orderType(OrderType.DECIDE_DAMAGES)
                 .build();
 
@@ -138,7 +147,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .smallClaims(directions)
                 .build();
@@ -154,7 +163,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .smallClaims(directions)
                 .build();
@@ -169,7 +178,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .build();
 
@@ -196,6 +205,219 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("four hours");
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOther() {
+            var expected = "6 hours 20 minutes";
+            SmallClaimsHearing smallClaimsHearing = SmallClaimsHearing.builder()
+                .input1("input1")
+                .input2("input2")
+                .time(SmallClaimsTimeEstimate.OTHER)
+                .otherHours(new BigDecimal(6))
+                .otherMinutes(new BigDecimal(20))
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .smallClaimsHearing(smallClaimsHearing)
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnEmptyString_whenHearingIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build();
+
+            assertThat(SdoHelper.getSmallClaimsHearingTimeLabel(caseData)).isEqualTo("");
+        }
+    }
+
+    @Nested
+    class GetDisposalHearingTimeLabelTest {
+        @Test
+        void shouldReturnLabel_whenHearingIsNotNull() {
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(FIFTEEN_MINUTES)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo("15 minutes");
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOther() {
+            var expected = "6 hours 20 minutes";
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(OTHER)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .otherHours("6")
+                .otherMinutes("20")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOtherAsOneHourOneMinute() {
+            var expected = "1 hour 1 minute";
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(OTHER)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .otherHours("1")
+                .otherMinutes("1")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOtherHourZero() {
+            var expected = "20 minutes";
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(OTHER)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .otherHours("0")
+                .otherMinutes("20")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOtherMinuteZero() {
+            var expected = "6 hours";
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(OTHER)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .otherHours("6")
+                .otherMinutes("0")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOtherMinuteZeroOneHour() {
+            var expected = "1 hour";
+            DisposalHearingHearingTime disposalHearingHearingTime = DisposalHearingHearingTime.builder()
+                .input("input")
+                .time(OTHER)
+                .dateFrom(LocalDate.parse("2022-01-01"))
+                .dateFrom(LocalDate.parse("2022-01-02"))
+                .otherHours("1")
+                .otherMinutes("0")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .disposalHearingHearingTime(disposalHearingHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldReturnEmptyString_whenHearingIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build();
+
+            assertThat(SdoHelper.getDisposalHearingTimeLabel(caseData)).isEqualTo("");
+        }
+    }
+
+    @Nested
+    class GetFastClaimsHearingTimeLabelTest {
+        @Test
+        void shouldReturnLabel_whenHearingIsNotNull() {
+            FastTrackHearingTime fastTrackHearingTime = FastTrackHearingTime.builder()
+                .helpText1("helpText1")
+                .helpText2("helpText2")
+                .hearingDuration(FastTrackHearingTimeEstimate.FOUR_HOURS)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackHearingTime(fastTrackHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getFastClaimsHearingTimeLabel(caseData)).isEqualTo("4 hours");
+        }
+
+        @Test
+        void shouldReturnLabel_whenHearingOther() {
+            var expected = "6 hours 20 minutes";
+            FastTrackHearingTime fastTrackHearingTime = FastTrackHearingTime.builder()
+                .helpText1("helpText1")
+                .helpText2("helpText2")
+                .hearingDuration(FastTrackHearingTimeEstimate.OTHER)
+                .otherHours("6")
+                .otherMinutes("20")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackHearingTime(fastTrackHearingTime)
+                .build();
+
+            assertThat(SdoHelper.getFastClaimsHearingTimeLabel(caseData)).isEqualTo(expected);
         }
 
         @Test
@@ -382,7 +604,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -398,7 +620,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -414,7 +636,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -430,7 +652,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -446,7 +668,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -462,7 +684,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -478,7 +700,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(directions)
                 .build();
@@ -493,7 +715,7 @@ public class SdoHelperTest {
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
 
@@ -517,8 +739,8 @@ public class SdoHelperTest {
                 .fastTrackWitnessOfFactToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackSchedulesOfLossToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackCostsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
-                .fastTrackTrialToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .fastTrackMethodToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
+                .fastTrackTrialToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAltDisputeResolutionToggle"))
@@ -533,6 +755,34 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")).isTrue();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")).isTrue();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenFastDateToTogglesExist() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                .atStateSdoFastTrackTrial()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .build();
+
+            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialDateToToggle")).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenDisposalHearingDateToToggleExist() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+                .atStateClaimIssuedTrialHearing()
+                .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+                .atStateClaimIssuedTrialSDOInPersonHearing()
+                .atStateClaimIssuedTrialLocationInPerson()
+                .atStateSdoTrialDj()
+                .build();
+
+            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingDateToToggle")).isTrue();
         }
 
         @Test
@@ -576,7 +826,6 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isFalse();
 
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")).isFalse();
-
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "invalid input")).isFalse();
         }
     }
@@ -837,6 +1086,85 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.getFastTrackTrialBundleTypeText(caseData)).isEqualTo("");
+        }
+    }
+
+    @Nested
+    class GetFastTrackAllocationText {
+        @Test
+        void shouldReturnText_whenComplexityBandChosenWithReasons() {
+            FastTrackAllocation fastTrackAllocation = FastTrackAllocation.builder()
+                .assignComplexityBand(YES)
+                .band(ComplexityBand.BAND_2)
+                .reasons("some reasons")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackAllocation(fastTrackAllocation)
+                .build();
+
+            String expectedText = "The claim is allocated to the Fast Track and is assigned to complexity band 2 because some reasons";
+
+            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
+        }
+
+        @Test
+        void shouldReturnText_whenComplexityBandChosenNoReasons() {
+            FastTrackAllocation fastTrackAllocation = FastTrackAllocation.builder()
+                .assignComplexityBand(YES)
+                .band(ComplexityBand.BAND_2)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackAllocation(fastTrackAllocation)
+                .build();
+
+            String expectedText = "The claim is allocated to the Fast Track and is assigned to complexity band 2";
+
+            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
+        }
+
+        @Test
+        void shouldReturnText_whenNoComplexityBandChosenNoReasons() {
+            FastTrackAllocation fastTrackAllocation = FastTrackAllocation.builder()
+                .assignComplexityBand(NO)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackAllocation(fastTrackAllocation)
+                .build();
+
+            String expectedText = "The claim is allocated to the Fast Track and is not assigned to a complexity band";
+
+            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
+        }
+
+        @Test
+        void shouldReturnText_whenNoComplexityBandChosenWithReasons() {
+            FastTrackAllocation fastTrackAllocation = FastTrackAllocation.builder()
+                .assignComplexityBand(NO)
+                .reasons("some more reasons")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .fastTrackAllocation(fastTrackAllocation)
+                .build();
+
+            String expectedText = "The claim is allocated to the Fast Track and is not assigned to a complexity band because some more reasons";
+
+            assertThat(SdoHelper.getFastTrackAllocation(caseData, true)).isEqualTo(expectedText);
         }
     }
 

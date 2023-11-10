@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
@@ -16,11 +17,20 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class SdoHelper {
 
@@ -28,15 +38,20 @@ public class SdoHelper {
         // Utility class, no instances
     }
 
+    private static final String FAST_TRACK_ALLOCATION_BASE = "The claim is allocated to the Fast Track";
+    private static final String FAST_TRACK_ALLOCATION_WTIH_COMPLEXITY = " and is assigned to complexity %s";
+    private static final String FAST_TRACK_ALLOCATION_NO_COMPLEXITY = " and is not assigned to a complexity band";
+    private static final String FAST_TRACK_ALLOCATION_REASON = " because %s";
+
     public static boolean isSmallClaimsTrack(CaseData caseData) {
         YesOrNo drawDirectionsOrderRequired = caseData.getDrawDirectionsOrderRequired();
         YesOrNo drawDirectionsOrderSmallClaims = caseData.getDrawDirectionsOrderSmallClaims();
         ClaimsTrack claimsTrack = caseData.getClaimsTrack();
 
-        Boolean smallClaimsPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
+        Boolean smallClaimsPath1 = (drawDirectionsOrderRequired == NO)
             && (claimsTrack == ClaimsTrack.smallClaimsTrack);
-        Boolean smallClaimsPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
-            && (drawDirectionsOrderSmallClaims == YesOrNo.YES);
+        Boolean smallClaimsPath2 = (drawDirectionsOrderRequired == YES)
+            && (drawDirectionsOrderSmallClaims == YES);
 
         return smallClaimsPath1 || smallClaimsPath2;
     }
@@ -47,16 +62,17 @@ public class SdoHelper {
         ClaimsTrack claimsTrack = caseData.getClaimsTrack();
         OrderType orderType = caseData.getOrderType();
 
-        Boolean fastTrackPath1 = (drawDirectionsOrderRequired == YesOrNo.NO)
+        Boolean fastTrackPath1 = (drawDirectionsOrderRequired == NO)
             && (claimsTrack == ClaimsTrack.fastTrack);
-        Boolean fastTrackPath2 = (drawDirectionsOrderRequired == YesOrNo.YES)
-            && (drawDirectionsOrderSmallClaims == YesOrNo.NO) && (orderType == OrderType.DECIDE_DAMAGES);
+        Boolean fastTrackPath2 = (drawDirectionsOrderRequired == YES)
+            && (drawDirectionsOrderSmallClaims == NO) && (orderType == OrderType.DECIDE_DAMAGES);
 
         return fastTrackPath1 || fastTrackPath2;
     }
 
     public static boolean hasSharedVariable(CaseData caseData, String variableName) {
         switch (variableName) {
+
             case "applicant2":
                 return caseData.getApplicant2() != null;
             case "respondent2":
@@ -79,13 +95,12 @@ public class SdoHelper {
 
     public static boolean hasSmallAdditionalDirections(CaseData caseData, String additionalDirection) {
         SmallTrack additionalDirectionEnum = getSmallClaimsAdditionalDirectionEnum(additionalDirection);
-        List<SmallTrack> smallClaims = caseData.getSmallClaims();
+        List<SmallTrack> smallClaims = caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections() != null
+            ? caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections() : caseData.getSmallClaims();
         boolean hasDirection;
 
         if ((smallClaims != null) && (additionalDirectionEnum != null)) {
-            hasDirection = (caseData.getDrawDirectionsOrderRequired() == YesOrNo.NO)
-                && (caseData.getClaimsTrack() == ClaimsTrack.smallClaimsTrack)
-                && (smallClaims.contains(additionalDirectionEnum));
+            hasDirection = smallClaims.contains(additionalDirectionEnum);
         } else {
             hasDirection = false;
         }
@@ -93,14 +108,90 @@ public class SdoHelper {
         return hasDirection;
     }
 
+    public static String getDisposalHearingTimeLabel(CaseData caseData) {
+        DisposalHearingHearingTime disposalHearingHearingTime = caseData.getDisposalHearingHearingTime();
+
+        String hearingTimeEstimateLabel = "";
+
+        if (Optional.ofNullable(caseData.getDisposalHearingHearingTime())
+            .map(DisposalHearingHearingTime::getTime)
+            .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel).isPresent()) {
+            if (disposalHearingHearingTime.getTime().getLabel().equals("Other")) {
+                StringBuilder otherLength = new StringBuilder();
+                if (disposalHearingHearingTime.getOtherHours() != null
+                    && Integer.parseInt(disposalHearingHearingTime.getOtherHours()) != 0) {
+                    String hourString = Integer.parseInt(disposalHearingHearingTime.getOtherHours()) == 1
+                        ? " hour" : " hours";
+                    otherLength.append(disposalHearingHearingTime.getOtherHours().trim() + hourString);
+                }
+                if (disposalHearingHearingTime.getOtherMinutes() != null
+                    && Integer.parseInt(disposalHearingHearingTime.getOtherMinutes()) != 0) {
+                    String minuteString = Integer.parseInt(disposalHearingHearingTime.getOtherMinutes()) == 1
+                        ? " minute" : " minutes";
+                    String spaceBeforeMinute = otherLength.toString().contains("hour") ? " " : "";
+                    otherLength.append(spaceBeforeMinute
+                                           + disposalHearingHearingTime.getOtherMinutes().trim()
+                                           + minuteString);
+                }
+                return otherLength.toString();
+            }
+
+            hearingTimeEstimateLabel = disposalHearingHearingTime.getTime().getLabel().toLowerCase(Locale.ROOT);
+        }
+
+        return hearingTimeEstimateLabel;
+    }
+
     public static String getSmallClaimsHearingTimeLabel(CaseData caseData) {
         SmallClaimsHearing smallClaimHearing = caseData.getSmallClaimsHearing();
 
-        if (smallClaimHearing != null) {
-            return smallClaimHearing.getTime().getLabel().toLowerCase(Locale.ROOT);
+        String hearingTimeEstimateLabel = "";
+
+        if (Optional.ofNullable(caseData.getSmallClaimsHearing())
+            .map(SmallClaimsHearing::getTime)
+            .map(SmallClaimsTimeEstimate::getLabel).isPresent()) {
+            if (smallClaimHearing.getTime().getLabel().equals("Other")) {
+                StringBuilder otherLength = new StringBuilder();
+                if (smallClaimHearing.getOtherHours() != null) {
+                    otherLength.append(smallClaimHearing.getOtherHours().toString().trim() +
+                                           " hours ");
+                }
+                if (smallClaimHearing.getOtherMinutes() != null) {
+                    otherLength.append(smallClaimHearing.getOtherMinutes().toString().trim() + " minutes");
+                }
+                return otherLength.toString();
+            }
+
+            hearingTimeEstimateLabel = smallClaimHearing.getTime().getLabel().toLowerCase(Locale.ROOT);
         }
 
-        return "";
+        return hearingTimeEstimateLabel;
+    }
+
+    public static String getFastClaimsHearingTimeLabel(CaseData caseData) {
+        FastTrackHearingTime fastTrackHearingTime = caseData.getFastTrackHearingTime();
+
+        String fastTrackHearingTimeLabel = "";
+
+        if (Optional.ofNullable(caseData.getFastTrackHearingTime())
+            .map(FastTrackHearingTime::getHearingDuration)
+            .map(FastTrackHearingTimeEstimate::getLabel).isPresent()) {
+            if (fastTrackHearingTime.getHearingDuration().getLabel().equals("Other")) {
+                StringBuilder otherLength = new StringBuilder();
+                if (fastTrackHearingTime.getOtherHours() != null) {
+                    otherLength.append(fastTrackHearingTime.getOtherHours().toString().trim() +
+                                           " hours ");
+                }
+                if (fastTrackHearingTime.getOtherMinutes() != null) {
+                    otherLength.append(fastTrackHearingTime.getOtherMinutes().toString().trim() + " minutes");
+                }
+                return otherLength.toString();
+            }
+
+            fastTrackHearingTimeLabel = fastTrackHearingTime.getHearingDuration().getLabel();
+        }
+
+        return fastTrackHearingTimeLabel;
     }
 
     public static String getSmallClaimsMethodTelephoneHearingLabel(CaseData caseData) {
@@ -135,6 +226,9 @@ public class SdoHelper {
                 return caseData.getSmallClaimsDocumentsToggle() != null;
             case "smallClaimsWitnessStatementToggle":
                 return caseData.getSmallClaimsWitnessStatementToggle() != null;
+            case "smallClaimsNumberOfWitnessesToggle":
+                return caseData.getSmallClaimsWitnessStatement() != null
+                    && caseData.getSmallClaimsWitnessStatement().getSmallClaimsNumberOfWitnessesToggle() != null;
             case "smallClaimsAddNewDirections":
                 return caseData.getSmallClaimsAddNewDirections() != null;
             default:
@@ -165,13 +259,12 @@ public class SdoHelper {
 
     public static boolean hasFastAdditionalDirections(CaseData caseData, String additionalDirection) {
         FastTrack additionalDirectionEnum = getFastTrackAdditionalDirectionEnum(additionalDirection);
-        List<FastTrack> fastClaims = caseData.getFastClaims();
+        List<FastTrack> fastClaims = caseData.getTrialAdditionalDirectionsForFastTrack() != null
+            ? caseData.getTrialAdditionalDirectionsForFastTrack() : caseData.getFastClaims();
         boolean hasDirection;
 
         if ((fastClaims != null) && (additionalDirectionEnum != null)) {
-            hasDirection = (caseData.getDrawDirectionsOrderRequired() == YesOrNo.NO)
-                && (caseData.getClaimsTrack() == ClaimsTrack.fastTrack)
-                && (fastClaims.contains(additionalDirectionEnum));
+            hasDirection = fastClaims.contains(additionalDirectionEnum);
         } else {
             hasDirection = false;
         }
@@ -201,6 +294,9 @@ public class SdoHelper {
                 return caseData.getFastTrackMethodToggle() != null;
             case "fastTrackAddNewDirections":
                 return caseData.getFastTrackAddNewDirections() != null;
+            case "fastTrackTrialDateToToggle":
+                return caseData.getFastTrackHearingTime() != null
+                    && caseData.getFastTrackHearingTime().getDateToToggle() != null;
             default:
                 return false;
         }
@@ -250,6 +346,34 @@ public class SdoHelper {
         }
 
         return "";
+    }
+
+    public static String getFastTrackAllocation(CaseData caseData, boolean fastTrackUpliftsEnabled) {
+        if (fastTrackUpliftsEnabled) {
+            FastTrackAllocation fastTrackAllocation = caseData.getFastTrackAllocation();
+            String reasons = "";
+            if (fastTrackAllocation != null) {
+                reasons = getFastTrackAllocationReason(fastTrackAllocation, reasons);
+                if (NO.equals(fastTrackAllocation.getAssignComplexityBand())) {
+                    return String.format("%s%s%s", FAST_TRACK_ALLOCATION_BASE, FAST_TRACK_ALLOCATION_NO_COMPLEXITY, reasons);
+                } else if (YES.equals(fastTrackAllocation.getAssignComplexityBand())) {
+                    String band = String.format(
+                        FAST_TRACK_ALLOCATION_WTIH_COMPLEXITY,
+                        fastTrackAllocation.getBand().getLabel().toLowerCase()
+                    );
+                    return String.format("%s%s%s", FAST_TRACK_ALLOCATION_BASE, band, reasons);
+                }
+            }
+        }
+        return "";
+    }
+
+    private static String getFastTrackAllocationReason(FastTrackAllocation fastTrackAllocation, String reasons) {
+        if (fastTrackAllocation.getReasons() != null
+            && !fastTrackAllocation.getReasons().equals("")) {
+            reasons = String.format(FAST_TRACK_ALLOCATION_REASON, fastTrackAllocation.getReasons());
+        }
+        return reasons;
     }
 
     public static String getDisposalHearingFinalDisposalHearingTimeLabel(CaseData caseData) {
@@ -333,6 +457,9 @@ public class SdoHelper {
                 return caseData.getDisposalHearingCostsToggle() != null;
             case "disposalHearingAddNewDirections":
                 return caseData.getDisposalHearingAddNewDirections() != null;
+            case "disposalHearingDateToToggle":
+                return caseData.getTrialHearingTimeDJ() != null
+                    && caseData.getTrialHearingTimeDJ().getDateToToggle() != null;
             default:
                 return false;
         }

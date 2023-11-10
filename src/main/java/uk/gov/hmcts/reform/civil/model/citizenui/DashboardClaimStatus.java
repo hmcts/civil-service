@@ -6,43 +6,78 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    CLAIMANT_REJECT_PARTIAL_ADMISSION(
+        Claim::isPartialAdmissionRejected
+    ),
     CLAIMANT_ACCEPTED_STATES_PAID(
         Claim::claimantConfirmedDefendantPaid
     ),
     CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT(
         Claim::hasClaimantAcceptedPartialAdmissionAmount
     ),
-    SETTLEMENT_SIGNED(
-        Claim::haveBothPartiesSignedSettlementAgreement
+    SDO_ORDER_CREATED(
+        Claim::isSDOOrderCreated
     ),
-    CLAIMANT_ASKED_FOR_SETTLEMENT(
-        Claim::hasClaimantAskedToSignSettlementAgreement
+    MORE_DETAILS_REQUIRED(
+        Claim::isMoreDetailsRequired
+    ),
+    MEDIATION_UNSUCCESSFUL(
+        Claim::isMediationUnsuccessful
+    ),
+    MEDIATION_SUCCESSFUL(
+        Claim::isMediationSuccessful
+    ),
+    IN_MEDIATION(
+        Claim::isMediationPending
+    ),
+    CLAIM_ENDED(
+        Claim::hasClaimEnded
+    ),
+    RESPONSE_BY_POST(
+        Claim::isPaperResponse
+    ),
+    WAITING_COURT_REVIEW(
+        Claim::isCourtReviewing
     ),
     TRANSFERRED(
         Claim::isSentToCourt
     ),
+    SETTLED(
+        Claim::isSettled
+    ),
+    DEFENDANT_PART_ADMIT_PAID(
+        Claim::hasDefendantStatedTheyPaid
+    ),
+    DEFENDANT_PART_ADMIT(
+        Claim::defendantRespondedWithPartAdmit
+    ),
+    SETTLEMENT_SIGNED(
+        Claim::haveBothPartiesSignedSettlementAgreement
+    ),
+    CLAIMANT_ACCEPTED_OFFER_OUT_OF_COURT(
+        Claim::claimantAcceptedOfferOutOfCourt
+    ),
+    CLAIMANT_ASKED_FOR_SETTLEMENT(
+        Claim::hasClaimantAskedToSignSettlementAgreement
+    ),
     HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
-
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
     REQUESTED_COUNTRY_COURT_JUDGEMENT(
         Claim::claimantRequestedCountyCourtJudgement
     ),
-    SETTLED(
-        Claim::isSettled
-    ),
-    RESPONSE_DUE_NOW(
-        Claim::hasResponseDueToday
+    DEFAULT_JUDGEMENT(
+        Claim::isClaimantDefaultJudgement
     ),
     RESPONSE_OVERDUE(
         Claim::hasResponsePendingOverdue
     ),
+    RESPONSE_DUE_NOW(
+        Claim::hasResponseDueToday
+    ),
     ELIGIBLE_FOR_CCJ(
         Claim::isEligibleForCCJ
-    ),
-    MORE_TIME_REQUESTED(
-        Claim::hasResponseDeadlineBeenExtended
     ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
@@ -53,11 +88,8 @@ public enum DashboardClaimStatus {
     ADMIT_PAY_INSTALLMENTS(
         Claim::defendantRespondedWithFullAdmitAndPayByInstallments
     ),
-    DEFENDANT_PART_ADMIT_PAID(
-        Claim::hasDefendantStatedTheyPaid
-    ),
-    DEFENDANT_PART_ADMIT(
-        Claim::defendantRespondedWithPartAdmit
+    MORE_TIME_REQUESTED(
+        Claim::hasResponseDeadlineBeenExtended
     ),
     NO_RESPONSE(
         Claim::hasResponsePending
@@ -65,14 +97,17 @@ public enum DashboardClaimStatus {
     PROCEED_OFFLINE(
         Claim::isProceedOffline
     ),
-    RESPONSE_BY_POST(
-        Claim::isPaperResponse
-    ),
     CHANGE_BY_DEFENDANT(
         Claim::hasChangeRequestFromDefendant
     ),
     CHANGE_BY_CLAIMANT(
         Claim::hasChangeRequestedFromClaimant
+    ),
+    CLAIMANT_REJECT_OFFER_OUT_OF_COURT(
+        Claim::hasClaimantRejectOffer
+    ),
+    CLAIM_REJECTED_OFFER_SETTLE_OUT_OF_COURT(
+        Claim::isClaimRejectedAndOfferSettleOutOfCourt
     ),
     WAITING_FOR_CLAIMANT_TO_RESPOND(
         Claim::isWaitingForClaimantToRespond
@@ -80,6 +115,7 @@ public enum DashboardClaimStatus {
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
+
     NO_STATUS(c -> false);
 
     @Getter

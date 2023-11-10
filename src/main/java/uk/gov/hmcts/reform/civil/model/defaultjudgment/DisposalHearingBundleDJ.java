@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 
+import java.util.List;
+
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
@@ -13,5 +15,5 @@ import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 public class DisposalHearingBundleDJ {
 
     private String input;
-    private DisposalHearingBundleType type;
+    private List<DisposalHearingBundleType> type;
 }

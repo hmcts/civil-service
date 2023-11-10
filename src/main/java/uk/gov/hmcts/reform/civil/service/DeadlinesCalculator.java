@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -74,6 +73,14 @@ public class DeadlinesCalculator {
         return calculateFirstWorkingDay(dateTime.toLocalDate()).plusDays(daysToAdd).atTime(END_OF_BUSINESS_DAY);
     }
 
+    public LocalDate calculateRespondentPaymentDateAdmittedClaim(LocalDateTime responseDate) {
+        LocalDateTime dateTime = responseDate;
+        if (is4pmOrAfter(responseDate)) {
+            dateTime = responseDate.plusDays(1);
+        }
+        return calculateFirstWorkingDay(dateTime.toLocalDate().plusDays(5));
+    }
+
     public LocalDate calculateFirstWorkingDay(LocalDate date) {
         while (!workingDayIndicator.isWorkingDay(date)) {
             date = date.plusDays(1);
@@ -100,48 +107,28 @@ public class DeadlinesCalculator {
         return currentDate;
     }
 
+    public LocalDate getOrderSetAsideOrVariedApplicationDeadline(LocalDateTime fromDateTime) {
+        LocalDate fromDate = is4pmOrAfter(fromDateTime) ? fromDateTime.toLocalDate().plusDays(1)
+            : fromDateTime.toLocalDate();
+        while (workingDayIndicator.isWeekend(fromDate)) {
+            fromDate = fromDate.plusDays(1);
+        }
+
+        LocalDate deadline = fromDate.plusDays(7);
+        while (workingDayIndicator.isWeekend(deadline)) {
+            deadline = deadline.plusDays(1);
+        }
+
+        return deadline;
+    }
+
     public LocalDate calculateWhenToBePaid(LocalDateTime responseDate) {
         LocalDateTime dateTime = responseDate;
-        LocalDate checkingIfWorkingday;
         if (is4pmOrAfter(responseDate)) {
             dateTime = responseDate.plusDays(1);
         }
         int daysToAdd = 5;
         dateTime = dateTime.plusDays(daysToAdd);
-        return workingDayIndicator.getNextWorkingDay(dateTime.toLocalDate());
-    }
-
-    public LocalDate getSlaStartDate(CaseData caseData) {
-        var caseIssueDate = caseData.getIssueDate();
-        if (caseIssueDate == null) {
-            throw new IllegalArgumentException("Case issue data cannot be null");
-        }
-        var allocatedTrackName = caseData.getAllocatedTrack() != null
-            ? caseData.getAllocatedTrack().name()
-            : caseData.getResponseClaimTrack();
-
-        AllocatedTrack allocatedTrack;
-        try {
-            allocatedTrack = AllocatedTrack.valueOf(allocatedTrackName);
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("The allocated track provided was not of type AllocatedTrack");
-        } catch (NullPointerException ex) {
-            throw new IllegalArgumentException("Allocated track cannot be null");
-        }
-
-        switch (allocatedTrack) {
-            case FAST_CLAIM: {
-                return caseIssueDate.plusWeeks(50);
-            }
-            case SMALL_CLAIM: {
-                return caseIssueDate.plusWeeks(30);
-            }
-            case MULTI_CLAIM: {
-                return caseIssueDate.plusWeeks(80);
-            }
-            default: {
-                throw new IllegalArgumentException("Unexpected allocated track provided");
-            }
-        }
+        return dateTime.toLocalDate();
     }
 }

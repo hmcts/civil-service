@@ -6,6 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+
+import java.util.List;
+import java.util.Optional;
 
 @Data
 @Builder
@@ -15,9 +19,19 @@ public class CaseDataLiP {
 
     @JsonProperty("respondent1LiPResponse")
     private RespondentLiPResponse respondent1LiPResponse;
-    private TranslatedDocument translatedDocument;
+    @JsonProperty("applicant1LiPResponse")
+    private ClaimantLiPResponse applicant1LiPResponse;
+    private List<Element<TranslatedDocument>> translatedDocuments;
+    @JsonProperty("respondent1LiPFinancialDetails")
+    private FinancialDetailsLiP respondent1LiPFinancialDetails;
     @JsonProperty("applicant1ClaimMediationSpecRequiredLip")
     private ClaimantMediationLip applicant1ClaimMediationSpecRequiredLip;
+    @JsonProperty("helpWithFees")
+    private HelpWithFees helpWithFees;
+    @JsonProperty("respondent1AdditionalLipPartyDetails")
+    private AdditionalLipPartyDetails respondent1AdditionalLipPartyDetails;
+    @JsonProperty("applicant1AdditionalLipPartyDetails")
+    private AdditionalLipPartyDetails applicant1AdditionalLipPartyDetails;
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {
@@ -29,5 +43,19 @@ public class CaseDataLiP {
     public boolean hasClaimantNotAgreedToFreeMediation() {
         return applicant1ClaimMediationSpecRequiredLip != null
             && applicant1ClaimMediationSpecRequiredLip.hasClaimantNotAgreedToFreeMediation();
+    }
+
+    @JsonIgnore
+    public String getEvidenceComment() {
+        return Optional.ofNullable(respondent1LiPResponse)
+            .map(RespondentLiPResponse::getEvidenceComment)
+            .orElse("");
+    }
+
+    @JsonIgnore
+    public String getTimeLineComment() {
+        return Optional.ofNullable(respondent1LiPResponse)
+            .map(RespondentLiPResponse::getTimelineComment)
+            .orElse("");
     }
 }

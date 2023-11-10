@@ -681,6 +681,106 @@ public class GeneralApplicationDetailsBuilder {
                 .build();
     }
 
+    public CaseData getTestCaseDataForStatementOfTruthCheck(GARespondentOrderAgreement respondentOrderAgreement) {
+        return CaseData.builder()
+            .ccdState(AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
+            .ccdCaseReference(1234L)
+            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
+            .applicant1DQ(Applicant1DQ.builder()
+                              .applicant1DQRequestedCourt(RequestedCourt.builder()
+                                                              .responseCourtCode("applicant1DQRequestedCourt")
+                                                              .caseLocation(CaseLocationCivil.builder()
+                                                                                .region("2")
+                                                                                .baseLocation("11111")
+                                                                                .build())
+                                                              .build())
+                              .build())
+            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                .responseCourtCode("respondent1DQRequestedCourt")
+                                                                .caseLocation(CaseLocationCivil.builder()
+                                                                                  .region("2")
+                                                                                  .baseLocation("00000")
+                                                                                  .build())
+                                                                .build())
+                               .build())
+            .addApplicant2(YES)
+            .applicant2(Party.builder().type(Party.Type.COMPANY).companyName("Applicant2").build())
+            .addRespondent2(YES)
+            .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Respondent2").build())
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .generalAppRespondentAgreement(respondentOrderAgreement)
+            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
+                                              .generalAppUrgency(YES)
+                                              .reasonsForUrgency(STRING_CONSTANT)
+                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
+                                              .build())
+            .generalAppInformOtherParty(GAInformOtherParty.builder()
+                                            .isWithNotice(NO)
+                                            .reasonsForWithoutNotice(STRING_CONSTANT)
+                                            .build())
+            .generalAppDetailsOfOrder(STRING_CONSTANT)
+            .generalAppReasonsOfOrder(STRING_CONSTANT)
+            .generalAppEvidenceDocument(wrapElements(Document.builder()
+                                                         .documentUrl(STRING_CONSTANT)
+                                                         .documentBinaryUrl(STRING_CONSTANT)
+                                                         .documentFileName(STRING_CONSTANT)
+                                                         .documentHash(STRING_CONSTANT)
+                                                         .build()))
+            .generalAppHearingDetails(GAHearingDetails.builder()
+                                          .judgeName(STRING_CONSTANT)
+                                          .hearingDate(APP_DATE_EPOCH)
+                                          .trialDateFrom(APP_DATE_EPOCH)
+                                          .trialDateTo(APP_DATE_EPOCH)
+                                          .hearingYesorNo(YES)
+                                          .hearingDuration(OTHER)
+                                          .generalAppHearingDays("1")
+                                          .generalAppHearingHours("2")
+                                          .generalAppHearingMinutes("30")
+                                          .supportRequirement(singletonList(OTHER_SUPPORT))
+                                          .judgeRequiredYesOrNo(YES)
+                                          .trialRequiredYesOrNo(YES)
+                                          .hearingDetailsEmailID(STRING_CONSTANT)
+                                          .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
+                                                                                       .unavailableTrialDateFrom(APP_DATE_EPOCH)
+                                                                                       .unavailableTrialDateTo(APP_DATE_EPOCH).build()))
+                                          .supportRequirementOther(STRING_CONSTANT)
+                                          .hearingPreferredLocation(getPreferredLoc())
+                                          .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
+                                          .reasonForPreferredHearingType(STRING_CONSTANT)
+                                          .telephoneHearingPreferredType(STRING_CONSTANT)
+                                          .supportRequirementSignLanguage(STRING_CONSTANT)
+                                          .hearingPreferencesPreferredType(IN_PERSON)
+                                          .unavailableTrialRequiredYesOrNo(YES)
+                                          .supportRequirementLanguageInterpreter(STRING_CONSTANT)
+                                          .build())
+            .generalAppPBADetails(GAPbaDetails.builder()
+                                      .build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
+                                                .id(STRING_CONSTANT)
+                                                .email(APPLICANT_EMAIL_ID_CONSTANT).build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                              .organisation(Organisation.builder()
+                                                                .organisationID(STRING_CONSTANT).build())
+                                              .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+                                              .orgPolicyReference(STRING_CONSTANT).build())
+            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
+                                               .organisation(Organisation.builder()
+                                                                 .organisationID(STRING_CONSTANT).build())
+                                               .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                                               .orgPolicyReference(STRING_CONSTANT).build())
+            .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
+            .build();
+    }
+
     public CaseData getTestCaseDataSPEC(CaseCategory claimType) {
         return CaseData.builder()
             .ccdCaseReference(1234L)
@@ -1311,6 +1411,22 @@ public class GeneralApplicationDetailsBuilder {
             .build();
     }
 
+    public CaseData getTestCaseDataWithDirectionResponseDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .generalAppEvidenceDocument(wrapElements(Document.builder().documentUrl(STRING_CONSTANT).build()))
+            .generalOrderDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid))
+                                                    .value(pdfDocument).build()))
+            .gaRespDocument(singletonList(Element.<Document>builder().id(UUID.fromString(uid1))
+                                                      .value(pdfDocument1).build()))
+            .build();
+    }
+
     public CaseData getTestCaseDataWithConsentOrderPDFDocument(CaseData caseData) {
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
@@ -1321,6 +1437,19 @@ public class GeneralApplicationDetailsBuilder {
                                 .build())
             .consentOrderDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                                                       .value(pdfDocument).build()))
+            .build();
+    }
+
+    public CaseData getTestCaseDataWithDraftApplicationPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .gaDraftDocument(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                                                    .value(pdfDocument).build()))
             .build();
     }
 
@@ -1350,6 +1479,19 @@ public class GeneralApplicationDetailsBuilder {
                                 .build())
             .consentOrderDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                                                       .value(pdfDocument).build()))
+            .build();
+    }
+
+    public CaseData getTestCaseDataWithDraftStaffPDFDocument(CaseData caseData) {
+        String uid = "f000aa01-0451-4000-b000-000000000111";
+        String uid1 = "f000aa01-0451-4000-b000-000000000000";
+        return caseData.toBuilder()
+            .ccdCaseReference(1234L)
+            .generalAppType(GAApplicationType.builder()
+                                .types(singletonList(EXTEND_TIME))
+                                .build())
+            .gaDraftDocStaff(singletonList(Element.<CaseDocument>builder().id(UUID.fromString(uid1))
+                                                    .value(pdfDocument).build()))
             .build();
     }
 
@@ -1536,5 +1678,11 @@ public class GeneralApplicationDetailsBuilder {
                           .documentFileName("file-name")
                           .documentBinaryUrl("binary-url")
                           .build())
+        .build();
+
+    public final Document pdfDocument1 = Document.builder()
+        .documentUrl("fake-url")
+        .documentFileName("file-name")
+        .documentBinaryUrl("binary-url")
         .build();
 }

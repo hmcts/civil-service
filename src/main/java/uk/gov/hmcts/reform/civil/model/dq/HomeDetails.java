@@ -1,18 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
-import lombok.Data;
+import lombok.Builder;
 import uk.gov.hmcts.reform.civil.enums.HomeTypeOptionLRspec;
 
-@Data
-public class HomeDetails {
+@Builder
+public record HomeDetails(HomeTypeOptionLRspec type, String typeOtherDetails) {
 
-    /**
-     * type of home.
-     */
-    private final HomeTypeOptionLRspec type;
-
-    /**
-     * home description when type is "other".
-     */
-    private final String typeOtherDetails;
 }

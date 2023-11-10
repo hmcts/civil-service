@@ -33,7 +33,9 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -141,12 +143,15 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
 
             if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
                 && (RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-                    || RespondentResponseTypeSpec.FULL_ADMISSION.equals(
-                        caseData.getRespondent2ClaimResponseTypeForSpec()))
+                || RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec()))
             ) {
                 emailTemplate = notificationsProperties.getClaimantSolicitorImmediatelyDefendantResponseForSpec();
             } else {
-                emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+                if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                    emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponse1v2DSForSpec();
+                } else {
+                    emailTemplate = notificationsProperties.getClaimantSolicitorDefendantResponseForSpec();
+                }
             }
 
             notificationService.sendMail(
@@ -156,7 +161,11 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         } else if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC)) {
-            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            } else {
+                emailTemplate = getTemplateForSpecOtherThan1v2DS(caseData);
+            }
             if (caseData.getRespondent1ResponseDate() == null || !MultiPartyScenario.getMultiPartyScenario(caseData)
                 .equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                 notificationService.sendMail(
@@ -168,7 +177,11 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             }
 
         } else {
-            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            if (MultiPartyScenario.getMultiPartyScenario(caseData).equals(ONE_V_TWO_TWO_LEGAL_REP)) {
+                emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+            } else {
+                emailTemplate = getTemplateForSpecOtherThan1v2DS(caseData);
+            }
             notificationService.sendMail(
                 recipient,
                 emailTemplate,
@@ -176,6 +189,23 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
+    }
+
+    private String getTemplateForSpecOtherThan1v2DS(CaseData caseData) {
+
+        String emailTemplate;
+        if ((caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
+            || caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == BY_SET_DATE
+            || caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == SUGGESTION_OF_REPAYMENT_PLAN)
+            &&
+            (RespondentResponseTypeSpec.PART_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
+        ) {
+            emailTemplate = notificationsProperties.getRespondentSolicitorDefResponseSpecWithClaimantAction();
+        } else {
+            emailTemplate = notificationsProperties.getRespondentSolicitorDefendantResponseForSpec();
+        }
+
+        return emailTemplate;
     }
 
     @Override
@@ -213,10 +243,10 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
                     + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getMonth()
                     + " " + caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid().getYear();
                 return Map.of(
-                CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                WHEN_WILL_BE_PAID_IMMEDIATELY, shouldBePaidBy
+                    CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
+                    CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                    RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                    WHEN_WILL_BE_PAID_IMMEDIATELY, shouldBePaidBy
                 );
             } else {
                 return Map.of(

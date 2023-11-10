@@ -37,7 +37,7 @@ public class HearingValuesController {
     })
     public ResponseEntity<ServiceHearingValuesModel> getHearingValues(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-        @NonNull @RequestBody HearingValuesRequest requestDetails) {
+        @NonNull @RequestBody HearingValuesRequest requestDetails) throws Exception {
 
         var hearingValues = hearingValuesService.getValues(
             requestDetails.getCaseReference(), requestDetails.getHearingId(), authorization);

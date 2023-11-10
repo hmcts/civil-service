@@ -11,16 +11,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
@@ -40,7 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
     CreateClaimLipCallBackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    ClaimIssueConfiguration.class,
+    ClaimUrlsConfiguration.class,
     MockDatabaseConfiguration.class,
     ValidationAutoConfiguration.class,
     StateFlowEngine.class,
@@ -57,13 +57,13 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     private FeatureToggleService toggleService;
 
     @MockBean
-    private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
-
-    @MockBean
     private SpecReferenceNumberRepository specReferenceNumberRepository;
 
     @MockBean
     private Time time;
+
+    @MockBean
+    private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
 
     @Autowired
     private CreateClaimLipCallBackHandler handler;
@@ -112,8 +112,6 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             System.out.println(response.getData());
             assertThat(response.getData())
-                .containsEntry("issueDate", submittedDate.format(DateTimeFormatter.ISO_DATE))
-                .containsEntry("respondent1ResponseDeadline", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME))
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME));
 

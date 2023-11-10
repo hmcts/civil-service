@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,12 @@ import uk.gov.hmcts.reform.civil.validation.groups.DateOfBirthGroup;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.SOLE_TRADER;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Data
@@ -43,10 +49,12 @@ public class Party {
     private Address primaryAddress;
 
     private String partyName;
+    private String bulkClaimPartyName;
     private String partyTypeDisplayValue;
 
     private String partyEmail;
     private String partyPhone;
+    private String legalRepHeading;
 
     private List<Element<UnavailableDate>> unavailableDates;
 
@@ -73,5 +81,35 @@ public class Party {
 
     public String getPartyTypeDisplayValue() {
         return this.getType().getDisplayValue();
+    }
+
+    @JsonIgnore
+    public boolean isIndividual() {
+        return INDIVIDUAL.equals(getType());
+    }
+
+    @JsonIgnore
+    public boolean isSoleTrader() {
+        return SOLE_TRADER.equals(getType());
+    }
+
+    @JsonIgnore
+    public boolean isCompany() {
+        return COMPANY.equals(getType());
+    }
+
+    @JsonIgnore
+    public boolean isOrganisation() {
+        return ORGANISATION.equals(getType());
+    }
+
+    @JsonIgnore
+    public boolean isCompanyOROrganisation() {
+        return this.isCompany() || this.isOrganisation();
+    }
+
+    @JsonIgnore
+    public LocalDate getDateOfBirth() {
+        return Optional.ofNullable(individualDateOfBirth).orElse(soleTraderDateOfBirth);
     }
 }

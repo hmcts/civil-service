@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import java.math.BigDecimal;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,7 +13,6 @@ import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
@@ -32,7 +30,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
@@ -68,8 +65,6 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
     public LocalDateTime localDateTime = LocalDateTime.now();
     private static final String END_OF_BUSINESS_DAY = "4pm, ";
     private final DeadlinesCalculator deadlinesCalculator;
-    private final UserService userService;
-    private final SystemUpdateUserConfiguration userConfig;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         SealedClaimFormForSpec templateData = getTemplateData(caseData);
@@ -83,19 +78,6 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             authorisation,
             new PDF(getFileName(caseData), docmosisDocument.getBytes(), DocumentType.SEALED_CLAIM)
         );
-    }
-
-    public byte[] downloadDocument(CaseDocument caseDocument) {
-        String authorisation = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
-        return downloadDocument(caseDocument, authorisation);
-    }
-
-    public byte[] downloadDocument(CaseDocument caseDocument, String authorisation) {
-        String documentPath = URI.create(caseDocument.getDocumentLink().getDocumentUrl()).getPath();
-
-        byte[] file = documentManagementService.downloadDocument(authorisation, documentPath);
-        return file;
-
     }
 
     @NotNull

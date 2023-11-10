@@ -2,15 +2,13 @@ package uk.gov.hmcts.reform.civil.service.flowstate;
 
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 
@@ -20,6 +18,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
@@ -32,6 +31,7 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting.LISTING;
 
 public class FlowPredicate {
 
@@ -370,10 +370,90 @@ public class FlowPredicate {
         getPredicateForPayImmediately(caseData);
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
-
         caseData.getReasonNotSuitableSDO() != null
             && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
-            && caseData.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM;
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getTakenOfflineByStaffDate() == null;
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension =
+        FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt;
+
+    private static boolean getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() != null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2TimeExtensionDate() != null
+                && caseData.getRespondent2ResponseDate() == null);
+            default -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() != null
+                && caseData.getRespondent1ResponseDate() == null);
+        };
+    }
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension = caseData ->
+        caseData.getReasonNotSuitableSDO() != null
+            && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getRespondent1AcknowledgeNotificationDate() == null
+            && caseData.getRespondent1TimeExtensionDate() != null
+            && caseData.getRespondent1ResponseDate() == null;
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledged =
+        FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterNotificationAcknowledged;
+
+    private static boolean getPredicateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() != null
+                && caseData.getRespondent2TimeExtensionDate() == null
+                && caseData.getRespondent2ResponseDate() == null);
+            default -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent1ResponseDate() == null);
+        };
+    }
+
+    public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterClaimDetailsNotified =
+        FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified;
+
+    private static boolean getPredicateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(CaseData caseData) {
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_TWO_TWO_LEGAL_REP, ONE_V_TWO_ONE_LEGAL_REP -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getRespondent2ResponseDate() == null
+                && caseData.getRespondent2AcknowledgeNotificationDate() == null
+                && caseData.getRespondent2TimeExtensionDate() == null
+                && caseData.getClaimDismissedDate() == null);
+            default -> (caseData.getReasonNotSuitableSDO() != null
+                && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
+                && caseData.getTakenOfflineDate() != null
+                && caseData.getRespondent1AcknowledgeNotificationDate() == null
+                && caseData.getRespondent1ResponseDate() == null
+                && caseData.getRespondent1TimeExtensionDate() == null
+                && caseData.getClaimDismissedDate() == null);
+        };
+    }
+
     public static final Predicate<CaseData> fullDefenceNotProceed = caseData ->
         getPredicateForClaimantIntentionNotProceed(caseData);
 
@@ -381,13 +461,59 @@ public class FlowPredicate {
         caseData.getTakenOfflineDate() != null;
 
     public static final Predicate<CaseData> takenOfflineAfterSDO = caseData ->
-        caseData.getTakenOfflineDate() != null;
+        caseData.getDrawDirectionsOrderRequired() != null
+            && caseData.getReasonNotSuitableSDO() == null
+            && caseData.getTakenOfflineDate() != null
+            && caseData.getTakenOfflineByStaffDate() == null;
 
     public static final Predicate<CaseData> takenOfflineByStaff = caseData ->
         caseData.getTakenOfflineByStaffDate() != null;
 
+    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimantResponseBeforeSDO = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+        && caseData.getApplicant1ResponseDate() != null
+        && caseData.getDrawDirectionsOrderRequired() == null
+        && caseData.getReasonNotSuitableSDO() == null;
+
+    public static final Predicate<CaseData> takenOfflineByStaffAfterSDO = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getDrawDirectionsOrderRequired() != null
+            && caseData.getReasonNotSuitableSDO() == null;
+
+    public static final Predicate<CaseData> takenOfflineAfterNotSuitableForSdo = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getDrawDirectionsOrderRequired() == null
+            && caseData.getReasonNotSuitableSDO() != null
+            && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput());
+
+    public static final Predicate<CaseData> takenOfflineByStaffAfterDefendantResponse = caseData ->
+        getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(caseData);
+
     public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = caseData ->
         getPredicateTakenOfflineByStaffAfterClaimIssue(caseData);
+
+    public static final Predicate<CaseData> takenOfflineByStaffBeforeClaimIssued = caseData ->
+        getPredicateTakenOfflineByStaffBeforeClaimIssue(caseData);
+
+    public static final boolean getPredicateTakenOfflineByStaffAfterDefendantResponseBeforeClaimantResponse(CaseData caseData) {
+        boolean basePredicate = caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getApplicant1ResponseDate() == null;
+
+        if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && YES.equals(caseData.getAddApplicant2())) {
+            return basePredicate && caseData.getApplicant2ResponseDate() == null;
+        }
+
+        return basePredicate;
+    }
+
+    public static final boolean getPredicateTakenOfflineByStaffBeforeClaimIssue(CaseData caseData) {
+        // In case of SPEC and UNSPEC claim ClaimNotificationDeadline will be set when the case is issued
+        return caseData.getTakenOfflineByStaffDate() != null
+            && caseData.getClaimNotificationDeadline() == null
+            && caseData.getClaimNotificationDate() == null
+            && caseData.getSubmittedDate() != null;
+    }
 
     public static final boolean getPredicateTakenOfflineByStaffAfterClaimIssue(CaseData caseData) {
         // In case of SPEC claim ClaimNotificationDate will be set even when the case is issued
@@ -529,11 +655,13 @@ public class FlowPredicate {
                     && caseData.getRespondent1AcknowledgeNotificationDate() != null
                     && caseData.getRespondent2AcknowledgeNotificationDate() != null
                     && (caseData.getRespondent1TimeExtensionDate() != null
-                    || caseData.getRespondent2TimeExtensionDate() != null);
+                    || caseData.getRespondent2TimeExtensionDate() != null)
+                    && caseData.getReasonNotSuitableSDO() == null;
             default:
                 return caseData.getClaimDismissedDeadline().isBefore(LocalDateTime.now())
                     && caseData.getRespondent1TimeExtensionDate() != null
-                    && caseData.getRespondent1AcknowledgeNotificationDate() != null;
+                    && caseData.getRespondent1AcknowledgeNotificationDate() != null
+                    && caseData.getReasonNotSuitableSDO() == null;
         }
     };
 
@@ -541,6 +669,14 @@ public class FlowPredicate {
         caseData.getApplicant1ResponseDeadline() != null
             && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now())
             && caseData.getApplicant1ProceedWithClaim() == null;
+
+    public static final Predicate<CaseData> claimDismissalOutOfTime = caseData ->
+        caseData.getClaimDismissedDeadline() != null
+            && caseData.getApplicant1ResponseDeadline().isBefore(LocalDateTime.now());
+
+    public static final Predicate<CaseData> demageMultiClaim = caseData ->
+        AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())
+        && CaseCategory.UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
     public static final Predicate<CaseData> applicantOutOfTimeProcessedByCamunda = caseData ->
         caseData.getTakenOfflineDate() != null;
@@ -833,7 +969,7 @@ public class FlowPredicate {
     public static final Predicate<CaseData> pinInPostEnabledAndLiP = caseData ->
         caseData.getRespondent1PinToPostLRspec() != null;
 
-    public static final Predicate<CaseData> allAgreedToMediation = caseData -> {
+    public static final Predicate<CaseData> allAgreedToLrMediationSpec = caseData -> {
         boolean result = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && AllocatedTrack.SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
@@ -847,12 +983,7 @@ public class FlowPredicate {
                 .filter(YesOrNo.NO::equals).isPresent()
                 || Optional.ofNullable(caseData.getApplicantMPClaimMediationSpecRequired())
                 .map(SmallClaimMedicalLRspec::getHasAgreedFreeMediation)
-                .filter(YesOrNo.NO::equals).isPresent()) {
-                result = false;
-            } else if (Optional.ofNullable(caseData.getCaseDataLiP())
-                .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
-                .map(ClaimantMediationLip::getHasAgreedFreeMediation)
-                .filter(MediationDecision.No::equals).isPresent()) {
+                .filter(YesOrNo.NO::equals).isPresent() || caseData.hasClaimantAgreedToFreeMediation()) {
                 result = false;
             } else {
                 result = true;
@@ -864,17 +995,17 @@ public class FlowPredicate {
     public static final Predicate<CaseData> contactDetailsChange = caseData ->
         NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 
-    public static final Predicate<CaseData> acceptRepaymentPlan = caseData ->
-        caseData.hasApplicantAcceptedRepaymentPlan();
+    public static final Predicate<CaseData> acceptRepaymentPlan =
+        CaseData::hasApplicantAcceptedRepaymentPlan;
 
-    public static final Predicate<CaseData> rejectRepaymentPlan = caseData ->
-        caseData.hasApplicantRejectedRepaymentPlan();
+    public static final Predicate<CaseData> rejectRepaymentPlan =
+        CaseData::hasApplicantRejectedRepaymentPlan;
 
-    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual = caseData ->
-        caseData.isRespondentResponseBilingual();
+    public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
+        CaseDataParent::isRespondentResponseBilingual;
 
-    public static final Predicate<CaseData> agreePartAdmitSettle = caseData ->
-        caseData.isPartAdmitClaimSettled();
+    public static final Predicate<CaseData> agreePartAdmitSettle =
+        CaseData::isPartAdmitClaimSettled;
 
     public static final Predicate<CaseData> isClaimantNotSettlePartAdmitClaim =
         CaseData::isClaimantNotSettlePartAdmitClaim;
@@ -882,4 +1013,20 @@ public class FlowPredicate {
     // This field is used in LR ITP, prevent going another path in preview
     public static final Predicate<CaseData> isOneVOneResponseFlagSpec = caseData ->
         caseData.getShowResponseOneVOneFlag() != null;
+
+    public static final Predicate<CaseData> isInHearingReadiness = caseData ->
+        caseData.getHearingReferenceNumber() != null
+        && caseData.getListingOrRelisting() != null
+        && caseData.getListingOrRelisting().equals(LISTING)
+        && caseData.getCaseDismissedHearingFeeDueDate() == null
+        && caseData.getTakenOfflineDate() == null;
+
+    public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
+
+    public static final Predicate<CaseData> casemanMarksMediationUnsuccessful = caseData ->
+        Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason());
+
+    public static final Predicate<CaseData> takenOfflineByStaffBeforeMediationUnsuccessful = caseData ->
+        caseData.getTakenOfflineByStaffDate() != null
+        && Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason());
 }

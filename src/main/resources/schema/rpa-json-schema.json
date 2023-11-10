@@ -40,7 +40,10 @@
         },
         "owningCourtName": {
           "$id": "#/properties/header/properties/owningCourtName",
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "The court description. When not using owningCourtCode, this should be populated with the court name as found in CASEMAN. Mismatches will result in an exception record for manual resolution."
         },
         "caseType": {
@@ -59,7 +62,10 @@
         },
         "preferredCourtName": {
           "$id": "#/properties/header/properties/preferredCourtName",
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "The court description. When not using preferredCourtCode, this should be populated with the court name as found in CASEMAN. Mismatches will result in an exception record for manual resolution."
         },
         "caseAllocatedTo": {
@@ -225,7 +231,10 @@
           },
           "name": {
             "$id": "#/properties/solicitors/items/properties/name",
-            "type": ["string","null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "description": ""
           },
           "addresses": {
@@ -310,7 +319,10 @@
         },
         "courtFee": {
           "$id": "#/properties/claimDetails/properties/courtFee",
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "maxLength": 99999999999,
           "description": ""
         }
@@ -337,7 +349,8 @@
         "breathingSpaceMentalHealthEntered",
         "breathingSpaceMentalHealthLifted",
         "interlocutoryJudgment",
-        "defaultJudgment"
+        "defaultJudgment",
+        "judgmentByAdmission"
       ],
       "properties": {
         "miscellaneous": {
@@ -530,13 +543,28 @@
             }
           ],
           "description": ""
+        },
+        "judgmentByAdmission": {
+          "$id": "#/properties/events/properties/judgmentByAdmission",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/judgmentByAdmissionEventType"
+            },
+            {
+              "$ref": "#/definitions/nullEventType"
+            }
+          ],
+          "description": ""
         }
       },
       "additionalProperties": false
     },
     "noticeOfChange": {
       "$id": "#/properties/noticeOfChange",
-      "type": ["array", "null"],
+      "type": [
+        "array",
+        "null"
+      ],
       "items": {
         "$id": "#/properties/noticeOfChange/items",
         "required": [
@@ -613,14 +641,19 @@
     },
     "solicitorIDType": {
       "$id": "#/definitions/solicitorIDType",
-      "type": ["string",
-        "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Identifies the solicitor object in the json document.",
       "default": ""
     },
     "courtCodeType": {
       "$id": "#/definitions/courtCodeType",
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "pattern": "^(?:\\d{3}|)$",
       "description": "The HMCTS 3 digit court location code."
     },
@@ -657,7 +690,6 @@
         "string",
         "null"
       ],
-      "pattern": "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$|^$",
       "maxLength": 80,
       "description": ""
     },
@@ -679,7 +711,10 @@
     },
     "solicitorOrganisationIDType": {
       "$id": "#/definitions/solicitorOrganisationIDType",
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Where a solicitor organisation is registered in HMCTS, the organisation ID will be provided here. This is not intended to match to any CASEMAN solicitor ID. Where a solicitor organisation is not registered, a system generated pseudo value will be provided. This identifier is used to indicate which solicitor firm represents which litigant. Links the solicitor object in the json document to the litigant object."
     },
     "addressLineType": {
@@ -699,7 +734,10 @@
     },
     "postCodeType": {
       "$id": "#/definitions/postCodeType",
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": ""
     },
     "contactAddressType": {
@@ -749,7 +787,10 @@
     },
     "addressesType": {
       "$id": "#/definitions/addressesType",
-      "type": ["object", "null"],
+      "type": [
+        "object",
+        "null"
+      ],
       "required": [
         "contactAddress"
       ],
@@ -865,7 +906,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/miscellaneousEventType/items/properties/eventDetailsText",
-            "type": ["null", "string"],
+            "type": [
+              "null",
+              "string"
+            ],
             "maxLength": 250
           }
         },
@@ -931,7 +975,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/acknowledgementOfServiceReceivedEventType/items/properties/eventDetailsText",
-            "type": [ "null", "string"],
+            "type": [
+              "null",
+              "string"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -998,7 +1045,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/consentExtensionFilingDefenceEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1053,7 +1103,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/defenceFiledEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1108,7 +1161,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/defenceAndCounterClaimEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1163,7 +1219,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/receiptOfPartAdmissionEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1218,7 +1277,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/receiptOfAdmissionEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1273,7 +1335,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/replyToDefenceEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1352,7 +1417,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/directionsQuestionnaireFiledEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1417,7 +1485,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/statesPaidFiledEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1482,7 +1553,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/breathingSpaceEnteredEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1547,7 +1621,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/breathingSpaceLiftedEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1612,7 +1689,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/breathingSpaceMentalHealthEnteredEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1677,7 +1757,10 @@
           },
           "eventDetailsText": {
             "$id": "#/definitions/breathingSpaceMentalHealthLiftedEventType/items/properties/eventDetailsText",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "maxLength": 250,
             "description": ""
           }
@@ -1894,7 +1977,184 @@
         },
         "additionalProperties": false
       }
+    },
+    "judgmentByAdmissionEventType": {
+      "$id": "#/definitions/judgmentByAdmissionEventType",
+      "type": "array",
+      "additionalItems": false,
+      "items": {
+        "$id": "#/definitions/judgmentByAdmissionEventType/items",
+        "type": "object",
+        "required": [
+          "eventSequence",
+          "eventCode",
+          "dateReceived",
+          "litigiousPartyID",
+          "eventDetails",
+          "eventDetailsText"
+        ],
+        "properties": {
+          "eventSequence": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventSequence",
+            "$ref": "#/definitions/eventSequenceType"
+          },
+          "eventCode": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventCode",
+            "type": "string",
+            "const": "240",
+            "description": "The CASEMAN code for the judgmentByAdmission event."
+          },
+          "dateReceived": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/dateReceived",
+            "$ref": "#/definitions/formatDate",
+            "description": ""
+          },
+          "litigiousPartyID": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/litigiousPartyID",
+            "$ref": "#/definitions/litigiousPartyIDType",
+            "description": ""
+          },
+          "eventDetails": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [
+              "amountOfJudgment",
+              "isJudgmentForthwith",
+              "amountOfCosts"
+            ],
+            "properties": {
+              "amountOfJudgment": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/amountOfJudgment",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 999999999999,
+                "description": ""
+              },
+              "amountOfCosts": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/amountOfCosts",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 99999999,
+                "description": ""
+              },
+              "amountPaidBeforeJudgment": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/amountPaidBeforeJudgment",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 999999999999,
+                "description": ""
+              },
+              "isJudgmentForthwith": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/isJudgmentForthwith",
+                "type": "boolean",
+                "default": "true"
+              },
+              "paymentInFullDate": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/paymentInFullDate",
+                "$ref": "#/definitions/formatDateOrNull",
+                "description": ""
+              },
+              "installmentAmount": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/installmentAmount",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 99999999999,
+                "description": ""
+              },
+              "installmentPeriod": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/installmentPeriod",
+                "type": "string",
+                "enum": [
+                  "FOR",
+                  "MTH",
+                  "WK",
+                  null
+                ],
+                "default": null,
+                "description": ""
+              },
+              "firstInstallmentDate": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/firstInstallmentDate",
+                "$ref": "#/definitions/formatDateOrNull",
+                "description": ""
+              },
+              "dateOfJudgment": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/dateOfJudgment",
+                "$ref": "#/definitions/formatDateOrNull",
+                "description": ""
+              },
+              "jointJudgment": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/jointJudgment",
+                "type": "boolean",
+                "default": "false",
+                "description": ""
+              },
+              "judgmentToBeRegistered": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/judgmentToBeRegistered",
+                "type": "boolean",
+                "default": "true",
+                "description": ""
+              },
+              "miscText": {
+                "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetails/properties/miscText",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 250,
+                "description": ""
+              }
+            },
+            "dependentRequired": {
+              "isJudgmentForthwith": [
+                "judgmentToBeRegistered"
+              ],
+              "paymentInFullDate": [
+                "judgmentToBeRegistered"
+              ],
+              "installmentPeriod": [
+                "judgmentToBeRegistered"
+              ]
+            },
+            "if": {
+              "properties": {
+                "isJudgmentForthwith": {
+                  "const": false
+                }
+              }
+            },
+            "then": {
+              "oneOf": [
+                {
+                  "required": [
+                    "paymentInFullDate"
+                  ]
+                },
+                {
+                  "required": [
+                    "installmentPeriod",
+                    "installmentAmount"
+                  ]
+                }
+              ]
+            },
+            "additionalProperties": false
+          },
+          "eventDetailsText": {
+            "$id": "#/definitions/judgmentByAdmissionEventType/items/properties/eventDetailsText",
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 250,
+            "description": ""
+          }
+        },
+        "additionalProperties": false
+      }
     }
   }
 }
-

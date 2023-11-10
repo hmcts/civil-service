@@ -11,6 +11,10 @@ import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,8 +87,12 @@ public class FeesService {
      *
      * @return an array containing a range of claim amounts with a fee for that range.
      */
-    public Fee2Dto[] getFeeRange() {
-        return feesClient.findRangeGroup(feesConfiguration.getChannel(), feesConfiguration.getEvent());
+    public List<Fee2Dto> getFeeRange() {
+        Fee2Dto[] feeRanges  = feesClient.findRangeGroup(feesConfiguration.getChannel(), feesConfiguration.getEvent());
+        return Arrays.stream(feeRanges)
+            .sorted(Comparator.comparing(Fee2Dto::getMinRange, Comparator.nullsFirst(Comparator.naturalOrder())))
+            .filter(e -> e.getMinRange() != null)
+            .collect(Collectors.toList());
     }
 
 }

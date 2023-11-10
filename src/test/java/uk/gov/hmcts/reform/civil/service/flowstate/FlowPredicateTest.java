@@ -10,9 +10,11 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -74,8 +76,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmi
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefence;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceNotProceed;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceProceed;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHearingReadiness;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isOneVOneResponseFlagSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.multipartyCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
@@ -90,23 +93,33 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pinInPostEnabledAndLiP;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.rejectRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1NotRepresented;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent1OrgNotRegistered;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2NotRepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterNotSuitableForSdo;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaff;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimIssue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimDetailsNotifiedExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimIssue;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterClaimantResponseBeforeSDO;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterDefendantResponse;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledged;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterNotificationAcknowledgedTimeExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffAfterSDO;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeClaimIssued;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineByStaffBeforeMediationUnsuccessful;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineBySystem;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterClaimDetailsNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterNotificationAcknowledged;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension;
 
 class FlowPredicateTest {
 
@@ -150,6 +163,14 @@ class FlowPredicateTest {
         void shouldReturnFalse_whenCaseDataAtDraftState() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             assertFalse(claimSubmittedOneRespondentRepresentative.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseTakenOfflineBeforeIssue() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
+                .takenOfflineByStaff()
+                .build();
+            assertTrue(takenOfflineByStaffBeforeClaimIssued.test(caseData));
         }
     }
 
@@ -1250,6 +1271,50 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
             assertFalse(fullDefence.test(caseData));
         }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse1v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateRespondentFullDefence()
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse1v2DS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .atStateRespondentFullDefence()
+                .respondent2Responds(FULL_DEFENCE)
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse1v2SS() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimOneDefendantSolicitor()
+                .atStateBothRespondentsSameResponse(FULL_DEFENCE)
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineBeforeClaimantResponseAfterDefendantResponse2v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .multiPartyClaimTwoApplicants()
+                .atStateRespondentFullDefence()
+                .takenOfflineByStaff().build();
+            assertTrue(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAfterClaimantResponseAfterDefendantResponse() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .takenOfflineByStaff().build();
+            assertFalse(takenOfflineByStaffAfterDefendantResponse.test(caseData));
+        }
     }
 
     @Nested
@@ -1698,6 +1763,49 @@ class FlowPredicateTest {
                 .build();
 
             assertTrue(takenOfflineBySystem.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffAferClaimantResponseBeforeSdo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .takenOfflineByStaff()
+                .build();
+
+            assertTrue(takenOfflineByStaffAfterClaimantResponseBeforeSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineByStaffAferClaimantResponseAfterSdo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .takenOfflineByStaff()
+                .build().toBuilder()
+                .drawDirectionsOrderRequired(YES).build();
+
+            assertFalse(takenOfflineByStaffAfterClaimantResponseBeforeSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineByStaffMediationUnsuccessful() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build();
+
+            assertFalse(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineByStaffInMediation() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build().toBuilder()
+                .mediation(Mediation.builder().build())
+                .build();
+
+            assertTrue(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
         }
     }
 
@@ -2558,7 +2666,7 @@ class FlowPredicateTest {
         @Test
         public void whenUnspec_false() {
             CaseData caseData = CaseData.builder().build();
-            Assertions.assertFalse(FlowPredicate.allAgreedToMediation.test(caseData));
+            Assertions.assertFalse(FlowPredicate.allAgreedToLrMediationSpec.test(caseData));
         }
 
         @Test
@@ -2566,7 +2674,7 @@ class FlowPredicateTest {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
                 .build();
-            Assertions.assertFalse(FlowPredicate.allAgreedToMediation.test(caseData));
+            Assertions.assertFalse(FlowPredicate.allAgreedToLrMediationSpec.test(caseData));
         }
 
         @Test
@@ -2591,12 +2699,8 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[1])
                                                               .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[2].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
         }
 
@@ -2624,12 +2728,8 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[1])
                                                               .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[2].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
         }
 
@@ -2662,12 +2762,8 @@ class FlowPredicateTest {
                     .applicant1ClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                               .hasAgreedFreeMediation(whoAgrees[2])
                                                               .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[3].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
         }
 
@@ -2700,13 +2796,27 @@ class FlowPredicateTest {
                     .applicantMPClaimMediationSpecRequired(SmallClaimMedicalLRspec.builder()
                                                                .hasAgreedFreeMediation(whoAgrees[2])
                                                                .build())
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                     .hasAgreedFreeMediation(whoAgrees[3].equals(NO) ? MediationDecision.No : MediationDecision.Yes)
-                                     .build()).build())
                     .build();
-                Assertions.assertEquals(expected, FlowPredicate.allAgreedToMediation.test(cd));
+                Assertions.assertEquals(expected, FlowPredicate.allAgreedToLrMediationSpec.test(cd));
             });
+        }
+
+        @Test
+        void shouldReturnFalse_whenClaimantAgreedToLipMediation() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .caseAccessCategory(SPEC_CLAIM)
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                                              .hasAgreedFreeMediation(MediationDecision.Yes)
+                                                                              .build())
+                                 .build())
+                .build();
+            //When
+            boolean result = FlowPredicate.allAgreedToLrMediationSpec.test(caseData);
+            //Then
+            assertFalse(result);
         }
     }
 
@@ -2722,11 +2832,207 @@ class FlowPredicateTest {
         }
 
         @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotifiedReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified1v2ReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotified1v2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotifiedExtension() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotifiedExtensionReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension(false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterClaimDetailsNotifiedExtension() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotifiedExtension.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged1v2ReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged1v2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtensionReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_ONE, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension1v2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
+                .build();
+            assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension1v2ReasonInputMissing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledgedTimeExtension1v2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
+                .build();
+            assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension.test(caseData));
+            assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
         void shouldReturnFalse_whenTakenOfflineAfterSdoDrawn() {
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
                 .build();
             assertFalse(takenOfflineSDONotDrawn.test(caseData));
             assertTrue(takenOfflineAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffAfterSdoDrawn() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineByStaffAfterSDO(MultiPartyScenario.ONE_V_ONE)
+                .build();
+            assertFalse(takenOfflineSDONotDrawn.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+            assertTrue(takenOfflineByStaffAfterSDO.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffAfterNotSuitableSdo() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build();
+            assertFalse(takenOfflineSDONotDrawn.test(caseData));
+            assertFalse(takenOfflineAfterSDO.test(caseData));
+            assertTrue(takenOfflineAfterNotSuitableForSdo.test(caseData));
         }
     }
 
@@ -2816,5 +3122,25 @@ class FlowPredicateTest {
 
             assertTrue(isOneVOneResponseFlagSpec.test(caseData));
         }
+    }
+
+    @Test
+    public void isInHearingReadiness_whenHearingNoticeSubmitted() {
+        CaseData caseData = CaseData.builder()
+            .hearingReferenceNumber("11111")
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .build();
+
+        assertTrue(isInHearingReadiness.test(caseData));
+    }
+
+    @Test
+    public void isNotInHearingReadiness_whenHearingNoticeSubmitted() {
+        CaseData caseData = CaseData.builder()
+            .hearingReferenceNumber("11111")
+            .listingOrRelisting(ListingOrRelisting.RELISTING)
+            .build();
+
+        assertFalse(isInHearingReadiness.test(caseData));
     }
 }

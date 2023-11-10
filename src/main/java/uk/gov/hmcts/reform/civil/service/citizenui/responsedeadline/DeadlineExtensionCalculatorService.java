@@ -17,4 +17,5 @@ public class DeadlineExtensionCalculatorService {
             ? dateProposed
             : workingDayIndicator.getNextWorkingDay(dateProposed);
     }
+
 }

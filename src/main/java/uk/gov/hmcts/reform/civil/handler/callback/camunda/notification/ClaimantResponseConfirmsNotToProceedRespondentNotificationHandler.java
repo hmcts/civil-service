@@ -70,31 +70,37 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
     private CallbackResponse notifyRespondentSolicitorForClaimantConfirmsNotToProceed(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        String template = null;
         var recipient = isCcNotification(callbackParams)
             ? caseData.getApplicantSolicitor1UserDetails().getEmail()
             : caseData.getRespondentSolicitor1EmailAddress();
 
-        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            template = isCcNotification(callbackParams)
-                ? notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpec()
-                : notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec();
-        } else {
-            template = notificationsProperties.getClaimantSolicitorConfirmsNotToProceed();
-        }
         if (isRespondentSolicitor2Notification(callbackParams)) {
             recipient = caseData.getRespondentSolicitor2EmailAddress();
         }
 
         notificationService.sendMail(
             recipient,
-            template,
+            getTemplate(caseData, callbackParams),
             SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                 ? addPropertiesSpec(caseData, caseEvent)
                 : addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
         );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+    }
+
+    private String getTemplate(CaseData caseData, CallbackParams callbackParams) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            if (caseData.isPartAdmitPayImmediatelyAccepted()) {
+                return notificationsProperties.getNotifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec();
+            } else {
+                return isCcNotification(callbackParams)
+                    ? notificationsProperties.getClaimantSolicitorConfirmsNotToProceedSpec()
+                    : notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec();
+            }
+        } else {
+            return notificationsProperties.getClaimantSolicitorConfirmsNotToProceed();
+        }
     }
 
     @Override
@@ -106,11 +112,28 @@ public class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler e
     }
 
     public Map<String, String> addPropertiesSpec(CaseData caseData, CaseEvent caseEvent) {
+        if (caseData.isPartAdmitPayImmediatelyAccepted()) {
+            return Map.of(
+                CLAIM_DEFENDANT_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            );
+        }
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, caseEvent),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
+    }
+
+    private String getRespondentLegalOrganizationName(CaseData caseData) {
+        String id = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
+        Optional<Organisation> organisation = organisationService.findOrganisationById(id);
+
+        String respondentLegalOrganizationName = null;
+        if (organisation.isPresent()) {
+            respondentLegalOrganizationName = organisation.get().getName();
+        }
+        return respondentLegalOrganizationName;
     }
 
     private boolean isCcNotification(CallbackParams callbackParams) {

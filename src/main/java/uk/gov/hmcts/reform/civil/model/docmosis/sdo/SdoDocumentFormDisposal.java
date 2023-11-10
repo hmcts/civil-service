@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -67,6 +68,8 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private final DynamicList disposalHearingMethodInPerson;
     private final String disposalHearingMethodTelephoneHearing;
     private final String disposalHearingMethodVideoConferenceHearing;
+    private final LocationRefData hearingLocation;
+    private final LocationRefData caseManagementLocation;
 
     private final DisposalHearingBundle disposalHearingBundle;
     private final String disposalHearingBundleTypeText;
@@ -86,4 +89,5 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private final boolean disposalHearingBundleToggle;
     private final boolean disposalHearingClaimSettlingToggle;
     private final boolean disposalHearingCostsToggle;
+    private final boolean writtenByJudge;
 }

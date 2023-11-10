@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 
 @Service
@@ -21,8 +22,8 @@ public class UploadTranslatedDocumentHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(UPLOAD_TRANSLATED_DOCUMENT);
     private final UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory;
-
-    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::uploadDocument);
+    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::uploadDocument,
+                                                             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
 
     @Override
     protected Map<String, Callback> callbacks() {

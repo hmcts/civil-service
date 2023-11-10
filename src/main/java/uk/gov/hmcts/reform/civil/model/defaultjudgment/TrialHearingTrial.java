@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 
 import java.time.LocalDate;
+import java.util.List;
 import javax.validation.constraints.Future;
 
 @Data
@@ -22,5 +23,5 @@ public class TrialHearingTrial {
     private LocalDate date2;
     private String input2;
     private String input3;
-    private DisposalHearingBundleType type;
+    private List<DisposalHearingBundleType> type;
 }

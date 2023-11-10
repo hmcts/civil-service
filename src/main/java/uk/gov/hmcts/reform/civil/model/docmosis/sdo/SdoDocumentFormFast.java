@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -65,6 +66,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private final boolean hasHousingDisrepair;
     private final boolean hasPersonalInjury;
     private final boolean hasRoadTrafficAccident;
+    private final boolean writtenByJudge;
 
     private final FastTrackJudgesRecital fastTrackJudgesRecital;
     private final FastTrackDisclosureOfDocuments fastTrackDisclosureOfDocuments;
@@ -79,6 +81,8 @@ public class SdoDocumentFormFast implements MappableObject {
     private final DynamicList fastTrackMethodInPerson;
     private final String fastTrackMethodTelephoneHearing;
     private final String fastTrackMethodVideoConferenceHearing;
+    private final LocationRefData hearingLocation;
+    private final LocationRefData caseManagementLocation;
 
     private final FastTrackBuildingDispute fastTrackBuildingDispute;
     private final FastTrackClinicalNegligence fastTrackClinicalNegligence;
@@ -100,6 +104,9 @@ public class SdoDocumentFormFast implements MappableObject {
     private final boolean fastTrackWitnessOfFactToggle;
     private final boolean fastTrackSchedulesOfLossToggle;
     private final boolean fastTrackCostsToggle;
+    private final boolean fastTrackTrialDateToToggle;
     private final boolean fastTrackTrialToggle;
     private final boolean fastTrackMethodToggle;
+
+    private final String fastTrackAllocation;
 }

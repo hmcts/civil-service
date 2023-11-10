@@ -41,7 +41,7 @@ public class LocationRefDataUtilTest {
                                .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
                                .courtTypeId("10").courtLocationCode("121")
                                .epimmsId("000000").build());
-        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(courtLocations);
+        when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(courtLocations);
         String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(caseData,
                                                                               BEARER_TOKEN, true);
         assertEquals("121", preferredCourtCode);

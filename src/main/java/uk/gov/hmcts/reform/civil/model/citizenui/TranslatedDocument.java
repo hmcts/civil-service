@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentUploadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
 
 @Data
 @AllArgsConstructor
@@ -23,7 +23,7 @@ public class TranslatedDocument {
     @JsonIgnore
     public DocumentType getCorrespondingDocumentType() {
         switch (documentType) {
-            case DEFENDANT_RESPONSE : return DEFENDANT_DEFENCE;
+            case DEFENDANT_RESPONSE : return DEFENCE_TRANSLATED_DOCUMENT;
             default: throw new DocumentUploadException("No document file type found for Translated document");
         }
     }

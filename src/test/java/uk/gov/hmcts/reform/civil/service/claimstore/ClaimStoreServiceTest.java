@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.claimstore;
 
+import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.cmc.model.CmcParty;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -41,17 +43,22 @@ public class ClaimStoreServiceTest {
     private static final String REFERENCE_NUMBER = "256MC007";
     private static final BigDecimal TOTAL_AMOUNT = new BigDecimal("1000");
     private static final LocalDate RESPONSE_DEADLINE = LocalDate.of(2021, 1, 1);
-    private static final List<DashboardClaimInfo> EXPECTED_CLAIM_RESULT = Arrays.asList(DashboardClaimInfo.builder()
-                                                                                            .claimNumber(
-                                                                                                REFERENCE_NUMBER)
-                                                                                            .claimAmount(TOTAL_AMOUNT)
-                                                                                            .claimantName(CLAIMANT_NAME)
-                                                                                            .defendantName(
-                                                                                                DEFENDANT_NAME)
-                                                                                            .responseDeadline(
-                                                                                                RESPONSE_DEADLINE)
-                                                                                            .ocmc(true)
-                                                                                            .build());
+    private static final LocalDate CREATE_DATE = LocalDate.of(2023, 1, 22);
+    private static final LocalDateTime CREATE_DATETIME = CREATE_DATE.atTime(0, 0);
+    private static final List<DashboardClaimInfo> EXPECTED_CLAIM_RESULT
+        = Arrays.asList(DashboardClaimInfo.builder()
+                            .claimNumber(
+                                REFERENCE_NUMBER)
+                            .claimAmount(TOTAL_AMOUNT)
+                            .claimantName(CLAIMANT_NAME)
+                            .defendantName(
+                                DEFENDANT_NAME)
+                            .responseDeadline(
+                                RESPONSE_DEADLINE)
+                            .responseDeadlineTime(RESPONSE_DEADLINE.atStartOfDay())
+                            .ocmc(true)
+                            .createdDate(CREATE_DATETIME)
+                            .build());
 
     @BeforeEach
     void setUp() {
@@ -63,6 +70,7 @@ public class ClaimStoreServiceTest {
             .referenceNumber(REFERENCE_NUMBER)
             .responseDeadline(RESPONSE_DEADLINE)
             .totalAmountTillToday(TOTAL_AMOUNT)
+            .createdAt(CREATE_DATETIME)
             .build();
         given(claimStoreApi.getClaimsForClaimant(any(), any())).willReturn(Collections.singletonList(cmcClaim));
         given(claimStoreApi.getClaimsForDefendant(any(), any())).willReturn(Collections.singletonList(cmcClaim));
@@ -82,5 +90,21 @@ public class ClaimStoreServiceTest {
         verify(claimStoreApi).getClaimsForDefendant("23746486", "1234");
         assertThat(resultClaims.size()).isEqualTo(1);
         assertThat(resultClaims.get(0)).isEqualTo(EXPECTED_CLAIM_RESULT.get(0));
+    }
+
+    @Test
+    void shouldReturnEmptyListForClaimantWhenCmcClaimStoreIsUnavailable() {
+        given(claimStoreApi.getClaimsForClaimant(any(), any())).willThrow(FeignException.FeignClientException.class);
+        List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForClaimant("23746486", "1234");
+        verify(claimStoreApi).getClaimsForClaimant("23746486", "1234");
+        assertThat(resultClaims).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyListForDefendantWhenCmcClaimStoreIsUnavailable() {
+        given(claimStoreApi.getClaimsForDefendant(any(), any())).willThrow(FeignException.FeignClientException.class);
+        List<DashboardClaimInfo> resultClaims = claimStoreService.getClaimsForDefendant("23746486", "1234");
+        verify(claimStoreApi).getClaimsForDefendant("23746486", "1234");
+        assertThat(resultClaims).isEmpty();
     }
 }

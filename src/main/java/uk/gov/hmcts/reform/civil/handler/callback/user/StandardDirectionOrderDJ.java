@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -13,13 +14,20 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingDisclosureOfDocumentsDJ;
@@ -42,16 +50,19 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -74,17 +85,21 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(STANDARD_DIRECTION_ORDER_DJ);
+    private static final String HEARING_CHANNEL = "HearingChannel";
+    private static final String SPEC_SERVICE_ID = "AAA6";
+    private static final String UNSPEC_SERVICE_ID = "AAA7";
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     private final LocationRefDataService locationRefDataService;
@@ -98,6 +113,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
     private final IdamClient idamClient;
     private final AssignCategoryId assignCategoryId;
+    private final CategoryService categoryService;
+    private final LocationHelper locationHelper;
 
     @Autowired
     private final DeadlinesCalculator deadlinesCalculator;
@@ -107,7 +124,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::initiateSDO)
             .put(callbackKey(MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
+            .put(callbackKey(V_1, MID, "trial-disposal-screen"), this::populateDisposalTrialScreen)
             .put(callbackKey(MID, "create-order"), this::createOrderScreen)
+            .put(callbackKey(V_1, MID, "create-order"), this::createOrderScreen)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::generateSDONotifications)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -151,25 +170,16 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public String caseParticipants(CaseData caseData) {
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         switch (multiPartyScenario) {
-
-            case ONE_V_ONE:
+            case ONE_V_ONE ->
                 participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                     .getPartyName());
-                break;
-            case ONE_V_TWO_ONE_LEGAL_REP:
+            case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP ->
                 participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
                     .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
-                break;
-            case ONE_V_TWO_TWO_LEGAL_REP:
-                participantString = (caseData.getApplicant1().getPartyName() + " v " + caseData.getRespondent1()
-                    .getPartyName() + " and " + caseData.getRespondent2().getPartyName());
-                break;
-            case TWO_V_ONE:
+            case TWO_V_ONE ->
                 participantString = (caseData.getApplicant1().getPartyName() + " and " + caseData.getApplicant2()
                     .getPartyName() + " v " + caseData.getRespondent1().getPartyName());
-                break;
-            default:
-                throw new CallbackException(String.format("Invalid participants"));
+            default -> throw new CallbackException("Invalid participants");
         }
         return participantString;
 
@@ -186,11 +196,28 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsForDefaultJudgments(authToken));
-        DynamicList locationsList = getLocationsFromList(locations);
+        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
+        DynamicList locationsList = getLocationList(callbackParams, preferredCourt.orElse(null));
         caseDataBuilder.trialHearingMethodInPersonDJ(locationsList);
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);
+
+        if (V_1.equals(callbackParams.getVersion())) {
+            String serviceId = caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)
+                ? SPEC_SERVICE_ID : UNSPEC_SERVICE_ID;
+            Optional<CategorySearchResult> categorySearchResult = categoryService.findCategoryByCategoryIdAndServiceId(
+                authToken, HEARING_CHANNEL, serviceId
+            );
+            DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult.orElse(null));
+            List<DynamicListElement> hearingMethodListWithoutNotInAttendance = hearingMethodList
+                .getListItems()
+                .stream()
+                .filter(elem -> !elem.getLabel().equals(HearingMethod.NOT_IN_ATTENDANCE.getLabel()))
+                .collect(Collectors.toList());
+            hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
+
+            caseDataBuilder.hearingMethodValuesDisposalHearingDJ(hearingMethodList);
+            caseDataBuilder.hearingMethodValuesTrialHearingDJ(hearingMethodList);
+        }
 
         UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String judgeNameTitle = userDetails.getFullName();
@@ -200,11 +227,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .disposalHearingJudgesRecitalDJ(DisposalHearingJudgesRecitalDJ
                                                 .builder()
                                                 .judgeNameTitle(judgeNameTitle)
-                                                .input(judgeNameTitle
-                                                           + ", Upon considering the claim form and "
-                                                           + "Particulars of Claim/statements of case"
-                                                           + " [and the directions questionnaires] "
-                                                           + "\n\nIT IS ORDERED that:-").build());
+                                                .input(judgeNameTitle + ","
+                                                ).build());
         caseDataBuilder
             .disposalHearingDisclosureOfDocumentsDJ(DisposalHearingDisclosureOfDocumentsDJ
                                                         .builder()
@@ -339,11 +363,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .trialHearingJudgesRecitalDJ(TrialHearingJudgesRecital
                                              .builder()
                                              .judgeNameTitle(judgeNameTitle)
-                                             .input(judgeNameTitle
-                                                        + ", has considered the statements of "
-                                                        + "the case and the information provided "
-                                                        + "by the parties, \n\n "
-                                                        + "IT IS ORDERED THAT:").build());
+                                             .input(judgeNameTitle + ","
+                                             ).build());
 
         caseDataBuilder
             .trialHearingDisclosureOfDocumentsDJ(TrialHearingDisclosureOfDocuments
@@ -416,6 +437,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                             + " upload to the Digital Portal ")
                                                 .build());
 
+        List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
         // copy of above method as to not break existing cases
         caseDataBuilder.trialHearingTimeDJ(TrialHearingTimeDJ.builder()
                                                .helpText1(
@@ -431,6 +453,9 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                        + "must endeavour to agree the contents of the bundle before it "
                                                        + "is filed. The bundle will include a case summary and a "
                                                        + "chronology.")
+                                               .dateToToggle(dateToShowTrue)
+                                               .date1(LocalDate.now().plusWeeks(22))
+                                               .date2(LocalDate.now().plusWeeks(30))
                                                .build());
 
         caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
@@ -601,6 +626,31 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .build();
     }
 
+    private DynamicList getLocationList(CallbackParams callbackParams,
+                                        RequestedCourt preferredCourt) {
+        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+        Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
+            .flatMap(requestedCourt -> locationHelper.getMatching(locations, preferredCourt));
+
+        DynamicList locationsList;
+        if (matchingLocation.isPresent()) {
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
+                                                 matchingLocation.get(), true
+            );
+        } else {
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
+                                                 null, true
+            );
+        }
+        return locationsList;
+    }
+
+    private String getLocationEpimms(LocationRefData location) {
+        return location.getEpimmsId();
+    }
+
     private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -611,29 +661,44 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.orderSDODocumentDJ(null);
         assignCategoryId.assignCategoryIdToCollection(caseData.getOrderSDODocumentDJCollection(), document -> document.getValue().getDocumentLink(), "sdo");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
-        var state = "CASE_PROGRESSION";
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
             .getCourtLocationsForDefaultJudgments(authToken));
-        LocationRefData location = null;
         if (nonNull(locations)) {
-            location = fillPreferredLocationData(locations, getLocationListFromCaseData(
+            LocationRefData location = fillPreferredLocationData(locations, getLocationListFromCaseData(
                 caseData.getDisposalHearingMethodInPersonDJ(), caseData.getTrialHearingMethodInPersonDJ()));
             Optional.ofNullable(location)
-                .map(LocationHelper::buildCaseLocation)
-                .ifPresent(caseDataBuilder::caseManagementLocation);
-            Optional.ofNullable(location)
-                .map(value -> value.getSiteName())
+                .map(LocationRefData::getSiteName)
                 .ifPresent(caseDataBuilder::locationName);
 
         }
-
+        var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
+
+        if (featureToggleService.isEarlyAdoptersEnabled()) {
+            if (featureToggleService.isLocationWhiteListedForCaseProgression(
+                getEpimmsId(caseData))) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(YesOrNo.YES);
+            } else {
+                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(YesOrNo.NO);
+            }
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
             .build();
+    }
+
+    private String getEpimmsId(CaseData caseData) {
+        if (caseData.getTrialHearingMethodInPersonDJ() != null) {
+            return caseData.getTrialHearingMethodInPersonDJ().getValue().getCode();
+        } else if (caseData.getDisposalHearingMethodInPersonDJ() != null) {
+            return caseData.getDisposalHearingMethodInPersonDJ().getValue().getCode();
+        }
+        throw new IllegalArgumentException("Epimms Id is not provided");
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -645,7 +710,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
+        var response = (AboutToStartOrSubmitCallbackResponse) validateInputValue(callbackParams);
+        if (response.getErrors() != null) {
+            return response;
+        }
+
+        CaseData caseData = V_1.equals(callbackParams.getVersion())
+            ? mapHearingMethodFields(callbackParams.getCaseData())
+            : callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
         CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
@@ -662,6 +734,34 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private CaseData mapHearingMethodFields(CaseData caseData) {
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+
+        if (caseData.getHearingMethodValuesDisposalHearingDJ() != null
+            && caseData.getHearingMethodValuesDisposalHearingDJ().getValue() != null) {
+            String disposalHearingMethodLabel = caseData.getHearingMethodValuesDisposalHearingDJ().getValue().getLabel();
+            if (disposalHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
+                updatedData.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+            } else if (disposalHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
+                updatedData.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+            } else if (disposalHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
+                updatedData.disposalHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+            }
+        } else if (caseData.getHearingMethodValuesTrialHearingDJ() != null
+            && caseData.getHearingMethodValuesTrialHearingDJ().getValue() != null) {
+            String trialHearingMethodLabel = caseData.getHearingMethodValuesTrialHearingDJ().getValue().getLabel();
+            if (trialHearingMethodLabel.equals(HearingMethod.IN_PERSON.getLabel())) {
+                updatedData.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodInPerson);
+            } else if (trialHearingMethodLabel.equals(HearingMethod.VIDEO.getLabel())) {
+                updatedData.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodVideoConferenceHearing);
+            } else if (trialHearingMethodLabel.equals(HearingMethod.TELEPHONE.getLabel())) {
+                updatedData.trialHearingMethodDJ(DisposalHearingMethodDJ.disposalHearingMethodTelephoneHearing);
+            }
+        }
+
+        return updatedData.build();
     }
 
     private CaseData fillDisposalToggle(CaseData caseData, List<DisposalAndTrialHearingDJToggle> checkList) {
@@ -692,15 +792,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.trialHearingTrialDJToggle(checkList);
 
         return caseDataBuilder.build();
-    }
-
-    private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
-        return fromList(locations.stream()
-                            .map(location -> location.getSiteName()
-                                + " - " + location.getCourtAddress()
-                                + " - " + location.getPostcode())
-                            .sorted()
-                            .collect(Collectors.toList()));
     }
 
     private DynamicList deleteLocationList(DynamicList list) {
@@ -741,5 +832,29 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         } else {
             return null;
         }
+    }
+
+    private CallbackResponse validateInputValue(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        if (nonNull(caseData.getTrialHearingWitnessOfFactDJ())) {
+            String inputValue1 = caseData.getTrialHearingWitnessOfFactDJ().getInput2();
+            String inputValue2 = caseData.getTrialHearingWitnessOfFactDJ().getInput3();
+            List<String> errors = new ArrayList<>();
+            if (inputValue1 != null && inputValue2 != null) {
+                int number1 = Integer.parseInt(inputValue1);
+                int number2 = Integer.parseInt(inputValue2);
+                if (number1 < 0 || number2 < 0) {
+                    errors.add("The number entered cannot be less than zero");
+                    return AboutToStartOrSubmitCallbackResponse.builder()
+                        .errors(errors)
+                        .build();
+                }
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 }

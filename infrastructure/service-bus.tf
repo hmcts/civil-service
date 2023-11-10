@@ -10,13 +10,8 @@ module "servicebus-subscription" {
 resource "azurerm_servicebus_subscription_rule" "topic_filter_rule_civil" {
   name            = "hmc-servicebus-${var.env}-subscription-rule-civil"
   subscription_id = module.servicebus-subscription.id
-  filter_type     = "CorrelationFilter"
-
-  correlation_filter {
-    properties = {
-      hmctsServiceId = "AAA7"
-    }
-  }
+  filter_type     = "SqlFilter"
+  sql_filter      = "hmctsServiceId IN ('AAA7','AAA6')"
 }
 
 data "azurerm_key_vault" "hmc-key-vault" {
@@ -27,4 +22,32 @@ data "azurerm_key_vault" "hmc-key-vault" {
 data "azurerm_key_vault_secret" "hmc-servicebus-connection-string" {
   key_vault_id = data.azurerm_key_vault.hmc-key-vault.id
   name         = "hmc-servicebus-connection-string"
+}
+
+resource "azurerm_key_vault_secret" "hmc-servicebus-connection-string" {
+  name         = "hmc-servicebus-connection-string"
+  value        = data.azurerm_key_vault_secret.hmc-servicebus-connection-string.value
+  key_vault_id = data.azurerm_key_vault.civil_key_vault.id
+
+  content_type = "secret"
+  tags = merge(var.common_tags, {
+    "source" : "Vault ${data.azurerm_key_vault.civil_key_vault.name}"
+  })
+}
+
+
+data "azurerm_key_vault_secret" "hmc-servicebus-shared-access-key" {
+  key_vault_id = data.azurerm_key_vault.hmc-key-vault.id
+  name         = "hmc-servicebus-shared-access-key"
+}
+
+resource "azurerm_key_vault_secret" "civil-hmc-servicebus-shared-access-key-tf" {
+  name         = "hmc-servicebus-shared-access-key-tf"
+  value        = data.azurerm_key_vault_secret.hmc-servicebus-shared-access-key.value
+  key_vault_id = data.azurerm_key_vault.civil_key_vault.id
+
+  content_type = "secret"
+  tags = merge(var.common_tags, {
+    "source" : "Vault ${data.azurerm_key_vault.civil_key_vault.name}"
+  })
 }

@@ -10,9 +10,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.docmosis.FixedRecoverableCostsSection;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfNonElectronicDocuments;
@@ -22,13 +24,12 @@ import uk.gov.hmcts.reform.civil.model.dq.FurtherInformation;
 import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
-import uk.gov.hmcts.reform.civil.model.dq.HearingSupport;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
@@ -47,6 +48,7 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final List<Party> respondents;
     private final List<Party> applicants;
     private final FileDirectionsQuestionnaire fileDirectionsQuestionnaire;
+    private final FixedRecoverableCostsSection fixedRecoverableCosts;
     private final DisclosureOfElectronicDocuments disclosureOfElectronicDocuments;
     private final DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments;
     private final Experts experts;
@@ -63,5 +65,11 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private final RequestedCourt requestedCourt;
     private final VulnerabilityQuestions vulnerabilityQuestions;
     private final String statementOfTruthText;
+    private final Address respondent1LiPCorrespondenceAddress;
+    private final Address applicant1LiPCorrespondenceAddress;
+    private final LipExperts lipExperts;
+    private final LipExtraDQ lipExtraDQ;
+    private final List<HearingLipSupportRequirements> hearingLipSupportRequirements;
+    private final String lipStatementOfTruthName;
 
 }

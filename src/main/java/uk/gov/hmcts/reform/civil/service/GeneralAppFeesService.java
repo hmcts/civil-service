@@ -40,6 +40,9 @@ public class GeneralAppFeesService {
     private static final String JURISDICTION2 = "jurisdiction2";
     private static final String SERVICE = "service";
     private static final String KEYWORD = "keyword";
+    public static final String FREE_REF = "FREE";
+    private static final Fee FREE_FEE = Fee.builder()
+            .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
             = Arrays.asList(GeneralApplicationTypes.VARY_JUDGEMENT,
@@ -47,9 +50,9 @@ public class GeneralAppFeesService {
     protected static final List<GeneralApplicationTypes> SET_ASIDE
             = List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
     protected static final List<GeneralApplicationTypes> ADJOURN_TYPES
-            = List.of(GeneralApplicationTypes.ADJOURN_VACATE_HEARING);
+            = List.of(GeneralApplicationTypes.ADJOURN_HEARING);
     protected static final List<GeneralApplicationTypes> SD_CONSENT_TYPES
-            = List.of(GeneralApplicationTypes.SETTLE_OR_DISCONTINUE_CONSENT);
+            = List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT);
 
     public Fee getFeeForGA(CaseData caseData) {
         Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
@@ -121,7 +124,7 @@ public class GeneralAppFeesService {
 
     private Fee getDefaultFee(CaseData caseData) {
         if (isFreeApplication(caseData)) {
-            return getFeeForGA(feesConfiguration.getFreeKeyword(), "copies", "insolvency");
+            return FREE_FEE;
         } else {
             return getFeeForGA(getFeeRegisterKeyword(caseData), null, null);
         }
@@ -140,7 +143,7 @@ public class GeneralAppFeesService {
     public boolean isFreeApplication(final CaseData caseData) {
         if (caseData.getGeneralAppType().getTypes().size() == 1
                 && caseData.getGeneralAppType().getTypes()
-                .contains(GeneralApplicationTypes.ADJOURN_VACATE_HEARING)
+                .contains(GeneralApplicationTypes.ADJOURN_HEARING)
                 && caseData.getGeneralAppRespondentAgreement() != null
                 && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
                 && caseData.getGeneralAppHearingDate() != null

@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.OrganisationDetailsModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.PartyDetailsModel;
-import uk.gov.hmcts.reform.civil.model.hearingvalues.RelatedPartiesModel;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.UnavailabilityRangeModel;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -90,14 +89,14 @@ public class HearingsPartyMapperTest {
 
     private CaseData rollUpUnavailableDateRespondent(CaseData caseData) {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder, true);
         caseData = builder.build();
         return caseData;
     }
 
     private CaseData rollUpUnavailableDateApplicant(CaseData caseData) {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder);
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder, true);
         caseData = builder.build();
         return caseData;
     }
@@ -105,7 +104,7 @@ public class HearingsPartyMapperTest {
     @Test
     void shouldBuildIndividualDetails_whenClaimantIsIndividualRespondentSoleTrader() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued()
+            .atStateApplicantRespondToDefenceAndProceed()
             .applicant1DQWithUnavailableDate()
             .build();
         caseData = rollUpUnavailableDateApplicant(caseData);
@@ -120,7 +119,7 @@ public class HearingsPartyMapperTest {
             "0123456789"
         );
 
-        applicantPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(1))));
+        applicantPartyDetails.setUnavailabilityRanges(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(1))));
 
         PartyDetailsModel applicantSolicitorParty = buildExpectedOrganisationPartyObject(
             APPLICANT_LR_ORG_NAME,
@@ -160,7 +159,7 @@ public class HearingsPartyMapperTest {
     @Test
     void shouldBuildOrganisationDetails_whenClaimantIsCompanyRespondentOrganisation() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued()
+            .atStateRespondentFullDefence()
             .respondent1DQWithUnavailableDateRange()
             .build()
             .toBuilder()
@@ -197,7 +196,7 @@ public class HearingsPartyMapperTest {
             DEFENDANT_ROLE,
             null
         );
-        respondentPartyDetails.setUnavailabilityRange(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))));
+        respondentPartyDetails.setUnavailabilityRanges(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(2))));
 
         PartyDetailsModel respondentSolicitorParty = buildExpectedOrganisationPartyObject(
             RESPONDENT_ONE_LR_ORG_NAME,
@@ -795,7 +794,7 @@ public class HearingsPartyMapperTest {
             .vulnerabilityDetails(null)
             .hearingChannelEmail(hearingChannelEmail)
             .hearingChannelPhone(hearingChannelPhone)
-            .relatedParties(List.of(RelatedPartiesModel.builder().build()))
+            .relatedParties(emptyList())
             .custodyStatus(null)
             .build();
 
@@ -807,7 +806,7 @@ public class HearingsPartyMapperTest {
             .individualDetails(individualDetails)
             .organisationDetails(null)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }
@@ -830,7 +829,7 @@ public class HearingsPartyMapperTest {
             .individualDetails(null)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRange(null)
+            .unavailabilityRanges(null)
             .hearingSubChannel(null)
             .build();
     }

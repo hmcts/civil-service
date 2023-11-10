@@ -437,6 +437,7 @@ class LocationRefDataServiceTest {
                 .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
                 .venueName("CCMCC").courtLocationCode("121").build();
             ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(List.of(ccmccLocation), OK);
+
             when(authTokenGenerator.generate()).thenReturn("service_token");
             when(restTemplate.exchange(
                 uriCaptor.capture(),
@@ -450,6 +451,7 @@ class LocationRefDataServiceTest {
                 .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList()).get(0).getCourtLocationCode();
 
+            assertThat(result).isNotNull();
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
             assertThat(uriCaptor.getValue().toString()).isEqualTo(
@@ -461,6 +463,67 @@ class LocationRefDataServiceTest {
             assertThat(prefferedCourtCode).isEqualTo("121");
         }
 
+        @Test
+        void shouldReturnLocations_whenLRDReturnsCourtLocationByEpimmsIdAndCourtType() {
+            LocationRefData ccmccLocation = LocationRefData.builder().courtVenueId("9263").epimmsId("192280")
+                .siteName("site_name").regionId("4").region("North West").courtType("County Court")
+                .courtTypeId("10").locationType("COURT").courtName("COUNTY COURT MONEY CLAIMS CENTRE")
+                .venueName("CCMCC").courtLocationCode("121").build();
+            ResponseEntity<List<LocationRefData>> mockedResponse = new ResponseEntity<>(List.of(ccmccLocation), OK);
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(restTemplate.exchange(
+                uriCaptor.capture(),
+                httpMethodCaptor.capture(),
+                httpEntityCaptor.capture(),
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
+                .thenReturn(mockedResponse);
+
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "192280");
+            String prefferedCourtCode = result.stream()
+                .filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .collect(Collectors.toList()).get(0).getCourtLocationCode();
+
+            assertThat(result).isNotNull();
+            verify(lrdConfiguration, times(1)).getUrl();
+            verify(lrdConfiguration, times(1)).getEndpoint();
+            assertThat(uriCaptor.getValue().toString()).isEqualTo(
+                "dummy_url/fees-register/fees/lookup?epimms_id=192280&court_type_id=10");
+            assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
+            assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
+            assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
+                .isEqualTo("service_token");
+            assertThat(prefferedCourtCode).isEqualTo("121");
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenEpimmsIdThrowsException() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(restTemplate.exchange(
+                uriCaptor.capture(),
+                httpMethodCaptor.capture(),
+                httpEntityCaptor.capture(),
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
+                .thenThrow(new RestClientException("403"));
+
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsId("user_token", "192280");
+
+            assertThat(result.isEmpty());
+        }
+
+        @Test
+        void shouldReturnEmptyList_whenEpimmsIdAndCourtTypeThrowsException() {
+            when(authTokenGenerator.generate()).thenReturn("service_token");
+            when(restTemplate.exchange(
+                uriCaptor.capture(),
+                httpMethodCaptor.capture(),
+                httpEntityCaptor.capture(),
+                ArgumentMatchers.<ParameterizedTypeReference<List<LocationRefData>>>any()))
+                .thenThrow(new RestClientException("403"));
+
+            List<LocationRefData> result = refDataService.getCourtLocationsByEpimmsIdAndCourtType("user_token", "192280");
+
+            assertThat(result.isEmpty());
+        }
     }
 
     @Nested

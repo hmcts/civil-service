@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,19 +13,26 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.config.ClaimIssueConfiguration;
+import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.String.format;
@@ -41,7 +49,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateReferToJudge
     CreateReferToJudgeCallbackHandler.class,
     JacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
-    ClaimIssueConfiguration.class,
+    ClaimUrlsConfiguration.class,
     MockDatabaseConfiguration.class,
     ValidationAutoConfiguration.class},
     properties = {"reference.database.enabled=false"})
@@ -49,11 +57,15 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
 
     public static final String REFERENCE_NUMBER = "000DC001";
     @MockBean
+    private LocationHelper helper;
+    @MockBean
     private Time time;
     @MockBean
     private IdamClient idamClient;
     @Autowired
     private CreateReferToJudgeCallbackHandler handler;
+    @MockBean
+    private LocationRefDataService locationService;
 
     @Nested
     class AboutToStartCallback {
@@ -85,6 +97,9 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             userId = UUID.randomUUID().toString();
 
+            given(helper.leadDefendantIs1(any()))
+                    .willReturn(true);
+
             given(idamClient.getUserDetails(any()))
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
@@ -98,6 +113,88 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
+
+        }
+
+        @Test
+        void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio1() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .atStateClaimSubmittedSmallClaim()
+                .setClaimTypeToUnspecClaim()
+                .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
+                .build();
+
+            given(helper.getClaimantRequestedCourt(any()))
+                .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
+
+            given(helper.getMatching(any(), any()))
+                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+
+        }
+
+        @Test
+        void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio2() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .atStateClaimSubmittedSmallClaim()
+                .setClaimTypeToUnspecClaim()
+                .respondent2(PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build())
+                .build();
+
+            given(helper.leadDefendantIs1(any()))
+                .willReturn(false);
+
+            given(helper.getClaimantRequestedCourt(any()))
+                .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
+
+            given(helper.getMatching(any(), any()))
+                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+
+        }
+
+        @Test
+        void shouldReturnExpectedAboutToSubmitResponseForLessThanThousandsPoundScenerio3() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .atStateClaimSubmitted()
+                .setClaimTypeToSpecClaim()
+                .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
+                .build();
+
+            given(helper.getClaimantRequestedCourt(any()))
+                .willReturn(Optional.of(RequestedCourt.builder().responseCourtCode("123").build()));
+
+            given(helper.getMatching(any(), any()))
+                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response).isNotNull();
+
+        }
+
+        @Test
+        public void thereIsAMatchingLocation() {
+            CaseData.CaseDataBuilder<?, ?> updatedData = CaseData.builder();
+
+            helper.updateWithLocation(updatedData, LocationRefData.builder()
+                .courtLocationCode("123").regionId("regionId").region("region name").epimmsId("epimms").build());
+
+            Assertions.assertThat(updatedData.build().getCaseManagementLocation())
+                .isNotNull()
+                .isEqualTo(CaseLocationCivil.builder()
+                               .region("regionId")
+                               .baseLocation("epimms")
+                               .build());
         }
     }
 

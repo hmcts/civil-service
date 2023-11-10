@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.Map;
 
@@ -20,6 +21,7 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final FeatureToggleService featureToggleService;
 
     protected abstract String getDocReference(CaseData caseData);
 
@@ -30,9 +32,7 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
         if (StringUtils.isNotBlank(email)) {
             notificationService.sendMail(
                 email,
-                caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM
-                    ? notificationsProperties.getSdoOrderedSpec()
-                    : notificationsProperties.getSdoOrdered(),
+                getSDOTemplate(caseData),
                 addProperties(caseData),
                 getDocReference(caseData)
             );
@@ -41,6 +41,18 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
                          + " has no email address for claim "
                          + caseData.getLegacyCaseReference());
         }
+    }
+
+    private String getSDOTemplate(CaseData caseData) {
+        if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
+            if (caseData.isRespondentResponseBilingual()) {
+                return notificationsProperties.getSdoOrderedSpecBilingual();
+            }
+            return featureToggleService.isEarlyAdoptersEnabled()
+                ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
+        }
+        return featureToggleService.isEarlyAdoptersEnabled()
+            ? notificationsProperties.getSdoOrderedEA() : notificationsProperties.getSdoOrdered();
     }
 
     /**
@@ -53,6 +65,12 @@ public abstract class AbstractCreateSDORespondentNotificationSender implements N
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+        if (caseData.isRespondentResponseBilingual()) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                RESPONDENT_NAME, getRespondentLegalName(caseData)
+            );
+        }
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalName(caseData)

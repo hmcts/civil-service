@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,12 +56,12 @@ class HearingFeeUnpaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateBusinessProcessToReadyWithEvent_whenInvoked() {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .containsOnly("READY", "HEARING_FEE_UNPAID");
 
             assertThat(response.getData())
-                .containsEntry("businessProcess", Map.of(
-                    "status", "READY",
-                    "camundaEvent", "HEARING_FEE_UNPAID"
-                ))
                 .containsEntry("caseDismissedHearingFeeDueDate", localDateTime.format(ISO_DATE_TIME));
         }
     }

@@ -9,44 +9,31 @@
     <notes>False positive. We don't have any reference to json-java_project:json-java
       nor any reference to hutool:hutool:5.8.10. Suppressed long-term to re-assess and possibly delete.</notes>
     <cve>CVE-2022-45688</cve>
+    <cve>CVE-2023-5072</cve>
   </suppress>
   <suppress>
     <notes>Temporarily suppressing it as the latest camunda connector 1.5.6 seem to have the vulnerability.</notes>
     <cve>CVE-2021-37533</cve>
   </suppress>
-  <suppress until="2023-06-05">
-    <cve>CVE-2021-4277</cve>
-    <cve>CVE-2022-3064</cve>
-    <cve>CVE-2021-4235</cve>
+  <suppress>
+    <notes>False Positive - service is not deployed to Cloud Foundry</notes>
+    <cve>CVE-2023-20873</cve>
   </suppress>
-  <suppress until="2023-07-05">
-    <notes>Temporarily suppressing as the latest snakeyaml 1.33 also has these vulnerabilities.</notes>
-    <packageUrl regex="true">^pkg:maven/org.yaml/snakeyaml@.*$</packageUrl>
-    <cve>CVE-2022-3064</cve>
-    <cve>CVE-2021-4235</cve>
-    <cve>CVE-2022-1471</cve>
-  </suppress>
-  <suppress until="2023-07-05">
-    <cve>CVE-2022-45143</cve>
-    <cve>CVE-2021-4235</cve>
-    <cve>CVE-2022-3064</cve>
-    <cve>CVE-2022-34305</cve>
-    <cve>CVE-2022-42252</cve>
-  </suppress>
-  <suppress until="2023-07-26">
-    <cve>CVE-2023-28708</cve>
-    <cve>CVE-2023-20861</cve>
-  </suppress>
+
   <suppress until="2024-04-04">
     <cve>CVE-2023-20860</cve>
     <cve>CVE-2023-20863</cve>
-    <cve>CVE-2023-20862</cve>
-  </suppress>
-  <suppress until="2023-07-24">
-    <notes>Requires updating spring dependencies to 5.3.27. Better address that in a different ticket</notes>
-    <cve>CVE-2023-20863</cve>
-  </suppress>
-  <suppress until="2023-07-29">
     <cve>CVE-2023-28709</cve>
+    <cve>CVE-2023-2976</cve>
+    <cve>CVE-2022-1471</cve>
+    <cve>CVE-2023-3782</cve>
+    <cve>CVE-2023-35116</cve>
+    <cve>CVE-2021-42306</cve>
+    <cve>CVE-2023-20861</cve>
+    <cve>CVE-2023-20883</cve>
+    <cve>CVE-2023-4586</cve>
+    <cve>CVE-2023-5072</cve>
+    <cve>CVE-2023-44487</cve>
   </suppress>
+
 </suppressions>
