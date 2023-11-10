@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
@@ -69,6 +70,7 @@ import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -170,6 +172,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RespondentMediationService respondentMediationService;
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
+    @MockBean
+    private WorkingDayIndicator workingDayIndicator;
+    @MockBean
+    private DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     @Nested
     class AboutToStart {
@@ -1084,6 +1090,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(YES)
                 .respondentResponseIsSame(YES)
                 .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1ProceedWithClaim(YES)
                 .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
                     ExpertDetails.builder().build()).build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
@@ -1104,6 +1111,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(NO)
                 .addRespondent2(YES)
                 .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1ProceedWithClaim(YES)
                 .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
                     ExpertDetails.builder().build()).build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
@@ -1360,7 +1368,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetUpPaymentDateToString() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
+            given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any())).willReturn(whenWillPay);
 
             RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec =
                 RespondToClaimAdmitPartLRspec.builder()
@@ -1387,7 +1397,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetUpPaymentDateToStringForPartAdmitPaid() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
+            given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any())).willReturn(whenWillPay);
 
             RespondToClaim respondToAdmittedClaim =
                 RespondToClaim.builder()
@@ -1415,7 +1427,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetUpPaymentDateForResponseDateToString() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
+            given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any())).willReturn(whenWillPay);
 
             CaseData caseData = CaseData.builder()
                 .respondent1ResponseDate(LocalDateTime.now())

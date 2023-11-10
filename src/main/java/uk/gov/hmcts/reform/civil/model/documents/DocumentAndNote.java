@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Data
 @Builder(toBuilder = true)
@@ -18,6 +19,6 @@ public class DocumentAndNote {
     private Document document;
     private String documentNote;
     @Builder.Default
-    private LocalDateTime createdDateTime = LocalDateTime.now();
+    private LocalDateTime createdDateTime = LocalDateTime.now(ZoneId.of("Europe/London"));
 
 }

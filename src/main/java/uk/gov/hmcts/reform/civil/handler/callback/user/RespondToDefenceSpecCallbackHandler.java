@@ -41,8 +41,10 @@ import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -109,6 +111,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final RespondentMediationService respondentMediationService;
     private final PaymentDateService paymentDateService;
     private final ResponseOneVOneShowTagService responseOneVOneShowTagService;
+    private final DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -384,7 +387,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
         if (caseData.isRespondentResponseFullDefence()
-            && RespondToDefenceCallbackHandler.shouldMoveToJudicialReferral(caseData)) {
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData)) {
             response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
     }
@@ -565,8 +568,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         if (caseData.getRespondent1ResponseDate() != null) {
-            return caseData.getRespondent1ResponseDate().plusDays(5)
-                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
+            LocalDate extendedResponseDate = caseData.getRespondent1ResponseDate().toLocalDate().plusDays(5);
+            return deadlineCalculatorService.calculateExtendedDeadline(extendedResponseDate).format(DateTimeFormatter.ofPattern(
+                datePattern,
+                Locale.ENGLISH
+            ));
         }
         return null;
     }
