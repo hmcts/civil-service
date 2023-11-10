@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.DeadlineDateDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -230,14 +231,10 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldCalculateDeadlineSuccessfully() {
         LocalDate extensionDate = LocalDate.of(2022, 6, 6);
-        System.out.println("Ex :"+extensionDate);
         when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).thenReturn(extensionDate);
-        String jsonString = "{\"extendedDeadline\":\"2022-06-06\", \"plusDays\":5}";
-        JSONObject json = new JSONObject(jsonString);
-        System.out.println("Ex :"+json);
         doPost(
             BEARER_TOKEN,
-            json,
+            DeadlineDateDetails.builder().responseDate(extensionDate).plusDays(5).build(),
             CALCULATE_DEADLINE_URL
         )
             .andExpect(content().json(toJson(extensionDate)))
