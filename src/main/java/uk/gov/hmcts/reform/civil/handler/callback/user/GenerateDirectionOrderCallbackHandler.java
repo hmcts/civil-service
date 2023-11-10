@@ -179,7 +179,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.finalOrderDocument(finalDocument.getDocumentLink());
+        caseDataBuilder.finalOrderDocument(finalDocument);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -368,6 +368,14 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                          .map(DatesFinalOrders::getDatesToAvoidDates).orElse(null),
                      "Further hearing", NOT_ALLOWED_DATE_PAST, errors, true);
 
+        if (nonNull(caseData.getFinalOrderFurtherHearingComplex())) {
+            if (nonNull(caseData.getFinalOrderFurtherHearingComplex().getDateToDate())
+                    && caseData.getFinalOrderFurtherHearingComplex().getDateToDate()
+                    .isBefore(caseData.getFinalOrderFurtherHearingComplex().getListFromDate())) {
+                errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Further hearing"));
+            }
+        }
+
         validateDate(Optional.ofNullable(caseData.getAssistedOrderMakeAnOrderForCosts())
                          .map(AssistedOrderCostDetails::getAssistedOrderCostsFirstDropdownDate).orElse(null),
                      "Make an order for detailed/summary costs", NOT_ALLOWED_DATE_PAST, errors, true);
@@ -405,8 +413,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
-            caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        CaseDocument finalDocument = caseData.getFinalOrderDocument();
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
