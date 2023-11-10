@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EventTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.EvidenceTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -52,6 +53,7 @@ public class ResponseRepaymentDetailsForm {
     private final String evidenceComments;
     private final boolean mediation;
     private final RespondentResponsePartAdmissionPaymentTimeLRspec howToPay;
+    private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
     public String getResponseTypeDisplay() {
         return Optional.ofNullable(responseType).map(RespondentResponseTypeSpec::getDisplayedValue).orElse("");
@@ -95,8 +97,7 @@ public class ResponseRepaymentDetailsForm {
     }
 
     private static void addPayByDatePayImmediately(ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount) {
-        builder.payBy(LocalDate.now()
-                          .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
+        builder.payBy(deadlineExtensionCalculatorService.calculateExtendedDeadline(LocalDate.now(), RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
             .amountToPay(totalClaimAmount + "");
     }
 
