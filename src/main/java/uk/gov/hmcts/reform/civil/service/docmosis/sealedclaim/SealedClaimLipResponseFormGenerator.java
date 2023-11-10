@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.ResponseRepaymentDetailsForm;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimLipResponseForm;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 
 import java.time.LocalDate;
@@ -28,6 +30,7 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
+    private final DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
