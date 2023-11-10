@@ -72,8 +72,8 @@ public class GenAppStateHelperService {
 
         if (!Collections.isEmpty(caseData.getGeneralApplications())) {
             List<GeneralApplication> genApps = new ArrayList<>();
-            LocationRefData locationDetails = genAppService.getWorkAllocationLocationDetails(caseData.getCaseManagementLocation().getBaseLocation(), authToken);
             CaseData finalCaseData = caseData;
+            LocationRefData locationDetails = genAppService.getWorkAllocationLocationDetails(finalCaseData.getCaseManagementLocation().getBaseLocation(), authToken);
             caseData.getGeneralApplications().forEach(generalApplicationElement -> {
                 GeneralApplication generalApplication = generalApplicationElement.getValue();
                 generalApplication.getCaseManagementLocation().setBaseLocation(finalCaseData.getCaseManagementLocation().getBaseLocation());

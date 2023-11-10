@@ -18,14 +18,19 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GADetailsRespondentSol;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -50,13 +55,19 @@ class GenAppStateHelperServiceTest {
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
+    @MockBean
+    private InitiateGeneralApplicationService genAppService;
 
     @Autowired
     private CaseDetailsConverter caseDetailsConverter;
 
+    @MockBean
+    private LocationRefDataService locationRefDataService;
+
     private static final String APPLICATION_CLOSED_TEXT = "Application Closed";
     private static final String APPLICATION_OFFLINE_TEXT = "Proceeds In Heritage";
     private static final String SET_DATE = "2022-08-31T22:50:11.2509019";
+    private static final String authToken = "Bearer TestAuthToken";
 
     @Nested
     class StatusChangeInApplicationDetailsInClaim {
@@ -393,8 +404,14 @@ class GenAppStateHelperServiceTest {
 
         @Test
          void updateApplicationLocationDetailsLists() {
+            when(locationRefDataService.getCourtLocationsByEpimmsId(any(),any()))
+                .thenReturn(getSampleCourLocationsRefObject());
+            when(genAppService.getWorkAllocationLocationDetails(any(),any()))
+                .thenReturn(getSampleCourLocationsRefObject1());
             CaseData caseData = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseDataWithDetails(CaseData.builder().build(),
+
+
                                             true,
                                             true,
                                             true, true,
@@ -404,8 +421,10 @@ class GenAppStateHelperServiceTest {
             Pair<CaseLocationCivil, Boolean> caseLocation = Pair.of(CaseLocationCivil.builder()
                                                          .region("2")
                                                          .baseLocation("00000").siteName("locationOfRegion2")
+                                                                        .address("Prince William House, Peel Cross Road, Salford")
+                                                                        .postcode("M5 4RR")
                                                          .build(), false);
-            CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData);
+            CaseData updatedData = service.updateApplicationLocationDetailsInClaim(caseData,authToken);
 
             assertThat(getGADetailsFromUpdatedCaseData(updatedData, "1234")).isNotNull();
             assertThat(updatedData.getGeneralApplications().get(0).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
@@ -415,6 +434,25 @@ class GenAppStateHelperServiceTest {
             assertThat(updatedData.getGeneralApplications().get(2).getValue().getCaseManagementLocation()).isEqualTo(caseLocation.getLeft());
             assertThat(updatedData.getGeneralApplications().get(2).getValue().getIsCcmccLocation()).isEqualTo(YesOrNo.NO);
         }
+
+        protected List<LocationRefData> getSampleCourLocationsRefObject() {
+            return new ArrayList<>(List.of(
+                LocationRefData.builder()
+                    .epimmsId("00000").siteName("locationOfRegion2").courtAddress("Prince William House, Peel Cross Road, Salford")
+                    .postcode("M5 4RR")
+                    .courtLocationCode("court1").build()
+            ));
+        }
+
+        protected LocationRefData getSampleCourLocationsRefObject1() {
+            return
+                LocationRefData.builder()
+                    .epimmsId("00000").siteName("locationOfRegion2").courtAddress("Prince William House, Peel Cross Road, Salford")
+                    .postcode("M5 4RR")
+                    .courtLocationCode("court1").build();
+        }
+
+
 
         @Test
          void noLocationUpdatesToCaseDataIfThereAreNoGeneralApplications() {
@@ -427,8 +465,7 @@ class GenAppStateHelperServiceTest {
                                             Map.of()
                 );
 
-            CaseData response = service.updateApplicationLocationDetailsInClaim(
-                caseData);
+            CaseData response = service.updateApplicationLocationDetailsInClaim(caseData, authToken);
 
             CaseData updatedData = mapper.convertValue(response, CaseData.class);
 
