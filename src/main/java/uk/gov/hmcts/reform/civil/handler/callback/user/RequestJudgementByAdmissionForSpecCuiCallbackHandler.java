@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
-import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +41,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final JudgementService judgementService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
-    private final DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     @Override
     protected Map<String, Callback> callbacks() {

@@ -26,7 +26,7 @@ public class DeadlineExtensionCalculatorServiceTest {
 
     @Test
     void shouldReturnTheSameGivenDateWhenDateIsWorkday() {
-        given(workingDayIndicator.getNextWorkingDay(any())).willReturn( LocalDate.now());
+        given(workingDayIndicator.getNextWorkingDay(any())).willReturn(LocalDate.now());
         LocalDate proposedExtensionDeadline = LocalDate.now();
 
         LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(
@@ -64,7 +64,7 @@ public class DeadlineExtensionCalculatorServiceTest {
     }
 
     @Test
-    void shouldReturnFifthWorkingDayFromTheGivenDateWhen_Holiday_InBetween(){
+    void shouldReturnFifthWorkingDayFromTheGivenDateWhen_Holiday_InBetween() {
         given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
         given(workingDayIndicator.isWorkingDay(LocalDate.of(2023, 11, 19))).willReturn(false);
         LocalDate proposedExtensionDeadline = LocalDate.of(2023, 11, 17);

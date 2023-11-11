@@ -68,7 +68,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
 
-
     @Nested
     class AboutToStartCallback {
         @Test
@@ -88,7 +87,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
 
         @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedOneDefendant() {
-            LocalDate whenWillPay = LocalDate.of(2023,10,11);
+            LocalDate whenWillPay = LocalDate.of(2023, 10, 11);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .respondent1ResponseDate(LocalDateTime.now().minusDays(15))
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
