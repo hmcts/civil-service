@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
-import uk.gov.hmcts.reform.civil.model.citizenui.dto.DeadlineDateDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.ExtendedDeadlineDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -231,7 +231,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
         when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).thenReturn(extensionDate);
         doPost(
             BEARER_TOKEN,
-            DeadlineDateDetails.builder().responseDate(extensionDate).plusDays(5).build(),
+            ExtendedDeadlineDto.builder().responseDate(extensionDate).plusDays(5).build(),
             CALCULATE_DEADLINE_URL
         )
             .andExpect(content().json(toJson(extensionDate)))
