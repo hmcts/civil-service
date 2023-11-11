@@ -7,13 +7,11 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -22,7 +20,6 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -65,15 +62,11 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
 
-        final WorkingDayIndicator workingDayIndicator = null;
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (caseData.isJudgementDateNotPermitted()) {
-            LocalDate extendedRespondent1ResponseDate = deadlineCalculatorService.calculateExtendedDeadline(
-                caseData.getRespondent1ResponseDate().toLocalDate(),
-                RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
-            errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(extendedRespondent1ResponseDate)));
+            errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

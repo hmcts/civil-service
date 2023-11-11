@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimLipResponseForm;
-import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 
@@ -21,7 +20,6 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
-    private final DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
