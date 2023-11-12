@@ -227,6 +227,16 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean hasClaimantSignedSettlementAgreementAndDeadlineNotExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
+        return false;
+    }
+
+    @Override
     @JsonIgnore
     public boolean hasClaimantAcceptedPartialAdmissionAmount() {
         return hasResponse() && response.isPartAdmitPayImmediately()

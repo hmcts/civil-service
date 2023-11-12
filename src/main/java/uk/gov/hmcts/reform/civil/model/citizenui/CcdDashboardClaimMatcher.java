@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
+import java.time.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -11,8 +12,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -146,6 +145,14 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean hasClaimantAskedToSignSettlementAgreement() {
         return false;
+    }
+
+    public boolean hasClaimantSignedSettlementAgreementAndDeadlineNotExpired() {
+        return caseData.hasApplicant1SignedSettlementAgreement() && !caseData.isSettlementAgreementDeadlineExpired();
+    }
+
+    public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
+        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isSettlementAgreementDeadlineExpired();
     }
 
     @Override

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 
 import java.time.LocalDateTime;
@@ -35,6 +36,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final ResponseOneVOneShowTagService responseOneVOneService;
 
     private final ObjectMapper objectMapper;
+
+    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -62,9 +65,11 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        LocalDateTime applicant1ResponseDate = LocalDateTime.now();
         CaseData updatedData = caseData.toBuilder()
-            .applicant1ResponseDate(LocalDateTime.now())
+            .applicant1ResponseDate(applicant1ResponseDate)
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
+            .respondent1RespondToSettlementAgreementDeadline(getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate))
             .build();
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
@@ -74,6 +79,11 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         updateClaimEndState(response, updatedData);
 
         return response.build();
+    }
+
+    private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
+        return caseData.hasApplicant1SignedSettlementAgreement() ?
+                deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate) : null;
     }
 
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {

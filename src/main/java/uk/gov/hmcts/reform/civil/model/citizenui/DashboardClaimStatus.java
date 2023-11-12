@@ -60,6 +60,12 @@ public enum DashboardClaimStatus {
     CLAIMANT_ASKED_FOR_SETTLEMENT(
         Claim::hasClaimantAskedToSignSettlementAgreement
     ),
+    CLAIMANT_SEND_SETTLEMENT_AGREEMENT(
+        Claim::hasClaimantSignedSettlementAgreementAndDeadlineNotExpired
+    ),
+    CLAIMANT_SEND_SETTLEMENT_AGREEMENT_DEADLINE_EXPIRED(
+        Claim::hasClaimantSignedSettlementAgreementAndDeadlineExpired
+    ),
     HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
