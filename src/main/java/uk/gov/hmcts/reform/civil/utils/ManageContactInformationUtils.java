@@ -254,9 +254,10 @@ public class ManageContactInformationUtils {
             return null;
         }
         for (Witness witness : witnesses) {
-            updateTopLevelPartyInfo(witness.getPartyID(), witness.getFirstName(), witness.getLastName(),
-                                    witness.getPhoneNumber(), witness.getEmailAddress(),
-                                    existingParties, updatedPartyWitnesses);
+            updatedPartyWitnesses.add(updateTopLevelPartyInfo(witness.getPartyID(),
+                                                              witness.getFirstName(), witness.getLastName(),
+                                                              witness.getPhoneNumber(), witness.getEmailAddress(),
+                                                              existingParties));
         }
         return wrapElements(updatedPartyWitnesses);
     }
@@ -267,29 +268,30 @@ public class ManageContactInformationUtils {
             return null;
         }
         for (Expert expert : experts) {
-            updateTopLevelPartyInfo(expert.getPartyID(), expert.getFirstName(), expert.getLastName(),
-                                    expert.getPhoneNumber(), expert.getEmailAddress(),
-                                    existingParties, updatedPartyExperts);
+            updatedPartyExperts.add(updateTopLevelPartyInfo(expert.getPartyID(),
+                                                            expert.getFirstName(), expert.getLastName(),
+                                                            expert.getPhoneNumber(), expert.getEmailAddress(),
+                                                            existingParties));
         }
         return wrapElements(updatedPartyExperts);
     }
 
-    private static void updateTopLevelPartyInfo(String partyId, String firstName, String lastName, String phoneNumber, String email,
-                                                List<PartyFlagStructure> existingParties, List<PartyFlagStructure> updatedParties) {
-        existingParties.stream().filter(p -> p.getPartyID().equals(partyId)).findFirst()
-            .map(p -> updatedParties.add(p.toBuilder()
-                                             .firstName(firstName)
-                                             .lastName(lastName)
-                                             .phone(phoneNumber)
-                                             .email(email)
-                                             .build()))
-            .orElse(updatedParties.add(PartyFlagStructure.builder()
-                                                    .partyID(partyId)
-                                                    .firstName(firstName)
-                                                    .lastName(lastName)
-                                                    .phone(phoneNumber)
-                                                    .email(email)
-                                                    .build()));
+    private static PartyFlagStructure updateTopLevelPartyInfo(String partyId, String firstName, String lastName, String phoneNumber, String email,
+                                                              List<PartyFlagStructure> existingParties) {
+        return existingParties.stream().filter(p -> p.getPartyID().equals(partyId)).findFirst()
+            .map(p -> (p.toBuilder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .phone(phoneNumber)
+                .email(email)
+                .build()))
+            .orElse(PartyFlagStructure.builder()
+                .partyID(partyId)
+                .firstName(firstName)
+                .lastName(lastName)
+                .phone(phoneNumber)
+                .email(email)
+                .build());
     }
 
     private static String formatId(String partyChosen, String isAdmin, Party party) {
