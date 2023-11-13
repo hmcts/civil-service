@@ -870,8 +870,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
-        @Test
-        void defendantResponsePopulatesWitnessesData() {
+    @Test
+    void defendantResponsePopulatesWitnessesData() {
         // Given
         LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
         LocalDate date = dateTime.toLocalDate();
