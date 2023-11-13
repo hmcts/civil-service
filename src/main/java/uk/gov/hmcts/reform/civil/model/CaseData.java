@@ -1119,7 +1119,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isSettlementAgreementDeadlineExpired() {
-        return nonNull(respondent1RespondToSettlementAgreementDeadline) &&
-                LocalDateTime.now().isAfter(respondent1RespondToSettlementAgreementDeadline);
+        return nonNull(respondent1RespondToSettlementAgreementDeadline)
+                && LocalDateTime.now().isAfter(respondent1RespondToSettlementAgreementDeadline);
     }
 }

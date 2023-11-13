@@ -86,8 +86,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     }
 
     private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
-        return caseData.hasApplicant1SignedSettlementAgreement() ?
-                deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate) : null;
+        return caseData.hasApplicant1SignedSettlementAgreement()
+                ? deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate) : null;
     }
 
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
