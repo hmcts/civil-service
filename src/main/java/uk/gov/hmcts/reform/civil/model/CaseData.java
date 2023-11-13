@@ -1099,10 +1099,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean hasApplicant1AcceptACCJ() {
+    public boolean isApplicant1AcceptCcj() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
-            .filter(ClaimantLiPResponse::hasApplicant1RequestACCJ).isPresent();
+            .filter(ClaimantLiPResponse::isApplicant1AcceptCcj).isPresent();
     }
 
 

@@ -18,7 +18,7 @@ public class ClaimantLiPResponse {
     private ChooseHowToProceed applicant1ChoosesHowToProceed;
 
     @JsonIgnore
-    public boolean hasApplicant1RequestACCJ() {
+    public boolean isApplicant1AcceptCcj() {
         return applicant1ChoosesHowToProceed.equals(REQUEST_A_CCJ);
     }
 }

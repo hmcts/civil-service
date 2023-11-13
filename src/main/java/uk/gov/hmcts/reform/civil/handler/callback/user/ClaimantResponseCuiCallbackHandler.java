@@ -67,7 +67,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        caseData = getCCJaRequestUpdatedCaseData(caseData);
+        caseData = updateCcjRequestPaymentDetails(caseData);
         CaseData updatedData = caseData.toBuilder()
             .applicant1ResponseDate(LocalDateTime.now())
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
@@ -92,8 +92,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CaseData getCCJaRequestUpdatedCaseData(CaseData caseData) {
-        if (hasCCJRequest(caseData)) {
+    private CaseData updateCcjRequestPaymentDetails(CaseData caseData) {
+        if (hasCcjRequest(caseData)) {
             CCJPaymentDetails ccjPaymentDetails = judgementService.buildJudgmentAmountSummaryDetails(caseData);
             CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
             return updatedData.ccjPaymentDetails(ccjPaymentDetails).build();
@@ -101,9 +101,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         return caseData;
     }
 
-    private boolean hasCCJRequest(CaseData caseData) {
+    private boolean hasCcjRequest(CaseData caseData) {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled() &&
-            caseData.hasApplicant1AcceptACCJ() && caseData.isCcjRequestJudgmentByAdmission());
+            caseData.isApplicant1AcceptCcj() && caseData.isCcjRequestJudgmentByAdmission());
     }
-
 }
