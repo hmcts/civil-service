@@ -48,20 +48,20 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 public class CaseFlagUtils {
 
-    public static String RESPONDENT_SOLICITOR_ONE_WITNESS = "Respondent solicitor 1 witness";
-    public static String RESPONDENT_SOLICITOR_ONE_EXPERT = "Respondent solicitor 1 expert";
-    public static String RESPONDENT_SOLICITOR_TWO_WITNESS = "Respondent solicitor 2 witness";
-    public static String RESPONDENT_SOLICITOR_TWO_EXPERT = "Respondent solicitor 2 expert";
-    public static String APPLICANT_SOLICITOR_WITNESS = "Applicant solicitor witness";
-    public static String APPLICANT_SOLICITOR_EXPERT = "Applicant solicitor expert";
-    public static String APPLICANT_ONE = "Applicant 1";
-    public static String APPLICANT_TWO = "Applicant 2";
-    public static String APPLICANT_ONE_LITIGATION_FRIEND = "Applicant 1 Litigation Friend";
-    public static String APPLICANT_TWO_LITIGATION_FRIEND = "Applicant 2 Litigation Friend";
-    public static String RESPONDENT_ONE = "Respondent 1";
-    public static String RESPONDENT_TWO = "Respondent 2";
-    public static String RESPONDENT_ONE_LITIGATION_FRIEND = "Respondent 1 Litigation Friend";
-    public static String RESPONDENT_TWO_LITIGATION_FRIEND = "Respondent 2 Litigation Friend";
+    public static final String RESPONDENT_SOLICITOR_ONE_WITNESS = "Respondent solicitor 1 witness";
+    public static final String RESPONDENT_SOLICITOR_ONE_EXPERT = "Respondent solicitor 1 expert";
+    public static final String RESPONDENT_SOLICITOR_TWO_WITNESS = "Respondent solicitor 2 witness";
+    public static final String RESPONDENT_SOLICITOR_TWO_EXPERT = "Respondent solicitor 2 expert";
+    public static final String APPLICANT_SOLICITOR_WITNESS = "Applicant solicitor witness";
+    public static final String APPLICANT_SOLICITOR_EXPERT = "Applicant solicitor expert";
+    public static final String APPLICANT_ONE = "Applicant 1";
+    public static final String APPLICANT_TWO = "Applicant 2";
+    public static final String APPLICANT_ONE_LITIGATION_FRIEND = "Applicant 1 Litigation Friend";
+    public static final String APPLICANT_TWO_LITIGATION_FRIEND = "Applicant 2 Litigation Friend";
+    public static final String RESPONDENT_ONE = "Respondent 1";
+    public static final String RESPONDENT_TWO = "Respondent 2";
+    public static final String RESPONDENT_ONE_LITIGATION_FRIEND = "Respondent 1 Litigation Friend";
+    public static final String RESPONDENT_TWO_LITIGATION_FRIEND = "Respondent 2 Litigation Friend";
 
     private CaseFlagUtils() {
         //NO-OP
