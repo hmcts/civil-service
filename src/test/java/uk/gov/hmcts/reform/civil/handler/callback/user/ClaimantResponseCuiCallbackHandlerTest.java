@@ -179,28 +179,35 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateCCJRequestPaymentDetails() {
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YES)
                 .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
                 .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
+
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(
                     CaseDataLiP.builder()
                         .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
                             ChooseHowToProceed.REQUEST_A_CCJ).build())
                         .build())
+                .atStateClaimDetailsNotified().build().toBuilder()
                 .respondent1Represented(NO)
                 .specRespondent1Represented(NO)
                 .applicant1Represented(NO)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .build();
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
             CCJPaymentDetails ccjResponseForJudgement =
                 getCaseData(response).getCcjPaymentDetails();
+
             assertThat(response.getData())
                 .extracting("businessProcess")
                 .extracting("camundaEvent")

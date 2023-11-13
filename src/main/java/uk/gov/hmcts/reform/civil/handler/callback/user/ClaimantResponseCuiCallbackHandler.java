@@ -67,12 +67,14 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        caseData = updateCcjRequestPaymentDetails(caseData);
-        CaseData updatedData = caseData.toBuilder()
-            .applicant1ResponseDate(LocalDateTime.now())
-            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
-            .build();
 
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+            .applicant1ResponseDate(LocalDateTime.now())
+            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
+
+        updateCcjRequestPaymentDetails(builder,caseData);
+
+        CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.toMap(objectMapper));
@@ -92,13 +94,11 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CaseData updateCcjRequestPaymentDetails(CaseData caseData) {
+    private void updateCcjRequestPaymentDetails(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
         if (hasCcjRequest(caseData)) {
             CCJPaymentDetails ccjPaymentDetails = judgementService.buildJudgmentAmountSummaryDetails(caseData);
-            CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-            return updatedData.ccjPaymentDetails(ccjPaymentDetails).build();
+            builder.ccjPaymentDetails(ccjPaymentDetails).build();
         }
-        return caseData;
     }
 
     private boolean hasCcjRequest(CaseData caseData) {
