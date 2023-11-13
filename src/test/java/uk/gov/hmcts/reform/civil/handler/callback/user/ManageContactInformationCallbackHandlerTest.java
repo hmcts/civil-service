@@ -741,6 +741,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @AfterAll
         static void tearDown() {
             partyIdMock.reset();
+            partyIdMock.close();
         }
 
         @BeforeEach

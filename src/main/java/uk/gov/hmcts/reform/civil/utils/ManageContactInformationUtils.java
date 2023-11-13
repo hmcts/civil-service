@@ -184,16 +184,6 @@ public class ManageContactInformationUtils {
                                                        .eventAdded("Manage Contact Information Event")
                                                        .partyID(createPartyId())
                                                        .build()));
-                    // Replace above to this in CIV-10382
-                    // newExperts.addAll(wrapElements(appendWithNewPartyIds(Expert.builder()
-                    //                                   .firstName(formExpert.getFirstName())
-                    //                                  .lastName(formExpert.getLastName())
-                    //                                  .emailAddress(formExpert.getEmailAddress())
-                    //                                  .phoneNumber(formExpert.getPhoneNumber())
-                    //                                  .fieldOfExpertise(formExpert.getFieldOfExpertise())
-                    //                                  .dateAdded(LocalDate.now())
-                    //                                  .eventAdded("Manage Contact Information Event")
-                    //                                  .build())));
                 }
             }
         }
@@ -251,15 +241,6 @@ public class ManageContactInformationUtils {
                                                        .eventAdded("Manage Contact Information Event")
                                                        .partyID(createPartyId())
                                                        .build()));
-                    // Replace above to this in CIV-10382
-                    // newWitnesses.addAll(wrapElements(appendWithNewPartyIds(Witness.builder()
-                    //                                  .firstName(formWitness.getFirstName())
-                    //                                  .lastName(formWitness.getLastName())
-                    //                                  .emailAddress(formWitness.getEmailAddress())
-                    //                                  .phoneNumber(formWitness.getPhoneNumber())
-                    //                                  .dateAdded(LocalDate.now())
-                    //                                  .eventAdded("Manage Contact Information Event")
-                    //                                   .build())));
                 }
             }
         }
