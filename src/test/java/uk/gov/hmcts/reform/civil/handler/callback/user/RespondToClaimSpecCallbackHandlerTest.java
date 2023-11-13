@@ -872,15 +872,15 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void defendantResponsePopulatesWitnessesData() {
-            // Given
-            LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
-            LocalDate date = dateTime.toLocalDate();
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(time.now()).thenReturn(dateTime);
-            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-            when(toggleService.isHmcEnabled()).thenReturn(true);
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        LocalDate date = dateTime.toLocalDate();
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(time.now()).thenReturn(dateTime);
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isHmcEnabled()).thenReturn(true);
 
         Witnesses res1witnesses = Witnesses.builder().details(
             wrapElements(
