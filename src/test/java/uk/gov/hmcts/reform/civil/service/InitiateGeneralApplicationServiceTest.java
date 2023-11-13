@@ -196,7 +196,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent1OrganisationPolicy(respondent1Organization)
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]"));
-            when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
                     .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent1SolAssigned()).build());
@@ -227,7 +227,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]"));
-            when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
                     .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent1SolAssigned()).build());
@@ -244,7 +244,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]", "[RESPONDENTSOLICITORTWO]"));
-            when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
                     .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
@@ -293,7 +293,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]", "[RESPONDENTSOLICITORTWO]"));
-            when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
                     .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
@@ -868,7 +868,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
         builder.applicant1OrganisationPolicy(OrganisationPolicy
                                                  .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
-        when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+        when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(onlyApplicantSolicitorAssigned()).build());
@@ -886,7 +886,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
         builder.applicant1OrganisationPolicy(OrganisationPolicy
                                                  .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
-        when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+        when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent2SolAssigned()).build());
