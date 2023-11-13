@@ -6566,6 +6566,4 @@ public class CaseDataBuilder {
             .respondent2OrgIndividuals(respondent2OrgIndividuals)
             .build();
     }
-
-
 }
