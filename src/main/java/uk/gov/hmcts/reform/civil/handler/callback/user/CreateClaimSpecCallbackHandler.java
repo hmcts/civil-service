@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -72,7 +73,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -163,7 +163,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
-    private static final String AIRLINE_NOT_FOUND_MESSAGE = "Airline code not found: %s";
+    private static final String ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST = "Scheduled date of flight must be today or in the past";
+
+    private static final String LOCATION_NOT_FOUND_MESSAGE = "Location not found for ePIMS_ID: %s";
 
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
@@ -188,7 +190,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final LocationRefDataService locationRefDataService;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
     private final AirlineEpimsDataLoader airlineEpimsDataLoader;
-    private static final String ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST = "Scheduled date of flight must be today or in the past";
+    private final AirlineEpimsService airlineEpimsService;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -944,9 +946,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private CallbackResponse getAirlineList(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         List<AirlineEpimsID> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
-        AirlineEpimsID otherAirlineEpimsID = new AirlineEpimsID("OTHER",null);
-        airlineEpimsIDList.add(otherAirlineEpimsID);
-        DynamicList airlineList = DynamicList.fromList(airlineEpimsIDList.stream().map(AirlineEpimsID::getAirline).toList());
+        DynamicList airlineList = DynamicList
+            .fromList(airlineEpimsIDList.stream()
+                          .map(AirlineEpimsID::getAirline).toList(),Object::toString,Object::toString,null,false);
         DynamicList dropdownAirlineList = DynamicList.builder()
             .listItems(airlineList.getListItems()).build();
 
@@ -1023,18 +1025,17 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     }
 
     private LocationRefData getAirlineCourtLocation(String airline, CallbackParams callbackParams) {
-        String locationEpimmsId = switch (airline) {
-            case "BA/CITYFLYER" -> "111";
-            case "AIR_INDIA" -> "222";
-            case "GULF_AIR" -> "333";
-            default -> throw new CallbackException(String.format(AIRLINE_NOT_FOUND_MESSAGE, airline));
-        };
         if (airline.equals("OTHER")) {
             return null;
         }
+        String locationEpimmsId = airlineEpimsService.getEpimsIdForAirline(airline);
         List<LocationRefData> locations = fetchLocationData(callbackParams);
         var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList();
-        return !matchedLocations.isEmpty() ? matchedLocations.get(0) : null;
+        if (matchedLocations.isEmpty()) {
+            throw new CallbackException(String.format(LOCATION_NOT_FOUND_MESSAGE, locationEpimmsId));
+        } else {
+            return matchedLocations.get(0);
+        }
     }
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
