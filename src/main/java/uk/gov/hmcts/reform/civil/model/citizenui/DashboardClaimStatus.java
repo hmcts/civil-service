@@ -27,7 +27,6 @@ public enum DashboardClaimStatus {
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
     ),
-
     IN_MEDIATION(
         Claim::isMediationPending
     ),
