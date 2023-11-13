@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
+import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -36,6 +37,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final ResponseOneVOneShowTagService responseOneVOneService;
 
     private final ObjectMapper objectMapper;
+    private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
 
     private final DeadlinesCalculator deadlinesCalculator;
 
@@ -66,15 +68,17 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime applicant1ResponseDate = LocalDateTime.now();
-        CaseData updatedData = caseData.toBuilder()
-            .applicant1ResponseDate(applicant1ResponseDate)
-            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
-            .respondent1RespondToSettlementAgreementDeadline(getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate))
-            .build();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                .applicant1ResponseDate(applicant1ResponseDate)
+                .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
+                .respondent1RespondToSettlementAgreementDeadline(getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate));
 
+        updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
+
+        CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
-            AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.toMap(objectMapper));
+                AboutToStartOrSubmitCallbackResponse.builder()
+                        .data(updatedData.toMap(objectMapper));
 
         updateClaimEndState(response, updatedData);
 
