@@ -353,9 +353,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, builder);
 
         // clear updateDetailsForm
-        builder.updateDetailsForm(UpdateDetailsForm.builder()
-                                      .manageContactDetailsEventUsed(YES)
-                                      .build());
+        builder.updateDetailsForm(UpdateDetailsForm.builder().manageContactDetailsEventUsed(YES).build());
 
         // update claim details tab
         updateClaimDetailsTab(caseData, builder);

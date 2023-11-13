@@ -298,8 +298,9 @@ class BundleCreationTriggerEventHandlerTest {
         // createBundle service
         BundleCreationTriggerEvent event = new BundleCreationTriggerEvent(1L);
         when(coreCaseDataService.getCase(1L)).thenReturn(caseDetails);
-        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE))
-            .thenReturn(StartEventResponse.builder().caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build());
+        StartEventResponse response = StartEventResponse.builder()
+            .caseDetails(CaseDetailsBuilder.builder().data(caseData).build()).eventId("event1").token("test").build();
+        when(coreCaseDataService.startUpdate(event.getCaseId().toString(), CREATE_BUNDLE)).thenReturn(response);
         when(bundleCreationService.createBundle(event)).thenThrow(new RuntimeException("Runtime Exception"));
         when(caseDetailsConverter.toCaseData(anyMap())).thenReturn(caseData);
 
