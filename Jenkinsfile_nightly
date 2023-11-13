@@ -14,6 +14,8 @@ properties([
       description: 'The URL of service auth provider'),
     string(name: 'CCD_DATA_STORE_URL', defaultValue: 'http://ccd-data-store-api-aat.service.core-compute-aat.internal',
       description: 'The URL of ccd data store'),
+    string(name: 'AAC_API_URL', defaultValue: 'http://aac-manage-case-assignment-aat.service.core-compute-aat.internal',
+      description: 'The URL of AAC service'),
     string(name: 'CIVIL_SERVICE_URL', defaultValue: 'http://civil-service-aat.service.core-compute-aat.internal',
       description: 'The URL of civil service'),
     string(name: 'WAIT_FOR_TIMEOUT_MS',
@@ -60,6 +62,7 @@ withNightlyPipeline(type, product, component) {
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
+  env.AAC_API_URL = params.AAC_API_URL
   overrideVaultEnvironments([
   'aat': params.ENVIRONMENT
   ])
