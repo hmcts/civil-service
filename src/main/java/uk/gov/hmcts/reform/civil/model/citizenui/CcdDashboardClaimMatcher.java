@@ -278,7 +278,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isPartialAdmissionRejected() {
         return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
-            && caseData.isPartAdmitClaimSpec();
+            && caseData.isPartAdmitClaimSpec() && YesOrNo.NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
     }
 
     @Override
@@ -293,5 +293,4 @@ public class CcdDashboardClaimMatcher implements Claim {
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
     }
-
 }

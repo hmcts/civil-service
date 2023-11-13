@@ -279,6 +279,7 @@ class CcdClaimStatusDashboardFactoryTest {
                                                     .mediationAgreement(MediationAgreementDocument.builder().build())
                                                     .build())
                            .build())
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim, featureToggleService));
@@ -288,10 +289,12 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_mediation_whenGetStatus_mediationUnsuccessful() {
         CaseData claim = CaseData.builder()
+            .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ResponseDate(LocalDateTime.now())
             .mediation(Mediation.builder()
                            .unsuccessfulMediationReason("this is a reason")
                            .build())
+            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
             claim, featureToggleService));
@@ -345,6 +348,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
@@ -413,7 +417,6 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
             .takenOfflineDate(LocalDateTime.now())
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .build();

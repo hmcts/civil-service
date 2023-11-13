@@ -6,6 +6,12 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    MEDIATION_UNSUCCESSFUL(
+        Claim::isMediationUnsuccessful
+    ),
+    MEDIATION_SUCCESSFUL(
+        Claim::isMediationSuccessful
+    ),
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected
     ),
@@ -21,12 +27,7 @@ public enum DashboardClaimStatus {
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
     ),
-    MEDIATION_UNSUCCESSFUL(
-        Claim::isMediationUnsuccessful
-    ),
-    MEDIATION_SUCCESSFUL(
-        Claim::isMediationSuccessful
-    ),
+
     IN_MEDIATION(
         Claim::isMediationPending
     ),
