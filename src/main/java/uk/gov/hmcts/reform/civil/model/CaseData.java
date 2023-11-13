@@ -876,9 +876,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isJudgementDateNotPermitted() {
-        return nonNull(getRespondent1ResponseDate())
-            && getRespondent1ResponseDate()
-            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+        return nonNull(getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+            && getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
+            .atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
 
     @JsonIgnore
