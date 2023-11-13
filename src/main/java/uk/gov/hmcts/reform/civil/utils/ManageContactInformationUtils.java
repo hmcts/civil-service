@@ -283,7 +283,7 @@ public class ManageContactInformationUtils {
                                              .phone(phoneNumber)
                                              .email(email)
                                              .build()))
-            .orElseGet(() -> updatedParties.add(PartyFlagStructure.builder()
+            .orElse(updatedParties.add(PartyFlagStructure.builder()
                                                     .partyID(partyId)
                                                     .firstName(firstName)
                                                     .lastName(lastName)
