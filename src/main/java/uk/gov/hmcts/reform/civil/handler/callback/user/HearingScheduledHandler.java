@@ -66,7 +66,7 @@ public class HearingScheduledHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::clearPreviousSelections)
             .put(callbackKey(MID, "locationName"), this::locationList)
             .put(callbackKey(MID, "checkPastDate"), this::checkPastDate)
             .put(callbackKey(MID, "checkFutureDate"), this::checkFutureDate)
@@ -81,6 +81,27 @@ public class HearingScheduledHandler extends CallbackHandler {
 
     private String getHeader(CaseData caseData) {
         return format(HEARING_CREATED_HEADER, caseData.getHearingReferenceNumber());
+    }
+
+    // hearing notices can be retriggered i.e. relisted, in such case we clear previous selections
+    private CallbackResponse clearPreviousSelections(CallbackParams callbackParams) {
+        var caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+
+        caseDataBuilder
+            .hearingNoticeList(null)
+            .listingOrRelisting(null)
+            .hearingLocation(null)
+            .channel(null)
+            .hearingDate(null)
+            .hearingTimeHourMinute(null)
+            .hearingDuration(null)
+            .information(null)
+            .hearingNoticeListOther(null);
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -110,6 +131,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
                 .append(" - ").append(location.getCourtAddress())
                 .append(" - ").append(location.getPostcode()).toString())
+                            .sorted()
                             .collect(Collectors.toList()));
     }
 
