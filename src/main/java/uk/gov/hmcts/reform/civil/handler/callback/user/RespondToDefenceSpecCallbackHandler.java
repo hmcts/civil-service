@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
@@ -568,11 +569,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         if (caseData.getRespondent1ResponseDate() != null) {
-            LocalDate extendedResponseDate = caseData.getRespondent1ResponseDate().toLocalDate().plusDays(5);
-            return deadlineCalculatorService.calculateExtendedDeadline(extendedResponseDate).format(DateTimeFormatter.ofPattern(
-                datePattern,
-                Locale.ENGLISH
-            ));
+            return deadlineCalculatorService.calculateExtendedDeadline(
+                caseData.getRespondent1ResponseDate().toLocalDate(),
+                RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY)
+                .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         return null;
     }
