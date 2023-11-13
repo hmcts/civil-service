@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -43,6 +44,10 @@ public class ElementUtils {
             .map(Element::getValue)
             .filter(Objects::nonNull)
             .collect(toUnmodifiableList());
+    }
+
+    public static <T> List<T> unwrapElementsNullSafe(List<Element<T>> elements) {
+        return Optional.ofNullable(elements).map(ElementUtils::unwrapElements).orElse(Collections.emptyList());
     }
 
     public static <T> Element<T> element(T element) {

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -140,6 +142,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private final CourtLocationUtils courtLocationUtils;
     private final AssignCategoryId assignCategoryId;
     private final CaseFlagsInitialiser caseFlagInitialiser;
+    private final ToggleConfiguration toggleConfiguration;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
 
     @Value("${court-location.unspecified-claim.region-id}")
@@ -181,6 +184,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         caseDataBuilder
             .claimStarted(YES)
+            .featureToggleWA(toggleConfiguration.getFeatureToggle())
             .courtLocation(CourtLocation.builder()
                                .applicantPreferredCourtLocationList(courtLocationUtils.getLocationsFromList(locations))
                                .build());
@@ -355,8 +359,50 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .build();
     }
 
+    private void clearOrganisationPolicyId(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
+        if (YES.equals(caseData.getRespondent1Represented())) {
+            if (StringUtils.isBlank(caseData.getRespondent1OrganisationIDCopy())) {
+                String id = Optional.ofNullable(caseData.getRespondent1OrganisationPolicy())
+                    .map(OrganisationPolicy::getOrganisation)
+                    .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+                    .orElse(null);
+                if (id != null) {
+                    caseDataBuilder.respondent1OrganisationIDCopy(id);
+                }
+            }
+
+            caseDataBuilder.respondent1OrganisationPolicy(
+                caseData
+                    .getRespondent1OrganisationPolicy()
+                    .toBuilder()
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .build()
+            );
+        }
+
+        if (NO.equals(caseData.getRespondent2SameLegalRepresentative()) && YES.equals(caseData.getRespondent2Represented())) {
+            if (StringUtils.isBlank(caseData.getRespondent2OrganisationIDCopy())) {
+                String id = Optional.ofNullable(caseData.getRespondent2OrganisationPolicy())
+                    .map(OrganisationPolicy::getOrganisation)
+                    .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+                    .orElse(null);
+                if (id != null) {
+                    caseDataBuilder.respondent2OrganisationIDCopy(id);
+                }
+            }
+
+            caseDataBuilder.respondent2OrganisationPolicy(
+                caseData
+                    .getRespondent2OrganisationPolicy()
+                    .toBuilder()
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .build()
+            );
+        }
+    }
+
     private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData, CaseData.CaseDataBuilder caseDataBuilder) {
-        if (caseData.getRespondent2SameLegalRepresentative() == YES) {
+        if (YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
             OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
 
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
@@ -365,7 +411,16 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 .build();
 
             organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
-            caseDataBuilder.respondent2OrganisationPolicy(organisationPolicy2Builder.build());
+
+            caseDataBuilder.respondent2OrganisationPolicy(
+                organisationPolicy2Builder
+                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
+                    .build()
+            );
+
+            caseDataBuilder.respondent2OrganisationIDCopy(
+                caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
+            );
         }
     }
 
@@ -379,6 +434,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
         CaseData.CaseDataBuilder dataBuilder = getSharedData(callbackParams);
+        clearOrganisationPolicyId(caseData, dataBuilder);
         addOrgPolicy2ForSameLegalRepresentative(caseData, dataBuilder);
 
         // temporarily remove respondent1OrgRegistered() for CIV-2659
@@ -409,7 +465,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder
             .uiStatementOfTruth(StatementOfTruth.builder().build())
             .applicantSolicitor1ClaimStatementOfTruth(statementOfTruth)
-            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1());
+            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
 
         // data for case list and unassigned list
         dataBuilder
@@ -418,7 +474,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             .caseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2());
+            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
         }
 
         dataBuilder

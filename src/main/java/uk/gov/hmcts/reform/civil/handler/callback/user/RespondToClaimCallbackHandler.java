@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -46,6 +47,7 @@ import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -59,6 +61,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -77,6 +80,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.TWO_RESPONDENT_REPRESENTATIVES;
@@ -202,12 +206,14 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                     .respondent2DQRequestedCourt(requestedCourt1.build()).build());
         }
 
-        updatedCaseData.respondent1DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent1());
+        updatedCaseData.respondent1DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent1()
+                                                                 .toBuilder().flags(null).build());
 
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
             updatedCaseData
                 .respondent2Copy(caseData.getRespondent2())
-                .respondent2DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent2());
+                .respondent2DetailsForClaimDetailsTab(updatedCaseData.build().getRespondent2()
+                                                          .toBuilder().flags(null).build());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
@@ -356,6 +362,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         // persist respondent address (ccd issue)
         var updatedRespondent1 = caseData.getRespondent1().toBuilder()
             .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
+            .flags(caseData.getRespondent1Copy().getFlags())
             .build();
 
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
@@ -367,6 +374,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             && ofNullable(caseData.getRespondent2Copy()).isPresent()) {
             var updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress())
+                .flags(caseData.getRespondent2Copy().getFlags())
                 .build();
 
             updatedData.respondent2(updatedRespondent2).respondent2Copy(null);
@@ -484,7 +492,7 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
                 updatedData
                     .respondent2(updatedRespondent2)
                     .respondent2Copy(null)
-                    .respondent2DetailsForClaimDetailsTab(updatedRespondent2);
+                    .respondent2DetailsForClaimDetailsTab(updatedRespondent2.toBuilder().flags(null).build());
 
                 if (caseData.getRespondent2ResponseDate() == null) {
                     updatedData.nextDeadline(caseData.getRespondent2ResponseDeadline().toLocalDate());
@@ -523,9 +531,9 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(updatedData,
                                                                         toggleService.isUpdateContactDetailsEnabled());
 
-        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1());
+        updatedData.respondent1DetailsForClaimDetailsTab(updatedData.build().getRespondent1().toBuilder().flags(null).build());
         if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2());
+            updatedData.respondent2DetailsForClaimDetailsTab(updatedData.build().getRespondent2().toBuilder().flags(null).build());
         }
 
         if (toggleService.isHmcEnabled()) {
@@ -554,6 +562,18 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.build().toMap(objectMapper))
                 .build();
+        }
+
+        // these documents are added to defendantUploads, if we do not remove/null the original,
+        // case file view will show duplicate documents
+        if (toggleService.isCaseFileViewEnabled()) {
+            log.info("Null placeholder documents");
+            updatedData.respondent1ClaimResponseDocument(null);
+            updatedData.respondent2ClaimResponseDocument(null);
+            updatedData.respondent1DQ(updatedData.build().getRespondent1DQ().toBuilder().respondent1DQDraftDirections(null).build());
+            if (caseData.getRespondent2() != null) {
+                updatedData.respondent2DQ(updatedData.build().getRespondent2DQ().toBuilder().respondent2DQDraftDirections(null).build());
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -616,13 +636,19 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (respondent1ClaimResponseDocument != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1ClaimDocument = respondent1ClaimResponseDocument.getFile();
             if (respondent1ClaimDocument != null) {
-                defendantUploads.add(
-                    buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
-                                          updatedCaseData.build().getRespondent1ResponseDate(),
-                                          DocumentType.DEFENDANT_DEFENCE
-                    ));
+                Element<CaseDocument> documentElement =
+                        buildElemCaseDocument(respondent1ClaimDocument, "Defendant",
+                        updatedCaseData.build().getRespondent1ResponseDate(),
+                        DocumentType.DEFENDANT_DEFENCE
+                );
                 assignCategoryId.assignCategoryIdToDocument(respondent1ClaimDocument,
-                                                       "defendant1DefenseDirectionsQuestionnaire");
+                        DocCategory.DEF1_DEFENSE_DQ.getValue());
+                CaseDocument copy = assignCategoryId
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
+                defendantUploads.add(documentElement);
+                if (Objects.nonNull(copy)) {
+                    defendantUploads.add(ElementUtils.element(copy));
+                }
             }
         }
 
@@ -630,15 +656,20 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (respondent1DQ != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent1DQDraftDirections = respondent1DQ.getRespondent1DQDraftDirections();
             if (respondent1DQDraftDirections != null) {
-                defendantUploads.add(
-                    buildElemCaseDocument(
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent1DQDraftDirections,
                         "Defendant",
                         updatedCaseData.build().getRespondent1ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
-                    ));
+                );
                 assignCategoryId.assignCategoryIdToDocument(respondent1DQDraftDirections,
-                                                       "defendant1DefenseDirectionsQuestionnaire");
+                        DocCategory.DEF1_DEFENSE_DQ.getValue());
+                CaseDocument copy = assignCategoryId
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
+                defendantUploads.add(documentElement);
+                if (Objects.nonNull(copy)) {
+                    defendantUploads.add(ElementUtils.element(copy));
+                }
             }
         }
 
@@ -646,28 +677,39 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
         if (respondent2ClaimResponseDocument != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2ClaimDocument = respondent2ClaimResponseDocument.getFile();
             if (respondent2ClaimDocument != null) {
-                defendantUploads.add(
-                    buildElemCaseDocument(respondent2ClaimDocument, "Defendant 2",
-                                          updatedCaseData.build().getRespondent2ResponseDate(),
-                                          DocumentType.DEFENDANT_DEFENCE
-                    ));
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
+                        respondent2ClaimDocument, "Defendant 2",
+                        updatedCaseData.build().getRespondent2ResponseDate(),
+                        DocumentType.DEFENDANT_DEFENCE
+                );
+                CaseDocument copy = assignCategoryId
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                 assignCategoryId.assignCategoryIdToDocument(respondent2ClaimDocument,
-                                                       "defendant2DefenseDirectionsQuestionnaire");
+                        DocCategory.DEF2_DEFENSE_DQ.getValue());
+                defendantUploads.add(documentElement);
+                if (Objects.nonNull(copy)) {
+                    defendantUploads.add(ElementUtils.element(copy));
+                }
             }
         }
         Respondent2DQ respondent2DQ = caseData.getRespondent2DQ();
         if (respondent2DQ != null) {
             uk.gov.hmcts.reform.civil.documentmanagement.model.Document respondent2DQDraftDirections = respondent2DQ.getRespondent2DQDraftDirections();
             if (respondent2DQDraftDirections != null) {
-                defendantUploads.add(
-                    buildElemCaseDocument(
+                Element<CaseDocument> documentElement = buildElemCaseDocument(
                         respondent2DQDraftDirections,
                         "Defendant 2",
                         updatedCaseData.build().getRespondent2ResponseDate(),
                         DocumentType.DEFENDANT_DRAFT_DIRECTIONS
-                    ));
+                );
+                CaseDocument copy = assignCategoryId
+                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                 assignCategoryId.assignCategoryIdToDocument(respondent2DQDraftDirections,
-                                                       "defendant2DefenseDirectionsQuestionnaire");
+                        DocCategory.DEF2_DEFENSE_DQ.getValue());
+                defendantUploads.add(documentElement);
+                if (Objects.nonNull(copy)) {
+                    defendantUploads.add(ElementUtils.element(copy));
+                }
             }
         }
 

@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
@@ -32,6 +34,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DJApplicantReceivedNotificationHandler.TASK_ID;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.APPLICANT_ONE_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.LEGAL_ORG_APPLICANT1;
@@ -53,6 +56,8 @@ public class DJApplicantReceivedNotificationHandlerTest {
     private OrganisationService organisationService;
     @Autowired
     private DJApplicantReceivedNotificationHandler handler;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -63,8 +68,12 @@ public class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn("test-template-received-id");
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested())
                 .thenReturn("test-template-requested-id");
+            when(notificationsProperties.getApplicantLiPDefaultJudgmentRequested())
+                .thenReturn("test-template-requested-lip-id");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+            when(featureToggleService.isLipVLipEnabled())
+                .thenReturn(false);
         }
 
         @Test
@@ -134,6 +143,32 @@ public class DJApplicantReceivedNotificationHandlerTest {
             );
         }
 
+        @Test
+        void shouldNotifyApplicantSolicitor_whenInvokedAndLiPvsLiPEnabled() {
+            when(featureToggleService.isLipVLipEnabled())
+                .thenReturn(true);
+            //send Received email
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .claimantUserDetails(IdamUserDetails.builder()
+                                         .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                                         .email("test@gmail.com")
+                                         .build())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "test-template-requested-lip-id",
+                getLipvLiPData(caseData),
+                "default-judgment-applicant-received-notification-000DC001"
+            );
+        }
+
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
@@ -150,6 +185,16 @@ public class DJApplicantReceivedNotificationHandlerTest {
                 CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
                 DEFENDANT_NAME, "David"
             );
+        }
+
+        @NotNull
+        public Map<String, String> getLipvLiPData(CaseData caseData) {
+            return Map.of(
+                APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                CLAIM_NUMBER, LEGACY_CASE_REFERENCE,
+                DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+            );
+
         }
 
     }

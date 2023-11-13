@@ -20,11 +20,11 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -45,7 +45,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
-import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_OR_DISCONTINUE_CONSENT;
+import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
 
 @Service
 @RequiredArgsConstructor
@@ -64,15 +64,15 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             + "respondent solicitor are assigned to the case.";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
-    private final OrganisationService organisationService;
     private final IdamClient idamClient;
+    private final UserRoleCaching userRoleCaching;
     private final GeneralAppFeesService feesService;
     private final LocationRefDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::aboutToStartValidattionAndSetup,
+            callbackKey(ABOUT_TO_START), this::aboutToStartValidationAndSetup,
             callbackKey(MID, VALIDATE_GA_TYPE), this::gaValidateType,
             callbackKey(MID, VALIDATE_HEARING_DATE), this::gaValidateHearingDate,
             callbackKey(MID, VALIDATE_GA_CONSENT), this::gaValidateConsent,
@@ -89,16 +89,15 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse aboutToStartValidattionAndSetup(CallbackParams callbackParams) {
+    private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
 
         CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-        if (!initiateGeneralApplicationService.respondentAssigned(caseData)) {
-            errors.add(RESP_NOT_ASSIGNED_ERROR);
-        }
-
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        List<String> errors = new ArrayList<>();
+        if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
+            errors.add(RESP_NOT_ASSIGNED_ERROR);
+        }
         caseDataBuilder
                 .generalAppHearingDetails(
                     GAHearingDetails
@@ -127,9 +126,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                                 && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed());
         List<String> errors = new ArrayList<>();
         if (generalAppTypes.size() == 1
-                && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_OR_DISCONTINUE_CONSENT)
+                && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)
                 && !consent) {
-            errors.add(INVALID_SETTLE_OR_DISCONTINUE_CONSENT);
+            errors.add(INVALID_SETTLE_BY_CONSENT);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
@@ -149,9 +148,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
             errors.add("It is not possible to select an additional application type when applying to vary judgment");
         }
         if (generalAppTypes.size() > 1
-                && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_OR_DISCONTINUE_CONSENT)) {
+                && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)) {
             errors.add("It is not possible to select an additional application type " +
-                    "when applying to settle or discontinue by consent");
+                    "when applying to Settle by consent");
         }
 
         if (generalAppTypes.size() == 1
@@ -162,10 +161,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         } else {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.NO);
         }
-
-        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
+        String token = callbackParams.getParams().get(BEARER_TOKEN).toString();
         boolean isGAApplicantSameAsParentCaseClaimant = initiateGeneralApplicationService
-                .isGAApplicantSameAsParentCaseClaimant(caseData, userDetails);
+                .isGAApplicantSameAsParentCaseClaimant(caseData, token);
         caseDataBuilder
             .generalAppParentClaimantIsApplicant(isGAApplicantSameAsParentCaseClaimant ? YES : YesOrNo.NO).build();
 
