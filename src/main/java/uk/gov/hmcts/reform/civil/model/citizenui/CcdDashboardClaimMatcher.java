@@ -147,6 +147,15 @@ public class CcdDashboardClaimMatcher implements Claim {
         return false;
     }
 
+    public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
+        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentSignedSettlementAgreement();
+    }
+
+    public boolean hasDefendantRejectedSettlementAgreement() {
+        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentRespondedToSettlementAgreement()
+                && !caseData.isRespondentSignedSettlementAgreement();
+    }
+
     public boolean hasClaimantSignedSettlementAgreementAndDeadlineNotExpired() {
         return caseData.hasApplicant1SignedSettlementAgreement() && !caseData.isSettlementAgreementDeadlineExpired();
     }

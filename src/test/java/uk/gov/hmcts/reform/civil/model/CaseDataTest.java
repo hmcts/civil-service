@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -679,7 +678,7 @@ public class CaseDataTest {
                 .build();
 
         //When
-        boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentRespondedToSettlementAgreement();
 
         //Then
         assertTrue(isRespondentSignSettlementAgreement);
@@ -694,7 +693,7 @@ public class CaseDataTest {
                 .build();
 
         //When
-        boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentRespondedToSettlementAgreement();
 
         //Then
         assertFalse(isRespondentSignSettlementAgreement);

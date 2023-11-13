@@ -60,6 +60,12 @@ public enum DashboardClaimStatus {
     CLAIMANT_ASKED_FOR_SETTLEMENT(
         Claim::hasClaimantAskedToSignSettlementAgreement
     ),
+    CLAIMANT_AND_DEFENDANT_SIGNED_SETTLEMENT_AGREEMENT(
+            Claim::hasClaimantAndDefendantSignedSettlementAgreement
+    ),
+    DEFENDANT_REJECTED_SETTLEMENT_AGREEMENT(
+            Claim::hasDefendantRejectedSettlementAgreement
+    ),
     CLAIMANT_SEND_SETTLEMENT_AGREEMENT(
         Claim::hasClaimantSignedSettlementAgreementAndDeadlineNotExpired
     ),

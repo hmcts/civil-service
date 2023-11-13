@@ -237,6 +237,16 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
+        return false;
+    }
+
+    @Override
+    public boolean hasDefendantRejectedSettlementAgreement() {
+        return false;
+    }
+
+    @Override
     @JsonIgnore
     public boolean hasClaimantAcceptedPartialAdmissionAmount() {
         return hasResponse() && response.isPartAdmitPayImmediately()
