@@ -78,9 +78,9 @@ public class ResponseRepaymentDetailsForm {
             .build();
     }
 
-    private static void addRepaymentMethod(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalAmount) {
+    private static void addRepaymentMethod(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalAmount) {
         if (caseData.isPayImmediately()) {
-            addPayByDatePayImmediately(builder, totalAmount);
+            addPayByDatePayImmediately(builder, totalAmount, caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
         } else if (caseData.isPayByInstallment()) {
             addRepaymentPlan(caseData, builder, totalAmount);
         } else if (caseData.isPayBySetDate()) {
@@ -94,10 +94,8 @@ public class ResponseRepaymentDetailsForm {
             .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
     }
 
-    private static void addPayByDatePayImmediately(ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount) {
-        builder.payBy(LocalDate.now()
-                          .plusDays(RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY))
-            .amountToPay(totalClaimAmount + "");
+    private static void addPayByDatePayImmediately(ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount, LocalDate responseDate) {
+        builder.payBy(responseDate).amountToPay(totalClaimAmount + "");
     }
 
     private static void addRepaymentPlan(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder, BigDecimal totalClaimAmount) {
@@ -142,7 +140,7 @@ public class ResponseRepaymentDetailsForm {
         }
     }
 
-    private static void partAdmissionData(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder) {
+    private static void partAdmissionData(CaseData caseData, ResponseRepaymentDetailsFormBuilder builder) {
         addDetailsOnWhyClaimIsRejected(caseData, builder);
         if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
             alreadyPaid(caseData, builder);
