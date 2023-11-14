@@ -455,8 +455,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     RESPONDENT_TWO_WITNESS_REFERRED,
                     APPLICANT_WITNESS_REFERRED,
                     APPLICANT_TWO_WITNESS_REFERRED:
-                prefix = "Referred Document";
-                renameUploadEvidenceDocumentType(documentUpload, prefix);
+                prefix = " referred to in the statement of ";
+                renameUploadEvidenceDocumentTypeWithName(documentUpload, prefix);
                 break;
             case RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE,
                     RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE,
@@ -561,6 +561,21 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     + (question ? type.getExpertDocumentQuestion() : type.getExpertDocumentAnswer())
                     + END + ext;
             type.getExpertDocument().setDocumentFileName(newName);
+        });
+    }
+
+    private <T> void renameUploadEvidenceDocumentTypeWithName(final List<Element<T>> documentUpload, String body) {
+        documentUpload.forEach(x -> {
+            UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
+            String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
+            String newName = type.getTypeOfDocument()
+                    + body
+                    + type.getWitnessOptionName()
+                    + SPACE
+                    + type.getDocumentIssuedDate()
+                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
+                    + END + ext;
+            type.getDocumentUpload().setDocumentFileName(newName);
         });
     }
 
