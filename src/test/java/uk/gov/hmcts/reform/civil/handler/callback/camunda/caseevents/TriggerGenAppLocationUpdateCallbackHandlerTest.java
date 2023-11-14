@@ -125,7 +125,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG
                                         true, true,
                                         getOriginalStatusOfGeneralApplication()
             );
-        when(helperService.updateApplicationLocationDetailsInClaim(caseData)).thenReturn(caseData);
+        when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
             .request(CallbackRequest.builder()
