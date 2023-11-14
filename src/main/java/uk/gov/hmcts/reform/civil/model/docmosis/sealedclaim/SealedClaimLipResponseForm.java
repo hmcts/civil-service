@@ -37,7 +37,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
 public class SealedClaimLipResponseForm implements MappableObject {
