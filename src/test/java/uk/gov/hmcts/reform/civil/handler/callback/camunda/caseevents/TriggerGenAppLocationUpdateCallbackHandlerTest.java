@@ -50,6 +50,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG
     @MockBean
     private GenAppStateHelperService helperService;
 
+    private static final String authToken = "Bearer TestAuthToken";
+
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(TRIGGER_UPDATE_GA_LOCATION);
@@ -65,7 +67,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG
                                         true, true,
                                         getOriginalStatusOfGeneralApplication()
             );
-        when(helperService.updateApplicationLocationDetailsInClaim(caseData)).thenReturn(caseData);
+        when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
         CallbackParams params = CallbackParamsBuilder.builder()
             .of(ABOUT_TO_SUBMIT, caseData)
             .request(CallbackRequest.builder()
@@ -75,7 +77,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNull();
-        verify(helperService, times(1)).updateApplicationLocationDetailsInClaim(caseData);
+        verify(helperService, times(1)).updateApplicationLocationDetailsInClaim(any(), any());
         verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
         verify(helperService, times(1)).triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
         verifyNoMoreInteractions(helperService);
@@ -103,7 +105,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_TASK_RECONFIG
             );
         String expectedErrorMessage = "Could not trigger event to update location on application under case: "
             + caseData.getCcdCaseReference();
-        when(helperService.updateApplicationLocationDetailsInClaim(caseData)).thenReturn(caseData);
+        when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
         when(helperService.triggerEvent(any(CaseData.class), eq(TRIGGER_LOCATION_UPDATE)))
             .thenThrow(new RuntimeException());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

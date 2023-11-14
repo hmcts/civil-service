@@ -179,6 +179,13 @@ public class InitiateGeneralApplicationService {
 
         Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
         //Setting Work Allocation location and location name
+        if (Objects.isNull(caseLocation.getLeft().getSiteName())
+            && Objects.nonNull(caseLocation.getLeft().getBaseLocation())) {
+            LocationRefData  locationDetails = getWorkAllocationLocationDetails(caseLocation.getLeft().getBaseLocation(), authToken);
+            caseLocation.getLeft().setSiteName(locationDetails.getSiteName());
+            caseLocation.getLeft().setAddress(locationDetails.getCourtAddress());
+            caseLocation.getLeft().setPostcode(locationDetails.getPostcode());
+        }
         applicationBuilder.caseManagementLocation(caseLocation.getLeft());
         applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
         applicationBuilder.locationName(hasSDOBeenMade(caseData.getCcdState())
@@ -343,6 +350,8 @@ public class InitiateGeneralApplicationService {
                     .region(ccmccLocation.getRegionId())
                     .baseLocation(ccmccLocation.getEpimmsId())
                     .siteName(ccmccLocation.getSiteName())
+                    .address(ccmccLocation.getCourtAddress())
+                    .postcode(ccmccLocation.getPostcode())
                     .build();
             return Pair.of(courtLocation, true);
         }
@@ -367,6 +376,15 @@ public class InitiateGeneralApplicationService {
             .baseLocation(caseData.getApplicant1DQ().getApplicant1DQRequestedCourt()
                               .getCaseLocation().getBaseLocation())
             .build();
+    }
+
+    public LocationRefData getWorkAllocationLocationDetails(String baseLocation, String authToken) {
+        List<LocationRefData> locationDetails = locationRefDataService.getCourtLocationsByEpimmsId(authToken, baseLocation);
+        if (locationDetails != null && !locationDetails.isEmpty()) {
+            return locationDetails.get(0);
+        } else {
+            return LocationRefData.builder().build();
+        }
     }
 
     private boolean isDefendant1RespondedFirst(CaseData caseData) {
