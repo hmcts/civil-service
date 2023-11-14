@@ -56,7 +56,7 @@ public class AddCaseNoteCallbackHandler extends CallbackHandler {
             caseData.getCaseNote()
         );
 
-        List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(caseNote, caseData.getCaseNotes());
+        List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToListStart(caseNote, caseData.getCaseNotes());
 
         CaseData updatedCaseData = caseData.toBuilder()
             .caseNotes(caseNotes)

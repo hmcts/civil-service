@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +37,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Getter
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @EqualsAndHashCode
 public class SealedClaimLipResponseForm implements MappableObject {
@@ -59,7 +60,8 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final List<DebtTemplateData> debtList;
     private final List<ReasonMoneyTemplateData> incomeList;
     private final List<ReasonMoneyTemplateData> expenseList;
-    private final SealedClaimResponseForm commonDetails;
+    //repayment details for repayment plan that are common between LR and LiP
+    private final ResponseRepaymentDetailsForm commonDetails;
 
     public boolean isCurrentlyWorking() {
         return (employerDetails != null && !employerDetails.isEmpty())
@@ -84,7 +86,7 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .defendant2(LipFormParty.toLipDefenceParty(caseData.getRespondent2()))
             .partnerAndDependent(caseData.getRespondent1PartnerAndDependent())
             .debtList(mapToDebtList(caseData.getSpecDefendant1Debts()))
-            .commonDetails(SealedClaimResponseForm.toSealedClaimResponseCommonContent(caseData));
+            .commonDetails(ResponseRepaymentDetailsForm.toSealedClaimResponseCommonContent(caseData));
         addSolicitorDetails(caseData, builder);
         addEmployeeDetails(caseData, builder);
         addFinancialDetails(caseData, builder);
@@ -114,11 +116,11 @@ public class SealedClaimLipResponseForm implements MappableObject {
             .ifPresent(selfEmployDetails ->
                            builder.selfEmployment(Respondent1SelfEmploymentLRspec.builder()
                                                       .amountOwed(selfEmployDetails.getAmountOwed() != null
-                                                                      ? MonetaryConversions.penniesToPounds(
-                                                          selfEmployDetails.getAmountOwed())
+                                                                      ? (MonetaryConversions.penniesToPounds(
+                                                          selfEmployDetails.getAmountOwed())).setScale(2, RoundingMode.CEILING)
                                                                       : null)
-                                                      .annualTurnover(MonetaryConversions.penniesToPounds(
-                                                          selfEmployDetails.getAnnualTurnover()))
+                                                      .annualTurnover((MonetaryConversions.penniesToPounds(
+                                                          selfEmployDetails.getAnnualTurnover())).setScale(2, RoundingMode.CEILING))
                                                       .jobTitle(selfEmployDetails.getJobTitle())
                                                       .reason(selfEmployDetails.getReason())
                                                       .build())

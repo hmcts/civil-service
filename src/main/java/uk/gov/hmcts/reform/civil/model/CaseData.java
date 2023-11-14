@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -81,10 +82,16 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TransferCaseDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -101,6 +108,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -520,6 +528,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
+    private String featureToggleWA;
 
     private String caseManagementOrderSelection;
     private Document orderSDODocumentDJ;
@@ -563,9 +572,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     //case progression
     private final List<Element<DocumentWithName>> documentAndName;
+    private final List<Element<DocumentWithName>> documentAndNameToAdd;
     private final List<Element<DocumentAndNote>> documentAndNote;
+    private final List<Element<DocumentAndNote>> documentAndNoteToAdd;
     private final CaseNoteType caseNoteType;
-    private final String caseNoteTypeNoteTA;
+    private final String caseNoteTA;
+    private final List<Element<CaseNote>> caseNotesTA;
     private final LocalDateTime noteAdditionDateTime;
     private final String caseTypeFlag;
     private final String witnessStatementFlag;
@@ -595,8 +607,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final FreeFormOrderValues orderOnCourtInitiative;
     private final FreeFormOrderValues orderWithoutNotice;
     private final OrderOnCourtsList orderOnCourtsList;
+    private final String freeFormHearingNotes;
 
-    private Document finalOrderDocument;
+    private CaseDocument finalOrderDocument;
+
     @Builder.Default
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
 
@@ -604,6 +618,22 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String bulkCustomerId;
     private final String sdtRequestIdFromSdt;
     private final List<Element<String>> sdtRequestId;
+
+    //Judgments Online
+    private JudgmentRecordedReason joJudgmentRecordReason;
+    private JudgmentStatusDetails joJudgmentStatusDetails;
+    private LocalDate joOrderMadeDate;
+    private String joAmountOrdered;
+    private String joAmountCostOrdered;
+    private YesOrNo joIsRegisteredWithRTL;
+    private PaymentPlanSelection joPaymentPlanSelection;
+    private JudgmentInstalmentDetails joJudgmentInstalmentDetails;
+    private LocalDate joPaymentToBeMadeByDate;
+    private YesOrNo joIsLiveJudgmentExists;
+    private LocalDate joSetAsideDate;
+    private JudgmentPaidInFull joJudgmentPaidInFull;
+
+    private final TransferCaseDetails transferCaseDetails;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -824,23 +854,35 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isApplicant1NotRepresented() {
+        return NO.equals(getApplicant1Represented());
+    }
+
+    @JsonIgnore
     public boolean isLRvLipOneVOne() {
         return isRespondent1NotRepresented()
+            && !isApplicant1NotRepresented()
+            && isOneVOne(this);
+    }
+
+    @JsonIgnore
+    public boolean isLipvLipOneVOne() {
+        return isRespondent1NotRepresented()
+            && isApplicant1NotRepresented()
             && isOneVOne(this);
     }
 
     @JsonIgnore
     public boolean isJudgementDateNotPermitted() {
-        return nonNull(getRespondent1ResponseDate())
-            && getRespondent1ResponseDate()
-            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+        return nonNull(getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+            && getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
+            .atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
 
     @JsonIgnore
-    public String setUpJudgementFormattedPermittedDate() {
+    public String setUpJudgementFormattedPermittedDate(LocalDate extendedRespondent1ResponseDate) {
         if (isJudgementDateNotPermitted()) {
-            return formatLocalDateTime(getRespondent1ResponseDate()
-                                           .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
+            return formatLocalDateTime(extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
         }
         return null;
     }
@@ -982,11 +1024,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public List<Element<RecurringExpenseLRspec>> getRecurringExpensesForRespondent1() {
         if (isFullAdmitClaimSpec()) {
-            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA).orElse(
-                null);
+            return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpensesFA)
+                .orElse(
+                    null);
         }
         return Optional.ofNullable(getRespondent1DQ()).map(Respondent1DQ::getRespondent1DQRecurringExpenses).orElse(
             null);
+    }
+
+    @JsonIgnore
+    public List<Element<ManageDocument>> getManageDocumentsList() {
+        return Optional.ofNullable(getManageDocuments()).orElse(new ArrayList<>());
     }
 
     @JsonIgnore
@@ -1001,4 +1049,51 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return getApplicant1().getPartyEmail() != null ? getApplicant1().getPartyEmail() : getClaimantUserDetails().getEmail();
     }
 
+    @JsonIgnore
+    public String getHelpWithFeesReferenceNumber() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getHelpWithFees)
+            .map(HelpWithFees::getHelpWithFeesReferenceNumber).orElse(null);
+    }
+
+    @JsonIgnore
+    public Address getRespondent1CorrespondenceAddress() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getRespondent1LiPResponse)
+            .map(RespondentLiPResponse::getRespondent1LiPCorrespondenceAddress)
+            .orElse(null);
+    }
+
+    @JsonIgnore
+    public String getCurrentCamundaBusinessProcessName() {
+        return ofNullable(getBusinessProcess())
+            .map(BusinessProcess::getCamundaEvent)
+            .orElse(null);
+    }
+
+    @JsonIgnore
+    public boolean isTranslatedDocumentUploaded() {
+        if (getSystemGeneratedCaseDocuments() != null) {
+            return getSystemGeneratedCaseDocuments().stream()
+                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                   .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
+        }
+        return false;
+    }
+
+    @JsonIgnore
+    public boolean isRespondentSolicitorRegistered() {
+        return YesOrNo.YES.equals(getRespondent1OrgRegistered());
+    }
+
+    @JsonIgnore
+    public String getRespondent1Email() {
+        if (isRespondent1NotRepresented()) {
+            return getRespondent1().getPartyEmail();
+        }
+        if (isRespondentSolicitorRegistered()) {
+            return getRespondentSolicitor1EmailAddress();
+        }
+        return null;
+    }
 }

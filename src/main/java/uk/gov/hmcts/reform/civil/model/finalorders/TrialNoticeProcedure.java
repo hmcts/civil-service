@@ -13,5 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantN
 public class TrialNoticeProcedure {
 
     private FinalOrdersClaimantDefendantNotAttending list;
+    private FinalOrdersClaimantDefendantNotAttending listClaimTwo;
     private FinalOrdersClaimantDefendantNotAttending listDef;
+    private FinalOrdersClaimantDefendantNotAttending listDefTwo;
 }

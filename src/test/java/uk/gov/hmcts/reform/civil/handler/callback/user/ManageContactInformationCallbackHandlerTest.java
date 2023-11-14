@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import java.time.LocalDate;
@@ -85,6 +86,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Autowired
     private ObjectMapper mapper;
+
+    @MockBean
+    private CaseFlagsInitialiser caseFlagInitialiser;
 
     @MockBean
     private CoreCaseUserService coreCaseUserService;
@@ -732,6 +736,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldUpdateApplicantOneExperts() {
             CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
                                                         .value(DynamicListElement.builder()
@@ -757,6 +762,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldUpdateDefendantOneExperts() {
             CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
                                                         .value(DynamicListElement.builder()
@@ -782,6 +788,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldUpdateDefendantTwoExperts() {
             CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
                                                         .value(DynamicListElement.builder()
@@ -807,6 +814,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldUpdateApplicantOneWitnesses() {
             CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
                                                         .value(DynamicListElement.builder()
@@ -832,6 +840,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldUpdateDefendantOneWitnesses() {
             CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
                                                         .value(DynamicListElement.builder()
@@ -857,6 +866,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldUpdateDefendantTwoWitnesses() {
             CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
                                                         .value(DynamicListElement.builder()
@@ -882,6 +892,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void addingExpertWhenNoneExisted() {
             CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
                                                         .value(DynamicListElement.builder()
@@ -910,6 +921,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void removingAllExperts() {
             CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
                                                         .value(DynamicListElement.builder()
@@ -938,6 +950,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void addingWitnessWhenNoneExisted() {
             CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
                                                         .value(DynamicListElement.builder()
@@ -964,6 +977,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void removingAllWitnesses() {
             CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
                                                         .value(DynamicListElement.builder()
