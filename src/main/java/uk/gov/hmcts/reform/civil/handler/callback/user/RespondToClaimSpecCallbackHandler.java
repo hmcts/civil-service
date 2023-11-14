@@ -1363,9 +1363,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         Party updatedRespondent1;
 
-        if (NO.equals(caseData.getTempCorrespondenceAddress1Required())) {
+        if (NO.equals(caseData.getTempAddress1Required())) {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
-                .primaryAddress(caseData.getTempCorrespondenceAddress1()).build();
+                .primaryAddress(caseData.getTempAddress1()).build();
         } else {
             updatedRespondent1 = caseData.getRespondent1().toBuilder()
                 .primaryAddress(caseData.getRespondent1Copy().getPrimaryAddress())
@@ -1578,9 +1578,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private static Party applyRespondent2Address(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         Party updatedRespondent2;
 
-        if (NO.equals(caseData.getTempCorrespondenceAddress2Required())) {
+        if (NO.equals(caseData.getTempAddress2Required())) {
             updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .primaryAddress(caseData.getTempCorrespondenceAddress2()).build();
+                .primaryAddress(caseData.getTempAddress2()).build();
         } else {
             updatedRespondent2 = caseData.getRespondent2().toBuilder()
                 .primaryAddress(caseData.getRespondent2Copy().getPrimaryAddress()).build();
