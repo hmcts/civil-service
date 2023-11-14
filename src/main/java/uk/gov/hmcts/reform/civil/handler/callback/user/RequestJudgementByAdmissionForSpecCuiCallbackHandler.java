@@ -18,9 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
-import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +41,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final JudgementService judgementService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
-    private final DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -67,9 +64,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (caseData.isJudgementDateNotPermitted()) {
-            LocalDate extendedResponseDate = caseData.getRespondent1ResponseDate().toLocalDate().plusDays(5);
-            LocalDate extendedRespondent1ResponseDate = deadlineCalculatorService.calculateExtendedDeadline(extendedResponseDate);
-            errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(extendedRespondent1ResponseDate)));
+            errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
