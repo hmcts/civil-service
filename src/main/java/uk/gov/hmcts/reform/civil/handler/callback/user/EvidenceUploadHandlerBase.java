@@ -1025,6 +1025,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     .documentUrl(from.getValue().getDocumentUpload().getDocumentUrl())
                     .build();
             UploadEvidenceDocumentType type = UploadEvidenceDocumentType.builder()
+                    .witnessOptionName(from.getValue().getWitnessOptionName())
                     .documentIssuedDate(from.getValue().getDocumentIssuedDate())
                     .typeOfDocument(from.getValue().getTypeOfDocument())
                     .createdDatetime(from.getValue().getCreatedDatetime())
@@ -1164,6 +1165,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 && uploadEvidenceDocumentType.getValue().getCreatedDatetime()
                 .isAfter(bundleDetails.get().getCreatedOn().get())) {
                 uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
+                                                                         .witnessOptionName(uploadEvidenceDocumentType.getValue().getWitnessOptionName())
                                                                          .typeOfDocument(docType)
                                                                          .createdDatetime(uploadEvidenceDocumentType.getValue().getCreatedDatetime())
                                                                          .documentUpload(uploadEvidenceDocumentType.getValue().getDocumentUpload())
