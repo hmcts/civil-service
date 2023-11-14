@@ -16,13 +16,13 @@ import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
-import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -41,8 +41,11 @@ import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
+import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
+import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
@@ -71,7 +74,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
@@ -85,7 +87,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
@@ -109,6 +111,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private static final String datePattern = "dd MMMM yyyy";
     private final RespondentMediationService respondentMediationService;
     private final PaymentDateService paymentDateService;
+    private final ResponseOneVOneShowTagService responseOneVOneShowTagService;
+    private final DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -267,6 +271,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (featureToggleService.isCaseFileViewEnabled()) {
             builder.respondent1GeneratedResponseDocument(null);
             builder.respondent2GeneratedResponseDocument(null);
+            builder.respondent1ClaimResponseDocumentSpec(null);
         }
 
         locationHelper.getCaseManagementLocation(caseData)
@@ -334,11 +339,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             addEventAndDateAddedToApplicantWitnesses(builder);
         }
 
-        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
-
         if (featureToggleService.isHmcEnabled()) {
-            populateWithPartyIds(builder);
+            populateDQPartyIds(builder);
         }
+
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
@@ -383,7 +388,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private void putCaseStateInJudicialReferral(CaseData caseData, AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response) {
         if (caseData.isRespondentResponseFullDefence()
-            && RespondToDefenceCallbackHandler.shouldMoveToJudicialReferral(caseData)) {
+            && JudicialReferralUtils.shouldMoveToJudicialReferral(caseData)) {
             response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
     }
@@ -414,7 +419,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         if (isDefendantFullAdmitPayImmediately(caseData)) {
             LocalDate whenBePaid = paymentDateService.getPaymentDateAdmittedClaim(caseData);
-            updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
+            updatedCaseData.showResponseOneVOneFlag(responseOneVOneShowTagService.setUpOneVOneFlow(caseData));
             updatedCaseData.whenToBePaidText(formatLocalDate(whenBePaid, DATE));
         }
 
@@ -430,7 +435,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             ).build());
 
         if (V_2.equals(callbackParams.getVersion()) && featureToggleService.isPinInPostEnabled()) {
-            updatedCaseData.showResponseOneVOneFlag(setUpOneVOneFlow(caseData));
+            updatedCaseData.showResponseOneVOneFlag(responseOneVOneShowTagService.setUpOneVOneFlow(caseData));
             updatedCaseData.respondent1PaymentDateToStringSpec(setUpPayDateToString(caseData));
 
             Optional<BigDecimal> howMuchWasPaid = Optional.ofNullable(caseData.getRespondToAdmittedClaim())
@@ -444,8 +449,17 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 null
             ).name());
         }
+        // add direction questionaire document from system generated documents, to placeholder field for preview during event.
+        // Or add sealed response form  from system generated documents, to placeholder field for preview during event.
+        populatePreviewDocuments(caseData, updatedCaseData);
 
-        // add document from system generated documents, to placeholder field for preview during event.
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(updatedCaseData.build().toMap(objectMapper))
+            .build();
+    }
+
+    private void populatePreviewDocuments(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedCaseData) {
+        // add direction questionaire document from system generated documents, to placeholder field for preview during event.
         if (caseData.getRespondent2DocumentURL() == null) {
             caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
                 if (document.getValue().getDocumentName().contains("defendant_directions_questionnaire_form")) {
@@ -462,10 +476,14 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 }
             });
         }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.build().toMap(objectMapper))
-            .build();
+        // add sealed response form  from system generated documents, to placeholder field for preview during event.
+        if (featureToggleService.isPinInPostEnabled()) {
+            caseData.getSystemGeneratedCaseDocuments().forEach(document -> {
+                if (document.getValue().getDocumentName().contains("response_sealed_form.pdf")) {
+                    updatedCaseData.respondent1ClaimResponseDocumentSpec(document.getValue());
+                }
+            });
+        }
     }
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
@@ -539,27 +557,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
     }
 
-    private ResponseOneVOneShowTag setUpOneVOneFlow(CaseData caseData) {
-        if (ONE_V_ONE.equals(getMultiPartyScenario(caseData))) {
-            if (caseData.getRespondent1ClaimResponseTypeForSpec() == null) {
-                return null;
-            }
-            switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
-                case FULL_DEFENCE:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_FULL_DEFENCE;
-                case FULL_ADMISSION:
-                    return setUpOneVOneFlowForFullAdmit(caseData);
-                case PART_ADMISSION:
-                    return setUpOneVOneFlowForPartAdmit(caseData);
-                case COUNTER_CLAIM:
-                    return ResponseOneVOneShowTag.ONE_V_ONE_COUNTER_CLAIM;
-                default:
-                    return null;
-            }
-        }
-        return null;
-    }
-
     private String setUpPayDateToString(CaseData caseData) {
         if (caseData.getRespondToClaimAdmitPartLRspec() != null
             && caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid() != null) {
@@ -572,42 +569,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         if (caseData.getRespondent1ResponseDate() != null) {
-            return caseData.getRespondent1ResponseDate().plusDays(5)
+            return deadlineCalculatorService.calculateExtendedDeadline(
+                caseData.getRespondent1ResponseDate().toLocalDate(),
+                RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY)
                 .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         return null;
-    }
-
-    private ResponseOneVOneShowTag setUpOneVOneFlowForPartAdmit(CaseData caseData) {
-        if (YES.equals(caseData.getSpecDefenceAdmittedRequired())) {
-            return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_HAS_PAID;
-        }
-        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
-            case IMMEDIATELY:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY;
-            case BY_SET_DATE:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_BY_SET_DATE;
-            case SUGGESTION_OF_REPAYMENT_PLAN:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_INSTALMENT;
-            default:
-                return ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT;
-        }
-    }
-
-    private ResponseOneVOneShowTag setUpOneVOneFlowForFullAdmit(CaseData caseData) {
-        if (YES.equals(caseData.getSpecDefenceFullAdmittedRequired())) {
-            return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_HAS_PAID;
-        }
-        switch (caseData.getDefenceAdmitPartPaymentTimeRouteRequired()) {
-            case IMMEDIATELY:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_IMMEDIATELY;
-            case BY_SET_DATE:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_BY_SET_DATE;
-            case SUGGESTION_OF_REPAYMENT_PLAN:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT_PAY_INSTALMENT;
-            default:
-                return ResponseOneVOneShowTag.ONE_V_ONE_FULL_ADMIT;
-        }
     }
 
     private CallbackResponse validatePaymentDate(CallbackParams callbackParams) {

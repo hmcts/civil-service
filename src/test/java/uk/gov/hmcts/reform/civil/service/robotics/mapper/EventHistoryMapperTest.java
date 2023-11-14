@@ -14,22 +14,22 @@ import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PartyRole;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseNote;
-import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyData;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
@@ -90,8 +90,8 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_SDO_NOT_DRAWN;
 import static uk.gov.hmcts.reform.civil.service.robotics.RoboticsNotificationService.findLatestEventTriggerReason;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_IN_MEDIATION;
-import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_MANUAL_DETERMINATION;
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_JUDGMENT_BY_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.RPA_REASON_MANUAL_DETERMINATION;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -1890,15 +1890,6 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText("Claim issued in CCD.")
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(3)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant fully admits.")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant fully admits.")
-                                      .build())
                     .build()
             );
 
@@ -1908,7 +1899,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
                 .containsExactly(expectedReceiptOfAdmission);
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                .containsExactly(expectedMiscellaneousEvents.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -1950,15 +1941,6 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText("Claim issued in CCD.")
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(3)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant fully admits.")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant fully admits.")
-                                      .build())
                     .build()
             );
 
@@ -1968,7 +1950,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
                 .containsExactly(expectedReceiptOfAdmission);
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                .containsExactly(expectedMiscellaneousEvents.get(0));
 
             assertEmptyEvents(
                 eventHistory,
@@ -2001,8 +1983,7 @@ class EventHistoryMapperTest {
                 .litigiousPartyID("002")
                 .build();
 
-            List<Event> expectedMiscellaneousEvents = List.of(
-                Event.builder()
+            Event expectedMiscellaneousEvents = Event.builder()
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getIssueDate().atStartOfDay())
@@ -2010,19 +1991,7 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText("Claim issued in CCD.")
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(3)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText(
-                        "RPA Reason: [1 of 2 - 2020-08-01] Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: [1 of 2 - 2020-08-01] "
-                                                    + "Defendant: Mr. Sole Trader has responded: FULL_ADMISSION")
-                                      .build())
-                    .build()
-            );
+                    .build();
 
             var eventHistory = mapper.buildEvents(caseData);
 
@@ -2030,7 +1999,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("receiptOfAdmission").asList()
                 .containsExactly(expectedReceiptOfAdmission);
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                .containsExactly(expectedMiscellaneousEvents);
 
             assertEmptyEvents(
                 eventHistory,
@@ -2069,8 +2038,7 @@ class EventHistoryMapperTest {
                 .litigiousPartyID("002")
                 .build();
 
-            List<Event> expectedMiscellaneousEvents = List.of(
-                Event.builder()
+            Event expectedMiscellaneousEvents = Event.builder()
                     .eventSequence(1)
                     .eventCode("999")
                     .dateReceived(caseData.getIssueDate().atStartOfDay())
@@ -2078,17 +2046,7 @@ class EventHistoryMapperTest {
                     .eventDetails(EventDetails.builder()
                                       .miscText("Claim issued in CCD.")
                                       .build())
-                    .build(),
-                Event.builder()
-                    .eventSequence(4)
-                    .eventCode("999")
-                    .dateReceived(caseData.getRespondent1ResponseDate())
-                    .eventDetailsText("RPA Reason: Defendant partial admission.")
-                    .eventDetails(EventDetails.builder()
-                                      .miscText("RPA Reason: Defendant partial admission.")
-                                      .build())
-                    .build()
-            );
+                    .build();
 
             List<Event> expectedDirectionsQuestionnaireFiled = List.of(
                 Event.builder()
@@ -2115,7 +2073,7 @@ class EventHistoryMapperTest {
             assertThat(eventHistory).extracting("receiptOfPartAdmission").asList()
                 .containsExactly(expectedReceiptOfPartAdmission);
             assertThat(eventHistory).extracting("miscellaneous").asList()
-                .containsExactly(expectedMiscellaneousEvents.get(0), expectedMiscellaneousEvents.get(1));
+                .containsExactly(expectedMiscellaneousEvents);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
                 .contains(expectedDirectionsQuestionnaireFiled.get(0));
 
@@ -8005,6 +7963,7 @@ class EventHistoryMapperTest {
                         )
                         .build()
                 )
+                .specDefenceAdmittedRequired(YES)
                 .build();
 
             List<Event> expectedDirectionsQuestionnaireFiled =
@@ -8030,6 +7989,8 @@ class EventHistoryMapperTest {
             var eventHistory = mapper.buildEvents(caseData);
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("statesPaid").asList()
+                .extracting("eventCode").asString().contains("49");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_REASON_MANUAL_DETERMINATION);
             assertThat(eventHistory).extracting("directionsQuestionnaireFiled").asList()
@@ -8095,6 +8056,7 @@ class EventHistoryMapperTest {
                         )
                         .build()
                 )
+                .specDefenceAdmittedRequired(NO)
                 .build();
 
             List<Event> expectedDirectionsQuestionnaireFiled =
@@ -8322,6 +8284,7 @@ class EventHistoryMapperTest {
                 .ccjPaymentDetails(ccjPaymentDetails)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
                 .respondToClaimAdmitPartLRspec(paymentDetails)
+                .applicant1ResponseDate(LocalDateTime.now())
                 .totalInterest(BigDecimal.ZERO)
                 .build();
 
@@ -8420,6 +8383,7 @@ class EventHistoryMapperTest {
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                 .respondToClaimAdmitPartLRspec(paymentDetails)
                 .totalInterest(BigDecimal.ZERO)
+                .applicant1ResponseDate(LocalDateTime.now())
                 .build();
 
             var eventHistory = mapper.buildEvents(caseData);
@@ -8434,6 +8398,85 @@ class EventHistoryMapperTest {
                 .extracting("eventCode").asString().contains("999");
             assertThat(eventHistory).extracting("miscellaneous").asList()
                 .extracting("eventDetailsText").asString().contains(RPA_REASON_JUDGMENT_BY_ADMISSION);
+        }
+
+        @Test
+        public void shouldGenerateRPA_ForFullAdmit_WhenClaimImmediatelyForLip() {
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(NO)
+                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(40))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                .ccjJudgmentLipInterest(ZERO)
+                .build();
+
+            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
+                .whenWillThisAmountBePaid(whenWillPay)
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+                .respondToClaimAdmitPartLRspec(paymentDetails)
+                .totalInterest(BigDecimal.ZERO)
+                .applicant1ResponseDate(LocalDateTime.now())
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+
+            var eventHistory = mapper.buildEvents(caseData);
+            assertThat(eventHistory).isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventCode").asString().contains("240");
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventDetails").asList()
+                .extracting("isJudgmentForthwith").contains(true);
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventCode").asString().contains("999");
+            assertThat(eventHistory).extracting("miscellaneous").asList()
+                .extracting("eventDetailsText").asString().contains(RPA_REASON_JUDGMENT_BY_ADMISSION);
+        }
+
+        @Test
+        void shouldNotThrowNullPointerException_whenRepaymentPlanIsNull() {
+            //Given
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(1500))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
+                .ccjPaymentPaidSomeAmountInPounds(ZERO)
+                .ccjJudgmentFixedCostAmount(ZERO)
+                .ccjPaymentPaidSomeOption(NO)
+                .ccjJudgmentFixedCostOption(NO)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateSpec1v1ClaimSubmitted()
+                .atStateRespondent1v1FullAdmissionSpec().build().toBuilder()
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+                .totalInterest(BigDecimal.ZERO)
+                .build();
+            //When
+            var eventHistory = mapper.buildEvents(caseData);
+            //Then
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventDetails").asList()
+                .extracting("firstInstallmentDate").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventDetails").asList()
+                .extracting("installmentPeriod").isNotNull();
+            assertThat(eventHistory).extracting("judgmentByAdmission").asList()
+                .extracting("eventDetails").asList()
+                .extracting("installmentAmount").isNotNull();
+
         }
     }
 }

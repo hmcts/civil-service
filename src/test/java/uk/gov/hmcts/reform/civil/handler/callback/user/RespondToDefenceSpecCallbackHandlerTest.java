@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
@@ -68,6 +69,8 @@ import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.PaymentDateService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.RespondentMediationService;
+import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -91,6 +94,7 @@ import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -128,7 +132,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     LocationHelper.class,
     LocationRefDataService.class,
     JudgementService.class,
-    PaymentDateService.class
+    PaymentDateService.class,
+    ResponseOneVOneShowTagService.class
 })
 class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -143,6 +148,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private PaymentDateService paymentDateService;
+
+    @Autowired
+    private ResponseOneVOneShowTagService responseOneVOneShowTagService;
 
     @MockBean
     private UnavailableDateValidator unavailableDateValidator;
@@ -165,6 +173,10 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RespondentMediationService respondentMediationService;
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
+    @MockBean
+    private WorkingDayIndicator workingDayIndicator;
+    @MockBean
+    private DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     @Nested
     class AboutToStart {
@@ -287,6 +299,30 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNotNull();
             assertThat(response.getData()).extracting("respondent2GeneratedResponseDocument").isNotNull();
+        }
+
+        @Test
+        void shouldPopulateResponse_whenInvokedAndSystemGeneratedContainsResponseDoc() {
+            // Given
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            var testDocument1 = CaseDocument.builder()
+                .documentName("response_sealed_form.pdf")
+                .documentType(SEALED_CLAIM)
+                .documentLink(Document.builder()
+                                  .documentUrl("test-respondent1Doc-url")
+                                  .documentFileName("response_sealed_form.pdf")
+                                  .documentBinaryUrl("binary-url")
+                                  .build()).build();
+            List<Element<CaseDocument>> documentList = new ArrayList<>();
+            documentList.add(element(testDocument1));
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .systemGeneratedCaseDocuments(documentList)
+                .build();
+            // When
+            var params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            assertThat(response.getData()).extracting("respondent1ClaimResponseDocumentSpec").isNotNull();
         }
     }
 
@@ -966,6 +1002,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData()).extracting("respondent1GeneratedResponseDocument").isNull();
             assertThat(response.getData()).extracting("respondent2GeneratedResponseDocument").isNull();
+            assertThat(response.getData()).extracting("respondent1ClaimResponseDocumentSpec").isNull();
         }
 
         @Test
@@ -1054,6 +1091,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(YES)
                 .respondentResponseIsSame(YES)
                 .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1ProceedWithClaim(YES)
                 .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
                     ExpertDetails.builder().build()).build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
@@ -1074,6 +1112,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2SameLegalRepresentative(NO)
                 .addRespondent2(YES)
                 .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1ProceedWithClaim(YES)
                 .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
                     ExpertDetails.builder().build()).build())
                 .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build()).build();
@@ -1330,7 +1369,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetUpPaymentDateToString() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
-            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
+            LocalDate whenWillPay = LocalDate.now();
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
 
             RespondToClaimAdmitPartLRspec respondToClaimAdmitPartLRspec =
                 RespondToClaimAdmitPartLRspec.builder()
@@ -1358,6 +1399,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
 
             RespondToClaim respondToAdmittedClaim =
                 RespondToClaim.builder()
@@ -1385,7 +1427,9 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetUpPaymentDateForResponseDateToString() {
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
 
-            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            given(workingDayIndicator.isWorkingDay(any())).willReturn(true);
+            LocalDate whenWillPay = LocalDate.now();
+            given(deadlineCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
 
             CaseData caseData = CaseData.builder()
                 .respondent1ResponseDate(LocalDateTime.now())

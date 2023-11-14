@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -42,9 +41,11 @@ public class DocmosisTemplateDataUtils {
             respondentNameBuilder.append("1 ");
             respondentNameBuilder.append(caseData.getRespondent1().getPartyName());
             soleTraderCompany(caseData.getRespondent1(), respondentNameBuilder);
+            litigationFriend(caseData.getRespondent1LitigationFriend(), respondentNameBuilder);
             respondentNameBuilder.append(" & 2 ");
             respondentNameBuilder.append(caseData.getRespondent2().getPartyName());
             soleTraderCompany(caseData.getRespondent2(), respondentNameBuilder);
+            litigationFriend(caseData.getRespondent2LitigationFriend(), respondentNameBuilder);
         } else {
             respondentNameBuilder.append(caseData.getRespondent1().getPartyName());
             soleTraderCompany(caseData.getRespondent1(), respondentNameBuilder);
@@ -61,9 +62,11 @@ public class DocmosisTemplateDataUtils {
             applicantNameBuilder.append("1 ");
             applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
+            litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
             applicantNameBuilder.append(" & 2 ");
             applicantNameBuilder.append(caseData.getApplicant2().getPartyName());
             soleTraderCompany(caseData.getApplicant2(), applicantNameBuilder);
+            litigationFriend(caseData.getApplicant2LitigationFriend(), applicantNameBuilder);
         } else if (caseData.getApplicant1() != null) {
             applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
             soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
@@ -110,9 +113,10 @@ public class DocmosisTemplateDataUtils {
     }
 
     private static void litigationFriend(LitigationFriend litigationFriend, StringBuilder stringBuilder) {
-        Optional.ofNullable(litigationFriend)
-            .map(LitigationFriend::getFullName)
-            .ifPresent(fullName -> stringBuilder.append(format(" (proceeding by L/F %s)", fullName)));
+        if (litigationFriend != null) {
+            String fullName = litigationFriend.getFirstName() + " " + litigationFriend.getLastName();
+            stringBuilder.append(format(" (proceeding by L/F %s)", fullName));
+        }
     }
 
     public static SolicitorReferences fetchSolicitorReferencesMultiparty(CaseData caseData) {

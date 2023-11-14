@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
@@ -55,31 +56,35 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
-import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.Experts;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
+import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
-import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.validation.DateOfBirthValidator;
 import uk.gov.hmcts.reform.civil.validation.PaymentDateValidator;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
@@ -92,15 +97,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -118,10 +125,12 @@ import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
@@ -162,6 +171,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CourtLocationUtils courtLocationUtils;
     @Mock
     private CaseFlagsInitialiser caseFlagsInitialiser;
+    @Mock
+    private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
@@ -195,14 +206,81 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Test
+    void whenCallBackEventNotImplementedOrEventInvalid() {
+        // Given
+        String postCode = "postCode";
+        CaseData caseData = CaseData.builder()
+            .build().toBuilder()
+            .respondentSolicitor1ServiceAddressRequired(NO)
+            .respondentSolicitor1ServiceAddress(Address.builder().postCode(postCode).build())
+            .isRespondent1(YES)
+            .build();
+        CallbackParams callbackParams = callbackParamsOf(caseData, CallbackType.MID, " ").toBuilder()
+            .request(CallbackRequest.builder().eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
+                         .build()).build();
+
+        //When
+        CallbackException ex = assertThrows(CallbackException.class, () -> handler.handle(callbackParams),
+
+                                                                            "A CallbackException was expected to be thrown but wasn't.");
+        // Then
+        assertThat(ex.getMessage()).contains("Callback for event");
+    }
+
+    @Test
+    void resetStatementOfTruth() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "statement-of-truth");
+        CallbackRequest request = CallbackRequest.builder()
+            .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
+            .build();
+        params = params.toBuilder().request(request).build();
+
+        // When
+        CallbackResponse response = handler.handle(params);
+
+        // Then
+        assertNotNull(response);
+    }
+
+    @Test
     void midSpecCorrespondenceAddress_checkAddressIfWasIncorrect() {
         // Given
         String postCode = "postCode";
         CaseData caseData = CaseData.builder()
-            .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
-            .specAoSApplicantCorrespondenceAddressdetails(Address.builder()
-                                                              .postCode(postCode)
-                                                              .build())
+            .build().toBuilder()
+            .respondentSolicitor1ServiceAddressRequired(NO)
+            .respondentSolicitor1ServiceAddress(Address.builder().postCode(postCode).build())
+            .isRespondent1(YES)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
+        CallbackRequest request = CallbackRequest.builder()
+            .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
+            .build();
+        params = params.toBuilder().request(request).build();
+
+        List<String> errors = Collections.singletonList("error 1");
+        Mockito.when(postcodeValidator.validate(postCode)).thenReturn(errors);
+
+        // When
+        CallbackResponse response = handler.handle(params);
+
+        // Then
+        assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
+    }
+
+    @Test
+    void midSpecCorrespondenceAddress_checkAddressIfWasIncorrectForSol2() {
+        // Given
+        String postCode = "postCode";
+        CaseData caseData = CaseData.builder()
+            .build().toBuilder()
+            .respondentSolicitor1ServiceAddressRequired(YES)
+            .respondentSolicitor1ServiceAddress(Address.builder().postCode(postCode).build())
+            .isRespondent1(YES)
+            .isRespondent2(YES)
+            .respondentSolicitor2ServiceAddressRequired(NO)
+            .respondentSolicitor2ServiceAddress(Address.builder().postCode(postCode).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress");
         CallbackRequest request = CallbackRequest.builder()
@@ -652,9 +730,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            List<String> expectedErrorArray = new ArrayList<>();
-            expectedErrorArray.add("Date for when will the amount be paid must be today or in the future.");
-
             // Then
             assertThat(response).isNotNull();
             /*
@@ -702,71 +777,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitTests {
 
         @Test
-        void shouldAddPartyIdsToPartyFields_whenInvoked() {
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
-                .thenReturn(LocalDateTime.now());
-            when(toggleService.isHmcEnabled()).thenReturn(true);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .respondent2DQ()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
-                .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSRespondent2HomeAddressRequired(NO)
-                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
-                .build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-
-            assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
-            assertThat(response.getData()).extracting("respondent1").hasFieldOrProperty("partyID");
-            assertThat(response.getData()).extracting("respondent2").hasFieldOrProperty("partyID");
-        }
-
-        @Test
-        void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
-            when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
-            when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
-                .thenReturn(LocalDateTime.now());
-            when(toggleService.isHmcEnabled()).thenReturn(false);
-
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .respondent2DQ()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
-                .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSRespondent2HomeAddressRequired(NO)
-                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
-                .build();
-
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
-
-            var objectMapper = new ObjectMapper();
-            objectMapper.findAndRegisterModules();
-            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-            assertThat(response.getData()).extracting("applicant1")
-                .isEqualTo(objectMapper.convertValue(caseData.getApplicant1(), HashMap.class));
-            assertThat(response.getData()).extracting("respondent1")
-                .isEqualTo(objectMapper.convertValue(caseData.getRespondent1(), HashMap.class));
-            assertThat(response.getData()).extracting("respondent2")
-                .isEqualTo(objectMapper.convertValue(caseData.getRespondent2(), HashMap.class));
-        }
-
-        @Test
         void updateRespondent1AddressWhenUpdated() {
             // Given
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -776,9 +786,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             Address changedAddress = AddressBuilder.maximal().build();
 
             CaseData caseData = CaseDataBuilder.builder()
+                .respondent1(PartyBuilder.builder().individual().build())
                 .atStateApplicantRespondToDefenceAndProceed()
-                .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
-                .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .tempCorrespondenceAddress1Required(NO)
+                .tempCorrespondenceAddress1(AddressBuilder.maximal().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -809,17 +821,21 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
-            Address changedAddress = AddressBuilder.maximal().build();
-
+            Address newAddress2 = AddressBuilder.defaults().build();
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .respondent2DQ()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSRespondent2HomeAddressRequired(NO)
-                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
+                .build().toBuilder()
+                .tempCorrespondenceAddress1Required(YES)
+                .tempCorrespondenceAddress1(Address.builder().build())
+                .build().toBuilder()
+                .tempCorrespondenceAddress2Required(NO)
+                .tempCorrespondenceAddress2(newAddress2)
+                .respondentSolicitor2ServiceAddressRequired(NO)
+                .respondentSolicitor2ServiceAddress(newAddress2)
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -833,13 +849,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine1").isEqualTo("address line 1");
+                .extracting("AddressLine1").isEqualTo(newAddress2.getAddressLine1());
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine2").isEqualTo("address line 2");
+                .extracting("AddressLine2").isEqualTo(newAddress2.getAddressLine2());
             assertThat(response.getData())
                 .extracting("respondent2").extracting("primaryAddress")
-                .extracting("AddressLine3").isEqualTo("address line 3");
+                .extracting("AddressLine3").isEqualTo(newAddress2.getAddressLine3());
         }
 
         @Test
@@ -852,6 +868,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+            when(toggleService.isHmcEnabled()).thenReturn(true);
 
             Witnesses res1witnesses = Witnesses.builder().details(
                 wrapElements(
@@ -882,18 +899,20 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .respondent2DQ()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSApplicantCorrespondenceAddressRequired(YES)
                 .addRespondent2(YES)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
-                .atSpecAoSRespondent2HomeAddressRequired(NO)
-                .atSpecAoSRespondent2HomeAddressDetails(AddressBuilder.maximal().build())
                 .build().toBuilder()
                 .respondent1DQWitnessesSmallClaim(res1witnesses)
                 .respondent2DQWitnessesSmallClaim(res2witnesses)
                 .build().toBuilder()
+                .tempCorrespondenceAddress1Required(YES)
+                .tempCorrespondenceAddress1(Address.builder().build())
                 .respondent2ResponseDate(dateTime)
-                .respondent1ResponseDate(dateTime).build();
+                .respondent1ResponseDate(dateTime).build().toBuilder()
+                .tempCorrespondenceAddress2Required(NO)
+                .tempCorrespondenceAddress2(AddressBuilder.maximal().build())
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
@@ -908,14 +927,29 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
             // Then
-            assertThat(response.getData())
-                .extracting("respondent1DQWitnesses")
-                .isEqualTo(objectMapper.convertValue(res1witnesses, new TypeReference<>() {
-                }));
-            assertThat(response.getData())
-                .extracting("respondent2DQWitnesses")
-                .isEqualTo(objectMapper.convertValue(res2witnesses, new TypeReference<>() {
-                }));
+
+            Witnesses actualRespondent1DQWitnesses = objectMapper.convertValue(response.getData().get("respondent1DQWitnesses"), new TypeReference<>() {});
+            Witness actualRespondent1Witness = unwrapElements(actualRespondent1DQWitnesses.getDetails()).get(0);
+            assertThat(actualRespondent1Witness.getPartyID()).isNotNull();
+            assertThat(actualRespondent1Witness.getFirstName()).isEqualTo("Witness");
+            assertThat(actualRespondent1Witness.getLastName()).isEqualTo("One");
+            assertThat(actualRespondent1Witness.getEmailAddress()).isEqualTo("test-witness-one@example.com");
+            assertThat(actualRespondent1Witness.getPhoneNumber()).isEqualTo("07865456789");
+            assertThat(actualRespondent1Witness.getReasonForWitness()).isEqualTo("great reasons");
+            assertThat(actualRespondent1Witness.getEventAdded()).isEqualTo("Defendant Response Event");
+            assertThat(actualRespondent1Witness.getDateAdded()).isEqualTo(date);
+
+            Witnesses actualRespondent2DQWitnesses = objectMapper.convertValue(response.getData().get("respondent2DQWitnesses"), new TypeReference<>() {});
+            Witness respondent2Witness = unwrapElements(actualRespondent2DQWitnesses.getDetails()).get(0);
+            assertThat(respondent2Witness.getPartyID()).isNotNull();
+            assertThat(respondent2Witness.getFirstName()).isEqualTo("Witness");
+            assertThat(respondent2Witness.getLastName()).isEqualTo("Two");
+            assertThat(respondent2Witness.getEmailAddress()).isEqualTo("test-witness-two@example.com");
+            assertThat(respondent2Witness.getPhoneNumber()).isEqualTo("07532628263");
+            assertThat(respondent2Witness.getReasonForWitness()).isEqualTo("good reasons");
+            assertThat(respondent2Witness.getEventAdded()).isEqualTo("Defendant Response Event");
+            assertThat(respondent2Witness.getDateAdded()).isEqualTo(date);
+
         }
 
         @Nested
@@ -1005,6 +1039,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .type(Party.Type.COMPANY)
                     .companyName("company")
                     .build();
+                Party defendant2 = Party.builder()
+                    .type(Party.Type.COMPANY)
+                    .companyName("company2")
+                    .build();
                 CaseData caseData = CaseData.builder()
                     .respondent2SameLegalRepresentative(YES)
                     .caseAccessCategory(SPEC_CLAIM)
@@ -1013,6 +1051,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .respondent2ClaimResponseTypeForSpec(FULL_ADMISSION)
                     .respondent1(defendant1)
                     .respondent1Copy(defendant1)
+                    .respondent2(defendant2)
+                    .respondent2Copy(defendant2)
                     .respondent1DQ(
                         Respondent1DQ.builder()
                             .respondToCourtLocation(
@@ -1058,10 +1098,10 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .thenReturn(true);
                 UserInfo userInfo = UserInfo.builder().uid("798").build();
                 when(userService.getUserInfo(anyString())).thenReturn(userInfo);
-
+                LocalDate whenWillPay = LocalDate.now().plusDays(5);
+                given(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
                 // When
-                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                    .handle(params);
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 // Then
                 AbstractObjectAssert<?, ?> sent2 = assertThat(response.getData())
@@ -1090,11 +1130,17 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .type(Party.Type.COMPANY)
                     .companyName("company")
                     .build();
+                Party defendant2 = Party.builder()
+                    .type(Party.Type.COMPANY)
+                    .companyName("company 2")
+                    .build();
                 CaseData caseData = CaseData.builder()
                     .caseAccessCategory(SPEC_CLAIM)
                     .ccdCaseReference(354L)
                     .respondent1(defendant1)
                     .respondent1Copy(defendant1)
+                    .respondent2(defendant2)
+                    .respondent2Copy(defendant2)
                     .respondent1DQ(
                         Respondent1DQ.builder()
                             .respondToCourtLocation(
@@ -1178,7 +1224,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1(PartyBuilder.builder().individual().build())
             .respondent1Copy(PartyBuilder.builder().individual().build())
             .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
             .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .ccdCaseReference(354L)
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
@@ -1193,6 +1243,238 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         // Then
         assertThat(response.getData().get("respondent1SpecDefenceResponseDocument")).isNull();
         assertThat(response.getData().get("respondent2SpecDefenceResponseDocument")).isNull();
+    }
+
+    @Test
+    void shouldUpdateExpertEvents_whenInvokedAndUpdateContactDetailsEnabled_For2DivergeResponse() {
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQExperts(Experts.builder()
+                                                         .details(wrapElements(Expert.builder().build())).build())
+                               .build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .claimant1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .claimant2ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .ccdCaseReference(354L)
+            .respondent1ResponseDate(dateTime).build().toBuilder()
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1DQExperts")).isNotNull();
+        assertThat(response.getData().get("respondent2DQExperts")).isNull();
+
+    }
+
+    @Test
+    void shouldUpdateExpertEvents_whenInvokedAndUpdateContactDetailsEnabled_CanAddApplicant2() {
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQExperts(Experts.builder()
+                                                         .details(wrapElements(Expert.builder().build())).build())
+                               .build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .claimant1ClaimResponseTypeForSpec(FULL_DEFENCE)
+            .claimant2ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .ccdCaseReference(354L)
+            .respondent1ResponseDate(dateTime).build().toBuilder()
+            .addApplicant2(YES)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1DQExperts")).isNotNull();
+        assertThat(response.getData().get("respondent2DQExperts")).isNull();
+
+    }
+
+    @Test
+    void shouldUpdateExpertEvents_whenInvokedAndUpdateContactDetailsEnabled_FullAdmission() {
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQExperts(Experts.builder()
+                                                         .details(wrapElements(Expert.builder().build())).build())
+                               .build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .ccdCaseReference(354L)
+            .respondent1ResponseDate(dateTime).build().toBuilder()
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1DQExperts")).isNotNull();
+        assertThat(response.getData().get("respondent2DQExperts")).isNull();
+
+    }
+
+    @Test
+    void shouldUpdateExpertEvents_whenInvokedAndUpdateContactDetailsEnabled() {
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQExperts(Experts.builder()
+                                                         .details(wrapElements(Expert.builder().build())).build())
+                               .build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .ccdCaseReference(354L)
+            .respondent1ResponseDate(dateTime).build().toBuilder()
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1DQExperts")).isNotNull();
+        assertThat(response.getData().get("respondent2DQExperts")).isNull();
+
+    }
+
+    @Test
+    void shouldUpdateExpertEvents_whenInvokedAndUpdateContactDetailsEnabled_V2DraftDirections() {
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQExperts(Experts.builder()
+                                                         .details(wrapElements(Expert.builder().build())).build())
+                               .build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder()
+                               .respondent2DQDraftDirections(Document.builder().build()).build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .ccdCaseReference(354L)
+            .respondent1ResponseDate(dateTime).build().toBuilder()
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1DQExperts")).isNotNull();
+        assertThat(response.getData().get("respondent2DQExperts")).isNull();
+
+    }
+
+    @Test
+    void shouldUpdateWitnessEvents_whenInvokedAndUpdateContactDetailsEnabled() {
+        // Given
+        LocalDateTime dateTime = LocalDateTime.of(2023, 6, 6, 6, 6, 6);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+        when(toggleService.isUpdateContactDetailsEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondent1DQWitnesses(Witnesses.builder()
+                                                         .details(wrapElements(Witness.builder().build())).build())
+                               .build())
+
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .ccdCaseReference(354L)
+            .respondent1ResponseDate(dateTime).build().toBuilder()
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("respondent1DQWitnesses")).isNotNull();
+        assertThat(response.getData().get("respondent2DQWitnesses")).isNull();
+
     }
 
     @Test
@@ -1216,8 +1498,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
             .isRespondent1(YesOrNo.YES)
-            .specAoSRespondentCorrespondenceAddressRequired(YesOrNo.NO)
-            .specAoSRespondentCorrespondenceAddressdetails(
+            .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+            .respondentSolicitor1ServiceAddress(
                 Address.builder()
                     .postCode("new postcode")
                     .build()
@@ -1234,7 +1516,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
             .extracting("PostCode")
             .isEqualTo("new postcode");
-        assertThat(response.getData().get("specAoSRespondentCorrespondenceAddressdetails"))
+        assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
             .extracting("PostCode")
                 .isNull();
     }
@@ -1260,8 +1542,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
             .isRespondent1(YesOrNo.YES)
-            .specAoSRespondentCorrespondenceAddressRequired(YesOrNo.NO)
-            .specAoSRespondentCorrespondenceAddressdetails(
+            .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+            .respondentSolicitor1ServiceAddress(
                 Address.builder()
                     .postCode("new postcode")
                     .build()
@@ -1283,7 +1565,184 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
             .extracting("PostCode")
             .isEqualTo("new postcode");
-        assertThat(response.getData().get("specAoSRespondentCorrespondenceAddressdetails"))
+        assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
+            .extracting("PostCode")
+            .isNull();
+        assertEquals(
+            response.getData().get("specRespondentCorrespondenceAddressdetails"),
+            response.getData().get("specRespondent2CorrespondenceAddressdetails")
+        );
+        assertEquals(
+            response.getData().get("specRespondentCorrespondenceAddressRequired"),
+            response.getData().get("specRespondent2CorrespondenceAddressRequired")
+        );
+    }
+
+    @Test
+    void shouldUpdateCorrespondence1_whenProvided1v2ss_withSameResponse() {
+        // Given
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        var testDocument = ResponseDocument.builder()
+            .file(Document.builder().documentUrl("fake-url").documentFileName("file-name").documentBinaryUrl("binary-url").build()).build();
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .ccdCaseReference(354L)
+            .respondent1SpecDefenceResponseDocument(testDocument)
+            .respondent2SpecDefenceResponseDocument(testDocument)
+            .isRespondent1(YesOrNo.YES)
+            .respondentResponseIsSame(YES)
+            .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+            .respondentSolicitor1ServiceAddress(
+                Address.builder()
+                    .postCode("new postcode")
+                    .build()
+            )
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("Company 3")
+                             .build())
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
+            .extracting("PostCode")
+            .isEqualTo("new postcode");
+        assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
+            .extracting("PostCode")
+            .isNull();
+        assertEquals(
+            response.getData().get("specRespondentCorrespondenceAddressdetails"),
+            response.getData().get("specRespondent2CorrespondenceAddressdetails")
+        );
+        assertEquals(
+            response.getData().get("specRespondentCorrespondenceAddressRequired"),
+            response.getData().get("specRespondent2CorrespondenceAddressRequired")
+        );
+    }
+
+    @Test
+    void shouldUpdateCorrespondence1_whenProvided1v2ss_withSameResponse_withv2copy() {
+        // Given
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        var testDocument = ResponseDocument.builder()
+            .file(Document.builder().documentUrl("fake-url").documentFileName("file-name").documentBinaryUrl("binary-url").build()).build();
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .ccdCaseReference(354L)
+            .respondent1SpecDefenceResponseDocument(testDocument)
+            .respondent2SpecDefenceResponseDocument(testDocument)
+            .isRespondent1(YesOrNo.YES)
+            .respondentResponseIsSame(YES)
+            .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+            .respondentSolicitor1ServiceAddress(
+                Address.builder()
+                    .postCode("new postcode")
+                    .build()
+            )
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("Company 3")
+                             .build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(YES)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
+            .extracting("PostCode")
+            .isEqualTo("new postcode");
+        assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
+            .extracting("PostCode")
+            .isNull();
+        assertEquals(
+            response.getData().get("specRespondentCorrespondenceAddressdetails"),
+            response.getData().get("specRespondent2CorrespondenceAddressdetails")
+        );
+        assertEquals(
+            response.getData().get("specRespondentCorrespondenceAddressRequired"),
+            response.getData().get("specRespondent2CorrespondenceAddressRequired")
+        );
+    }
+
+    @Test
+    void shouldUpdateCorrespondence1_whenProvided1v2ss_withSameResponse_withv2copyAndNoTempAdr() {
+        // Given
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+        when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(false);
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        var testDocument = ResponseDocument.builder()
+            .file(Document.builder().documentUrl("fake-url").documentFileName("file-name").documentBinaryUrl("binary-url").build()).build();
+
+        CaseData caseData = CaseData.builder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .ccdCaseReference(354L)
+            .respondent1SpecDefenceResponseDocument(testDocument)
+            .respondent2SpecDefenceResponseDocument(testDocument)
+            .isRespondent1(YesOrNo.YES)
+            .respondentResponseIsSame(YES)
+            .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+            .respondentSolicitor1ServiceAddress(
+                Address.builder()
+                    .postCode("new postcode")
+                    .build()
+            )
+            .respondent2(Party.builder()
+                             .type(Party.Type.COMPANY)
+                             .companyName("Company 3")
+                             .build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent2SameLegalRepresentative(YES)
+            .tempCorrespondenceAddress2Required(NO)
+            .build();
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+
+        // Then
+        assertThat(response.getData().get("specRespondentCorrespondenceAddressdetails"))
+            .extracting("PostCode")
+            .isEqualTo("new postcode");
+        assertThat(response.getData().get("respondentSolicitor1ServiceAddress"))
             .extracting("PostCode")
             .isNull();
         assertEquals(
@@ -1311,13 +1770,15 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1(PartyBuilder.builder().individual().build())
             .respondent1Copy(PartyBuilder.builder().individual().build())
             .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2Copy(PartyBuilder.builder().individual().build())
             .respondent2DQ(Respondent2DQ.builder().build())
             .ccdCaseReference(354L)
             .respondent1SpecDefenceResponseDocument(testDocument)
             .respondent2SpecDefenceResponseDocument(testDocument)
             .isRespondent2(YesOrNo.YES)
-            .specAoSRespondent2CorrespondenceAddressRequired(YesOrNo.NO)
-            .specAoSRespondent2CorrespondenceAddressdetails(
+            .respondentSolicitor2ServiceAddressRequired(YesOrNo.NO)
+            .respondentSolicitor2ServiceAddress(
                 Address.builder()
                     .postCode("new postcode")
                     .build()
@@ -1334,7 +1795,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(response.getData().get("specRespondent2CorrespondenceAddressdetails"))
             .extracting("PostCode")
             .isEqualTo("new postcode");
-        assertThat(response.getData().get("specAoSRespondent2CorrespondenceAddressdetails"))
+        assertThat(response.getData().get("respondentSolicitor2ServiceAddress"))
             .extracting("PostCode")
             .isNull();
     }
@@ -1355,6 +1816,58 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             .respondent1Copy(PartyBuilder.builder().individual().build())
             .respondent1DQ(Respondent1DQ.builder().build())
             .respondent2DQ(Respondent2DQ.builder().build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        // Given
+        assertThat(response.getData().get("respondent2DocumentGeneration")).isEqualTo("userRespondent2");
+    }
+
+    @Test
+    void shouldPopulateRespondent2Flag_WhenInvokedWithSmallClaimExperts_1DQ() {
+        // Given
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent1DQ(Respondent1DQ.builder()
+                               .respondToClaimExperts(ExpertDetails.builder().build()).build())
+            .respondent2DQ(Respondent2DQ.builder().build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+            .handle(params);
+        // Given
+        assertThat(response.getData().get("respondent2DocumentGeneration")).isEqualTo("userRespondent2");
+    }
+
+    @Test
+    void shouldPopulateRespondent2Flag_WhenInvokedWithSmallClaimExperts_2DQ() {
+        // Given
+        when(toggleService.isCaseFileViewEnabled()).thenReturn(true);
+        when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+        when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
+        given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateClaimDetailsNotified()
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YES)
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1Copy(PartyBuilder.builder().individual().build())
+            .respondent2DQ(Respondent2DQ.builder()
+                               .respondToClaimExperts2(ExpertDetails.builder().build()).build())
+            .respondent1DQ(Respondent1DQ.builder().build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         // When
@@ -1425,6 +1938,26 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
                 .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
         }
+
+        @Test
+        void shouldSetMultiPartyResponseTypeFlags_Counter_Admit_OR_Admit_Part_combination2_CanAddApplicant2() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateRespondent2v1BothNotFullDefence_CounterClaimX2()
+                .addApplicant2(YES)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData()).extracting("multiPartyResponseTypeFlags")
+                .isEqualTo("COUNTER_ADMIT_OR_ADMIT_PART");
+        }
+
 
         /**
          * if solicitor says that each defendant gets their response but then chooses the same
@@ -1516,7 +2049,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoError_whenWitnessRequiredAndDetailsProvided() {
             // Given
             List<Element<Witness>> testWitness = wrapElements(Witness.builder().name("test witness").build());
-            Witnesses witnesses = Witnesses.builder().witnessesToAppear(YES).details(testWitness).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1DQ(Respondent1DQ.builder().build())
                 .respondent1DQWitnessesRequiredSpec(YES)
@@ -1604,9 +2136,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // When
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
-
-            LocalDateTime responseDeadline = caseData.getApplicant1ResponseDeadline();
-            String claimNumber = caseData.getLegacyCaseReference();
 
             // Then
             assertThat(response.getConfirmationBody())
@@ -2015,12 +2544,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
                 .isRespondent1(YES)
-                .specAoSRespondentCorrespondenceAddressRequired(YesOrNo.NO)
-                .specAoSRespondentCorrespondenceAddressdetails(Address.builder()
+                .respondentSolicitor1ServiceAddressRequired(YesOrNo.NO)
+                .respondentSolicitor1ServiceAddress(Address.builder()
                                                                    .postCode("postal code")
                                                                    .build())
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "confirm-details");
+            CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
             when(postcodeValidator.validate("postal code")).thenReturn(Collections.emptyList());
 
             // When
@@ -2037,12 +2566,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
                 .isRespondent2(YES)
-                .specAoSRespondent2CorrespondenceAddressRequired(YesOrNo.NO)
-                .specAoSRespondent2CorrespondenceAddressdetails(Address.builder()
+                .respondentSolicitor2ServiceAddressRequired(YesOrNo.NO)
+                .respondentSolicitor2ServiceAddress(Address.builder()
                                                                    .postCode("postal code")
                                                                    .build())
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "confirm-details");
+            CallbackParams params = callbackParamsOf(caseData, MID, "specCorrespondenceAddress");
             when(postcodeValidator.validate("postal code")).thenReturn(Collections.emptyList());
 
             // When
@@ -2060,7 +2589,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateCourtLocations() {
             // Given
-            CaseData caseData = CaseData.builder().build();
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder()
+                                 .partyName("name")
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .build())
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             List<LocationRefData> locations = List.of(LocationRefData.builder()
@@ -2256,6 +2790,50 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1DQ(Respondent1DQ.builder()
                                    .respondent1DQHearingSmallClaim(SmallClaimHearing.builder().unavailableDatesRequired(
                                        YES).build()).build())
+                .build();
+            List<String> errors = Collections.singletonList("error 1");
+            Mockito.when(dateValidator.validateSmallClaimsHearing(any())).thenReturn(errors);
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-unavailable-dates");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
+        public void shouldThrowError_whenValidateRespondentExpertsMultipartyWithNoUnavailableDates_DisputesTheClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQHearingSmallClaim(SmallClaimHearing.builder().unavailableDatesRequired(
+                                       YES).build()).build())
+                .build();
+            List<String> errors = Collections.singletonList("error 1");
+            Mockito.when(dateValidator.validateFastClaimHearing(any())).thenReturn(errors);
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-unavailable-dates");
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isNotEmpty();
+        }
+
+        @Test
+        public void shouldThrowError_whenValidateRespondentExpertsMultipartyWithNoUnavailableDates_V2() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQHearingSmallClaim(SmallClaimHearing.builder().unavailableDatesRequired(
+                                       YES).build()).build())
+                .respondent2DQ(Respondent2DQ.builder()
+                                   .respondent2DQHearingSmallClaim(SmallClaimHearing.builder().unavailableDatesRequired(
+                                       YES).build()).build())
+                .isRespondent2(YES)
                 .build();
             List<String> errors = Collections.singletonList("error 1");
             Mockito.when(dateValidator.validateSmallClaimsHearing(any())).thenReturn(errors);

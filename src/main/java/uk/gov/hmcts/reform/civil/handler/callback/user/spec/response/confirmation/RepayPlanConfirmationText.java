@@ -74,7 +74,6 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         }
         sb.append("<li>request a county court judgment against you</li>")
             .append("</ul>")
-
             .append("<h3 class=\"govuk-heading-m\">If ")
             .append(applicantName);
         if (caseData.getApplicant2() != null) {

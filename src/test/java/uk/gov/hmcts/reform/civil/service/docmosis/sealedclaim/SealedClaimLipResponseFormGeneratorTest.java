@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.civil.model.dq.HomeDetails;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
@@ -81,6 +82,8 @@ class SealedClaimLipResponseFormGeneratorTest {
     private DocumentGeneratorService documentGeneratorService;
     @MockBean
     private DocumentManagementService documentManagementService;
+    @MockBean
+    private DeadlineExtensionCalculatorService deadlineCalculatorService;
     @Autowired
     private SealedClaimLipResponseFormGenerator generator;
     @Captor
@@ -115,15 +118,20 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void admitPayImmediate() {
-        CaseData caseData = commonData()
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .build();
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
 
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(caseData);
+            .getTemplateData(builder.build());
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
     }
 
@@ -171,6 +179,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void partAdmitPayImmediate() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
@@ -178,7 +187,12 @@ class SealedClaimLipResponseFormGeneratorTest {
             .specDefenceAdmittedRequired(YesOrNo.NO)
             .respondToAdmittedClaimOwingAmount(BigDecimal.valueOf(2000))
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim")
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
 
         CaseData caseData = timeline(financialDetails(builder))
             .build();
@@ -204,7 +218,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .build();
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
-        assertThat(templateData.getRepaymentPlan()).isNull();
+        assertThat(templateData.getCommonDetails().getRepaymentPlan()).isNull();
     }
 
     @Test
@@ -231,7 +245,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
-        assertThat(templateData.getRepaymentPlan()).isNotNull();
+        assertThat(templateData.getCommonDetails().getRepaymentPlan()).isNotNull();
     }
 
     @Test
@@ -332,6 +346,70 @@ class SealedClaimLipResponseFormGeneratorTest {
         SealedClaimLipResponseForm templateData = generator
             .getTemplateData(caseData);
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
+    }
+
+    @Test
+    void shouldGenerateDocumentSuccessfullyForFullAdmit() {
+        //Given
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        CaseData caseData = commonData()
+            .respondent1(company("B"))
+            .respondent2(individual("C"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            )
+            .build();
+        String fileName = "someName";
+        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
+        byte[] bytes = {};
+        given(docmosisDocument.getBytes()).willReturn(bytes);
+        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
+            docmosisDocument);
+        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(caseData);
+        //When
+        CaseDocument result = generator.generate(caseData, AUTHORIZATION);
+        //Then
+        assertThat(result).isEqualTo(caseDocument);
+    }
+
+    @Test
+    void shouldGenerateDocumentSuccessfullyForPartAdmit() {
+        //Given
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        CaseData caseData = commonData()
+            .respondent1(company("B"))
+            .respondent2(individual("C"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .specDefenceAdmittedRequired(YesOrNo.NO)
+            .respondToAdmittedClaimOwingAmount(BigDecimal.valueOf(2000))
+            .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim")
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            ).build();
+        String fileName = "someName";
+        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
+        byte[] bytes = {};
+        given(docmosisDocument.getBytes()).willReturn(bytes);
+        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
+            docmosisDocument);
+        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(caseData);
+        //When
+        CaseDocument result = generator.generate(caseData, AUTHORIZATION);
+        //Then
+        assertThat(result).isEqualTo(caseDocument);
     }
 
     private static AccountSimple account(@NotNull AccountType type, @NotNull YesOrNo joint, @NotNull BigDecimal balance) {

@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -21,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.bundle.BundleCreationService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_BUNDLE;
 @AllArgsConstructor
 public class BundleCreationTriggerEventHandler {
 
-    @Autowired
     private BundleCreationService bundleCreationService;
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
@@ -67,12 +66,12 @@ public class BundleCreationTriggerEventHandler {
         Bundle result = Bundle.builder()
             .bundleHearingDate(Optional.of(caseData.getHearingDate()))
             .stitchedDocument(Optional.ofNullable(bundle.getValue().getStitchedDocument()))
-            .filename(bundle.getValue().getFileName())
+            .fileName(bundle.getValue().getFileName())
             .title(bundle.getValue().getTitle())
             .description(null != bundle.getValue().getDescription()
                              ? Optional.of(bundle.getValue().getDescription()).get() : "")
             .stitchStatus(Optional.ofNullable(bundle.getValue().getStitchStatus()))
-            .createdOn(Optional.of(LocalDateTime.now()))
+            .createdOn(Optional.of(LocalDateTime.now(ZoneId.of("Europe/London"))))
             .id(bundle.getValue().getId()).build();
         return new IdValue<>(result.getId(), result);
     }

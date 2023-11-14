@@ -24,6 +24,9 @@ java:
         - ordnance-survey-api-key
         - notification-caseworker-spec-receiver
         - launch-darkly-sdk-key
+        - default-password
+        - judge-default-password
+        - iac-default-password
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
@@ -42,6 +45,7 @@ java:
     DOCUMENT_MANAGEMENT_SECURED: true
     STITCHING_API_ENABLED: true
     RELEASE_REVISION: "{{ .Release.Revision }}"
+    ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
   postgresql:
     enabled: true
@@ -212,7 +216,7 @@ aac-manage-case-assignment:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
     image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
-    ingressHost: manage-case-assignment-civil-service-staging-aat.service.core-compute-aat.internal
+    ingressHost: civil-service-manage-case-assignment-staging.aat.platform.hmcts.net
     environment:
       IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net

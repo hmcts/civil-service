@@ -43,7 +43,10 @@ def secrets = [
     secret('ccd-importer-username', 'CCD_CONFIGURER_IMPORTER_USERNAME'),
     secret('ccd-importer-password', 'CCD_CONFIGURER_IMPORTER_PASSWORD'),
     secret('postgres-user', 'POSTGRES_USER'),
-    secret('postgres-password', 'POSTGRES_PASSWORD')
+    secret('postgres-password', 'POSTGRES_PASSWORD'),
+    secret('default-password','DEFAULT_PASSWORD'),
+    secret('judge-default-password','JUDGE_DEFAULT_PASSWORD'),
+    secret('iac-default-password','IAC_DEFAULT_PASSWORD')
   ]
 ]
 
@@ -141,7 +144,7 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_URL = "https://civil-service-data-store-staging-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     env.CIVIL_SERVICE_URL="https://civil-service-staging.aat.platform.hmcts.net"
-    env.AAC_API_URL="https://manage-case-assignment-civil-service-staging-aat.service.core-compute-aat.internal"
+    env.AAC_API_URL="https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
   }
 
   afterAlways('functionalTest:aat') {
