@@ -157,7 +157,7 @@ public class CcdDashboardClaimMatcher implements Claim {
                 && !caseData.isRespondentSignedSettlementAgreement();
     }
 
-    public boolean hasClaimantSignedSettlementAgreementAndDeadlineNotExpired() {
+    public boolean hasClaimantSignedSettlementAgreement() {
         return caseData.hasApplicant1SignedSettlementAgreement() && !caseData.isSettlementAgreementDeadlineExpired();
     }
 

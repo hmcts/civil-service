@@ -46,7 +46,7 @@ public interface Claim {
 
     boolean hasDefendantRejectedSettlementAgreement();
 
-    boolean hasClaimantSignedSettlementAgreementAndDeadlineNotExpired();
+    boolean hasClaimantSignedSettlementAgreement();
 
     boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired();
 

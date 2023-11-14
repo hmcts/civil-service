@@ -80,6 +80,12 @@ public class CmcClaim implements Claim {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate intentionToProceedDeadline;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime claimantRespondedAt;
+
     private ClaimantResponse claimantResponse;
     private ClaimState state;
     private ProceedOfflineReasonType proceedOfflineReason;
@@ -227,23 +233,38 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean hasClaimantSignedSettlementAgreementAndDeadlineNotExpired() {
-        return false;
+    public boolean hasClaimantSignedSettlementAgreement() {
+        return hasClaimantSignedSettlementAgreementOfferAccepted() || hasClaimantSignedSettlementAgreementChosenByCourt();
+    }
+
+    private boolean hasClaimantSignedSettlementAgreementOfferAccepted() {
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && settlement.isThroughAdmissions()
+                && Objects.nonNull(claimantResponse) && !claimantResponse.hasCourtDetermination();
+    }
+
+    private boolean hasClaimantSignedSettlementAgreementChosenByCourt() {
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && !settlement.isRejectedByDefendant() && settlement.isThroughAdmissions()
+                && Objects.nonNull(claimantResponse) && claimantResponse.hasCourtDetermination();
     }
 
     @Override
     public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
-        return false;
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && settlement.isThroughAdmissions()
+                && Objects.nonNull(claimantRespondedAt) && claimantRespondedAt.plusDays(7).isBefore(LocalDateTime.now());
     }
 
     @Override
     public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
-        return false;
+        return Objects.nonNull(settlement) && !settlement.isRejectedByDefendant() && settlement.isSettled() && settlement.isThroughAdmissions();
     }
 
     @Override
     public boolean hasDefendantRejectedSettlementAgreement() {
-        return false;
+        if (!Objects.nonNull(claimantResponse) || !ClaimantResponseType.ACCEPTATION.equals(claimantResponse.getType())) {
+            return false;
+        }
+        return claimantResponse.getFormaliseOption() == FormaliseOption.SETTLEMENT
+                && Objects.nonNull(settlement) && settlement.isOfferRejected();
     }
 
     @Override
