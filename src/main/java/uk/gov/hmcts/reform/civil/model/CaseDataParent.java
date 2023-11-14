@@ -726,19 +726,19 @@ public class CaseDataParent implements MappableObject {
     /**
      * used to temporary hold addresses.
      */
-    private final Address tempAddress1;
+    private final Address tempCorrespondenceAddress1;
     /**
-     * used with tempAddress1.
+     * used with tempCorrespondenceAddress1.
      */
-    private final YesOrNo tempAddress1Required;
+    private final YesOrNo tempCorrespondenceAddress1Required;
     /**
      * used to temporary hold addresses.
      */
-    private final Address tempAddress2;
+    private final Address tempCorrespondenceAddress2;
     /**
-     * used with tempAddress1.
+     * used with tempCorrespondenceAddress2.
      */
-    private final YesOrNo tempAddress2Required;
+    private final YesOrNo tempCorrespondenceAddress2Required;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {

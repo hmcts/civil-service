@@ -789,8 +789,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1(PartyBuilder.builder().individual().build())
                 .atStateApplicantRespondToDefenceAndProceed()
                 .build().toBuilder()
-                .tempAddress1Required(NO)
-                .tempAddress1(AddressBuilder.maximal().build())
+                .tempCorrespondenceAddress1Required(NO)
+                .tempCorrespondenceAddress1(AddressBuilder.maximal().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -829,11 +829,11 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2(PartyBuilder.builder().individual().build())
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build().toBuilder()
-                .tempAddress1Required(YES)
-                .tempAddress1(Address.builder().build())
+                .tempCorrespondenceAddress1Required(YES)
+                .tempCorrespondenceAddress1(Address.builder().build())
                 .build().toBuilder()
-                .tempAddress2Required(NO)
-                .tempAddress2(newAddress2)
+                .tempCorrespondenceAddress2Required(NO)
+                .tempCorrespondenceAddress2(newAddress2)
                 .respondentSolicitor2ServiceAddressRequired(NO)
                 .respondentSolicitor2ServiceAddress(newAddress2)
                 .build();
@@ -906,12 +906,12 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1DQWitnessesSmallClaim(res1witnesses)
                 .respondent2DQWitnessesSmallClaim(res2witnesses)
                 .build().toBuilder()
-                .tempAddress1Required(YES)
-                .tempAddress1(Address.builder().build())
+                .tempCorrespondenceAddress1Required(YES)
+                .tempCorrespondenceAddress1(Address.builder().build())
                 .respondent2ResponseDate(dateTime)
                 .respondent1ResponseDate(dateTime).build().toBuilder()
-                .tempAddress2Required(NO)
-                .tempAddress2(AddressBuilder.maximal().build())
+                .tempCorrespondenceAddress2Required(NO)
+                .tempCorrespondenceAddress2(AddressBuilder.maximal().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1729,7 +1729,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                              .build())
             .respondent2Copy(PartyBuilder.builder().individual().build())
             .respondent2SameLegalRepresentative(YES)
-            .tempAddress2Required(NO)
+            .tempCorrespondenceAddress2Required(NO)
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
