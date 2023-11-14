@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.GenAppStateHelperService;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_LOCATION_UPDATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_UPDATE_GA_LOCATION;
@@ -44,9 +45,10 @@ public class TriggerGenAppLocationUpdateCallbackHandler extends CallbackHandler 
 
     private CallbackResponse triggerGaEvent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         try {
             if (caseData.getGeneralApplications() != null && !caseData.getGeneralApplications().isEmpty()) {
-                caseData = helperService.updateApplicationLocationDetailsInClaim(caseData);
+                caseData = helperService.updateApplicationLocationDetailsInClaim(caseData, authToken);
                 helperService.triggerEvent(caseData, TRIGGER_LOCATION_UPDATE);
             }
         } catch (Exception e) {
