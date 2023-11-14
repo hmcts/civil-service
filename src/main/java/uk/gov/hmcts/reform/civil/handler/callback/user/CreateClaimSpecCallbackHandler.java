@@ -544,9 +544,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             List<Element<String>> stdRequestIdList = new ArrayList<>();
             stdRequestIdList.add(element(caseData.getSdtRequestIdFromSdt()));
             dataBuilder.sdtRequestId(stdRequestIdList);
-            //TODO implement bulk claims that have interest added.
-            BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
+            BigDecimal bulkInterest = interestCalculator.calculateBulkInterest(caseData);
+            dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(bulkInterest)));
             //PBA manual selection
             List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
             dataBuilder.applicantSolicitor1PbaAccounts(DynamicList.builder()
