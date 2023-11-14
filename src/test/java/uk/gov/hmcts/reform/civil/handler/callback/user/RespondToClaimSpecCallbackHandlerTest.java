@@ -72,6 +72,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
@@ -100,6 +101,7 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -162,6 +164,8 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CourtLocationUtils courtLocationUtils;
     @Mock
     private CaseFlagsInitialiser caseFlagsInitialiser;
+    @Mock
+    private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
 
     @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
@@ -751,8 +755,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
-            Address changedAddress = AddressBuilder.maximal().build();
-
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .respondent2DQ()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
@@ -1084,7 +1086,6 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2
                 ))
                 .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             List<LocationRefData> locations = List.of(LocationRefData.builder().build());
             when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
@@ -1104,10 +1105,13 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(true);
             UserInfo userInfo = UserInfo.builder().uid("798").build();
             when(userService.getUserInfo(anyString())).thenReturn(userInfo);
+            LocalDate whenWillPay = LocalDate.now().plusDays(5);
+            given(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).willReturn(whenWillPay);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             // When
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
             AbstractObjectAssert<?, ?> sent2 = assertThat(response.getData())
