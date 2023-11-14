@@ -275,6 +275,18 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
                 .extracting("makeAnOrderForCostsQOCSYesOrNo")
                 .isEqualTo("No");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("makeAnOrderForCostsList")
+                .isEqualTo("CLAIMANT");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("assistedOrderClaimantDefendantFirstDropdown")
+                .isEqualTo("SUBJECT_DETAILED_ASSESSMENT");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("assistedOrderAssessmentSecondDropdownList1")
+                .isEqualTo("STANDARD_BASIS");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("assistedOrderAssessmentSecondDropdownList2")
+                .isEqualTo("NO");
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
