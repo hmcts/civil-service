@@ -936,31 +936,31 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         objectMapper.findAndRegisterModules();
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-            // Then
+        // Then
 
-            Witnesses actualRespondent1DQWitnesses = objectMapper.convertValue(response.getData().get("respondent1DQWitnesses"), new TypeReference<>() {});
-            Witness actualRespondent1Witness = unwrapElements(actualRespondent1DQWitnesses.getDetails()).get(0);
-            assertThat(actualRespondent1Witness.getPartyID()).isNotNull();
-            assertThat(actualRespondent1Witness.getFirstName()).isEqualTo("Witness");
-            assertThat(actualRespondent1Witness.getLastName()).isEqualTo("One");
-            assertThat(actualRespondent1Witness.getEmailAddress()).isEqualTo("test-witness-one@example.com");
-            assertThat(actualRespondent1Witness.getPhoneNumber()).isEqualTo("07865456789");
-            assertThat(actualRespondent1Witness.getReasonForWitness()).isEqualTo("great reasons");
-            assertThat(actualRespondent1Witness.getEventAdded()).isEqualTo("Defendant Response Event");
-            assertThat(actualRespondent1Witness.getDateAdded()).isEqualTo(date);
+        Witnesses actualRespondent1DQWitnesses = objectMapper.convertValue(response.getData().get("respondent1DQWitnesses"), new TypeReference<>() {});
+        Witness actualRespondent1Witness = unwrapElements(actualRespondent1DQWitnesses.getDetails()).get(0);
+        assertThat(actualRespondent1Witness.getPartyID()).isNotNull();
+        assertThat(actualRespondent1Witness.getFirstName()).isEqualTo("Witness");
+        assertThat(actualRespondent1Witness.getLastName()).isEqualTo("One");
+        assertThat(actualRespondent1Witness.getEmailAddress()).isEqualTo("test-witness-one@example.com");
+        assertThat(actualRespondent1Witness.getPhoneNumber()).isEqualTo("07865456789");
+        assertThat(actualRespondent1Witness.getReasonForWitness()).isEqualTo("great reasons");
+        assertThat(actualRespondent1Witness.getEventAdded()).isEqualTo("Defendant Response Event");
+        assertThat(actualRespondent1Witness.getDateAdded()).isEqualTo(date);
 
-            Witnesses actualRespondent2DQWitnesses = objectMapper.convertValue(response.getData().get("respondent2DQWitnesses"), new TypeReference<>() {});
-            Witness respondent2Witness = unwrapElements(actualRespondent2DQWitnesses.getDetails()).get(0);
-            assertThat(respondent2Witness.getPartyID()).isNotNull();
-            assertThat(respondent2Witness.getFirstName()).isEqualTo("Witness");
-            assertThat(respondent2Witness.getLastName()).isEqualTo("Two");
-            assertThat(respondent2Witness.getEmailAddress()).isEqualTo("test-witness-two@example.com");
-            assertThat(respondent2Witness.getPhoneNumber()).isEqualTo("07532628263");
-            assertThat(respondent2Witness.getReasonForWitness()).isEqualTo("good reasons");
-            assertThat(respondent2Witness.getEventAdded()).isEqualTo("Defendant Response Event");
-            assertThat(respondent2Witness.getDateAdded()).isEqualTo(date);
+        Witnesses actualRespondent2DQWitnesses = objectMapper.convertValue(response.getData().get("respondent2DQWitnesses"), new TypeReference<>() {});
+        Witness respondent2Witness = unwrapElements(actualRespondent2DQWitnesses.getDetails()).get(0);
+        assertThat(respondent2Witness.getPartyID()).isNotNull();
+        assertThat(respondent2Witness.getFirstName()).isEqualTo("Witness");
+        assertThat(respondent2Witness.getLastName()).isEqualTo("Two");
+        assertThat(respondent2Witness.getEmailAddress()).isEqualTo("test-witness-two@example.com");
+        assertThat(respondent2Witness.getPhoneNumber()).isEqualTo("07532628263");
+        assertThat(respondent2Witness.getReasonForWitness()).isEqualTo("good reasons");
+        assertThat(respondent2Witness.getEventAdded()).isEqualTo("Defendant Response Event");
+        assertThat(respondent2Witness.getDateAdded()).isEqualTo(date);
 
-        }
+    }
 
     @Nested
     class HandleLocations {

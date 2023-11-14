@@ -540,10 +540,6 @@ public class RespondToClaimCallbackHandler extends CallbackHandler implements Ex
             populateDQPartyIds(updatedData);
         }
 
-        if (toggleService.isHmcEnabled()) {
-            populateDQPartyIds(updatedData);
-        }
-
         caseFlagsInitialiser.initialiseCaseFlags(DEFENDANT_RESPONSE, updatedData);
 
         if (toggleService.isCaseFileViewEnabled()) {
