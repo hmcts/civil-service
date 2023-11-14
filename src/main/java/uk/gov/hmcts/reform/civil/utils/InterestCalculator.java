@@ -75,6 +75,19 @@ public class InterestCalculator {
         return interestPerDay.multiply(BigDecimal.valueOf(numberOfDays));
     }
 
+    public BigDecimal calculateBulkInterest(CaseData caseData) {
+        if (caseData.getClaimInterest() == YesOrNo.YES) {
+            long numberOfDays = Math.abs(ChronoUnit.DAYS.between(localDateTime.toLocalDate(), caseData.getInterestFromSpecificDate()));
+            if (isAfterFourPM()) {
+                numberOfDays = Math.abs(ChronoUnit.DAYS.between(localDateTime.toLocalDate(), caseData.getInterestFromSpecificDate().plusDays(1)));
+            }
+            BigDecimal interestDailyAmount = caseData.getSameRateInterestSelection().getDifferentRate();
+            return interestDailyAmount.multiply(BigDecimal.valueOf(numberOfDays));
+        } else {
+            return ZERO;
+        }
+    }
+
     private boolean isAfterFourPM() {
         LocalTime localTime = localDateTime.toLocalTime();
         return localTime.getHour() > 15;
