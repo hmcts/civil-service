@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
@@ -14,17 +15,23 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.APPLICANT_SOLICITOR_EXPERT;
@@ -35,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.RESPONDENT_SOLICITOR
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.RESPONDENT_SOLICITOR_TWO_WITNESS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID;
 
 class CaseFlagsInitialiserTest {
 
@@ -42,11 +50,16 @@ class CaseFlagsInitialiserTest {
 
     private FeatureToggleService featureToggleService;
 
+    private OrganisationService organisationService;
+
     @BeforeEach
     void setup() {
         featureToggleService = mock(FeatureToggleService.class);
-        caseFlagsInitialiser = new CaseFlagsInitialiser(featureToggleService);
+        organisationService = mock(OrganisationService.class);
+        caseFlagsInitialiser = new CaseFlagsInitialiser(featureToggleService, organisationService);
         when(featureToggleService.isCaseFlagsEnabled()).thenReturn(true);
+        when(organisationService.findOrganisationById(anyString()))
+            .thenReturn(Optional.of(Organisation.builder().name("Civil - Organisation 1").build()));
     }
 
     @Test
@@ -176,6 +189,24 @@ class CaseFlagsInitialiserTest {
         caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.CREATE_CLAIM, actual);
 
         assertEquals(expected, actual.build());
+    }
+
+    @Test
+    void shouldInitialiseCaseFlagsForManageContactInformationEvent() {
+        CaseData caseData = CaseData.builder()
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+                                                                .organisationID("id")
+                                                                .build())
+                                              .build())
+            .updateDetailsForm(UpdateDetailsForm.builder()
+                                   .partyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID)
+                                   .build())
+            .build();
+
+        caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.MANAGE_CONTACT_INFORMATION, caseData.toBuilder());
+
+        verify(organisationService).findOrganisationById("id");
     }
 
     @Test

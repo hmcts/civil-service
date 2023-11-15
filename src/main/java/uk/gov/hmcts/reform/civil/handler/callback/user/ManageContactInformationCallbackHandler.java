@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -97,6 +98,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private final UserService userService;
     private final ObjectMapper objectMapper;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final PostcodeValidator postcodeValidator;
 
     @Override
@@ -344,6 +346,9 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
         updateExperts(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
         updateWitnesses(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
+
+        // last step before clearing update details form
+        caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, builder);
 
         // clear updateDetailsForm
         builder.updateDetailsForm(UpdateDetailsForm.builder().manageContactDetailsEventUsed(YES).build());
