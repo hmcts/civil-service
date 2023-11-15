@@ -181,6 +181,15 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsSdoR2Enabled(Boolean toggleStat) {
+        var sdoR2Key = "isSdoR2Enabled";
+        givenToggle(sdoR2Key, toggleStat);
+
+        assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenCarmEnabled(Boolean toggleStat) {
         var caseFileKey = "carm";
         givenToggle(caseFileKey, toggleStat);

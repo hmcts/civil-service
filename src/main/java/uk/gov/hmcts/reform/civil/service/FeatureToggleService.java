@@ -89,6 +89,10 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("early-adopters");
     }
 
+    public boolean isSdoR2Enabled() {
+        return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
+    }
+
     public boolean isCarmEnabled() {
         return featureToggleApi.isFeatureEnabled("carm");
     }
