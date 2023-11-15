@@ -75,6 +75,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -568,12 +569,17 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     caseData.getSpecRespondentCorrespondenceAddressdetails());
         }
 
-        if (callbackParams.getCaseData().getFlightDelay() != null) {
-            dataBuilder.flightDelay(FlightDelay.builder().flightCourtLocation(
-                getAirlineCaseLocation(callbackParams.getCaseData()
-                                            .getFlightDelay()
-                                            .getFlightDetailsAirlineList().getValue()
-                                            .getCode(), callbackParams)).build());
+        if (toggleService.isSdoR2Enabled() && (callbackParams.getCaseData().getFlightDelay() != null)) {
+            FlightDelay flightDelay = callbackParams.getCaseData().getFlightDelay();
+            String selectedAirlineCode = flightDelay.getFlightDetailsAirlineList().getValue().getCode();
+
+            dataBuilder.flightDelay(FlightDelay.builder()
+                                        .flightDetailsAirlineList(DynamicList.builder().value(flightDelay.getFlightDetailsAirlineList().getValue()).build())
+                                        .flightDetailsNameOfAirline(flightDelay.getFlightDetailsNameOfAirline())
+                                        .flightDetailsFlightNumber(flightDelay.getFlightDetailsFlightNumber())
+                                        .flightDetailsScheduledDate(flightDelay.getFlightDetailsScheduledDate())
+                                        .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, callbackParams))
+                                        .build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
