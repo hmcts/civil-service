@@ -181,7 +181,7 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenCARMEnabled(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenCarmEnabled(Boolean toggleStat) {
         var caseFileKey = "carm";
         givenToggle(caseFileKey, toggleStat);
 
