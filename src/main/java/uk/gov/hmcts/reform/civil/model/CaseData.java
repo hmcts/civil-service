@@ -637,6 +637,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final TransferCaseDetails transferCaseDetails;
 
+    //SDO-R2
+    private YesOrNo isFlightDelayClaim;
+
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
