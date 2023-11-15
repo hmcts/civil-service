@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +94,11 @@ public class InitiateGeneralApplicationServiceHelperTest {
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(getCaseAssignedApplicantUserRoles()).build());
+    }
+
+    @AfterEach
+    void setUserRolesAsNull() {
+        helper.userRoles = null;
     }
 
     public List<CaseAssignedUserRole> getCaseAssignedApplicantUserRoles() {

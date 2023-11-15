@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,7 @@ public class InitiateGeneralApplicationServiceHelper {
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
+    public CaseAssignedUserRolesResource userRoles;
 
     public boolean isGAApplicantSameAsPCClaimant(CaseData caseData, String organisationIdentifier) {
 
@@ -252,8 +254,11 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     public CaseAssignedUserRolesResource getUserRoles(String parentCaseId) {
-        return caseAccessDataStoreApi.getUserRoles(
-            getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
+        if (Objects.isNull(userRoles)) {
+            userRoles = caseAccessDataStoreApi.getUserRoles(
+                getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
+        }
+        return userRoles;
     }
 
     public String getCaaAccessToken() {
