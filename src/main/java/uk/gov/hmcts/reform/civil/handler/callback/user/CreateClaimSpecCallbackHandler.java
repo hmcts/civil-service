@@ -570,7 +570,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         if (callbackParams.getCaseData().getFlightDelay() != null) {
             dataBuilder.flightDelay(FlightDelay.builder().flightCourtLocation(
-                getAirlineCourtLocation(callbackParams.getCaseData()
+                getAirlineCaseLocation(callbackParams.getCaseData()
                                             .getFlightDelay()
                                             .getFlightDetailsAirlineList().getValue()
                                             .getCode(), callbackParams)).build());
@@ -1024,7 +1024,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     }
 
-    private LocationRefData getAirlineCourtLocation(String airline, CallbackParams callbackParams) {
+    private CaseLocationCivil getAirlineCaseLocation(String airline, CallbackParams callbackParams) {
         if (airline.equals("OTHER")) {
             return null;
         }
@@ -1034,7 +1034,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (matchedLocations.isEmpty()) {
             throw new CallbackException(String.format(LOCATION_NOT_FOUND_MESSAGE, locationEpimmsId));
         } else {
-            return matchedLocations.get(0);
+            return CaseLocationCivil.builder()
+                .region(matchedLocations.get(0).getRegionId())
+                .baseLocation(matchedLocations.get(0).getEpimmsId()).build();
         }
     }
 

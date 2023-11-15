@@ -6092,8 +6092,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder updateDetailsForm(UpdateDetailsForm additionalDates) {
-        this.updateDetailsForm = additionalDates;
+    public CaseDataBuilder updateDetailsForm(UpdateDetailsForm form) {
+        this.updateDetailsForm = form;
         return this;
     }
 
@@ -6551,6 +6551,7 @@ public class CaseDataBuilder {
             .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
             .transferCourtLocationList(transferCourtLocationList)
             .reasonForTransfer(reasonForTransfer)
+
             .applicant1LRIndividuals(applicant1LRIndividuals)
             .respondent1LRIndividuals(respondent1LRIndividuals)
             .respondent2LRIndividuals(respondent2LRIndividuals)
