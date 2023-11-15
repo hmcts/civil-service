@@ -185,7 +185,7 @@ class FeatureToggleServiceTest {
         var caseFileKey = "carm";
         givenToggle(caseFileKey, toggleStat);
 
-        assertThat(featureToggleService.isCARMEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isCarmEnabled()).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {

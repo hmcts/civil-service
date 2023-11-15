@@ -89,7 +89,7 @@ public class FeatureToggleService {
         return featureToggleApi.isFeatureEnabled("early-adopters");
     }
 
-    public boolean isCARMEnabled() {
+    public boolean isCarmEnabled() {
         return featureToggleApi.isFeatureEnabled("carm");
     }
 }
