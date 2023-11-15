@@ -2177,7 +2177,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").extracting("site_name").isEqualTo("Site 3");
+                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").extracting("region").isEqualTo("Site 3");
             }
 
             @Test
@@ -2198,7 +2198,29 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").extracting("site_name").isEqualTo("Site 1");
+                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").extracting("region").isEqualTo("Site 1");
+            }
+
+            @Test
+            void shouldReturnCallbackException_whenNoAirlineFound() {
+                // Given
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .flightDelay(FlightDelay.builder()
+                                     .flightDetailsAirlineList(
+                                         DynamicList.builder()
+                                             .value(DynamicListElement.builder().code("NOT_MATCHING_AIRLINE")
+                                                        .label("Not matching airline")
+                                                        .build()).build()).build()).build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .willReturn(getSampleCourLocationsRefObject());
+
+                // When
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                // Then
+                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").isNull();
             }
         }
     }

@@ -16,6 +16,8 @@ import java.time.LocalDate;
 public class FlightDelay {
 
     private DynamicList flightDetailsAirlineList;
+    private String flightDetailsNameOfAirline;
+    private String flightDetailsFlightNumber;
     private LocalDate flightDetailsScheduledDate;
     private CaseLocationCivil flightCourtLocation;
 }
