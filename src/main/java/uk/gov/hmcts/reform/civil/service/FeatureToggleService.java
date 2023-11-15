@@ -80,4 +80,8 @@ public class FeatureToggleService {
     public boolean isEarlyAdoptersEnabled() {
         return featureToggleApi.isFeatureEnabled("early-adopters");
     }
+
+    public boolean isSdoR2Enabled() {
+        return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
+    }
 }

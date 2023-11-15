@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -230,6 +231,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             )
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
+            .put(callbackKey(MID, "is-flight-delay-claim"), this::isFlightDelayClaim)
             .build();
     }
 
@@ -895,6 +897,23 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validateEmailService.validate(caseData.getRespondentSolicitor2EmailAddress()))
+            .build();
+    }
+
+    private CallbackResponse isFlightDelayClaim(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+
+        if (toggleService.isSdoR2Enabled()) {
+            caseDataBuilder.isFlightDelayClaim(callbackParams.getCaseData().getIsFlightDelayClaim());
+            if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
+                caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
+            } else {
+                caseDataBuilder.claimType(null);
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
