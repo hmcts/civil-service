@@ -534,9 +534,13 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<PartyFlagStructure>> applicantWitnesses;
     private final List<Element<PartyFlagStructure>> respondent1Witnesses;
     private final List<Element<PartyFlagStructure>> respondent2Witnesses;
-    private final List<Element<PartyFlagStructure>> applicantSolOrgIndividuals;
-    private final List<Element<PartyFlagStructure>> respondent1SolOrgIndividuals;
-    private final List<Element<PartyFlagStructure>> applicant1SolOrgIndividuals;
+    private final List<Element<PartyFlagStructure>> applicant1LRIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent1LRIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent2LRIndividuals;
+    private final List<Element<PartyFlagStructure>> applicant1OrgIndividuals;
+    private final List<Element<PartyFlagStructure>> applicant2OrgIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent1OrgIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent2OrgIndividuals;
 
     private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
@@ -718,6 +722,23 @@ public class CaseDataParent implements MappableObject {
     private final UpdateDetailsForm updateDetailsForm;
 
     private FastTrackAllocation fastTrackAllocation;
+
+    /**
+     * used to temporary hold addresses.
+     */
+    private final Address tempCorrespondenceAddress1;
+    /**
+     * used with tempCorrespondenceAddress1.
+     */
+    private final YesOrNo tempCorrespondenceAddress1Required;
+    /**
+     * used to temporary hold addresses.
+     */
+    private final Address tempCorrespondenceAddress2;
+    /**
+     * used with tempCorrespondenceAddress2.
+     */
+    private final YesOrNo tempCorrespondenceAddress2Required;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {

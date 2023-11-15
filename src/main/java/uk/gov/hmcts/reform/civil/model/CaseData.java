@@ -609,7 +609,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final OrderOnCourtsList orderOnCourtsList;
     private final String freeFormHearingNotes;
 
-    private Document finalOrderDocument;
+    private CaseDocument finalOrderDocument;
+
     @Builder.Default
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
 
@@ -877,16 +878,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isJudgementDateNotPermitted() {
-        return nonNull(getRespondent1ResponseDate())
-            && getRespondent1ResponseDate()
-            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+        return nonNull(getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+            && getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
+            .atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
 
     @JsonIgnore
-    public String setUpJudgementFormattedPermittedDate() {
+    public String setUpJudgementFormattedPermittedDate(LocalDate extendedRespondent1ResponseDate) {
         if (isJudgementDateNotPermitted()) {
-            return formatLocalDateTime(getRespondent1ResponseDate()
-                                           .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
+            return formatLocalDateTime(extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
         }
         return null;
     }
