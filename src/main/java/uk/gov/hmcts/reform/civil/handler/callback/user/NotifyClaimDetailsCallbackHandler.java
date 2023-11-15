@@ -82,7 +82,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             "Your claim will progress offline if you only notify one Defendant of the claim details.";
 
     public static final String DOC_SERVED_DATE_IN_FUTURE =
-            "Date you served the documents must be today or in the past";
+            "On what day did you serve must be today or in the past";
 
     public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
         "On what day did you serve should not be more than 14 days old";
