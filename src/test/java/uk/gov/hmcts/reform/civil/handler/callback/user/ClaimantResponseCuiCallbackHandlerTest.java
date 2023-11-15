@@ -177,6 +177,82 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation_NoBaseCourt() {
+            Applicant1DQ applicant1DQ =
+                Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
+                                                                      .caseLocation(CaseLocationCivil.builder()
+                                                                                        .build())
+                                                                      .build()).build();
+            Respondent1DQ respondent1DQ =
+                Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                        .caseLocation(CaseLocationCivil.builder()
+                                                                                          .build())
+                                                                        .build()).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
+                .applicant1AcceptAdmitAmountPaidSpec(NO)
+                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                        MediationDecision.No).build())
+                                 .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(CLAIMANT_RESPONSE_CUI.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
+
+            CaseData data = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(data.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()).isNull();
+        }
+
+        @Test
+        void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation_NoCourtSelected() {
+            Applicant1DQ applicant1DQ =
+                Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
+                                                                      .build()).build();
+            Respondent1DQ respondent1DQ =
+                Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                        .build()).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
+                .applicant1AcceptAdmitAmountPaidSpec(NO)
+                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                        MediationDecision.No).build())
+                                 .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(CLAIMANT_RESPONSE_CUI.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
+
+            CaseData data = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(data.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()).isNull();
+        }
+
+        @Test
         void shouldChangeCaseState_whenApplicantRejectClaimSettlementAndAgreeToMediation() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
