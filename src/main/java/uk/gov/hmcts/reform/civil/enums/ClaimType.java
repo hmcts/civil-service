@@ -12,7 +12,8 @@ public enum ClaimType {
     BREACH_OF_CONTRACT(FeeType.HIGHER),
     CONSUMER(FeeType.HIGHER),
     CONSUMER_CREDIT(FeeType.HIGHER),
-    OTHER(FeeType.HIGHER);
+    OTHER(FeeType.HIGHER),
+    FLIGHT_DELAY(null);
 
     private final FeeType feeType;
 
