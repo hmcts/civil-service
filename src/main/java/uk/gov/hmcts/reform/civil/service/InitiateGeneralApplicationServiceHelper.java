@@ -65,7 +65,7 @@ public class InitiateGeneralApplicationServiceHelper {
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
-        CaseAssignedUserRolesResource userRoles = getUserRoles(parentCaseId);
+        userRoles = getUserRoles(parentCaseId);
 
         /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
         List<CaseAssignedUserRole> respondentSolicitors = userRoles.getCaseAssignedUserRoles().stream()
