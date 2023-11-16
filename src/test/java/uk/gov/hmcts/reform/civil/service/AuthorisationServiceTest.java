@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -32,7 +33,7 @@ public class AuthorisationServiceTest {
 
     @BeforeEach
     public void setup() {
-        ReflectionTestUtils.setField(authorisationService, "s2sAuthorisedServices", "payment_app");
+        ReflectionTestUtils.setField(authorisationService, "s2sAuthorisedServices", Arrays.asList("payment_app"));
     }
 
     @Test
