@@ -1289,6 +1289,7 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
+                LIP_CLAIM_SETTLED,
                 asyncStitchingComplete
             )
         ),
