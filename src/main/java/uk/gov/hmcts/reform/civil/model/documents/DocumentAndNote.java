@@ -20,5 +20,6 @@ public class DocumentAndNote {
     private String documentNote;
     @Builder.Default
     private LocalDateTime createdDateTime = LocalDateTime.now(ZoneId.of("Europe/London"));
+    private String createdBy;
 
 }
