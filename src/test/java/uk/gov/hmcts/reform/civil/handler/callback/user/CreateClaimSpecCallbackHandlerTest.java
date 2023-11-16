@@ -29,9 +29,12 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsDataLoader;
 import uk.gov.hmcts.reform.civil.model.FlightDelay;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -2162,6 +2165,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedCourtLocation_whenAirlineExists() {
                 // Given
+                List<LocationRefData> locations = new ArrayList<>();
+                locations.add(LocationRefData.builder().regionId("Site Name").epimmsId("36791")
+                                  .build());
+                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .willReturn(locations);
+
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                     .flightDelay(FlightDelay.builder()
                                      .flightDetailsAirlineList(
@@ -2169,9 +2178,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                              .value(DynamicListElement.builder().code("GULF_AIR").label("Gulf Air")
                                                         .build()).build()).build()).build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
-                    .willReturn(getSampleCourLocationsRefObject());
 
                 // When
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2203,6 +2209,28 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnCallbackException_whenNoAirlineFound() {
+                // Given
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .flightDelay(FlightDelay.builder()
+                                     .flightDetailsAirlineList(
+                                         DynamicList.builder()
+                                             .value(DynamicListElement.builder().code("NOT_MATCHING_AIRLINE")
+                                                        .label("Not matching airline")
+                                                        .build()).build()).build()).build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .willReturn(getSampleCourLocationsRefObject());
+
+                // When
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                // Then
+                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").isNull();
+            }
+
+            @Test
+            void shouldReturnCallbackException_whenAirlineFoundButLocationNotFound() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                     .flightDelay(FlightDelay.builder()
