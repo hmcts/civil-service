@@ -320,7 +320,8 @@ class FlowStateAllowedEventServiceTest {
                         GENERATE_DIRECTIONS_ORDER,
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        asyncStitchingComplete
                     }
                 ),
                 of(
@@ -570,6 +571,7 @@ class FlowStateAllowedEventServiceTest {
                         JUDGMENT_PAID_IN_FULL,
                         RECORD_JUDGMENT,
                         TRANSFER_ONLINE_CASE,
+                        asyncStitchingComplete,
                         CLAIMANT_RESPONSE_CUI
                     }
                 ),

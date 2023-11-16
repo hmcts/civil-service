@@ -531,9 +531,7 @@ public class BundleRequestMapper {
             bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getDirectionOrderDocStaff(),
                                                                            BundleFileNameList.ORDER.getDisplayName()));
         }
-        if (caseData.getFinalOrderDocument() != null) {
-            bundlingRequestDocuments.add(buildBundlingRequestDoc(caseData.getFinalOrderDocument().getDocumentFileName(), caseData.getFinalOrderDocument(), ""));
-        }
+
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
