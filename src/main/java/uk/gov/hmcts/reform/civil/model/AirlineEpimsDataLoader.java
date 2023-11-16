@@ -13,12 +13,13 @@ import java.util.List;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
-
 @Service
 @Slf4j
 public class AirlineEpimsDataLoader {
+
     private static final String CSV_FILE_PATH = "airline_ePimsID_csv/airline_ePimsID.csv";
     private final List<AirlineEpimsID> airlineEpimsIDList = new ArrayList<>();
+
     @PostConstruct
     protected void init() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(CSV_FILE_PATH);
@@ -28,7 +29,7 @@ public class AirlineEpimsDataLoader {
             linesList.forEach(line -> {
                 AirlineEpimsID airlineEpimsID = AirlineEpimsID.builder()
                     .airline(line[0])
-                    .ePimsID(line[1])
+                    .epimsid(line[1])
                     .build();
                 airlineEpimsIDList.add(airlineEpimsID);
             });

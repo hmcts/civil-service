@@ -75,7 +75,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -954,7 +953,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         List<AirlineEpimsID> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
         DynamicList airlineList = DynamicList
             .fromList(airlineEpimsIDList.stream()
-                          .map(AirlineEpimsID::getAirline).toList(),Object::toString,Object::toString,null,false);
+                          .map(AirlineEpimsID::getAirline).toList(), Object::toString, Object::toString,
+                      null, false);
         DynamicList dropdownAirlineList = DynamicList.builder()
             .listItems(airlineList.getListItems()).build();
 

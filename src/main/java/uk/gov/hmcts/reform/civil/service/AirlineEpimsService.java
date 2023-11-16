@@ -12,12 +12,13 @@ import java.util.Optional;
 public class AirlineEpimsService {
 
     private final AirlineEpimsDataLoader airlineEpimsDataLoader;
-        public String getEpimsIdForAirline(String airline) {
-            AirlineEpimsID airlineEpimsID = airlineEpimsDataLoader.getAirlineEpimsIDList()
+
+    public String getEpimsIdForAirline(String airline) {
+        AirlineEpimsID airlineEpimsID = airlineEpimsDataLoader.getAirlineEpimsIDList()
                 .stream().filter(item -> item.getAirline().equals(airline)).findFirst().orElse(null);
 
-            return Optional.ofNullable(airlineEpimsID)
-                .map(AirlineEpimsID::getEPimsID)
-                .orElseThrow(() -> new IllegalStateException("Unable to find epims ID for airline: " + airline));
-        }
+        return Optional.ofNullable(airlineEpimsID)
+            .map(AirlineEpimsID::getEpimsid)
+            .orElseThrow(() -> new IllegalStateException("Unable to find epims ID for airline: " + airline));
+    }
 }

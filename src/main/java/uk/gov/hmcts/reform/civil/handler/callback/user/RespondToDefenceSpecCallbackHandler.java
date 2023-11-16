@@ -280,11 +280,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         if (toggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim().equals(YES)) {
             if (caseData.getFlightDelay() != null && caseData.getFlightDelay().getFlightDetailsAirlineList()
                 .getValue().getCode().equals("OTHER")) {
-                locationHelper.getClaimantRequestedCourt(caseData).
-                    ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                locationHelper.getClaimantRequestedCourt(caseData)
+                        .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                         builder,
                         requestedCourt,
-                        () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams()
+                            () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams()
                                 .get(CallbackParams.Params.BEARER_TOKEN).toString())
                     ));
             } else {

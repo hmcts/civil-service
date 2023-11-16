@@ -8,6 +8,7 @@ import lombok.Value;
 @Builder
 @AllArgsConstructor
 public class AirlineEpimsID {
+
     private String airline;
-    private String ePimsID;
+    private String epimsid;
 }
