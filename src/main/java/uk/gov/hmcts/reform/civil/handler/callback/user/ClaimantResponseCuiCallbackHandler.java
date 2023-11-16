@@ -83,6 +83,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
         if (updatedData.hasClaimantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
+        } else if (!updatedData.hasApplicantProceededWithClaim()) {
+            response.state(updatedData.isClaimantConfirmAmountPaidPartAdmit() || updatedData.hasDefendantPayedTheAmountClaimed()
+                               ? CaseState.CASE_SETTLED.name()
+                               : CaseState.CASE_DISMISSED.name());
         } else if (updatedData.hasApplicantRejectedRepaymentPlan() && updatedData.getRespondent1().isCompanyOROrganisation()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         } else {
