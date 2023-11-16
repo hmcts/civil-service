@@ -900,7 +900,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     void shouldPopulateApplicantDetails() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
-        when(locationRefDataService.getCtscLocation(any()))
+        when(locationRefDataService.getCtscLocation(any(), any()))
             .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").siteName("CTSC")
                             .courtAddress("Prince William House, Peel Cross Road, Salford").postcode("M5 4RR").build());
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
