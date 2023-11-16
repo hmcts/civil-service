@@ -572,7 +572,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     //case progression
     private final List<Element<DocumentWithName>> documentAndName;
+    private final List<Element<DocumentWithName>> documentAndNameToAdd;
     private final List<Element<DocumentAndNote>> documentAndNote;
+    private final List<Element<DocumentAndNote>> documentAndNoteToAdd;
     private final CaseNoteType caseNoteType;
     private final String caseNoteTA;
     private final List<Element<CaseNote>> caseNotesTA;
@@ -605,8 +607,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final FreeFormOrderValues orderOnCourtInitiative;
     private final FreeFormOrderValues orderWithoutNotice;
     private final OrderOnCourtsList orderOnCourtsList;
+    private final String freeFormHearingNotes;
 
-    private Document finalOrderDocument;
+    private CaseDocument finalOrderDocument;
+
     @Builder.Default
     private final List<Element<CaseDocument>> finalOrderDocumentCollection = new ArrayList<>();
 
@@ -630,6 +634,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private JudgmentPaidInFull joJudgmentPaidInFull;
 
     private final TransferCaseDetails transferCaseDetails;
+
+    //SDO-R2
+    private YesOrNo isFlightDelayClaim;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -870,16 +877,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isJudgementDateNotPermitted() {
-        return nonNull(getRespondent1ResponseDate())
-            && getRespondent1ResponseDate()
-            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+        return nonNull(getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+            && getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
+            .atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
 
     @JsonIgnore
-    public String setUpJudgementFormattedPermittedDate() {
+    public String setUpJudgementFormattedPermittedDate(LocalDate extendedRespondent1ResponseDate) {
         if (isJudgementDateNotPermitted()) {
-            return formatLocalDateTime(getRespondent1ResponseDate()
-                                           .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
+            return formatLocalDateTime(extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
         }
         return null;
     }
