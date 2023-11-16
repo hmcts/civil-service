@@ -179,6 +179,15 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsSdoR2Enabled(Boolean toggleStat) {
+        var sdoR2Key = "isSdoR2Enabled";
+        givenToggle(sdoR2Key, toggleStat);
+
+        assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
