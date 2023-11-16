@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.common;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
 
-@Builder
+import java.math.RoundingMode;
+
+@SuperBuilder
 @AllArgsConstructor
 @Getter
 public class AccountSimpleTemplateData extends AccountSimple {
@@ -15,7 +17,7 @@ public class AccountSimpleTemplateData extends AccountSimple {
     public AccountSimpleTemplateData(AccountSimple data, int index) {
         setAccountType(data.getAccountType());
         setJointAccount(data.getJointAccount());
-        setBalance(data.getBalance());
+        setBalance(data.getBalance().setScale(2, RoundingMode.CEILING));
         this.index = index;
     }
 

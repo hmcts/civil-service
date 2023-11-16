@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
@@ -57,6 +59,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
@@ -88,6 +91,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StandardDirectionOrderDJ extends CallbackHandler {
@@ -99,6 +103,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
     private final LocationRefDataService locationRefDataService;
+    private final FeatureToggleService featureToggleService;
     String participantString;
     public static final String DISPOSAL_HEARING = "DISPOSAL_HEARING";
     public static final String ORDER_1_CLAI = "The directions order has been sent to: "
@@ -628,9 +633,22 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         );
         Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
             .flatMap(requestedCourt -> locationHelper.getMatching(locations, preferredCourt));
-        return DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
-                                    matchingLocation.orElse(null), true
-        );
+
+        DynamicList locationsList;
+        if (matchingLocation.isPresent()) {
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
+                                                 matchingLocation.get(), true
+            );
+        } else {
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
+                                                 null, true
+            );
+        }
+        return locationsList;
+    }
+
+    private String getLocationEpimms(LocationRefData location) {
+        return location.getEpimmsId();
     }
 
     private CallbackResponse generateSDONotifications(CallbackParams callbackParams) {
@@ -643,7 +661,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.orderSDODocumentDJ(null);
         assignCategoryId.assignCategoryIdToCollection(caseData.getOrderSDODocumentDJCollection(), document -> document.getValue().getDocumentLink(), "sdo");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
-        var state = "CASE_PROGRESSION";
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<LocationRefData> locations = (locationRefDataService
             .getCourtLocationsForDefaultJudgments(authToken));
@@ -655,13 +672,33 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 .ifPresent(caseDataBuilder::locationName);
 
         }
-
+        var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
+
+        if (featureToggleService.isEarlyAdoptersEnabled()) {
+            if (featureToggleService.isLocationWhiteListedForCaseProgression(
+                getEpimmsId(caseData))) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(YesOrNo.YES);
+            } else {
+                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                caseDataBuilder.eaCourtLocation(YesOrNo.NO);
+            }
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
             .build();
+    }
+
+    private String getEpimmsId(CaseData caseData) {
+        if (caseData.getTrialHearingMethodInPersonDJ() != null) {
+            return caseData.getTrialHearingMethodInPersonDJ().getValue().getCode();
+        } else if (caseData.getDisposalHearingMethodInPersonDJ() != null) {
+            return caseData.getDisposalHearingMethodInPersonDJ().getValue().getCode();
+        }
+        throw new IllegalArgumentException("Epimms Id is not provided");
     }
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -673,6 +710,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
+        var response = (AboutToStartOrSubmitCallbackResponse) validateInputValue(callbackParams);
+        if (response.getErrors() != null) {
+            return response;
+        }
+
         CaseData caseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
             : callbackParams.getCaseData();
@@ -790,5 +832,29 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         } else {
             return null;
         }
+    }
+
+    private CallbackResponse validateInputValue(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        if (nonNull(caseData.getTrialHearingWitnessOfFactDJ())) {
+            String inputValue1 = caseData.getTrialHearingWitnessOfFactDJ().getInput2();
+            String inputValue2 = caseData.getTrialHearingWitnessOfFactDJ().getInput3();
+            List<String> errors = new ArrayList<>();
+            if (inputValue1 != null && inputValue2 != null) {
+                int number1 = Integer.parseInt(inputValue1);
+                int number2 = Integer.parseInt(inputValue2);
+                if (number1 < 0 || number2 < 0) {
+                    errors.add("The number entered cannot be less than zero");
+                    return AboutToStartOrSubmitCallbackResponse.builder()
+                        .errors(errors)
+                        .build();
+                }
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
     }
 }

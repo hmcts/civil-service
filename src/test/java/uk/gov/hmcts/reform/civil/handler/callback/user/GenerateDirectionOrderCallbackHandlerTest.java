@@ -18,7 +18,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
+import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
+import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersJudgePapers;
+import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
+import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
@@ -26,9 +32,13 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
+import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderReasons;
+import uk.gov.hmcts.reform.civil.model.finalorders.ClaimantAndDefendantHeard;
 import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderAppeal;
 import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderFurtherHearing;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRecitalsRecorded;
+import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -56,14 +66,15 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.JUDGE_FINAL_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
+import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersDefendantRepresentationList.DEFENDANT_NOT_ATTENDING;
+
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_1v2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.BODY_2v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.HEADER;
-
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
@@ -131,6 +142,61 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();
         }
+
+        @Test
+        void shouldNullPreviousSubmittedEventSelections_whenInvokedFreeForm() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .freeFormRecordedTextArea("text")
+                .freeFormOrderedTextArea("text")
+                .orderOnCourtsList(OrderOnCourtsList.ORDER_ON_COURT_INITIATIVE)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("finalOrderSelection")).isNull();
+            assertThat(response.getData().get("freeFormRecordedTextArea")).isNull();
+            assertThat(response.getData().get("freeFormOrderedTextArea")).isNull();
+            assertThat(response.getData().get("orderOnCourtsList")).isNull();
+        }
+
+        @Test
+        void shouldNullPreviousSubmittedEventSelections_whenInvokedAssisted() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .finalOrderMadeSelection(YES).finalOrderDateHeardComplex(OrderMade.builder().build())
+                .finalOrderJudgePapers(List.of(FinalOrdersJudgePapers.CONSIDERED))
+                .finalOrderJudgeHeardFrom(List.of(FinalOrderToggle.SHOW)).finalOrderRepresentation(FinalOrderRepresentation.builder().build())
+                .finalOrderRecitals(List.of(FinalOrderToggle.SHOW)).finalOrderRecitalsRecorded(FinalOrderRecitalsRecorded.builder().text("text").build())
+                .finalOrderOrderedThatText("text")
+                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW)).finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder().build())
+                .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS).assistedOrderCostsReserved(AssistedOrderCostDetails.builder().build())
+                .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder().build()).assistedOrderCostsBespoke(AssistedOrderCostDetails.builder().build())
+                .finalOrderAppealToggle(List.of(FinalOrderToggle.SHOW)).finalOrderAppealComplex(FinalOrderAppeal.builder().build())
+                .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
+                .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("text").build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData().get("finalOrderSelection")).isNull();
+            assertThat(response.getData().get("finalOrderMadeSelection")).isNull();
+            assertThat(response.getData().get("finalOrderDateHeardComplex")).isNull();
+            assertThat(response.getData().get("finalOrderJudgePapers")).isNull();
+            assertThat(response.getData().get("finalOrderJudgeHeardFrom")).isNull();
+            assertThat(response.getData().get("finalOrderRepresentation")).isNull();
+            assertThat(response.getData().get("finalOrderRecitals")).isNull();
+            assertThat(response.getData().get("finalOrderRecitalsRecorded")).isNull();
+            assertThat(response.getData().get("finalOrderOrderedThatText")).isNull();
+            assertThat(response.getData().get("finalOrderFurtherHearingToggle")).isNull();
+            assertThat(response.getData().get("finalOrderFurtherHearingComplex")).isNull();
+            assertThat(response.getData().get("assistedOrderCostList")).isNull();
+            assertThat(response.getData().get("assistedOrderCostsReserved")).isNull();
+            assertThat(response.getData().get("assistedOrderMakeAnOrderForCosts")).isNull();
+            assertThat(response.getData().get("assistedOrderCostsBespoke")).isNull();
+            assertThat(response.getData().get("finalOrderAppealToggle")).isNull();
+            assertThat(response.getData().get("finalOrderAppealComplex")).isNull();
+            assertThat(response.getData().get("orderMadeOnDetailsList")).isNull();
+            assertThat(response.getData().get("finalOrderGiveReasonsComplex")).isNull();
+        }
     }
 
     @Nested
@@ -193,13 +259,13 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .isEqualTo("Mr. John Rambo");
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
                 .extracting("ownInitiativeDate")
-                .isEqualTo(LocalDate.now().toString());
+                .isEqualTo(LocalDate.now().plusDays(7).toString());
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
                 .extracting("withOutNoticeText")
                 .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
             assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
                 .extracting("withOutNoticeDate")
-                .isEqualTo(LocalDate.now().toString());
+                .isEqualTo(LocalDate.now().plusDays(7).toString());
             assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
                 .extracting("assistedOrderCostsFirstDropdownDate")
                 .isEqualTo(advancedDate);
@@ -209,6 +275,18 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
                 .extracting("makeAnOrderForCostsQOCSYesOrNo")
                 .isEqualTo("No");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("makeAnOrderForCostsList")
+                .isEqualTo("CLAIMANT");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("assistedOrderClaimantDefendantFirstDropdown")
+                .isEqualTo("SUBJECT_DETAILED_ASSESSMENT");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("assistedOrderAssessmentSecondDropdownList1")
+                .isEqualTo("STANDARD_BASIS");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("assistedOrderAssessmentSecondDropdownList2")
+                .isEqualTo("NO");
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
@@ -266,82 +344,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .extracting("typeRepresentationDefendantTwoDynamic")
                 .isEqualTo("Mr. John Rambo");
 
-        }
-
-        @Test
-        void shouldPopulateFields_whenIsCalledBeforeSdo() {
-            // Given
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .addApplicant2(YES)
-                .applicant2(PartyBuilder.builder().individual().build())
-                .ccdState(JUDICIAL_REFERRAL)
-                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-            String advancedDate = LocalDate.now().plusDays(14).toString();
-            when(locationRefDataService.getCcmccLocation(any())).thenReturn(locationRefDataBeforeSdo);
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            // Then
-            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
-                .extracting("ownInitiativeText")
-                .isEqualTo(ON_INITIATIVE_SELECTION_TEXT);
-            assertThat(response.getData()).extracting("finalOrderRepresentation")
-                .extracting("typeRepresentationComplex")
-                .extracting("typeRepresentationClaimantOneDynamic")
-                .isEqualTo("Mr. John Rambo");
-            assertThat(response.getData()).extracting("finalOrderRepresentation")
-                .extracting("typeRepresentationComplex")
-                .extracting("typeRepresentationDefendantOneDynamic")
-                .isEqualTo("Mr. Sole Trader");
-            assertThat(response.getData()).extracting("finalOrderRepresentation")
-                .extracting("typeRepresentationComplex")
-                .extracting("typeRepresentationClaimantTwoDynamic")
-                .isEqualTo("Mr. John Rambo");
-            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderCourt")
-                .extracting("ownInitiativeDate")
-                .isEqualTo(LocalDate.now().toString());
-            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
-                .extracting("withOutNoticeText")
-                .isEqualTo(WITHOUT_NOTICE_SELECTION_TEXT);
-            assertThat(response.getData()).extracting("orderMadeOnDetailsOrderWithoutNotice")
-                .extracting("withOutNoticeDate")
-                .isEqualTo(LocalDate.now().toString());
-            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
-                .extracting("assistedOrderCostsFirstDropdownDate")
-                .isEqualTo(advancedDate);
-            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
-                .extracting("assistedOrderAssessmentThirdDropdownDate")
-                .isEqualTo(advancedDate);
-            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
-                .extracting("makeAnOrderForCostsQOCSYesOrNo")
-                .isEqualTo("No");
-            assertThat(response.getData()).extracting("publicFundingCostsProtection")
-                .isEqualTo("No");
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedDropdown")
-                .extracting("appealChoiceSecondDropdownA")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealGrantedDropdown")
-                .extracting("appealChoiceSecondDropdownB")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealRefusedDropdown")
-                .extracting("appealChoiceSecondDropdownA")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderAppealComplex")
-                .extracting("appealRefusedDropdown")
-                .extracting("appealChoiceSecondDropdownB")
-                .extracting("appealGrantedRefusedDate")
-                .isEqualTo(LocalDate.now().plusDays(21).toString());
-            assertThat(response.getData()).extracting("finalOrderFurtherHearingComplex")
-                .extracting("hearingLocationList").asString().contains("SiteName before Sdo");
         }
     }
 
@@ -430,6 +432,14 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                              .datesToAvoidDateDropdown(DatesFinalOrders.builder()
                                                                                            .datesToAvoidDates(LocalDate.now().plusDays(2))
                                                                                            .build()).build()).build()
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                            .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                            .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                                    .dateToDate(LocalDate.now().minusDays(4))
+                                    .listFromDate(LocalDate.now().minusDays(5))
+                                    .build()).build()
                 ),
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -542,7 +552,16 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Further hearing may not be before the established date"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                                        .dateToDate(LocalDate.now().minusDays(5))
+                                        .listFromDate(LocalDate.now().minusDays(4))
+                                        .build()).build(),
+                    "The date range in Further hearing may not have a 'from date', that is after the 'date to'"
+                ),
+                Arguments.of(
+                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
                                                               .assistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(2))
@@ -598,6 +617,162 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                                                                  .appealGrantedRefusedDate(LocalDate.now().minusDays(1))
                                                                                                                  .build()).build()).build()).build(),
                     "The date in Appeal notice date may not be before the established date"
+                ),
+                Arguments.of(
+                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                                .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
+                                .finalOrderFurtherHearingComplex(
+                                        FinalOrderFurtherHearing.builder().lengthList(HearingLengthFinalOrderList.OTHER)
+                                                .build()).build(),
+                        "Further hearing, Length of new hearing, Other is empty"
+                )
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("validJudgeHeardFrom")
+        void validateJudgeHeardFromSection_shouldReturnNoError(CaseData caseData) {
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
+            // Then
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        static Stream<Arguments> validJudgeHeardFrom() {
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            return Stream.of(
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderJudgeHeardFrom(toggle)
+                        .finalOrderRepresentation(FinalOrderRepresentation.builder()
+                                                      .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                                                      .typeRepresentationComplex(ClaimantAndDefendantHeard.builder()
+                                                                                     .typeRepresentationDefendantOneDynamic("defendant one")
+                                                                                     .typeRepresentationClaimantOneDynamic("claimant one")
+                                                                                     .typeRepresentationClaimantList(CLAIMANT_NOT_ATTENDING)
+                                                                                     .typeRepresentationDefendantList(DEFENDANT_NOT_ATTENDING)
+                                                                                     .build()).build()).build()
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .addRespondent2(YES)
+                        .respondent2(PartyBuilder.builder().individual().build())
+                        .respondent2SameLegalRepresentative(NO)
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderJudgeHeardFrom(toggle)
+                        .finalOrderRepresentation(FinalOrderRepresentation.builder()
+                                                      .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                                                      .typeRepresentationComplex(ClaimantAndDefendantHeard.builder()
+                                                                                     .typeRepresentationDefendantOneDynamic("defendant one")
+                                                                                     .typeRepresentationDefendantTwoDynamic("defendant two")
+                                                                                     .typeRepresentationClaimantOneDynamic("claimant one")
+                                                                                     .typeRepresentationClaimantList(CLAIMANT_NOT_ATTENDING)
+                                                                                     .typeRepresentationDefendantList(DEFENDANT_NOT_ATTENDING)
+                                                                                     .typeRepresentationDefendantTwoList(DEFENDANT_NOT_ATTENDING)
+                                                                                     .build()).build()).build()
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .addApplicant2(YES)
+                        .applicant2(PartyBuilder.builder().individual().build())
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderJudgeHeardFrom(toggle)
+                        .finalOrderRepresentation(FinalOrderRepresentation.builder()
+                                                      .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                                                      .typeRepresentationComplex(ClaimantAndDefendantHeard.builder()
+                                                                                     .typeRepresentationDefendantOneDynamic("defendant one")
+                                                                                     .typeRepresentationClaimantOneDynamic("claimant one")
+                                                                                     .typeRepresentationClaimantTwoDynamic("claimant one")
+                                                                                     .typeRepresentationClaimantList(CLAIMANT_NOT_ATTENDING)
+                                                                                     .typeRepresentationDefendantList(DEFENDANT_NOT_ATTENDING)
+                                                                                     .typeRepresentationClaimantListTwo(CLAIMANT_NOT_ATTENDING)
+                                                                                     .build()).build()).build()
+                )
+            );
+        }
+
+        @ParameterizedTest
+        @MethodSource("invalidJudgeHeardFrom")
+        void validateJudgeHeardFromSection_shouldReturnErrors(CaseData caseData, String expectedErrorMessage) {
+            // When
+            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
+            // Then
+            assertThat(response.getErrors().get(0)).isEqualTo(expectedErrorMessage);;
+        }
+
+        static Stream<Arguments> invalidJudgeHeardFrom() {
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            return Stream.of(
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderJudgeHeardFrom(toggle)
+                        .finalOrderRepresentation(FinalOrderRepresentation.builder()
+                                                      .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                                                      .typeRepresentationComplex(ClaimantAndDefendantHeard.builder()
+                                                                                     .typeRepresentationDefendantOneDynamic("defendant one")
+                                                                                     .typeRepresentationClaimantOneDynamic("claimant one")
+                                                                                     .typeRepresentationClaimantList(null)
+                                                                                     .typeRepresentationDefendantList(DEFENDANT_NOT_ATTENDING)
+                                                                                     .build()).build()).build(),
+                    "Judge Heard from: 'Claimant(s) and defendant(s)' section for claimant, requires a selection to be made"
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderJudgeHeardFrom(toggle)
+                        .finalOrderRepresentation(FinalOrderRepresentation.builder()
+                                                      .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                                                      .typeRepresentationComplex(ClaimantAndDefendantHeard.builder()
+                                                                                     .typeRepresentationDefendantOneDynamic("defendant one")
+                                                                                     .typeRepresentationClaimantOneDynamic("claimant one")
+                                                                                     .typeRepresentationClaimantList(CLAIMANT_NOT_ATTENDING)
+                                                                                     .typeRepresentationDefendantList(null)
+                                                                                     .build()).build()).build(),
+                    "Judge Heard from: 'Claimant(s) and defendant(s)' section for defendant, requires a selection to be made"
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .addRespondent2(YES)
+                        .respondent2(PartyBuilder.builder().individual().build())
+                        .respondent2SameLegalRepresentative(NO)
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderJudgeHeardFrom(toggle)
+                        .finalOrderRepresentation(FinalOrderRepresentation.builder()
+                                                      .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                                                      .typeRepresentationComplex(ClaimantAndDefendantHeard.builder()
+                                                                                     .typeRepresentationDefendantOneDynamic("defendant one")
+                                                                                     .typeRepresentationDefendantTwoDynamic("defendant two")
+                                                                                     .typeRepresentationClaimantOneDynamic("claimant one")
+                                                                                     .typeRepresentationClaimantList(CLAIMANT_NOT_ATTENDING)
+                                                                                     .typeRepresentationDefendantList(DEFENDANT_NOT_ATTENDING)
+                                                                                     .typeRepresentationDefendantTwoList(null)
+                                                                                     .build()).build()).build(),
+                    "Judge Heard from: 'Claimant(s) and defendant(s)' section for second defendant, requires a selection to be made"
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        .addApplicant2(YES)
+                        .applicant2(PartyBuilder.builder().individual().build())
+                        .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                        .finalOrderJudgeHeardFrom(toggle)
+                        .finalOrderRepresentation(FinalOrderRepresentation.builder()
+                                                      .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                                                      .typeRepresentationComplex(ClaimantAndDefendantHeard.builder()
+                                                                                     .typeRepresentationDefendantOneDynamic("defendant one")
+                                                                                     .typeRepresentationClaimantOneDynamic("claimant one")
+                                                                                     .typeRepresentationClaimantTwoDynamic("claimant one")
+                                                                                     .typeRepresentationClaimantList(CLAIMANT_NOT_ATTENDING)
+                                                                                     .typeRepresentationClaimantListTwo(null)
+                                                                                     .typeRepresentationDefendantList(DEFENDANT_NOT_ATTENDING)
+                                                                                     .build()).build()).build(),
+                    "Judge Heard from: 'Claimant(s) and defendant(s)' section for second claimant, requires a selection to be made"
                 )
             );
         }
@@ -614,16 +789,16 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
-            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             // Then
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
-                           .getValue().getDocumentLink().getCategoryID().equals("finalOrders"));
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("finalOrders");
         }
 
         @Test
@@ -634,10 +809,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
-            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
@@ -652,10 +827,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(null)
                 .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
-            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getState()).isEqualTo("All_FINAL_ORDERS_ISSUED");
@@ -672,10 +847,10 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .finalOrderDocumentCollection(finalCaseDocuments)
+                .finalOrderDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
-            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getState()).isEqualTo("CASE_PROGRESSION");
@@ -689,15 +864,32 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
+                .finalOrderDocument(finalOrder)
                 .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
                                                      .hearingNotesText("test text hearing notes assisted order").build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
-            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("test text hearing notes assisted order");
+        }
+
+        @Test
+        void shouldRePopulateHearingNotes_whenFreeFormHearingNotesExist() {
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .freeFormHearingNotes("test text hearing notes free form order")
+                .finalOrderDocument(finalOrder)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("test text hearing notes free form order");
         }
 
         @Test
@@ -708,11 +900,29 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
+                .finalOrderDocument(finalOrder)
                 .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
-            when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // Then
+            assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("preexisting hearing notes");
+        }
+
+        @Test
+        void shouldNotRePopulateHearingNotes_whenFreeFormHearingNotesDoNotExist() {
+            // Given
+            List<FinalOrderToggle> toggle = new ArrayList<>();
+            toggle.add(FinalOrderToggle.SHOW);
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .finalOrderFurtherHearingToggle(toggle)
+                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .finalOrderDocument(finalOrder)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             // Then
             assertThat(response.getData()).extracting("hearingNotes").extracting("notes").isEqualTo("preexisting hearing notes");

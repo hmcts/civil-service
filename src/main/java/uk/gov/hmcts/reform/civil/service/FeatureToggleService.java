@@ -71,4 +71,25 @@ public class FeatureToggleService {
     public boolean isLipVLipEnabled() {
         return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
+
+    public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
+        return featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", locationEpimms,
+                                                            true);
+    }
+
+    public boolean isTransferOnlineCaseEnabled() {
+        return featureToggleApi.isFeatureEnabled("isTransferOnlineCaseEnabled");
+    }
+
+    public boolean isCaseProgressionEnabled() {
+        return featureToggleApi.isFeatureEnabled("cui-case-progression");
+    }
+
+    public boolean isEarlyAdoptersEnabled() {
+        return featureToggleApi.isFeatureEnabled("early-adopters");
+    }
+
+    public boolean isSdoR2Enabled() {
+        return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
+    }
 }

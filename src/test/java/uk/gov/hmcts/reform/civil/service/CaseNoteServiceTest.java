@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -41,11 +42,17 @@ class CaseNoteServiceTest {
     @MockBean
     private IdamClient idamClient;
 
+    @MockBean
+    private Time time;
+    private LocalDateTime timeNow = LocalDateTime.of(2023, 10, 9, 1, 1, 1);
+
     @Nested
     class BuildCaseNote {
         @BeforeEach
         void setUp() {
+
             given(idamClient.getUserDetails(BEARER_TOKEN)).willReturn(USER_DETAILS);
+            when(time.now()).thenReturn(timeNow);
         }
 
         @Test
@@ -55,44 +62,46 @@ class CaseNoteServiceTest {
 
             assertThat(caseNote.getNote()).isEqualTo(caseNoteForToday(note).getNote());
             assertThat(caseNote.getCreatedBy()).isEqualTo(caseNoteForToday(note).getCreatedBy());
-            assertThat(caseNote.getCreatedOn()).isCloseTo(caseNoteForToday(note).getCreatedOn(),
-                                                          within(1, ChronoUnit.SECONDS));
+            assertThat(caseNote.getCreatedOn()).isCloseTo(
+                caseNoteForToday(note).getCreatedOn(),
+                within(1, ChronoUnit.SECONDS)
+            );
             verify(idamClient).getUserDetails(BEARER_TOKEN);
         }
-    }
 
-    @Test
-    void shouldAddNoteToList_WhenNullList() {
-        CaseNote caseNote = caseNoteForToday("new note");
-        List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(caseNote, null);
+        @Test
+        void shouldAddNoteToList_WhenNullList() {
+            CaseNote caseNote = caseNoteForToday("new note");
+            List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToListStart(caseNote, null);
 
-        assertThat(unwrapElements(caseNotes)).contains(caseNote);
-    }
+            assertThat(unwrapElements(caseNotes)).contains(caseNote);
+        }
 
-    @Test
-    void shouldAddNoteToList_WhenEmptyList() {
-        CaseNote caseNote = caseNoteForToday("new note");
-        List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(caseNote, new ArrayList<>());
+        @Test
+        void shouldAddNoteToList_WhenEmptyList() {
+            CaseNote caseNote = caseNoteForToday("new note");
+            List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToListStart(caseNote, new ArrayList<>());
 
-        assertThat(unwrapElements(caseNotes)).contains(caseNote);
-    }
+            assertThat(unwrapElements(caseNotes)).contains(caseNote);
+        }
 
-    @Test
-    void shouldAddNoteToListWithNewestAtTop_WhenExistingNotes() {
-        LocalDateTime today = LocalDateTime.now();
-        CaseNote newNote = caseNoteWithDate(today);
-        CaseNote oldNote = caseNoteWithDate(today.minusDays(5));
+        @Test
+        void shouldAddNoteToListWithNewestAtTop_WhenExistingNotes() {
+            LocalDateTime today = time.now();
+            CaseNote newNote = caseNoteWithDate(today);
+            CaseNote oldNote = caseNoteWithDate(today.minusDays(5));
 
-        List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToList(newNote, wrapElements(oldNote));
+            List<Element<CaseNote>> caseNotes = caseNoteService.addNoteToListStart(newNote, wrapElements(oldNote));
 
-        assertThat(unwrapElements(caseNotes)).isEqualTo(List.of(newNote, oldNote));
+            assertThat(unwrapElements(caseNotes)).isEqualTo(List.of(newNote, oldNote));
+        }
     }
 
     private CaseNote caseNoteForToday(String note) {
         return CaseNote.builder()
             .note(note)
             .createdBy(USER_DETAILS.getFullName())
-            .createdOn(LocalDateTime.now())
+            .createdOn(time.now())
             .build();
     }
 

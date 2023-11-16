@@ -96,6 +96,7 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingFinalDispo
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingJudgesRecitalDJ;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingTrial;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.DisclosureOfElectronicDocuments;
@@ -135,9 +136,13 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearin
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
+import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 
@@ -469,6 +474,9 @@ public class CaseDataBuilder {
     private YesOrNo specDefenceFullAdmitted2Required;
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
+    private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private FastTrackWitnessOfFact fastTrackWitnessOfFact;
+    private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
 
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
@@ -476,8 +484,26 @@ public class CaseDataBuilder {
 
     private UpdateDetailsForm updateDetailsForm;
 
+    private TocTransferCaseReason tocTransferCaseReason;
+
+    private NotSuitableSdoOptions notSuitableSdoOptions;
+
+    private List<Element<PartyFlagStructure>> applicant1LRIndividuals;
+    private List<Element<PartyFlagStructure>> respondent1LRIndividuals;
+    private List<Element<PartyFlagStructure>> respondent2LRIndividuals;
+
+    private List<Element<PartyFlagStructure>> applicant1OrgIndividuals;
+    private List<Element<PartyFlagStructure>> applicant2OrgIndividuals;
+    private List<Element<PartyFlagStructure>> respondent1OrgIndividuals;
+    private List<Element<PartyFlagStructure>> respondent2OrgIndividuals;
+
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
+
+    private YesOrNo drawDirectionsOrderRequired;
+
+    private DynamicList transferCourtLocationList;
+    private String reasonForTransfer;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -4540,6 +4566,35 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateBeforeTransferCaseSDONotDrawn() {
+
+        atStateApplicantRespondToDefenceAndProceed();
+
+        ccdState = JUDICIAL_REFERRAL;
+        notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
+
+        tocTransferCaseReason = TocTransferCaseReason.builder()
+            .reasonForCaseTransferJudgeTxt("unforeseen complexities")
+            .build();
+        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateBeforeTransferCaseSDONotDrawnOverLimit() {
+
+        atStateApplicantRespondToDefenceAndProceed();
+
+        ccdState = JUDICIAL_REFERRAL;
+        notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
+
+        tocTransferCaseReason = TocTransferCaseReason.builder()
+            .reasonForCaseTransferJudgeTxt("This is more than 150 111111111111111111111111111111111111111111111111111111111111111111111111111"
+                       + "111111111111111111111111111111111111111111111111111111")
+            .build();
+        unsuitableSDODate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder atStateTakenOfflineSDONotDrawn(MultiPartyScenario mpScenario) {
 
         atStateApplicantRespondToDefenceAndProceed(mpScenario);
@@ -4645,8 +4700,24 @@ public class CaseDataBuilder {
             atStateBothApplicantsRespondToDefenceAndProceed_2v1();
         }
 
+        drawDirectionsOrderRequired = NO;
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = applicant1ResponseDate.plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStateTakenOfflineByStaffAfterSDO(MultiPartyScenario mpScenario) {
+        atStateApplicantRespondToDefenceAndProceed(mpScenario);
+        if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP) {
+            atStateApplicantRespondToDefenceAndProceedVsBothDefendants_1v2();
+        } else if (mpScenario == TWO_V_ONE) {
+            atStateBothApplicantsRespondToDefenceAndProceed_2v1();
+        }
+
+        drawDirectionsOrderRequired = NO;
+        ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
+        takenOfflineDate = applicant1ResponseDate.plusDays(1);
+        takenOfflineByStaffDate = applicant1ResponseDate.plusDays(1);
         return this;
     }
 
@@ -5105,6 +5176,16 @@ public class CaseDataBuilder {
     public CaseDataBuilder removeSolicitorReferences() {
         this.solicitorReferences = null;
         this.respondentSolicitor2Reference = null;
+        return this;
+    }
+
+    public CaseDataBuilder transferCourtLocationList(DynamicList transferCourtLocationList) {
+        this.transferCourtLocationList = transferCourtLocationList;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForTransfer(String reasonForTransfer) {
+        this.reasonForTransfer = reasonForTransfer;
         return this;
     }
 
@@ -6004,8 +6085,177 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder updateDetailsForm(UpdateDetailsForm additionalDates) {
-        this.updateDetailsForm = additionalDates;
+    public CaseDataBuilder updateDetailsForm(UpdateDetailsForm form) {
+        this.updateDetailsForm = form;
+        return this;
+    }
+
+    public CaseDataBuilder atSmallClaimsWitnessStatementWithNegativeInputs() {
+        atStateClaimNotified();
+        this.smallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+            .input2("-3")
+            .input3("-3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atFastTrackWitnessOfFactWithNegativeInputs() {
+        atStateClaimNotified();
+        this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
+            .input2("-3")
+            .input3("-3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atSmallClaimsWitnessStatementWithPositiveInputs() {
+        atStateClaimNotified();
+        this.smallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
+            .input2("3")
+            .input3("3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atFastTrackWitnessOfFactWithPositiveInputs() {
+        atStateClaimNotified();
+        this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
+            .input2("3")
+            .input3("3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atTrialHearingWitnessOfFactWithNegativeInputs() {
+        atStateClaimNotified();
+        this.trialHearingWitnessOfFactDJ = TrialHearingWitnessOfFact.builder()
+            .input2("-3")
+            .input3("-3")
+            .build();
+
+        return this;
+    }
+
+    public CaseDataBuilder addApplicantLRIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("app-lr-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.applicant1LRIndividuals != null && !this.applicant1LRIndividuals.isEmpty()) {
+            this.applicant1LRIndividuals.addAll(individual);
+        } else {
+            this.applicant1LRIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1LRIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-1-lr-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.respondent1LRIndividuals != null && !this.respondent1LRIndividuals.isEmpty()) {
+            this.respondent1LRIndividuals.addAll(individual);
+        } else {
+            this.respondent1LRIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent2LRIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-2-lr-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.respondent2LRIndividuals != null && !this.respondent2LRIndividuals.isEmpty()) {
+            this.respondent2LRIndividuals.addAll(individual);
+        } else {
+            this.respondent2LRIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addApplicant1OrgIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("app-1-org-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.applicant1OrgIndividuals != null && !this.applicant1OrgIndividuals.isEmpty()) {
+            this.applicant1OrgIndividuals.addAll(individual);
+        } else {
+            this.applicant1OrgIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addApplicant2OrgIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("app-2-org-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.applicant2OrgIndividuals != null && !this.applicant2OrgIndividuals.isEmpty()) {
+            this.applicant2OrgIndividuals.addAll(individual);
+        } else {
+            this.applicant2OrgIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1OrgIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-1-org-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.respondent1OrgIndividuals != null && !this.respondent1OrgIndividuals.isEmpty()) {
+            this.respondent1OrgIndividuals.addAll(individual);
+        } else {
+            this.respondent1OrgIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent2OrgIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-2-org-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.respondent2OrgIndividuals != null && !this.respondent2OrgIndividuals.isEmpty()) {
+            this.respondent2OrgIndividuals.addAll(individual);
+        } else {
+            this.respondent2OrgIndividuals = individual;
+        }
         return this;
     }
 
@@ -6285,6 +6535,22 @@ public class CaseDataBuilder {
             .claimantUserDetails(claimantUserDetails)
             .updateDetailsForm(updateDetailsForm)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
+            .smallClaimsWitnessStatement(smallClaimsWitnessStatement)
+            .fastTrackWitnessOfFact(fastTrackWitnessOfFact)
+            .trialHearingWitnessOfFactDJ(trialHearingWitnessOfFactDJ)
+            //Transfer Online Case
+            .notSuitableSdoOptions(notSuitableSdoOptions)
+            .tocTransferCaseReason(tocTransferCaseReason)
+            .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
+            .transferCourtLocationList(transferCourtLocationList)
+            .reasonForTransfer(reasonForTransfer)
+            .applicant1LRIndividuals(applicant1LRIndividuals)
+            .respondent1LRIndividuals(respondent1LRIndividuals)
+            .respondent2LRIndividuals(respondent2LRIndividuals)
+            .applicant1OrgIndividuals(applicant1OrgIndividuals)
+            .applicant2OrgIndividuals(applicant2OrgIndividuals)
+            .respondent1OrgIndividuals(respondent1OrgIndividuals)
+            .respondent2OrgIndividuals(respondent2OrgIndividuals)
             .build();
     }
 }

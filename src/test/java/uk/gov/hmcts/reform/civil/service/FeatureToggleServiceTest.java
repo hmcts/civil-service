@@ -141,6 +141,53 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isUpdateContactDetailsEnabled()).isEqualTo(toggleStat);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
+        final String feature = "case-progression-location-whitelist";
+        String location = "000000";
+        when(featureToggleApi.isFeatureEnabledForLocation(eq(feature), eq(location), eq(true)))
+            .thenReturn(toggleStat);
+
+        assertThat(featureToggleService.isLocationWhiteListedForCaseProgression(location)).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
+        var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
+        givenToggle(transferCaseOnlineKey, toggleStat);
+
+        assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
+        var caseFileKey = "cui-case-progression";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
+        var caseFileKey = "early-adopters";
+        givenToggle(caseFileKey, toggleStat);
+
+        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenIsSdoR2Enabled(Boolean toggleStat) {
+        var sdoR2Key = "isSdoR2Enabled";
+        givenToggle(sdoR2Key, toggleStat);
+
+        assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);

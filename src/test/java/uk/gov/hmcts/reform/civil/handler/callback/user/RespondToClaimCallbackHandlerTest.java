@@ -1834,7 +1834,9 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("defendantResponseDocuments")
                 .asString()
                 .contains("category_id=defendant1DefenseDirectionsQuestionnaire")
-                .contains("category_id=defendant2DefenseDirectionsQuestionnaire");
+                .contains("category_id=defendant2DefenseDirectionsQuestionnaire")
+                .contains("category_id=DQRespondent")
+                .contains("category_id=DQRespondentTwo");
         }
 
         @Test

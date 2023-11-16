@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireLipGenerator;
 
 import java.time.LocalDateTime;
@@ -38,6 +40,8 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     @Autowired
     private GenerateDirectionQuestionnaireLipCallBackHandler handler;
     @MockBean
+    private DirectionQuestionnaireLipGeneratorFactory directionQuestionnaireLipGeneratorFactory;
+    @MockBean
     private DirectionsQuestionnaireLipGenerator directionsQuestionnaireLipGenerator;
     @MockBean
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
@@ -55,6 +59,12 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
                           .build())
         .build();
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
+
+    @BeforeEach
+    void setUp() {
+        given(directionQuestionnaireLipGeneratorFactory.getDirectionQuestionnaire()).willReturn(
+            directionsQuestionnaireLipGenerator);
+    }
 
     @Test
     void shouldGenerateForm_whenAboutToSubmitCalled() {
