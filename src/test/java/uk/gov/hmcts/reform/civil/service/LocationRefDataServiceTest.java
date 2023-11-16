@@ -340,7 +340,7 @@ class LocationRefDataServiceTest {
 
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
-            assertThat(uriCaptor.getValue().toString()).isEqualTo("dummy_url/fees-register/fees/lookup?court_name=Salford%20CTSC");
+            assertThat(uriCaptor.getValue().toString()).isEqualTo("dummy_url/fees-register/fees/lookup?court_name=Level%204%20Metro");
             assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization")).isEqualTo("user_token");
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("ServiceAuthorization"))
@@ -365,7 +365,7 @@ class LocationRefDataServiceTest {
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
             assertThat(uriCaptor.getValue().toString()).isEqualTo(
-                "dummy_url/fees-register/fees/lookup?court_name=Salford%20CTSC");
+                "dummy_url/fees-register/fees/lookup?court_name=Level%204%20Metro");
             assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization"))
                 .isEqualTo("user_token");
@@ -402,7 +402,7 @@ class LocationRefDataServiceTest {
             verify(lrdConfiguration, times(1)).getUrl();
             verify(lrdConfiguration, times(1)).getEndpoint();
             assertThat(uriCaptor.getValue().toString()).isEqualTo(
-                "dummy_url/fees-register/fees/lookup?court_name=Salford%20CTSC");
+                "dummy_url/fees-register/fees/lookup?court_name=Level%204%20Metro");
             assertThat(httpMethodCaptor.getValue()).isEqualTo(HttpMethod.GET);
             assertThat(httpEntityCaptor.getValue().getHeaders().getFirst("Authorization"))
                 .isEqualTo("user_token");
