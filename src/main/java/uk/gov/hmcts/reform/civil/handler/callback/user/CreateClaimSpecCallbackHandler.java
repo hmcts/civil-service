@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsDataLoader;
-import uk.gov.hmcts.reform.civil.model.AirlineEpimsID;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
@@ -950,10 +950,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
     private CallbackResponse getAirlineList(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        List<AirlineEpimsID> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
+        List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
         DynamicList airlineList = DynamicList
             .fromList(airlineEpimsIDList.stream()
-                          .map(AirlineEpimsID::getAirline).toList(),Object::toString,Object::toString,null,false);
+                          .map(AirlineEpimsId::getAirline).toList(), Object::toString, Object::toString, null, false);
         DynamicList dropdownAirlineList = DynamicList.builder()
             .listItems(airlineList.getListItems()).build();
 

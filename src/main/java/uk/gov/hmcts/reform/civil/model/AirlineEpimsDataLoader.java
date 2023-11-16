@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model;
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,12 +12,13 @@ import java.util.List;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
-
 @Service
 @Slf4j
 public class AirlineEpimsDataLoader {
+
     private static final String CSV_FILE_PATH = "airline_ePimsID_csv/airline_ePimsID.csv";
-    private final List<AirlineEpimsID> airlineEpimsIDList = new ArrayList<>();
+    private final List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
+
     @PostConstruct
     protected void init() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(CSV_FILE_PATH);
@@ -26,9 +26,9 @@ public class AirlineEpimsDataLoader {
 
             List<String[]> linesList = reader.readAll();
             linesList.forEach(line -> {
-                AirlineEpimsID airlineEpimsID = AirlineEpimsID.builder()
+                AirlineEpimsId airlineEpimsID = AirlineEpimsId.builder()
                     .airline(line[0])
-                    .ePimsID(line[1])
+                    .epimsID(line[1])
                     .build();
                 airlineEpimsIDList.add(airlineEpimsID);
             });
@@ -37,7 +37,7 @@ public class AirlineEpimsDataLoader {
         }
     }
 
-    public List<AirlineEpimsID> getAirlineEpimsIDList() {
+    public List<AirlineEpimsId> getAirlineEpimsIDList() {
         return ImmutableList.copyOf(airlineEpimsIDList);
     }
 }

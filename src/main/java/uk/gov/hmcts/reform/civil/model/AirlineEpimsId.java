@@ -7,7 +7,8 @@ import lombok.Value;
 @Value
 @Builder
 @AllArgsConstructor
-public class AirlineEpimsID {
+public class AirlineEpimsId {
+
     private String airline;
-    private String ePimsID;
+    private String epimsID;
 }

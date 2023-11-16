@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsDataLoader;
-import uk.gov.hmcts.reform.civil.model.AirlineEpimsID;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.FlightDelay;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -95,7 +95,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willReturn;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -221,7 +220,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private AirlineEpimsDataLoader airlineEpimsDataLoader;
 
-    @Autowired
+    @MockBean
     private AirlineEpimsService airlineEpimsService;
 
     @Nested
@@ -2173,8 +2172,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedCourtLocation_whenAirlineExists() {
                 // Given
-                List<AirlineEpimsID> airlineEpimsIDList = new ArrayList<>();
-                airlineEpimsIDList.add(AirlineEpimsID.builder().airline("GULF_AIR").ePimsID("36791").build());
+                List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
+                airlineEpimsIDList.add(AirlineEpimsId.builder().airline("GULF_AIR").epimsID("36791").build());
                 given(airlineEpimsDataLoader.getAirlineEpimsIDList())
                     .willReturn(airlineEpimsIDList);
 
