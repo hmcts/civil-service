@@ -118,7 +118,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse prepareEvent(CallbackParams callbackParams) {
-        //TODO: 1v2DS/SS -> LR to show LR org 1/2 dependning on MP
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
@@ -343,9 +342,15 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
 
-        updateExperts(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
-        updateWitnesses(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
+        updateExperts(partyChosenId, caseData, builder);
+        updateWitnesses(partyChosenId, caseData, builder);
+
+        // persist flags for respondents
+        if (DEFENDANT_ONE_ID.equals(partyChosenId) || DEFENDANT_TWO_ID.equals(partyChosenId)) {
+            getFlagsForRespondents(callbackParams, caseData, builder);
+        }
 
         // last step before clearing update details form
         caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, builder);
@@ -456,6 +461,28 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                                  .build());
             addRespondentDQPartiesFlagStructure(builder, caseData);
             //TODO: need to add it to top level party object
+        }
+    }
+
+    private void getFlagsForRespondents(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        // Party fields are empty in this mid event, this is a workaround
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        // persist respondent flags (ccd issue)
+        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
+            .flags(oldCaseData.getRespondent1().getFlags())
+            .build();
+
+        builder.respondent1(updatedRespondent1);
+
+        // if present, persist the 2nd respondent flags in the same fashion as above, i.e ignore for 1v1
+        if (ofNullable(caseData.getRespondent2()).isPresent()
+            && ofNullable(oldCaseData.getRespondent2()).isPresent()) {
+            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
+                .flags(oldCaseData.getRespondent2().getFlags())
+                .build();
+
+            builder.respondent2(updatedRespondent2);
         }
     }
 
