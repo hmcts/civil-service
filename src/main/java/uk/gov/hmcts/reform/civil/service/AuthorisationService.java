@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -19,7 +20,7 @@ public class AuthorisationService {
     private final ServiceAuthorisationApi serviceAuthorisationApi;
 
     @Value("${civil.authorised-services}")
-    private String s2sAuthorisedServices;
+    private List<String> s2sAuthorisedServices;
 
     private final IdamClient idamClient;
 
@@ -31,29 +32,23 @@ public class AuthorisationService {
             String bearerJwt = serviceAuthHeader.startsWith("Bearer ") ? serviceAuthHeader : "Bearer " + serviceAuthHeader;
             callingService = serviceAuthorisationApi.getServiceName(bearerJwt);
             log.info("Calling Service... {}", callingService);
-            if (callingService != null && Arrays.asList(s2sAuthorisedServices.split(","))
-                .contains(callingService)) {
-
-                return true;
-            }
+            return (callingService != null && s2sAuthorisedServices.contains(callingService));
         } catch (Exception ex) {
             //do nothing
             log.error("S2S token is not authorised" + ex);
+            return false;
         }
-        return false;
     }
 
     public Boolean authoriseUser(String authorisation) {
         try {
             userInfo = idamClient.getUserInfo(authorisation);
-            if (null != userInfo) {
-                return true;
-            }
+            return (null != userInfo);
         } catch (Exception ex) {
             //do nothing
             log.error("User token is invalid");
+            return false;
         }
-        return false;
     }
 
     public UserInfo getUserInfo() {
