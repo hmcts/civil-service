@@ -940,7 +940,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         Witnesses actualRespondent1DQWitnesses = objectMapper.convertValue(response.getData().get(
             "respondent1DQWitnesses"), new TypeReference<>() {
-        });
+            });
         Witness actualRespondent1Witness = unwrapElements(actualRespondent1DQWitnesses.getDetails()).get(0);
         assertThat(actualRespondent1Witness.getPartyID()).isNotNull();
         assertThat(actualRespondent1Witness.getFirstName()).isEqualTo("Witness");
@@ -953,7 +953,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         Witnesses actualRespondent2DQWitnesses = objectMapper.convertValue(response.getData().get(
             "respondent2DQWitnesses"), new TypeReference<>() {
-        });
+            });
         Witness respondent2Witness = unwrapElements(actualRespondent2DQWitnesses.getDetails()).get(0);
         assertThat(respondent2Witness.getPartyID()).isNotNull();
         assertThat(respondent2Witness.getFirstName()).isEqualTo("Witness");
