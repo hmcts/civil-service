@@ -30,6 +30,11 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
+import uk.gov.hmcts.reform.civil.service.Time;
+
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
 import java.util.ArrayList;
@@ -76,6 +81,9 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @MockBean
     private ResponseOneVOneShowTagService responseOneVOneShowTagService;
 
+    @MockBean
+    private Time time;
+
     @Nested
     class AboutToStartCallback {
 
@@ -93,6 +101,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
+        private final LocalDateTime submittedDate = LocalDateTime.now();
+
         @BeforeEach
         void before() {
             LocationRefData locationRefData = LocationRefData.builder().siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
@@ -101,6 +111,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .epimmsId("111").build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
+            given(time.now()).willReturn(submittedDate);
             given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(locationRefData));
         }
 

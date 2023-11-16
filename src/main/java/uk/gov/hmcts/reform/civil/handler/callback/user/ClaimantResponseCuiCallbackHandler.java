@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
+import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -36,6 +37,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final ResponseOneVOneShowTagService responseOneVOneService;
 
     private final ObjectMapper objectMapper;
+    private final Time time;
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
 
     @Override
@@ -64,10 +66,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                .applicant1ResponseDate(LocalDateTime.now())
-                .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
-
+        CaseData updatedData = caseData.toBuilder()
+            .applicant1ResponseDate(LocalDateTime.now())
+            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
+            .applicant1ResponseDate(time.now())
+            .build();
+      
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
         CaseData updatedData = builder.build();
