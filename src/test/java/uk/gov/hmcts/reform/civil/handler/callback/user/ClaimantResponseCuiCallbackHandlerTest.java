@@ -248,6 +248,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
+        }
+        
         @Test
         void shouldChangeCaseState_whenApplicantDoesNotProceedWithTheClaim() {
             CaseData caseData = CaseDataBuilder.builder()
