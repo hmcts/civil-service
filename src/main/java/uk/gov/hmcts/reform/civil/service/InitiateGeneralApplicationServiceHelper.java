@@ -62,7 +62,7 @@ public class InitiateGeneralApplicationServiceHelper {
         String parentCaseId = caseData.getCcdCaseReference().toString();
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
-        GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
+
         userRoles = getUserRoles(parentCaseId);
 
         /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
@@ -119,7 +119,7 @@ public class InitiateGeneralApplicationServiceHelper {
                 }
             }
         }
-
+        GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
         applicationBuilder
             .generalAppApplnSolicitor(applicantBuilder.build());
         String applicantPartyName = null;
