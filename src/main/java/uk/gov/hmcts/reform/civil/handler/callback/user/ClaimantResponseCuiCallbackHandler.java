@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
+import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -69,10 +71,13 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
             .applicant1ResponseDate(time.now())
             .build();
+      
+        updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
+        CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
-            AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedData.toMap(objectMapper));
+                AboutToStartOrSubmitCallbackResponse.builder()
+                        .data(updatedData.toMap(objectMapper));
 
         updateClaimEndState(response, updatedData);
 
@@ -82,6 +87,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
         if (updatedData.hasClaimantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
+        } else if (!updatedData.hasApplicantProceededWithClaim()) {
+            response.state(updatedData.isClaimantConfirmAmountPaidPartAdmit() || updatedData.hasDefendantPayedTheAmountClaimed()
+                               ? CaseState.CASE_SETTLED.name()
+                               : CaseState.CASE_DISMISSED.name());
         } else if (updatedData.hasApplicantRejectedRepaymentPlan() && updatedData.getRespondent1().isCompanyOROrganisation()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         } else {
