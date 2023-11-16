@@ -58,13 +58,11 @@ public class InitiateGeneralApplicationServiceHelper {
                 || (YES.equals(caseData.getAddRespondent2()) && caseData.getRespondent2OrganisationPolicy() == null)) {
             throw new IllegalArgumentException("Solicitor Org details are not set correctly.");
         }
-        GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
 
         String parentCaseId = caseData.getCcdCaseReference().toString();
-
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
-
+        GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
         userRoles = getUserRoles(parentCaseId);
 
         /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
