@@ -54,6 +54,7 @@ public class CaseNoteService {
             .document(documentAndNote.getDocument())
             .documentNote(documentAndNote.getDocumentNote())
             .createdBy(userDetails.getFullName())
+            .documentNoteForTab(documentAndNote.getDocumentNote())
             .build();
         List<Element<DocumentAndNote>> updatedJudgeNoteAndDocument = newArrayList();
         updatedJudgeNoteAndDocument.add(element(updatedJudgeNote));
