@@ -568,7 +568,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     caseData.getSpecRespondentCorrespondenceAddressdetails());
         }
 
-        if ((callbackParams.getCaseData().getFlightDelay() != null)) {
+        if ((toggleService.isSdoR2Enabled() && callbackParams.getCaseData().getFlightDelay() != null)) {
             FlightDelay flightDelay = callbackParams.getCaseData().getFlightDelay();
             String selectedAirlineCode = flightDelay.getFlightDetailsAirlineList().getValue().getCode();
 

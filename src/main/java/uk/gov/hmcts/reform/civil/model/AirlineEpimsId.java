@@ -9,6 +9,6 @@ import lombok.Value;
 @AllArgsConstructor
 public class AirlineEpimsId {
 
-    private String airline;
-    private String epimsID;
+    String airline;
+    String epimsID;
 }
