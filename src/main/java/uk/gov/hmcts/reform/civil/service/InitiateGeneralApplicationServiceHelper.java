@@ -154,7 +154,8 @@ public class InitiateGeneralApplicationServiceHelper {
                         /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                         Solicitor 2 details if it's 1 V 2 Different Solicitor scenario*/
                     } else {
-                        if (caseData.getAddRespondent2().equals(YES)) {
+                        if (Objects.nonNull(caseData.getAddRespondent2())
+                                            && caseData.getAddRespondent2().equals(YES)) {
                             specBuilder.id(respSol.getUserId());
                             specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
                             specBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
