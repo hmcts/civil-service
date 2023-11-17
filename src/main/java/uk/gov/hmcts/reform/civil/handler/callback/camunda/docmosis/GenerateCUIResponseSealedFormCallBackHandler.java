@@ -47,16 +47,16 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     }
 
     private CallbackResponse prepareSealedForm(CallbackParams callbackParams) {
-
+        CaseData caseData = callbackParams.getCaseData();
         CaseDocument sealedForm = formGenerator.generate(
-            callbackParams.getCaseData(),
+            caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        CaseData updatedCaseData = callbackParams.getCaseData().toBuilder()
+        CaseData updatedCaseData = caseData.toBuilder()
             .respondent1ClaimResponseDocumentSpec(sealedForm)
             .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                 sealedForm,
-                callbackParams.getCaseData()
+                caseData
             ))
             .build();
         return AboutToStartOrSubmitCallbackResponse.builder()
