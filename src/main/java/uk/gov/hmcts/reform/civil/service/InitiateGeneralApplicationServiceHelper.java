@@ -134,11 +134,12 @@ public class InitiateGeneralApplicationServiceHelper {
                     .builder();
 
                 if (respSol.getCaseRole() != null) {
-                    specBuilder.id(respSol.getUserId());
+                    log.info(respSol.getCaseRole(), "**", respSol.getUserId());
                     /*Populate the GA respondent solicitor details in accordance with civil case Applicant Solicitor 1
                 details if case role of collected user matches with case role of Applicant 1*/
                     if (respSol.getCaseRole().equals(applicant1OrgCaseRole)) {
                         if (caseData.getApplicantSolicitor1UserDetails() != null) {
+                            specBuilder.id(respSol.getUserId());
                             specBuilder.email(caseData.getApplicantSolicitor1UserDetails().getEmail());
                             specBuilder.organisationIdentifier(caseData.getApplicant1OrganisationPolicy()
                                                                    .getOrganisation().getOrganisationID());
@@ -146,14 +147,18 @@ public class InitiateGeneralApplicationServiceHelper {
                         /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                         Solicitor 1 details if caserole of collected user matches with caserole Respondent Solicitor 1*/
                     } else if (respSol.getCaseRole().equals(respondent1OrgCaseRole)) {
+                        specBuilder.id(respSol.getUserId());
                         specBuilder.email(caseData.getRespondentSolicitor1EmailAddress());
                         specBuilder.organisationIdentifier(getRespondent1SolicitorOrgId(caseData));
 
                         /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                         Solicitor 2 details if it's 1 V 2 Different Solicitor scenario*/
                     } else {
-                        specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
-                        specBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
+                        if (caseData.getAddRespondent2().equals(YES)) {
+                            specBuilder.id(respSol.getUserId());
+                            specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
+                            specBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
+                        }
                     }
                     /*Set the GA Respondent solicitor details to Empty if above checks are failed*/
                 } else {
