@@ -274,13 +274,30 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             builder.respondent1ClaimResponseDocumentSpec(null);
         }
 
-        locationHelper.getCaseManagementLocation(caseData)
-            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                builder,
-                requestedCourt,
-                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
-                    CallbackParams.Params.BEARER_TOKEN).toString())
-            ));
+        //Update the caseManagement location to the flight location if No flight location update to Claimant
+        // preffered location
+        if (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim().equals(YES)) {
+            if (caseData.getFlightDelay() != null && caseData.getFlightDelay().getFlightDetailsAirlineList()
+                .getValue().getCode().equals("OTHER")) {
+                locationHelper.getClaimantRequestedCourt(caseData)
+                    .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                        builder,
+                        requestedCourt,
+                        () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams()
+                              .get(CallbackParams.Params.BEARER_TOKEN).toString())
+                    ));
+            } else {
+                builder.caseManagementLocation(caseData.getFlightDelay().getFlightCourtLocation());
+            }
+        } else {
+            locationHelper.getCaseManagementLocation(caseData)
+                .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                    builder,
+                    requestedCourt,
+                    () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
+                        CallbackParams.Params.BEARER_TOKEN).toString())
+                ));
+        }
 
         if (log.isDebugEnabled()) {
             log.debug("Case management location for " + caseData.getLegacyCaseReference()
