@@ -35,8 +35,8 @@ public class AuthorisationService {
         } catch (Exception ex) {
             //do nothing
             log.error("S2S token is not authorised" + ex);
-            return false;
         }
+        return false;
     }
 
     public Boolean authoriseUser(String authorisation) {
@@ -46,8 +46,8 @@ public class AuthorisationService {
         } catch (Exception ex) {
             //do nothing
             log.error("User token is invalid");
-            return false;
         }
+        return false;
     }
 
     public UserInfo getUserInfo() {
