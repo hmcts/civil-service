@@ -5771,7 +5771,7 @@ public class CaseDataBuilder {
             .partyID("res-1-party-id")
             .flags(Flags.builder()
                        .partyName(applicant1.getPartyName())
-                       .roleOnCase("Claimant 1")
+                       .roleOnCase("Applicant 1")
                        .details(flags)
                        .build())
             .build();
@@ -5784,7 +5784,7 @@ public class CaseDataBuilder {
                                                    .lastName("W last")
                                                    .flags(Flags.builder()
                                                               .partyName("W First W Last")
-                                                              .roleOnCase("Claimant 1 Witness")
+                                                              .roleOnCase("Applicant 1 Witness")
                                                               .details(flagDetails())
                                                               .build())
                                                    .build());
@@ -5797,7 +5797,7 @@ public class CaseDataBuilder {
                                                  .lastName("E last")
                                                  .flags(Flags.builder()
                                                             .partyName("E First E Last")
-                                                            .roleOnCase("Claimant 1 Expert")
+                                                            .roleOnCase("Applicant 1 Expert")
                                                             .details(flagDetails())
                                                             .build())
                                                  .build());
@@ -5808,7 +5808,7 @@ public class CaseDataBuilder {
         this.applicant1LitigationFriend = applicant1LitigationFriend.toBuilder()
             .flags(Flags.builder()
                        .partyName(applicant1LitigationFriend.getFullName())
-                       .roleOnCase("Claimant 1 Litigation Friend")
+                       .roleOnCase("Applicant 1 Litigation Friend")
                        .details(flagDetails())
                        .build())
             .build();
@@ -5819,7 +5819,7 @@ public class CaseDataBuilder {
         this.applicant2 = applicant2.toBuilder()
             .flags(Flags.builder()
                        .partyName(applicant2.getPartyName())
-                       .roleOnCase("Claimant 2")
+                       .roleOnCase("Applicant 2")
                        .details(flagDetails())
                        .build())
             .build();
@@ -5832,7 +5832,7 @@ public class CaseDataBuilder {
                                                    .lastName("W last")
                                                    .flags(Flags.builder()
                                                               .partyName("W First W Last")
-                                                              .roleOnCase("Claimant 2 Witness")
+                                                              .roleOnCase("Applicant 2 Witness")
                                                               .details(flagDetails())
                                                               .build())
                                                    .build());
@@ -5845,7 +5845,7 @@ public class CaseDataBuilder {
                                                  .lastName("E last")
                                                  .flags(Flags.builder()
                                                             .partyName("E First E Last")
-                                                            .roleOnCase("Claimant 2 Expert")
+                                                            .roleOnCase("Applicant 2 Expert")
                                                             .details(flagDetails())
                                                             .build())
                                                  .build());
@@ -5856,7 +5856,7 @@ public class CaseDataBuilder {
         this.applicant2LitigationFriend = applicant2LitigationFriend.toBuilder()
             .flags(Flags.builder()
                        .partyName(applicant2LitigationFriend.getFullName())
-                       .roleOnCase("Claimant 2 Litigation Friend")
+                       .roleOnCase("Applicant 2 Litigation Friend")
                        .details(flagDetails())
                        .build())
             .build();
@@ -5872,7 +5872,7 @@ public class CaseDataBuilder {
             .partyID("res-1-litfriend-party-id")
             .flags(Flags.builder()
                        .partyName(respondent1LitigationFriend.getFullName())
-                       .roleOnCase("Defendant 1 Litigation Friend")
+                       .roleOnCase("Respondent 1 Litigation Friend")
                        .details(flags)
                        .build())
             .build();
@@ -5888,7 +5888,7 @@ public class CaseDataBuilder {
             .partyID("res-1-party-id")
             .flags(Flags.builder()
                        .partyName(respondent1.getPartyName())
-                       .roleOnCase("Defendant 1")
+                       .roleOnCase("Respondent 1")
                        .details(flags)
                        .build())
             .build();
@@ -5903,7 +5903,7 @@ public class CaseDataBuilder {
                 .lastName("W last")
                 .flags(Flags.builder()
                            .partyName("W First W Last")
-                           .roleOnCase("Defendant 1 Witness")
+                           .roleOnCase("Respondent 1 Witness")
                            .details(flagDetails())
                            .build())
                 .build());
@@ -5918,7 +5918,7 @@ public class CaseDataBuilder {
                 .lastName("E last")
                 .flags(Flags.builder()
                            .partyName("E First E Last")
-                           .roleOnCase("Defendant 1 Expert")
+                           .roleOnCase("Respondent 1 Expert")
                            .details(flagDetails())
                            .build())
                 .build());
@@ -5929,7 +5929,7 @@ public class CaseDataBuilder {
         this.respondent2 = respondent2.toBuilder()
             .flags(Flags.builder()
                        .partyName(respondent2.getPartyName())
-                       .roleOnCase("Defendant 2")
+                       .roleOnCase("Respondent 2")
                        .details(flagDetails())
                        .build())
             .build();
@@ -5942,7 +5942,7 @@ public class CaseDataBuilder {
                                                    .lastName("E last")
                                                    .flags(Flags.builder()
                                                               .partyName("E First E Last")
-                                                              .roleOnCase("Defendant 2 Expert")
+                                                              .roleOnCase("Respondent 2 Expert")
                                                               .details(flagDetails())
                                                               .build())
                                                    .build());
@@ -5955,7 +5955,7 @@ public class CaseDataBuilder {
                                                      .lastName("W last")
                                                      .flags(Flags.builder()
                                                                 .partyName("W First W Last")
-                                                                .roleOnCase("Defendant 2 Witness")
+                                                                .roleOnCase("Respondent 2 Witness")
                                                                 .details(flagDetails())
                                                                 .build())
                                                      .build());
@@ -5966,7 +5966,7 @@ public class CaseDataBuilder {
         this.respondent2LitigationFriend = respondent2LitigationFriend.toBuilder()
             .flags(Flags.builder()
                        .partyName(respondent2LitigationFriend.getFullName())
-                       .roleOnCase("Defendant 2 Litigation Friend")
+                       .roleOnCase("Respondent 2 Litigation Friend")
                        .details(flagDetails())
                        .build())
             .build();
