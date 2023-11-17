@@ -1678,31 +1678,31 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).doesNotHaveToString("claimType");
         }
 
-            @Test
-            void shouldGetAirlineList_whenRequired() {
-                // Given
-                List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
-                airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
-                airlineEpimsIDList.add(AirlineEpimsId.builder().airline("OTHER").epimsID("111111").build());
+        @Test
+        void shouldGetAirlineList_whenRequired() {
+            // Given
+            List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
+            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
+            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("OTHER").epimsID("111111").build());
 
-                given(airlineEpimsDataLoader.getAirlineEpimsIDList())
-                    .willReturn(airlineEpimsIDList);
+            given(airlineEpimsDataLoader.getAirlineEpimsIDList())
+                .willReturn(airlineEpimsIDList);
 
-                CaseData caseData = CaseData.builder().build();
-                CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
+            CaseData caseData = CaseData.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
 
-                // When
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-                // Then
-                assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
-                    .extracting("list_items").asList().extracting("label")
-                    .contains("BA/Cityflyer");
+            // Then
+            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
+                .extracting("list_items").asList().extracting("label")
+                .contains("BA/Cityflyer");
 
-                assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
-                    .extracting("list_items").asList().extracting("label")
-                    .contains("OTHER");
-            }
+            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
+                .extracting("list_items").asList().extracting("label")
+                .contains("OTHER");
+        }
 
         @Test
         void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
