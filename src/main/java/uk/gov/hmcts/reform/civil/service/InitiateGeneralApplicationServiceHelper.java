@@ -133,9 +133,8 @@ public class InitiateGeneralApplicationServiceHelper {
                 GASolicitorDetailsGAspec.GASolicitorDetailsGAspecBuilder specBuilder = GASolicitorDetailsGAspec
                     .builder();
 
-                specBuilder.id(respSol.getUserId());
-
                 if (respSol.getCaseRole() != null) {
+                    specBuilder.id(respSol.getUserId());
                     /*Populate the GA respondent solicitor details in accordance with civil case Applicant Solicitor 1
                 details if case role of collected user matches with case role of Applicant 1*/
                     if (respSol.getCaseRole().equals(applicant1OrgCaseRole)) {
@@ -252,7 +251,7 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     public CaseAssignedUserRolesResource getUserRoles(String parentCaseId) {
-        if (Objects.isNull(userRoles)) {
+        if (Objects.isNull(userRoles) ) {
             userRoles = caseAccessDataStoreApi.getUserRoles(
                 getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
         }
