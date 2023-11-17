@@ -1,11 +1,10 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,34 +13,40 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = {AirlineEpimsService.class})
-public class AirlineEpimsServiceTest {
+class AirlineEpimsServiceTest {
 
-    @Mock
+    @MockBean
     private AirlineEpimsDataLoader airlineEpimsDataLoader;
 
     @InjectMocks
     private AirlineEpimsService airlineEpimsService;
 
     @Test
-    public void getEpimsIdForAirline_shouldReturnCorrespondingEpimsIdForAirline() {
-        setupAirlineEpimsList();
-
-        String result = airlineEpimsService.getEpimsIdForAirline("GULF_AIR");
+    void getEpimsIdForAirline_shouldReturnCorrespondingEpimsIdForAirline() {
+        setup();
+        String result = airlineEpimsService.getEpimsIdForAirline("Gulf Air");
 
         assertThat(result).isEqualTo("36791");
     }
 
     @Test
-    public void getEpimsIdForAirline_givenInvalidAirline_shouldThrowException() {
-        setupAirlineEpimsList();
+    void getEpimsIdForAirline_givenInvalidAirline_shouldReturnNull() {
+        setup();
+        String result = airlineEpimsService.getEpimsIdForAirline("INVALID_AIRLINE");
 
-        assertThatExceptionOfType(IllegalStateException.class)
-            .isThrownBy(() -> airlineEpimsService.getEpimsIdForAirline("INVALID_AIRLINE"));
+        assertThat(result).isNull();
     }
 
-    private void setupAirlineEpimsList() {
+    @Test
+    void getEpimsIdForAirline_givenInvalidAirline_shouldThrowException() {
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> airlineEpimsService.getEpimsIdForAirline("NoLocationAirline"));
+    }
+
+    void setup () {
         List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
-        airlineEpimsIDList.add(AirlineEpimsId.builder().airline("GULF_AIR").epimsID("36791").build());
+        airlineEpimsIDList.add(AirlineEpimsId.builder().airline("Gulf Air").epimsID("36791").build());
+        airlineEpimsIDList.add(AirlineEpimsId.builder().airline("NoLocationAirline").build());
 
         when(airlineEpimsDataLoader.getAirlineEpimsIDList()).thenReturn(airlineEpimsIDList);
     }
