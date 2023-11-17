@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -67,24 +68,37 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-            .applicant1ResponseDate(LocalDateTime.now())
-            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
-            .applicant1ResponseDate(time.now());
-        CaseData updatedData = builder.build();
+                .applicant1ResponseDate(LocalDateTime.now())
+                .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
-        
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
-                AboutToStartOrSubmitCallbackResponse.builder()
-                        .data(updatedData.toMap(objectMapper));
 
+        CaseData updatedData = builder.build();
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
+            AboutToStartOrSubmitCallbackResponse.builder()
+                .data(updatedData.toMap(objectMapper));
+
+        updateClaimStateJudicialReferral(response, updatedData);
         updateClaimEndState(response, updatedData);
 
         return response.build();
     }
 
+    private void updateClaimStateJudicialReferral(
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response,
+        CaseData caseData) {
+        if (isJudicialReferralAllowed(caseData)) {
+            response.state(CaseState.JUDICIAL_REFERRAL.name());
+        }
+    }
+
+    private boolean isJudicialReferralAllowed(CaseData caseData) {
+        return (caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence())
+            && (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation());
+    }
+
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
-        if (updatedData.hasClaimantAgreedToFreeMediation()) {
+        if (updatedData.hasClaimantAgreedToFreeMediation() && updatedData.hasDefendantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
         } else if (!updatedData.hasApplicantProceededWithClaim()) {
             response.state(updatedData.isClaimantConfirmAmountPaidPartAdmit() || updatedData.hasDefendantPayedTheAmountClaimed()
@@ -92,8 +106,6 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                                : CaseState.CASE_DISMISSED.name());
         } else if (updatedData.hasApplicantRejectedRepaymentPlan() && updatedData.getRespondent1().isCompanyOROrganisation()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-        } else {
-            response.state(CaseState.JUDICIAL_REFERRAL.name());
         }
     }
 
