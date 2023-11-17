@@ -29,8 +29,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.AirlineEpimsDataLoader;
-import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
 import uk.gov.hmcts.reform.civil.model.FlightDelay;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -2169,20 +2168,21 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class GetAirlineCourtLocation extends LocationRefSampleDataBuilder {
 
-            @Test
-            void shouldReturnExpectedCourtLocation_whenAirlineExists() {
-                // Given
-                List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
-                airlineEpimsIDList.add(AirlineEpimsId.builder().airline("GULF_AIR").epimsID("36791").build());
-                given(airlineEpimsDataLoader.getAirlineEpimsIDList())
-                    .willReturn(airlineEpimsIDList);
+            @BeforeEach
+            void mockAirlineEpimsData() {
+                given(airlineEpimsService.getEpimsIdForAirline("GULF_AIR"))
+                    .willReturn("36791");
 
                 List<LocationRefData> locations = new ArrayList<>();
                 locations.add(LocationRefData.builder().regionId("Site Name").epimmsId("36791")
                                   .build());
                 given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                     .willReturn(locations);
+            }
 
+            @Test
+            void shouldReturnExpectedCourtLocation_whenAirlineExists() {
+                // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                     .flightDelay(FlightDelay.builder()
                                      .flightDetailsAirlineList(
@@ -2195,7 +2195,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").extracting("region").isEqualTo("Site 3");
+                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").extracting("region").isEqualTo("Site Name");
             }
 
             @Test
@@ -2206,50 +2206,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                      .flightDetailsAirlineList(
                                          DynamicList.builder()
                                              .value(DynamicListElement.builder().code("OTHER").label("OTHER")
-                                                        .build()).build()).build()).build();
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
-                    .willReturn(getSampleCourLocationsRefObject());
-
-                // When
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-                // Then
-                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").extracting("region").isEqualTo("Site 1");
-            }
-
-            @Test
-            void shouldReturnCallbackException_whenNoAirlineFound() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                    .flightDelay(FlightDelay.builder()
-                                     .flightDetailsAirlineList(
-                                         DynamicList.builder()
-                                             .value(DynamicListElement.builder().code("NOT_MATCHING_AIRLINE")
-                                                        .label("Not matching airline")
-                                                        .build()).build()).build()).build();
-                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
-                    .willReturn(getSampleCourLocationsRefObject());
-
-                // When
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-                // Then
-                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").isNull();
-            }
-
-            @Test
-            void shouldReturnCallbackException_whenAirlineFoundButLocationNotFound() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                    .flightDelay(FlightDelay.builder()
-                                     .flightDetailsAirlineList(
-                                         DynamicList.builder()
-                                             .value(DynamicListElement.builder().code("NOT_MATCHING_AIRLINE")
-                                                        .label("Not matching airline")
                                                         .build()).build()).build()).build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

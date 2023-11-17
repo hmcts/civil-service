@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.model.AirlineEpimsDataLoader;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import java.util.Optional;
 

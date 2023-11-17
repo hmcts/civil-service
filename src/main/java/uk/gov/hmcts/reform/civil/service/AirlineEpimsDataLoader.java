@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model;
+package uk.gov.hmcts.reform.civil.service;
 
 import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 
 @Service
 @Slf4j

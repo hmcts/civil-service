@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.AirlineEpimsDataLoader;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -568,7 +568,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     caseData.getSpecRespondentCorrespondenceAddressdetails());
         }
 
-        if (toggleService.isSdoR2Enabled() && (callbackParams.getCaseData().getFlightDelay() != null)) {
+        if ((callbackParams.getCaseData().getFlightDelay() != null)) {
             FlightDelay flightDelay = callbackParams.getCaseData().getFlightDelay();
             String selectedAirlineCode = flightDelay.getFlightDetailsAirlineList().getValue().getCode();
 
