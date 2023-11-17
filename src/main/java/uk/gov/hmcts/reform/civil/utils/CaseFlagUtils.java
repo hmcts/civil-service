@@ -24,27 +24,21 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
-import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ORG_INDIVIDUALS_ID;
-import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_WITNESSES_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ORG_INDIVIDUALS_ID;
-import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ORG_INDIVIDUALS_ID;
-import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_WITNESSES_ID;
-import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ORG_INDIVIDUALS_ID;
-import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_WITNESSES_ID;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.appendWithNewPartyId;
 
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -54,20 +48,20 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 public class CaseFlagUtils {
 
-    public static final String RESPONDENT_SOLICITOR_ONE_WITNESS = "Defendant solicitor 1 witness";
-    public static final String RESPONDENT_SOLICITOR_ONE_EXPERT = "Defendant solicitor 1 expert";
-    public static final String RESPONDENT_SOLICITOR_TWO_WITNESS = "Defendant solicitor 2 witness";
-    public static final String RESPONDENT_SOLICITOR_TWO_EXPERT = "Defendant solicitor 2 expert";
-    public static final String APPLICANT_SOLICITOR_WITNESS = "Claimant solicitor witness";
-    public static final String APPLICANT_SOLICITOR_EXPERT = "Claimant solicitor expert";
-    public static final String APPLICANT_ONE = "Claimant 1";
-    public static final String APPLICANT_TWO = "Claimant 2";
-    public static final String APPLICANT_ONE_LITIGATION_FRIEND = "Claimant 1 Litigation Friend";
-    public static final String APPLICANT_TWO_LITIGATION_FRIEND = "Claimant 2 Litigation Friend";
-    public static final String RESPONDENT_ONE = "Defendant 1";
-    public static final String RESPONDENT_TWO = "Defendant 2";
-    public static final String RESPONDENT_ONE_LITIGATION_FRIEND = "Defendant 1 Litigation Friend";
-    public static final String RESPONDENT_TWO_LITIGATION_FRIEND = "Defendant 2 Litigation Friend";
+    public static final String RESPONDENT_SOLICITOR_ONE_WITNESS = "Respondent solicitor 1 witness";
+    public static final String RESPONDENT_SOLICITOR_ONE_EXPERT = "Respondent solicitor 1 expert";
+    public static final String RESPONDENT_SOLICITOR_TWO_WITNESS = "Respondent solicitor 2 witness";
+    public static final String RESPONDENT_SOLICITOR_TWO_EXPERT = "Respondent solicitor 2 expert";
+    public static final String APPLICANT_SOLICITOR_WITNESS = "Applicant solicitor witness";
+    public static final String APPLICANT_SOLICITOR_EXPERT = "Applicant solicitor expert";
+    public static final String APPLICANT_ONE = "Applicant 1";
+    public static final String APPLICANT_TWO = "Applicant 2";
+    public static final String APPLICANT_ONE_LITIGATION_FRIEND = "Applicant 1 Litigation Friend";
+    public static final String APPLICANT_TWO_LITIGATION_FRIEND = "Applicant 2 Litigation Friend";
+    public static final String RESPONDENT_ONE = "Respondent 1";
+    public static final String RESPONDENT_TWO = "Respondent 2";
+    public static final String RESPONDENT_ONE_LITIGATION_FRIEND = "Respondent 1 Litigation Friend";
+    public static final String RESPONDENT_TWO_LITIGATION_FRIEND = "Respondent 2 Litigation Friend";
 
     private CaseFlagUtils() {
         //NO-OP
@@ -215,10 +209,6 @@ public class CaseFlagUtils {
         updateOrgIndividualsFlags(builder, caseData, partyChosen);
         // attending for legal rep
         updateLRIndividualsFlags(builder, caseData, partyChosen, organisationService);
-        // experts
-        updateExpertFlags(builder, caseData, partyChosen);
-        // witnesses
-        updateWitnessFlags(builder, caseData, partyChosen);
     }
 
     private static void updateLRIndividualsFlags(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData, String partyChosen, OrganisationService organisationService) {
@@ -272,30 +262,6 @@ public class CaseFlagUtils {
         }
         if ((DEFENDANT_TWO_LITIGATION_FRIEND_ID).equals(partyChosen)) {
             builder.respondent2LitigationFriend(updatePartyNameForLitigationFriendFlags(caseData.getRespondent2LitigationFriend()));
-        }
-    }
-
-    private static void updateExpertFlags(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData, String partyChosen) {
-        if ((CLAIMANT_ONE_EXPERTS_ID).equals(partyChosen)) {
-            builder.applicantExperts(updatePartyNameForPartyFlagStructures(caseData.getApplicantExperts(), APPLICANT_SOLICITOR_EXPERT));
-        }
-        if ((DEFENDANT_ONE_EXPERTS_ID).equals(partyChosen)) {
-            builder.respondent1Experts(updatePartyNameForPartyFlagStructures(caseData.getRespondent1Experts(), RESPONDENT_SOLICITOR_ONE_EXPERT));
-        }
-        if ((DEFENDANT_TWO_EXPERTS_ID).equals(partyChosen)) {
-            builder.respondent2Experts(updatePartyNameForPartyFlagStructures(caseData.getRespondent2Experts(), RESPONDENT_SOLICITOR_TWO_EXPERT));
-        }
-    }
-
-    private static void updateWitnessFlags(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData, String partyChosen) {
-        if ((CLAIMANT_ONE_WITNESSES_ID).equals(partyChosen)) {
-            builder.applicantWitnesses(updatePartyNameForPartyFlagStructures(caseData.getApplicantWitnesses(), APPLICANT_SOLICITOR_WITNESS));
-        }
-        if ((DEFENDANT_ONE_WITNESSES_ID).equals(partyChosen)) {
-            builder.respondent1Witnesses(updatePartyNameForPartyFlagStructures(caseData.getRespondent1Witnesses(), RESPONDENT_SOLICITOR_ONE_WITNESS));
-        }
-        if ((DEFENDANT_TWO_WITNESSES_ID).equals(partyChosen)) {
-            builder.respondent2Witnesses(updatePartyNameForPartyFlagStructures(caseData.getRespondent2Witnesses(), RESPONDENT_SOLICITOR_TWO_WITNESS));
         }
     }
 
