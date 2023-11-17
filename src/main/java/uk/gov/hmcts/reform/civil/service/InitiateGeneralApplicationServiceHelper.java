@@ -251,7 +251,7 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     public CaseAssignedUserRolesResource getUserRoles(String parentCaseId) {
-        if (Objects.isNull(userRoles) ) {
+        if (Objects.isNull(userRoles)) {
             userRoles = caseAccessDataStoreApi.getUserRoles(
                 getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
         }
