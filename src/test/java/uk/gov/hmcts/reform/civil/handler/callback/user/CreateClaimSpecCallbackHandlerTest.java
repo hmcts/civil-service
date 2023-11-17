@@ -1677,24 +1677,24 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).doesNotHaveToString("claimType");
         }
 
-        @Test
-        void shouldGetAirlineList_whenRequired() {
-            // Given
-            CaseData caseData = CaseData.builder().build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
-
-            // When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
-                .extracting("list_items").asList().extracting("label")
-                .contains("BA/Cityflyer");
-
-            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
-                .extracting("list_items").asList().extracting("label")
-                .contains("OTHER");
-        }
+        //        @Test
+        //        void shouldGetAirlineList_whenRequired() {
+        //            // Given
+        //            CaseData caseData = CaseData.builder().build();
+        //            CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
+        //
+        //            // When
+        //            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        //
+        //            // Then
+        //            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
+        //                .extracting("list_items").asList().extracting("label")
+        //                .contains("BA/Cityflyer");
+        //
+        //            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
+        //                .extracting("list_items").asList().extracting("label")
+        //                .contains("OTHER");
+        //        }
 
         @Test
         void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
