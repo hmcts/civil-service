@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -61,12 +62,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_O
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_ORDER_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection.ASSISTED_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.CLAIMANT;
+import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.STANDARD_BASIS;
+import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.SUBJECT_DETAILED_ASSESSMENT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -129,7 +132,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseDataBuilder
             .freeFormRecordedTextArea(null)
             .freeFormOrderedTextArea(null)
-            .orderOnCourtsList(null);
+            .orderOnCourtsList(null)
+            .freeFormHearingNotes(null);
         // Assisted orders
         caseDataBuilder
             .finalOrderMadeSelection(null).finalOrderDateHeardComplex(null)
@@ -179,7 +183,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
             caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.finalOrderDocument(finalDocument.getDocumentLink());
+        caseDataBuilder.finalOrderDocument(finalDocument);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -240,12 +244,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private DynamicList populateCurrentHearingLocation(CaseData caseData, String authorisation) {
-        LocationRefData locationRefData;
-        if (hasSDOBeenMade(caseData.getCcdState())) {
-            locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
-        } else {
-            locationRefData = locationRefDataService.getCcmccLocation(authorisation);
-        }
+        LocationRefData locationRefData = locationHelper.getHearingLocation(null, caseData, authorisation);
+
         return DynamicList.builder().listItems(List.of(DynamicListElement.builder()
                                    .code("LOCATION_LIST")
                                    .label(locationRefData.getSiteName())
@@ -259,10 +259,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                        .label(locationRefData.getSiteName())
                        .build())
             .build();
-    }
-
-    private boolean hasSDOBeenMade(CaseState state) {
-        return !JUDICIAL_REFERRAL.equals(state);
     }
 
     private CaseData.CaseDataBuilder<?, ?> populateFields(
@@ -297,6 +293,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                                                   .assistedOrderCostsFirstDropdownDate(advancedDate)
                                                   .assistedOrderAssessmentThirdDropdownDate(advancedDate)
                                                   .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
+                                                  .makeAnOrderForCostsList(CLAIMANT)
+                                                  .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT)
+                                                  .assistedOrderAssessmentSecondDropdownList1(STANDARD_BASIS)
+                                                  .assistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
                                                   .build())
             .publicFundingCostsProtection(YesOrNo.NO)
             .finalOrderAppealComplex(FinalOrderAppeal.builder()
@@ -376,6 +376,14 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
                          .map(DatesFinalOrders::getDatesToAvoidDates).orElse(null),
                      "Further hearing", NOT_ALLOWED_DATE_PAST, errors, true);
 
+        if (nonNull(caseData.getFinalOrderFurtherHearingComplex())) {
+            if (nonNull(caseData.getFinalOrderFurtherHearingComplex().getDateToDate())
+                    && caseData.getFinalOrderFurtherHearingComplex().getDateToDate()
+                    .isBefore(caseData.getFinalOrderFurtherHearingComplex().getListFromDate())) {
+                errors.add(String.format(NOT_ALLOWED_DATE_RANGE, "Further hearing"));
+            }
+        }
+
         validateDate(Optional.ofNullable(caseData.getAssistedOrderMakeAnOrderForCosts())
                          .map(AssistedOrderCostDetails::getAssistedOrderCostsFirstDropdownDate).orElse(null),
                      "Make an order for detailed/summary costs", NOT_ALLOWED_DATE_PAST, errors, true);
@@ -413,8 +421,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
-            caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        CaseDocument finalDocument = caseData.getFinalOrderDocument();
 
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
@@ -435,12 +442,22 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             state = CASE_PROGRESSION;
         }
 
-        if (caseData.getFinalOrderFurtherHearingComplex() != null
-            && caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText() != null) {
-            caseDataBuilder.hearingNotes(HearingNotes.builder()
-                                             .date(LocalDate.now())
-                                             .notes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText())
-                                             .build());
+        // populate hearing notes in listing tab with hearing notes from either assisted or freeform order, if either exist.
+        if (caseData.getFinalOrderSelection().equals(ASSISTED_ORDER)) {
+            if (caseData.getFinalOrderFurtherHearingComplex() != null
+                && caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText() != null) {
+                caseDataBuilder.hearingNotes(HearingNotes.builder()
+                                                 .date(LocalDate.now())
+                                                 .notes(caseData.getFinalOrderFurtherHearingComplex().getHearingNotesText())
+                                                 .build());
+            }
+        } else {
+            if (nonNull(caseData.getFreeFormHearingNotes())) {
+                caseDataBuilder.hearingNotes(HearingNotes.builder()
+                                                 .date(LocalDate.now())
+                                                 .notes(caseData.getFreeFormHearingNotes())
+                                                 .build());
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

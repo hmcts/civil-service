@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.docmosis.trialready.TrialReadyFormGenerator;
 
@@ -22,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_TRIAL_READY_FORM_RESPONDENT2;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Service
 @RequiredArgsConstructor
@@ -53,9 +54,9 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        if (isApplicant(callbackParams, GENERATE_TRIAL_READY_FORM_APPLICANT)) {
+        if (isEvent(callbackParams, GENERATE_TRIAL_READY_FORM_APPLICANT)) {
             return TASK_ID_APPLICANT;
-        } else if (isRespondent1(callbackParams, GENERATE_TRIAL_READY_FORM_RESPONDENT1)) {
+        } else if (isEvent(callbackParams, GENERATE_TRIAL_READY_FORM_RESPONDENT1)) {
             return TASK_ID_RESPONDENT1;
         } else {
             return TASK_ID_RESPONDENT2;
@@ -75,19 +76,23 @@ public class GenerateTrialReadyFormHandler extends CallbackHandler {
 
     private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder,
                                CaseData caseData) {
+        String activityID = camundaActivityId(callbackParams);
+        CaseRole role = switch (activityID) {
+            case TASK_ID_APPLICANT -> CaseRole.CLAIMANT;
+            case TASK_ID_RESPONDENT1 -> CaseRole.DEFENDANT;
+            case TASK_ID_RESPONDENT2 -> CaseRole.RESPONDENTSOLICITORTWO;
+            default -> null;
+        };
+
         CaseDocument caseDocument = trialReadyFormGenerator.generate(
             callbackParams.getCaseData(),
             callbackParams.getParams().get(BEARER_TOKEN).toString(),
-            camundaActivityId(callbackParams)
+            camundaActivityId(callbackParams),
+            role
         );
         var documents = caseData.getTrialReadyDocuments();
         documents.add(element(caseDocument));
         caseDataBuilder.trialReadyDocuments(documents);
-    }
-
-    private boolean isApplicant(CallbackParams callbackParams, CaseEvent matchEvent) {
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        return caseEvent.equals(matchEvent);
     }
 
 }

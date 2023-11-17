@@ -14,7 +14,9 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private final ObjectMapper objectMapper;
     private final JudgementService judgementService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -61,7 +64,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
         if (caseData.isJudgementDateNotPermitted()) {
-            errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate()));
+            errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -91,9 +94,13 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
     private CallbackResponse updateBusinessProcessToReady(CallbackParams callbackParams) {
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
-
+        CCJPaymentDetails
+            ccjPaymentDetails = data.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+            ? judgementService.buildJudgmentAmountSummaryDetails(data) :
+            data.getCcjPaymentDetails();
         CaseData.CaseDataBuilder caseDataBuilder = data.toBuilder()
-            .businessProcess(BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC));
+            .businessProcess(BusinessProcess.ready(REQUEST_JUDGEMENT_ADMISSION_SPEC))
+            .ccjPaymentDetails(ccjPaymentDetails);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
