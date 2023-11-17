@@ -66,11 +66,9 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData updatedData = caseData.toBuilder()
-            .applicant1ResponseDate(LocalDateTime.now())
-            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
-            .applicant1ResponseDate(time.now())
-            .build();
+        CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                .applicant1ResponseDate(LocalDateTime.now())
+                .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
       
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
