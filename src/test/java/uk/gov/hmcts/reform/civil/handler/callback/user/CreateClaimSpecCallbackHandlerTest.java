@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
 import uk.gov.hmcts.reform.civil.model.FlightDelay;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
@@ -1680,6 +1681,13 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldGetAirlineList_whenRequired() {
                 // Given
+                List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
+                airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
+                airlineEpimsIDList.add(AirlineEpimsId.builder().airline("OTHER").epimsID("111111").build());
+
+                given(airlineEpimsDataLoader.getAirlineEpimsIDList())
+                    .willReturn(airlineEpimsIDList);
+
                 CaseData caseData = CaseData.builder().build();
                 CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
 
