@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -69,7 +70,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
                 .applicant1ResponseDate(LocalDateTime.now())
                 .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
-      
+
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
         CaseData updatedData = builder.build();
@@ -93,11 +94,11 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private boolean isJudicialReferralAllowed(CaseData caseData) {
         return (caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence())
-            && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation();
+            && (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation());
     }
 
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
-        if (updatedData.hasClaimantAgreedToFreeMediation()) {
+        if (updatedData.hasClaimantAgreedToFreeMediation() && updatedData.hasDefendantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
         } else if (!updatedData.hasApplicantProceededWithClaim()) {
             response.state(updatedData.isClaimantConfirmAmountPaidPartAdmit() || updatedData.hasDefendantPayedTheAmountClaimed()

@@ -27,10 +27,12 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +77,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private ResponseOneVOneShowTagService responseOneVOneShowTagService;
+    @MockBean
+    private Time time;
 
     @Nested
     class AboutToStartCallback {
@@ -93,6 +97,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
 
+        private final LocalDateTime submittedDate = LocalDateTime.now();
+
         @BeforeEach
         void before() {
             LocationRefData locationRefData = LocationRefData.builder().siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
@@ -101,6 +107,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .epimmsId("111").build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
+            given(time.now()).willReturn(submittedDate);
             given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(locationRefData));
         }
 
@@ -150,6 +157,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                         .build()).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
+                .applicant1ProceedWithClaim(YES)
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                 .applicant1DQ(applicant1DQ)
@@ -187,6 +195,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                     .caseDataLip(caseDataLiP)
                     .applicant1AcceptAdmitAmountPaidSpec(NO)
+                    .applicant1ProceedWithClaim(YES)
                     .atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -203,6 +212,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(caseDataLiP)
+                .applicant1ProceedWithClaim(YES)
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -221,6 +231,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData =
                 CaseDataBuilder.builder().caseDataLip(caseDataLiP).applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                     .atStateClaimIssued()
+                    .applicant1ProceedWithClaim(YES)
                     .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -253,7 +264,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
                     MediationDecision.Yes).build())
                             .build())
-                .build();
+                .build().toBuilder()
+                .responseClaimMediationSpecRequired(YES).build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -278,8 +290,11 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsCompany_toAllFinalOrdersIssued() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                        MediationDecision.No).build()).build())
+                .applicant1ProceedWithClaim(YES)
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
                 .respondent1(Party.builder()
                                    .type(COMPANY)
                                    .companyName("Test Inc")
@@ -295,7 +310,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsOrganisation_toAllFinalOrdersIssued() {
             CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
+                .applicant1ProceedWithClaim(YES)
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
                 .respondent1(Party.builder()
                                  .type(ORGANISATION)
