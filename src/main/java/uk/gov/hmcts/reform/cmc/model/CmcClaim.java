@@ -399,4 +399,23 @@ public class CmcClaim implements Claim {
     public boolean isClaimantDefaultJudgement() {
         return false;
     }
+
+    @Override
+    public boolean isPartialAdmissionAccepted() {
+
+        return hasResponse() && response.isPartAdmitPayImmediately()
+            && !response.getPaymentIntention().hasAlreadyPaid()
+            && claimantAcceptedDefendantResponse();
+    }
+
+    @Override
+    public boolean isPaymentPlanAccepted() {
+        //return false;
+
+        return (hasResponse() && (response.isPartAdmit() || response.isFullAdmit())
+            && (response.getPaymentIntention().isPayByDate() || response.getPaymentIntention().isPayByInstallments()));
+          //  && (response.getResponseType().isCompany() || response.getRespondent1().isOrganisation())
+          //  && response.hasApplicantRejectedRepaymentPlan());
+    }
+
 }

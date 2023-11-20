@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected
     ),
@@ -36,6 +37,9 @@ public enum DashboardClaimStatus {
     RESPONSE_BY_POST(
         Claim::isPaperResponse
     ),
+    CLAIMANT_REJECTED_PAYMENT_PLAN(
+        Claim::isPaymentPlanAccepted
+    ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
     ),
@@ -44,6 +48,9 @@ public enum DashboardClaimStatus {
     ),
     SETTLED(
         Claim::isSettled
+    ),
+    REQUESTED_COUNTRY_COURT_JUDGEMENT(
+        Claim::claimantRequestedCountyCourtJudgement
     ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
@@ -64,9 +71,7 @@ public enum DashboardClaimStatus {
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
-    REQUESTED_COUNTRY_COURT_JUDGEMENT(
-        Claim::claimantRequestedCountyCourtJudgement
-    ),
+
     DEFAULT_JUDGEMENT(
         Claim::isClaimantDefaultJudgement
     ),
@@ -114,6 +119,10 @@ public enum DashboardClaimStatus {
     ),
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
+    ),
+
+    CLAIMANT_ACCEPTED_PARTIAL_ADMISSION(
+        Claim::isPartialAdmissionAccepted
     ),
 
     NO_STATUS(c -> false);
