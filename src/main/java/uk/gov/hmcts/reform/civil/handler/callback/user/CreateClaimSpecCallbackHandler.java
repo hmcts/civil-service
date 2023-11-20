@@ -14,8 +14,10 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
@@ -173,6 +175,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final FeatureToggleService toggleService;
     private final StateFlowEngine stateFlowEngine;
     private final CaseFlagsInitialiser caseFlagInitialiser;
+    private final ToggleConfiguration toggleConfiguration;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
 
     @Value("${court-location.specified-claim.region-id}")
@@ -228,6 +231,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             )
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
+            .put(callbackKey(MID, "is-flight-delay-claim"), this::isFlightDelayClaim)
             .build();
     }
 
@@ -446,10 +450,15 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         dataBuilder
             .caseManagementLocation(CaseLocationCivil.builder().region(regionId).baseLocation(epimmsId).build())
-            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1())
+            .respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build())
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        ofNullable(caseData.getRespondent2()).ifPresent(dataBuilder::respondent2DetailsForClaimDetailsTab);
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            dataBuilder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
+        }
+
+        dataBuilder.caseAccessCategory(CaseCategory.SPEC_CLAIM);
+        dataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
 
         //assign case management category to the case and caseNameHMCTSinternal
         dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
@@ -890,6 +899,23 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(validateEmailService.validate(caseData.getRespondentSolicitor2EmailAddress()))
+            .build();
+    }
+
+    private CallbackResponse isFlightDelayClaim(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+
+        if (toggleService.isSdoR2Enabled()) {
+            caseDataBuilder.isFlightDelayClaim(callbackParams.getCaseData().getIsFlightDelayClaim());
+            if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
+                caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
+            } else {
+                caseDataBuilder.claimType(null);
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 

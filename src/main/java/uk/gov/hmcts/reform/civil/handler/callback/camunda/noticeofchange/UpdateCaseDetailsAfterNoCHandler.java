@@ -190,7 +190,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         caseDataBuilder.respondent2OrgRegistered(YES)
             .respondentSolicitor2OrganisationDetails(null)
-            .respondent2Represented(YES);
+            .respondent2Represented(YES)
+            .defendant2LIPAtClaimIssued(NO);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor2ServiceAddress(null)
@@ -217,7 +218,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
 
         caseDataBuilder.respondent1OrgRegistered(YES)
             .respondentSolicitor1OrganisationDetails(null)
-            .respondent1Represented(YES);
+            .respondent1Represented(YES)
+            .defendant1LIPAtClaimIssued(NO);
 
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             caseDataBuilder.respondentSolicitor1ServiceAddress(null)

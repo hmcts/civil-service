@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +23,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -200,6 +203,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private FeatureToggleService toggleService;
+
+    @MockBean
+    private ToggleConfiguration toggleConfiguration;
 
     @Nested
     class AboutToStartCallback {
@@ -1617,6 +1623,47 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class IsFlightDelayClaimMidCallback {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Enabled(Boolean toggleStat) {
+            // Given
+            YesOrNo yesOrNo = toggleStat ? YES : NO;
+            CaseData caseData = CaseData.builder().isFlightDelayClaim(yesOrNo)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "is-flight-delay-claim");
+            // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData()).containsEntry("isFlightDelayClaim", toggleStat ? "Yes" : "No");
+            if (toggleStat) {
+                assertThat(response.getData()).containsEntry("claimType", "FLIGHT_DELAY");
+            } else {
+                assertThat(response.getData()).doesNotHaveToString("claimType");
+            }
+        }
+
+        @Test
+        void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Disabled() {
+            // Given
+            CaseData caseData = CaseData.builder().isFlightDelayClaim(YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "is-flight-delay-claim");
+            // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(false);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData()).doesNotHaveToString("isFlightDelayClaim");
+            assertThat(response.getData()).doesNotHaveToString("claimType");
+        }
+    }
+
+    @Nested
     class AboutToSubmitCallbackV1 {
 
         private CallbackParams params;
@@ -1637,7 +1684,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(UserDetails.builder().email(EMAIL).id(userId).build());
 
             given(time.now()).willReturn(submittedDate);
-
+            given(toggleConfiguration.getFeatureToggle()).willReturn("WA 4");
             given(defendantPinToPostLRspecService.buildDefendantPinToPost())
                 .willReturn(DefendantPinToPostLRspec.builder()
                                 .accessCode(

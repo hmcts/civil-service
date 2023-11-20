@@ -160,6 +160,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getUnassignedCaseListDisplayOrganisationReferences()).isEmpty();
             assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress())
                 .isEqualTo("requester@example.com");
+            assertThat(updatedCaseData.getDefendant1LIPAtClaimIssued()).isEqualTo(NO);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
         }
@@ -191,6 +192,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent1OrgRegistered()).isEqualTo(YES);
             assertThat(updatedCaseData.getRespondentSolicitor1EmailAddress())
                 .isEqualTo("requester@example.com");
+            assertThat(updatedCaseData.getDefendant1LIPAtClaimIssued()).isEqualTo(NO);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
         }
@@ -232,6 +234,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getUnassignedCaseListDisplayOrganisationReferences()).isEmpty();
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
                 .isEqualTo("requester@example.com");
+            assertThat(updatedCaseData.getDefendant2LIPAtClaimIssued()).isEqualTo(NO);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
@@ -310,6 +313,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
                 .isEqualTo("requester@example.com");
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
+            assertThat(updatedCaseData.getDefendant2LIPAtClaimIssued()).isEqualTo(NO);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
@@ -382,6 +386,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
                 .isEqualTo("requester@example.com");
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
+            assertThat(updatedCaseData.getDefendant2LIPAtClaimIssued()).isEqualTo(NO);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
@@ -453,6 +458,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
                 .isEqualTo("requester@example.com");
+            assertThat(updatedCaseData.getDefendant2LIPAtClaimIssued()).isEqualTo(NO);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
@@ -488,6 +494,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(getMultiPartyScenario(updatedCaseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
             assertThat(updatedCaseData.getRespondentSolicitor2EmailAddress())
                 .isEqualTo("requester@example.com");
+            assertThat(updatedCaseData.getDefendant2LIPAtClaimIssued()).isEqualTo(NO);
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNull();
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();

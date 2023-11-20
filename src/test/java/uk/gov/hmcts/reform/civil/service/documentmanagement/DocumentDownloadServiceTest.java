@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -19,12 +18,11 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 public class DocumentDownloadServiceTest {
 
+    private static final String BEARER_TOKEN = "Bearer Token";
     @Mock
     private UserService userService;
     @Mock
     private DocumentManagementService documentManagementService;
-    @Mock
-    private SystemUpdateUserConfiguration userConfig;
 
     @InjectMocks
     private DocumentDownloadService documentDownloadService;
@@ -40,7 +38,7 @@ public class DocumentDownloadServiceTest {
         when(documentManagementService.downloadDocumentWithMetaData(anyString(), anyString())).thenReturn(expectedDoc);
 
         // when
-        DownloadedDocumentResponse downloadedDoc = documentDownloadService.downloadDocument(documentId);
+        DownloadedDocumentResponse downloadedDoc = documentDownloadService.downloadDocument(BEARER_TOKEN, documentId);
         //Then
         assertEquals(downloadedDoc, expectedDoc);
     }

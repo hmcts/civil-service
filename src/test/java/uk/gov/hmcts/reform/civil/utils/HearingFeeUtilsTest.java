@@ -35,7 +35,7 @@ class HearingFeeUtilsTest {
     @CsvSource({
         // current date,hearing date,expected
         "2022-10-27,2022-11-04,2022-11-03",   // based on bug report: on the boundary of exactly 7 days
-        "2022-10-01,2022-11-14,2022-10-29",   // hearing date more than 36 days away -> expect in 28 straight days time
+        "2022-10-01,2022-11-14,2022-10-17",   // hearing date more than 36 days away -> expect in 28 straight days time
         "2022-10-01,2022-10-14,2022-10-08",   // hearing date less than 36 days away -> expect in 7 straight days
         "2022-10-01,2022-10-10,2022-10-08"    // should never happen. If it does the deadline is the hearing day
     })

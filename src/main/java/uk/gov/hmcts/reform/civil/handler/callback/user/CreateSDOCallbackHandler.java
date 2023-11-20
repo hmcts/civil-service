@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -13,30 +14,26 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
-import uk.gov.hmcts.reform.civil.service.CategoryService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
@@ -73,15 +70,19 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
-import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -90,6 +91,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -97,10 +99,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
+import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CreateSDOCallbackHandler extends CallbackHandler {
@@ -216,7 +222,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackMethodInPerson(locationsList);
         updatedData.smallClaimsMethodInPerson(locationsList);
 
-        List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
+        List<OrderDetailsPagesSectionsToggle> checkList = List.of(SHOW);
         setCheckList(updatedData, checkList);
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
@@ -708,15 +714,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             ));
         DynamicList locationsList;
         if (matchingLocation.isPresent()) {
-            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
                                                  matchingLocation.get(), true
             );
         } else {
-            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
                                                  null, true
             );
         }
         return locationsList;
+    }
+
+    private String getLocationEpimms(LocationRefData location) {
+        return location.getEpimmsId();
     }
 
     private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
@@ -729,9 +739,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.setFastTrackFlag(YesOrNo.NO).build();
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            updatedData.setSmallClaimsFlag(YesOrNo.YES).build();
+            updatedData.setSmallClaimsFlag(YES).build();
         } else if (SdoHelper.isFastTrack(caseData)) {
-            updatedData.setFastTrackFlag(YesOrNo.YES).build();
+            updatedData.setFastTrackFlag(YES).build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -745,17 +755,37 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             : callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        CaseDocument document = sdoGeneratorService.generate(
-            caseData,
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
-
-        if (document != null) {
-            updatedData.sdoOrderDocument(document);
+        List<String> errors = new ArrayList<>();
+        if (nonNull(caseData.getSmallClaimsWitnessStatement())) {
+            String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
+            String inputValue2 = caseData.getSmallClaimsWitnessStatement().getInput3();
+            final String witnessValidationErrorMessage = validateNegativeWitness(inputValue1, inputValue2);
+            if (!witnessValidationErrorMessage.isEmpty()) {
+                errors.add(witnessValidationErrorMessage);
+            }
+        } else if (nonNull(caseData.getFastTrackWitnessOfFact())) {
+            String inputValue1 = caseData.getFastTrackWitnessOfFact().getInput2();
+            String inputValue2 = caseData.getFastTrackWitnessOfFact().getInput3();
+            final String witnessValidationErrorMessage = validateNegativeWitness(inputValue1, inputValue2);
+            if (!witnessValidationErrorMessage.isEmpty()) {
+                errors.add(witnessValidationErrorMessage);
+            }
         }
-        assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
+
+        if (errors.isEmpty()) {
+            CaseDocument document = sdoGeneratorService.generate(
+                caseData,
+                callbackParams.getParams().get(BEARER_TOKEN).toString()
+            );
+
+            if (document != null) {
+                updatedData.sdoOrderDocument(document);
+            }
+            assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .data(updatedData.build().toMap(objectMapper))
             .build();
     }
@@ -816,38 +846,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return null;
     }
 
-    private String getHearingInPersonLocation(CaseData caseData) {
-        if (caseData.getDrawDirectionsOrderRequired() == YesOrNo.YES) {
-            if (caseData.getDrawDirectionsOrderSmallClaims() == YesOrNo.YES) {
-                return getHearingInPersonSmall(caseData);
-            } else {
-                return getHearingInPersonFast(caseData);
-            }
-        } else if (caseData.getClaimsTrack() == ClaimsTrack.fastTrack) {
-            return getHearingInPersonFast(caseData);
-        } else if (caseData.getClaimsTrack() == ClaimsTrack.smallClaimsTrack) {
-            return getHearingInPersonSmall(caseData);
-        } else if (Optional.ofNullable(caseData.getDisposalHearingMethodToggle())
-            .map(c -> c.contains(OrderDetailsPagesSectionsToggle.SHOW)).orElse(Boolean.FALSE)
-            && caseData.getDisposalHearingMethod() == DisposalHearingMethod.disposalHearingMethodInPerson
-            && Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            return caseData.getDisposalHearingMethodInPerson().getValue().getLabel();
-        }
-        return null;
-    }
-
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
         CaseData caseData = callbackParams.getCaseData();
-
-        String hearingInPersonLocation = getHearingInPersonLocation(caseData);
-        locationRefDataService.getLocationMatchingLabel(
-                hearingInPersonLocation,
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            )
-            .ifPresent(locationRefData -> LocationHelper.updateWithLocation(dataBuilder, locationRefData));
 
         CaseDocument document = caseData.getSdoOrderDocument();
         if (document != null) {
@@ -861,9 +863,70 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
+        if (featureToggleService.isEarlyAdoptersEnabled()) {
+            if (featureToggleService.isLocationWhiteListedForCaseProgression(
+                getEpimmsId(caseData))) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YES);
+            } else {
+                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YesOrNo.NO);
+            }
+        }
+
+        dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
+            caseData.getDisposalHearingMethodInPerson()));
+        dataBuilder.fastTrackMethodInPerson(deleteLocationList(
+            caseData.getFastTrackMethodInPerson()));
+        dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
+            caseData.getSmallClaimsMethodInPerson()));
+
+        System.out.println("before about to submit");
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private DynamicList deleteLocationList(DynamicList list) {
+        if (isNull(list)) {
+            return null;
+        }
+        return DynamicList.builder().value(list.getValue()).build();
+    }
+
+    private String getEpimmsId(CaseData caseData) {
+
+        if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
+            return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
+        }
+        if (SdoHelper.isFastTrack(caseData)) {
+            return caseData.getFastTrackMethodInPerson().getValue().getCode();
+        }
+        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
+        }
+        throw new IllegalArgumentException("Could not determine claim track");
+    }
+
+    private boolean nonNull(Object object) {
+        if (object != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private String validateNegativeWitness(String inputValue1, String inputValue2) {
+        final String errorMessage = "";
+        if (inputValue1 != null && inputValue2 != null) {
+            int number1 = Integer.parseInt(inputValue1);
+            int number2 = Integer.parseInt(inputValue2);
+            if (number1 < 0 || number2 < 0) {
+                return "The number entered cannot be less than zero";
+            }
+        }
+        return errorMessage;
     }
 
     private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {

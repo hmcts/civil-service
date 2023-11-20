@@ -24,7 +24,10 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.ExtendedDeadlineDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
+import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -34,6 +37,7 @@ import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService;
 import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerEventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
 import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
+import uk.gov.hmcts.reform.civil.service.citizen.repaymentplan.RepaymentPlanDecisionService;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
@@ -65,6 +69,7 @@ public class CasesController {
     private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
     private final PostcodeValidator postcodeValidator;
     private final UserInformationService userInformationService;
+    private final RepaymentPlanDecisionService repaymentPlanDecisionService;
 
     @GetMapping(path = {
         "/{caseId}",
@@ -170,8 +175,9 @@ public class CasesController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized")})
-    public ResponseEntity<LocalDate> calculateNewResponseDeadline(@RequestBody LocalDate extendedDeadline) {
-        LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(extendedDeadline);
+    public ResponseEntity<LocalDate> calculateNewResponseDeadline(@RequestBody ExtendedDeadlineDto deadlineDateDetails) {
+        LocalDate calculatedDeadline = deadlineExtensionCalculatorService.calculateExtendedDeadline(
+            deadlineDateDetails.getResponseDate(), deadlineDateDetails.getPlusDays());
         return new ResponseEntity<>(calculatedDeadline, HttpStatus.OK);
     }
 
@@ -254,6 +260,16 @@ public class CasesController {
         @PathVariable("caseId") String caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         return ResponseEntity.ok(userInformationService.getUserCaseRoles(caseId, authorization));
+    }
+
+    @PostMapping(path = "/{caseId}/courtDecision")
+    @Operation(summary = "Calculates decision on proposed claimant repayment")
+    public RepaymentDecisionType calculateDecisionOnClaimantProposedRepayment(
+        @PathVariable("caseId") Long caseId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
+        @RequestBody ClaimantProposedPlan claimantProposedPlan) {
+        var caseDetails = coreCaseDataService.getCase(caseId, authorisation);
+        return repaymentPlanDecisionService.getCalculatedDecision(caseDetails, claimantProposedPlan);
     }
 
 }

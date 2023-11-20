@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Expert;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -35,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import static java.lang.String.format;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -96,6 +98,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private final UserService userService;
     private final ObjectMapper objectMapper;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final PostcodeValidator postcodeValidator;
 
     @Override
@@ -344,14 +347,26 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         updateExperts(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
         updateWitnesses(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
 
+        // last step before clearing update details form
+        caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, builder);
+
         // clear updateDetailsForm
-        builder.updateDetailsForm(UpdateDetailsForm.builder()
-                                      .manageContactDetailsEventUsed(YES)
-                                      .build());
+        builder.updateDetailsForm(UpdateDetailsForm.builder().manageContactDetailsEventUsed(YES).build());
+
+        // update claim details tab
+        updateClaimDetailsTab(caseData, builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void updateClaimDetailsTab(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        builder.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
+
+        if (ofNullable(caseData.getRespondent2()).isPresent()) {
+            builder.respondent2DetailsForClaimDetailsTab(caseData.getRespondent2().toBuilder().flags(null).build());
+        }
     }
 
     // wip can't be tested yet because need to get ids from new ticket: CIV-10382
