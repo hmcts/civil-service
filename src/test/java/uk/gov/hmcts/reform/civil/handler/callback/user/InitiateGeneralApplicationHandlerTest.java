@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
@@ -111,6 +113,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     protected UserRoleCaching userRoleCaching;
+    @MockBean
+    protected FeatureToggleService featureToggleService;
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
@@ -121,6 +125,34 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private final BigDecimal fee275 = new BigDecimal("27500");
     private static final String FEE_CODE = "test_fee_code";
     private static final String FEE_VERSION = "1";
+
+    @Test
+    void shouldThrowError_whenEpimsIdIsNotAValidRegion() {
+        CaseData caseData = CaseDataBuilder.builder().caseManagementLocation(CaseLocationCivil.builder()
+                                                                                 .baseLocation("45678")
+                                                                                 .region("4").build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(false);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldNotThrowError_whenEpimsIdIsValidRegion() {
+        CaseData caseData = CaseDataBuilder.builder().caseManagementLocation(CaseLocationCivil.builder()
+                                                                                 .baseLocation("45678")
+                                                                                 .region("4").build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
 
     @Nested
     class MidEventForUrgencyCheck extends LocationRefSampleDataBuilder {

@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.utils.UserRoleCaching;
@@ -62,12 +63,14 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(INITIATE_GENERAL_APPLICATION);
     private static final String RESP_NOT_ASSIGNED_ERROR = "Application cannot be created until all the required "
             + "respondent solicitor are assigned to the case.";
+    private static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
     private final IdamClient idamClient;
     private final UserRoleCaching userRoleCaching;
     private final GeneralAppFeesService feesService;
     private final LocationRefDataService locationRefDataService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -95,6 +98,13 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
+
+        if (featureToggleService.isEarlyAdoptersEnabled()
+            && !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
+                                                                                  .getBaseLocation()))) {
+            errors.add(NOT_IN_EA_REGION);
+        }
+
         if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
