@@ -44,7 +44,7 @@ public class NoOngoingBusinessProcessAspect {
         if (callbackParams.getType() == SUBMITTED
             || caseEvent.isCamundaEvent()
             || caseData.hasNoOngoingBusinessProcess()
-            || generalAppsOrSDOOrReferToJudge(callbackParams)
+            || generalAppsOrSDOOrReferToJudgeOrCuiServiceRequest(callbackParams)
             || caseEvent.equals(CaseEvent.migrateCase)
         ) {
             return joinPoint.proceed();
@@ -67,9 +67,10 @@ public class NoOngoingBusinessProcessAspect {
             .build();
     }
 
-    private boolean generalAppsOrSDOOrReferToJudge(CallbackParams callbackParams) {
+    private boolean generalAppsOrSDOOrReferToJudgeOrCuiServiceRequest(CallbackParams callbackParams) {
         return (valueOf(CaseEvent.INITIATE_GENERAL_APPLICATION).equals(callbackParams.getRequest().getEventId())
             || valueOf(CaseEvent.CREATE_SDO).equals(callbackParams.getRequest().getEventId())
-            || valueOf(CaseEvent.REFER_TO_JUDGE).equals(callbackParams.getRequest().getEventId()));
+            || valueOf(CaseEvent.REFER_TO_JUDGE).equals(callbackParams.getRequest().getEventId())
+            || valueOf(CaseEvent.CREATE_SERVICE_REQUEST_CUI).equals(callbackParams.getRequest().getEventId()));
     }
 }
