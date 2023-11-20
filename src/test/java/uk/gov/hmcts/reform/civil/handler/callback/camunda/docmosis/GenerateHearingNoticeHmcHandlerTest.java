@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
@@ -62,6 +64,8 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
     private HearingNoticeCamundaService camundaService;
     @MockBean
     private HearingNoticeHmcGenerator hearingNoticeHmcGenerator;
+    @MockBean
+    private LocationRefDataService locationRefDataService;
 
     private static Long CASE_ID = 1L;
     private static String HEARING_ID = "1234";
@@ -108,9 +112,13 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
             .caseId(CASE_ID)
             .build();
 
+        List<LocationRefData> locations = List.of(LocationRefData.builder()
+                                                      .epimmsId(EPIMS).build());
+        when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString()))
+            .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
-        when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString())).thenReturn(List.of(CASE_DOCUMENT));
+        when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString())).thenReturn(List.of(CASE_DOCUMENT));
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
@@ -168,9 +176,13 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
             .caseId(CASE_ID)
             .build();
 
+        List<LocationRefData> locations = List.of(LocationRefData.builder()
+                                                      .epimmsId(EPIMS).build());
+        when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString()))
+            .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
-        when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString())).thenReturn(List.of(CASE_DOCUMENT));
+        when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString())).thenReturn(List.of(CASE_DOCUMENT));
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
