@@ -264,6 +264,7 @@ public class InitiateGeneralApplicationServiceHelper {
             userRoles = caseAccessDataStoreApi.getUserRoles(
                 getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
         }
+        log.info("UserRoles from API :" + userRoles);
         return userRoles;
     }
 
