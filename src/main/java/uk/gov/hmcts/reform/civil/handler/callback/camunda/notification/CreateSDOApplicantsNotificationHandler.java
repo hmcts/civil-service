@@ -57,12 +57,6 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
     private CallbackResponse notifyApplicantsSolicitorSDOTriggered(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        String unspecTemplate = featureToggleService.isEarlyAdoptersEnabled()
-            ? notificationsProperties.getSdoOrderedEA() : notificationsProperties.getSdoOrdered();
-
-        String specTemplate = featureToggleService.isEarlyAdoptersEnabled()
-            ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
-
         notificationService.sendMail(
             getRecipientEmail(caseData),
             getNotificationTemplate(caseData),
@@ -96,13 +90,20 @@ public class CreateSDOApplicantsNotificationHandler extends CallbackHandler impl
     }
 
     private String getNotificationTemplate(CaseData caseData) {
+
+        String unspecTemplate = featureToggleService.isEarlyAdoptersEnabled()
+            ? notificationsProperties.getSdoOrderedEA() : notificationsProperties.getSdoOrdered();
+
+        String specTemplate = featureToggleService.isEarlyAdoptersEnabled()
+            ? notificationsProperties.getSdoOrderedSpecEA() : notificationsProperties.getSdoOrderedSpec();
+
         if (caseData.isApplicantLiP()) {
             return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
         } else {
             if (caseData.getCaseAccessCategory() == CaseCategory.SPEC_CLAIM) {
-                return notificationsProperties.getSdoOrderedSpec();
+                return specTemplate;
             } else {
-                return notificationsProperties.getSdoOrdered();
+                return unspecTemplate;
             }
         }
     }
