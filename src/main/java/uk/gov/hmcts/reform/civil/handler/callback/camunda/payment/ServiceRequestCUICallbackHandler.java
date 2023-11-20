@@ -30,9 +30,16 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUES
 public class ServiceRequestCUICallbackHandler extends CallbackHandler {
 
     private static final String ERROR_MESSAGE = "Technical error occurred";
+    private static final String TASK_ID = "CreateServiceRequestCUI";
+
 
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
+    }
 
     @Override
     protected Map<String, Callback> callbacks() {
