@@ -50,7 +50,10 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addApplicantExpertAndWitnessFlagsStructure;
+import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.addRespondentDQPartiesFlagStructure;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNameInternal;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNamePublic;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LITIGATION_FRIEND_ID;
@@ -345,9 +348,16 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
 
         updateExperts(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
         updateWitnesses(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
+
+        if (isParty(partyChosen) || isLitigationFriend(partyChosen)) {
+            // update case name for hmc if applicant/respondent/litigation friend was updated
+            builder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
+            builder.caseNamePublic(buildCaseNamePublic(caseData));
+        }
 
         // last step before clearing update details form
         caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, builder);
