@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
@@ -95,6 +94,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNameInternal;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
@@ -477,7 +477,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
 
         //assign case management category to the case and caseNameHMCTSinternal
-        dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+        dataBuilder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
 
         CaseManagementCategoryElement civil =
             CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
@@ -1003,30 +1003,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             || caseData.getRespondent1OrgRegistered() == NO
             || caseData.getRespondent2Represented() == NO
             || caseData.getRespondent2OrgRegistered() == NO);
-    }
-
-    public StringBuilder caseParticipants(CaseData caseData) {
-        StringBuilder participantString = new StringBuilder();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
-            || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
-            participantString.append(caseData.getApplicant1().getPartyName())
-                .append(" v ").append(caseData.getRespondent1().getPartyName())
-                .append(" and ").append(caseData.getRespondent2().getPartyName());
-
-        } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
-            participantString.append(caseData.getApplicant1().getPartyName())
-                .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
-                .append(caseData.getRespondent1()
-                            .getPartyName());
-
-        } else {
-            participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
-                .append(caseData.getRespondent1()
-                            .getPartyName());
-        }
-        return participantString;
-
     }
 
     private CaseLocationCivil getAirlineCaseLocation(String airline, CallbackParams callbackParams) {
