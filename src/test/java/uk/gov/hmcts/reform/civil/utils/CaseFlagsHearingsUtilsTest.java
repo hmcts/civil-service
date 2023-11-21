@@ -187,25 +187,25 @@ public class CaseFlagsHearingsUtilsTest {
     }
 
     private PartyFlags getRespondent1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Respondent 1", details, caseData.getRespondent1().getPartyID());
+        return getFlagsForParty(caseData.getRespondent1().getPartyName(), "Defendant 1", details, caseData.getRespondent1().getPartyID());
     }
 
     private PartyFlags getApplicant1Flags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty(caseData.getApplicant1().getPartyName(), "Applicant 1", details, caseData.getApplicant1().getPartyID());
+        return getFlagsForParty(caseData.getApplicant1().getPartyName(), "Claimant 1", details, caseData.getApplicant1().getPartyID());
     }
 
     private PartyFlags getRespondent1LitFriendFlags(CaseData caseData, List<Element<FlagDetail>> details) {
         return getFlagsForParty(caseData.getRespondent1LitigationFriend().getFullName(),
-                                "Respondent 1 Litigation Friend", details, caseData.getRespondent1LitigationFriend().getPartyID());
+                                "Defendant 1 Litigation Friend", details, caseData.getRespondent1LitigationFriend().getPartyID());
     }
 
     private PartyFlags getRespondent1WitnessFlags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty("W First W Last", "Respondent 1 Witness", details,
+        return getFlagsForParty("W First W Last", "Defendant 1 Witness", details,
                                 "res-1-witness-party-id");
     }
 
     private PartyFlags getRespondent1ExpertsFlags(CaseData caseData, List<Element<FlagDetail>> details) {
-        return getFlagsForParty("E First E Last", "Respondent 1 Expert", details,
+        return getFlagsForParty("E First E Last", "Defendant 1 Expert", details,
                                 "res-1-expert-party-id");
     }
 

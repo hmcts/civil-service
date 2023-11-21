@@ -29,8 +29,9 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
-import uk.gov.hmcts.reform.civil.model.FlightDelay;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
@@ -1638,7 +1639,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class FlightDelayClaimMidCallbacks {
+    class FlightDelayDetailsMidCallbacks {
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Enabled(Boolean toggleStat) {
@@ -1677,30 +1678,37 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).doesNotHaveToString("claimType");
         }
 
-        //        @Test
-        //        void shouldGetAirlineList_whenRequired() {
-        //            // Given
-        //            CaseData caseData = CaseData.builder().build();
-        //            CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
-        //
-        //            // When
-        //            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        //
-        //            // Then
-        //            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
-        //                .extracting("list_items").asList().extracting("label")
-        //                .contains("BA/Cityflyer");
-        //
-        //            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
-        //                .extracting("list_items").asList().extracting("label")
-        //                .contains("OTHER");
-        //        }
+        @Test
+        void shouldGetAirlineList_whenRequired() {
+            // Given
+            List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
+            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
+            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("OTHER").epimsID("111111").build());
+
+            given(airlineEpimsDataLoader.getAirlineEpimsIDList())
+                .willReturn(airlineEpimsIDList);
+
+            CaseData caseData = CaseData.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")
+                .extracting("list_items").asList().extracting("label")
+                .contains("BA/Cityflyer");
+
+            assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")
+                .extracting("list_items").asList().extracting("label")
+                .contains("OTHER");
+        }
 
         @Test
         void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
             // Given
             CaseData caseData = CaseData.builder()
-                .flightDelay(FlightDelay.builder().flightDetailsScheduledDate(now().plusDays(1)).build()).build();
+                .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().plusDays(1)).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
             // When
@@ -1715,7 +1723,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnErrorWhenDateOfFlightIsTodayOrInThePast(Integer days) {
             // Given
             CaseData caseData = CaseData.builder()
-                .flightDelay(FlightDelay.builder().flightDetailsScheduledDate(now().minusDays(days)).build()).build();
+                .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().minusDays(days)).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
             // When
@@ -2178,14 +2186,16 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                                   .build());
                 given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                     .willReturn(locations);
+
+                when(toggleService.isSdoR2Enabled()).thenReturn(true);
             }
 
             @Test
             void shouldReturnExpectedCourtLocation_whenAirlineExists() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                    .flightDelay(FlightDelay.builder()
-                                     .flightDetailsAirlineList(
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(
                                          DynamicList.builder()
                                              .value(DynamicListElement.builder().code("GULF_AIR").label("Gulf Air")
                                                         .build()).build()).build()).build();
@@ -2195,15 +2205,15 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").extracting("region").isEqualTo("Site Name");
+                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").extracting("region").isEqualTo("Site Name");
             }
 
             @Test
             void shouldReturnExpectedCourtLocation_whenOtherAirlineSelected() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                    .flightDelay(FlightDelay.builder()
-                                     .flightDetailsAirlineList(
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(
                                          DynamicList.builder()
                                              .value(DynamicListElement.builder().code("OTHER").label("OTHER")
                                                         .build()).build()).build()).build();
@@ -2216,7 +2226,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").isNull();
+                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").isNull();
             }
         }
     }

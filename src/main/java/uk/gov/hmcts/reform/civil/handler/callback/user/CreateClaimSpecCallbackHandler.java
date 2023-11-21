@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
@@ -30,7 +29,7 @@ import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.FlightDelay;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -95,6 +94,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNameInternal;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
@@ -477,7 +477,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
 
         //assign case management category to the case and caseNameHMCTSinternal
-        dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+        dataBuilder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
 
         CaseManagementCategoryElement civil =
             CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
@@ -568,15 +568,15 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     caseData.getSpecRespondentCorrespondenceAddressdetails());
         }
 
-        if ((callbackParams.getCaseData().getFlightDelay() != null)) {
-            FlightDelay flightDelay = callbackParams.getCaseData().getFlightDelay();
-            String selectedAirlineCode = flightDelay.getFlightDetailsAirlineList().getValue().getCode();
+        if ((toggleService.isSdoR2Enabled() && callbackParams.getCaseData().getFlightDelayDetails() != null)) {
+            FlightDelayDetails flightDelayDetails = callbackParams.getCaseData().getFlightDelayDetails();
+            String selectedAirlineCode = flightDelayDetails.getAirlineList().getValue().getCode();
 
-            dataBuilder.flightDelay(FlightDelay.builder()
-                                        .flightDetailsAirlineList(DynamicList.builder().value(flightDelay.getFlightDetailsAirlineList().getValue()).build())
-                                        .flightDetailsNameOfAirline(flightDelay.getFlightDetailsNameOfAirline())
-                                        .flightDetailsFlightNumber(flightDelay.getFlightDetailsFlightNumber())
-                                        .flightDetailsScheduledDate(flightDelay.getFlightDetailsScheduledDate())
+            dataBuilder.flightDelayDetails(FlightDelayDetails.builder()
+                                        .airlineList(DynamicList.builder().value(flightDelayDetails.getAirlineList().getValue()).build())
+                                        .nameOfAirline(flightDelayDetails.getNameOfAirline())
+                                        .flightNumber(flightDelayDetails.getFlightNumber())
+                                        .scheduledDate(flightDelayDetails.getScheduledDate())
                                         .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, callbackParams))
                                         .build());
         }
@@ -957,8 +957,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         DynamicList dropdownAirlineList = DynamicList.builder()
             .listItems(airlineList.getListItems()).build();
 
-        FlightDelay flightDelay = FlightDelay.builder().flightDetailsAirlineList(dropdownAirlineList).build();
-        caseDataBuilder.flightDelay(flightDelay);
+        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().airlineList(dropdownAirlineList).build();
+        caseDataBuilder.flightDelayDetails(flightDelayDetails);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -968,7 +968,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         List<String> errors = new ArrayList<>();
         LocalDate today = LocalDate.now();
-        LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelay().getFlightDetailsScheduledDate();
+        LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
         if (scheduledDate.isAfter(today)) {
             errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
         }
@@ -1003,30 +1003,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             || caseData.getRespondent1OrgRegistered() == NO
             || caseData.getRespondent2Represented() == NO
             || caseData.getRespondent2OrgRegistered() == NO);
-    }
-
-    public StringBuilder caseParticipants(CaseData caseData) {
-        StringBuilder participantString = new StringBuilder();
-        MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
-            || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
-            participantString.append(caseData.getApplicant1().getPartyName())
-                .append(" v ").append(caseData.getRespondent1().getPartyName())
-                .append(" and ").append(caseData.getRespondent2().getPartyName());
-
-        } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
-            participantString.append(caseData.getApplicant1().getPartyName())
-                .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
-                .append(caseData.getRespondent1()
-                            .getPartyName());
-
-        } else {
-            participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
-                .append(caseData.getRespondent1()
-                            .getPartyName());
-        }
-        return participantString;
-
     }
 
     private CaseLocationCivil getAirlineCaseLocation(String airline, CallbackParams callbackParams) {
