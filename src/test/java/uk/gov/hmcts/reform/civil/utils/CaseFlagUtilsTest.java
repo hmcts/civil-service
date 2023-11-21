@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.APPLICANT_SOLICITOR_EXPERT;
@@ -49,21 +50,27 @@ import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.filter;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.getAllCaseFlags;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ORG_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_WITNESSES_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_TWO_ORG_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_ORG_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_ONE_WITNESSES_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_LITIGATION_FRIEND_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_ORG_INDIVIDUALS_ID;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFENDANT_TWO_WITNESSES_ID;
 
 class CaseFlagUtilsTest {
 
@@ -1337,6 +1344,358 @@ class CaseFlagUtilsTest {
 
                 assertThat(actualFlags).isEqualTo(expectedFlags);
                 assertThat(individual.getPartyID()).isEqualTo("res-2-org-ind-party-id");
+            }
+        }
+
+        @Nested
+        class Experts {
+
+            @Test
+            void shouldCreateFlag_whenClaimantExpertsAdded() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_EXPERTS_ID).build())
+                    .build();
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .applicantExperts(wrapElements(PartyFlagStructure.builder()
+                                                       .firstName("Ex").lastName("Pert")
+                                                       .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getApplicantExperts()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
+                    .details(List.of())
+                    .roleOnCase("Claimant solicitor expert").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isNotNull();
+            }
+
+            @Test
+            void shouldUpdateFlagName_whenClaimantExpertNameUpdated() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .addApplicant1ExpertsAndWitnesses()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_EXPERTS_ID).build())
+                    .build();
+
+                PartyFlagStructure newParty = unwrapElements(caseData.getApplicantExperts()).get(0);
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .applicantExperts(wrapElements(newParty.toBuilder()
+                                                       .flags(Flags.builder()
+                                                                  .partyName("Exxxx Pert")
+                                                                  .roleOnCase("Claimant solicitor expert")
+                                                                  .details(wrapElements(List.of(
+                                                                      FlagDetail.builder().name("flag name").build()))).build())
+                                                       .firstName("Ex").lastName("Pert")
+                                                       .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getApplicantExperts()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
+                    .details(wrapElements(List.of(
+                        FlagDetail.builder().name("flag name").build())))
+                    .roleOnCase("Claimant solicitor expert").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isEqualTo("app-1-expert-party-id");
+            }
+
+            @Test
+            void shouldCreateFlag_whenRespondent1ExpertsAdded() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_EXPERTS_ID).build())
+                    .build();
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .respondent1Experts(wrapElements(PartyFlagStructure.builder()
+                                                         .firstName("Ex").lastName("Pert")
+                                                         .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1Experts()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
+                    .details(List.of())
+                    .roleOnCase("Defendant solicitor 1 expert").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isNotNull();
+            }
+
+            @Test
+            void shouldUpdateFlagName_whenRespondent1ExpertNameUpdated() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .addRespondent1ExpertsAndWitnesses()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_EXPERTS_ID).build())
+                    .build();
+
+                PartyFlagStructure newParty = unwrapElements(caseData.getRespondent1Experts()).get(0);
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .respondent1Experts(wrapElements(newParty.toBuilder()
+                                                         .flags(Flags.builder()
+                                                                    .partyName("Exxxx Pert")
+                                                                    .roleOnCase("Defendant solicitor 1 expert")
+                                                                    .details(wrapElements(List.of(
+                                                                        FlagDetail.builder().name("flag name").build()))).build())
+                                                         .firstName("Ex").lastName("Pert")
+                                                         .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1Experts()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
+                    .details(wrapElements(List.of(
+                        FlagDetail.builder().name("flag name").build())))
+                    .roleOnCase("Defendant solicitor 1 expert").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isEqualTo("res-1-expert-party-id");
+            }
+
+            @Test
+            void shouldCreateFlag_whenRespondent2ExpertsAdded() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_EXPERTS_ID).build())
+                    .build();
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .respondent2Experts(wrapElements(PartyFlagStructure.builder()
+                                                         .firstName("Ex").lastName("Pert")
+                                                         .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2Experts()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
+                    .details(List.of())
+                    .roleOnCase("Defendant solicitor 2 expert").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isNotNull();
+            }
+
+            @Test
+            void shouldUpdateFlagName_whenRespondent2ExpertNameUpdated() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atStateApplicantRespondToDefenceAndProceed(ONE_V_TWO_TWO_LEGAL_REP)
+                    .addRespondent2ExpertsAndWitnesses()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_EXPERTS_ID).build())
+                    .build();
+
+                PartyFlagStructure newParty = unwrapElements(caseData.getRespondent2Experts()).get(0);
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .respondent2Experts(wrapElements(newParty.toBuilder()
+                                                         .flags(Flags.builder()
+                                                                    .partyName("Exxxx Pert")
+                                                                    .roleOnCase("Defendant solicitor 2 expert")
+                                                                    .details(wrapElements(List.of(
+                                                                        FlagDetail.builder().name("flag name").build()))).build())
+                                                         .firstName("Ex").lastName("Pert")
+                                                         .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2Experts()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Ex Pert")
+                    .details(wrapElements(List.of(
+                        FlagDetail.builder().name("flag name").build())))
+                    .roleOnCase("Defendant solicitor 2 expert").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isEqualTo("res-2-expert-party-id");
+            }
+        }
+
+        @Nested
+        class Witnesses {
+
+            @Test
+            void shouldCreateFlag_whenClaimantWitnessAdded() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_WITNESSES_ID).build())
+                    .build();
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .applicantWitnesses(wrapElements(PartyFlagStructure.builder()
+                                                         .firstName("Wit").lastName("Ness")
+                                                         .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getApplicantWitnesses()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
+                    .details(List.of())
+                    .roleOnCase("Claimant solicitor witness").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isNotNull();
+            }
+
+            @Test
+            void shouldUpdateFlagName_whenClaimantWitnessNameUpdated() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .addApplicant1ExpertsAndWitnesses()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_WITNESSES_ID).build())
+                    .build();
+
+                PartyFlagStructure newParty = unwrapElements(caseData.getApplicantWitnesses()).get(0);
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .applicantWitnesses(wrapElements(newParty.toBuilder()
+                                                         .flags(Flags.builder()
+                                                                    .partyName("Wittyness")
+                                                                    .roleOnCase("Claimant solicitor witness")
+                                                                    .details(wrapElements(List.of(
+                                                                        FlagDetail.builder().name("flag name").build()))).build())
+                                                         .firstName("Wit").lastName("Ness")
+                                                         .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getApplicantWitnesses()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
+                    .details(wrapElements(List.of(
+                        FlagDetail.builder().name("flag name").build())))
+                    .roleOnCase("Claimant solicitor witness").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isEqualTo("app-1-witness-party-id");
+            }
+
+            @Test
+            void shouldCreateFlag_whenRespondent1WitnessAdded() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_WITNESSES_ID).build())
+                    .build();
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .respondent1Witnesses(wrapElements(PartyFlagStructure.builder()
+                                                           .firstName("Wit").lastName("Ness")
+                                                           .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1Witnesses()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
+                    .details(List.of())
+                    .roleOnCase("Defendant solicitor 1 witness").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isNotNull();
+            }
+
+            @Test
+            void shouldUpdateFlagName_whenRespondent1WitnessNameUpdated() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .addRespondent1ExpertsAndWitnesses()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_WITNESSES_ID).build())
+                    .build();
+
+                PartyFlagStructure newParty = unwrapElements(caseData.getRespondent1Witnesses()).get(0);
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .respondent1Witnesses(wrapElements(newParty.toBuilder()
+                                                           .flags(Flags.builder()
+                                                                      .partyName("Wittyness")
+                                                                      .roleOnCase("Defendant solicitor 1 witness")
+                                                                      .details(wrapElements(List.of(
+                                                                          FlagDetail.builder().name("flag name").build()))).build())
+                                                           .firstName("Wit").lastName("Ness")
+                                                           .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent1Witnesses()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
+                    .details(wrapElements(List.of(
+                        FlagDetail.builder().name("flag name").build())))
+                    .roleOnCase("Defendant solicitor 1 witness").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isEqualTo("res-1-witness-party-id");
+            }
+
+            @Test
+            void shouldCreateFlag_whenRespondent2WitnessAdded() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_WITNESSES_ID).build())
+                    .build();
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .respondent2Witnesses(wrapElements(PartyFlagStructure.builder()
+                                                           .firstName("Wit").lastName("Ness")
+                                                           .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2Witnesses()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
+                    .details(List.of())
+                    .roleOnCase("Defendant solicitor 2 witness").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isNotNull();
+            }
+
+            @Test
+            void shouldUpdateFlagName_whenRespondent2WitnessNameUpdated() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .atStateApplicantRespondToDefenceAndProceed(ONE_V_TWO_TWO_LEGAL_REP)
+                    .addRespondent2ExpertsAndWitnesses()
+                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_WITNESSES_ID).build())
+                    .build();
+
+                PartyFlagStructure newParty = unwrapElements(caseData.getRespondent2Witnesses()).get(0);
+
+                CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
+                    .respondent2Witnesses(wrapElements(newParty.toBuilder()
+                                                           .flags(Flags.builder()
+                                                                      .partyName("Wittyness")
+                                                                      .roleOnCase("Defendant solicitor 2 witness")
+                                                                      .details(wrapElements(List.of(
+                                                                          FlagDetail.builder().name("flag name").build()))).build())
+                                                           .firstName("Wit").lastName("Ness")
+                                                           .build()));
+
+                CaseFlagUtils.createOrUpdateFlags(builder, builder.build(), organisationService);
+
+                PartyFlagStructure individual = unwrapElements(builder.build().getRespondent2Witnesses()).get(0);
+                Flags actualFlags = individual.getFlags();
+                Flags expectedFlags = Flags.builder().partyName("Wit Ness")
+                    .details(wrapElements(List.of(
+                        FlagDetail.builder().name("flag name").build())))
+                    .roleOnCase("Defendant solicitor 2 witness").build();
+
+                assertThat(actualFlags).isEqualTo(expectedFlags);
+                assertThat(individual.getPartyID()).isEqualTo("res-2-witness-party-id");
             }
         }
     }
