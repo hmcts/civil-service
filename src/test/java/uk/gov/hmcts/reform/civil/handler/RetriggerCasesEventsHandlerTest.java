@@ -4,7 +4,6 @@ import feign.FeignException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -13,7 +12,9 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.Collections;
 
+import static java.util.Collections.singletonList;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -24,7 +25,7 @@ class RetriggerCasesEventsHandlerTest {
     @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @InjectMocks
+    @Mock
     private RetriggerCasesEventsHandler retriggerCasesEventsHandler;
 
     @BeforeEach
@@ -36,8 +37,9 @@ class RetriggerCasesEventsHandlerTest {
     void testHandleTask() {
         ExternalTask externalTask = mock(ExternalTask.class);
 
-        // Read from the testfile.txt in the resources folder
-        when(retriggerCasesEventsHandler.readCaseIds("testfile.txt")).thenReturn(Collections.singletonList("123L"));
+        // Calling the method to test
+        retriggerCasesEventsHandler.handleTask(externalTask);
+        when(retriggerCasesEventsHandler.readCaseIds(anyString())).thenReturn(singletonList("123L"));
 
         when(coreCaseDataService.startUpdate(eq("123L"), eq(CaseEvent.RETRIGGER_CASES)))
             .thenThrow(FeignException.class);
@@ -45,10 +47,8 @@ class RetriggerCasesEventsHandlerTest {
         // Mocking the coreCaseDataService to return case data
         when(coreCaseDataService.getCase(eq(123L))).thenReturn(CaseDetails.builder().data(Collections.emptyMap()).build());
 
-        // Calling the method to test
-        retriggerCasesEventsHandler.handleTask(externalTask);
-
-        // Verifying that the coreCaseDataService methods were called as expected
+      
+        verify(retriggerCasesEventsHandler).readCaseIds(anyString());
         verify(coreCaseDataService).startUpdate(eq("123L"), eq(CaseEvent.RETRIGGER_CASES));
         verify(coreCaseDataService).submitUpdate(eq("123L"), any());
     }

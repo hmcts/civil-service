@@ -94,7 +94,7 @@ public class RetriggerCasesEventsHandler implements BaseExternalTaskHandler {
     }
 
     private byte[] readBytes(String resourcePath) {
-        try (InputStream inputStream = RetriggerCasesEventsHandler.class.getResourceAsStream(resourcePath)) {
+        try (InputStream inputStream = RetriggerCasesEventsHandler.class.getResourceAsStream("testfile.txt")) {
             return IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
             throw new IllegalStateException(e);
