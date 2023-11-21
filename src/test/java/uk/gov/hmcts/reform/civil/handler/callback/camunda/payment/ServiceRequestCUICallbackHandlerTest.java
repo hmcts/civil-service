@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CUI;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE;
 
 @SpringBootTest(classes = {
     ServiceRequestCUICallbackHandler.class,
@@ -60,13 +60,13 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
 
         @BeforeEach
         void setup() {
-            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
         }
 
         @Test
         void shouldMakePaymentServiceRequestForClaimFee_whenInvoked() {
             //GIVEN
-            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -85,7 +85,7 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
             caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee().toBuilder()
                 .serviceRequestReference(CaseDataBuilder.CUSTOMER_REFERENCE)
                 .build();
-            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //THEN
@@ -106,7 +106,7 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
                             .build()
                     ).build())
                 .build();
-            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI, ABOUT_TO_SUBMIT);
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //THEN
@@ -116,13 +116,14 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void handleEventsReturnsTheExpectedCallbackEvent() {
             //THEN
-            assertThat(handler.handledEvents()).contains(CREATE_SERVICE_REQUEST_CUI);
+            assertThat(handler.handledEvents()).contains(CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE);
         }
 
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
             //GIVEN
-            CallbackParams params =  params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI, ABOUT_TO_SUBMIT);
+            CallbackParams params =  params = callbackParamsOf(caseData,
+                                                               CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
             //THEN
             assertThat(handler.camundaActivityId(params)).isEqualTo("CreateServiceRequestCUI");
         }
@@ -130,7 +131,7 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldHandleException_whenServiceRequestFails() {
             //GIVEN
-            params =  params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI, ABOUT_TO_SUBMIT);
+            params =  params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenThrow(FeignException.class);
             //WHEN
