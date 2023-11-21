@@ -277,7 +277,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         //Update the caseManagement location to the flight location if No flight location update to Claimant
         // preffered location featureToggleService.isSdoR2Enabled() &&
         if (isFlightDelayClaimAndUpdateCaseLocation(caseData)) {
-            builder.caseManagementLocation(caseData.getFlightDelay().getFlightCourtLocation());
+            builder.caseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
         } else if (isFlightDelayClaim(caseData) == false) {
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
@@ -680,15 +680,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private boolean isFlightDelayClaimAndUpdateCaseLocation(CaseData caseData) {
         //Update the Case Management Location when the Airline  is not Other
-        return (isFlightDelayClaim(caseData) && caseData.getFlightDelay() != null
-            && caseData.getFlightDelay().getFlightDetailsAirlineList()
+        return (isFlightDelayClaim(caseData) && caseData.getFlightDelayDetails() != null
+            && caseData.getFlightDelayDetails().getAirlineList()
             .getValue().getCode().equals("OTHER") == false);
     }
 
     private boolean isFlightDelayClaimAndUpdateCaseLocationWithClaimantCourt(CaseData caseData) {
         //Update the Case Management Location with Claimant preferred court when Airlines is Other
-        return (isFlightDelayClaim(caseData) && caseData.getFlightDelay() != null
-            && caseData.getFlightDelay().getFlightDetailsAirlineList()
+        return (isFlightDelayClaim(caseData) && caseData.getFlightDelayDetails() != null
+            && caseData.getFlightDelayDetails().getAirlineList()
                 .getValue().getCode().equals("OTHER"));
     }
 }
