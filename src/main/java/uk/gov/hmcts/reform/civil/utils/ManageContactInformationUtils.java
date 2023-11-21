@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -18,6 +19,7 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.createPartyId;
 
 public class ManageContactInformationUtils {
 
@@ -180,18 +182,8 @@ public class ManageContactInformationUtils {
                                                        .fieldOfExpertise(formExpert.getFieldOfExpertise())
                                                        .dateAdded(LocalDate.now())
                                                        .eventAdded("Manage Contact Information Event")
-                                                       .partyID(null) //CIV-10382
+                                                       .partyID(createPartyId())
                                                        .build()));
-                    // Replace above to this in CIV-10382
-                    // newExperts.addAll(wrapElements(appendWithNewPartyIds(Expert.builder()
-                    //                                   .firstName(formExpert.getFirstName())
-                    //                                  .lastName(formExpert.getLastName())
-                    //                                  .emailAddress(formExpert.getEmailAddress())
-                    //                                  .phoneNumber(formExpert.getPhoneNumber())
-                    //                                  .fieldOfExpertise(formExpert.getFieldOfExpertise())
-                    //                                  .dateAdded(LocalDate.now())
-                    //                                  .eventAdded("Manage Contact Information Event")
-                    //                                  .build())));
                 }
             }
         }
@@ -247,22 +239,59 @@ public class ManageContactInformationUtils {
                                                        .phoneNumber(formWitness.getPhoneNumber())
                                                        .dateAdded(LocalDate.now())
                                                        .eventAdded("Manage Contact Information Event")
-                                                       .partyID(null) //CIV-10382
+                                                       .partyID(createPartyId())
                                                        .build()));
-                    // Replace above to this in CIV-10382
-                    // newWitnesses.addAll(wrapElements(appendWithNewPartyIds(Witness.builder()
-                    //                                  .firstName(formWitness.getFirstName())
-                    //                                  .lastName(formWitness.getLastName())
-                    //                                  .emailAddress(formWitness.getEmailAddress())
-                    //                                  .phoneNumber(formWitness.getPhoneNumber())
-                    //                                  .dateAdded(LocalDate.now())
-                    //                                  .eventAdded("Manage Contact Information Event")
-                    //                                   .build())));
                 }
             }
         }
 
         return newWitnesses;
+    }
+
+    public static List<Element<PartyFlagStructure>> updatePartyDQWitnesses(List<PartyFlagStructure> existingParties, List<Witness> witnesses) {
+        List<PartyFlagStructure> updatedPartyWitnesses = new ArrayList<>();
+        if (witnesses == null || witnesses.isEmpty()) {
+            return null;
+        }
+        for (Witness witness : witnesses) {
+            updatedPartyWitnesses.add(updateTopLevelPartyInfo(witness.getPartyID(),
+                                                              witness.getFirstName(), witness.getLastName(),
+                                                              witness.getPhoneNumber(), witness.getEmailAddress(),
+                                                              existingParties));
+        }
+        return wrapElements(updatedPartyWitnesses);
+    }
+
+    public static List<Element<PartyFlagStructure>> updatePartyDQExperts(List<PartyFlagStructure> existingParties, List<Expert> experts) {
+        List<PartyFlagStructure> updatedPartyExperts = new ArrayList<>();
+        if (experts == null || experts.isEmpty()) {
+            return null;
+        }
+        for (Expert expert : experts) {
+            updatedPartyExperts.add(updateTopLevelPartyInfo(expert.getPartyID(),
+                                                            expert.getFirstName(), expert.getLastName(),
+                                                            expert.getPhoneNumber(), expert.getEmailAddress(),
+                                                            existingParties));
+        }
+        return wrapElements(updatedPartyExperts);
+    }
+
+    private static PartyFlagStructure updateTopLevelPartyInfo(String partyId, String firstName, String lastName, String phoneNumber, String email,
+                                                              List<PartyFlagStructure> existingParties) {
+        return existingParties.stream().filter(p -> p.getPartyID().equals(partyId)).findFirst()
+            .map(p -> (p.toBuilder()
+                .firstName(firstName)
+                .lastName(lastName)
+                .phone(phoneNumber)
+                .email(email)
+                .build()))
+            .orElse(PartyFlagStructure.builder()
+                .partyID(partyId)
+                .firstName(firstName)
+                .lastName(lastName)
+                .phone(phoneNumber)
+                .email(email)
+                .build());
     }
 
     private static String formatId(String partyChosen, String isAdmin, Party party) {
