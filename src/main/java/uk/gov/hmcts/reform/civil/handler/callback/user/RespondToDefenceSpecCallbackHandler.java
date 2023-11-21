@@ -276,10 +276,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         //Update the caseManagement location to the flight location if No flight location update to Claimant
         // preffered location featureToggleService.isSdoR2Enabled() &&
-        if (caseData.getIsFlightDelayClaim().equals(YES) && caseData.getFlightDelay().getFlightDetailsAirlineList()
-            .getValue().getCode().equals("OTHER") == false) {
+        if (isFlightDelayClaimAndUpdateCaseLocation(caseData)) {
             builder.caseManagementLocation(caseData.getFlightDelay().getFlightCourtLocation());
-        } else if(caseData.getIsFlightDelayClaim().equals(NO)){
+        } else if (isFlightDelayClaim(caseData) == false) {
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                     builder,
@@ -300,10 +299,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
 
-            if ( caseData.getIsFlightDelayClaim().equals(NO)
-                || (caseData.getIsFlightDelayClaim().equals(YES)
-                && caseData.getFlightDelay().getFlightDetailsAirlineList()
-                .getValue().getCode().equals("OTHER"))) {
+            if (isFlightDelayClaim(caseData) == false
+                || isFlightDelayClaimAndUpdateCaseLocationWithClaimantCourt(caseData)) {
                 updateDQCourtLocations(callbackParams, caseData, builder, dq);
             }
 
@@ -674,5 +671,24 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean isFlightDelayClaim(CaseData caseData) {
+        return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
+            && caseData.getIsFlightDelayClaim().equals(YES));
+    }
+
+    private boolean isFlightDelayClaimAndUpdateCaseLocation(CaseData caseData) {
+        //Update the Case Management Location when the Airline  is not Other
+        return (isFlightDelayClaim(caseData) && caseData.getFlightDelay() != null
+            && caseData.getFlightDelay().getFlightDetailsAirlineList()
+            .getValue().getCode().equals("OTHER") == false);
+    }
+
+    private boolean isFlightDelayClaimAndUpdateCaseLocationWithClaimantCourt(CaseData caseData) {
+        //Update the Case Management Location with Claimant preferred court when Airlines is Other
+        return (isFlightDelayClaim(caseData) && caseData.getFlightDelay() != null
+            && caseData.getFlightDelay().getFlightDetailsAirlineList()
+                .getValue().getCode().equals("OTHER"));
     }
 }
