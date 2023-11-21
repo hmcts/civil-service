@@ -36,18 +36,15 @@ class RetriggerCasesEventsHandlerTest {
     @Test
     void testHandleTask() {
         ExternalTask externalTask = mock(ExternalTask.class);
-
-        // Calling the method to test
+        
         retriggerCasesEventsHandler.handleTask(externalTask);
         when(retriggerCasesEventsHandler.readCaseIds(anyString())).thenReturn(singletonList("123L"));
 
         when(coreCaseDataService.startUpdate(eq("123L"), eq(CaseEvent.RETRIGGER_CASES)))
             .thenThrow(FeignException.class);
 
-        // Mocking the coreCaseDataService to return case data
         when(coreCaseDataService.getCase(eq(123L))).thenReturn(CaseDetails.builder().data(Collections.emptyMap()).build());
 
-      
         verify(retriggerCasesEventsHandler).readCaseIds(anyString());
         verify(coreCaseDataService).startUpdate(eq("123L"), eq(CaseEvent.RETRIGGER_CASES));
         verify(coreCaseDataService).submitUpdate(eq("123L"), any());
