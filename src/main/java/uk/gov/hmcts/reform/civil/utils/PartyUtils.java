@@ -351,7 +351,7 @@ public class PartyUtils {
                           ? ", " + caseData.getRespondent2().getPartyName() : "");
     }
 
-    private static String createPartyId() {
+    public static String createPartyId() {
         return UUID.randomUUID().toString().substring(0, 16);
     }
 
