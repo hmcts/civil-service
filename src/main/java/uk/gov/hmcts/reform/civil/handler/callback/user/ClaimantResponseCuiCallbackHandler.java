@@ -71,7 +71,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                 .applicant1ResponseDate(LocalDateTime.now())
                 .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
 
-        updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
+        //updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
@@ -100,7 +100,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
         if (updatedData.hasClaimantAgreedToFreeMediation() && updatedData.hasDefendantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
-        } else if (!updatedData.hasApplicantProceededWithClaim()) {
+        } else if (!updatedData.hasApplicantProceededWithClaim() && updatedData.hasClaimantAcceptedAdmittedAmountPaid()) {
             response.state(updatedData.isClaimantConfirmAmountPaidPartAdmit() || updatedData.hasDefendantPayedTheAmountClaimed()
                                ? CaseState.CASE_SETTLED.name()
                                : CaseState.CASE_DISMISSED.name());
