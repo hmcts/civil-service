@@ -79,7 +79,7 @@ public class RetriggerCasesEventsHandler implements BaseExternalTaskHandler {
             .build();
     }
 
-    private List<String> readCaseIds(String file) {
+    public List<String> readCaseIds(String file) {
 
         String data = readString(file);
         return Arrays.stream(data.split("[\r\n]+"))
