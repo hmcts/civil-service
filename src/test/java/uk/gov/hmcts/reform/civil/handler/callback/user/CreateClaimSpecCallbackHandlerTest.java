@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
-import uk.gov.hmcts.reform.civil.model.FlightDelay;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
@@ -1639,7 +1639,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class FlightDelayClaimMidCallbacks {
+    class FlightDelayDetailsMidCallbacks {
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Enabled(Boolean toggleStat) {
@@ -1708,7 +1708,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
             // Given
             CaseData caseData = CaseData.builder()
-                .flightDelay(FlightDelay.builder().flightDetailsScheduledDate(now().plusDays(1)).build()).build();
+                .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().plusDays(1)).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
             // When
@@ -1723,7 +1723,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnErrorWhenDateOfFlightIsTodayOrInThePast(Integer days) {
             // Given
             CaseData caseData = CaseData.builder()
-                .flightDelay(FlightDelay.builder().flightDetailsScheduledDate(now().minusDays(days)).build()).build();
+                .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().minusDays(days)).build()).build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
             // When
@@ -2194,8 +2194,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnExpectedCourtLocation_whenAirlineExists() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                    .flightDelay(FlightDelay.builder()
-                                     .flightDetailsAirlineList(
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(
                                          DynamicList.builder()
                                              .value(DynamicListElement.builder().code("GULF_AIR").label("Gulf Air")
                                                         .build()).build()).build()).build();
@@ -2212,8 +2212,8 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnExpectedCourtLocation_whenOtherAirlineSelected() {
                 // Given
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                    .flightDelay(FlightDelay.builder()
-                                     .flightDetailsAirlineList(
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(
                                          DynamicList.builder()
                                              .value(DynamicListElement.builder().code("OTHER").label("OTHER")
                                                         .build()).build()).build()).build();

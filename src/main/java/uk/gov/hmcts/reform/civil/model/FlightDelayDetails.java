@@ -13,11 +13,11 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FlightDelay {
+public class FlightDelayDetails {
 
-    private DynamicList flightDetailsAirlineList;
-    private String flightDetailsNameOfAirline;
-    private String flightDetailsFlightNumber;
-    private LocalDate flightDetailsScheduledDate;
+    private DynamicList airlineList;
+    private String nameOfAirline;
+    private String flightNumber;
+    private LocalDate scheduledDate;
     private CaseLocationCivil flightCourtLocation;
 }
