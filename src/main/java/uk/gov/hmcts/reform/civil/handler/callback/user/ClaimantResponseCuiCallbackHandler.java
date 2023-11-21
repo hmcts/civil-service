@@ -71,7 +71,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                 .applicant1ResponseDate(LocalDateTime.now())
                 .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
 
-        //updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
+        updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
