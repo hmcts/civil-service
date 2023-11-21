@@ -6,8 +6,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import java.util.List;
-import static org.assertj.core.util.Lists.emptyList;
+
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.APPLICANT_ONE;
 import static uk.gov.hmcts.reform.civil.utils.CaseFlagUtils.APPLICANT_ONE_LITIGATION_FRIEND;
@@ -29,15 +28,11 @@ public class CaseFlagsInitialiser {
     private final OrganisationService organisationService;
 
     public void initialiseCaseFlags(CaseEvent caseEvent, CaseData.CaseDataBuilder dataBuilder) {
-        initialiseCaseFlags(caseEvent, dataBuilder, null);
-    }
-
-    public void initialiseCaseFlags(CaseEvent caseEvent, CaseData.CaseDataBuilder dataBuilder, CaseData oldCaseData) {
         if (!featureToggleService.isCaseFlagsEnabled()) {
             return;
         }
 
-        CaseData caseData = oldCaseData == null ? dataBuilder.build() : oldCaseData;
+        CaseData caseData = dataBuilder.build();
         switch (caseEvent) {
             case CREATE_CLAIM:
             case CREATE_CLAIM_SPEC: {
