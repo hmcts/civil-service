@@ -138,7 +138,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Service
@@ -1526,10 +1525,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                                            .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
                 updatedData.respondent2DocumentGeneration("userRespondent2");
             }
-        }
-
-        if (toggleService.isHmcEnabled()) {
-            populateWithPartyIds(updatedData);
         }
 
         updateCorrespondenceAddress(callbackParams, updatedData, caseData);

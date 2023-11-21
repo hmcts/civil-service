@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
@@ -15,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mockStatic;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -40,7 +45,23 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapE
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses;
 
+@SuppressWarnings("unchecked")
 class ManageContactInformationUtilsTest {
+
+    private static final String PARTY_ID = "party-id";
+    private static MockedStatic partyIdMock;
+
+    @BeforeAll
+    static void setupSuite() {
+        partyIdMock = mockStatic(PartyUtils.class, Mockito.CALLS_REAL_METHODS);
+        partyIdMock.when(PartyUtils::createPartyId).thenReturn(PARTY_ID);
+    }
+
+    @AfterAll
+    static void tearDown() {
+        partyIdMock.reset();
+        partyIdMock.close();
+    }
 
     @Test
     void shouldAddCorrectOptions_forClaimant1AsLegalRep() {
@@ -312,12 +333,12 @@ class ManageContactInformationUtilsTest {
         void shouldAddExperts() {
             Expert expectedExpert1 = Expert.builder().firstName("Lewis").lastName("John")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-                .partyID(null) //change this for CIV-10382
+                .partyID(PARTY_ID)
                 .build();
             Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
                 .emailAddress("expertemail")
-                .partyID(null) //change this for CIV-10382
+                .partyID(PARTY_ID)
                 .build();
 
             assertThat(mapUpdatePartyDetailsFormToDQExperts(null, wrapElements(party, party2)))
@@ -331,7 +352,7 @@ class ManageContactInformationUtilsTest {
             Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
                 .emailAddress("expertemail")
-                .partyID(null) //change this for CIV-10382
+                .partyID(PARTY_ID)
                 .build();
 
             assertThat(mapUpdatePartyDetailsFormToDQExperts(wrapElements(expert1), wrapElements(party, party2)))
@@ -370,11 +391,11 @@ class ManageContactInformationUtilsTest {
         void shouldAddWitnesses() {
             Witness expectedWitness1 = Witness.builder().firstName("Lewis").lastName("John")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-                .partyID(null).build(); // CIV-10382
+                .partyID(PARTY_ID).build();
             Witness expectedWitness2 = Witness.builder().firstName("Second").lastName("witness")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
                 .emailAddress("witnessemail")
-                .partyID(null).build(); // CIV-10382
+                .partyID(PARTY_ID).build();
 
             assertThat(mapUpdatePartyDetailsFormToDQWitnesses(null, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
@@ -393,7 +414,7 @@ class ManageContactInformationUtilsTest {
             Witness expectedWitness2 = Witness.builder().firstName("Second").lastName("witness")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
                 .emailAddress("witnessemail")
-                .partyID(null) //change this for CIV-10382
+                .partyID(PARTY_ID)
                 .build();
 
             assertThat(mapUpdatePartyDetailsFormToDQWitnesses(wrapElements(witness1), wrapElements(party, party2)))
