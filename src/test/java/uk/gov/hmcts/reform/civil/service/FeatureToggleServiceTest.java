@@ -69,7 +69,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isGeneralApplicationsEnabled()).isEqualTo(toggleStat);
     }
 
-
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCertificateOfServiceEnabledInvoked(Boolean toggleStat) {
