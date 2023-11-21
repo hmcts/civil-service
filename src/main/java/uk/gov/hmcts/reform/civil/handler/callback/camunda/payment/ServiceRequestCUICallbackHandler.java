@@ -32,7 +32,6 @@ public class ServiceRequestCUICallbackHandler extends CallbackHandler {
     private static final String ERROR_MESSAGE = "Technical error occurred";
     private static final String TASK_ID = "CreateServiceRequestCUI";
 
-
     private final PaymentsService paymentsService;
     private final ObjectMapper objectMapper;
 
@@ -80,7 +79,6 @@ public class ServiceRequestCUICallbackHandler extends CallbackHandler {
         return paymentsService.createServiceRequest(caseData, authToken)
             .getServiceRequestReference();
     }
-
 
     private boolean isServiceRequestNotRequested(CaseData caseData) {
         return isNull(caseData.getServiceRequestReference());
