@@ -42,7 +42,7 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getClaimantLipClaimUpdatedTemplate())
+            when(notificationsProperties.getNotifyClaimantLipHelpWithFees())
                 .thenReturn("test-template-received-id");
         }
 

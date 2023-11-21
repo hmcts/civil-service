@@ -65,7 +65,7 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandler extends CallbackHa
     }
 
     private String getNotificationTemplate() {
-        return notificationsProperties.getClaimantLipClaimUpdatedTemplate(); //TODO: add template in commons
+        return notificationsProperties.getNotifyClaimantLipHelpWithFees();
     }
 
     private String getRecipientEmail(CaseData caseData) {
