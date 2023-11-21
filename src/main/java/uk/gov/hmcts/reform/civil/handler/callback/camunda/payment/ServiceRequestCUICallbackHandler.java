@@ -59,7 +59,7 @@ public class ServiceRequestCUICallbackHandler extends CallbackHandler {
         var authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
         try {
-            if (isServiceRequestNotRequested(caseData)) {
+            if (isServiceRequestNotRequested(caseData) && !caseData.isHelpWithFees()) {
                 log.info("Calling payment service request (claim fee) for case {}", caseData.getCcdCaseReference());
                 String serviceRequestReference = getServiceRequestReference(caseData, authToken);
                 caseData = caseData.toBuilder().serviceRequestReference(serviceRequestReference).build();

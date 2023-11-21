@@ -11,9 +11,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
@@ -90,6 +93,24 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             String serviceRequestReference = responseCaseData.getServiceRequestReference();
             assertThat(serviceRequestReference).isEqualTo(CaseDataBuilder.CUSTOMER_REFERENCE);
+        }
+
+        @Test
+        void shouldNotMakeAnyServiceRequest_whenClaimantHasRequestedHelpWithFees() {
+            //GIVEN
+            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee().toBuilder()
+                .caseDataLiP(CaseDataLiP.builder()
+                    .helpWithFees(
+                        HelpWithFees.builder()
+                            .helpWithFee(YesOrNo.YES)
+                            .build()
+                    ).build())
+                .build();
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI, ABOUT_TO_SUBMIT);
+            //WHEN
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //THEN
+            verifyNoInteractions(paymentsService);
         }
 
         @Test
