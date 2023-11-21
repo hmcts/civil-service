@@ -275,6 +275,18 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
                 .extracting("makeAnOrderForCostsQOCSYesOrNo")
                 .isEqualTo("No");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("makeAnOrderForCostsList")
+                .isEqualTo("CLAIMANT");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("assistedOrderClaimantDefendantFirstDropdown")
+                .isEqualTo("SUBJECT_DETAILED_ASSESSMENT");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("assistedOrderAssessmentSecondDropdownList1")
+                .isEqualTo("STANDARD_BASIS");
+            assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts")
+                .extracting("assistedOrderAssessmentSecondDropdownList2")
+                .isEqualTo("NO");
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
             assertThat(response.getData()).extracting("finalOrderAppealComplex")
@@ -423,6 +435,14 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 ),
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                            .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                            .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                                    .dateToDate(LocalDate.now().minusDays(4))
+                                    .listFromDate(LocalDate.now().minusDays(5))
+                                    .build()).build()
+                ),
+                Arguments.of(
+                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder().build()).build()
                 ),
@@ -532,7 +552,16 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                     "The date in Further hearing may not be before the established date"
                 ),
                 Arguments.of(
-                    CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                                        .dateToDate(LocalDate.now().minusDays(5))
+                                        .listFromDate(LocalDate.now().minusDays(4))
+                                        .build()).build(),
+                    "The date range in Further hearing may not have a 'from date', that is after the 'date to'"
+                ),
+                Arguments.of(
+                        CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
                                                               .assistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(2))
