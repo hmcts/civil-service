@@ -320,6 +320,9 @@ notifications:
   notifyLiPApplicantBreathingSpaceLifted: "b6dbc714-210e-475d-a1db-bf5ea28de98b"
   notifyLiPRespondentBreathingSpaceLifted: "4ca3017b-b2fa-4ac0-a867-9bfada50a80c"
 
+  notifyApplicantLipRequestJudgementByAdmissionNotificationTemplate: "d6625ee3-f794-4a87-b0a3-bef7dd0663b9"
+  notifyRespondentLipRequestJudgementByAdmissionNotificationTemplate: "6ced7f9c-b0fd-4fad-a76c-745873b9a3a2"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 

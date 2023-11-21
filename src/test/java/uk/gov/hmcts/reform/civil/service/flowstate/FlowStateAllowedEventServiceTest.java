@@ -571,7 +571,8 @@ class FlowStateAllowedEventServiceTest {
                         JUDGMENT_PAID_IN_FULL,
                         RECORD_JUDGMENT,
                         TRANSFER_ONLINE_CASE,
-                        asyncStitchingComplete
+                        asyncStitchingComplete,
+                        CLAIMANT_RESPONSE_CUI
                     }
                 ),
                 of(

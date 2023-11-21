@@ -118,23 +118,22 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String RESPONDENT_ONE_PRE_TRIAL_SUMMARY = "RespondentOnePreTrialSummary";
     protected static final String RESPONDENT_ONE_TRIAL_SKELETON = "RespondentOneTrialSkeleton";
     protected static final String RESPONDENT_ONE_PRECEDENT_H = "RespondentOneUploadedPrecedentH";
-    protected static final String RESPONDENT_ONE_ANY_PRECEDENT_H = "respondentOneAnyPrecedentH";
     protected static final String RESPONDENT_TWO_DISCLOSURE_LIST = "RespondentTwoDisclosureList";
     protected static final String RESPONDENT_TWO_PRE_TRIAL_SUMMARY = "RespondentTwoPreTrialSummary";
     protected static final String RESPONDENT_TWO_TRIAL_SKELETON = "RespondentTwoTrialSkeleton";
     protected static final String RESPONDENT_TWO_PRECEDENT_H = "RespondentTwoUploadedPrecedentH";
-    protected static final String RESPONDENT_TWO_ANY_PRECEDENT_H = "respondentTwoAnyPrecedentH";
+    protected static final String RESPONDENT_ONE_SCHEDULE_OF_COSTS = "RespondentSchedulesOfCost";
+    protected static final String RESPONDENT_TWO_SCHEDULE_OF_COSTS = "RespondentTwoSchedulesOfCost";
     protected static final String APPLICANT_DISCLOSURE_LIST = "ApplicantDisclosureList";
     protected static final String APPLICANT_PRE_TRIAL_SUMMARY = "ApplicantPreTrialSummary";
     protected static final String APPLICANT_TRIAL_SKELETON = "ApplicantTrialSkeleton";
     protected static final String APPLICANT_PRECEDENT_H = "ApplicantUploadedPrecedentH";
-    protected static final String APPLICANT_ANY_PRECEDENT_H = "ApplicantAnyPrecedentH";
     protected static final String APPLICANT_TWO_DISCLOSURE_LIST = "ApplicantTwoDisclosureList";
     protected static final String APPLICANT_TWO_PRE_TRIAL_SUMMARY = "ApplicantTwoPreTrialSummary";
     protected static final String APPLICANT_TWO_TRIAL_SKELETON = "ApplicantTwoTrialSkeleton";
     protected static final String APPLICANT_TWO_PRECEDENT_H = "ApplicantTwoUploadedPrecedentH";
-    protected static final String APPLICANT_TWO_ANY_PRECEDENT_H = "ApplicantTwoAnyPrecedentH";
-
+    protected static final String APPLICANT_SCHEDULE_OF_COSTS = "ApplicantSchedulesOfCost";
+    protected static final String APPLICANT_TWO_SCHEDULE_OF_COSTS = "ApplicantTwoSchedulesOfCost";
     // Notification Strings used for email
     protected static StringBuilder notificationString = new StringBuilder();
     protected static final String DISCLOSURE_LIST_TEXT = "%s - Disclosure list";
@@ -456,8 +455,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     RESPONDENT_TWO_WITNESS_REFERRED,
                     APPLICANT_WITNESS_REFERRED,
                     APPLICANT_TWO_WITNESS_REFERRED:
-                prefix = "Referred Document";
-                renameUploadEvidenceDocumentType(documentUpload, prefix);
+                prefix = " referred to in the statement of ";
+                renameUploadEvidenceDocumentTypeWithName(documentUpload, prefix);
                 break;
             case RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE,
                     RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE,
@@ -565,6 +564,21 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         });
     }
 
+    private <T> void renameUploadEvidenceDocumentTypeWithName(final List<Element<T>> documentUpload, String body) {
+        documentUpload.forEach(x -> {
+            UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
+            String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
+            String newName = type.getTypeOfDocument()
+                    + body
+                    + type.getWitnessOptionName()
+                    + SPACE
+                    + type.getDocumentIssuedDate()
+                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
+                    + END + ext;
+            type.getDocumentUpload().setDocumentFileName(newName);
+        });
+    }
+
     private <T> void renameUploadEvidenceDocumentType(final List<Element<T>> documentUpload, String prefix) {
         documentUpload.forEach(x -> {
             UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
@@ -635,7 +649,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       TRIAL_SKELETON_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_PRECEDENT_H,
                                       TRIAL_AUTHORITIES_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_ANY_PRECEDENT_H,
+            setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
@@ -671,7 +685,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       TRIAL_SKELETON_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_PRECEDENT_H,
                                       TRIAL_AUTHORITIES_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_ANY_PRECEDENT_H,
+            setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
@@ -708,7 +722,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       TRIAL_SKELETON_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthorities(), document -> document.getValue().getDocumentUpload(), APPLICANT_PRECEDENT_H,
                                       TRIAL_AUTHORITIES_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), APPLICANT_ANY_PRECEDENT_H,
+            setCategoryIdAndRenameDoc(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), APPLICANT_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrial(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
@@ -745,7 +759,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       TRIAL_SKELETON_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_PRECEDENT_H,
                                       TRIAL_AUTHORITIES_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
-            setCategoryIdAndRenameDoc(caseData.getDocumentCostsApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_ANY_PRECEDENT_H,
+            setCategoryIdAndRenameDoc(caseData.getDocumentCostsApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentEvidenceForTrialApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_DOC_CORRESPONDENCE,
                                       TRIAL_DOC_CORRESPONDENCE_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
@@ -872,7 +886,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentCostsRes(),
                 caseData.getDocumentCostsRes(),
                 caseData.getDocumentCostsRes2());
-        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, RESPONDENT_TWO_ANY_PRECEDENT_H);
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, RESPONDENT_TWO_SCHEDULE_OF_COSTS);
         builder.documentCostsRes2(evidenceDocToAdd);
 
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentEvidenceForTrialRes(),
@@ -984,7 +998,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentCosts(),
                 caseData.getDocumentCosts(),
                 caseData.getDocumentCostsApp2());
-        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, APPLICANT_TWO_ANY_PRECEDENT_H);
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, APPLICANT_TWO_SCHEDULE_OF_COSTS);
         builder.documentCostsApp2(evidenceDocToAdd);
 
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentEvidenceForTrial(),
@@ -1011,6 +1025,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     .documentUrl(from.getValue().getDocumentUpload().getDocumentUrl())
                     .build();
             UploadEvidenceDocumentType type = UploadEvidenceDocumentType.builder()
+                    .witnessOptionName(from.getValue().getWitnessOptionName())
                     .documentIssuedDate(from.getValue().getDocumentIssuedDate())
                     .typeOfDocument(from.getValue().getTypeOfDocument())
                     .createdDatetime(from.getValue().getCreatedDatetime())
@@ -1150,6 +1165,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 && uploadEvidenceDocumentType.getValue().getCreatedDatetime()
                 .isAfter(bundleDetails.get().getCreatedOn().get())) {
                 uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
+                                                                         .witnessOptionName(uploadEvidenceDocumentType.getValue().getWitnessOptionName())
                                                                          .typeOfDocument(docType)
                                                                          .createdDatetime(uploadEvidenceDocumentType.getValue().getCreatedDatetime())
                                                                          .documentUpload(uploadEvidenceDocumentType.getValue().getDocumentUpload())

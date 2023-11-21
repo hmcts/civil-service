@@ -12,13 +12,12 @@ import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
 import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
-import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
-import uk.gov.hmcts.reform.civil.exceptions.UserNotFoundOnCaseException;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.bulkclaims.CaseworkerSubmitEventDTo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.ExtendedDeadlineDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.EventDto;
 import uk.gov.hmcts.reform.civil.model.repaymentplan.ClaimantProposedPlan;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -42,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -228,10 +228,10 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldCalculateDeadlineSuccessfully() {
         LocalDate extensionDate = LocalDate.of(2022, 6, 6);
-        when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any())).thenReturn(extensionDate);
+        when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(), anyInt())).thenReturn(extensionDate);
         doPost(
             BEARER_TOKEN,
-            extensionDate,
+            ExtendedDeadlineDto.builder().responseDate(extensionDate).plusDays(5).build(),
             CALCULATE_DEADLINE_URL
         )
             .andExpect(content().json(toJson(extensionDate)))

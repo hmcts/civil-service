@@ -118,15 +118,20 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void admitPayImmediate() {
-        CaseData caseData = commonData()
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .build();
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
 
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(caseData);
+            .getTemplateData(builder.build());
         Assertions.assertEquals(LocalDate.now(), templateData.getGenerationDate());
     }
 
@@ -174,6 +179,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void partAdmitPayImmediate() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
@@ -181,7 +187,12 @@ class SealedClaimLipResponseFormGeneratorTest {
             .specDefenceAdmittedRequired(YesOrNo.NO)
             .respondToAdmittedClaimOwingAmount(BigDecimal.valueOf(2000))
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim")
-            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
 
         CaseData caseData = timeline(financialDetails(builder))
             .build();
@@ -340,11 +351,17 @@ class SealedClaimLipResponseFormGeneratorTest {
     @Test
     void shouldGenerateDocumentSuccessfullyForFullAdmit() {
         //Given
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            )
             .build();
         String fileName = "someName";
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
@@ -365,6 +382,7 @@ class SealedClaimLipResponseFormGeneratorTest {
     @Test
     void shouldGenerateDocumentSuccessfullyForPartAdmit() {
         //Given
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData caseData = commonData()
             .respondent1(company("B"))
             .respondent2(individual("C"))
@@ -373,7 +391,11 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondToAdmittedClaimOwingAmount(BigDecimal.valueOf(2000))
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim")
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .build();
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            ).build();
         String fileName = "someName";
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
