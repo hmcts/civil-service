@@ -275,21 +275,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         //Update the caseManagement location to the flight location if No flight location update to Claimant
-        // preffered location
-        if (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim().equals(YES)) {
-            if (caseData.getFlightDelay() != null && caseData.getFlightDelay().getFlightDetailsAirlineList()
-                .getValue().getCode().equals("OTHER")) {
-                locationHelper.getClaimantRequestedCourt(caseData)
-                    .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                        builder,
-                        requestedCourt,
-                        () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams()
-                              .get(CallbackParams.Params.BEARER_TOKEN).toString())
-                    ));
-            } else {
-                builder.caseManagementLocation(caseData.getFlightDelay().getFlightCourtLocation());
-            }
-        } else {
+        // preffered location featureToggleService.isSdoR2Enabled() &&
+        if (caseData.getIsFlightDelayClaim().equals(YES) && caseData.getFlightDelay().getFlightDetailsAirlineList()
+            .getValue().getCode().equals("OTHER") == false) {
+            builder.caseManagementLocation(caseData.getFlightDelay().getFlightCourtLocation());
+        } else if(caseData.getIsFlightDelayClaim().equals(NO)){
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                     builder,
@@ -310,7 +300,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
 
-            updateDQCourtLocations(callbackParams, caseData, builder, dq);
+            if ( caseData.getIsFlightDelayClaim().equals(NO)
+                || (caseData.getIsFlightDelayClaim().equals(YES)
+                && caseData.getFlightDelay().getFlightDetailsAirlineList()
+                .getValue().getCode().equals("OTHER"))) {
+                updateDQCourtLocations(callbackParams, caseData, builder, dq);
+            }
 
             var smallClaimWitnesses = builder.build().getApplicant1DQWitnessesSmallClaim();
             if (smallClaimWitnesses != null) {
