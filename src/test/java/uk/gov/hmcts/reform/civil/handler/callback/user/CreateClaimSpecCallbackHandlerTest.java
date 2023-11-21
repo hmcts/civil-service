@@ -1695,11 +1695,11 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
-            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
+            assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")
                 .extracting("list_items").asList().extracting("label")
                 .contains("BA/Cityflyer");
 
-            assertThat(response.getData()).extracting("flightDelay").extracting("flightDetailsAirlineList")
+            assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")
                 .extracting("list_items").asList().extracting("label")
                 .contains("OTHER");
         }
@@ -2205,7 +2205,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").extracting("region").isEqualTo("Site Name");
+                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").extracting("region").isEqualTo("Site Name");
             }
 
             @Test
@@ -2226,7 +2226,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
                 // Then
-                assertThat(response.getData()).extracting("flightDelay").extracting("flightCourtLocation").isNull();
+                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").isNull();
             }
         }
     }
