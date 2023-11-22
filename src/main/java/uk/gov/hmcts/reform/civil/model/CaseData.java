@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
@@ -635,6 +636,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final TransferCaseDetails transferCaseDetails;
 
+    //SDO-R2
+    private YesOrNo isFlightDelayClaim;
+
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
@@ -874,9 +878,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isJudgementDateNotPermitted() {
-        return nonNull(getRespondent1ResponseDate())
-            && getRespondent1ResponseDate()
-            .toLocalDate().plusDays(5).atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+        return nonNull(getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
+            && getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
+            .atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
 
     @JsonIgnore
@@ -978,9 +982,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPartAdmitPayImmediatelyAccepted() {
-        return  SPEC_CLAIM.equals(getCaseAccessCategory())
+        return SPEC_CLAIM.equals(getCaseAccessCategory())
             && YES.equals(getApplicant1AcceptAdmitAmountPaidSpec())
-            && getShowResponseOneVOneFlag().equals(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY);
+            && (getShowResponseOneVOneFlag() != null
+            && getShowResponseOneVOneFlag().equals(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY));
     }
 
     @JsonIgnore
@@ -1095,5 +1100,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
             return getRespondentSolicitor1EmailAddress();
         }
         return null;
+    }
+
+    @JsonIgnore
+    public boolean hasApplicant1SignedSettlementAgreement() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasApplicant1SignedSettlementAgreement).isPresent();
     }
 }

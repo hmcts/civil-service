@@ -196,7 +196,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent1OrganisationPolicy(respondent1Organization)
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]"));
-            when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
                     .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent1SolAssigned()).build());
@@ -227,7 +227,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]"));
-            when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
                     .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent1SolAssigned()).build());
@@ -244,7 +244,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]", "[RESPONDENTSOLICITORTWO]"));
-            when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
                     .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
@@ -293,7 +293,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
                     .respondent2OrganisationPolicy(respondent2Organization)
                     .build();
             List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORONE]", "[RESPONDENTSOLICITORTWO]"));
-            when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+            when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
             when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
                     .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent1Respondent2SolAssigned()).build());
@@ -868,7 +868,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
         builder.applicant1OrganisationPolicy(OrganisationPolicy
                                                  .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
-        when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+        when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(onlyApplicantSolicitorAssigned()).build());
@@ -886,7 +886,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
         builder.applicant1OrganisationPolicy(OrganisationPolicy
                                                  .builder().orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build());
-        when(userRoleCaching.getUserRoles(any(), any(), any())).thenReturn(userRoles);
+        when(userRoleCaching.getUserRoles(any(), any())).thenReturn(userRoles);
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(applicant1Respondent2SolAssigned()).build());
@@ -901,7 +901,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataForConsentUnconsentCheck(GARespondentOrderAgreement.builder().hasAgreed(NO).build());
         when(locationRefDataService.getCcmccLocation(any()))
-            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").siteName("CCMCC").build());
+            .thenReturn(LocationRefData.builder().regionId("9").epimmsId("574546").siteName("CCMCC")
+                            .courtAddress("Prince William House, Peel Cross Road, Salford").postcode("M5 4RR").build());
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).id(STRING_NUM_CONSTANT).build(), CallbackParams.builder().toString());
 
@@ -914,9 +915,96 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
         assertThat(result.getGeneralApplications().get(0).getValue().getLocationName())
             .isEqualTo("CCMCC");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
+            .isEqualTo("Prince William House, Peel Cross Road, Salford");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
+            .isEqualTo("M5 4RR");
 
         assertThat(result.getGeneralApplications().get(0).getValue().getGeneralAppRespondentSolicitors()
                        .stream().filter(e -> STRING_NUM_CONSTANT.equals(e.getValue().getId())).count()).isEqualTo(0);
+    }
+
+    @Test
+    void shouldPopulateLocationDetailsForBaseLocation() {
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(getSampleCourLocationsRefObject());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(null, null, INDIVIDUAL, applicant1DQ, respondent1DQ,
+                                          respondent2DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("11111");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
+            .isEqualTo("locationOfRegion2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
+            .isEqualTo("Prince William House, Peel Cross Road, Salford");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
+            .isEqualTo("M5 4RR");
+    }
+
+    protected List<LocationRefData> getSampleCourLocationsRefObject() {
+        return new ArrayList<>(List.of(
+            LocationRefData.builder()
+                .epimmsId("11111").siteName("locationOfRegion2").courtAddress("Prince William House, Peel Cross Road, Salford")
+                .postcode("M5 4RR")
+                .courtLocationCode("court1").build()
+        ));
+    }
+
+    protected List<LocationRefData> getEmptyCourLocationsRefObject() {
+        return new ArrayList<>(List.of(
+            LocationRefData.builder().build()
+        ));
+    }
+
+    protected List<LocationRefData> getSampleCourtLocationsRefObjectMultipleValues() {
+        return new ArrayList<>(List.of(
+            LocationRefData.builder()
+                .epimmsId("11111").siteName("locationOfRegion2").courtAddress("Prince William House, Peel Cross Road, Salford")
+                .postcode("M5 4RR")
+                .courtLocationCode("court1").build(),
+
+            LocationRefData.builder()
+                .epimmsId("11111").siteName("locationOfRegion2").courtAddress("Prince William House, Peel Cross Road, Salford")
+                .postcode("M5 4RR")
+                .courtLocationCode("court1").build()
+        ));
+    }
+
+    @Test
+    void shouldPopulateLocationDetailsForBaseLocationWhereListIsEmpty() {
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(getEmptyCourLocationsRefObject());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(null, null, INDIVIDUAL, applicant1DQ, respondent1DQ,
+                                          respondent2DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("11111");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
+            .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
+            .isNull();
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
+            .isNull();
+    }
+
+    @Test
+    void shouldPopulateLocationDetailsForBaseLocationWithMultipleListValues() {
+        when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(getSampleCourtLocationsRefObjectMultipleValues());
+        CaseData caseData = GeneralApplicationDetailsBuilder.builder()
+            .getCaseDataForWorkAllocation(null, null, INDIVIDUAL, applicant1DQ, respondent1DQ,
+                                          respondent2DQ);
+        CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
+            .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
+            .isEqualTo("11111");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getSiteName())
+            .isEqualTo("locationOfRegion2");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getAddress())
+            .isEqualTo("Prince William House, Peel Cross Road, Salford");
+        assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getPostcode())
+            .isEqualTo("M5 4RR");
     }
 
     @Test
