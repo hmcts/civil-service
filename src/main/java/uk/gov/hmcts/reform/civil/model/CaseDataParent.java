@@ -723,23 +723,6 @@ public class CaseDataParent implements MappableObject {
 
     private FastTrackAllocation fastTrackAllocation;
 
-    /**
-     * used to temporary hold addresses.
-     */
-    private final Address tempCorrespondenceAddress1;
-    /**
-     * used with tempCorrespondenceAddress1.
-     */
-    private final YesOrNo tempCorrespondenceAddress1Required;
-    /**
-     * used to temporary hold addresses.
-     */
-    private final Address tempCorrespondenceAddress2;
-    /**
-     * used with tempCorrespondenceAddress2.
-     */
-    private final YesOrNo tempCorrespondenceAddress2Required;
-
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
