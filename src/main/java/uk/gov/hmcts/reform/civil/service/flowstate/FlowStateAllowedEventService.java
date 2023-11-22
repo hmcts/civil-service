@@ -14,9 +14,6 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
@@ -60,6 +57,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
@@ -86,11 +84,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
@@ -282,7 +280,8 @@ public class FlowStateAllowedEventService {
                 GENERATE_DIRECTIONS_ORDER,
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                asyncStitchingComplete
             )
         ),
 
@@ -542,7 +541,9 @@ public class FlowStateAllowedEventService {
                 SET_ASIDE_JUDGMENT,
                 JUDGMENT_PAID_IN_FULL,
                 RECORD_JUDGMENT,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                CLAIMANT_RESPONSE_CUI,
+                asyncStitchingComplete
             )
         ),
 
@@ -864,7 +865,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_RESPONDENT,
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                asyncStitchingComplete
             )
         ),
         entry(
@@ -903,7 +905,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_RESPONDENT,
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                asyncStitchingComplete
             )
         ),
         entry(
@@ -1100,7 +1103,10 @@ public class FlowStateAllowedEventService {
                 JUDGMENT_PAID_IN_FULL,
                 RECORD_JUDGMENT,
                 LIP_CLAIM_SETTLED,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                asyncStitchingComplete,
+                CLAIMANT_RESPONSE_CUI
+
             )
         ),
 
@@ -1285,7 +1291,8 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                asyncStitchingComplete
             )
         ),
         entry(
@@ -1327,7 +1334,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                asyncStitchingComplete
             )
         ),
         entry(
