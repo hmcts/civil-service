@@ -78,10 +78,9 @@ public class HearingFormGeneratorTest {
     @MockBean
     private AssignCategoryId assignCategoryId;
     @MockBean
-
     FeatureToggleService featureToggleService;
+    @MockBean
     private LocationRefDataService locationRefDataService;
-
     @MockBean
     private CourtLocationUtils courtLocationUtils;
 
@@ -125,7 +124,7 @@ public class HearingFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_small_claim, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-
+        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -154,7 +153,7 @@ public class HearingFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
-
+        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
@@ -183,6 +182,7 @@ public class HearingFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
+        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
 
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(false);
 
@@ -212,6 +212,7 @@ public class HearingFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
+        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
 
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
@@ -241,6 +242,7 @@ public class HearingFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_small_claim, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
+        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
 
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
@@ -270,6 +272,7 @@ public class HearingFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_fast_track, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
+        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
 
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
@@ -299,6 +302,7 @@ public class HearingFormGeneratorTest {
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_other_claim, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
+        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
 
         when(featureToggleService.isAutomatedHearingNoticeEnabled()).thenReturn(true);
 
