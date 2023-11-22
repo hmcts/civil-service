@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -766,6 +767,39 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .firstName("First")
                 .lastName("Name")
                 .build();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
+        void shouldCopyFlagsForRespondents(String partyChosenId) {
+            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
+            Flags respondent2Flags = Flags.builder().partyName("respondent2name").roleOnCase("respondent2").build();
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .respondent1(Party.builder().flags(respondent1Flags).build())
+                .respondent2(Party.builder().flags(respondent2Flags).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(partyChosenId)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(partyChosenId)
+                                       .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+            assertThat(responseCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
         }
 
         @Test
