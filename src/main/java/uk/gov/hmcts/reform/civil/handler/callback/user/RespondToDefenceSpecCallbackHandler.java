@@ -275,7 +275,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         //Update the caseManagement location to the flight location if No flight location update to Claimant
-        // preffered location featureToggleService.isSdoR2Enabled() &&
+        // preferred location
         if (isFlightDelayClaimAndUpdateCaseLocation(caseData)) {
             builder.caseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
         } else if (isFlightDelayClaim(caseData) == false) {

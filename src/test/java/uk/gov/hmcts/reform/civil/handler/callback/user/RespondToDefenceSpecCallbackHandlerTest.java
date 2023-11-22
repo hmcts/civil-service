@@ -36,12 +36,15 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantRespon
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
@@ -924,6 +927,100 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getData())
                     .extracting("applicant1DQRequestedCourt")
                     .extracting("responseCourtCode").isEqualTo("312");
+            }
+
+        }
+
+        @Nested
+        class ClaimTypeFlightDelay {
+
+            @Test
+            void shouldUpdateCaseManagmentLocationIfAirlineNotOther() {
+                given(featureToggleService.isSdoR2Enabled()).willReturn(true);
+                LocationRefData locationA = LocationRefData.builder()
+                    .regionId("regionId1").epimmsId("111000").courtLocationCode("312").siteName("Site 1")
+                    .courtAddress("Lane 1").postcode("123").build();
+                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
+                    .thenReturn(locationA);
+                CaseLocationCivil flightLocation = CaseLocationCivil.builder().baseLocation("111000").region("2").build();
+
+                List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
+                airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .caseManagementLocation(CaseLocationCivil.builder().build())
+                    .applicant1DQ(
+                        Applicant1DQ.builder().applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(DynamicList.builder().build())
+                                .build()).build())
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(fromList(airlineEpimsIDList.stream()
+                                                                    .map(AirlineEpimsId::getAirline).toList(),
+                                                           Object::toString, airlineEpimsIDList.stream()
+                                                                    .map(AirlineEpimsId::getAirline).toList().get(0), false))
+                                     .flightCourtLocation(flightLocation)
+                                     .build())
+                    .build();
+                caseData.setIsFlightDelayClaim(YES);
+
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                assertThat(response.getData())
+                    .extracting("caseManagementLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("2", "111000");
+            }
+
+            @Test
+            void shouldUpdateCaseManagementLocatioToClaimantCourtIfAirlineOther() {
+
+                given(featureToggleService.isSdoR2Enabled()).willReturn(true);
+                LocationRefData locationA = LocationRefData.builder()
+                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
+                    .courtAddress("Lane 1").postcode("123").build();
+                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
+                    .thenReturn(locationA);
+
+                DynamicList airlineList = DynamicList.builder()
+                    .listItems(List.of(
+                                   DynamicListElement.builder().code("OTHER").label("OTHER").build()
+                               )
+                    )
+                    .value(DynamicListElement.builder().code("OTHER").label("OTHER").build())
+                    .build();
+                CaseLocationCivil requestCourt = CaseLocationCivil.builder().baseLocation("111000").region("2").build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .applicant1DQ(
+                        Applicant1DQ.builder().applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(DynamicList.builder().build())
+                                .build()).build())
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(airlineList)
+                                     .flightCourtLocation(null)
+                                     .build())
+                    .build();
+
+                caseData.setIsFlightDelayClaim(YES);
+
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                assertThat(response.getData())
+                    .extracting("caseManagementLocation").isNotNull();
+
+                assertThat(response.getData())
+                    .extracting("caseManagementLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("10", "214320");
+
             }
 
         }
