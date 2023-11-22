@@ -1123,6 +1123,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return Optional.ofNullable(getClaimFee())
             .map(Fee::getCalculatedAmountInPence)
             .orElse(BigDecimal.ZERO);
+    }
 
     public boolean hasApplicant1SignedSettlementAgreement() {
         return Optional.ofNullable(getCaseDataLiP())
