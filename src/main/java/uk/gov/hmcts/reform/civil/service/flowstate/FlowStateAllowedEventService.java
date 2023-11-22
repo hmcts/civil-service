@@ -85,11 +85,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
@@ -141,6 +141,9 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @RequiredArgsConstructor
 public class FlowStateAllowedEventService {
 
+    private final StateFlowEngine stateFlowEngine;
+    private final CaseDetailsConverter caseDetailsConverter;
+
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
         entry(
             DRAFT.fullName(),
@@ -178,16 +181,15 @@ public class FlowStateAllowedEventService {
 
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-            List.of(
-                NOC_REQUEST,
-                APPLY_NOC_DECISION,
-                ADD_CASE_NOTE,
-                INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO,
-                NotSuitable_SDO,
-                migrateCase,
-                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                CREATE_CLAIM_AFTER_PAYMENT
+            List.of(NOC_REQUEST,
+                    APPLY_NOC_DECISION,
+                    ADD_CASE_NOTE,
+                    INITIATE_GENERAL_APPLICATION,
+                    CREATE_SDO,
+                    NotSuitable_SDO,
+                    migrateCase,
+                    CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                    CREATE_CLAIM_AFTER_PAYMENT
             )
         ),
 
@@ -773,6 +775,7 @@ public class FlowStateAllowedEventService {
             )
         )
     );
+
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE_SPEC = Map.ofEntries(
         entry(
             DRAFT.fullName(),
@@ -794,16 +797,15 @@ public class FlowStateAllowedEventService {
 
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-            List.of(
-                NOC_REQUEST,
-                APPLY_NOC_DECISION,
-                ADD_CASE_NOTE,
-                INITIATE_GENERAL_APPLICATION,
-                CREATE_SDO,
-                NotSuitable_SDO,
-                migrateCase,
-                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                CREATE_CLAIM_AFTER_PAYMENT
+            List.of(NOC_REQUEST,
+                    APPLY_NOC_DECISION,
+                    ADD_CASE_NOTE,
+                    INITIATE_GENERAL_APPLICATION,
+                    CREATE_SDO,
+                    NotSuitable_SDO,
+                    migrateCase,
+                    CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                    CREATE_CLAIM_AFTER_PAYMENT
             )
         ),
 
@@ -1415,7 +1417,6 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS
             )
         ),
-
         entry(
             PART_ADMIT_AGREE_REPAYMENT.fullName(),
             List.of(
@@ -1429,8 +1430,6 @@ public class FlowStateAllowedEventService {
             )
         )
     );
-    private final StateFlowEngine stateFlowEngine;
-    private final CaseDetailsConverter caseDetailsConverter;
 
     public FlowState getFlowState(CaseData caseData) {
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
