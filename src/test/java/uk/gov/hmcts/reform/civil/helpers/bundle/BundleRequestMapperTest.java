@@ -36,6 +36,7 @@ class BundleRequestMapperTest {
     @InjectMocks
     private BundleRequestMapper bundleRequestMapper;
     private static final String TEST_URL = "url";
+    private static final String TEST_FILE_TYPE = "Email";
     private static final String TEST_FILE_NAME = "testFileName.pdf";
 
     @Test
@@ -117,7 +118,7 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(4).getValue().getDocumentFileName());
         assertEquals("Witness Summary cl1Fname 12/12/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(5).getValue().getDocumentFileName());
-        assertEquals("Documents referred to in statement 1 12/12/2022",
+        assertEquals("Email referred to in the statement of witness 12/12/2022",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(10).getValue().getDocumentFileName());
         assertEquals("Expert Evidence expert1 Test 12/01/2023",
                       bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1ExpertEvidence().get(0).getValue().getDocumentFileName());
@@ -168,10 +169,10 @@ class BundleRequestMapperTest {
             .documentHearsayNoticeApp2(getWitnessDocs())
             .documentHearsayNoticeRes(getWitnessDocs())
             .documentHearsayNoticeRes2(getWitnessDocs())
-            .documentReferredInStatement(setupOtherEvidenceDocs())
-            .documentReferredInStatementApp2(setupOtherEvidenceDocs())
-            .documentReferredInStatementRes(setupOtherEvidenceDocs())
-            .documentReferredInStatementRes2(setupOtherEvidenceDocs())
+            .documentReferredInStatement(setupOtherEvidenceDocs("witness"))
+            .documentReferredInStatementApp2(setupOtherEvidenceDocs("witness"))
+            .documentReferredInStatementRes(setupOtherEvidenceDocs("witness"))
+            .documentReferredInStatementRes2(setupOtherEvidenceDocs("witness"))
             .documentExpertReport(getExpertDocs("expert1"))
             .documentExpertReportApp2(getExpertDocs("expert2"))
             .documentExpertReportRes(getExpertDocs("expert3"))
@@ -192,19 +193,19 @@ class BundleRequestMapperTest {
             .documentEvidenceForTrialApp2(getDocumentEvidenceForTrial())
             .documentEvidenceForTrialRes(getDocumentEvidenceForTrial())
             .documentEvidenceForTrialRes2(getDocumentEvidenceForTrial())
-            .documentCaseSummary(setupOtherEvidenceDocs())
-            .documentCaseSummaryApp2(setupOtherEvidenceDocs())
-            .documentCaseSummaryRes(setupOtherEvidenceDocs())
-            .documentCaseSummaryRes2(setupOtherEvidenceDocs())
-            .documentForDisclosure(setupOtherEvidenceDocs())
+            .documentCaseSummary(setupOtherEvidenceDocs(null))
+            .documentCaseSummaryApp2(setupOtherEvidenceDocs(null))
+            .documentCaseSummaryRes(setupOtherEvidenceDocs(null))
+            .documentCaseSummaryRes2(setupOtherEvidenceDocs(null))
+            .documentForDisclosure(setupOtherEvidenceDocs(null))
             .defendantResponseDocuments(getDefendantResponseDocs())
             .claimantResponseDocuments(getClaimantResponseDocs())
             .dismissalOrderDocStaff(getOrderDoc(DocumentType.DISMISSAL_ORDER))
             .generalOrderDocStaff(getOrderDoc(DocumentType.GENERAL_ORDER))
-            .documentCosts(setupOtherEvidenceDocs())
-            .documentCostsApp2(setupOtherEvidenceDocs())
-            .documentCostsRes(setupOtherEvidenceDocs())
-            .documentCostsRes2(setupOtherEvidenceDocs())
+            .documentCosts(setupOtherEvidenceDocs(null))
+            .documentCostsApp2(setupOtherEvidenceDocs(null))
+            .documentCostsRes(setupOtherEvidenceDocs(null))
+            .documentCostsRes2(setupOtherEvidenceDocs(null))
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocs())
             .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
                 "applicant1").type(Party.Type.INDIVIDUAL).build())
@@ -328,10 +329,12 @@ class BundleRequestMapperTest {
         return otherEvidenceDocs;
     }
 
-    private List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs() {
+    private List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs(String witnessOptionName) {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
         otherEvidenceDocs.add(ElementUtils.element(UploadEvidenceDocumentType
                                                        .builder()
+                                                       .witnessOptionName(witnessOptionName)
+                                                       .typeOfDocument(TEST_FILE_TYPE)
                                                        .documentUpload(Document.builder().documentBinaryUrl(TEST_URL)
                                                                            .documentFileName(TEST_FILE_NAME).build())
                                                        .documentIssuedDate(LocalDate.of(2022, 12, 12))
