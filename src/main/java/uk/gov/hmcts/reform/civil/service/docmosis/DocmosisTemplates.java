@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 
 import javax.validation.constraints.NotNull;
 
-public enum DocmosisTemplates {
+public enum
+DocmosisTemplates {
     N1("CV-UNS-CLM-ENG-01126.docx", "sealed_claim_form_%s.pdf"),
     N1_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-01125.docx", "sealed_claim_form_%s.pdf"),
     N2("CV-SPC-CLM-ENG-01349.docx", "sealed_claim_form_spec%s.pdf"),
@@ -54,7 +55,9 @@ public enum DocmosisTemplates {
     HEARING_NOTICE_HMC("CV-UNS-HNO-ENG-01200.docx", "hearing_notice_%s.pdf"),
     // judge final Order
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
-    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf");
+    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
+    INTERLOCUTORY_JUDGEMENT_DOCUMENT("CV-SPC-CLM-ENG-INTERLOCUTORY-JUDGEMENT.docx", "%s-request-interloc-judgment.pdf");
+
     private final String template;
     private final String documentTitle;
 
