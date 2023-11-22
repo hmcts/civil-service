@@ -1588,6 +1588,7 @@ public class GeneralApplicationDetailsBuilder {
                 .ccdCaseReference(1L)
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("Applicant1").build())
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName("Respondent1").build())
+                .addRespondent2(NO)
                 .courtLocation(CourtLocation.builder()
                         .caseLocation(CaseLocationCivil.builder()
                                 .region("2")
