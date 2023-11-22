@@ -14,10 +14,6 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
@@ -45,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_LIP;
@@ -61,6 +58,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
@@ -143,9 +141,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 @RequiredArgsConstructor
 public class FlowStateAllowedEventService {
 
-    private final StateFlowEngine stateFlowEngine;
-    private final CaseDetailsConverter caseDetailsConverter;
-
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
         entry(
             DRAFT.fullName(),
@@ -183,15 +178,16 @@ public class FlowStateAllowedEventService {
 
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-            List.of(NOC_REQUEST,
-                    APPLY_NOC_DECISION,
-                    ADD_CASE_NOTE,
-                    INITIATE_GENERAL_APPLICATION,
-                    CREATE_SDO,
-                    NotSuitable_SDO,
-                    migrateCase,
-                    CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                    CREATE_CLAIM_AFTER_PAYMENT
+            List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ADD_CASE_NOTE,
+                INITIATE_GENERAL_APPLICATION,
+                CREATE_SDO,
+                NotSuitable_SDO,
+                migrateCase,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                CREATE_CLAIM_AFTER_PAYMENT
             )
         ),
 
@@ -547,6 +543,7 @@ public class FlowStateAllowedEventService {
                 JUDGMENT_PAID_IN_FULL,
                 RECORD_JUDGMENT,
                 TRANSFER_ONLINE_CASE,
+                CLAIMANT_RESPONSE_CUI,
                 asyncStitchingComplete
             )
         ),
@@ -605,11 +602,11 @@ public class FlowStateAllowedEventService {
             PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
             List.of(
                 NOC_REQUEST,
-                    APPLY_NOC_DECISION,
-                    TAKE_CASE_OFFLINE,
-                    NOTIFY_DEFENDANT_OF_CLAIM,
-                    APPLICATION_OFFLINE_UPDATE_CLAIM,
-                    migrateCase
+                APPLY_NOC_DECISION,
+                TAKE_CASE_OFFLINE,
+                NOTIFY_DEFENDANT_OF_CLAIM,
+                APPLICATION_OFFLINE_UPDATE_CLAIM,
+                migrateCase
             )
         ),
         entry(
@@ -776,7 +773,6 @@ public class FlowStateAllowedEventService {
             )
         )
     );
-
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE_SPEC = Map.ofEntries(
         entry(
             DRAFT.fullName(),
@@ -798,15 +794,16 @@ public class FlowStateAllowedEventService {
 
         entry(
             CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-            List.of(NOC_REQUEST,
-                    APPLY_NOC_DECISION,
-                    ADD_CASE_NOTE,
-                    INITIATE_GENERAL_APPLICATION,
-                    CREATE_SDO,
-                    NotSuitable_SDO,
-                    migrateCase,
-                    CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                    CREATE_CLAIM_AFTER_PAYMENT
+            List.of(
+                NOC_REQUEST,
+                APPLY_NOC_DECISION,
+                ADD_CASE_NOTE,
+                INITIATE_GENERAL_APPLICATION,
+                CREATE_SDO,
+                NotSuitable_SDO,
+                migrateCase,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
+                CREATE_CLAIM_AFTER_PAYMENT
             )
         ),
 
@@ -1108,7 +1105,9 @@ public class FlowStateAllowedEventService {
                 RECORD_JUDGMENT,
                 LIP_CLAIM_SETTLED,
                 TRANSFER_ONLINE_CASE,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                CLAIMANT_RESPONSE_CUI
+
             )
         ),
 
@@ -1259,7 +1258,7 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete
             )
         ),
-         entry(
+        entry(
             PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(),
             List.of(
                 ADD_DEFENDANT_LITIGATION_FRIEND,
@@ -1416,6 +1415,7 @@ public class FlowStateAllowedEventService {
                 AMEND_PARTY_DETAILS
             )
         ),
+
         entry(
             PART_ADMIT_AGREE_REPAYMENT.fullName(),
             List.of(
@@ -1429,6 +1429,8 @@ public class FlowStateAllowedEventService {
             )
         )
     );
+    private final StateFlowEngine stateFlowEngine;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     public FlowState getFlowState(CaseData caseData) {
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
