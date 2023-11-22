@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
@@ -100,15 +101,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
         if (updatedData.hasClaimantAgreedToFreeMediation() && updatedData.hasDefendantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
-        } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
-            response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());
-        } else if (!updatedData.hasApplicantProceededWithClaim()) {
-            response.state(updatedData.isClaimantConfirmAmountPaidPartAdmit() || updatedData.hasDefendantPayedTheAmountClaimed()
-                               ? CaseState.CASE_SETTLED.name()
-                               : CaseState.CASE_DISMISSED.name());
+        } else if (Objects.nonNull(updatedData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && updatedData.getApplicant1PartAdmitIntentionToSettleClaimSpec().equals(YesOrNo.YES)) {
+            response.state(CaseState.CASE_SETTLED.name());
+        } else if(!updatedData.hasApplicantProceededWithClaim()) {
+            response.state(CaseState.CASE_DISMISSED.name());
         } else if (updatedData.hasApplicantRejectedRepaymentPlan() && updatedData.getRespondent1().isCompanyOROrganisation()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
     }
-
 }
