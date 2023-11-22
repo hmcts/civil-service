@@ -159,7 +159,8 @@ class HearingNoticeHmcGeneratorTest {
                             .calculatedAmountInPence(new BigDecimal(123))
                             .build());
 
-        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN);
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
@@ -212,7 +213,8 @@ class HearingNoticeHmcGeneratorTest {
                             .calculatedAmountInPence(new BigDecimal(123))
                             .build());
 
-        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN);
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
@@ -265,7 +267,8 @@ class HearingNoticeHmcGeneratorTest {
                             .calculatedAmountInPence(new BigDecimal(123))
                             .build());
 
-        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN);
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
@@ -322,7 +325,8 @@ class HearingNoticeHmcGeneratorTest {
                             .calculatedAmountInPence(new BigDecimal(123))
                             .build());
 
-        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN);
+        var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
+                                                            "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = HearingNoticeHmc.builder()
             .caseNumber(caseData.getCcdCaseReference())
             .creationDate(LocalDate.now())
@@ -377,7 +381,8 @@ class HearingNoticeHmcGeneratorTest {
                             .calculatedAmountInPence(new BigDecimal(123))
                             .build());
 
-        var actual = generator.generate(caseData, hearing, BEARER_TOKEN);
+        var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
+                                        "SiteName - CourtAddress - Postcode", "hearingId");
         var expected = List.of(CASE_DOCUMENT);
 
         verify(documentManagementService)

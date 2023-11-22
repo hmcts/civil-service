@@ -22,7 +22,7 @@ public class HearingFeeUtils {
     public static LocalDate calculateHearingDueDate(LocalDate now, LocalDate hearingDate) {
         LocalDate calculatedHearingDueDate;
         if (now.isBefore(hearingDate.minusDays(36))) {
-            calculatedHearingDueDate = now.plusDays(28);
+            calculatedHearingDueDate = hearingDate.minusDays(28);
         } else {
             calculatedHearingDueDate = now.plusDays(7);
         }
