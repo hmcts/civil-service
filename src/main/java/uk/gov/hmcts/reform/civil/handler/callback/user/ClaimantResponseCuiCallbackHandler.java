@@ -21,8 +21,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -94,7 +94,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private boolean isJudicialReferralAllowed(CaseData caseData) {
         return (caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence())
-            && (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation());
+            && (nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation());
     }
 
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
@@ -102,10 +102,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             response.state(CaseState.IN_MEDIATION.name());
         } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
             response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());
-        } else if (!updatedData.hasApplicantProceededWithClaim()) {
-            response.state(updatedData.isClaimantConfirmAmountPaidPartAdmit() || updatedData.hasDefendantPayedTheAmountClaimed()
-                               ? CaseState.CASE_SETTLED.name()
-                               : CaseState.CASE_DISMISSED.name());
+        } else if (!updatedData.hasApplicantProceededWithClaim() && nonNull(updatedData.getApplicant1ProceedWithClaim())) {
+            response.state(updatedData.hasDefendantPayedTheAmountClaimed() ? CaseState.CASE_SETTLED.name() : CaseState.CASE_DISMISSED.name());
+        } else if (updatedData.hasClaimantAcceptedAdmittedAmountPaid()) {
+            response.state(CaseState.CASE_SETTLED.name());
         } else if (updatedData.hasApplicantRejectedRepaymentPlan() && updatedData.getRespondent1().isCompanyOROrganisation()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
