@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -103,7 +102,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             response.state(CaseState.IN_MEDIATION.name());
         } else if (!updatedData.hasApplicantProceededWithClaim() && nonNull(updatedData.getApplicant1ProceedWithClaim())) {
             response.state(updatedData.hasDefendantPayedTheAmountClaimed() ? CaseState.CASE_SETTLED.name() : CaseState.CASE_DISMISSED.name());
-        }else if (updatedData.hasClaimantAcceptedAdmittedAmountPaid()){
+        } else if (updatedData.hasClaimantAcceptedAdmittedAmountPaid()) {
             response.state(CaseState.CASE_SETTLED.name());
         } else if (updatedData.hasApplicantRejectedRepaymentPlan() && updatedData.getRespondent1().isCompanyOROrganisation()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
