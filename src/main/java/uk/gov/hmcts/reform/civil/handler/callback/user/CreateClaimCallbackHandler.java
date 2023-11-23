@@ -482,8 +482,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         handleCourtLocationData(caseData, dataBuilder, callbackParams);
 
-        // LiP are not represented or registered
-        OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
+        if (toggleService.isNoticeOfChangeEnabled()) {
+            // LiP are not represented or registered
+            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
+        }
 
         // temporarily default to yes for CIV-2659
         if (YES.equals(caseData.getRespondent1Represented()) && caseData.getRespondent1OrgRegistered() == null) {
@@ -508,17 +510,20 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         log.info("Case management equals: " + caseData.getCaseManagementCategory());
         log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 
-        if (caseData.getRespondent1Represented().equals(NO)) {
-            dataBuilder.defendant1LIPAtClaimIssued(YES);
-        } else {
-            dataBuilder.defendant1LIPAtClaimIssued(NO);
-        }
-
-        if (YES.equals(caseData.getAddRespondent2())) {
-            if (caseData.getRespondent2Represented() == NO) {
-                dataBuilder.defendant2LIPAtClaimIssued(YES);
+        //Adding variables for feature Certificate of Service
+        if (toggleService.isCertificateOfServiceEnabled()) {
+            if (caseData.getRespondent1Represented().equals(NO)) {
+                dataBuilder.defendant1LIPAtClaimIssued(YES);
             } else {
-                dataBuilder.defendant2LIPAtClaimIssued(NO);
+                dataBuilder.defendant1LIPAtClaimIssued(NO);
+            }
+
+            if (YES.equals(caseData.getAddRespondent2())) {
+                if (caseData.getRespondent2Represented() == NO) {
+                    dataBuilder.defendant2LIPAtClaimIssued(YES);
+                } else {
+                    dataBuilder.defendant2LIPAtClaimIssued(NO);
+                }
             }
         }
         //assign category ids to documents uploaded as part of particulars of claim
@@ -601,11 +606,18 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private String getBody(CaseData caseData) {
         return areRespondentsRepresentedAndRegistered(caseData)
             ? getConfirmationSummary(caseData)
-            : format(CONFIRMATION_BODY_LIP_COS,
+            : toggleService.isCertificateOfServiceEnabled()
+              ? format(CONFIRMATION_BODY_LIP_COS,
                        format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
                        format(caseDocLocation, caseData.getCcdCaseReference()),
                        claimUrlsConfiguration.getResponsePackLink())
-                + exitSurveyContentService.applicantSurvey();
+                + exitSurveyContentService.applicantSurvey()
+              : format(CONFIRMATION_BODY_COS,
+               format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
+               format(caseDocLocation, caseData.getCcdCaseReference()),
+               claimUrlsConfiguration.getResponsePackLink())
+            + exitSurveyContentService.applicantSurvey();
+
     }
 
     private String getConfirmationSummary(CaseData caseData) {

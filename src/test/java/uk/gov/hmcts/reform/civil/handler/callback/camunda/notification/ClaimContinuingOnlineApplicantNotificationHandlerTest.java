@@ -52,7 +52,23 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
 
         @BeforeEach
         void setup() {
+            when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline()).thenReturn("template-id");
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineCos()).thenReturn("template-id-cos");
+        }
+
+        @Test
+        void shouldNotifyApplicantSolicitor_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "claim-continuing-online-notification-000DC001"
+            );
         }
 
         @NotNull
@@ -66,10 +82,11 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
         }
 
         @Test
-        void shouldNotifyApplicantSolicitor_whenInvoked() {
+        void shouldNotifyApplicantSolicitor_whenCosEnabled() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -79,5 +96,22 @@ class ClaimContinuingOnlineApplicantNotificationHandlerTest extends BaseCallback
                 "claim-continuing-online-notification-000DC001"
             );
         }
+
+        @Test
+        void shouldNotifyApplicantSolicitorWithOldTemplate_whenCosDisabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "template-id",
+                getNotificationDataMap(caseData),
+                "claim-continuing-online-notification-000DC001"
+            );
+        }
+
     }
 }

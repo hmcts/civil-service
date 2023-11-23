@@ -80,7 +80,7 @@ public class GenerateClaimFormCallbackHandler extends CallbackHandler {
         );
         assignCategoryId.assignCategoryIdToCaseDocument(sealedClaim, "detailsOfClaim");
 
-        if (stitchEnabled
+        if (featureToggleService.isNoticeOfChangeEnabled() && stitchEnabled
             && (YesOrNo.NO.equals(caseData.getRespondent1Represented())
             || YesOrNo.NO.equals(caseData.getRespondent2Represented()))) {
 

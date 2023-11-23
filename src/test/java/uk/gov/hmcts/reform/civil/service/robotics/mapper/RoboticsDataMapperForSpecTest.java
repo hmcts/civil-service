@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
@@ -81,6 +82,7 @@ public class RoboticsDataMapperForSpecTest {
 
     @Test
     public void shouldMapExpectedNoticeOfChangeData_whenCaseGoesOffline() {
+        Mockito.when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
 
         var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
         var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
@@ -140,6 +142,8 @@ public class RoboticsDataMapperForSpecTest {
 
     @Test
     public void shouldMapExpectedNoticeOfChangeData_whenCaseDismissed() {
+        Mockito.when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
         var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
         var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
         var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");
@@ -198,6 +202,8 @@ public class RoboticsDataMapperForSpecTest {
 
     @Test
     public void shouldNotPopulateNoticeOfChangeSection_whenCaseIsStillOnline() {
+        Mockito.when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .submittedDate(LocalDateTime.now().minusDays(14))

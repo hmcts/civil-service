@@ -472,7 +472,9 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         log.info("Case management equals: " + caseData.getCaseManagementCategory());
         log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 
-        OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
+        if (featureToggleService.isNoticeOfChangeEnabled()) {
+            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
+        }
 
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, dataBuilder);
 

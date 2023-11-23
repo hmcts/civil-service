@@ -136,6 +136,7 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void setup() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
         when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
         when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
         when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
@@ -327,5 +328,40 @@ class GenerateClaimFormCallbackHandlerTest extends BaseCallbackHandlerTest {
             verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
         }
 
+    }
+
+    @Nested
+    @ExtendWith(SpringExtension.class)
+    @SpringBootTest(classes = {
+        GenerateClaimFormCallbackHandler.class,
+        JacksonAutoConfiguration.class,
+        CaseDetailsConverter.class,
+        AssignCategoryId.class
+    })
+    class GenerateSealedClaimNoNoC {
+
+        @Autowired
+        private GenerateClaimFormCallbackHandler handler;
+        @Autowired
+        private AssignCategoryId assignCategoryId;
+
+        @BeforeEach
+        void setup() {
+            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
+            when(sealedClaimFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(CLAIM_FORM);
+            when(time.now()).thenReturn(issueDate.atStartOfDay());
+        }
+
+        @Test
+        void testSingleSealedClaimGeneratedWhenNoCDisabled() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePendingClaimIssuedUnrepresentedDefendant().build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
+            verify(sealedClaimFormGenerator).generate(any(CaseData.class), eq(BEARER_TOKEN));
+        }
     }
 }

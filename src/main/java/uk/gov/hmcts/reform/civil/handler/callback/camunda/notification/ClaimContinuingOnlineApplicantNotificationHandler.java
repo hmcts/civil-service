@@ -54,7 +54,10 @@ public class ClaimContinuingOnlineApplicantNotificationHandler extends CallbackH
 
     private CallbackResponse notifyApplicantSolicitorForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String emailTemplateID = notificationsProperties.getClaimantSolicitorClaimContinuingOnlineCos();
+        boolean isCosEnabled = featureToggleService.isCertificateOfServiceEnabled();
+        String emailTemplateID = isCosEnabled != true
+            ? notificationsProperties.getClaimantSolicitorClaimContinuingOnline()
+            : notificationsProperties.getClaimantSolicitorClaimContinuingOnlineCos();
 
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),

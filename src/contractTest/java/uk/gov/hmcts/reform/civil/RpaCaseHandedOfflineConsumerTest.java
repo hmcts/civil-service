@@ -89,6 +89,8 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
     @Test
     @SneakyThrows
     void shouldGeneratePact_whenCaseTakenOffline() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
         CaseData caseData = CaseDataBuilder.builder()
             .atState(FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
             .legacyCaseReference("100DC001")
@@ -108,6 +110,8 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
     @Test
     @SneakyThrows
     void shouldGeneratePact_whenCaseDismissed() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
         CaseData caseData = CaseDataBuilder.builder()
             .atState(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
             .legacyCaseReference("100DC001")
@@ -127,6 +131,8 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
     @Test
     @SneakyThrows
     void shouldGeneratePact_whenNoticeOfChangeAndCaseTakenOffline() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
         CaseData caseData = CaseDataBuilder.builder()
             .atState(FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED)
             .legacyCaseReference("100DC001")
@@ -157,6 +163,8 @@ class RpaCaseHandedOfflineConsumerTest extends BaseRpaTest {
     @Test
     @SneakyThrows
     void shouldGeneratePact_whenNoticeOfChangeAndCaseDismissed() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
         CaseData caseData = CaseDataBuilder.builder()
             .atState(FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE)
             .legacyCaseReference("100DC001")

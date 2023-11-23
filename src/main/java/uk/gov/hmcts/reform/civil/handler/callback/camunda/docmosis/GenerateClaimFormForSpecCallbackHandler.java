@@ -154,7 +154,7 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
                                                       LocalDate.now().toString()));
 
         //LiP Claim form guidance needs be sent as the 2nd doc to go on the back of the claim form
-        if (stitchEnabled) {
+        if (toggleService.isNoticeOfChangeEnabled() && stitchEnabled) {
             if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
                 || YesOrNo.NO.equals(caseData.getSpecRespondent2Represented())) {
 

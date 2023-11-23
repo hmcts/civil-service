@@ -55,6 +55,8 @@ class StateFlowEngineSpecTest {
     @BeforeEach
     void setup() {
         given(featureToggleService.isGeneralApplicationsEnabled()).willReturn(false);
+        given(featureToggleService.isCertificateOfServiceEnabled()).willReturn(false);
+        given(featureToggleService.isNoticeOfChangeEnabled()).willReturn(false);
     }
 
     static Stream<Arguments> caseDataStream() {
@@ -196,9 +198,12 @@ class StateFlowEngineSpecTest {
         //When
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
-        // Then Claim will have GENERAL_APPLICATION_ENABLED and RPA_CONTINUOUS_FEED
+        // Then Claim will have NOTICE_OF_CHANGE, GENERAL_APPLICATION_ENABLED, CERTIFICATE_OF_SERVICE and RPA_CONTINUOUS_FEED
         assertThat(stateFlow.getFlags()).contains(
-            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
+            entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+            entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
+            entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
+        );
     }
 
     @ParameterizedTest(name = "{index}: The state flow flag ONE_RESPONDENT_REPRESENTATIVE is set to true (for appropriate cases)")
@@ -211,7 +216,7 @@ class StateFlowEngineSpecTest {
         assertThat(stateFlow.getFlags()).contains(
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(3);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(5);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     @ParameterizedTest(name = "{index}: The state flow flags ONE_RESPONDENT_REPRESENTATIVE and " +
@@ -226,7 +231,7 @@ class StateFlowEngineSpecTest {
             entry(FlowFlag.ONE_RESPONDENT_REPRESENTATIVE.name(), false),
             entry(FlowFlag.TWO_RESPONDENT_REPRESENTATIVES.name(), true)
         );
-        assertThat(stateFlow.getFlags()).hasSize(4);    // bonus: if this fails, a flag was added/removed but tests were not updated
+        assertThat(stateFlow.getFlags()).hasSize(6);    // bonus: if this fails, a flag was added/removed but tests were not updated
     }
 
     public interface StubbingFn extends Function<FeatureToggleService, OngoingStubbing<Boolean>> {
@@ -234,8 +239,12 @@ class StateFlowEngineSpecTest {
 
     static Stream<Arguments> commonFlagNames() {
         return Stream.of(
+            arguments(FlowFlag.NOTICE_OF_CHANGE.name(), (StubbingFn)(featureToggleService)
+                -> when(featureToggleService.isNoticeOfChangeEnabled())),
             arguments(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), (StubbingFn)(featureToggleService)
-                -> when(featureToggleService.isGeneralApplicationsEnabled()))
+                -> when(featureToggleService.isGeneralApplicationsEnabled())),
+            arguments(FlowFlag.CERTIFICATE_OF_SERVICE.name(), (StubbingFn)(featureToggleService)
+                -> when(featureToggleService.isCertificateOfServiceEnabled()))
         );
     }
 
@@ -423,7 +432,7 @@ class StateFlowEngineSpecTest {
     // Specified 1V2 both unrepresented with state transition from PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
     // TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT
     @Test()
-    void shouldNotGoOffline_1v2_whenBothUnrepresented() {
+    void shouldGoOffline_1v2_whenBothUnrepresented() {
         //Given
         CaseData caseData = CaseDataBuilderSpec.builder().atStateTakenOfflineUnrepresentedDefendantSameSolicitor()
             .build();

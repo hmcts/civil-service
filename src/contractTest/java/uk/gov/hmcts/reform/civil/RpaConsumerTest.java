@@ -214,6 +214,10 @@ class RpaConsumerTest extends BaseRpaTest {
 
     @Nested
     class UnrepresentedAndUnregisteredDefendant {
+        @BeforeEach
+        public void setup() {
+            when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+        }
 
         @Test
         @SneakyThrows
@@ -230,6 +234,30 @@ class RpaConsumerTest extends BaseRpaTest {
             PactVerificationResult result = getPactVerificationResult(payload, description);
 
             assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+        }
+
+        @Nested
+        class ToBeRemovedAfterNoc {
+            @Test
+            @SneakyThrows
+            void shouldGeneratePact_whenClaimAgainstUnrepresentedAndUnregisteredDefendant() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(false);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atState(FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT)
+                    .respondent1OrganisationPolicy(null)
+                    .respondent2OrganisationPolicy(null)
+                    .legacyCaseReference("000DC047")
+                    .build();
+                String payload = roboticsDataMapper.toRoboticsCaseData(caseData, BEARER_TOKEN).toJsonString();
+
+                assertThat(payload, validateJson());
+
+                String description = "Robotics case data for claim against unrepresented and unregistered defendant";
+                PactVerificationResult result = getPactVerificationResult(payload, description);
+
+                assertEquals(PactVerificationResult.Ok.INSTANCE, result);
+            }
         }
     }
 

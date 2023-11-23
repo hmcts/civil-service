@@ -310,8 +310,8 @@ public class CaseDataBuilderUnspec {
         respondent2 = PartyBuilder.builder().individual().build();
         respondent1Represented = NO;
         respondent2Represented = NO;
-        respondent1OrgRegistered = null;
-        respondent2OrgRegistered = null;
+        respondent1OrgRegistered = NO;
+        respondent2OrgRegistered = NO;
         return this;
     }
 
@@ -348,7 +348,7 @@ public class CaseDataBuilderUnspec {
         addRespondent2 = YES;
         respondent2 = PartyBuilder.builder().individual().build();
         respondent1Represented = NO;
-        respondent1OrgRegistered = null;
+        respondent1OrgRegistered = NO;
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
         return this;

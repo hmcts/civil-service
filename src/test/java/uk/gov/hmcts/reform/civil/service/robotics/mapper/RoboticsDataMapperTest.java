@@ -399,6 +399,8 @@ class RoboticsDataMapperTest {
 
     @Test
     void shouldMapExpectedNoticeOfChangeData_whenCaseGoesOffline() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePaymentSuccessful()
             .build().toBuilder()
@@ -435,6 +437,8 @@ class RoboticsDataMapperTest {
 
     @Test
     void shouldMapExpectedNoticeOfChangeData_whenCaseDismissed() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePaymentSuccessful()
             .build().toBuilder()
@@ -471,6 +475,8 @@ class RoboticsDataMapperTest {
 
     @Test
     void shouldNotPopulateNoticeOfChangeSection_whenCaseIsStillOnline() {
+        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+
         var app1NocDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
         var res1NocDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
         var res2NocDate = LocalDateTime.parse("2022-03-01T12:00:00.000550439");

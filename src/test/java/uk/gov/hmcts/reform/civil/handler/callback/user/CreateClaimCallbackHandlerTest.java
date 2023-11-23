@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -90,6 +91,7 @@ import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_SUMMARY;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_BODY_COS;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateClaimCallbackHandler.CONFIRMATION_BODY_LIP_COS;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -1291,6 +1293,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         class DefendantLipAtClaimIssued {
             @Test
             void shouldSetDefend1LipAtClaimIssued_when_defendant1LitigantParty() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 caseData = CaseDataBuilder.builder().atStateClaimSubmitted1v1AndNoRespondentRepresented().build();
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                     callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
@@ -1302,6 +1305,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetDefend1LipAtClaimIssued_1v2_defendant2LitigantParty_whenInvoked() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 caseData = CaseDataBuilder.builder()
                     .atStateClaimSubmitted1v2AndOnlyFirstRespondentIsRepresented()
                     .build();
@@ -1317,6 +1321,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetDefend1LipAtClaimIssued_1v2_defendant1LitigantParty_whenInvoked() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 caseData = CaseDataBuilder.builder()
                     .atStateClaimSubmitted1v2AndOnlySecondRespondentIsRepresented()
                     .build();
@@ -1332,6 +1337,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetDefendantLIPAtClaim_1v2_BothDefendantLitigantParty_whenInvoked() {
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 caseData = CaseDataBuilder.builder().atStateClaimSubmittedNoRespondentRepresented().build();
 
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -1624,6 +1630,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class PopulateBlankOrgPolicies {
+            @BeforeEach
+            public void setup() {
+                when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
+            }
 
             @Test
             void oneVOne() {
@@ -1779,9 +1789,32 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         class RespondentsDoNotHaveLegalRepresentation {
 
             @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondentsDoesNotHaveRepresentation() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
+
+                String body = format(
+                    CONFIRMATION_BODY_COS,
+                    format("/cases/case-details/%s#Service%%20Request", CASE_ID),
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                    responsePackLink
+                )  + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
+                        .confirmationBody(body)
+                        .build());
+            }
+
+            @Test
             void certificateOfService_shouldReturnExpectedResponse_whenRespondentsDoesNotHaveRepresentation() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
 
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -1847,6 +1880,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1HasRepresentationAndPBAv3AndCOSIsOn() {
+                Mockito.when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .multiPartyClaimOneDefendantSolicitor().build();
@@ -1870,9 +1904,33 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         class Respondent1DoesNotHaveLegalRepresentation {
 
             @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondentsDoesNotHaveRepresentation() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                LocalDateTime serviceDeadline = now().plusDays(112).atTime(23, 59);
+
+                String body = format(
+                    CONFIRMATION_BODY_COS,
+                    format("/cases/case-details/%s#Service%%20Request", CASE_ID),
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                    responsePackLink
+                )  + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
+                        .confirmationBody(body)
+                        .build());
+            }
+
+            @Test
             void certificateOfService_shouldReturnExpectedResponse_whenRespondentsDoesNotHaveRepresentation() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendant1().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
 
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -1895,11 +1953,34 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         class Respondent1SolicitorOrgNotRegisteredInMyHmcts {
 
             @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent1SolicitorNotRegisteredInMyHmcts() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .respondent1Represented(YES)
+                    .respondent1OrgRegistered(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
+                        .confirmationBody(format(
+                            CONFIRMATION_BODY_COS,
+                            format("/cases/case-details/%s#Service%%20Request", CASE_ID),
+                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            responsePackLink
+                        )  + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
             void certificateOfService_shouldReturnExpectedResponse_whenRespondent1SolicitorNotRegisteredInMyHmcts() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                     .respondent1Represented(YES)
                     .respondent1OrgRegistered(NO)
                     .build();
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
+
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -1920,9 +2001,30 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         class Respondent2DoesNotHaveLegalRepresentation {
 
             @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent2DoesNotHaveRepresentation() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                String body = format(
+                    CONFIRMATION_BODY_COS,
+                    format("/cases/case-details/%s#Service%%20Request", CASE_ID),
+                    format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                    responsePackLink
+                )  + exitSurveyContentService.applicantSurvey();
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
+                        .confirmationBody(body)
+                        .build());
+            }
+
+            @Test
             void certificateOfService_shouldReturnExpectedResponse_whenRespondent2DoesNotHaveRepresentation() {
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants().build();
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
                 String body = format(
@@ -1938,6 +2040,76 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .confirmationBody(body)
                         .build());
             }
+        }
+
+        @Nested
+        class Respondent2SolicitorOrgNotRegisteredInMyHmcts {
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent2SolicitorNotRegisteredInMyHmcts() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .respondent2Represented(YES)
+                    .respondent2OrgRegistered(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
+                        .confirmationBody(format(
+                            CONFIRMATION_BODY_COS,
+                            format("/cases/case-details/%s#Service%%20Request", CASE_ID),
+                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            responsePackLink
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void shouldReturnExpectedSubmittedCallbackResponse_whenRespondent2SolicitorNotRegisteredInMyHmcts_PBAV3() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .respondent2Represented(YES)
+                    .respondent2OrgRegistered(NO)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
+                        .confirmationBody(format(
+                            CONFIRMATION_BODY_COS,
+                            format("/cases/case-details/%s#Service%%20Request", CASE_ID),
+                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            responsePackLink
+                        ) + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
+            @Test
+            void certificateOfService_shouldReturnExpectedResponse_whenRespondent2SolicitorNotRegisteredInMyHmcts() {
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                    .respondent2Represented(YES)
+                    .respondent2OrgRegistered(NO)
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+                assertThat(response).usingRecursiveComparison().isEqualTo(
+                    SubmittedCallbackResponse.builder()
+                        .confirmationHeader(format("# Please now pay your claim fee%n# using the link below"))
+                        .confirmationBody(format(
+                            CONFIRMATION_BODY_COS,
+                            format("/cases/case-details/%s#Service%%20Request", CASE_ID),
+                            format("/cases/case-details/%s#CaseDocuments", CASE_ID),
+                            responsePackLink
+                        )  + exitSurveyContentService.applicantSurvey())
+                        .build());
+            }
+
         }
 
         @Nested

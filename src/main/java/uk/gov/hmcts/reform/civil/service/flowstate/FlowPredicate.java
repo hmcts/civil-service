@@ -71,12 +71,6 @@ public class FlowPredicate {
             && ((caseData.getRespondent1OrgRegistered() == YES && caseData.getRespondent2OrgRegistered() == NO)
             || (caseData.getRespondent2OrgRegistered() == YES && caseData.getRespondent1OrgRegistered() == NO));
 
-    public static final Predicate<CaseData> claimSubmitted1v1RespondentOneUnregistered = caseData ->
-        caseData.getSubmittedDate() != null
-            && caseData.getAddRespondent2() == NO
-            && caseData.getRespondent1Represented() == YES
-            && caseData.getRespondent1OrgRegistered() == NO;
-
     // have to use this for now because cannot use featureToggleService.isNoticeOfChangeEnabled() as predicate
     public static final Predicate<CaseData> noticeOfChangeEnabled = caseData ->
         (caseData.getDefendant1LIPAtClaimIssued() != null

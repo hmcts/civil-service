@@ -1863,7 +1863,6 @@ public class CaseDataBuilder {
         addRespondent2 = NO;
         respondent2 = null;
         respondent2Represented = null;
-        respondent2OrgRegistered = null;
         return this;
     }
 
@@ -2294,8 +2293,8 @@ public class CaseDataBuilder {
         atStateClaimSubmitted();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
-        respondent1OrgRegistered = null;
-        respondent2OrgRegistered = null;
+        respondent1OrgRegistered = NO;
+        respondent2OrgRegistered = NO;
         respondent1Represented = NO;
         respondent2Represented = NO;
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
