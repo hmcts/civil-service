@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Collection;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -750,10 +752,7 @@ public class BundleRequestMapper {
                 partyName = partyName.concat(" counter");
             }
             if (documentType.equals(EvidenceUploadFiles.DOCUMENTS_REFERRED.name())) {
-                return generateDocName(fileNamePrefix,
-                                       index,
-                                       null,
-                                       uploadEvidence.getValue().getDocumentIssuedDate());
+                return getEvidenceUploadTypeWithNameFileName(fileNamePrefix, uploadEvidence.getValue());
             } else {
                 return generateDocName(fileNamePrefix, partyName, null,
                                        documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name()) || documentType.equals(
@@ -763,6 +762,13 @@ public class BundleRequestMapper {
                 );
             }
         }
+    }
+
+    private String getEvidenceUploadTypeWithNameFileName(String body, UploadEvidenceDocumentType uploadEvidence) {
+        return String.format(body, uploadEvidence.getTypeOfDocument(),
+                uploadEvidence.getWitnessOptionName(),
+                uploadEvidence.getDocumentIssuedDate()
+                .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK)));
     }
 
     private List<BundlingRequestDocument> covertExpertEvidenceTypeToBundleRequestDocs(List<Element<UploadEvidenceExpert>> evidenceUploadExpert,
