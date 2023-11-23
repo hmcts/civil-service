@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimantClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -55,7 +55,7 @@ public class DashboardClaimInfoServiceTest {
     private FeatureToggleService featureToggleService;
 
     @Mock
-    private DashboardClaimStatusFactory dashboardClaimStatusFactory;
+    private DashboardDefendantClaimStatusFactory dashboardClaimStatusFactory;
 
     @Mock
     private DashboardClaimantClaimStatusFactory dashboardClaimantClaimStatusFactory;

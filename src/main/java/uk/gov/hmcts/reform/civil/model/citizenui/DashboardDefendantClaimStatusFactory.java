@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 
 @Service
-public class DashboardClaimStatusFactory {
+public class DashboardDefendantClaimStatusFactory {
 
     public DashboardClaimStatus getDashboardClaimStatus(Claim claim) {
         return Arrays.stream(DashboardClaimStatus.values())

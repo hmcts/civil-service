@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantClaimStatusFactory;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.ClaimData;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
@@ -33,7 +33,7 @@ public class ClaimStoreServiceTest {
     private ClaimStoreApi claimStoreApi;
 
     @Mock
-    private DashboardClaimStatusFactory dashboardClaimStatusFactory;
+    private DashboardDefendantClaimStatusFactory dashboardClaimStatusFactory;
 
     @InjectMocks
     private ClaimStoreService claimStoreService;

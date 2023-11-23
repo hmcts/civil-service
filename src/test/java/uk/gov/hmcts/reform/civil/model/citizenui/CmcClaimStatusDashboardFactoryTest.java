@@ -33,7 +33,7 @@ import static org.mockito.Mockito.mockStatic;
 public class CmcClaimStatusDashboardFactoryTest {
 
     @InjectMocks
-    private DashboardClaimStatusFactory cmcClaimStatusDashboardFactory;
+    private DashboardDefendantClaimStatusFactory cmcClaimStatusDashboardFactory;
 
     @Test
     void given_hasResponsePending_whenGetStatus_thenReturnNoResponse() {

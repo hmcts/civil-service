@@ -8,10 +8,10 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CcdDashboardClaimantClaimMatcher;
-import uk.gov.hmcts.reform.civil.model.citizenui.CcdDashboardClaimMatcher;
+import uk.gov.hmcts.reform.civil.model.citizenui.CcdDashboardDefendantClaimMatcher;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimantClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -39,7 +39,7 @@ public class DashboardClaimInfoService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ClaimStoreService claimStoreService;
     private final CoreCaseDataService coreCaseDataService;
-    private final DashboardClaimStatusFactory dashboardClaimStatusFactory;
+    private final DashboardDefendantClaimStatusFactory dashboardClaimStatusFactory;
     private final DashboardClaimantClaimStatusFactory dashboardClaimantClaimStatusFactory;
     private final FeatureToggleService featureToggleService;
 
@@ -185,7 +185,7 @@ public class DashboardClaimInfoService {
             caseData,
             featureToggleService
         ))
-            : dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            : dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             caseData,
             featureToggleService
         ));

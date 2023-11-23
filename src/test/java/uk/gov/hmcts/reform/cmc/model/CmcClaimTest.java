@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantClaimStatusFactory;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -22,7 +22,7 @@ public class CmcClaimTest {
 
     private static final String NAME = "Mr John Clark";
     @InjectMocks
-    private DashboardClaimStatusFactory cmcClaimStatusDashboardFactory;
+    private DashboardDefendantClaimStatusFactory cmcClaimStatusDashboardFactory;
 
     @Test
     void shouldReturnClaimantNameWhenClaimantExists() {
