@@ -29,7 +29,7 @@ data "azurerm_key_vault_secret" "db_password_v15_secret" {
 }
 
 resource "azurerm_key_vault_secret" "civil_db_password__v15_secret" {
-  name         = "cmc-db-username-v15"
+  name         = "cmc-db-password-v15"
   value        = data.azurerm_key_vault_secret.db_password_v15_secret.value
   key_vault_id = module.key-vault.key_vault_id
 
