@@ -205,7 +205,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(directionsQuestionnaire, "");
         if (UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.APP1_DQ.getValue());
-            assignCategoryId.assignCategoryIdToCaseDocument(copy, "DQApplicant");
+            assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_APP.getValue());
             if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.DEF1_DEFENSE_DQ.getValue());
                 assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF1.getValue());
@@ -224,7 +224,7 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.APP1_DQ.getValue());
-            assignCategoryId.assignCategoryIdToCaseDocument(copy, "DQApplicant");
+            assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_APP.getValue());
             if (directionsQuestionnaire.getDocumentName().contains("defendant")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.DEF1_DEFENSE_DQ.getValue());
                 assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF1.getValue());

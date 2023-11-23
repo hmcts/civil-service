@@ -12,6 +12,7 @@ public enum DocCategory {
     APP1_DQ("directionsQuestionnaire"),
     DQ_DEF1("DQRespondent"),
     DQ_DEF2("DQRespondentTwo"),
+    DQ_APP("DQApplicant"),
     HEARING_NOTICES("hearingNotices");
 
     private final String value;
