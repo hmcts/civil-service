@@ -671,6 +671,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return YesOrNo.NO == getRespondent1Represented();
     }
 
+    @JsonIgnore
+    public boolean isApplicantLiP() {
+        return YesOrNo.NO == getApplicant1Represented();
+    }
+
     public YesOrNo getRespondent2Represented() {
         return Stream.of(
                 respondent2Represented,
