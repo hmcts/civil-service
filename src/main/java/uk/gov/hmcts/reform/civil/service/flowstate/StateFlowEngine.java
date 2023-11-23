@@ -561,6 +561,7 @@ public class StateFlowEngine {
             .state(TAKEN_OFFLINE_AFTER_SDO)
             .state(PART_ADMIT_AGREE_SETTLE)
             .state(PART_ADMIT_AGREE_REPAYMENT)
+                .transitionTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyIf(ccjRequestJudgmentByAdmission)
             .state(PART_ADMIT_REJECT_REPAYMENT)
             .state(PART_ADMIT_PROCEED)
             .state(PART_ADMIT_NOT_PROCEED)
