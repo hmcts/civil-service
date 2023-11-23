@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RETRIGGER_CASES;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RETRIGGER_CASES_EVENTS;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,7 +36,7 @@ public class RetriggerCasesEventsHandler implements BaseExternalTaskHandler {
     public void handleTask(ExternalTask externalTask) {
         log.info("User authentication successful.");
         var caseIdForNotifyRpaOnCaseHandedOffline = readCaseIds("/caseIdForRetrigger.txt");
-        updateCaseByEvent(caseIdForNotifyRpaOnCaseHandedOffline, RETRIGGER_CASES);
+        updateCaseByEvent(caseIdForNotifyRpaOnCaseHandedOffline, RETRIGGER_CASES_EVENTS);
     }
 
     private void updateCaseByEvent(List<String> caseIdList, CaseEvent caseEvent) {
