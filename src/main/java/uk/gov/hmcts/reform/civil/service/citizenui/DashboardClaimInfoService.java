@@ -11,8 +11,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CcdDashboardClaimantClaimMatche
 import uk.gov.hmcts.reform.civil.model.citizenui.CcdDashboardDefendantClaimMatcher;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantClaimStatusFactory;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimantClaimStatusFactory;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -39,8 +38,7 @@ public class DashboardClaimInfoService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final ClaimStoreService claimStoreService;
     private final CoreCaseDataService coreCaseDataService;
-    private final DashboardDefendantClaimStatusFactory dashboardClaimStatusFactory;
-    private final DashboardClaimantClaimStatusFactory dashboardClaimantClaimStatusFactory;
+    private final DashboardClaimStatusFactory dashboardClaimStatusFactory;
     private final FeatureToggleService featureToggleService;
 
     public List<DashboardClaimInfo> getOcmcDefendantClaims(String authorisation, String defendantId) {
@@ -181,7 +179,7 @@ public class DashboardClaimInfoService {
 
     private DashboardClaimStatus getStatus(boolean isClaimant, CaseData caseData) {
         return isClaimant
-            ? dashboardClaimantClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            ? dashboardClaimStatusFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             caseData,
             featureToggleService
         ))

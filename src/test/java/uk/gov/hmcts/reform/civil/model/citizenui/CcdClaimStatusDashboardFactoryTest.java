@@ -43,11 +43,11 @@ class CcdClaimStatusDashboardFactoryTest {
     private FeatureToggleService featureToggleService;
 
     @InjectMocks
-    private DashboardDefendantClaimStatusFactory ccdClaimStatusDashboardFactory;
+    private DashboardClaimStatusFactory ccdClaimStatusDashboardFactory;
 
     @BeforeEach
     void setUp() {
-        ccdClaimStatusDashboardFactory = new DashboardDefendantClaimStatusFactory();
+        ccdClaimStatusDashboardFactory = new DashboardClaimStatusFactory();
     }
 
     @Test

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimInfo;
-import uk.gov.hmcts.reform.civil.model.citizenui.DashboardDefendantClaimStatusFactory;
+import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
 import uk.gov.hmcts.reform.cmc.client.ClaimStoreApi;
 import uk.gov.hmcts.reform.cmc.model.CmcClaim;
 import uk.gov.hmcts.reform.cmc.model.Response;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class ClaimStoreService {
 
     private final ClaimStoreApi claimStoreApi;
-    private final DashboardDefendantClaimStatusFactory dashboardClaimStatusFactory;
+    private final DashboardClaimStatusFactory dashboardClaimStatusFactory;
 
     public List<DashboardClaimInfo> getClaimsForClaimant(String authorisation, String claimantId) {
         try {
