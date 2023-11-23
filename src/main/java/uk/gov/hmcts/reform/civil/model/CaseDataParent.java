@@ -780,4 +780,9 @@ public class CaseDataParent implements MappableObject {
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantNotAgreedToFreeMediation).isPresent();
     }
+
+    @JsonIgnore
+    public boolean hasClaimantAcceptedAdmittedAmountPaid() {
+        return getApplicant1AcceptAdmitAmountPaidSpec() == YES;
+    }
 }
