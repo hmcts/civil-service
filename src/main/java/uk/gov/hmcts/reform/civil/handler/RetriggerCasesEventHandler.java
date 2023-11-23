@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RETRIGGER_CASES;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class RetriggerCasesEventsHandler implements BaseExternalTaskHandler {
+public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
 
@@ -94,7 +94,7 @@ public class RetriggerCasesEventsHandler implements BaseExternalTaskHandler {
     }
 
     private byte[] readBytes(String resourcePath) {
-        try (InputStream inputStream = RetriggerCasesEventsHandler.class.getResourceAsStream(resourcePath)) {
+        try (InputStream inputStream = RetriggerCasesEventHandler.class.getResourceAsStream(resourcePath)) {
             return IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
             throw new IllegalStateException(e);
