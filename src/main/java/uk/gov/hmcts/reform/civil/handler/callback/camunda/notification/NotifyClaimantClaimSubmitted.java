@@ -8,9 +8,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,8 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     public static final String TASK_ID_Applicant1 = "NotifyApplicant1ClaimSubmitted";
     private static final String REFERENCE_TEMPLATE = "claim-submitted-notification-%s";
     private final NotificationService notificationService;
+    private final FeatureToggleService toggleService;
+    private final PinInPostConfiguration pipInPostConfiguration;
     private final NotificationsProperties notificationsProperties;
     private final Map<String, Callback> callBackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForClaimSubmitted
@@ -45,7 +49,7 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     private CallbackResponse notifyApplicantForClaimSubmitted(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (Objects.isNull(caseData.getHelpWithFeesReferenceNumber())) {
+        if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
             generateEmail(caseData);
         }
 
@@ -61,15 +65,23 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
+            FRONTEND_URL, pipInPostConfiguration.getCuiFrontEndUrl()
         );
+    }
+
+    private String addTemplate(CaseData caseData) {
+        return Objects.isNull(caseData.getHelpWithFeesReferenceNumber())
+            ? notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate()
+            : notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate();
     }
 
     private void generateEmail(CaseData caseData) {
         if (Objects.nonNull(caseData.getApplicant1Email())) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate(),
+                addTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
