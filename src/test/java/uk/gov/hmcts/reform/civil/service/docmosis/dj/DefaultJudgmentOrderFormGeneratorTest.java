@@ -200,7 +200,6 @@ public class DefaultJudgmentOrderFormGeneratorTest {
 
     @Test
     void shouldDefaultJudgmentTrialOrderFormGenerator_whenNoticeOfChangeEnabled() {
-        when(featureToggleService.isNoticeOfChangeEnabled()).thenReturn(true);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DJ_SDO_TRIAL)))
             .thenReturn(new DocmosisDocument(DJ_SDO_TRIAL.getDocumentTitle(), bytes));
         when(documentManagementService
