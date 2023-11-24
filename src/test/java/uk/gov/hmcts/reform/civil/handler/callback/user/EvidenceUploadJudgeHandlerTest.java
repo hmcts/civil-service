@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -104,109 +105,83 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldCopyDocumentAndNameToAdd_whenDocumentWithNameIsNull() {
             Document document = Document.builder().documentFileName("fileName").build();
-            DocumentWithName testDocument = DocumentWithName.builder()
-                .documentName("testDocument")
-                .document(document)
-                .build();
+            DocumentWithName testDocument = DocumentWithName.builder().documentName("testDocument").document(document).createdBy("bill bob").build();
             List<Element<DocumentWithName>> documentWithNameToAdd = wrapElements(testDocument);
-
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
                 .documentAndNameToAdd(documentWithNameToAdd)
-                .caseNoteTA(null)
                 .build();
+            when(caseNoteService.buildJudgeCaseNoteDocumentAndName(any(), any())).thenReturn(documentWithNameToAdd);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("documentAndName")
-                .isEqualTo(objectMapper.convertValue(documentWithNameToAdd, new TypeReference<>() {}));
+            assertThat(response.getData()).extracting("documentAndName").isEqualTo(objectMapper.convertValue(documentWithNameToAdd, new TypeReference<>() {}));
             assertThat(response.getData()).extracting("caseNotesTA").isNull();
             assertThat(response.getData()).extracting("documentAndNote").isNull();
-
         }
 
         @Test
         void shouldAddDocument_whenDocumentWithNameIsNotNull() {
             Document document = Document.builder().documentFileName("fileName").build();
-            DocumentWithName testDocument = DocumentWithName.builder()
-                .documentName("testDocument")
-                .document(document)
-                .build();
-            List<Element<DocumentWithName>> documentWithNameToAdd = wrapElements(testDocument);
+            DocumentWithName testDocument = DocumentWithName.builder().documentName("testDocument").document(document).createdBy("John Doe").build();
             List<Element<DocumentWithName>> documentWithNameStart = wrapElements(testDocument);
+            List<Element<DocumentWithName>> documentWithNameToAdd = wrapElements(testDocument);
             List<Element<DocumentWithName>> documentWithNameEnd = wrapElements(testDocument, testDocument);
-
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .caseNoteType(CaseNoteType.DOCUMENT_ONLY)
                 .documentAndNameToAdd(documentWithNameToAdd)
                 .documentAndName(documentWithNameStart)
-                .caseNoteTA(null)
                 .build();
+            when(caseNoteService.buildJudgeCaseNoteDocumentAndName(any(), any())).thenReturn(documentWithNameToAdd);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("documentAndName")
-                .isEqualTo(objectMapper.convertValue(documentWithNameEnd, new TypeReference<>() {}));
+            assertThat(response.getData()).extracting("documentAndName").isEqualTo(objectMapper.convertValue(documentWithNameEnd, new TypeReference<>() {}));
             assertThat(response.getData()).extracting("caseNotesTA").isNull();
             assertThat(response.getData()).extracting("documentAndNote").isNull();
-
         }
 
         @Test
         void shouldAddNote_whenDocumentWithNoteIsNotNull() {
             Document document = Document.builder().documentFileName("fileName").build();
-            DocumentAndNote testDocument = DocumentAndNote.builder()
-                .documentName("testDocument")
-                .document(document)
-                .documentNote("Note")
-                .build();
+            DocumentAndNote testDocument = DocumentAndNote.builder().documentName("testDocument").document(document).documentNote("Note").createdBy("john smith").build();
             List<Element<DocumentAndNote>> documentAndNoteToAdd = wrapElements(testDocument);
             List<Element<DocumentAndNote>> documentAndNoteStart = wrapElements(testDocument);
             List<Element<DocumentAndNote>> documentAndNoteEnd = wrapElements(testDocument, testDocument);
-
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .caseNoteType(CaseNoteType.DOCUMENT_AND_NOTE)
                 .documentAndNoteToAdd(documentAndNoteToAdd)
                 .documentAndNote(documentAndNoteStart)
                 .build();
+            when(caseNoteService.buildJudgeCaseNoteAndDocument(any(), any())).thenReturn(documentAndNoteToAdd);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("documentAndNote")
-                .isEqualTo(objectMapper.convertValue(documentAndNoteEnd, new TypeReference<>() {}));
+            assertThat(response.getData()).extracting("documentAndNote").isEqualTo(objectMapper.convertValue(documentAndNoteEnd, new TypeReference<>() {}));
             assertThat(response.getData()).extracting("caseNotesTA").isNull();
             assertThat(response.getData()).extracting("documentAndName").isNull();
-
         }
 
         @Test
         void shouldCopyDocumentAndNoteToAdd_whenDocumentWithNoteIsNull() {
             Document document = Document.builder().documentFileName("fileName").build();
-            DocumentAndNote testDocument = DocumentAndNote.builder()
-                .documentName("testDocument")
-                .document(document)
-                .documentNote("Note")
-                .build();
+            DocumentAndNote testDocument = DocumentAndNote.builder().documentName("testDocument").document(document).documentNote("Note").createdBy("Jason Bourne").build();
             List<Element<DocumentAndNote>> documentAndNoteToAdd = wrapElements(testDocument);
-
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .caseNoteType(CaseNoteType.DOCUMENT_AND_NOTE)
                 .documentAndNoteToAdd(documentAndNoteToAdd)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            when(caseNoteService.buildJudgeCaseNoteAndDocument(any(), any())).thenReturn(documentAndNoteToAdd);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("documentAndNote")
-                .isEqualTo(objectMapper.convertValue(documentAndNoteToAdd, new TypeReference<>() {}));
+            assertThat(response.getData()).extracting("documentAndNote").isEqualTo(objectMapper.convertValue(documentAndNoteToAdd, new TypeReference<>() {}));
             assertThat(response.getData()).extracting("caseNotesTA").isNull();
             assertThat(response.getData()).extracting("documentAndName").isNull();
-
         }
     }
 
