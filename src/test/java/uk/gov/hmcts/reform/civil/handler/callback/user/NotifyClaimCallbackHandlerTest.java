@@ -36,7 +36,6 @@ import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -98,74 +97,11 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimNotified_1v2_andNotifyBothSolicitors()
                 .build();
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertTrue(response.getData().containsKey("defendantSolicitorNotifyClaimOptions"));
-        }
-
-        @Test
-        void aboutToStart_ShouldReturnErrorMessageCallbackResponse_1v1_WhenDefendant1LiP_CosDisabled() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued1v1LiP()
-                .build();
-
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).contains(ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT);
-        }
-
-        @Test
-        void aboutToStart_ShouldReturnErrorMessageCallbackResponse_1v2WhenDefendant2LiP_CosDisabled() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued1v2Respondent2LiP()
-                .addRespondent2(YesOrNo.YES)
-                .build();
-
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getErrors()).contains(ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT);
-        }
-
-        @Test
-        void aboutToStart_Should_Not_ReturnErrorMessageCallbackResponse_1v1_WhenDefendant1Represented_CosDisabled() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .addRespondent2(YesOrNo.NO)
-                .build();
-
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertNull(response.getErrors());
-        }
-
-        @Test
-        void aboutToStart_ShouldNotReturnErrorMessageCallbackResponse_1v2_BothDefendant1Represented_CosDisabled() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimSubmittedTwoRespondentRepresentatives()
-                .build();
-
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            AboutToStartOrSubmitCallbackResponse response =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertNull(response.getErrors());
         }
     }
 
@@ -296,7 +232,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 15, 16, 05));
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
 
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(16, 05)))
                 .thenReturn(claimDetailsNotificationDeadline);
@@ -341,8 +276,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
 
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                 .thenReturn(cosNotifyDate.plusDays(14).atTime(END_OF_BUSINESS_DAY));
 
@@ -366,7 +299,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 15, 15, 05));
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
 
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                 .thenReturn(claimDetailsNotificationDeadline);
@@ -506,7 +438,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 LocalDate cosNotifyDate = LocalDate.of(2021, 4, 2);
 
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
                 when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
@@ -538,7 +469,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             void shouldSetDetailsNotificationDeadline_Cos_1v2_whenLipDefendant2() {
 
                 LocalDate cosNotifyDate = LocalDate.of(2021, 4, 2);
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
                 when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
@@ -573,7 +503,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate cosDef2NotifyDate = LocalDate.of(2021, 5, 2);
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
 
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef1NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
@@ -606,7 +535,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate cosDef2NotifyDate = LocalDate.of(2021, 4, 28);
 
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef2NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
@@ -639,7 +567,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate cosDef2NotifyDate = LocalDate.of(2021, 4, 2);
 
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
                 when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef1NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
@@ -670,35 +597,8 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 LocalDate cosNotifyDate = LocalDate.of(2021, 4, 26);
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
 
                 when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
-                    .thenReturn(claimDetailsNotificationDeadline);
-
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimNotified1v1LiP(CertificateOfService.builder()
-                                                    .cosDateOfServiceForDefendant(cosNotifyDate)
-                                                    .build())
-                    .claimNotificationDeadline(claimNotificationDeadline)
-                    .build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(
-                    CallbackType.ABOUT_TO_SUBMIT,
-                    caseData
-                ).build();
-                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-                assertThat(response.getData())
-                    .containsEntry("claimDetailsNotificationDeadline", expectedDeadline.format(ISO_DATE_TIME));
-            }
-
-            @Test
-            void shouldSetDetailsNotificationDeadline_Cos_disabled_1v1_whenLipDefendant() {
-
-                LocalDate cosNotifyDate = LocalDate.of(2021, 4, 2);
-
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
-
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(notifyClaimDateTime))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -899,7 +799,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                           .builder().cosDateOfServiceForDefendant(LocalDate.now())
                                                           .build())
                 .build();
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
@@ -922,7 +821,6 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                                               .cosDateOfServiceForDefendant(LocalDate.now())
                                               .build())
                 .build();
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
