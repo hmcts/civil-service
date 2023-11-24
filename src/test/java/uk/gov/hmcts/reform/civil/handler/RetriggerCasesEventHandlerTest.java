@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -75,13 +76,14 @@ class RetriggerCasesEventHandlerTest {
     void testUpdateCaseByEventWithGenericException() {
         List<String> caseIdList = Arrays.asList("1", "2", "3");
 
-        // Simulate a generic exception
-        doThrow(RuntimeException.class).when(coreCaseDataService).triggerEvent(anyLong(), eq(CaseEvent.RETRIGGER_CASES));
+        doThrow(new RuntimeException("Simulated RuntimeException")).when(coreCaseDataService)
+            .triggerEvent(anyLong(), eq(CaseEvent.RETRIGGER_CASES));
 
-        // Assertions
         RuntimeException exception = assertThrows(RuntimeException.class, () ->
             retriggerCasesEventHandler.updateCaseByEvent(caseIdList, CaseEvent.RETRIGGER_CASES)
         );
+
+        assertEquals("Simulated RuntimeException", exception.getMessage());
     }
 
     @Test
