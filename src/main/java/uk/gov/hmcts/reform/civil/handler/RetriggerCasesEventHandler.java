@@ -6,9 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.Event;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -18,7 +15,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -39,26 +35,23 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
         updateCaseByEvent(caseIdForNotifyRpaOnCaseHandedOffline, RETRIGGER_CASES);
     }
 
-    private void updateCaseByEvent(List<String> caseIdList, CaseEvent caseEvent) {
+    public void updateCaseByEvent(List<String> caseIdList, CaseEvent caseEvent) {
         if (caseIdList != null && !caseIdList.isEmpty()) {
             log.info("Retrigger cases started for event: {}", caseEvent);
             caseIdList.forEach(caseId -> {
                 try {
                     log.info("Retrigger CaseId: {} started", caseId);
-                    var startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
-
-                    Map<String, Object> caseDataMap = coreCaseDataService.getCase(Long.valueOf(caseId)).getData();
-
-                    coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, caseDataMap));
+                    coreCaseDataService.triggerEvent(Long.parseLong(caseId), caseEvent);
                     log.info("Retrigger CaseId: {} finished", caseId);
 
                 } catch (FeignException e) {
                     log.error("ERROR Retrigger CaseId: {}", caseId);
-                    log.error(String.format("Updating case data failed: %s", e.contentUTF8()));
+                    log.error(String.format("Retrigger case failed: %s", e.contentUTF8()));
                     throw e;
                 } catch (Exception e) {
                     log.error("ERROR Retrigger CaseId: {}", caseId);
-                    log.error(String.format("Updating case data failed: %s", e.getMessage()));
+                    log.error(String.format("Retrigger case failed: %s", e.getMessage()));
+                    throw e;
                 }
                 log.info("Retrigger cases Finished for event: {}", caseEvent);
             });
@@ -66,17 +59,6 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
             log.info("List id empty for: {}", caseEvent);
         }
 
-    }
-
-    private CaseDataContent caseDataContent(StartEventResponse startEventResponse, Map<String, Object> caseDataMap) {
-        Map<String, Object> data = startEventResponse.getCaseDetails().getData();
-        data.putAll(caseDataMap);
-
-        return CaseDataContent.builder()
-            .eventToken(startEventResponse.getToken())
-            .event(Event.builder().id(startEventResponse.getEventId()).build())
-            .data(data)
-            .build();
     }
 
     public List<String> readCaseIds(String file) {
@@ -93,7 +75,7 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
         return new String(readBytes(resourcePath), StandardCharsets.UTF_8);
     }
 
-    private byte[] readBytes(String resourcePath) {
+    byte[] readBytes(String resourcePath) {
         try (InputStream inputStream = RetriggerCasesEventHandler.class.getResourceAsStream(resourcePath)) {
             return IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
