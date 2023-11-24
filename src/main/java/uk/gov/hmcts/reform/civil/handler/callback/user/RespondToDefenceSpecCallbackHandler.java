@@ -13,12 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
@@ -274,6 +269,11 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             builder.respondent1ClaimResponseDocumentSpec(null);
         }
 
+        // if its flight delay claim set the claim type to Flight delay for Work Allocation
+        if(isFlightDelayClaim(caseData)){
+            builder.claimType(ClaimType.FLIGHT_DELAY);
+
+        }
         //Update the caseManagement location to the flight location if No flight location update to Claimant
         // preferred location
         if (isFlightDelayClaimAndUpdateCaseLocation(caseData)) {
