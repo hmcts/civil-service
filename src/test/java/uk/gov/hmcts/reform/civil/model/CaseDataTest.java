@@ -687,7 +687,7 @@ public class CaseDataTest {
         @Test
         public void shouldReturnNull_whenHearingLocationValueIsNull() {
             CaseData caseData = CaseData.builder()
-                .hearingLocation(DynamicList.builder().value(DynamicListElement.EMPTY).build()).build();
+                    .hearingLocation(DynamicList.builder().value(DynamicListElement.EMPTY).build()).build();
             String actual = caseData.getHearingLocationText();
 
             assertNull(actual);
@@ -696,12 +696,42 @@ public class CaseDataTest {
         @Test
         public void shouldExpectedString_whenHearingLocationValueLabelIsNotNull() {
             CaseData caseData = CaseData.builder()
-                .hearingLocation(DynamicList.builder().value(
-                    DynamicListElement.dynamicElement("label")).build()).build();
+                    .hearingLocation(DynamicList.builder().value(
+                            DynamicListElement.dynamicElement("label")).build()).build();
             String actual = caseData.getHearingLocationText();
 
             assertEquals("label", actual);
         }
+    }
+
+    @Test
+    void shouldReturnTrueWhenRespondentSignSettlementAgreementIsNotNull() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .caseDataLip(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO).build())
+            .build();
+
+        //When
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
+
+        //Then
+        assertTrue(isRespondentSignSettlementAgreement);
+    }
+
+    @Test
+    void shouldReturnFalseWhenRespondentSignSettlementAgreementIsNull() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .caseDataLip(CaseDataLiP.builder().build())
+            .build();
+
+        //When
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
+
+        //Then
+        assertFalse(isRespondentSignSettlementAgreement);
     }
 }
 

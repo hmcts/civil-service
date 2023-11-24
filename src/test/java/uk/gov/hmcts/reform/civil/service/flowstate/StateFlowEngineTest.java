@@ -31,8 +31,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,6 +85,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
@@ -129,10 +132,8 @@ class StateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
@@ -159,10 +160,8 @@ class StateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
@@ -194,13 +193,11 @@ class StateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
 
@@ -229,13 +226,10 @@ class StateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -380,144 +374,6 @@ class StateFlowEngineTest {
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName());
         }
 
-        // remove this when NoC is implemented
-        @Nested
-        class UnrepresentedTakenOfflineBeforeNoC {
-            // 1v1 Unrepresented
-            @Test
-            void shouldReturnProceedsWithOfflineJourney_1v1_whenCaseDataAtStateClaimDraftIssuedAndResUnrepresented() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimIssued1v1UnrepresentedDefendant()
-                    .defendant1LIPAtClaimIssued(null)
-                    .defendant2LIPAtClaimIssued(null)
-                    .build();
-
-                // When
-                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-                // Then
-                assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
-                assertThat(stateFlow.getStateHistory())
-                    .hasSize(5)
-                    .extracting(State::getName)
-                    .containsExactly(
-                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
-                        TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
-                    );
-                assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
-                );
-            }
-
-            // 1v2
-            // Unrepresented
-            // 1. Both def1 and def2 unrepresented
-            @Test
-            void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondentsNotRepresented() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimIssuedUnrepresentedDefendants()
-                    .defendant1LIPAtClaimIssued(null)
-                    .defendant2LIPAtClaimIssued(null)
-                    .build();
-
-                // When
-                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-                // Then
-                assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
-                assertThat(stateFlow.getStateHistory())
-                    .hasSize(5)
-                    .extracting(State::getName)
-                    .containsExactly(
-                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
-                        TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
-                    );
-                assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
-                );
-            }
-
-            // Unrepresented
-            // 2. Def1 unrepresented, Def2 registered
-            @Test
-            void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondent1NotRepresented() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimIssuedUnrepresentedDefendant1()
-                    .defendant1LIPAtClaimIssued(null)
-                    .build();
-
-                // When
-                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-                // Then
-                assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
-                assertThat(stateFlow.getStateHistory())
-                    .hasSize(5)
-                    .extracting(State::getName)
-                    .containsExactly(
-                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
-                        TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
-                    );
-                assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
-                );
-            }
-
-            // Unrepresented
-            // 3. Def1 registered, Def 2 unrepresented
-            @Test
-            void shouldReturnProceedsWithOfflineJourney_whenCaseDataAtStateClaimDraftIssuedRespondent2NotRepresented() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimIssuedUnrepresentedDefendant2()
-                    .defendant2LIPAtClaimIssued(null)
-                    .build();
-
-                // When
-                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-                // Then
-                assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
-                assertThat(stateFlow.getStateHistory())
-                    .hasSize(5)
-                    .extracting(State::getName)
-                    .containsExactly(
-                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
-                        TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
-                    );
-                assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
-                );
-            }
-        }
-
         @Nested
         class UnrepresentedDefendant {
             @Test
@@ -547,52 +403,13 @@ class StateFlowEngineTest {
                         PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
 
-            // 1v1
-            // Unrepresented cos service not activated
-            @Test
-            void shouldContinueOnline_1v1_whenDefendantIsUnrepresented() {
-                // Given
-                CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimIssued1v1UnrepresentedDefendant()
-                    .defendant1LIPAtClaimIssued(YES)
-                    .build();
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
-
-                // When
-                StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-                // Then
-                assertThat(stateFlow.getState())
-                    .extracting(State::getName)
-                    .isNotNull()
-                    .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName());
-                assertThat(stateFlow.getStateHistory())
-                    .hasSize(4)
-                    .extracting(State::getName)
-                    .containsExactly(
-                        DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
-                    );
-
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                    entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
-            }
-
-            // Unrepresented cos service activated
             @Test
             void shouldContinueOnline_1v1_cos_whenDefendantIsUnrepresented() {
                 // Given
@@ -600,7 +417,6 @@ class StateFlowEngineTest {
                     .atStateClaimIssued1v1UnrepresentedDefendant()
                     .defendant2LIPAtClaimIssued(YES)
                     .build();
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -618,11 +434,9 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), true)
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
 
@@ -654,10 +468,8 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -673,7 +485,6 @@ class StateFlowEngineTest {
                     .defendant1LIPAtClaimIssued(YES)
                     .defendant2LIPAtClaimIssued(YES)
                     .build();
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -691,11 +502,9 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -708,7 +517,6 @@ class StateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
                     .build();
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -726,11 +534,9 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -743,7 +549,6 @@ class StateFlowEngineTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssuedUnrepresentedDefendant1()
                     .build();
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -761,11 +566,9 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), true),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -779,7 +582,6 @@ class StateFlowEngineTest {
                     .atStateClaimIssuedUnrepresentedDefendant2()
                     .defendant2LIPAtClaimIssued(YES)
                     .build();
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
 
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
@@ -797,11 +599,9 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -816,8 +616,6 @@ class StateFlowEngineTest {
                     .defendant2LIPAtClaimIssued(YES)
                     .build();
 
-                when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-
                 // When
                 StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
@@ -834,13 +632,10 @@ class StateFlowEngineTest {
                         PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false),
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), true)
-                );
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
             }
 
             // 1v2 spec
@@ -862,19 +657,18 @@ class StateFlowEngineTest {
                 assertThat(stateFlow.getState())
                     .extracting(State::getName)
                     .isNotNull()
-                    .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName());
+                    .isEqualTo(TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName());
                 assertThat(stateFlow.getStateHistory())
-                    .hasSize(4)
+                    .hasSize(5)
                     .extracting(State::getName)
                     .containsExactly(
                         SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName()
+                        PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
+                        TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry(FlowFlag.UNREPRESENTED_DEFENDANT_TWO.name(), true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -905,10 +699,8 @@ class StateFlowEngineTest {
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -938,8 +730,6 @@ class StateFlowEngineTest {
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
                 assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -970,8 +760,6 @@ class StateFlowEngineTest {
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
                 assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -1000,10 +788,8 @@ class StateFlowEngineTest {
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -1038,10 +824,8 @@ class StateFlowEngineTest {
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -1069,10 +853,8 @@ class StateFlowEngineTest {
                         TAKEN_OFFLINE_UNREGISTERED_DEFENDANT.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -1104,8 +886,6 @@ class StateFlowEngineTest {
                         TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
                     );
                 assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -1136,8 +916,6 @@ class StateFlowEngineTest {
                     );
 
                 assertThat(stateFlow.getFlags()).hasSize(4).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -1169,11 +947,9 @@ class StateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -1198,13 +974,10 @@ class StateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -1226,13 +999,10 @@ class StateFlowEngineTest {
                 .containsExactly(
                     DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_FAILED.fullName());
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -1262,13 +1032,10 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -1302,14 +1069,11 @@ class StateFlowEngineTest {
                     CLAIM_ISSUED.fullName(),
                     TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName()
                 );
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -1343,14 +1107,11 @@ class StateFlowEngineTest {
                     CLAIM_ISSUED.fullName(),
                     CLAIM_NOTIFIED.fullName()
                 );
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -1380,13 +1141,10 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false));
         }
 
         @Test
@@ -1411,12 +1169,9 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true));
         }
 
         @Test
@@ -1449,13 +1204,10 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -1512,12 +1264,9 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -1548,12 +1297,9 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -1586,12 +1332,9 @@ class StateFlowEngineTest {
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -1622,13 +1365,10 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -1653,12 +1393,9 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Nested
@@ -1689,12 +1426,9 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", true));
             }
 
             @Test
@@ -1734,12 +1468,9 @@ class StateFlowEngineTest {
                         FULL_ADMISSION.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
+                    entry("ONE_RESPONDENT_REPRESENTATIVE", true));
             }
 
             @Test
@@ -1773,12 +1504,9 @@ class StateFlowEngineTest {
                         PART_ADMISSION.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
             }
 
             @Test
@@ -1816,12 +1544,9 @@ class StateFlowEngineTest {
                         COUNTER_CLAIM.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
             }
         }
 
@@ -1861,13 +1586,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
             }
 
             //1v2 Different solicitor scenario-first response FullDefence received
@@ -1903,13 +1625,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
             }
 
             //1v2 Different solicitor scenario-first response FullDefence received
@@ -1945,13 +1664,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
             }
 
             //1v2 Different solicitor scenario-first party acknowledges, not responds
@@ -1988,13 +1704,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true));
             }
 
             //Respondent 1 submits FULL DEFENCE, Respondent 2 submits FULL DEFENCE
@@ -2030,13 +1743,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true));
             }
 
             //Respondent 1 and 2 acknowledges claim, then submits  FULL DEFENCE
@@ -2073,13 +1783,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true));
             }
 
             //Respondent 1 acknowledges claim, then Respondent 1 & 2 submits  FULL DEFENCE
@@ -2117,13 +1824,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-                );
+                    entry("TWO_RESPONDENT_REPRESENTATIVES", true));
             }
 
             // Respondent 2 acknowledges claim, Respondent 1 & 2 submits  FULL DEFENCE
@@ -2161,10 +1865,8 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
@@ -2203,10 +1905,8 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
@@ -2246,10 +1946,8 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -2287,11 +1985,9 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -2329,10 +2025,8 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_ADMISSION.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true)
                 );
@@ -2363,10 +2057,8 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -2417,17 +2109,13 @@ class StateFlowEngineTest {
             }
 
             if (flowState == FlowState.Main.FULL_DEFENCE_NOT_PROCEED) {
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true)
                 );
             } else if (flowState == TAKEN_OFFLINE_AFTER_SDO) {
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
@@ -2504,12 +2192,10 @@ class StateFlowEngineTest {
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -2556,13 +2242,11 @@ class StateFlowEngineTest {
                     FULL_DEFENCE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
+                entry("TWO_RESPONDENT_REPRESENTATIVES", true)
             );
         }
 
@@ -2602,11 +2286,9 @@ class StateFlowEngineTest {
                     AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -2632,9 +2314,7 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
@@ -2690,9 +2370,7 @@ class StateFlowEngineTest {
                     TAKEN_OFFLINE_PAST_APPLICANT_RESPONSE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
@@ -2752,9 +2430,7 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
@@ -2846,10 +2522,8 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
@@ -2879,9 +2553,7 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.SDO_ENABLED.name(), false)
             );
@@ -2929,11 +2601,9 @@ class StateFlowEngineTest {
                     FULL_DEFENCE_PROCEED.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(8).contains(
+            assertThat(stateFlow.getFlags()).hasSize(6).contains(
                 entry("BULK_CLAIM_ENABLED", false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                 entry(FlowFlag.IS_MULTI_TRACK.name(), true),
@@ -2967,11 +2637,9 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -2998,11 +2666,9 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3029,11 +2695,9 @@ class StateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3060,11 +2724,9 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3093,11 +2755,9 @@ class StateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3126,11 +2786,9 @@ class StateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3160,11 +2818,9 @@ class StateFlowEngineTest {
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3202,12 +2858,10 @@ class StateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3236,11 +2890,9 @@ class StateFlowEngineTest {
                     ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName(), TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3271,11 +2923,9 @@ class StateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3306,11 +2956,9 @@ class StateFlowEngineTest {
                     TAKEN_OFFLINE_BY_STAFF.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3432,11 +3080,9 @@ class StateFlowEngineTest {
                     PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3475,12 +3121,10 @@ class StateFlowEngineTest {
                 );
 
             assertThat(stateFlow.getFlags())
-                .hasSize(5)
+                .hasSize(3)
                 .contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
         }
@@ -3517,11 +3161,9 @@ class StateFlowEngineTest {
                     PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3554,11 +3196,9 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3656,11 +3296,9 @@ class StateFlowEngineTest {
                     CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
             );
         }
@@ -3729,12 +3367,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -3772,12 +3408,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -3815,12 +3449,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -3859,12 +3491,10 @@ class StateFlowEngineTest {
                         AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -3901,12 +3531,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -3944,12 +3572,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -3989,12 +3615,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -4034,13 +3658,11 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
+                    entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
 
@@ -4077,12 +3699,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -4121,10 +3741,8 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(5).contains(
+                assertThat(stateFlow.getFlags()).hasSize(3).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
@@ -4163,12 +3781,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), DIVERGENT_RESPOND_GO_OFFLINE.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -4206,12 +3822,10 @@ class StateFlowEngineTest {
                         ALL_RESPONSES_RECEIVED.fullName(), FULL_ADMISSION.fullName()
                     );
 
-                assertThat(stateFlow.getFlags()).hasSize(6).contains(
+                assertThat(stateFlow.getFlags()).hasSize(4).contains(
                     entry("ONE_RESPONDENT_REPRESENTATIVE", false),
                     entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                     entry("TWO_RESPONDENT_REPRESENTATIVES", true),
-                    entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                    entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                     entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false)
                 );
             }
@@ -4501,12 +4115,10 @@ class StateFlowEngineTest {
                     PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CONTACT_DETAILS_CHANGE.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(6).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(4).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false),
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true)
             );
         }
@@ -4686,13 +4298,10 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), IN_HEARING_READINESS.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true));
         }
 
         @Test
@@ -4827,13 +4436,10 @@ class StateFlowEngineTest {
                     CLAIM_DETAILS_NOTIFIED.fullName(), TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
                 entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry("ONE_RESPONDENT_REPRESENTATIVE", true),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry("ONE_RESPONDENT_REPRESENTATIVE", true));
         }
 
         @Test
@@ -4860,13 +4466,10 @@ class StateFlowEngineTest {
                     TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -4900,13 +4503,10 @@ class StateFlowEngineTest {
                     TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -4940,13 +4540,10 @@ class StateFlowEngineTest {
                     NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION.fullName(), TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName()
                 );
 
-            assertThat(stateFlow.getFlags()).hasSize(5).contains(
+            assertThat(stateFlow.getFlags()).hasSize(3).contains(
                 entry("ONE_RESPONDENT_REPRESENTATIVE", true),
                 entry(FlowFlag.BULK_CLAIM_ENABLED.name(), false),
-                entry(FlowFlag.NOTICE_OF_CHANGE.name(), false),
-                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false),
-                entry(FlowFlag.CERTIFICATE_OF_SERVICE.name(), false)
-            );
+                entry(FlowFlag.GENERAL_APPLICATION_ENABLED.name(), false));
         }
 
         @Test
@@ -5010,4 +4607,77 @@ class StateFlowEngineTest {
         }
     }
 
+    @Nested
+    class FromPartAdmitRepaymentAgreed {
+        @Test
+        void partAdmitRepaymentAgreedSpec() {
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .caseAccessCategory(SPEC_CLAIM)
+                // claim submitted
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // part admit
+                .respondent1ResponseDate(LocalDateTime.now())
+                .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
+                                 .build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .claimNotificationDate(LocalDateTime.now())
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
+                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                .build();
+
+            // When
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertEquals(SIGN_SETTLEMENT_AGREEMENT.fullName(), fullState.getState().getName());
+        }
+    }
+
+    @Nested
+    class FromFullAdmitRepaymentAgreed {
+        @Test
+        void fullAdmitRepaymentAgreedSpec() {
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .caseAccessCategory(SPEC_CLAIM)
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // part admit
+                .respondent1ResponseDate(LocalDateTime.now())
+                .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
+                                 .build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .claimNotificationDate(LocalDateTime.now())
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                .build();
+
+            // When
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertEquals(SIGN_SETTLEMENT_AGREEMENT.fullName(), fullState.getState().getName());
+        }
+    }
 }
