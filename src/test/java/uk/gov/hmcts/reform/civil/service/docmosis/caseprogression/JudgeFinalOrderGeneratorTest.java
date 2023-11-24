@@ -304,6 +304,37 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
+    @SneakyThrows
+    void shouldThrowLocationRefDataExceptionOnGeneratingFreeFormOrder_whenLocationServiceReturnsCourtsWithoutCaseTypeIdOf10() {
+        when(locationRefDataService.getCourtLocationsByEpimmsId(BEARER_TOKEN, caseManagementLocation.getBaseLocation()))
+                .thenReturn(List.of(locationRefData.toBuilder().courtTypeId("5").build()));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
+                .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
+        when(documentManagementService
+                .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+                .thenReturn(FREE_FROM_ORDER);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("test without notice")
+                        .withoutNoticeSelectionDate(LocalDate.now()).build())
+                .respondent2(PartyBuilder.builder().individual().build().toBuilder()
+                        .partyID("app-2-party-id")
+                        .partyName("Applicant2")
+                        .build())
+                .applicant2(PartyBuilder.builder().soleTrader().build().toBuilder()
+                        .partyID("res-2-party-id")
+                        .partyName("Respondent2")
+                        .build())
+                .caseManagementLocation(caseManagementLocation)
+                .build();;
+
+        assertThrows(LocationRefDataException.class, () -> generator.generate(caseData, BEARER_TOKEN),
+                "Unexpected amount of locations (2) where matched against location epimms id: 000000"
+        );
+    }
+
+    @Test
     void shouldGenerateFreeFormOrder_whenHearingLocationExists() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));

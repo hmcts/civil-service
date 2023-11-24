@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -46,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_PDF;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.FREE_FORM_ORDER_PDF;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.CIVIL_COURT_TYPE_ID;
 
 @Slf4j
 @Service
@@ -612,7 +614,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private String getCaseManagementLocationText(CaseData caseData, String authorisation) {
         String locationEpimms = caseData.getCaseManagementLocation().getBaseLocation();
         List<LocationRefData> matchingLocations = locationRefDataService.getCourtLocationsByEpimmsId(
-            authorisation, caseData.getCaseManagementLocation().getBaseLocation());
+                        authorisation, caseData.getCaseManagementLocation().getBaseLocation())
+                .stream().filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
+                .collect(Collectors.toList());
 
         if (matchingLocations.size() != 1) {
             throw new LocationRefDataException(
