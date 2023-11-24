@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +94,11 @@ public class InitiateGeneralApplicationServiceHelperTest {
         when(caseAccessDataStoreApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignedUserRolesResource.builder()
                             .caseAssignedUserRoles(getCaseAssignedApplicantUserRoles()).build());
+    }
+
+    @AfterEach
+    void setUserRolesAsNull() {
+        helper.userRoles = null;
     }
 
     public List<CaseAssignedUserRole> getCaseAssignedApplicantUserRoles() {
@@ -268,6 +274,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .respondentSolicitor1EmailAddress(RESPONDENT_EMAIL_ID_CONSTANT)
                 .applicant1(Party.builder().type(COMPANY).companyName("Applicant1").build())
                 .respondent2(Party.builder().type(COMPANY).companyName("Respondent1").build())
+                .addRespondent2(YesOrNo.YES)
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                                   .organisation(Organisation.builder().organisationID("200").build())
                                                   .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
@@ -309,6 +316,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .applicant2(Party.builder().type(COMPANY).companyName("Applicant2").build())
                 .respondent1(Party.builder().type(COMPANY).companyName("Respondent1").build())
                 .respondent2(Party.builder().type(COMPANY).companyName("Respondent2").build())
+                .addRespondent2(YesOrNo.YES)
                 .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                                   .organisation(Organisation.builder().organisationID("200").build())
                                                   .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())

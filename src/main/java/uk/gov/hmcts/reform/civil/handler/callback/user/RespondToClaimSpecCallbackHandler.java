@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
@@ -55,6 +56,7 @@ import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -136,7 +138,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.buildElemCaseDocument
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToRespondentExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToRespondentWitnesses;
 
 @Service
@@ -164,6 +165,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final CourtLocationUtils courtLocationUtils;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final AssignCategoryId assignCategoryId;
+    private final DeadlineExtensionCalculatorService deadlineCalculatorService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -1383,7 +1385,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         if (caseData.getDefenceAdmitPartPaymentTimeRouteRequired() != null
             && caseData.getDefenceAdmitPartPaymentTimeRouteRequired() == IMMEDIATELY
             && ifResponseTypeIsPartOrFullAdmission(caseData)) {
-            LocalDate whenBePaid = deadlinesCalculator.calculateWhenToBePaid(responseDate);
+            LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
+                LocalDate.now(),
+                RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
             updatedData.respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                           .whenWillThisAmountBePaid(whenBePaid).build());
         }
@@ -1521,10 +1525,6 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                                            .toString(), userInfo.getUid(), RESPONDENTSOLICITORTWO)) {
                 updatedData.respondent2DocumentGeneration("userRespondent2");
             }
-        }
-
-        if (toggleService.isHmcEnabled()) {
-            populateWithPartyIds(updatedData);
         }
 
         updateCorrespondenceAddress(callbackParams, updatedData, caseData);

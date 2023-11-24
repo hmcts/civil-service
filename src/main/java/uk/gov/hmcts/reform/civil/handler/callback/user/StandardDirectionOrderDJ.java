@@ -661,17 +661,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.orderSDODocumentDJ(null);
         assignCategoryId.assignCategoryIdToCollection(caseData.getOrderSDODocumentDJCollection(), document -> document.getValue().getDocumentLink(), "sdo");
         caseDataBuilder.businessProcess(BusinessProcess.ready(STANDARD_DIRECTION_ORDER_DJ));
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsForDefaultJudgments(authToken));
-        if (nonNull(locations)) {
-            LocationRefData location = fillPreferredLocationData(locations, getLocationListFromCaseData(
-                caseData.getDisposalHearingMethodInPersonDJ(), caseData.getTrialHearingMethodInPersonDJ()));
-            Optional.ofNullable(location)
-                .map(LocationRefData::getSiteName)
-                .ifPresent(caseDataBuilder::locationName);
 
-        }
         var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
@@ -710,28 +700,34 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     }
 
     private CallbackResponse createOrderScreen(CallbackParams callbackParams) {
-        var response = (AboutToStartOrSubmitCallbackResponse) validateInputValue(callbackParams);
-        if (response.getErrors() != null) {
-            return response;
-        }
-
         CaseData caseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
             : callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
-            caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
+        List<String> errors = new ArrayList<>();
+        final String witnessValidationErrorMessage = validateInputValue(callbackParams);
 
-        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
-        systemGeneratedCaseDocuments.add(element(document));
-        caseDataBuilder.orderSDODocumentDJCollection(systemGeneratedCaseDocuments);
-        caseDataBuilder.disposalHearingMethodInPersonDJ(deleteLocationList(
-            caseData.getDisposalHearingMethodInPersonDJ()));
-        caseDataBuilder.trialHearingMethodInPersonDJ(deleteLocationList(
-            caseData.getTrialHearingMethodInPersonDJ()));
+        if (!witnessValidationErrorMessage.isEmpty()) {
+            errors.add(witnessValidationErrorMessage);
+        }
+
+        if (errors.isEmpty()) {
+            CaseDocument document = defaultJudgmentOrderFormGenerator.generate(
+                caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+            caseDataBuilder.orderSDODocumentDJ(document.getDocumentLink());
+
+            List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+            systemGeneratedCaseDocuments.add(element(document));
+            caseDataBuilder.orderSDODocumentDJCollection(systemGeneratedCaseDocuments);
+            caseDataBuilder.disposalHearingMethodInPersonDJ(deleteLocationList(
+                caseData.getDisposalHearingMethodInPersonDJ()));
+            caseDataBuilder.trialHearingMethodInPersonDJ(deleteLocationList(
+                caseData.getTrialHearingMethodInPersonDJ()));
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
@@ -834,7 +830,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         }
     }
 
-    private CallbackResponse validateInputValue(CallbackParams callbackParams) {
+    private String validateInputValue(CallbackParams callbackParams) {
+        final String errorMessage = "";
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         if (nonNull(caseData.getTrialHearingWitnessOfFactDJ())) {
@@ -845,16 +842,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 int number1 = Integer.parseInt(inputValue1);
                 int number2 = Integer.parseInt(inputValue2);
                 if (number1 < 0 || number2 < 0) {
-                    errors.add("The number entered cannot be less than zero");
-                    return AboutToStartOrSubmitCallbackResponse.builder()
-                        .errors(errors)
-                        .build();
+                    return "The number entered cannot be less than zero";
                 }
             }
         }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return errorMessage;
     }
 }
