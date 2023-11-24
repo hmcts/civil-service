@@ -605,6 +605,85 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
+    @SneakyThrows
+    void shouldThrowLocationRefDataExceptionOnGeneratingAssistedOrder_whenLocationServiceReturnsCourtWithoutCaseTypeId10() {
+        when(locationRefDataService.getCourtLocationsByEpimmsId(BEARER_TOKEN, caseManagementLocation.getBaseLocation()))
+                .thenReturn(List.of(locationRefData.toBuilder().courtTypeId("5").build()));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_PDF)))
+                .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
+        when(documentManagementService
+                .uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
+                .thenReturn(ASSISTED_FROM_ORDER);
+        DynamicListElement dynamicListElement = DynamicListElement.builder().label("test_label").build();
+        DynamicList dynamicList = DynamicList.builder()
+                .listItems(Collections.singletonList(dynamicListElement))
+                .value(dynamicListElement)
+                .build();
+        List<FinalOrdersJudgePapers> finalOrdersJudgePapersList =
+                new ArrayList<>(Arrays.asList(FinalOrdersJudgePapers.CONSIDERED));
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                // Order made section
+                .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
+                        LocalDate.now()).build()).build())
+                //Papers considered
+                .finalOrderJudgePapers(
+                        finalOrdersJudgePapersList)
+                // judge heard from section
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .addApplicant2(YES)
+                .finalOrderRepresentation(FinalOrderRepresentation.builder()
+                        .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                        .typeRepresentationComplex(ClaimantAndDefendantHeard.builder().build()).build())
+                // recitals section
+                .finalOrderRecitals(toggleList)
+                .finalOrderRecitalsRecorded(FinalOrderRecitalsRecorded.builder().text("Test").build())
+                // further hearing section
+                .finalOrderFurtherHearingToggle(toggleList)
+                .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
+                        .alternativeHearingList(dynamicList)
+                        .hearingMethodList(IN_PERSON)
+                        .hearingNotesText("test hearing notes")
+                        .datesToAvoidDateDropdown(DatesFinalOrders.builder().datesToAvoidDates(LocalDate.now())
+                                .build()).build())
+                // Costs section
+                .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
+                .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
+                        .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
+                        .assistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
+                        .makeAnOrderForCostsList(COSTS)
+                        .assistedOrderClaimantDefendantFirstDropdown(COSTS)
+                        .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L))
+                        .makeAnOrderForCostsYesOrNo(YesOrNo.YES).build())
+                .assistedOrderCostsReserved(AssistedOrderCostDetails.builder().detailsRepresentationText("Test").build())
+                .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("Test").build())
+                .assistedOrderCostsBespoke(AssistedOrderCostDetails.builder().besPokeCostDetailsText("Test").build())
+                .publicFundingCostsProtection(YES)
+                // Appeal section
+                .finalOrderAppealComplex(FinalOrderAppeal.builder()
+                        .applicationList(ApplicationAppealList.GRANTED)
+                        .appealGrantedDropdown(AppealGrantedRefused.builder()
+                                .circuitOrHighCourtList(ApplicationAppealList.HIGH_COURT)
+                                .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
+                                        .build()).build()).build())
+                // initiative or without notice section
+                .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
+                .orderMadeOnDetailsOrderWithoutNotice(OrderMadeOnDetailsOrderWithoutNotice.builder()
+                        .withOutNoticeText("without notice test")
+                        .withOutNoticeDate(LocalDate.now())
+                        .build())
+                .caseManagementLocation(caseManagementLocation)
+                .build();
+
+        assertThrows(LocationRefDataException.class, () -> generator.generate(caseData, BEARER_TOKEN),
+                "Unexpected amount of locations (2) where matched against location epimms id: 000000"
+        );
+    }
+
+    @Test
     void testDefendantOneAttendsOrRepresentedTextBuilder() {
         for (FinalOrdersDefendantRepresentationList finalOrdersDefendantRepresentationList : List.of(
             FinalOrdersDefendantRepresentationList.values())) {
