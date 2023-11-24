@@ -18,11 +18,14 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.documentmanagement.UnsecuredDocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -55,11 +58,14 @@ public class HearingFormGeneratorTest {
 
     @MockBean
     private UnsecuredDocumentManagementService documentManagementService;
-
     @MockBean
     private DocumentGeneratorService documentGeneratorService;
     @MockBean
     private AssignCategoryId assignCategoryId;
+    @MockBean
+    private LocationRefDataService locationRefDataService;
+    @MockBean
+    private CourtLocationUtils courtLocationUtils;
     @Autowired
     private HearingFormGenerator generator;
 
@@ -67,10 +73,10 @@ public class HearingFormGeneratorTest {
     void shouldHearingFormGeneratorOneForm_whenValidDataIsProvided() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_APPLICATION)))
             .thenReturn(new DocmosisDocument(HEARING_APPLICATION.getDocumentTitle(), bytes));
-
         when(documentManagementService
                  .uploadDocument(BEARER_TOKEN, new PDF(fileName_application, bytes, HEARING_FORM)))
             .thenReturn(CASE_DOCUMENT);
+        when(courtLocationUtils.findPreferredLocationData(any(), any())).thenReturn(LocationRefData.builder().build());
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .listingOrRelisting(ListingOrRelisting.LISTING)
