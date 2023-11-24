@@ -845,7 +845,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(NO);
         }
 
-
         @Test
         void shouldNotPopulateEarlyAdoptersFlag_whenEarlyAdoptersToggleIsOff() {
             DynamicList options = DynamicList.builder()
