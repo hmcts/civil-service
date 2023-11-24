@@ -671,6 +671,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return YesOrNo.NO == getRespondent1Represented();
     }
 
+    @JsonIgnore
+    public boolean isApplicantLiP() {
+        return YesOrNo.NO == getApplicant1Represented();
+    }
+
     public YesOrNo getRespondent2Represented() {
         return Stream.of(
                 respondent2Represented,
@@ -1107,5 +1112,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasApplicant1SignedSettlementAgreement).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean isRespondentSignSettlementAgreement() {
+        return getCaseDataLiP() != null && getCaseDataLiP().getRespondentSignSettlementAgreement() != null;
     }
 }
