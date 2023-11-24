@@ -23,49 +23,44 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CONTINUOUS_FEED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RPA_ON_CASE_HANDED_OFFLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RETRIGGER_CASES;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class ResendNotifyRPAEventsHandler implements BaseExternalTaskHandler {
+public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
 
     @Override
     public void handleTask(ExternalTask externalTask) {
         log.info("User authentication successful.");
-        var caseIdForNotifyRpaOnCaseHandedOffline = readCaseIds("/caseIdForNotifyRpaOnCaseHandedOffline.txt");
-        updateCaseByEvent(caseIdForNotifyRpaOnCaseHandedOffline, NOTIFY_RPA_ON_CASE_HANDED_OFFLINE);
-
-        var caseIdForNotifyRpaOnContinuousFeed = readCaseIds("/caseIdForNotifyRpaOnContinuousFeed.txt");
-        updateCaseByEvent(caseIdForNotifyRpaOnContinuousFeed, NOTIFY_RPA_ON_CONTINUOUS_FEED);
-
+        var caseIdForNotifyRpaOnCaseHandedOffline = readCaseIds("/caseIdForRetrigger.txt");
+        updateCaseByEvent(caseIdForNotifyRpaOnCaseHandedOffline, RETRIGGER_CASES);
     }
 
     private void updateCaseByEvent(List<String> caseIdList, CaseEvent caseEvent) {
         if (caseIdList != null && !caseIdList.isEmpty()) {
-            log.info("Resend notify RPA started for event: {}", caseEvent);
+            log.info("Retrigger cases started for event: {}", caseEvent);
             caseIdList.forEach(caseId -> {
                 try {
-                    log.info("Resend CaseId: {} started", caseId);
+                    log.info("Retrigger CaseId: {} started", caseId);
                     var startEventResponse = coreCaseDataService.startUpdate(caseId, caseEvent);
 
                     Map<String, Object> caseDataMap = coreCaseDataService.getCase(Long.valueOf(caseId)).getData();
 
                     coreCaseDataService.submitUpdate(caseId, caseDataContent(startEventResponse, caseDataMap));
-                    log.info("Resend CaseId: {} finished", caseId);
+                    log.info("Retrigger CaseId: {} finished", caseId);
 
                 } catch (FeignException e) {
-                    log.error("ERROR Resend CaseId: {}", caseId);
+                    log.error("ERROR Retrigger CaseId: {}", caseId);
                     log.error(String.format("Updating case data failed: %s", e.contentUTF8()));
                     throw e;
                 } catch (Exception e) {
-                    log.error("ERROR Resend CaseId: {}", caseId);
+                    log.error("ERROR Retrigger CaseId: {}", caseId);
                     log.error(String.format("Updating case data failed: %s", e.getMessage()));
                 }
-                log.info("Resend notify RPA Finished for event: {}", caseEvent);
+                log.info("Retrigger cases Finished for event: {}", caseEvent);
             });
         } else {
             log.info("List id empty for: {}", caseEvent);
@@ -84,7 +79,7 @@ public class ResendNotifyRPAEventsHandler implements BaseExternalTaskHandler {
             .build();
     }
 
-    private List<String> readCaseIds(String file) {
+    public List<String> readCaseIds(String file) {
 
         String data = readString(file);
         return Arrays.stream(data.split("[\r\n]+"))
@@ -99,7 +94,7 @@ public class ResendNotifyRPAEventsHandler implements BaseExternalTaskHandler {
     }
 
     private byte[] readBytes(String resourcePath) {
-        try (InputStream inputStream = ResendNotifyRPAEventsHandler.class.getResourceAsStream(resourcePath)) {
+        try (InputStream inputStream = RetriggerCasesEventHandler.class.getResourceAsStream(resourcePath)) {
             return IOUtils.toByteArray(inputStream);
         } catch (IOException e) {
             throw new IllegalStateException(e);
