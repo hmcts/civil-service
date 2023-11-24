@@ -156,7 +156,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final LocationHelper locationHelper;
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
-    private final List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
+    private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -714,18 +714,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             ));
         DynamicList locationsList;
         if (matchingLocation.isPresent()) {
-            locationsList = DynamicList.fromList(locations,
-                                                 this::getLocationEpimms,
-                                                 LocationRefDataService::getDisplayEntry,
-                                                 matchingLocation.get(),
-                                                 true
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
+                                                 matchingLocation.get(), true
             );
         } else {
-            locationsList = DynamicList.fromList(locations,
-                                                 this::getLocationEpimms,
-                                                 LocationRefDataService::getDisplayEntry,
-                                                 null,
-                                                 true
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
+                                                 null, true
             );
         }
         return locationsList;
@@ -872,13 +866,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         // if is an EA court and there is no LiP on the case, eaCourtLocation will set to true
         // LiP check ensures any LiP cases will always trigger takeCaseOffline task as CUI R1 does not account for LiPs
         // ToDo: remove LiP check for CUI R2
-        if (featureToggleService.isLocationWhiteListedForCaseProgression(
-            getEpimmsId(caseData)) && !caseContainsLiP(caseData)) {
-            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-            dataBuilder.eaCourtLocation(YES);
-        } else {
-            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-            dataBuilder.eaCourtLocation(YesOrNo.NO);
+        if (featureToggleService.isEarlyAdoptersEnabled()) {
+            if (featureToggleService.isLocationWhiteListedForCaseProgression(
+                getEpimmsId(caseData)) && !caseContainsLiP(caseData)) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YES);
+            } else {
+                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YesOrNo.NO);
+            }
         }
 
         dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
@@ -978,14 +974,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         );
 
         if (applicant2 != null) {
-            initialBody = format(
+            initialBody =  format(
                 CONFIRMATION_SUMMARY_2v1,
                 applicant1Name,
                 applicant2.getPartyName(),
                 respondent1Name
             );
         } else if (respondent2 != null) {
-            initialBody = format(
+            initialBody =  format(
                 CONFIRMATION_SUMMARY_1v2,
                 applicant1Name,
                 respondent1Name,
