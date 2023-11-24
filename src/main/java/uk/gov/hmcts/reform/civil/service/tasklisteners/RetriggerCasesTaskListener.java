@@ -4,16 +4,16 @@ import org.camunda.bpm.client.ExternalTaskClient;
 import org.camunda.bpm.client.topic.TopicSubscriptionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.handler.ResendNotifyRPAEventsHandler;
+import uk.gov.hmcts.reform.civil.handler.RetriggerCasesEventHandler;
 
 @Component
-public class ResendNotifyRPAEventsTaskListener {
+public class RetriggerCasesTaskListener {
 
-    private static final String TOPIC = "RESEND_NOTIFY_RPA_EVENTS";
+    private static final String TOPIC = "RETRIGGER_CASES_EVENTS";
 
     @Autowired
-    private ResendNotifyRPAEventsTaskListener(ResendNotifyRPAEventsHandler resendNotifyRPAEventsHandler, ExternalTaskClient client) {
+    private RetriggerCasesTaskListener(RetriggerCasesEventHandler retriggerCasesEventHandler, ExternalTaskClient client) {
         TopicSubscriptionBuilder subscriptionBuilder = client.subscribe(TOPIC);
-        subscriptionBuilder.handler(resendNotifyRPAEventsHandler).open();
+        subscriptionBuilder.handler(retriggerCasesEventHandler).open();
     }
 }
