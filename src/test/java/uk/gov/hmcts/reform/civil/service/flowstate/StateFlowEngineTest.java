@@ -31,8 +31,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -83,6 +85,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
@@ -4604,4 +4607,77 @@ class StateFlowEngineTest {
         }
     }
 
+    @Nested
+    class FromPartAdmitRepaymentAgreed {
+        @Test
+        void partAdmitRepaymentAgreedSpec() {
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .caseAccessCategory(SPEC_CLAIM)
+                // claim submitted
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // part admit
+                .respondent1ResponseDate(LocalDateTime.now())
+                .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
+                                 .build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .claimNotificationDate(LocalDateTime.now())
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
+                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                .build();
+
+            // When
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertEquals(SIGN_SETTLEMENT_AGREEMENT.fullName(), fullState.getState().getName());
+        }
+    }
+
+    @Nested
+    class FromFullAdmitRepaymentAgreed {
+        @Test
+        void fullAdmitRepaymentAgreedSpec() {
+            CaseData caseData = CaseData.builder()
+                // spec claim
+                .caseAccessCategory(SPEC_CLAIM)
+                .submittedDate(LocalDateTime.now())
+                .respondent1Represented(YES)
+                // payment successful
+                .paymentSuccessfulDate(LocalDateTime.now())
+                // pending claim issued
+                .issueDate(LocalDate.now())
+                .respondent1OrgRegistered(YES)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                // part admit
+                .respondent1ResponseDate(LocalDateTime.now())
+                .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YES)
+                                 .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.No).build())
+                                 .build())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .claimNotificationDate(LocalDateTime.now())
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                .build();
+
+            // When
+            StateFlow fullState = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertEquals(SIGN_SETTLEMENT_AGREEMENT.fullName(), fullState.getState().getName());
+        }
+    }
 }
