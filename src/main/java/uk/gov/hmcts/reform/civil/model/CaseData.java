@@ -636,6 +636,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final TransferCaseDetails transferCaseDetails;
 
+    private CaseDocument applicant1JudgmentByDeterminationForm;
+
     //SDO-R2
     private YesOrNo isFlightDelayClaim;
 
