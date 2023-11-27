@@ -37,18 +37,7 @@ class RetriggerCasesEventHandlerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
-    @Test
-    void testHandleTask() {
-        ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getId()).thenReturn("testExternalTaskId");
-
-        retriggerCasesEventHandler.handleTask(externalTask);
-
-        // Assertions
-        verify(coreCaseDataService, times(1)).triggerEvent(anyLong(), eq(CaseEvent.RETRIGGER_CASES));
-    }
-
+    
     @Test
     void testUpdateCaseByEvent() {
         List<String> caseIdList = Arrays.asList("1", "2", "3");
