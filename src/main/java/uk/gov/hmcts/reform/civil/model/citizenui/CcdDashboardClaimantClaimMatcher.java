@@ -3,7 +3,11 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
@@ -104,8 +108,7 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-
-       return (!hasSdoBeenDrawn()) && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC.name())
+        return (!hasSdoBeenDrawn()) && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC.name())
             && caseData.getBusinessProcess().getStatus().equals(BusinessProcessStatus.FINISHED);
     }
 
@@ -126,10 +129,10 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
             return false;
         }
 
-//        return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
-//            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-//            && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.TAKE_CASE_OFFLINE)
-//            && caseData.getBusinessProcess().getStatus().equals(BusinessProcessStatus.FINISHED);
+        //return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
+        //    && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
+        //    && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.TAKE_CASE_OFFLINE)
+        //    && caseData.getBusinessProcess().getStatus().equals(BusinessProcessStatus.FINISHED);
 
         return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
             && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
