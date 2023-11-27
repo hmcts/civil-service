@@ -702,6 +702,35 @@ public class CaseDataTest {
 
             assertEquals("label", actual);
         }
+
+    @Test
+    void shouldReturnTrueWhenRespondentSignSettlementAgreementIsNotNull() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .caseDataLip(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO).build())
+            .build();
+
+        //When
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
+
+        //Then
+        assertTrue(isRespondentSignSettlementAgreement);
+    }
+    
+    @Test
+    void shouldReturnFalseWhenRespondentSignSettlementAgreementIsNull() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .caseDataLip(CaseDataLiP.builder().build())
+            .build();
+
+        //When
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
+
+        //Then
+        assertFalse(isRespondentSignSettlementAgreement);
     }
 }
 
