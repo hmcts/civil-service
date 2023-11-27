@@ -369,6 +369,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
                 .build();
         CaseData caseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build())
                 .caseDataLip(
                         CaseDataLiP.builder()
                                 .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
