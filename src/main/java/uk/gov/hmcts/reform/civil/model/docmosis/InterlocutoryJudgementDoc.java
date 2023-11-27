@@ -33,10 +33,11 @@ public class InterlocutoryJudgementDoc implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     private final LocalDate claimantRequestRepaymentLastDateBy;
 
-    private final double disposableIncome;
+    private final String formattedDisposableIncome;
     private final String courtDecisionRepaymentBy;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     private final LocalDate courtDecisionRepaymentLastDateBy;
     private final String formalisePaymentBy;
+    private final String rejectionReason;
 }

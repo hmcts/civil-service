@@ -5,17 +5,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseDataParent;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.InterlocutoryJudgementDocGenerator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -45,6 +52,15 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
 
     private CallbackResponse generateInterlocutoryJudgementDoc(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        ChooseHowToProceed chooseHowToProceed = getChooseHowToProceed(caseData);
+        RepaymentDecisionType repaymentDecisionType = getRepaymentDecisionType(caseData);
+
+        // Generate the document only if applicant chosen formalises with ccj and in favour of defendant
+        if (chooseHowToProceed != ChooseHowToProceed.REQUEST_A_CCJ  || repaymentDecisionType != RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT) {
+           // return SubmittedCallbackResponse.builder().build();
+        }
+
         CaseDocument interlocutoryJudgementDoc = interlocutoryJudgementDocGenerator.generateInterlocutoryJudgementDoc(
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
@@ -60,6 +76,19 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
+    }
+
+    private ChooseHowToProceed getChooseHowToProceed(CaseData caseData) {
+        return Optional.ofNullable(caseData)
+            .map(CaseData::getCaseDataLiP)
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .map(ClaimantLiPResponse::getApplicant1ChoosesHowToProceed)
+            .orElse(null);
+    }
+
+    private RepaymentDecisionType getRepaymentDecisionType(CaseData caseData) {
+        return Optional.ofNullable(caseData).map(CaseDataParent::getCaseDataLiP)
+            .map(CaseDataLiP::getCourtDecision).orElse(null);
     }
 
 }

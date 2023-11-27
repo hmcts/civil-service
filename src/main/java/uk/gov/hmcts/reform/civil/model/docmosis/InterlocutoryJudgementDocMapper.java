@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.docmosis;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
@@ -15,10 +14,13 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.service.citizen.repaymentplan.RepaymentPlanDecisionCalculator;
 import uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+
+import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getClaimantSuggestedRepaymentType;
+import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantRepaymentOption;
 
 @Component
 @RequiredArgsConstructor
@@ -26,18 +28,20 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
     private static final String REFER_TO_JUDGE = "Refer to Judge";
 
     private final RepaymentPlanDecisionCalculator repaymentPlanDecisionCalculator;
+
     public InterlocutoryJudgementDoc toInterlocutoryJudgementDoc(CaseData caseData) {
-       return InterlocutoryJudgementDoc.builder()
-            .claimNumber(caseData.getLegacyCaseReference())
+        return InterlocutoryJudgementDoc.builder()
             .claimIssueDate(caseData.getIssueDate())
-            .claimantResponseSubmitDate(caseData.getApplicant1ResponseDate())
-            .disposableIncome(repaymentPlanDecisionCalculator.calculateDisposableIncome(caseData))
-            .claimantResponseToDefendantAdmission(getClaimantResponseToDefendantAdmission(caseData))
-            .claimantRequestRepaymentBy(ClaimantResponseUtils.getClaimantRepaymentOption(caseData))
+            .claimNumber(caseData.getLegacyCaseReference())
+            .claimantRequestRepaymentBy(getClaimantSuggestedRepaymentType(caseData))
             .claimantRequestRepaymentLastDateBy(getClaimantRequestRepaymentLastDateBy(caseData))
-            .courtDecisionRepaymentBy(getCourtDecisionPaymentBy(caseData))
-           . courtDecisionRepaymentLastDateBy(getCourtDecisionRepaymentLastDateBy(caseData))
+            .claimantResponseSubmitDate(caseData.getApplicant1ResponseDate())
+            .claimantResponseToDefendantAdmission(getClaimantResponseToDefendantAdmission(caseData))
+            .courtDecisionRepaymentBy(getDefendantRepaymentOption(caseData))
+            .courtDecisionRepaymentLastDateBy(getDefendantRepaymentLastDateBy(caseData))
             .formalisePaymentBy(REFER_TO_JUDGE)
+            .formattedDisposableIncome(getFormattedDisposableIncome(caseData))
+            .rejectionReason("rejected")
             .build();
 
     }
@@ -57,62 +61,37 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
 
     private LocalDate getClaimantRequestRepaymentLastDateBy(CaseData caseData) {
         PaymentType claimantRepaymentOption = caseData.getApplicant1RepaymentOptionForDefendantSpec();
-        if(claimantRepaymentOption == PaymentType.REPAYMENT_PLAN){
+        if (claimantRepaymentOption == PaymentType.REPAYMENT_PLAN) {
             return ClaimantResponseUtils.getClaimantFinalRepaymentDate(caseData);
-        } else if(claimantRepaymentOption == PaymentType.SET_DATE) {
-                return LocalDate.now();
+        } else if (claimantRepaymentOption == PaymentType.SET_DATE) {
+            return caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate();
         }
         return null;
     }
-
-    private LocalDate getCourtDecisionRepaymentLastDateBy(CaseData caseData) {
-        RepaymentDecisionType repaymentDecisionType = Optional.ofNullable(caseData).map(CaseDataParent::getCaseDataLiP)
-            .map(CaseDataLiP::getCourtDecision).orElse(null);
-
-        if (repaymentDecisionType == null) {
-            return null;
-        }
-        switch (repaymentDecisionType) {
-            case IN_FAVOUR_OF_CLAIMANT -> {
-                return getClaimantRequestRepaymentLastDateBy(caseData);
-            }
-            case IN_FAVOUR_OF_DEFENDANT -> {
-                return getDefendantRepaymentLastDateBy(caseData);
-            }
-
-        };
-        return null;
-    }
-
-    private String getCourtDecisionPaymentBy(CaseData caseData) {
-        RepaymentDecisionType repaymentDecisionType = Optional.ofNullable(caseData).map(CaseDataParent::getCaseDataLiP)
-            .map(CaseDataLiP::getCourtDecision).orElse(null);
-
-        if (repaymentDecisionType == null) {
-            return "No repayment decision";
-        }
-        switch (repaymentDecisionType) {
-            case IN_FAVOUR_OF_CLAIMANT -> {
-                return ClaimantResponseUtils.getClaimantRepaymentOption(caseData);
-            }
-            case IN_FAVOUR_OF_DEFENDANT -> {
-                return ClaimantResponseUtils.getDefendantRepaymentOption(caseData);
-            }
-
-        };
-        return null;
-    }
-
     private LocalDate getDefendantRepaymentLastDateBy(CaseData caseData) {
 
         RespondentResponsePartAdmissionPaymentTimeLRspec defendantPaymentOption = caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
-        if(defendantPaymentOption == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN){
+        if (defendantPaymentOption == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
             return ClaimantResponseUtils.getDefendantFinalRepaymentDate(caseData);
-        } else if(defendantPaymentOption == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
+        } else if (defendantPaymentOption == RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE) {
             return Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
-               .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
+                .map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
         }
 
         return null;
     }
+
+    private String getFormattedDisposableIncome(CaseData caseData) {
+        StringBuilder defendantDisposableIncome = new StringBuilder();
+
+        BigDecimal disposableIncome = BigDecimal.valueOf(repaymentPlanDecisionCalculator.calculateDisposableIncome(
+            caseData)).setScale(2, RoundingMode.CEILING);
+        if (BigDecimal.ZERO.compareTo(disposableIncome) < 0) {
+            defendantDisposableIncome.append("-");
+        }
+
+        defendantDisposableIncome.append("£");
+        return defendantDisposableIncome.append(disposableIncome.abs()).toString();
+    }
+
 }

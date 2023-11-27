@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -24,7 +25,7 @@ public class ClaimantResponseUtils {
         //NO-OP
     }
 
-    public static String getClaimantRepaymentOption(CaseData caseData) {
+    public static String getClaimantSuggestedRepaymentType(CaseData caseData) {
         PaymentType claimantRepaymentOption = caseData.getApplicant1RepaymentOptionForDefendantSpec();
         if (claimantRepaymentOption == null) {
             return "No payment type selected";
