@@ -138,7 +138,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 .filter(e -> e.getPartyId() == null)
                 .collect(Collectors.toList());
 
-            if (!expertsWithoutPartyId.isEmpty()){
+            if (!expertsWithoutPartyId.isEmpty()) {
                 errors.add(CREATE_ORDER_ERROR_EXPERTS);
             }
         }
@@ -161,7 +161,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 .filter(e -> e.getPartyId() == null)
                 .collect(Collectors.toList());
 
-            if (!witnessesWithoutPartyId.isEmpty()){
+            if (!witnessesWithoutPartyId.isEmpty()) {
                 errors.add(CREATE_ORDER_ERROR_WITNESSES);
             }
         }
