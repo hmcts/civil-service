@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +29,13 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -204,6 +213,15 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private ToggleConfiguration toggleConfiguration;
+
+    @MockBean
+    protected LocationRefDataService locationRefDataService;
+
+    @MockBean
+    private AirlineEpimsDataLoader airlineEpimsDataLoader;
+
+    @MockBean
+    private AirlineEpimsService airlineEpimsService;
 
     @Nested
     class AboutToStartCallback {
@@ -1621,6 +1639,102 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class FlightDelayDetailsMidCallbacks {
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Enabled(Boolean toggleStat) {
+            // Given
+            YesOrNo yesOrNo = toggleStat ? YES : NO;
+            CaseData caseData = CaseData.builder().isFlightDelayClaim(yesOrNo)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "is-flight-delay-claim");
+            // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData()).containsEntry("isFlightDelayClaim", toggleStat ? "Yes" : "No");
+            if (toggleStat) {
+                assertThat(response.getData()).containsEntry("claimType", "FLIGHT_DELAY");
+            } else {
+                assertThat(response.getData()).doesNotHaveToString("claimType");
+            }
+        }
+
+        @Test
+        void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Disabled() {
+            // Given
+            CaseData caseData = CaseData.builder().isFlightDelayClaim(YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "is-flight-delay-claim");
+            // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(false);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData()).doesNotHaveToString("isFlightDelayClaim");
+            assertThat(response.getData()).doesNotHaveToString("claimType");
+        }
+
+        @Test
+        void shouldGetAirlineList_whenRequired() {
+            // Given
+            List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
+            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
+            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("OTHER").epimsID("111111").build());
+
+            given(airlineEpimsDataLoader.getAirlineEpimsIDList())
+                .willReturn(airlineEpimsIDList);
+
+            CaseData caseData = CaseData.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
+
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")
+                .extracting("list_items").asList().extracting("label")
+                .contains("BA/Cityflyer");
+
+            assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")
+                .extracting("list_items").asList().extracting("label")
+                .contains("OTHER");
+        }
+
+        @Test
+        void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().plusDays(1)).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).contains("Scheduled date of flight must be today or in the past");
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = {0, 1})
+        void shouldNotReturnErrorWhenDateOfFlightIsTodayOrInThePast(Integer days) {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().minusDays(days)).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
+            // When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
     class AboutToSubmitCallbackV1 {
 
         private CallbackParams params;
@@ -1920,7 +2034,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                               .respondent1OrganisationPolicy(null)
                               .build())
                 .build();
-            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(true);
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
@@ -1937,7 +2050,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             var callbackParams = params.toBuilder()
                 .caseData(params.getCaseData().toBuilder().build())
                 .build();
-            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(true);
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
@@ -2054,6 +2166,63 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("uiStatementOfTruth")
                     .doesNotHaveToString("name")
                     .doesNotHaveToString("role");
+            }
+        }
+
+        @Nested
+        class GetAirlineCourtLocation extends LocationRefSampleDataBuilder {
+
+            @BeforeEach
+            void mockAirlineEpimsData() {
+                given(airlineEpimsService.getEpimsIdForAirline("GULF_AIR"))
+                    .willReturn("36791");
+
+                List<LocationRefData> locations = new ArrayList<>();
+                locations.add(LocationRefData.builder().regionId("Site Name").epimmsId("36791")
+                                  .build());
+                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .willReturn(locations);
+
+                when(toggleService.isSdoR2Enabled()).thenReturn(true);
+            }
+
+            @Test
+            void shouldReturnExpectedCourtLocation_whenAirlineExists() {
+                // Given
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(
+                                         DynamicList.builder()
+                                             .value(DynamicListElement.builder().code("GULF_AIR").label("Gulf Air")
+                                                        .build()).build()).build()).build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                // When
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                // Then
+                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").extracting("region").isEqualTo("Site Name");
+            }
+
+            @Test
+            void shouldReturnExpectedCourtLocation_whenOtherAirlineSelected() {
+                // Given
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(
+                                         DynamicList.builder()
+                                             .value(DynamicListElement.builder().code("OTHER").label("OTHER")
+                                                        .build()).build()).build()).build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .willReturn(getSampleCourLocationsRefObject());
+
+                // When
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                // Then
+                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").isNull();
             }
         }
     }
