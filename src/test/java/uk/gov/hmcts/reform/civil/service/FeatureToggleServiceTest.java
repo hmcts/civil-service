@@ -62,15 +62,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsCertificateOfServiceEnabledInvoked(Boolean toggleStat) {
-        var certificateOfServiceKey = "isCertificateOfServiceEnabled";
-        givenToggle(certificateOfServiceKey, toggleStat);
-
-        assertThat(featureToggleService.isCertificateOfServiceEnabled()).isEqualTo(toggleStat);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsPbaV3EnabledInvoked(Boolean toggleStat) {
         var pbaV3Key = "pba-version-3-ways-to-pay";
         givenToggle(pbaV3Key, toggleStat);
