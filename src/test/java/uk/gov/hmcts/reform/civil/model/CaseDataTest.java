@@ -674,7 +674,6 @@ public class CaseDataTest {
     }
 
     @Test
-
     void shouldReturnClaimFeeInPence_whenClaimFeeExists() {
         //Given
         CaseData caseData = CaseData.builder()
@@ -711,7 +710,9 @@ public class CaseDataTest {
         BigDecimal fee = caseData.getCalculatedClaimFeeInPence();
         //Then
         assertThat(fee).isEqualTo(ZERO);
+    }
 
+    @Test
     void shouldReturnTrueWhenRespondentSignSettlementAgreementIsNotNull() {
 
         //Given
@@ -725,7 +726,7 @@ public class CaseDataTest {
         //Then
         assertTrue(isRespondentSignSettlementAgreement);
     }
-    
+
     @Test
     void shouldReturnFalseWhenRespondentSignSettlementAgreementIsNull() {
 
