@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
@@ -32,6 +34,12 @@ public class CaseDataLiP {
     private AdditionalLipPartyDetails respondent1AdditionalLipPartyDetails;
     @JsonProperty("applicant1AdditionalLipPartyDetails")
     private AdditionalLipPartyDetails applicant1AdditionalLipPartyDetails;
+
+    @JsonProperty("respondentSignSettlementAgreement")
+    private YesOrNo respondentSignSettlementAgreement;
+
+    @JsonProperty("courtDecision")
+    private RepaymentDecisionType courtDecision;
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {

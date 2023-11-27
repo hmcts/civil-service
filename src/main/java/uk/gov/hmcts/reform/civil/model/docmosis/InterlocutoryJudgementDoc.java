@@ -20,19 +20,23 @@ public class InterlocutoryJudgementDoc implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
     private final LocalDate claimIssueDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate claimantResponseSubmitDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy 'at' HH:mm a")
+    private final LocalDateTime claimantResponseSubmitDate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "hh:mm a")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDateTime claimantResponseSubmitTime;
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm a")
+//    @JsonSerialize(using = LocalDateSerializer.class)
+//    private final LocalDateTime claimantResponseSubmitTime;
 
     private final String claimantResponseToDefendantAdmission;
     private final String claimantRequestRepaymentBy;
-    private final String claimantRequestRepaymentLastDateBy;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
+    private final LocalDate claimantRequestRepaymentLastDateBy;
 
     private final double disposableIncome;
     private final String courtDecisionRepaymentBy;
-    private final String courtDecisionRepaymentLastDateBy;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
+    private final LocalDate courtDecisionRepaymentLastDateBy;
+    private final String formalisePaymentBy;
 }
