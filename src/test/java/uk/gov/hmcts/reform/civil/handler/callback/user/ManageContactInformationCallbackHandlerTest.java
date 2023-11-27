@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -147,10 +148,11 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertNull(response.getErrors());
         }
 
-        @Test
-        void shouldReturnErrors_WhenAboutToStartIsInvokedByNonAdminUserWhileCaseInAwaitingApplicantIntentionState() {
+        @ParameterizedTest
+        @EnumSource(value = CaseState.class, names = {"AWAITING_RESPONDENT_ACKNOWLEDGEMENT", "AWAITING_APPLICANT_INTENTION"})
+        void shouldReturnErrors_WhenAboutToStartIsInvokedByNonAdminUserWhileCaseInAwaitingRespondentAcknowledgementState(CaseState states) {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            CaseData caseData = CaseData.builder().ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            CaseData caseData = CaseData.builder().ccdState(states)
                 .ccdCaseReference(123L)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);

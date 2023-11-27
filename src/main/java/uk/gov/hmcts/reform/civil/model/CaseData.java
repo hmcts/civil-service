@@ -640,6 +640,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     //SDO-R2
     private YesOrNo isFlightDelayClaim;
+    private FlightDelayDetails flightDelayDetails;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1135,5 +1136,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasApplicant1SignedSettlementAgreement).isPresent();
 
+    }
+
+    @JsonIgnore
+    public boolean isRespondentSignSettlementAgreement() {
+        return getCaseDataLiP() != null && getCaseDataLiP().getRespondentSignSettlementAgreement() != null;
     }
 }
