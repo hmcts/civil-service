@@ -11,7 +11,9 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -44,7 +46,7 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.appe
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapExpertsToUpdatePartyDetailsForm;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses;
-
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapWitnessesToUpdatePartyDetailsForm;
 @SuppressWarnings("unchecked")
 class ManageContactInformationUtilsTest {
 
@@ -290,18 +292,37 @@ class ManageContactInformationUtilsTest {
         Expert expert1 = Expert.builder().firstName("First").lastName("Name").partyID("id").eventAdded("event").build();
         Expert expert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
             .phoneNumber("1").emailAddress("email").partyID("id2").build();
+        Experts experts = Experts.builder().details(wrapElements(expert1, expert2)).build();
         UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
             .partyId("id").build();
         UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("expert")
             .fieldOfExpertise("field").phoneNumber("1").emailAddress("email").partyId("id2").build();
 
-        assertThat(mapExpertsToUpdatePartyDetailsForm(wrapElements(expert1, expert2)))
-            .isEqualTo(wrapElements(party, party2));
+        assertThat(mapExpertsToUpdatePartyDetailsForm(experts)).isEqualTo(wrapElements(party, party2));
     }
 
     @Test
     void shouldMapExpertsToUpdatePartyDetailsForm_ifEmpty() {
         assertThat(mapExpertsToUpdatePartyDetailsForm(null)).isEqualTo(new ArrayList<>());
+    }
+
+    @Test
+    void shouldMapWitnessesToUpdatePartyDetailsForm() {
+        Witness witness1 = Witness.builder().firstName("First").lastName("Name").partyID("id").eventAdded("event").build();
+        Witness witness2 = Witness.builder().firstName("Second").lastName("expert").reasonForWitness("reason")
+            .phoneNumber("1").emailAddress("email").partyID("id2").build();
+        Witnesses witnesses = Witnesses.builder().details(wrapElements(witness1, witness2)).build();
+        UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
+            .partyId("id").build();
+        UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("expert")
+            .phoneNumber("1").emailAddress("email").partyId("id2").build();
+
+        assertThat(mapWitnessesToUpdatePartyDetailsForm(witnesses)).isEqualTo(wrapElements(party, party2));
+    }
+
+    @Test
+    void shouldMapWitnessesToUpdatePartyDetailsForm_ifEmpty() {
+        assertThat(mapWitnessesToUpdatePartyDetailsForm(null)).isEqualTo(new ArrayList<>());
     }
 
     @Nested

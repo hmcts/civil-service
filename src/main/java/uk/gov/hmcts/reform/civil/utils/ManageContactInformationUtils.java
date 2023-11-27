@@ -131,11 +131,11 @@ public class ManageContactInformationUtils {
         }
     }
 
-    public static List<Element<UpdatePartyDetailsForm>> mapExpertsToUpdatePartyDetailsForm(List<Element<Expert>> experts) {
+    public static List<Element<UpdatePartyDetailsForm>> mapExpertsToUpdatePartyDetailsForm(Experts dqExperts) {
         List<Element<UpdatePartyDetailsForm>> newExperts = new ArrayList<>();
 
-        if (experts != null) {
-            for (Element<Expert> party : experts) {
+        if (dqExperts != null && dqExperts.getDetails() != null) {
+            for (Element<Expert> party : dqExperts.getDetails()) {
                 Expert expert = party.getValue();
                 newExperts.addAll(wrapElements(UpdatePartyDetailsForm.builder()
                                                    .firstName(expert.getFirstName())
@@ -191,11 +191,11 @@ public class ManageContactInformationUtils {
         return newExperts;
     }
 
-    public static List<Element<UpdatePartyDetailsForm>> mapWitnessesToUpdatePartyDetailsForm(List<Element<Witness>> witnesses) {
+    public static List<Element<UpdatePartyDetailsForm>> mapWitnessesToUpdatePartyDetailsForm(Witnesses dqWitnesses) {
         List<Element<UpdatePartyDetailsForm>> newWitnesses = new ArrayList<>();
 
-        if (witnesses != null) {
-            for (Element<Witness> party : witnesses) {
+        if (dqWitnesses != null && dqWitnesses.getDetails() != null) {
+            for (Element<Witness> party : dqWitnesses.getDetails()) {
                 Witness witness = party.getValue();
                 newWitnesses.addAll(wrapElements(UpdatePartyDetailsForm.builder()
                                                    .firstName(witness.getFirstName())
