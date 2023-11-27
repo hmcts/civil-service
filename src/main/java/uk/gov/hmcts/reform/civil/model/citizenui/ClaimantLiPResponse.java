@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 
 @Data
 @Builder
@@ -17,6 +18,7 @@ public class ClaimantLiPResponse {
     private HearingSupportLip applicant1DQHearingSupportLip;
     private YesOrNo applicant1SignedSettlementAgreement;
     private ChooseHowToProceed applicant1ChoosesHowToProceed;
+    private RepaymentDecisionType claimantCourtDecision;
 
     @JsonIgnore
     public boolean hasApplicant1SignedSettlementAgreement() {
