@@ -35,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.DEFENDA
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.JUDGEMENT_REQUEST;
 import static uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
-import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED_NOTICE_OF_CHANGE;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -181,8 +180,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT:
                     return format("Unregistered defendant solicitor firm: %s",
                                      StringUtils.join(
-                                         getDefendantNames(featureToggleService.isNoticeOfChangeEnabled()
-                                                               ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
+                                         getDefendantNames(UNREGISTERED,
                                                            caseData), " and "
                                      ));
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
@@ -191,8 +189,7 @@ public class CaseEventTaskHandler implements BaseExternalTaskHandler {
                                       + "Unregistered defendant solicitor firm: %s.",
                                         StringUtils.join(getDefendantNames(UNREPRESENTED, caseData), " and "),
                                         StringUtils.join(
-                                            getDefendantNames(featureToggleService.isNoticeOfChangeEnabled()
-                                                                  ? UNREGISTERED_NOTICE_OF_CHANGE : UNREGISTERED,
+                                            getDefendantNames(UNREGISTERED,
                                                               caseData), " and "
                                         ));
                 case FULL_DEFENCE_PROCEED:
