@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -504,6 +505,7 @@ public class CaseDataBuilder {
 
     private DynamicList transferCourtLocationList;
     private String reasonForTransfer;
+    private FlightDelayDetails flightDelayDetails;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1863,6 +1865,7 @@ public class CaseDataBuilder {
         addRespondent2 = NO;
         respondent2 = null;
         respondent2Represented = null;
+        respondent2OrgRegistered = null;
         return this;
     }
 
@@ -2293,8 +2296,8 @@ public class CaseDataBuilder {
         atStateClaimSubmitted();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
-        respondent1OrgRegistered = NO;
-        respondent2OrgRegistered = NO;
+        respondent1OrgRegistered = null;
+        respondent2OrgRegistered = null;
         respondent1Represented = NO;
         respondent2Represented = NO;
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
@@ -5189,6 +5192,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder flightDelay(FlightDelayDetails flightDelayDetails) {
+        this.flightDelayDetails = flightDelayDetails;
+        return this;
+    }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -6551,6 +6559,7 @@ public class CaseDataBuilder {
             .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
             .transferCourtLocationList(transferCourtLocationList)
             .reasonForTransfer(reasonForTransfer)
+
             .applicant1LRIndividuals(applicant1LRIndividuals)
             .respondent1LRIndividuals(respondent1LRIndividuals)
             .respondent2LRIndividuals(respondent2LRIndividuals)
@@ -6558,6 +6567,7 @@ public class CaseDataBuilder {
             .applicant2OrgIndividuals(applicant2OrgIndividuals)
             .respondent1OrgIndividuals(respondent1OrgIndividuals)
             .respondent2OrgIndividuals(respondent2OrgIndividuals)
+            .flightDelayDetails(flightDelayDetails)
             .build();
     }
 }

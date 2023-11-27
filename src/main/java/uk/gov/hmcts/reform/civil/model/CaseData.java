@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOne
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
@@ -638,6 +639,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     //SDO-R2
     private YesOrNo isFlightDelayClaim;
+    private FlightDelayDetails flightDelayDetails;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -669,6 +671,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isRespondent1LiP() {
         return YesOrNo.NO == getRespondent1Represented();
+    }
+
+    @JsonIgnore
+    public boolean isApplicantLiP() {
+        return YesOrNo.NO == getApplicant1Represented();
     }
 
     public YesOrNo getRespondent2Represented() {
@@ -982,9 +989,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPartAdmitPayImmediatelyAccepted() {
-        return  SPEC_CLAIM.equals(getCaseAccessCategory())
+        return SPEC_CLAIM.equals(getCaseAccessCategory())
             && YES.equals(getApplicant1AcceptAdmitAmountPaidSpec())
-            && getShowResponseOneVOneFlag().equals(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY);
+            && (getShowResponseOneVOneFlag() != null
+            && getShowResponseOneVOneFlag().equals(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY));
     }
 
     @JsonIgnore
@@ -1105,5 +1113,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
             return getRespondentSolicitor1EmailAddress();
         }
         return null;
+    }
+
+    @JsonIgnore
+    public boolean hasApplicant1SignedSettlementAgreement() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasApplicant1SignedSettlementAgreement).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean isRespondentSignSettlementAgreement() {
+        return getCaseDataLiP() != null && getCaseDataLiP().getRespondentSignSettlementAgreement() != null;
     }
 }
