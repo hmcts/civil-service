@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.*;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
@@ -14,12 +16,9 @@ import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-
 @Slf4j
 @AllArgsConstructor
-public class CcdDashboardClaimMatcher implements Claim {
+public class CcdDashboardDefendantClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
     private CaseData caseData;
@@ -104,9 +103,8 @@ public class CcdDashboardClaimMatcher implements Claim {
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-
-       return (!hasSdoBeenDrawn()) && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC.name())
-            && caseData.getBusinessProcess().getStatus().equals(BusinessProcessStatus.FINISHED);
+        return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
+            && !hasSdoBeenDrawn();
     }
 
     @Override
@@ -126,14 +124,8 @@ public class CcdDashboardClaimMatcher implements Claim {
             return false;
         }
 
-//        return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
-//            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-//            && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.TAKE_CASE_OFFLINE)
-//            && caseData.getBusinessProcess().getStatus().equals(BusinessProcessStatus.FINISHED);
-
         return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
-            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            && Objects.isNull(caseData.getCcjPaymentDetails());
+            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }
 
     @Override
@@ -286,8 +278,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isPartialAdmissionRejected() {
         return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
-            && caseData.isPartAdmitClaimSpec()
-            && NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
+            && caseData.isPartAdmitClaimSpec();
     }
 
     @Override
@@ -303,20 +294,4 @@ public class CcdDashboardClaimMatcher implements Claim {
             && caseData.getPaymentTypeSelection() != null;
     }
 
-    @Override
-    public boolean isPartialAdmissionAccepted() {
-        return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
-            && caseData.isPartAdmitClaimSpec()
-            && caseData.isPartAdmitClaimNotSettled()
-            && caseData.isPayImmediately()
-            && YES.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
-    }
-
-    @Override
-    public boolean isPaymentPlanAccepted() {
-        return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
-                && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
-                && (caseData.getRespondent1().isCompany() || caseData.getRespondent1().isOrganisation())
-                && caseData.hasApplicantRejectedRepaymentPlan());
-    }
 }
