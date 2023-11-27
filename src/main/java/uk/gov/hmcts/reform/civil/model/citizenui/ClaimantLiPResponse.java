@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import static uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed.REQUEST_A_CCJ;
 
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -24,7 +23,7 @@ public class ClaimantLiPResponse {
     public boolean hasApplicant1SignedSettlementAgreement() {
         return YesOrNo.YES.equals(applicant1SignedSettlementAgreement);
     }
-	
+
     @JsonIgnore
     public boolean hasApplicant1AcceptedCcj() {
         return applicant1ChoosesHowToProceed.equals(REQUEST_A_CCJ);

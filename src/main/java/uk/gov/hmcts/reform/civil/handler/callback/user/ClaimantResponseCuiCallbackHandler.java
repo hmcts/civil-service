@@ -78,8 +78,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                 .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
-		updateCcjRequestPaymentDetails(builder,caseData);
-		
+        updateCcjRequestPaymentDetails(builder, caseData);
+
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
@@ -117,7 +117,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
     }
-	
+
     private void updateCcjRequestPaymentDetails(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
         if (hasCcjRequest(caseData)) {
             CCJPaymentDetails ccjPaymentDetails = judgementService.buildJudgmentAmountSummaryDetails(caseData);
@@ -126,8 +126,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     }
 
     private boolean hasCcjRequest(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled() &&
-            caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
+        return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+                && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
     }
 
 }

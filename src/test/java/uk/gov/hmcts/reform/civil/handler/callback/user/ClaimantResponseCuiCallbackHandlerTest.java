@@ -59,16 +59,15 @@ import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
-        ClaimantResponseCuiCallbackHandler.class,
-        JacksonAutoConfiguration.class,
-        ResponseOneVOneShowTagService.class,
-        JacksonAutoConfiguration.class,
-        CourtLocationUtils.class,
-        LocationRefDataService.class,
-        LocationHelper.class,
-        UpdateCaseManagementDetailsService.class,
-        JudgementService.class
-})
+    ClaimantResponseCuiCallbackHandler.class,
+    JacksonAutoConfiguration.class,
+    ResponseOneVOneShowTagService.class,
+    JacksonAutoConfiguration.class,
+    CourtLocationUtils.class,
+    LocationRefDataService.class,
+    LocationHelper.class,
+    UpdateCaseManagementDetailsService.class,
+    JudgementService.class})
 class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired

@@ -1119,12 +1119,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isRespondentSignSettlementAgreement() {
         return getCaseDataLiP() != null && getCaseDataLiP().getRespondentSignSettlementAgreement() != null;
     }
-	
-	@JsonIgnore
+
+    @JsonIgnore
     public boolean hasApplicant1AcceptedCcj() {
         return Optional.ofNullable(getCaseDataLiP())
-            .map(CaseDataLiP::getApplicant1LiPResponse)
-            .filter(ClaimantLiPResponse::hasApplicant1AcceptedCcj).isPresent();
+                .map(CaseDataLiP::getApplicant1LiPResponse)
+                .filter(ClaimantLiPResponse::hasApplicant1AcceptedCcj).isPresent();
     }
 
 }
