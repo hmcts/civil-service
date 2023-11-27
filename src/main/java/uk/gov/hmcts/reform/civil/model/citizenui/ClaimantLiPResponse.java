@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import static uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed.REQUEST_A_CCJ;
 
 
@@ -27,7 +26,7 @@ public class ClaimantLiPResponse {
     }
 	
     @JsonIgnore
-    public boolean isApplicant1AcceptCcj() {
+    public boolean hasApplicant1AcceptedCcj() {
         return applicant1ChoosesHowToProceed.equals(REQUEST_A_CCJ);
     }
 }

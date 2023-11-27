@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
@@ -1122,10 +1121,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 	
 	@JsonIgnore
-    public boolean isApplicant1AcceptCcj() {
+    public boolean hasApplicant1AcceptedCcj() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
-            .filter(ClaimantLiPResponse::isApplicant1AcceptCcj).isPresent();
+            .filter(ClaimantLiPResponse::hasApplicant1AcceptedCcj).isPresent();
     }
 
 }

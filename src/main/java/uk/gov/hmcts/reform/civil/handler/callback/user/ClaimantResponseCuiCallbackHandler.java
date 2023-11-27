@@ -127,7 +127,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private boolean hasCcjRequest(CaseData caseData) {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled() &&
-            caseData.isApplicant1AcceptCcj() && caseData.isCcjRequestJudgmentByAdmission());
+            caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
     }
 
 }
