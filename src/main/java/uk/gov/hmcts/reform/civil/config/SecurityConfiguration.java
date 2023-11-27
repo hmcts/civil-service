@@ -51,7 +51,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/assignment/**",
         "/service-request-update",
         "/service-request-update-claim-issued",
-        "/case/document/**"
+        "/case/document/downloadDocument/**"
     };
 
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")
