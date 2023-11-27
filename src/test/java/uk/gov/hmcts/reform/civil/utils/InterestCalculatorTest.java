@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class InterestCalculatorTest {
+class InterestCalculatorTest {
 
     @Mock
     private Time time;
@@ -32,7 +32,7 @@ public class InterestCalculatorTest {
     private InterestCalculator interestCalculator;
 
     @Test
-    public void shouldReturnValidInterestAmountByDate() {
+    void shouldReturnValidInterestAmountByDate() {
         LocalDateTime dateTime = LocalDateTime.now().withHour(13).withMinute(59);
         when(time.now()).thenReturn(dateTime);
         assertThat(interestCalculator.calculateInterestByDate(
@@ -42,7 +42,7 @@ public class InterestCalculatorTest {
     }
 
     @Test
-    public void shouldReturnZeroInterestRateWhenNoInterestIsSelected() {
+    void shouldReturnZeroInterestRateWhenNoInterestIsSelected() {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.NO)
             .totalClaimAmount(BigDecimal.valueOf(5000))
@@ -53,7 +53,7 @@ public class InterestCalculatorTest {
     }
 
     @Test
-    public void shouldReturnZeroInterestRateWhenSameRateInterestAndSubmitDateIsChoosen() {
+    void shouldReturnZeroInterestRateWhenSameRateInterestAndSubmitDateIsChoosen() {
         LocalDateTime dateTime = LocalDateTime.of(2022, 11, 15, 13, 0);
         when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
@@ -70,7 +70,7 @@ public class InterestCalculatorTest {
     }
 
     @Test
-    public void shouldReturnZeroInterestRateWhenSameRateInterestDifferentRateAndSubmitDateIsChoosen() {
+    void shouldReturnZeroInterestRateWhenSameRateInterestDifferentRateAndSubmitDateIsChoosen() {
         LocalDateTime dateTime = LocalDateTime.of(2022, 11, 15, 13, 0);
         when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
@@ -89,7 +89,7 @@ public class InterestCalculatorTest {
     }
 
     @Test
-    public void shouldReturnZeroInterestRateWhenSameRateInterestDifferentRateAndSpecificDateIsChoosen() {
+    void shouldReturnZeroInterestRateWhenSameRateInterestDifferentRateAndSpecificDateIsChoosen() {
         LocalDateTime dateTime = LocalDateTime.now().withHour(13).withMinute(59);
         when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
@@ -110,7 +110,7 @@ public class InterestCalculatorTest {
     }
 
     @Test
-    public void shouldReturnValidInterestRateWhenSameRateInterestAndSpecificDateIsChoosen() {
+    void shouldReturnValidInterestRateWhenSameRateInterestAndSpecificDateIsChoosen() {
         LocalDateTime dateTime = LocalDateTime.now().withHour(13).withMinute(59);
         when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
@@ -129,7 +129,7 @@ public class InterestCalculatorTest {
     }
 
     @Test
-    public void shouldReturnZeroInterestRateWhenDifferentRateInterestAndSubmitDateIsChoosen() {
+    void shouldReturnZeroInterestRateWhenDifferentRateInterestAndSubmitDateIsChoosen() {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .interestClaimOptions(InterestClaimOptions.BREAK_DOWN_INTEREST)
@@ -141,7 +141,7 @@ public class InterestCalculatorTest {
     }
 
     @Test
-    public void shouldReturnInterestRateBulkClaim_InterestSelectedBefore4pm() {
+    void shouldReturnInterestRateBulkClaim_InterestSelectedBefore4pm() {
         // when before 4pm interest will be days multiplied by daily rate of interest. 5 * 6 = 30
         LocalDateTime dateTime = LocalDateTime.of(2023, 11, 15, 15, 0);
         when(time.now()).thenReturn(dateTime);
@@ -159,7 +159,7 @@ public class InterestCalculatorTest {
     }
 
     @Test
-    public void shouldReturnInterestRateBulkClaim_InterestSelectedAfter4pm() {
+    void shouldReturnInterestRateBulkClaim_InterestSelectedAfter4pm() {
         // when after 4pm interest will be days +1, multiplied by daily rate of interest. (5+1) * 6 = 36
         LocalDateTime dateTime = LocalDateTime.of(2023, 11, 15, 18, 0);
         when(time.now()).thenReturn(dateTime);
@@ -177,7 +177,7 @@ public class InterestCalculatorTest {
     }
 
     @Test
-    public void shouldReturnZeroInterestRateBulkClaim_noInterestSelected() {
+    void shouldReturnZeroInterestRateBulkClaim_noInterestSelected() {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.NO)
             .interestFromSpecificDate(null)
