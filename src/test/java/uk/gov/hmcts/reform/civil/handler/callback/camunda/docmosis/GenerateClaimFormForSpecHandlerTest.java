@@ -229,23 +229,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
             verify(civilDocumentStitchingService).bundle(eq(specClaimTimelineDocuments), anyString(), anyString(),
                                                          anyString(), eq(caseData));
         }
-
-        @Test
-        void shouldNotStitchClaimFormWithLipForm_whenOneVsOne_withLitigantInPersonSpecClaim_whenToggleIsOff() {
-            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(false);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssuedUnrepresentedDefendant().build().toBuilder()
-                .specRespondent1Represented(NO)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().get(0).getValue()).isEqualTo(CLAIM_FORM);
-        }
-
     }
 
     @Test
@@ -357,11 +340,6 @@ public class GenerateClaimFormForSpecHandlerTest extends BaseCallbackHandlerTest
 
     @Nested
     class GenerateAndStitchLitigantInPersonFormSpec {
-
-        @BeforeEach
-        void setup() {
-            when(toggleService.isNoticeOfChangeEnabled()).thenReturn(true);
-        }
 
         @Test
         void shouldStitchClaimFormWithLipForm_whenOneVsOne_withLitigantInPersonSpecClaim() {

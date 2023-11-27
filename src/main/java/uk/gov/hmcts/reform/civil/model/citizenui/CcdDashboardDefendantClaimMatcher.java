@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Slf4j
 @AllArgsConstructor
-public class CcdDashboardClaimMatcher implements Claim {
+public class CcdDashboardDefendantClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
     private CaseData caseData;
@@ -247,9 +247,8 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isCourtReviewing() {
         return (!hasSdoBeenDrawn()
-            && (caseData.isRespondentResponseFullDefence()
-            || caseData.isPartAdmitClaimSpec())
-            && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState()))
+            && caseData.isRespondentResponseFullDefence()
+            && caseData.getCcdState().equals(CaseState.JUDICIAL_REFERRAL))
             || (caseData.hasApplicantRejectedRepaymentPlan());
     }
 
@@ -279,7 +278,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isPartialAdmissionRejected() {
         return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
-            && caseData.isPartAdmitClaimSpec() && YesOrNo.NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec());
+            && caseData.isPartAdmitClaimSpec();
     }
 
     @Override
@@ -294,4 +293,5 @@ public class CcdDashboardClaimMatcher implements Claim {
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
     }
+
 }

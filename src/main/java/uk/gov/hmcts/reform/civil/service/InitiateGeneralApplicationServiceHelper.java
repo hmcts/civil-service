@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,6 +40,7 @@ public class InitiateGeneralApplicationServiceHelper {
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
+    public CaseAssignedUserRolesResource userRoles;
 
     public boolean isGAApplicantSameAsPCClaimant(CaseData caseData, String organisationIdentifier) {
 
@@ -56,14 +58,12 @@ public class InitiateGeneralApplicationServiceHelper {
                 || (YES.equals(caseData.getAddRespondent2()) && caseData.getRespondent2OrganisationPolicy() == null)) {
             throw new IllegalArgumentException("Solicitor Org details are not set correctly.");
         }
-        GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
 
         String parentCaseId = caseData.getCcdCaseReference().toString();
-
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
-        CaseAssignedUserRolesResource userRoles = getUserRoles(parentCaseId);
+        userRoles = getUserRoles(parentCaseId);
 
         /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
         List<CaseAssignedUserRole> respondentSolicitors = userRoles.getCaseAssignedUserRoles().stream()
@@ -119,7 +119,7 @@ public class InitiateGeneralApplicationServiceHelper {
                 }
             }
         }
-
+        GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
         applicationBuilder
             .generalAppApplnSolicitor(applicantBuilder.build());
         String applicantPartyName = null;
@@ -133,13 +133,13 @@ public class InitiateGeneralApplicationServiceHelper {
                 GASolicitorDetailsGAspec.GASolicitorDetailsGAspecBuilder specBuilder = GASolicitorDetailsGAspec
                     .builder();
 
-                specBuilder.id(respSol.getUserId());
-
                 if (respSol.getCaseRole() != null) {
+                    log.info(respSol.getCaseRole(), "**", respSol.getUserId());
                     /*Populate the GA respondent solicitor details in accordance with civil case Applicant Solicitor 1
                 details if case role of collected user matches with case role of Applicant 1*/
                     if (respSol.getCaseRole().equals(applicant1OrgCaseRole)) {
                         if (caseData.getApplicantSolicitor1UserDetails() != null) {
+                            specBuilder.id(respSol.getUserId());
                             specBuilder.email(caseData.getApplicantSolicitor1UserDetails().getEmail());
                             specBuilder.organisationIdentifier(caseData.getApplicant1OrganisationPolicy()
                                                                    .getOrganisation().getOrganisationID());
@@ -147,14 +147,19 @@ public class InitiateGeneralApplicationServiceHelper {
                         /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                         Solicitor 1 details if caserole of collected user matches with caserole Respondent Solicitor 1*/
                     } else if (respSol.getCaseRole().equals(respondent1OrgCaseRole)) {
+                        specBuilder.id(respSol.getUserId());
                         specBuilder.email(caseData.getRespondentSolicitor1EmailAddress());
                         specBuilder.organisationIdentifier(getRespondent1SolicitorOrgId(caseData));
 
                         /*Populate the GA respondent solicitor details in accordance with civil case Respondent
                         Solicitor 2 details if it's 1 V 2 Different Solicitor scenario*/
                     } else {
-                        specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
-                        specBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
+                        if (Objects.nonNull(caseData.getAddRespondent2())
+                                            && caseData.getAddRespondent2().equals(YES)) {
+                            specBuilder.id(respSol.getUserId());
+                            specBuilder.email(caseData.getRespondentSolicitor2EmailAddress());
+                            specBuilder.organisationIdentifier(getRespondent2SolicitorOrgId(caseData));
+                        }
                     }
                     /*Set the GA Respondent solicitor details to Empty if above checks are failed*/
                 } else {
@@ -167,7 +172,10 @@ public class InitiateGeneralApplicationServiceHelper {
                 }
 
                 GASolicitorDetailsGAspec gaSolicitorDetailsGAspec = specBuilder.build();
-                respondentSols.add(element(gaSolicitorDetailsGAspec));
+                if (Objects.nonNull(gaSolicitorDetailsGAspec.getId())) {
+                    respondentSols.add(element(gaSolicitorDetailsGAspec));
+                }
+
             });
             applicantPartyName = getApplicantPartyName(userRoles, userDetails, caseData);
             applicationBuilder.applicantPartyName(applicantPartyName);
@@ -252,8 +260,12 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     public CaseAssignedUserRolesResource getUserRoles(String parentCaseId) {
-        return caseAccessDataStoreApi.getUserRoles(
-            getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
+        if (Objects.isNull(userRoles)) {
+            userRoles = caseAccessDataStoreApi.getUserRoles(
+                getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
+        }
+        log.info("UserRoles from API :" + userRoles);
+        return userRoles;
     }
 
     public String getCaaAccessToken() {
