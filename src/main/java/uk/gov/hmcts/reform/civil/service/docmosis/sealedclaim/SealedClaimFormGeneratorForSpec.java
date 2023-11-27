@@ -195,7 +195,6 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         if (caseData.getClaimInterest() == YesOrNo.YES) {
             interest = interestCalculator.calculateBulkInterest(caseData);
         }
-        System.out.println("tetttt " + interest);
         return SealedClaimFormForSpec.builder()
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
@@ -210,10 +209,10 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .interestRate(interest != null ? "£" + caseData.getSameRateInterestSelection().getDifferentRate().toString() + " of interest per day" : null)
             .interestExplanationText("The claimant reserves the right to claim interest under Section 69 of the County Courts Act 1984")
             .interestFromDate(interest != null ? caseData.getInterestFromSpecificDate() : null)
-            .whenAreYouClaimingInterestFrom("null for bulk")
-            .interestEndDate(interest != null ? LocalDate.now().minusDays(100) : null)
+            .whenAreYouClaimingInterestFrom("null for bulk") //clarify to remove
+            .interestEndDate(interest != null ? LocalDate.now().minusDays(100) : null) //clarify to remove
             .totalClaimAmount(caseData.getTotalClaimAmount() + "")
-            .interestAmount(interest != null ? interest.toString() : null)
+            .interestAmount(interest != null ? interest.toString() : "0")
             .claimAmount(getClaimAmountBulk(caseData))
             .claimFee(MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence()).toString())
             // Claim amount + interest + claim fees
