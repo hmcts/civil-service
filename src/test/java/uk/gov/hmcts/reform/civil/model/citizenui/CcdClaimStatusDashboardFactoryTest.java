@@ -353,7 +353,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
-        assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_PARTIAL_ADMISSION);
     }
 
     private static CaseData getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec paymentMethod) {
