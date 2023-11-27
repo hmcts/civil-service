@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler;
 
 import feign.FeignException;
-import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,11 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class RetriggerCasesEventHandlerTest {
 
@@ -37,7 +34,7 @@ class RetriggerCasesEventHandlerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-    
+
     @Test
     void testUpdateCaseByEvent() {
         List<String> caseIdList = Arrays.asList("1", "2", "3");
