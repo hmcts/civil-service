@@ -35,15 +35,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenIsNoticeOfChangeEnabledInvoked(Boolean toggleState) {
-        var noticeOfChangeKey = "notice-of-change";
-        givenToggle(noticeOfChangeKey, toggleState);
-
-        assertThat(featureToggleService.isNoticeOfChangeEnabled()).isEqualTo(toggleState);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenAutomatedHearingNoticeEnabledInvoked(Boolean toggleStat) {
         var hearingAndListingKey = "ahn";
         givenToggle(hearingAndListingKey, toggleStat);
