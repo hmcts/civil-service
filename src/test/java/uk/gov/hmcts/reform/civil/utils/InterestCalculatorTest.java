@@ -21,7 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class InterestCalculatorTest {
@@ -33,7 +33,8 @@ public class InterestCalculatorTest {
 
     @Test
     public void shouldReturnValidInterestAmountByDate() {
-        given(time.now()).willReturn(LocalDateTime.now().withHour(13).withMinute(59));
+        LocalDateTime dateTime = LocalDateTime.now().withHour(13).withMinute(59);
+        when(time.now()).thenReturn(dateTime);
         assertThat(interestCalculator.calculateInterestByDate(
             new BigDecimal("1000"),
             BigDecimal.valueOf(8),
@@ -53,7 +54,8 @@ public class InterestCalculatorTest {
 
     @Test
     public void shouldReturnZeroInterestRateWhenSameRateInterestAndSubmitDateIsChoosen() {
-        given(time.now()).willReturn(LocalDateTime.of(2022, 11, 15, 13, 0));
+        LocalDateTime dateTime = LocalDateTime.of(2022, 11, 15, 13, 0);
+        when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
@@ -69,7 +71,8 @@ public class InterestCalculatorTest {
 
     @Test
     public void shouldReturnZeroInterestRateWhenSameRateInterestDifferentRateAndSubmitDateIsChoosen() {
-        given(time.now()).willReturn(LocalDateTime.of(2022, 11, 15, 13, 0));
+        LocalDateTime dateTime = LocalDateTime.of(2022, 11, 15, 13, 0);
+        when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
@@ -87,7 +90,8 @@ public class InterestCalculatorTest {
 
     @Test
     public void shouldReturnZeroInterestRateWhenSameRateInterestDifferentRateAndSpecificDateIsChoosen() {
-        given(time.now()).willReturn(LocalDateTime.now().withHour(13).withMinute(59));
+        LocalDateTime dateTime = LocalDateTime.now().withHour(13).withMinute(59);
+        when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
@@ -107,7 +111,8 @@ public class InterestCalculatorTest {
 
     @Test
     public void shouldReturnValidInterestRateWhenSameRateInterestAndSpecificDateIsChoosen() {
-        given(time.now()).willReturn(LocalDateTime.now().withHour(13).withMinute(59));
+        LocalDateTime dateTime = LocalDateTime.now().withHour(13).withMinute(59);
+        when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
@@ -138,7 +143,8 @@ public class InterestCalculatorTest {
     @Test
     public void shouldReturnInterestRateBulkClaim_InterestSelectedBefore4pm() {
         // when before 4pm interest will be days multiplied by daily rate of interest. 5 * 6 = 30
-        given(time.now()).willReturn(LocalDateTime.of(2023, 11, 15, 15, 0));
+        LocalDateTime dateTime = LocalDateTime.of(2023, 11, 15, 15, 0);
+        when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .interestFromSpecificDate(LocalDate.of(2023, 11, 20))
@@ -155,7 +161,8 @@ public class InterestCalculatorTest {
     @Test
     public void shouldReturnInterestRateBulkClaim_InterestSelectedAfter4pm() {
         // when after 4pm interest will be days +1, multiplied by daily rate of interest. (5+1) * 6 = 36
-        given(time.now()).willReturn(LocalDateTime.of(2023, 11, 15, 18, 0));
+        LocalDateTime dateTime = LocalDateTime.of(2023, 11, 15, 18, 0);
+        when(time.now()).thenReturn(dateTime);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .claimInterest(YesOrNo.YES)
             .interestFromSpecificDate(LocalDate.of(2023, 11, 20))
