@@ -6022,6 +6022,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder allocatedTrack(AllocatedTrack track) {
+        this.allocatedTrack = track;
+        return this;
+    }
+
     public CaseDataBuilder responseClaimTrack(String claimType) {
         this.responseClaimTrack = claimType;
         return this;
