@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapE
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapWitnessesToUpdatePartyDetailsForm;
+
 @SuppressWarnings("unchecked")
 class ManageContactInformationUtilsTest {
 
