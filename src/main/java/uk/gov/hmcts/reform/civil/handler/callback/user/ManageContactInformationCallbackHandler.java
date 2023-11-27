@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -93,6 +94,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private static final String CHECK_LITIGATION_FRIEND_ERROR_TITLE = "Check the litigation friend's details";
     private static final String CHECK_LITIGATION_FRIEND_ERROR = "After making these changes, please ensure that the "
         + "litigation friend's contact information is also up to date.";
+    private static final String CREATE_ORDER_ERROR_EXPERTS = "Please create an order to add more experts.";
+    private static final String CREATE_ORDER_ERROR_WITNESSES = "Please create an order to add more witnesses.";
     private static final List<String> ADMIN_ROLES = List.of(
         "caseworker-civil-admin");
     private static final List<CaseEvent> EVENTS = List.of(
@@ -112,6 +115,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .put(callbackKey(ABOUT_TO_START), this::prepareEvent)
             .put(callbackKey(MID, "show-party-field"), this::showPartyField)
             .put(callbackKey(MID, "show-warning"), this::showWarning)
+            .put(callbackKey(MID, "validate-experts"), this::validateExperts)
+            .put(callbackKey(MID, "validate-witnesses"), this::validateWitnesses)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitChanges)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
@@ -120,6 +125,52 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    private CallbackResponse validateExperts(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        List<String> errors = new ArrayList<>();
+
+        if (!isAdmin(authToken)) {
+            List<UpdatePartyDetailsForm> expertsWithoutPartyId = unwrapElements(caseData.getUpdateDetailsForm().getUpdateExpertsDetailsForm())
+                .stream()
+                .filter(e -> e.getPartyId() == null)
+                .collect(Collectors.toList());
+
+            if(!expertsWithoutPartyId.isEmpty()){
+                errors.add(CREATE_ORDER_ERROR_EXPERTS);
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse validateWitnesses(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        List<String> errors = new ArrayList<>();
+
+        if (!isAdmin(authToken)) {
+            List<UpdatePartyDetailsForm> witnessesWithoutPartyId = unwrapElements(caseData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm())
+                .stream()
+                .filter(e -> e.getPartyId() == null)
+                .collect(Collectors.toList());
+
+            if(!witnessesWithoutPartyId.isEmpty()){
+                errors.add(CREATE_ORDER_ERROR_WITNESSES);
+            }
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(builder.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse prepareEvent(CallbackParams callbackParams) {
@@ -199,23 +250,23 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     }
 
     private List<Element<UpdatePartyDetailsForm>> prepareExperts(String partyId, CaseData caseData) {
-        if (partyId.equals(CLAIMANT_ONE_EXPERTS_ID)) {
-            return mapExpertsToUpdatePartyDetailsForm(caseData.getApplicant1DQ().getExperts().getDetails());
-        } else if (partyId.equals(DEFENDANT_ONE_EXPERTS_ID)) {
-            return mapExpertsToUpdatePartyDetailsForm(caseData.getRespondent1DQ().getExperts().getDetails());
-        } else if (partyId.equals(DEFENDANT_TWO_EXPERTS_ID)) {
-            return mapExpertsToUpdatePartyDetailsForm(caseData.getRespondent2DQ().getExperts().getDetails());
+        if (CLAIMANT_ONE_EXPERTS_ID.equals(partyId) && caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ() .getExperts() != null) {
+            return mapExpertsToUpdatePartyDetailsForm(caseData.getApplicant1DQ().getExperts());
+        } else if (DEFENDANT_ONE_EXPERTS_ID.equals(partyId) && caseData.getRespondent1DQ() != null && caseData.getRespondent1DQ().getExperts() != null) {
+            return mapExpertsToUpdatePartyDetailsForm(caseData.getRespondent1DQ().getExperts());
+        } else if (DEFENDANT_TWO_EXPERTS_ID.equals(partyId) && caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getExperts() != null) {
+            return mapExpertsToUpdatePartyDetailsForm(caseData.getRespondent2DQ().getExperts());
         }
         return Collections.emptyList();
     }
 
     private List<Element<UpdatePartyDetailsForm>> prepareWitnesses(String partyId, CaseData caseData) {
-        if (partyId.equals(CLAIMANT_ONE_WITNESSES_ID)) {
-            return mapWitnessesToUpdatePartyDetailsForm(caseData.getApplicant1DQ().getWitnesses().getDetails());
-        } else if (partyId.equals(DEFENDANT_ONE_WITNESSES_ID)) {
-            return mapWitnessesToUpdatePartyDetailsForm(caseData.getRespondent1DQ().getWitnesses().getDetails());
-        } else if (partyId.equals(DEFENDANT_TWO_WITNESSES_ID)) {
-            return mapWitnessesToUpdatePartyDetailsForm(caseData.getRespondent2DQ().getWitnesses().getDetails());
+        if (CLAIMANT_ONE_WITNESSES_ID.equals(partyId) && caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getWitnesses() != null) {
+            return mapWitnessesToUpdatePartyDetailsForm(caseData.getApplicant1DQ().getWitnesses());
+        } else if (DEFENDANT_ONE_WITNESSES_ID.equals(partyId) && caseData.getRespondent1DQ() != null && caseData.getRespondent1DQ().getWitnesses() != null) {
+            return mapWitnessesToUpdatePartyDetailsForm(caseData.getRespondent1DQ().getWitnesses());
+        } else if (DEFENDANT_TWO_WITNESSES_ID.equals(partyId) && caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getWitnesses()!= null) {
+            return mapWitnessesToUpdatePartyDetailsForm(caseData.getRespondent2DQ().getWitnesses());
         }
         return Collections.emptyList();
     }
