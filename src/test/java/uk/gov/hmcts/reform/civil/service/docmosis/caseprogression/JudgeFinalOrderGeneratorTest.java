@@ -161,7 +161,8 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
-    void shouldGenerateFreeFormOrder_whenNoneSelected() {
+    void shouldGenerateFreeFormOrder_whenHmcToggleDisabled() {
+        when(featureToggleService.isHmcEnabled()).thenReturn(false);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
         when(documentManagementService
@@ -179,6 +180,26 @@ public class JudgeFinalOrderGeneratorTest {
     }
 
     @Test
+    void shouldGenerateFreeFormOrder_whenNoneSelected() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
+            .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+            .thenReturn(FREE_FROM_ORDER);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+            .caseManagementLocation(caseManagementLocation)
+            .build();
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertNotNull(caseDocument);
+        verify(locationRefDataService).getCourtLocationsByEpimmsId(BEARER_TOKEN, caseManagementLocation.getBaseLocation());
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
+    }
+
+    @Test
     void shouldGenerateFreeFormOrder_whenClaimantAndDefendantReferenceNotAddedToCase() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
             .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
@@ -189,10 +210,12 @@ public class JudgeFinalOrderGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .solicitorReferences(null)
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+            .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
+        verify(locationRefDataService).getCourtLocationsByEpimmsId(BEARER_TOKEN, caseManagementLocation.getBaseLocation());
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
     }
@@ -209,10 +232,12 @@ public class JudgeFinalOrderGeneratorTest {
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
             .orderOnCourtInitiative(FreeFormOrderValues.builder().onInitiativeSelectionTextArea("test").onInitiativeSelectionDate(
                 LocalDate.now()).build())
+            .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
+        verify(locationRefDataService).getCourtLocationsByEpimmsId(BEARER_TOKEN, caseManagementLocation.getBaseLocation());
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
     }
@@ -237,12 +262,156 @@ public class JudgeFinalOrderGeneratorTest {
                             .partyID("res-2-party-id")
                             .partyName("Respondent2")
                             .build())
-            .build();
+            .caseManagementLocation(caseManagementLocation)
+            .build();;
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertNotNull(caseDocument);
+        verify(locationRefDataService).getCourtLocationsByEpimmsId(BEARER_TOKEN, caseManagementLocation.getBaseLocation());
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowLocationRefDataExceptionOnGeneratingFreeFormOrder_whenLocationServiceDoesNotReturnOnlyASingleLocation() {
+        when(locationRefDataService.getCourtLocationsByEpimmsId(BEARER_TOKEN, caseManagementLocation.getBaseLocation()))
+            .thenReturn(List.of(locationRefData, locationRefData));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
+            .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+            .thenReturn(FREE_FROM_ORDER);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("test without notice")
+                                    .withoutNoticeSelectionDate(LocalDate.now()).build())
+            .respondent2(PartyBuilder.builder().individual().build().toBuilder()
+                             .partyID("app-2-party-id")
+                             .partyName("Applicant2")
+                             .build())
+            .applicant2(PartyBuilder.builder().soleTrader().build().toBuilder()
+                            .partyID("res-2-party-id")
+                            .partyName("Respondent2")
+                            .build())
+            .caseManagementLocation(caseManagementLocation)
+            .build();;
+
+        assertThrows(LocationRefDataException.class, () -> generator.generate(caseData, BEARER_TOKEN),
+                     "Unexpected amount of locations (2) where matched against location epimms id: 000000"
+        );
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldThrowLocationRefDataExceptionOnGeneratingFreeFormOrder_whenLocationServiceReturnsCourtsWithoutCaseTypeIdOf10() {
+        when(locationRefDataService.getCourtLocationsByEpimmsId(BEARER_TOKEN, caseManagementLocation.getBaseLocation()))
+                .thenReturn(List.of(locationRefData.toBuilder().courtTypeId("5").build()));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
+                .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
+        when(documentManagementService
+                .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+                .thenReturn(FREE_FROM_ORDER);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+                .ccdState(CaseState.CASE_PROGRESSION)
+                .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("test without notice")
+                        .withoutNoticeSelectionDate(LocalDate.now()).build())
+                .respondent2(PartyBuilder.builder().individual().build().toBuilder()
+                        .partyID("app-2-party-id")
+                        .partyName("Applicant2")
+                        .build())
+                .applicant2(PartyBuilder.builder().soleTrader().build().toBuilder()
+                        .partyID("res-2-party-id")
+                        .partyName("Respondent2")
+                        .build())
+                .caseManagementLocation(caseManagementLocation)
+                .build();;
+
+        assertThrows(LocationRefDataException.class, () -> generator.generate(caseData, BEARER_TOKEN),
+                "Unexpected amount of locations (2) where matched against location epimms id: 000000"
+        );
+    }
+
+    @Test
+    void shouldGenerateFreeFormOrder_whenHearingLocationExists() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
+            .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+            .thenReturn(FREE_FROM_ORDER);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("test without notice")
+                                    .withoutNoticeSelectionDate(LocalDate.now()).build())
+            .respondent2(PartyBuilder.builder().individual().build().toBuilder()
+                             .partyID("app-2-party-id")
+                             .partyName("Applicant2")
+                             .build())
+            .applicant2(PartyBuilder.builder().soleTrader().build().toBuilder()
+                            .partyID("res-2-party-id")
+                            .partyName("Respondent2")
+                            .build())
+            .hearingLocation(DynamicList.builder()
+                                 .value(DynamicListElement.dynamicElement("hearing-location")).build())
+            .build();;
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertNotNull(caseDocument);
+        verify(locationRefDataService, times(0))
+            .getCourtLocationsByEpimmsId(BEARER_TOKEN, caseManagementLocation.getBaseLocation());
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER));
+    }
+
+    @Test
+    void shouldGenerateAssistedFormOrder_whenHmcToggleDisabled() {
+        //Given: case data without recitals selected
+        when(featureToggleService.isHmcEnabled()).thenReturn(false);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_PDF)))
+            .thenReturn(new DocmosisDocument(ASSISTED_ORDER_PDF.getDocumentTitle(), bytes));
+        when(documentManagementService
+                 .uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER)))
+            .thenReturn(ASSISTED_FROM_ORDER);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .ccdState(CaseState.CASE_PROGRESSION)
+            .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+            // Order made section
+            .finalOrderMadeSelection(NO)
+            // judge heard from section
+            .finalOrderJudgeHeardFrom(null)
+            // recitals section
+            .finalOrderRecitals(null)
+            // ordered section
+            .finalOrderOrderedThatText("order text")
+            // Further hearing section
+            .finalOrderFurtherHearingToggle(null)
+            .finalOrderFurtherHearingComplex(null)
+            // Costs section
+            .assistedOrderCostList(AssistedCostTypesList.COSTS_IN_THE_CASE)
+            .assistedOrderMakeAnOrderForCosts(null)
+            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder().makeAnOrderForCostsList(null).build())
+            .publicFundingCostsProtection(NO)
+            // Appeal section
+            .finalOrderAppealToggle(null)
+            // initiative or without notice section
+            .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
+            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder()
+                                              .ownInitiativeText("own initiative test")
+                                              .ownInitiativeDate(LocalDate.now())
+                                              .build())
+            .finalOrderGiveReasonsYesNo(NO)
+            .build();
+
+        //When: Assisted order document generation called
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+        //Then: It should generate assisted order document
+        assertNotNull(caseDocument);
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(assistedForm, bytes, JUDGE_FINAL_ORDER));
     }
 
     @Test

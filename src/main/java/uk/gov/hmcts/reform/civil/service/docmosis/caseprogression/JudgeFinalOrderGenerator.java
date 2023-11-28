@@ -129,7 +129,9 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
             .judgeNameTitle(userDetails.getFullName())
             .courtName(locationRefData.getVenueName())
-            .courtLocation(LocationRefDataService.getDisplayEntry(locationRefData));
+            .courtLocation(featureToggleService.isHmcEnabled()
+                               ? getHearingLocationText(caseData, authorisation)
+                               : LocationRefDataService.getDisplayEntry(locationRefData));
         return freeFormOrderBuilder.build();
     }
 
@@ -614,7 +616,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private String getCaseManagementLocationText(CaseData caseData, String authorisation) {
         String locationEpimms = caseData.getCaseManagementLocation().getBaseLocation();
         List<LocationRefData> matchingLocations = locationRefDataService.getCourtLocationsByEpimmsId(
-            authorisation, caseData.getCaseManagementLocation().getBaseLocation())
+                        authorisation, caseData.getCaseManagementLocation().getBaseLocation())
                 .stream().filter(id -> id.getCourtTypeId().equals(CIVIL_COURT_TYPE_ID))
                 .collect(Collectors.toList());
 
