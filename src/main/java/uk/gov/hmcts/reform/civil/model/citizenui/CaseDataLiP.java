@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
@@ -32,6 +33,8 @@ public class CaseDataLiP {
     private AdditionalLipPartyDetails respondent1AdditionalLipPartyDetails;
     @JsonProperty("applicant1AdditionalLipPartyDetails")
     private AdditionalLipPartyDetails applicant1AdditionalLipPartyDetails;
+    @JsonProperty("applicant1RepaymentPlan")
+    private RepaymentPlanLRspec applicant11RepaymentPlan;
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {

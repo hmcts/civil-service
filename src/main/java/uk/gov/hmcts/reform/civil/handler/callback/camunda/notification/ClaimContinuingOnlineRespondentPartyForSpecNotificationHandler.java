@@ -74,7 +74,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             generatePIPEmail(caseData);
         }
 
-        generatePIPLetter(callbackParams);
+       //generatePIPLetter(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
