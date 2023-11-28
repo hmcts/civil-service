@@ -867,8 +867,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         // LiP check ensures any LiP cases will always trigger takeCaseOffline task as CUI R1 does not account for LiPs
         // ToDo: remove LiP check for CUI R2
         if (featureToggleService.isEarlyAdoptersEnabled()) {
-            if (featureToggleService.isLocationWhiteListedForCaseProgression(
-                getEpimmsId(caseData)) && !caseContainsLiP(caseData)) {
+            if (!caseContainsLiP(caseData) && featureToggleService.isLocationWhiteListedForCaseProgression(
+                getEpimmsId(caseData))) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(YES);
             } else {
