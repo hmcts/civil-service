@@ -410,8 +410,7 @@ public class CmcClaim implements Claim {
 
     @Override
     public boolean isPaymentPlanAccepted() {
-        //return false;
-
+        
         return (hasResponse() && (response.isPartAdmit() || response.isFullAdmit())
             && (response.getPaymentIntention().isPayByDate() || response.getPaymentIntention().isPayByInstallments()));
           //  && (response.getResponseType().isCompany() || response.getRespondent1().isOrganisation())
