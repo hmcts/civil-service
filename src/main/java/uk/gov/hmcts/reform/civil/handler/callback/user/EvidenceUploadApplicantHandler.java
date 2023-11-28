@@ -69,6 +69,7 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
                 && caseData.getCaseTypeFlag().equals("ApplicantTwoFields")) {
             return validateValuesParty(caseData.getDocumentForDisclosureRes2(),
                     caseData.getDocumentWitnessStatementApp2(),
+                    caseData.getDocumentWitnessSummaryApp2(),
                     caseData.getDocumentHearsayNoticeApp2(),
                     caseData.getDocumentReferredInStatementApp2(),
                     caseData.getDocumentExpertReportApp2(),
@@ -79,6 +80,7 @@ public class EvidenceUploadApplicantHandler extends EvidenceUploadHandlerBase {
         } else {
             return validateValuesParty(caseData.getDocumentForDisclosure(),
                     caseData.getDocumentWitnessStatement(),
+                    caseData.getDocumentWitnessSummary(),
                     caseData.getDocumentHearsayNotice(),
                     caseData.getDocumentReferredInStatement(),
                     caseData.getDocumentExpertReport(),
