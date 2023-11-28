@@ -24,4 +24,7 @@ public class FlowLipPredicate {
     public static final Predicate<CaseData> ccjRequestJudgmentByAdmission =
         CaseData::isCcjRequestJudgmentByAdmission;
 
+    public static final Predicate<CaseData> isRespondentSignSettlementAgreement =
+        CaseData::isRespondentSignSettlementAgreement;
+
 }

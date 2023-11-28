@@ -18,12 +18,14 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentAndNote;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -75,10 +77,11 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
     private AboutToStartOrSubmitCallbackResponse populateSubmittedDateTime(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        String userAuth = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         if (caseData.getCaseNoteType().equals(CaseNoteType.NOTE_ONLY)) {
             CaseNote caseNoteTA = caseNoteService.buildCaseNote(
-                callbackParams.getParams().get(BEARER_TOKEN).toString(),
+                userAuth,
                 caseData.getCaseNoteTA()
             );
 
@@ -92,35 +95,28 @@ public class EvidenceUploadJudgeHandler extends CallbackHandler {
 
         if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_ONLY)) {
             List<Element<DocumentWithName>> documentAndNameToAdd = caseData.getDocumentAndNameToAdd();
-            List<Element<DocumentWithName>> documentAndNameCurrent = caseData.getDocumentAndName();
-
-            if (documentAndNameCurrent == null) {
-                documentAndNameCurrent = documentAndNameToAdd;
-            } else {
-                for (Element<DocumentWithName> document : documentAndNameToAdd) {
-                    documentAndNameCurrent.add(document);
-                }
+            List<Element<DocumentWithName>> documentAndNameCurrent = new ArrayList<>();
+            if (nonNull(caseData.getDocumentAndName())) {
+                documentAndNameCurrent.addAll(caseData.getDocumentAndName());
             }
-            caseDataBuilder
-                .documentAndName(documentAndNameCurrent)
-                .build();
+            documentAndNameToAdd.forEach(documentAndName -> {
+                List<Element<DocumentWithName>> newJudgeCaseNoteDocumentAndName =  caseNoteService.buildJudgeCaseNoteDocumentAndName(documentAndName.getValue(), userAuth);
+                documentAndNameCurrent.addAll(newJudgeCaseNoteDocumentAndName);
+            });
+            caseDataBuilder.documentAndName(documentAndNameCurrent);
         }
 
         if (caseData.getCaseNoteType().equals(CaseNoteType.DOCUMENT_AND_NOTE)) {
             List<Element<DocumentAndNote>> documentAndNoteToAdd = caseData.getDocumentAndNoteToAdd();
-            List<Element<DocumentAndNote>> documentAndNoteCurrent = caseData.getDocumentAndNote();
-
-            if (documentAndNoteCurrent == null) {
-                documentAndNoteCurrent = documentAndNoteToAdd;
-            } else {
-                for (Element<DocumentAndNote> document : documentAndNoteToAdd) {
-                    documentAndNoteCurrent.add(document);
-                }
+            List<Element<DocumentAndNote>> documentAndNoteCurrent = new ArrayList<>();
+            if (nonNull(caseData.getDocumentAndNote())) {
+                documentAndNoteCurrent.addAll(caseData.getDocumentAndNote());
             }
-            caseDataBuilder
-                .documentAndNote(documentAndNoteCurrent)
-                .build();
-
+            documentAndNoteToAdd.forEach(documentAndNote -> {
+                List<Element<DocumentAndNote>> newJudgeCaseNoteAndDocument =  caseNoteService.buildJudgeCaseNoteAndDocument(documentAndNote.getValue(), userAuth);
+                documentAndNoteCurrent.addAll(newJudgeCaseNoteAndDocument);
+            });
+            caseDataBuilder.documentAndNote(documentAndNoteCurrent);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
