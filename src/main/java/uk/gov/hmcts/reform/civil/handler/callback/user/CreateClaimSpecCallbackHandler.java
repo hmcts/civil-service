@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
+import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -20,12 +21,15 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -37,8 +41,11 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -156,6 +163,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         + "to : <a href=\"mailto:OCMCNton@justice.gov.uk\">OCMCNton@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
+    private static final String ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST = "Scheduled date of flight must be today or in the past";
+
+    private static final String LOCATION_NOT_FOUND_MESSAGE = "Location not found for ePIMS_ID: %s";
+
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
     private final ReferenceNumberRepository referenceNumberRepository;
@@ -176,7 +187,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
     private final StateFlowEngine stateFlowEngine;
     private final CaseFlagsInitialiser caseFlagInitialiser;
     private final ToggleConfiguration toggleConfiguration;
+    private final LocationRefDataService locationRefDataService;
     private final String caseDocLocation = "/cases/case-details/%s#CaseDocuments";
+    private final AirlineEpimsDataLoader airlineEpimsDataLoader;
+    private final AirlineEpimsService airlineEpimsService;
 
     @Value("${court-location.specified-claim.region-id}")
     private String regionId;
@@ -232,6 +246,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
             .put(callbackKey(MID, "is-flight-delay-claim"), this::isFlightDelayClaim)
+            .put(callbackKey(MID, "get-airline-list"), this::getAirlineList)
+            .put(callbackKey(MID, "validate-date-of-flight"), this::validateDateOfFlight)
             .build();
     }
 
@@ -523,7 +539,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             populateWithPartyIds(dataBuilder);
         }
 
-        List<String> errors = new ArrayList<>();
         if (caseData.getSdtRequestIdFromSdt() != null) {
             // assign StdRequestId, to ensure duplicate requests from SDT/bulk claims are not processed
             List<Element<String>> stdRequestIdList = new ArrayList<>();
@@ -540,6 +555,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                                                       .build()).build());
         }
 
+        List<String> errors = new ArrayList<>();
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP
             && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
             // to keep with heading tab
@@ -548,6 +564,19 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     caseData.getSpecRespondentCorrespondenceAddressRequired())
                 .specRespondent2CorrespondenceAddressdetails(
                     caseData.getSpecRespondentCorrespondenceAddressdetails());
+        }
+
+        if ((toggleService.isSdoR2Enabled() && callbackParams.getCaseData().getFlightDelayDetails() != null)) {
+            FlightDelayDetails flightDelayDetails = callbackParams.getCaseData().getFlightDelayDetails();
+            String selectedAirlineCode = flightDelayDetails.getAirlineList().getValue().getCode();
+
+            dataBuilder.flightDelayDetails(FlightDelayDetails.builder()
+                                        .airlineList(DynamicList.builder().value(flightDelayDetails.getAirlineList().getValue()).build())
+                                        .nameOfAirline(flightDelayDetails.getNameOfAirline())
+                                        .flightNumber(flightDelayDetails.getFlightNumber())
+                                        .scheduledDate(flightDelayDetails.getScheduledDate())
+                                        .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, callbackParams))
+                                        .build());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -917,6 +946,36 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
+    private CallbackResponse getAirlineList(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
+        DynamicList airlineList = DynamicList
+            .fromList(airlineEpimsIDList.stream()
+                          .map(AirlineEpimsId::getAirline).toList(), Object::toString, Object::toString, null, false);
+        DynamicList dropdownAirlineList = DynamicList.builder()
+            .listItems(airlineList.getListItems()).build();
+
+        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().airlineList(dropdownAirlineList).build();
+        caseDataBuilder.flightDelayDetails(flightDelayDetails);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse validateDateOfFlight(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        List<String> errors = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
+        if (scheduledDate.isAfter(today)) {
+            errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
+    }
+
     private CallbackResponse setRespondent2SameLegalRepToNo(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
 
@@ -942,5 +1001,26 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             || caseData.getRespondent1OrgRegistered() == NO
             || caseData.getRespondent2Represented() == NO
             || caseData.getRespondent2OrgRegistered() == NO);
+    }
+
+    private CaseLocationCivil getAirlineCaseLocation(String airline, CallbackParams callbackParams) {
+        if (airline.equals("OTHER")) {
+            return null;
+        }
+        String locationEpimmsId = airlineEpimsService.getEpimsIdForAirline(airline);
+        List<LocationRefData> locations = fetchLocationData(callbackParams);
+        var matchedLocations =  locations.stream().filter(loc -> loc.getEpimmsId().equals(locationEpimmsId)).toList();
+        if (matchedLocations.isEmpty()) {
+            throw new CallbackException(String.format(LOCATION_NOT_FOUND_MESSAGE, locationEpimmsId));
+        } else {
+            return CaseLocationCivil.builder()
+                .region(matchedLocations.get(0).getRegionId())
+                .baseLocation(matchedLocations.get(0).getEpimmsId()).build();
+        }
+    }
+
+    private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        return locationRefDataService.getCourtLocationsForDefaultJudgments(authToken);
     }
 }
