@@ -56,7 +56,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDeadline(LocalDate.now().plusDays(10).atTime(16, 0, 0))
             .build();
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.NO_RESPONSE);
     }
@@ -68,7 +68,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDeadline(LocalDateTime.of(2022, 2, 2, 16, 0))
             .build();
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.ELIGIBLE_FOR_CCJ);
     }
@@ -81,7 +81,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.DEFAULT_JUDGEMENT);
     }
@@ -92,7 +92,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDeadline(LocalDate.now().atTime(10, 0, 0))
             .build();
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_DUE_NOW);
     }
@@ -104,7 +104,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1TimeExtensionDate(LocalDateTime.now().plusDays(30))
             .build();
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.MORE_TIME_REQUESTED);
     }
@@ -113,7 +113,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_responseAdmitPayImmediately_whenGetStatus_thenReturnAdmitPayImmediately() {
         CaseData claim = getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.ADMIT_PAY_IMMEDIATELY);
     }
@@ -122,7 +122,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_responseAdmitPayBySetDate_whenGetStatus_thenReturnAdmitPayBySetDate() {
         CaseData claim = getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.ADMIT_PAY_BY_SET_DATE);
     }
@@ -131,7 +131,7 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_responseAdmitPayByInstallments_whenGetStatus_thenReturnAdmitPayByInstallments() {
         CaseData claim = getClaimWithFullAdmitResponse(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.ADMIT_PAY_INSTALLMENTS);
     }
@@ -145,7 +145,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT)
             .build();
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_ACCEPTED_STATES_PAID);
     }
@@ -158,7 +158,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ClaimResponsePaymentAdmissionForSpec(RespondentResponseTypeSpecPaidStatus.PAID_FULL_OR_MORE_THAN_CLAIMED_AMOUNT)
             .build();
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.SETTLED);
     }
@@ -171,7 +171,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
             .build();
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.SETTLED);
     }
@@ -184,7 +184,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .applicant1DQ(Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder().build()).build())
             .build();
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.REQUESTED_COUNTRY_COURT_JUDGEMENT);
     }
@@ -198,7 +198,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
             .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_ACCEPTED_ADMISSION_OF_AMOUNT);
     }
@@ -210,7 +210,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.DEFENDANT_PART_ADMIT);
     }
@@ -223,7 +223,7 @@ class CcdClaimStatusDashboardFactoryTest {
                                                                                 .documentName("testDoc")
                                                                                 .build()).build()))
             .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.HEARING_FORM_GENERATED);
     }
@@ -244,7 +244,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .systemGeneratedCaseDocuments(List.of(document))
             .build();
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.MORE_DETAILS_REQUIRED);
     }
@@ -265,7 +265,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .systemGeneratedCaseDocuments(List.of(document))
             .build();
         given(featureToggleService.isCaseProgressionEnabled()).willReturn(true);
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.MORE_DETAILS_REQUIRED);
     }
@@ -280,7 +280,7 @@ class CcdClaimStatusDashboardFactoryTest {
                                                     .build())
                            .build())
             .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.MEDIATION_SUCCESSFUL);
     }
@@ -293,7 +293,7 @@ class CcdClaimStatusDashboardFactoryTest {
                            .unsuccessfulMediationReason("this is a reason")
                            .build())
             .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.MEDIATION_UNSUCCESSFUL);
     }
@@ -308,7 +308,7 @@ class CcdClaimStatusDashboardFactoryTest {
                                                     .build())
                            .build())
             .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.IN_MEDIATION);
     }
@@ -321,7 +321,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDate(LocalDateTime.now())
             .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
     }
@@ -334,7 +334,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDate(LocalDateTime.now())
             .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
     }
@@ -347,7 +347,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECT_PARTIAL_ADMISSION);
     }
@@ -376,7 +376,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .ccdState(CaseState.CASE_PROGRESSION)
             .build();
         DashboardClaimStatus status =
-            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
                 claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.SDO_ORDER_CREATED);
     }
@@ -388,7 +388,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .applicant1ResponseDeadline(LocalDateTime.now().minusDays(1))
             .build();
         DashboardClaimStatus status =
-            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+            ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
                 claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
     }
@@ -401,7 +401,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .build();
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.WAITING_COURT_REVIEW);
     }
@@ -418,7 +418,7 @@ class CcdClaimStatusDashboardFactoryTest {
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .build();
 
-        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimMatcher(
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
