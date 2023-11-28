@@ -74,6 +74,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
@@ -276,9 +277,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         //Update the caseManagement location to the flight location if No flight location update to Claimant
         // preferred location
-        if (isFlightDelayClaimAndUpdateCaseLocation(caseData)) {
+        if (isFlightDelaySmallClaimAndUpdateCaseLocation(caseData)) {
             builder.caseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
-        } else if (isFlightDelayClaim(caseData) == false) {
+        } else if (isFlightDelayAndSmallClaim(caseData) == false) {
             locationHelper.getCaseManagementLocation(caseData)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                     builder,
@@ -299,8 +300,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             Applicant1DQ.Applicant1DQBuilder dq = caseData.getApplicant1DQ().toBuilder()
                 .applicant1DQStatementOfTruth(statementOfTruth);
 
-            if (isFlightDelayClaim(caseData) == false
-                || isFlightDelayClaimAndUpdateCaseLocationWithClaimantCourt(caseData)) {
+            if (isFlightDelayAndSmallClaim(caseData) == false
+                || isFlightDelaySmallClaimAndUpdateCaseLocationWithClaimantCourt(caseData)) {
                 updateDQCourtLocations(callbackParams, caseData, builder, dq);
             }
 
@@ -673,23 +674,23 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private boolean isFlightDelayClaim(CaseData caseData) {
+    private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
         return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
-            && caseData.getIsFlightDelayClaim().equals(YES));
+            && caseData.getIsFlightDelayClaim().equals(YES)
+            &&  SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()));
     }
 
-    private boolean isFlightDelayClaimAndUpdateCaseLocation(CaseData caseData) {
+    private boolean isFlightDelaySmallClaimAndUpdateCaseLocation(CaseData caseData) {
         //Update the Case Management Location when the Airline  is not Other
-        return (isFlightDelayClaim(caseData) && caseData.getFlightDelayDetails() != null
-            && caseData.getAllocatedTrack() == AllocatedTrack.SMALL_CLAIM
+        return (isFlightDelayAndSmallClaim(caseData) && caseData.getFlightDelayDetails() != null
             && caseData.getFlightDelayDetails().getAirlineList()
             .getValue().getCode().equals("OTHER") == false);
     }
 
-    private boolean isFlightDelayClaimAndUpdateCaseLocationWithClaimantCourt(CaseData caseData) {
+    private boolean isFlightDelaySmallClaimAndUpdateCaseLocationWithClaimantCourt(CaseData caseData) {
         //Update the Case Management Location with Claimant preferred court when Airlines is Other
-        return (isFlightDelayClaim(caseData) && caseData.getFlightDelayDetails() != null
+        return (isFlightDelayAndSmallClaim(caseData) && caseData.getFlightDelayDetails() != null
             && caseData.getFlightDelayDetails().getAirlineList()
-                .getValue().getCode().equals("OTHER"));
+            .getValue().getCode().equals("OTHER"));
     }
 }
