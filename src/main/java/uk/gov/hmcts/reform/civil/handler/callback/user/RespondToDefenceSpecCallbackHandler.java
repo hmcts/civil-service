@@ -697,6 +697,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         //Update the Case Management Location with Claimant preferred court when Airlines is Other
         return (isFlightDelayAndSmallClaim(caseData) && caseData.getFlightDelayDetails() != null
             && caseData.getFlightDelayDetails().getAirlineList()
-                .getValue().getCode().equals("OTHER"));
+            .getValue().getCode().equals("OTHER"));
     }
 }
