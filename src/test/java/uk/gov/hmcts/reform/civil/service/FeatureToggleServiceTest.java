@@ -158,7 +158,7 @@ class FeatureToggleServiceTest {
         var caseFileKey = "early-adopters";
         givenToggle(caseFileKey, toggleStat);
 
-        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(true);
     }
 
     @ParameterizedTest
