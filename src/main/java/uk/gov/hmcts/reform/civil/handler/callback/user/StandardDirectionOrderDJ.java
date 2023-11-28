@@ -665,11 +665,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         var state = "CASE_PROGRESSION";
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        // if is an EA court and there is no LiP on the case, eaCourtLocation will set to true
-        // LiP check ensures any LiP cases will always trigger takeCaseOffline task as CUI R1 does not account for LiPs
-        // ToDo: remove LiP check for CUI R2
         if (featureToggleService.isEarlyAdoptersEnabled()) {
-            if (!caseContainsLiP(caseData) && featureToggleService.isLocationWhiteListedForCaseProgression(
+            if (featureToggleService.isLocationWhiteListedForCaseProgression(
                 getEpimmsId(caseData))) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 caseDataBuilder.eaCourtLocation(YesOrNo.YES);
@@ -683,10 +680,6 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
             .data(caseDataBuilder.build().toMap(objectMapper))
             .state(state)
             .build();
-    }
-
-    private boolean caseContainsLiP(CaseData caseData) {
-        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
     }
 
     private String getEpimmsId(CaseData caseData) {

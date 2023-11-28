@@ -863,12 +863,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        // if is an EA court and there is no LiP on the case, eaCourtLocation will set to true
-        // LiP check ensures any LiP cases will always trigger takeCaseOffline task as CUI R1 does not account for LiPs
-        // ToDo: remove LiP check for CUI R2
         if (featureToggleService.isEarlyAdoptersEnabled()) {
-            log.info("EA feature enabled");
-            log.info("Case contains LiP: " + caseContainsLiP(caseData));
+            // LiP check ensures any LiP cases will always trigger takeCaseOffline task as CUI R1 does not account for LiPs
+            // ToDo: remove LiP check for CUI R2
             if (!caseContainsLiP(caseData) && featureToggleService.isLocationWhiteListedForCaseProgression(
                 getEpimmsId(caseData))) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
@@ -877,8 +874,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(YesOrNo.NO);
             }
-        } else {
-            log.info("EA feature disabled");
         }
 
         dataBuilder.disposalHearingMethodInPerson(deleteLocationList(

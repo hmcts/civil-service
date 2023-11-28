@@ -817,34 +817,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
         }
 
-        @ParameterizedTest
-        @CsvSource({"true", "false"})
-        void shouldPopulateEarlyAdoptersFlagToFalse_whenLiP(Boolean isLocationWhiteListed) {
-            DynamicList options = DynamicList.builder()
-                .listItems(List.of(
-                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                               DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
-                           )
-                )
-                .value(DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build())
-                .build();
-
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
-                .toBuilder()
-                .disposalHearingMethodInPersonDJ(options)
-                .respondent1Represented(NO)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(
-                isLocationWhiteListed);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-
-            assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(NO);
-        }
-
         @Test
         void shouldNotPopulateEarlyAdoptersFlag_whenEarlyAdoptersToggleIsOff() {
             DynamicList options = DynamicList.builder()
