@@ -38,7 +38,7 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         when(paymentsClient
                  .createGovPayCardPaymentRequest("2023-1701090705688", BEARER_TOKEN, CARD_PAYMENT_SERVICE_REQUEST))
             .thenReturn(response);
-        doPost(BEARER_TOKEN,null, FEES_PAYMENT_REQUEST_URL, HEARING.name(), "1701090368574910")
+        doPost(BEARER_TOKEN, "", FEES_PAYMENT_REQUEST_URL, HEARING.name(), "1701090368574910")
             .andExpect(content().json(toJson(response)))
             .andExpect(status().isOk());
     }
@@ -53,8 +53,6 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             .andExpect(content().json(toJson(response)))
             .andExpect(status().isOk());
     }
-
-
 
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {
         return PaymentDto.builder()
