@@ -133,6 +133,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
 
+        // Legal Reps should not be able to add or delete experts and witnesses.
+        // Have to add "CRU" for LRs for updateExpertsDetailsForm or else we see a No Field Found error upon submission.
         if (!isAdmin(authToken)) {
             List<UpdatePartyDetailsForm> expertsWithoutPartyId = unwrapElements(caseData.getUpdateDetailsForm().getUpdateExpertsDetailsForm())
                 .stream()
@@ -156,6 +158,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
         List<String> errors = new ArrayList<>();
 
+        // Legal Reps should not be able to add or delete experts and witnesses.
+        // Have to add "CRU" for LRs for UpdateWitnessesDetailsForm or else we see a No Field Found error upon submission.
         if (!isAdmin(authToken)) {
             List<UpdatePartyDetailsForm> witnessesWithoutPartyId = unwrapElements(caseData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm())
                 .stream()
@@ -174,7 +178,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse prepareEvent(CallbackParams callbackParams) {
-        //TODO: 1v2DS/SS -> LR to show LR org 1/2 dependning on MP
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
@@ -441,7 +444,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
         if (partyId.equals(CLAIMANT_ONE_EXPERTS_ID)) {
             mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
-                caseData.getApplicant1DQ().getApplicant1DQExperts().getDetails(), formData);
+                caseData.getApplicant1DQ().getApplicant1DQExperts(), formData);
             builder.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
                                      .applicant1DQExperts(
                                          caseData.getApplicant1DQ().getApplicant1DQExperts().toBuilder()
@@ -456,7 +459,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             builder.applicantExperts(updatedApplicantExperts);
         } else if (partyId.equals(DEFENDANT_ONE_EXPERTS_ID)) {
             mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
-                caseData.getRespondent1DQ().getRespondent1DQExperts().getDetails(), formData);
+                caseData.getRespondent1DQ().getRespondent1DQExperts(), formData);
             builder.respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                      .respondent1DQExperts(
                                          caseData.getRespondent1DQ().getRespondent1DQExperts().toBuilder()
@@ -471,7 +474,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             builder.respondent1Experts(updatedRespondent1Experts);
         } else if (partyId.equals(DEFENDANT_TWO_EXPERTS_ID)) {
             mappedExperts = mapUpdatePartyDetailsFormToDQExperts(
-                caseData.getRespondent2DQ().getRespondent2DQExperts().getDetails(), formData);
+                caseData.getRespondent2DQ().getRespondent2DQExperts(), formData);
             builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
                                      .respondent2DQExperts(
                                          caseData.getRespondent2DQ().getRespondent2DQExperts().toBuilder()
@@ -494,7 +497,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
         if (partyId.equals(CLAIMANT_ONE_WITNESSES_ID)) {
             mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
-                caseData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails(), formData);
+                caseData.getApplicant1DQ().getApplicant1DQWitnesses(), formData);
             builder.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
                                      .applicant1DQWitnesses(
                                          caseData.getApplicant1DQ().getApplicant1DQWitnesses().toBuilder()
@@ -509,7 +512,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             builder.applicantWitnesses(updatedApplicantWitnesses);
         } else if (partyId.equals(DEFENDANT_ONE_WITNESSES_ID)) {
             mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
-                caseData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails(), formData);
+                caseData.getRespondent1DQ().getRespondent1DQWitnesses(), formData);
             builder.respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                  .respondent1DQWitnesses(
                                      caseData.getRespondent1DQ().getRespondent1DQWitnesses().toBuilder()
@@ -524,7 +527,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             builder.respondent1Witnesses(updatedRespondent1Witnesses);
         } else if (partyId.equals(DEFENDANT_TWO_WITNESSES_ID)) {
             mappedWitnesses = mapUpdatePartyDetailsFormToDQWitnesses(
-                caseData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails(), formData);
+                caseData.getRespondent2DQ().getRespondent2DQWitnesses(), formData);
             builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
                                  .respondent2DQWitnesses(
                                      caseData.getRespondent2DQ().getRespondent2DQWitnesses().toBuilder()
