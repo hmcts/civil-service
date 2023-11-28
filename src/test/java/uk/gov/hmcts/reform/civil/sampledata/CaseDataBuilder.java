@@ -505,6 +505,7 @@ public class CaseDataBuilder {
 
     private DynamicList transferCourtLocationList;
     private String reasonForTransfer;
+    private FlightDelayDetails flightDelayDetails;
     private ReasonForReconsideration reasonForReconsideration;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
@@ -5192,6 +5193,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder flightDelay(FlightDelayDetails flightDelayDetails) {
+        this.flightDelayDetails = flightDelayDetails;
+        return this;
+    }
+
     public CaseDataBuilder reasonForReconsideration(ReasonForReconsideration reasonForReconsideration) {
         this.reasonForReconsideration = reasonForReconsideration;
         return this;
@@ -6552,6 +6558,7 @@ public class CaseDataBuilder {
             .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
             .transferCourtLocationList(transferCourtLocationList)
             .reasonForTransfer(reasonForTransfer)
+
             .applicant1LRIndividuals(applicant1LRIndividuals)
             .respondent1LRIndividuals(respondent1LRIndividuals)
             .respondent2LRIndividuals(respondent2LRIndividuals)
@@ -6559,6 +6566,7 @@ public class CaseDataBuilder {
             .applicant2OrgIndividuals(applicant2OrgIndividuals)
             .respondent1OrgIndividuals(respondent1OrgIndividuals)
             .respondent2OrgIndividuals(respondent2OrgIndividuals)
+            .flightDelayDetails(flightDelayDetails)
             .reasonForReconsideration(reasonForReconsideration)
             .build();
     }
