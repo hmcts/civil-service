@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -179,7 +180,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         UserInfo userInfo = userService.getUserInfo(authToken);
         boolean isAdmin = isAdmin(authToken);
 
-        List<String> errors = isAwaitingClaimantIntention(caseData)
+        List<String> errors = isBeforeAwaitingApplicantIntention(caseData)
             && !isAdmin ? List.of(INVALID_CASE_STATE_ERROR) : null;
 
         if (errors != null) {
@@ -572,8 +573,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private boolean isAwaitingClaimantIntention(CaseData caseData) {
-        return caseData.getCcdState().equals(AWAITING_APPLICANT_INTENTION);
+    private boolean isBeforeAwaitingApplicantIntention(CaseData caseData) {
+        return caseData.getCcdState().equals(AWAITING_APPLICANT_INTENTION) || caseData.getCcdState().equals(AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
     }
 
     private boolean isAdmin(String userAuthToken) {
