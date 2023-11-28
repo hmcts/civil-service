@@ -58,7 +58,8 @@ public enum DocmosisTemplates {
     HEARING_OTHER_AHN("CV-UNS-HNO-ENG-01201.docx", "hearing_other_claim_%s.pdf"),
     // judge final Order
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
-    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf");
+    ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
+    JUDGMENT_BY_ADMISSION("CV-SPC-CLM-ENG-00001-JBA.docx", "%s-ccj-request-admission.pdf");
     private final String template;
     private final String documentTitle;
 
