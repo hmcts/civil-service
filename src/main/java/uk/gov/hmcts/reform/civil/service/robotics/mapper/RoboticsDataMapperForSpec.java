@@ -69,9 +69,8 @@ public class RoboticsDataMapperForSpec {
             .claimDetails(buildClaimDetails(caseData))
             .events(eventHistoryMapper.buildEvents(caseData));
 
-        if (featureToggleService.isNoticeOfChangeEnabled()
-            && (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
-            || caseData.getCcdState() == CASE_DISMISSED)) {
+        if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
+            || caseData.getCcdState() == CASE_DISMISSED) {
             builder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
 
