@@ -75,6 +75,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_2;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
@@ -687,7 +688,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private boolean isFlightDelayClaimAndUpdateCaseLocation(CaseData caseData) {
         //Update the Case Management Location when the Airline  is not Other
         return (isFlightDelayClaim(caseData) && caseData.getFlightDelayDetails() != null
-            && caseData.getAllocatedTrack() == AllocatedTrack.SMALL_CLAIM
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
             && caseData.getFlightDelayDetails().getAirlineList()
             .getValue().getCode().equals("OTHER") == false);
     }
@@ -695,6 +696,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private boolean isFlightDelayClaimAndUpdateCaseLocationWithClaimantCourt(CaseData caseData) {
         //Update the Case Management Location with Claimant preferred court when Airlines is Other
         return (isFlightDelayClaim(caseData) && caseData.getFlightDelayDetails() != null
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
             && caseData.getFlightDelayDetails().getAirlineList()
                 .getValue().getCode().equals("OTHER"));
     }

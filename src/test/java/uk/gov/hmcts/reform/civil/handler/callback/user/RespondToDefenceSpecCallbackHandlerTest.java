@@ -949,7 +949,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                    .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                     .caseManagementLocation(CaseLocationCivil.builder().build())
                     .applicant1DQ(
@@ -999,6 +999,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
                     .applicant1DQ(
                         Applicant1DQ.builder().applicant1DQRequestedCourt(
                             RequestedCourt.builder()
