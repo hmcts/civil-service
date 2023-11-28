@@ -139,7 +139,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 .filter(e -> e.getPartyId() == null)
                 .collect(Collectors.toList());
 
-            if(!expertsWithoutPartyId.isEmpty()){
+            if (!expertsWithoutPartyId.isEmpty()) {
                 errors.add(CREATE_ORDER_ERROR_EXPERTS);
             }
         }
@@ -162,7 +162,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 .filter(e -> e.getPartyId() == null)
                 .collect(Collectors.toList());
 
-            if(!witnessesWithoutPartyId.isEmpty()){
+            if (!witnessesWithoutPartyId.isEmpty()) {
                 errors.add(CREATE_ORDER_ERROR_WITNESSES);
             }
         }
@@ -250,7 +250,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     }
 
     private List<Element<UpdatePartyDetailsForm>> prepareExperts(String partyId, CaseData caseData) {
-        if (CLAIMANT_ONE_EXPERTS_ID.equals(partyId) && caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ() .getExperts() != null) {
+        if (CLAIMANT_ONE_EXPERTS_ID.equals(partyId) && caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getExperts() != null) {
             return mapExpertsToUpdatePartyDetailsForm(caseData.getApplicant1DQ().getExperts());
         } else if (DEFENDANT_ONE_EXPERTS_ID.equals(partyId) && caseData.getRespondent1DQ() != null && caseData.getRespondent1DQ().getExperts() != null) {
             return mapExpertsToUpdatePartyDetailsForm(caseData.getRespondent1DQ().getExperts());
@@ -265,7 +265,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             return mapWitnessesToUpdatePartyDetailsForm(caseData.getApplicant1DQ().getWitnesses());
         } else if (DEFENDANT_ONE_WITNESSES_ID.equals(partyId) && caseData.getRespondent1DQ() != null && caseData.getRespondent1DQ().getWitnesses() != null) {
             return mapWitnessesToUpdatePartyDetailsForm(caseData.getRespondent1DQ().getWitnesses());
-        } else if (DEFENDANT_TWO_WITNESSES_ID.equals(partyId) && caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getWitnesses()!= null) {
+        } else if (DEFENDANT_TWO_WITNESSES_ID.equals(partyId) && caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getWitnesses() != null) {
             return mapWitnessesToUpdatePartyDetailsForm(caseData.getRespondent2DQ().getWitnesses());
         }
         return Collections.emptyList();
