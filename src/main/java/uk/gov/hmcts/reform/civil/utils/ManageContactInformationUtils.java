@@ -150,9 +150,13 @@ public class ManageContactInformationUtils {
         return newExperts;
     }
 
-    public static List<Element<Expert>> mapUpdatePartyDetailsFormToDQExperts(List<Element<Expert>> existingDQExperts, List<Element<UpdatePartyDetailsForm>> formExperts) {
+    public static List<Element<Expert>> mapUpdatePartyDetailsFormToDQExperts(Experts existingDQExperts, List<Element<UpdatePartyDetailsForm>> formExperts) {
         List<Element<Expert>> newExperts = new ArrayList<>();
-        List<Expert> experts = unwrapElements(existingDQExperts);
+        List<Expert> experts = new ArrayList<>();
+
+        if (existingDQExperts != null && existingDQExperts.getDetails() != null) {
+            experts = unwrapElements(existingDQExperts.getDetails());
+        }
 
         if (formExperts != null) {
             for (Element<UpdatePartyDetailsForm> form : formExperts) {
@@ -209,9 +213,13 @@ public class ManageContactInformationUtils {
         return newWitnesses;
     }
 
-    public static List<Element<Witness>> mapUpdatePartyDetailsFormToDQWitnesses(List<Element<Witness>> existingDQWitnesses, List<Element<UpdatePartyDetailsForm>> formWitnesses) {
+    public static List<Element<Witness>> mapUpdatePartyDetailsFormToDQWitnesses(Witnesses existingDQWitnesses, List<Element<UpdatePartyDetailsForm>> formWitnesses) {
         List<Element<Witness>> newWitnesses = new ArrayList<>();
-        List<Witness> witnesses = unwrapElements(existingDQWitnesses);
+        List<Witness> witnesses = new ArrayList<>();
+
+        if (existingDQWitnesses != null && existingDQWitnesses.getDetails() != null) {
+            witnesses = unwrapElements(existingDQWitnesses.getDetails());
+        }
 
         if (formWitnesses != null) {
             for (Element<UpdatePartyDetailsForm> form : formWitnesses) {

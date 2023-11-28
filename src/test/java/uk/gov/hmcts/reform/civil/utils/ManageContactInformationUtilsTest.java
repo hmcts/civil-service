@@ -346,8 +346,9 @@ class ManageContactInformationUtilsTest {
                 .eventAdded("event").dateAdded(date).estimatedCost(BigDecimal.valueOf(10000)).build();
             Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
                 .eventAdded("event").dateAdded(date).phoneNumber("1").emailAddress("expertemail").partyID("id2").build();
+            Experts experts = Experts.builder().details(wrapElements(expert1, expert2)).build();
 
-            assertThat(mapUpdatePartyDetailsFormToDQExperts(wrapElements(expert1, expert2), wrapElements(party, party2)))
+            assertThat(mapUpdatePartyDetailsFormToDQExperts(experts, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedExpert1, expectedExpert2));
         }
 
@@ -377,7 +378,9 @@ class ManageContactInformationUtilsTest {
                 .partyID(PARTY_ID)
                 .build();
 
-            assertThat(mapUpdatePartyDetailsFormToDQExperts(wrapElements(expert1), wrapElements(party, party2)))
+            Experts experts = Experts.builder().details(wrapElements(expert1)).build();
+
+            assertThat(mapUpdatePartyDetailsFormToDQExperts(experts, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedExpert1, expectedExpert2));
         }
     }
@@ -396,6 +399,8 @@ class ManageContactInformationUtilsTest {
         Witness witness2 = Witness.builder().firstName("Second").lastName("expert").eventAdded("event")
             .dateAdded(date).phoneNumber("1").emailAddress("email").partyID("id2").build();
 
+        Witnesses witnesses = Witnesses.builder().details(wrapElements(witness1, witness2)).build();
+
         @Test
         void shouldEditWitnesses() {
             Witness expectedWitness1 = Witness.builder().firstName("Lewis").lastName("John")
@@ -405,7 +410,7 @@ class ManageContactInformationUtilsTest {
                 .eventAdded("event").dateAdded(date).phoneNumber("1").emailAddress("witnessemail")
                 .partyID("id2").build();
 
-            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(wrapElements(witness1, witness2), wrapElements(party, party2)))
+            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(witnesses, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
         }
 
@@ -425,7 +430,7 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldRemoveWitnesses() {
-            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(wrapElements(witness1, witness2), null))
+            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(witnesses, null))
                 .isEmpty();
         }
 
@@ -439,7 +444,9 @@ class ManageContactInformationUtilsTest {
                 .partyID(PARTY_ID)
                 .build();
 
-            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(wrapElements(witness1), wrapElements(party, party2)))
+            Witnesses witnesses = Witnesses.builder().details(wrapElements(witness1)).build();
+
+            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(witnesses, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
         }
     }
