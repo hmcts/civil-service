@@ -245,9 +245,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             )
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
-            .put(callbackKey(MID, "is-flight-delay-claim"), this::isFlightDelayClaim)
             .put(callbackKey(MID, "get-airline-list"), this::getAirlineList)
-            .put(callbackKey(MID, "validate-date-of-flight"), this::validateDateOfFlight)
+            .put(callbackKey(MID, "validateDateAndSetFlightDelayClaimType"), this::validateDateAndSetFlightDelayClaimType)
             .build();
     }
 
@@ -931,51 +930,52 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private CallbackResponse isFlightDelayClaim(CallbackParams callbackParams) {
+    private CallbackResponse getAirlineList(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        if (toggleService.isSdoR2Enabled()) {
+            List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
+            DynamicList airlineList = DynamicList
+                .fromList(
+                    airlineEpimsIDList.stream()
+                        .map(AirlineEpimsId::getAirline).toList(),
+                    Object::toString,
+                    Object::toString,
+                    null,
+                    false
+                );
+            DynamicList dropdownAirlineList = DynamicList.builder()
+                .listItems(airlineList.getListItems()).build();
 
+            FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().airlineList(dropdownAirlineList).build();
+            caseDataBuilder.flightDelayDetails(flightDelayDetails);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse validateDateAndSetFlightDelayClaimType(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        List<String> errors = new ArrayList<>();
         if (toggleService.isSdoR2Enabled()) {
             caseDataBuilder.isFlightDelayClaim(callbackParams.getCaseData().getIsFlightDelayClaim());
             if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
-                caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
+                LocalDate today = LocalDate.now();
+                LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
+                if (scheduledDate.isAfter(today)) {
+                    errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
+                } else {
+                    caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
+                }
             } else {
                 caseDataBuilder.claimType(null);
             }
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse getAirlineList(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
-        DynamicList airlineList = DynamicList
-            .fromList(airlineEpimsIDList.stream()
-                          .map(AirlineEpimsId::getAirline).toList(), Object::toString, Object::toString, null, false);
-        DynamicList dropdownAirlineList = DynamicList.builder()
-            .listItems(airlineList.getListItems()).build();
-
-        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().airlineList(dropdownAirlineList).build();
-        caseDataBuilder.flightDelayDetails(flightDelayDetails);
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
-    private CallbackResponse validateDateOfFlight(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        List<String> errors = new ArrayList<>();
-        LocalDate today = LocalDate.now();
-        LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
-        if (scheduledDate.isAfter(today)) {
-            errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
+
     }
 
     private CallbackResponse setRespondent2SameLegalRepToNo(CallbackParams callbackParams) {
