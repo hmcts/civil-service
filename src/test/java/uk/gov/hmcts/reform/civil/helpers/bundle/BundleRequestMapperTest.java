@@ -116,7 +116,7 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(3).getValue().getDocumentFileName());
         assertEquals("Witness Statement df1Fname 1 11/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(4).getValue().getDocumentFileName());
-        assertEquals("Witness Summary cl1Fname 12/12/2023",
+        assertEquals("Witness Summary cl1Fname 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(5).getValue().getDocumentFileName());
         assertEquals("Email referred to in the statement of witness 12/12/2022",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(10).getValue().getDocumentFileName());
