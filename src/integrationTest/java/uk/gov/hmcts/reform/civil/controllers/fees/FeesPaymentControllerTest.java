@@ -1,16 +1,22 @@
 package uk.gov.hmcts.reform.civil.controllers.fees;
 
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
@@ -23,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,6 +38,9 @@ import static uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController.F
 import static uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController.FEES_PAYMENT_STATUS_URL;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {FeesPaymentService.class})
+@EnableRetry
 public class FeesPaymentControllerTest extends BaseIntegrationTest {
 
     private static final CardPaymentServiceRequestDTO CARD_PAYMENT_SERVICE_REQUEST
@@ -37,31 +48,36 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         .returnUrl("http://localhost:3001/hearing-payment-confirmation/1701090368574910")
         .language("English")
         .amount(new BigDecimal("232.00")).currency("GBP").build();
-    private static final String CASES_URL = "/cases/{caseId}";
 
     @MockBean
     private PaymentsClient paymentsClient;
     @MockBean
     private CoreCaseDataService coreCaseDataService;
 
-    @Test
-    @SneakyThrows
-    public void shouldCreateGovPayPaymentUrlForServiceRequestPayment() {
+    @BeforeEach
+    void before() {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
             .data(Map.of(
                 "hearingFeePBADetails",
                 SRPbaDetails.builder().serviceReqReference("2023-1701090705688").build(),
                 "hearingFee",
                 Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
-            ))
-            .build();
-        when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
+            )).build();
 
+        when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldCreateGovPayPaymentUrlForServiceRequestPayment() {
         CardPaymentServiceRequestResponse response = buildServiceRequestResponse();
 
-        when(paymentsClient
-                 .createGovPayCardPaymentRequest("2023-1701090705688", BEARER_TOKEN, CARD_PAYMENT_SERVICE_REQUEST))
-            .thenReturn(response);
+        when(paymentsClient.createGovPayCardPaymentRequest(
+            "2023-1701090705688",
+            BEARER_TOKEN,
+            CARD_PAYMENT_SERVICE_REQUEST
+        )).thenReturn(response);
+
         doPost(BEARER_TOKEN, "", FEES_PAYMENT_REQUEST_URL, HEARING.name(), "1701090368574910")
             .andExpect(content().json(toJson(response)))
             .andExpect(status().isOk());
@@ -70,13 +86,28 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     @ParameterizedTest
     @CsvSource({"Success", "Failed", "Pending", "Declined"})
     @SneakyThrows
-    public void shouldReturnServiceRequestPaymentStatus(String status) {
+    void shouldReturnServiceRequestPaymentStatus(String status) {
         PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
         when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
             .thenReturn(response);
         doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "RC-1701-0909-0602-0418")
             .andExpect(content().json(toJson(expectedResponse(status))))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    void whenPaymentClientReturnsInitiatedStatusTwoTimes() throws Exception {
+        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
+            .thenReturn(buildGovPayCardPaymentStatusResponse("Initiated"))
+            .thenReturn(buildGovPayCardPaymentStatusResponse("Initiated"))
+            .thenReturn(buildGovPayCardPaymentStatusResponse("Success"));
+
+        doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "RC-1701-0909-0602-0418")
+            .andExpect(content().json(toJson(expectedResponse("Success"))))
+            .andExpect(status().isOk());
+
+        verify(paymentsClient, times(3))
+            .getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
     }
 
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {
@@ -93,8 +124,8 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     private CardPaymentStatusResponse expectedResponse(String status) {
         CardPaymentStatusResponse.CardPaymentStatusResponseBuilder payment
             = CardPaymentStatusResponse.builder()
-            .paymentReference("")
-            .externalReference("")
+            .paymentReference("RC-1701-0909-0602-0418")
+            .externalReference("lbh2ogknloh9p3b4lchngdfg63")
             .status(status)
             .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"));
 

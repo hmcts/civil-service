@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
@@ -30,6 +28,7 @@ public class FeesPaymentService {
     private final CoreCaseDataService coreCaseDataService;
     private final PaymentsClient paymentsClient;
     private final PinInPostConfiguration pinInPostConfiguration;
+    private final PaymentStatusService paymentStatusService;
 
     public CardPaymentServiceRequestResponse createGovPaymentRequest(
         FeeType feeType, String caseReference, String authorization) {
@@ -44,7 +43,10 @@ public class FeesPaymentService {
             ? "/hearing-payment-confirmation/" : "/claim-issued-payment-confirmation/";
 
         CardPaymentServiceRequestDTO requestDto = CardPaymentServiceRequestDTO.builder()
-            .amount(hearingFeePaymentDetails.getFee().getCalculatedAmountInPence().divide(BigDecimal.valueOf(100), RoundingMode.CEILING).setScale(2, RoundingMode.CEILING))
+            .amount(hearingFeePaymentDetails.getFee().getCalculatedAmountInPence().divide(
+                BigDecimal.valueOf(100),
+                RoundingMode.CEILING
+            ).setScale(2, RoundingMode.CEILING))
             .currency("GBP")
             .language("English")
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
@@ -54,12 +56,6 @@ public class FeesPaymentService {
             authorization,
             requestDto
         );
-//        return CardPaymentStatusResponse.builder()
-//            .paymentReference(govPayCardPaymentRequest.getPaymentReference())
-//            .externalReference(govPayCardPaymentRequest.getExternalReference())
-//            .status(govPayCardPaymentRequest.getStatus())
-//            .dateCreated(govPayCardPaymentRequest.getDateCreated())
-//            .build();
     }
 
     private SRPbaDetails extractHearingFeePaymentDetails(FeeType feeType, CaseData caseData) {
@@ -72,7 +68,7 @@ public class FeesPaymentService {
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(
         FeeType feeType, String paymentReference, String authorization) {
-        PaymentDto cardPaymentDetails = getCardPaymentDetails(paymentReference, authorization);
+        PaymentDto cardPaymentDetails = paymentStatusService.getCardPaymentDetails(paymentReference, authorization);
         String paymentStatus = cardPaymentDetails.getStatus();
         CardPaymentStatusResponse.CardPaymentStatusResponseBuilder response = CardPaymentStatusResponse.builder()
             .status(paymentStatus)
@@ -88,20 +84,5 @@ public class FeesPaymentService {
         }
 
         return response.build();
-    }
-
-    @Retryable(value = RuntimeException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
-    private PaymentDto getCardPaymentDetails(String paymentReference, String authorization) {
-        try {
-            PaymentDto cardPaymentStatus = paymentsClient.getGovPayCardPaymentStatus(paymentReference, authorization);
-            String status = cardPaymentStatus.getStatus();
-            if (status.equals("Initiated")) {
-                throw new Exception("Need to check payment status again as current payment status is still Initiated");
-            }
-            return cardPaymentStatus;
-        } catch (Exception e) {
-            log.error("Payment status check failed due to {}", e.getMessage());
-            throw new RuntimeException(e);
-        }
     }
 }

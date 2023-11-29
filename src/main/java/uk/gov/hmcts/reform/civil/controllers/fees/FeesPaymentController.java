@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,12 +34,15 @@ public class FeesPaymentController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful Gov pay link is created."),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public CardPaymentServiceRequestResponse createGovPaymentRequest(
+    public ResponseEntity<CardPaymentServiceRequestResponse> createGovPaymentRequest(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @PathVariable("feeType") FeeType feeType,
         @PathVariable("caseReference") String caseReference) {
 
-        return feesPaymentService.createGovPaymentRequest(feeType, caseReference, authorization);
+        return new ResponseEntity<>(
+            feesPaymentService.createGovPaymentRequest(feeType, caseReference, authorization),
+            HttpStatus.OK
+        );
     }
 
     @GetMapping(path = FEES_PAYMENT_STATUS_URL, produces = APPLICATION_JSON)
@@ -45,11 +50,14 @@ public class FeesPaymentController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful Gov pay status."),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public CardPaymentStatusResponse getGovPaymentRequestStatus(
+    public ResponseEntity<CardPaymentStatusResponse> getGovPaymentRequestStatus(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @PathVariable("feeType") FeeType feeType,
         @PathVariable("paymentReference") String paymentReference) {
 
-        return feesPaymentService.getGovPaymentRequestStatus(feeType, paymentReference, authorization);
+        return new ResponseEntity<>(
+            feesPaymentService.getGovPaymentRequestStatus(feeType, paymentReference, authorization),
+            HttpStatus.OK
+        );
     }
 }
