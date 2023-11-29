@@ -1030,9 +1030,12 @@ public class FlowPredicate {
     public static final Predicate<CaseData> isPayImmediately = CaseData::isPayImmediately;
 
     public static final Predicate<CaseData> casemanMarksMediationUnsuccessful = caseData ->
-        Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason());
+        Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
+        || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
+            && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty());
 
     public static final Predicate<CaseData> takenOfflineByStaffBeforeMediationUnsuccessful = caseData ->
         caseData.getTakenOfflineByStaffDate() != null
-        && Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason());
+        && (Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason())
+            || Objects.isNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()));
 }
