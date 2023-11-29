@@ -2,8 +2,15 @@ package uk.gov.hmcts.reform.civil.controllers.fees;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
@@ -14,6 +21,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -24,15 +32,31 @@ import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 
 public class FeesPaymentControllerTest extends BaseIntegrationTest {
 
-    private static final CardPaymentServiceRequestDTO CARD_PAYMENT_SERVICE_REQUEST = CardPaymentServiceRequestDTO.builder()
-        .returnUrl("return-url").language("English").amount(new BigDecimal("232.00")).currency("GBP").build();
+    private static final CardPaymentServiceRequestDTO CARD_PAYMENT_SERVICE_REQUEST
+        = CardPaymentServiceRequestDTO.builder()
+        .returnUrl("http://localhost:3001/hearing-payment-confirmation/1701090368574910")
+        .language("English")
+        .amount(new BigDecimal("232.00")).currency("GBP").build();
+    private static final String CASES_URL = "/cases/{caseId}";
 
     @MockBean
     private PaymentsClient paymentsClient;
+    @MockBean
+    private CoreCaseDataService coreCaseDataService;
 
     @Test
     @SneakyThrows
     public void shouldCreateGovPayPaymentUrlForServiceRequestPayment() {
+        CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
+            .data(Map.of(
+                "hearingFeePBADetails",
+                SRPbaDetails.builder().serviceReqReference("2023-1701090705688").build(),
+                "hearingFee",
+                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
+            ))
+            .build();
+        when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
+
         CardPaymentServiceRequestResponse response = buildServiceRequestResponse();
 
         when(paymentsClient
@@ -43,14 +67,15 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             .andExpect(status().isOk());
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource({"Success", "Failed", "Pending", "Declined"})
     @SneakyThrows
-    public void shouldReturnServiceRequestPaymentStatus() {
-        PaymentDto response = buildGovPayCardPaymentStatusResponse("Success");
+    public void shouldReturnServiceRequestPaymentStatus(String status) {
+        PaymentDto response = buildGovPayCardPaymentStatusResponse(status);
         when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
             .thenReturn(response);
         doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "RC-1701-0909-0602-0418")
-            .andExpect(content().json(toJson(response)))
+            .andExpect(content().json(toJson(expectedResponse(status))))
             .andExpect(status().isOk());
     }
 
@@ -65,20 +90,48 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             .build();
     }
 
+    private CardPaymentStatusResponse expectedResponse(String status) {
+        CardPaymentStatusResponse.CardPaymentStatusResponseBuilder payment
+            = CardPaymentStatusResponse.builder()
+            .paymentReference("")
+            .externalReference("")
+            .status(status)
+            .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"));
+
+        if (status.equals("Failed")) {
+            payment.errorCode("CA-E0001")
+                .errorDescription("Payment request failed. PBA account accountName have insufficient funds available");
+        } else if (status.equals("Declined")) {
+            payment.errorCode("CA-E0003")
+                .errorDescription("Your account is on hold");
+        } else if (status.equals("Pending")) {
+            payment.errorCode("CA-E0004")
+                .errorDescription("Your account is deleted");
+        }
+        return payment.build();
+    }
+
     private StatusHistoryDto[] getStatusHistories(String status) {
 
         StatusHistoryDto initiatedHistory = StatusHistoryDto.builder().status("Initiated").build();
         StatusHistoryDto successHistory = StatusHistoryDto.builder().status("Success").build();
-        StatusHistoryDto failedHistory = StatusHistoryDto.builder().status("Failed").build();
+        StatusHistoryDto failedHistory = StatusHistoryDto.builder().status("Failed")
+            .errorCode("CA-E0001")
+            .errorMessage("Payment request failed. PBA account accountName have insufficient funds available").build();
+        StatusHistoryDto declinedHistory = StatusHistoryDto.builder().status("Declined")
+            .errorCode("CA-E0003").errorMessage("Your account is on hold").build();
+        StatusHistoryDto pendingHistory = StatusHistoryDto.builder().status("Pending")
+            .errorCode("CA-E0004").errorMessage("Your account is deleted").build();
         List<StatusHistoryDto> histories = new ArrayList<>();
+        histories.add(initiatedHistory);
         if (status.equals("Success")) {
-            histories.add(initiatedHistory);
             histories.add(successHistory);
-        }
-
-        if (status.equals("Failed")) {
-            histories.add(initiatedHistory);
+        } else if (status.equals("Failed")) {
             histories.add(failedHistory);
+        } else if (status.equals("Declined")) {
+            histories.add(declinedHistory);
+        } else {
+            histories.add(pendingHistory);
         }
         StatusHistoryDto[] result = new StatusHistoryDto[histories.size()];
         return histories.toArray(result);

@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Arrays;
 
 @Slf4j
 @Service
@@ -42,7 +44,7 @@ public class FeesPaymentService {
             ? "/hearing-payment-confirmation/" : "/claim-issued-payment-confirmation/";
 
         CardPaymentServiceRequestDTO requestDto = CardPaymentServiceRequestDTO.builder()
-            .amount(hearingFeePaymentDetails.getFee().getCalculatedAmountInPence().multiply(BigDecimal.valueOf(100)))
+            .amount(hearingFeePaymentDetails.getFee().getCalculatedAmountInPence().divide(BigDecimal.valueOf(100), RoundingMode.CEILING).setScale(2, RoundingMode.CEILING))
             .currency("GBP")
             .language("English")
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
@@ -52,6 +54,12 @@ public class FeesPaymentService {
             authorization,
             requestDto
         );
+//        return CardPaymentStatusResponse.builder()
+//            .paymentReference(govPayCardPaymentRequest.getPaymentReference())
+//            .externalReference(govPayCardPaymentRequest.getExternalReference())
+//            .status(govPayCardPaymentRequest.getStatus())
+//            .dateCreated(govPayCardPaymentRequest.getDateCreated())
+//            .build();
     }
 
     private SRPbaDetails extractHearingFeePaymentDetails(FeeType feeType, CaseData caseData) {
@@ -64,22 +72,31 @@ public class FeesPaymentService {
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(
         FeeType feeType, String paymentReference, String authorization) {
-        PaymentDto cardPaymentStatus = getCardPaymentStatus(paymentReference, authorization);
-        return CardPaymentStatusResponse.builder()
-            .status(cardPaymentStatus.getStatus())
-            .paymentReference(cardPaymentStatus.getPaymentReference())
-            .externalReference(cardPaymentStatus.getExternalReference())
-            .dateCreated(cardPaymentStatus.getDateCreated())
-            .build();
+        PaymentDto cardPaymentDetails = getCardPaymentDetails(paymentReference, authorization);
+        String paymentStatus = cardPaymentDetails.getStatus();
+        CardPaymentStatusResponse.CardPaymentStatusResponseBuilder response = CardPaymentStatusResponse.builder()
+            .status(paymentStatus)
+            .paymentReference(cardPaymentDetails.getPaymentReference())
+            .externalReference(cardPaymentDetails.getExternalReference())
+            .dateCreated(cardPaymentDetails.getDateCreated());
+
+        if (!paymentStatus.equals("Success")) {
+            Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
+                .filter(h -> h.getStatus().equals(paymentStatus))
+                .findFirst()
+                .ifPresent(h -> response.errorCode(h.getErrorCode()).errorDescription(h.getErrorMessage()));
+        }
+
+        return response.build();
     }
 
     @Retryable(value = RuntimeException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
-    private PaymentDto getCardPaymentStatus(String paymentReference, String authorization) {
+    private PaymentDto getCardPaymentDetails(String paymentReference, String authorization) {
         try {
             PaymentDto cardPaymentStatus = paymentsClient.getGovPayCardPaymentStatus(paymentReference, authorization);
             String status = cardPaymentStatus.getStatus();
-            if (!status.equals("Success")) {
-                throw new Exception("Need to check payment status again as current payment status is " + status);
+            if (status.equals("Initiated")) {
+                throw new Exception("Need to check payment status again as current payment status is still Initiated");
             }
             return cardPaymentStatus;
         } catch (Exception e) {
