@@ -487,9 +487,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         log.info("Case management equals: " + caseData.getCaseManagementCategory());
         log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 
-        if (featureToggleService.isNoticeOfChangeEnabled()) {
-            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
-        }
+        OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
 
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM_SPEC, dataBuilder);
 
@@ -975,7 +973,36 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .data(caseDataBuilder.build().toMap(objectMapper))
             .errors(errors)
             .build();
+    }
 
+    private CallbackResponse getAirlineList(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
+        DynamicList airlineList = DynamicList
+            .fromList(airlineEpimsIDList.stream()
+                          .map(AirlineEpimsId::getAirline).toList(), Object::toString, Object::toString, null, false);
+        DynamicList dropdownAirlineList = DynamicList.builder()
+            .listItems(airlineList.getListItems()).build();
+
+        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().airlineList(dropdownAirlineList).build();
+        caseDataBuilder.flightDelayDetails(flightDelayDetails);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private CallbackResponse validateDateOfFlight(CallbackParams callbackParams) {
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        List<String> errors = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
+        if (scheduledDate.isAfter(today)) {
+            errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
+            .build();
     }
 
     private CallbackResponse setRespondent2SameLegalRepToNo(CallbackParams callbackParams) {
