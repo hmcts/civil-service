@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
@@ -44,6 +45,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -60,6 +62,8 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
+import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
@@ -95,7 +99,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
     private ManageContactInformationCallbackHandler handler;
 
     @Autowired
-    private ObjectMapper mapper;
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private PartyDetailsChangedUtil partyDetailsChangedUtil;
 
     @MockBean
     private CaseFlagsInitialiser caseFlagInitialiser;
@@ -215,7 +222,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                 "DEFENDANT 1: Witnesses",
                                                                 "DEFENDANT 1: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -251,7 +258,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "CLAIMANT 1: Witnesses",
                 "CLAIMANT 1: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -288,7 +295,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 1: Witnesses",
                 "DEFENDANT 1: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -332,7 +339,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 1: Witnesses",
                 "DEFENDANT 1: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -371,7 +378,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "CLAIMANTS: Witnesses",
                 "CLAIMANTS: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -409,7 +416,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 1: Witnesses",
                 "DEFENDANT 1: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -452,7 +459,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANTS: Witnesses",
                 "DEFENDANTS: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -492,7 +499,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "CLAIMANT 1: Witnesses",
                 "CLAIMANT 1: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -535,7 +542,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANTS: Witnesses",
                 "DEFENDANTS: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -586,7 +593,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 2: Witnesses",
                 "DEFENDANT 2: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -629,7 +636,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "CLAIMANT 1: Witnesses",
                 "CLAIMANT 1: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -672,7 +679,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 1: Witnesses",
                 "DEFENDANT 1: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -715,7 +722,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 2: Witnesses",
                 "DEFENDANT 2: Experts");
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
 
             assertThat(actual).isEqualTo(expected);
@@ -733,6 +740,11 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         PartyFlagStructure expectedWitnessFlags;
 
         private static final String PARTY_ID = "party-id";
+        private static final ContactDetailsUpdatedEvent EVENT =
+                ContactDetailsUpdatedEvent.builder()
+                        .summary("Summary")
+                        .description("Description")
+                        .build();
         private static MockedStatic partyIdMock;
 
         @BeforeAll
@@ -771,6 +783,133 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .build();
         }
 
+        @Test
+        void shouldReturnExpectedResponseCaseData_whenTriggeredByAdmin_withPartyChanges() {
+            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .respondent1(Party.builder()
+                            .individualFirstName("Dis")
+                            .individualLastName("Guy")
+                            .type(INDIVIDUAL).flags(respondent1Flags).build())
+                    .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
+            CaseData updated = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                            .partyChosen(DynamicList.builder()
+                                    .value(DynamicListElement.builder()
+                                            .code(DEFENDANT_ONE_ID)
+                                            .build())
+                                    .build())
+                            .partyChosenId(DEFENDANT_ONE_ID)
+                            .build())
+                    .build();
+
+            when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
+            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
+                    EVENT);
+
+            CallbackParams params = callbackParamsOf(updated, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+            CaseData responseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertEquals(updated.getApplicant1(), responseData.getApplicant1());
+            assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
+            assertEquals(READY, responseData.getBusinessProcess().getStatus());
+            assertEquals(
+                    EVENT.toBuilder().submittedByCaseworker(YES).build(), responseData.getContactDetailsUpdatedEvent());
+        }
+
+        @Test
+        void shouldReturnExpectedResponseCaseData_whenTriggeredByNonAdmin_withPartyChanges() {
+            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .respondent1(Party.builder()
+                            .individualFirstName("Dis")
+                            .individualLastName("Guy")
+                            .type(INDIVIDUAL).flags(respondent1Flags).build())
+                    .buildClaimIssuedPaymentCaseData();
+
+            CaseData updated = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                            .partyChosen(DynamicList.builder()
+                                    .value(DynamicListElement.builder()
+                                            .code(DEFENDANT_ONE_ID)
+                                            .build())
+                                    .build())
+                            .partyChosenId(DEFENDANT_ONE_ID)
+                            .build())
+                    .build();
+
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
+            when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
+            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class))).thenReturn(
+                    EVENT);
+
+            CallbackParams params = callbackParamsOf(updated, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+            CaseData responseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertEquals(updated.getApplicant1(), responseData.getApplicant1());
+            assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
+            assertEquals(READY, responseData.getBusinessProcess().getStatus());
+            assertEquals(
+                    EVENT.toBuilder().submittedByCaseworker(NO).build(), responseData.getContactDetailsUpdatedEvent());
+        }
+
+        @Test
+        void shouldNotSetEventDetailsOrChangeBusinessProcessCallbackResponse_withNoPartyChanges() {
+            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
+            Party respondent = Party.builder()
+                    .individualFirstName("Dis")
+                    .individualLastName("Guy")
+                    .type(INDIVIDUAL).flags(respondent1Flags).build();
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1(respondent).build()
+                    .toBuilder()
+                    .respondent1DetailsForClaimDetailsTab(respondent.toBuilder().flags(respondent1Flags).build())
+                    .caseNameHmctsInternal("Mr. John Rambo v Dis Guy")
+                    .caseNamePublic("'John Rambo' v 'Dis Guy'")
+                    .build();
+
+            CaseData updated = caseDataBefore.toBuilder()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                            .partyChosen(DynamicList.builder()
+                                    .value(DynamicListElement.builder()
+                                            .code(DEFENDANT_ONE_ID)
+                                            .build())
+                                    .build())
+                            .partyChosenId(DEFENDANT_ONE_ID)
+                            .build())
+                    .build();
+
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
+            when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
+            when(partyDetailsChangedUtil.buildChangesEvent(any(CaseData.class), any(CaseData.class)))
+                    .thenReturn(null);
+
+            CallbackParams params = callbackParamsOf(updated, ABOUT_TO_SUBMIT, caseDataBefore.toMap(objectMapper));
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+            CaseData responseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertNull(responseData.getContactDetailsUpdatedEvent());
+            assertEquals(caseDataBefore.getBusinessProcess(), responseData.getBusinessProcess());
+        }
+
         @ParameterizedTest
         @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
         void shouldCopyFlagsForRespondents(String partyChosenId) {
@@ -799,7 +938,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
             assertThat(responseCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
         }
@@ -826,7 +965,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getApplicant1DQ().getApplicant1DQExperts().getDetails()).get(0)).isEqualTo(expectedExpert1);
             assertThat(unwrapElements(updatedData.getApplicantExperts()).get(0)).isEqualTo(expectedExpertFlags);
         }
@@ -853,7 +992,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getRespondent1DQ().getRespondent1DQExperts().getDetails()).get(0)).isEqualTo(expectedExpert1);
             assertThat(unwrapElements(updatedData.getRespondent1Experts()).get(0)).isEqualTo(expectedExpertFlags);
         }
@@ -880,7 +1019,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getRespondent1DQ().getRespondent1DQExperts().getDetails()).get(0)).isEqualTo(expectedExpert1);
             assertThat(unwrapElements(updatedData.getRespondent1Experts()).get(0)).isEqualTo(expectedExpertFlags);
         }
@@ -907,7 +1046,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getRespondent2DQ().getRespondent2DQExperts().getDetails()).get(0)).isEqualTo(expectedExpert1);
             assertThat(unwrapElements(updatedData.getRespondent2Experts()).get(0)).isEqualTo(expectedExpertFlags);
         }
@@ -934,7 +1073,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getRespondent2DQ().getRespondent2DQExperts().getDetails()).get(0)).isEqualTo(expectedExpert1);
             assertThat(unwrapElements(updatedData.getRespondent2Experts()).get(0)).isEqualTo(expectedExpertFlags);
         }
@@ -961,7 +1100,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getApplicant1DQ().getApplicant1DQWitnesses().getDetails()).get(0)).isEqualTo(expectedWitness1);
             assertThat(unwrapElements(updatedData.getApplicantWitnesses()).get(0)).isEqualTo(expectedWitnessFlags);
         }
@@ -988,7 +1127,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails()).get(0)).isEqualTo(expectedWitness1);
             assertThat(unwrapElements(updatedData.getRespondent1Witnesses()).get(0)).isEqualTo(expectedWitnessFlags);
         }
@@ -1015,7 +1154,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails()).get(0)).isEqualTo(expectedWitness1);
             assertThat(unwrapElements(updatedData.getRespondent2Witnesses()).get(0)).isEqualTo(expectedWitnessFlags);
         }
@@ -1042,7 +1181,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails()).get(0)).isEqualTo(expectedWitness1);
             assertThat(unwrapElements(updatedData.getRespondent1Witnesses()).get(0)).isEqualTo(expectedWitnessFlags);
         }
@@ -1069,7 +1208,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails()).get(0)).isEqualTo(expectedWitness1);
             assertThat(unwrapElements(updatedData.getRespondent2Witnesses()).get(0)).isEqualTo(expectedWitnessFlags);
         }
@@ -1098,7 +1237,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getApplicant1DQ().getApplicant1DQExperts().getDetails()).get(0)).isEqualTo(expectedExpert1);
             assertThat(updatedData.getApplicant1DQ().getApplicant1DQExperts().getExpertRequired()).isEqualTo(YES);
         }
@@ -1127,7 +1266,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getApplicant1DQ().getApplicant1DQExperts().getDetails())).isEmpty();
             assertThat(updatedData.getApplicant1DQ().getApplicant1DQExperts().getExpertRequired()).isEqualTo(NO);
         }
@@ -1154,7 +1293,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails()).get(0)).isEqualTo(expectedWitness1);
             assertThat(updatedData.getRespondent1DQ().getRespondent1DQWitnesses().getWitnessesToAppear()).isEqualTo(YES);
         }
@@ -1183,10 +1322,11 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(unwrapElements(updatedData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails())).isEmpty();
             assertThat(updatedData.getRespondent1DQ().getRespondent1DQWitnesses().getWitnessesToAppear()).isEqualTo(NO);
         }
+
     }
 
     @Nested
@@ -1287,7 +1427,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo("CODE");
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
             assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEmpty();
@@ -1318,7 +1458,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(partyChosenId + "_ADMIN_INDIVIDUAL");
             assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEmpty();
@@ -1349,7 +1489,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(partyChosenId + "_LR");
             assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEmpty();
@@ -1386,7 +1526,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
             assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEqualTo(form);
@@ -1421,7 +1561,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
             assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEmpty();
@@ -1458,7 +1598,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
             assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEmpty();
@@ -1490,7 +1630,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
             assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEmpty();
@@ -1622,4 +1762,5 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(response.getErrors()).isEmpty();
         }
     }
+
 }
