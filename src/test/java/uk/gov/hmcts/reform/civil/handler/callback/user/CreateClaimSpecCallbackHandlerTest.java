@@ -1695,6 +1695,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
 
             // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
