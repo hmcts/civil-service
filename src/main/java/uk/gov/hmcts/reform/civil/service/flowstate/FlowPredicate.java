@@ -1037,5 +1037,5 @@ public class FlowPredicate {
     public static final Predicate<CaseData> takenOfflineByStaffBeforeMediationUnsuccessful = caseData ->
         caseData.getTakenOfflineByStaffDate() != null
         && (Objects.isNull(caseData.getMediation().getUnsuccessfulMediationReason())
-            || Objects.isNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()));
+            && Objects.isNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect()));
 }
