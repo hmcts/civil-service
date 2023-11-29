@@ -407,6 +407,11 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         updateExperts(partyChosenId, caseData, builder);
         updateWitnesses(partyChosenId, caseData, builder);
 
+        // persist flags for claimants
+        if (CLAIMANT_ONE_ID.equals(partyChosenId) || CLAIMANT_TWO_ID.equals(partyChosenId)) {
+            getFlagsForClaimants(callbackParams, caseData, builder);
+        }
+
         // persist flags for respondents
         if (DEFENDANT_ONE_ID.equals(partyChosenId) || DEFENDANT_TWO_ID.equals(partyChosenId)) {
             getFlagsForRespondents(callbackParams, caseData, builder);
@@ -570,6 +575,41 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         }
     }
 
+    private void getFlagsForClaimants(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
+        // Party fields are empty in this mid event, this is a workaround
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        System.out.print("caseData.getApplicant1().getFlags()>>>\n");
+        System.out.print(caseData.getApplicant1().getFlags()+"\n");
+        System.out.print("oldCaseData.getApplicant1().getFlags()>>>\n");
+        System.out.print(oldCaseData.getApplicant1().getFlags()+"\n");
+
+        if(ofNullable(caseData.getApplicant2()).isPresent()
+            && ofNullable(oldCaseData.getApplicant2()).isPresent()) {
+            System.out.print("caseData.getApplicant2().getFlags()>>>\n");
+            System.out.print(caseData.getApplicant2().getFlags()+"\n");
+            System.out.print("oldCaseData.getApplicant2().getFlags()>>>\n");
+            System.out.print(oldCaseData.getApplicant2().getFlags()+"\n");
+        }
+
+        // persist applicant flags (ccd issue)
+        var updatedApplicant1 = caseData.getApplicant1().toBuilder()
+            .flags(oldCaseData.getApplicant1().getFlags())
+            .build();
+
+        builder.applicant1(updatedApplicant1);
+
+        // if present, persist the 2nd applicant flags in the same fashion as above, i.e ignore for 1v1
+        if (ofNullable(caseData.getApplicant2()).isPresent()
+            && ofNullable(oldCaseData.getApplicant2()).isPresent()) {
+            var updatedApplicant2 = caseData.getApplicant2().toBuilder()
+                .flags(oldCaseData.getApplicant2().getFlags())
+                .build();
+
+            builder.applicant2(updatedApplicant2);
+        }
+    }
+
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(format("# Contact information changed"))
@@ -582,7 +622,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     }
 
     private boolean isAdmin(String userAuthToken) {
-        return userService.getUserInfo(userAuthToken).getRoles()
-            .stream().anyMatch(ADMIN_ROLES::contains);
+        return false;
+//            userService.getUserInfo(userAuthToken).getRoles()
+//            .stream().anyMatch(ADMIN_ROLES::contains);
     }
 }
