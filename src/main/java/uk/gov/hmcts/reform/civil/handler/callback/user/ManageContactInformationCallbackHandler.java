@@ -580,16 +580,16 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
         System.out.print("caseData.getApplicant1().getFlags()>>>\n");
-        System.out.print(caseData.getApplicant1().getFlags()+"\n");
+        System.out.print(caseData.getApplicant1().getFlags() + "\n");
         System.out.print("oldCaseData.getApplicant1().getFlags()>>>\n");
-        System.out.print(oldCaseData.getApplicant1().getFlags()+"\n");
+        System.out.print(oldCaseData.getApplicant1().getFlags() + "\n");
 
-        if(ofNullable(caseData.getApplicant2()).isPresent()
+        if (ofNullable(caseData.getApplicant2()).isPresent()
             && ofNullable(oldCaseData.getApplicant2()).isPresent()) {
             System.out.print("caseData.getApplicant2().getFlags()>>>\n");
-            System.out.print(caseData.getApplicant2().getFlags()+"\n");
+            System.out.print(caseData.getApplicant2().getFlags() + "\n");
             System.out.print("oldCaseData.getApplicant2().getFlags()>>>\n");
-            System.out.print(oldCaseData.getApplicant2().getFlags()+"\n");
+            System.out.print(oldCaseData.getApplicant2().getFlags() + "\n");
         }
 
         // persist applicant flags (ccd issue)
@@ -622,8 +622,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     }
 
     private boolean isAdmin(String userAuthToken) {
-        return false;
-//            userService.getUserInfo(userAuthToken).getRoles()
-//            .stream().anyMatch(ADMIN_ROLES::contains);
+        return userService.getUserInfo(userAuthToken).getRoles()
+            .stream().anyMatch(ADMIN_ROLES::contains);
     }
 }
