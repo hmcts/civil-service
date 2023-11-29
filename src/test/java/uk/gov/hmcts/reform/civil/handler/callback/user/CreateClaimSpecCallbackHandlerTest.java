@@ -1647,9 +1647,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             YesOrNo yesOrNo = toggleStat ? YES : NO;
             CaseData caseData = CaseData.builder().isFlightDelayClaim(yesOrNo)
                 .build();
-            if (toggleStat)
+            if (toggleStat) {
                 caseData = CaseData.builder().isFlightDelayClaim(yesOrNo).flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now()).build()).build();
-
+            }
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDateAndSetFlightDelayClaimType");
             // When
             when(toggleService.isSdoR2Enabled()).thenReturn(true);

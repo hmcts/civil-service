@@ -975,22 +975,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private CallbackResponse getAirlineList(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
-        DynamicList airlineList = DynamicList
-            .fromList(airlineEpimsIDList.stream()
-                          .map(AirlineEpimsId::getAirline).toList(), Object::toString, Object::toString, null, false);
-        DynamicList dropdownAirlineList = DynamicList.builder()
-            .listItems(airlineList.getListItems()).build();
-
-        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().airlineList(dropdownAirlineList).build();
-        caseDataBuilder.flightDelayDetails(flightDelayDetails);
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
-    }
-
     private CallbackResponse validateDateOfFlight(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         List<String> errors = new ArrayList<>();
