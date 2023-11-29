@@ -210,7 +210,9 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.DEF1_DEFENSE_DQ.getValue());
                 assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF1.getValue());
             }
-            if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
+            if (nonNull(caseData.getRespondent2DocumentGeneration())
+                    && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")
+                    && !directionsQuestionnaire.getDocumentName().contains("claimant")) {
                 assignCategoryId.assignCategoryIdToCaseDocument(directionsQuestionnaire, DocCategory.DEF2_DEFENSE_DQ.getValue());
                 assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF2.getValue());
             }
