@@ -164,7 +164,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     }
 
     public Map<String, String> addPropertiesHMC(final CaseData caseData) {
-        Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack());
+        Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack().name());
         LocalDateTime hearingStartDateTime = camundaService
             .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
 
