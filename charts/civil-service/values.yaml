@@ -115,6 +115,6 @@ java:
         - name: appinsights-connection-string
           alias: azure.application-insights.instrumentation-key
         - name: docmosis-api-key
-          alias: DOCMOSIS_TORNADO_KEY
+          alias: docmosis.tornado.key
         - name: cmc-db-password-v11
           alias: CMC_DB_PASSWORD
