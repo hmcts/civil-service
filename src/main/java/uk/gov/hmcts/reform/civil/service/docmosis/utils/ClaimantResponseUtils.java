@@ -100,7 +100,7 @@ public class ClaimantResponseUtils {
 
     private static BigDecimal getDefendantAdmittedAmount(CaseData caseData) {
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
-           return caseData.getTotalClaimAmount();
+            return caseData.getTotalClaimAmount();
         } else {
             return caseData.getRespondToAdmittedClaimOwingAmountPounds();
         }

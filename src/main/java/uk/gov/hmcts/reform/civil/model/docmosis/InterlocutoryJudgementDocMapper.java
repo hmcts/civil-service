@@ -25,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseU
 @Component
 @RequiredArgsConstructor
 public class InterlocutoryJudgementDocMapper implements MappableObject {
+
     private static final String REFER_TO_JUDGE = "Refer to Judge";
 
     private final DeadlineExtensionCalculatorService calculatorService;
