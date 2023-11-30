@@ -100,7 +100,8 @@ java:
         - name: cmc-db-password-v11
           alias: CMC_DB_PASSWORD
         - gov-notify-api-key
-        - sendgrid-api-key
+        - name: sendgrid-api-key
+          alias: SENDGRID_API_KEY
         - name: robotics-notification-sender
           alias: robotics.notification.sender
         - name: robotics-notification-recipient
