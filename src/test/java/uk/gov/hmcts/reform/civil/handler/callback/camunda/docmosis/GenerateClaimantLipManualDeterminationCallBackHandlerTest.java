@@ -37,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LI
     JacksonAutoConfiguration.class
 })
 class GenerateClaimantLipManualDeterminationCallBackHandlerTest extends BaseCallbackHandlerTest {
+
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private static final CaseDocument FORM = CaseDocument.builder()
             .createdBy("John")
