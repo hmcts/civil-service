@@ -772,7 +772,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Nested
-        class retainFlags {
+        class RetainFlags {
             Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
             Flags respondent2Flags = Flags.builder().partyName("respondent2name").roleOnCase("respondent2").build();
             Flags applicant1Flags = Flags.builder().partyName("applicant1name").roleOnCase("applicant1").build();
