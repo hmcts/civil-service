@@ -18,12 +18,12 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.finalorders.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingNotes;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealChoiceSecondDropdown;
 import uk.gov.hmcts.reform.civil.model.finalorders.AppealGrantedRefused;
 import uk.gov.hmcts.reform.civil.model.finalorders.AssistedOrderCostDetails;
@@ -35,10 +35,8 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-
-import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.LocationRefDataServiceHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
 
@@ -50,10 +48,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.lang.String.format;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -99,7 +97,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public String defendantTwoPartyName;
     public String claimantTwoPartyName;
     public static final String APPEAL_NOTICE_DATE = "Appeal notice date";
-    private final LocationRefDataService locationRefDataService;
+    private final LocationRefDataServiceHelper locationRefDataServiceHelper;
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
     private final DocumentHearingLocationHelper locationHelper;
@@ -159,7 +157,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         if (ASSISTED_ORDER.equals(caseData.getFinalOrderSelection())) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-            List<LocationRefData> locations = (locationRefDataService
+            List<LocationRefData> locations = (locationRefDataServiceHelper
                 .getCourtLocationsForDefaultJudgments(authToken));
             caseDataBuilder = populateFields(caseDataBuilder, locations, caseData, authToken);
         } else {
