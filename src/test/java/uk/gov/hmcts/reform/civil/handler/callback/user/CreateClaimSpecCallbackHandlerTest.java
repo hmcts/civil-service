@@ -1647,10 +1647,13 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             YesOrNo yesOrNo = toggleStat ? YES : NO;
             CaseData caseData = CaseData.builder().isFlightDelayClaim(yesOrNo)
                 .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, "is-flight-delay-claim");
+            if (toggleStat) {
+                caseData = CaseData.builder().isFlightDelayClaim(yesOrNo).flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now()).build()).build();
+            }
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateDateAndSetFlightDelayClaimType");
             // When
             when(toggleService.isSdoR2Enabled()).thenReturn(true);
+
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -1668,7 +1671,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder().isFlightDelayClaim(YES)
                 .build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "is-flight-delay-claim");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateDateAndSetFlightDelayClaimType");
             // When
             when(toggleService.isSdoR2Enabled()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1692,6 +1695,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
 
             // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -1708,10 +1712,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
             // Given
             CaseData caseData = CaseData.builder()
+                .isFlightDelayClaim(YES)
                 .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().plusDays(1)).build()).build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateDateAndSetFlightDelayClaimType");
             // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -1723,10 +1729,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnErrorWhenDateOfFlightIsTodayOrInThePast(Integer days) {
             // Given
             CaseData caseData = CaseData.builder()
+                .isFlightDelayClaim(YES)
                 .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().minusDays(days)).build()).build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateDateAndSetFlightDelayClaimType");
             // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -2191,7 +2199,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedCourtLocation_whenAirlineExists() {
                 // Given
+
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .isFlightDelayClaim(YES)
                     .flightDelay(FlightDelayDetails.builder()
                                      .airlineList(
                                          DynamicList.builder()
