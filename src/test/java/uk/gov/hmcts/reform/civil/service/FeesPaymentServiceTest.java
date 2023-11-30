@@ -102,13 +102,77 @@ class FeesPaymentServiceTest {
             CARD_PAYMENT_SERVICE_REQUEST
         )).thenReturn(response);
 
-        CardPaymentServiceRequestResponse govPaymentRequest = feesPaymentService.createGovPaymentRequest(
+        CardPaymentStatusResponse govPaymentRequest = feesPaymentService.createGovPaymentRequest(
             HEARING,
             "1701090368574910",
             BEARER_TOKEN
         );
-        assertThat(govPaymentRequest).isEqualTo(response);
+        assertThat(govPaymentRequest).isEqualTo(CardPaymentStatusResponse.from(response));
 
+    }
+
+    @Test
+    void shouldRetryCreatePaymentsApiWhenInternalServerErrorThrown() {
+        when(paymentsClient.createGovPayCardPaymentRequest(
+            "2023-1701090705688",
+            BEARER_TOKEN,
+            CARD_PAYMENT_SERVICE_REQUEST
+        )).thenThrow(FeignException.InternalServerError.class);
+
+        assertThrows(
+            PaymentsApiException.class,
+            () -> feesPaymentService.createGovPaymentRequest(FeeType.HEARING, "1701090368574910", BEARER_TOKEN)
+        );
+
+        verify(paymentsClient, times(3)).createGovPayCardPaymentRequest(
+            "2023-1701090705688",
+            BEARER_TOKEN,
+            CARD_PAYMENT_SERVICE_REQUEST
+        );
+    }
+
+    @Test
+    void shouldNotRetryCreatePaymentsApiWhenExceptionOtherThanInternalServerIsThrown() {
+        when(paymentsClient.createGovPayCardPaymentRequest(
+            "2023-1701090705688",
+            BEARER_TOKEN,
+            CARD_PAYMENT_SERVICE_REQUEST
+        )).thenThrow(FeignException.NotImplemented.class);
+
+        assertThrows(
+            PaymentsApiException.class,
+            () -> feesPaymentService.createGovPaymentRequest(FeeType.HEARING, "1701090368574910", BEARER_TOKEN)
+        );
+
+        verify(paymentsClient).createGovPayCardPaymentRequest(
+            "2023-1701090705688",
+            BEARER_TOKEN,
+            CARD_PAYMENT_SERVICE_REQUEST
+        );
+    }
+
+    @Test
+    void shouldFailOnCreatePaymentsApiTwiceThenHaveSuccessfulRetry() {
+        CardPaymentServiceRequestResponse response = buildServiceRequestResponse();
+
+        when(paymentsClient.createGovPayCardPaymentRequest(
+            "2023-1701090705688",
+            BEARER_TOKEN,
+            CARD_PAYMENT_SERVICE_REQUEST
+        )).thenThrow(FeignException.InternalServerError.class)
+            .thenThrow(FeignException.InternalServerError.class)
+            .thenReturn(response);
+
+        CardPaymentStatusResponse govPaymentRequest =
+            feesPaymentService.createGovPaymentRequest(FeeType.HEARING, "1701090368574910", BEARER_TOKEN);
+
+        assertThat(govPaymentRequest).isEqualTo(CardPaymentStatusResponse.from(response));
+
+        verify(paymentsClient, times(3)).createGovPayCardPaymentRequest(
+            "2023-1701090705688",
+            BEARER_TOKEN,
+            CARD_PAYMENT_SERVICE_REQUEST
+        );
     }
 
     @ParameterizedTest

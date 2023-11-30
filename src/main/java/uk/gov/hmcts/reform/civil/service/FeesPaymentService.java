@@ -30,7 +30,7 @@ public class FeesPaymentService {
     private final PinInPostConfiguration pinInPostConfiguration;
     private final PaymentStatusService paymentStatusService;
 
-    public CardPaymentServiceRequestResponse createGovPaymentRequest(
+    public CardPaymentStatusResponse createGovPaymentRequest(
         FeeType feeType, String caseReference, String authorization) {
 
         log.info("Creating gov Payment request url for caseId {} for fee type {}", caseReference, feeType);
@@ -51,11 +51,14 @@ public class FeesPaymentService {
             .language("English")
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
             .build();
-        return paymentsClient.createGovPayCardPaymentRequest(
-            hearingFeePaymentDetails.getServiceReqReference(),
-            authorization,
-            requestDto
-        );
+
+        CardPaymentServiceRequestResponse govPayCardPaymentRequest = paymentStatusService
+            .createGovPayCardPaymentRequest(
+                hearingFeePaymentDetails.getServiceReqReference(),
+                authorization,
+                requestDto
+            );
+        return CardPaymentStatusResponse.from(govPayCardPaymentRequest);
     }
 
     private SRPbaDetails extractHearingFeePaymentDetails(FeeType feeType, CaseData caseData) {

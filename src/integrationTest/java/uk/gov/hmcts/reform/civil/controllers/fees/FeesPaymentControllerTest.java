@@ -79,7 +79,7 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         )).thenReturn(response);
 
         doPost(BEARER_TOKEN, "", FEES_PAYMENT_REQUEST_URL, HEARING.name(), "1701090368574910")
-            .andExpect(content().json(toJson(response)))
+            .andExpect(content().json(toJson(CardPaymentStatusResponse.from(response))))
             .andExpect(status().isOk());
     }
 

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
-import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -34,7 +33,7 @@ public class FeesPaymentController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful Gov pay link is created."),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<CardPaymentServiceRequestResponse> createGovPaymentRequest(
+    public ResponseEntity<CardPaymentStatusResponse> createGovPaymentRequest(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @PathVariable("feeType") FeeType feeType,
         @PathVariable("caseReference") String caseReference) {
