@@ -169,7 +169,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                             .build()).build();
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .applicant1ProceedWithClaim(YES)
                     .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                     .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                     .applicant1DQ(applicant1DQ)
@@ -207,7 +206,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                     .caseDataLip(caseDataLiP)
                     .applicant1AcceptAdmitAmountPaidSpec(NO)
-                    .applicant1ProceedWithClaim(YES)
                     .atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -224,7 +222,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build();
             CaseData caseData = CaseDataBuilder.builder()
                     .caseDataLip(caseDataLiP)
-                    .applicant1ProceedWithClaim(YES)
                     .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                     .atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -243,7 +240,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData =
                     CaseDataBuilder.builder().caseDataLip(caseDataLiP).applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                             .atStateClaimIssued()
-                            .applicant1ProceedWithClaim(YES)
                             .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -381,7 +377,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
                     .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
                             MediationDecision.No).build()).build())
-                    .applicant1ProceedWithClaim(YES)
                     .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
                     .respondent1(Party.builder()
                             .type(COMPANY)
@@ -399,7 +394,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsOrganisation_toAllFinalOrdersIssued() {
             CaseData caseData = CaseDataBuilder.builder()
                     .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
-                    .applicant1ProceedWithClaim(YES)
                     .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
                     .respondent1(Party.builder()
                             .type(ORGANISATION)
@@ -428,6 +422,49 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
+
+        @Test
+        void shouldUpdateCCJRequestPaymentDetails() {
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                    .ccjPaymentPaidSomeOption(YES)
+                    .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
+                    .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                    .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                    .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build())
+                    .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build())
+                    .caseDataLip(
+                            CaseDataLiP.builder()
+                                    .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
+                                            ChooseHowToProceed.REQUEST_A_CCJ).build())
+                                    .build())
+                    .respondent1Represented(NO)
+                    .specRespondent1Represented(NO)
+                    .applicant1Represented(NO)
+                    .totalClaimAmount(BigDecimal.valueOf(1000))
+                    .ccjPaymentDetails(ccjPaymentDetails)
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CCJPaymentDetails ccjResponseForJudgement =
+                    getCaseData(response).getCcjPaymentDetails();
+            assertThat(response.getData())
+                    .extracting("businessProcess")
+                    .extracting("camundaEvent")
+                    .isEqualTo(CLAIMANT_RESPONSE_CUI.name());
+            assertThat(response.getData())
+                    .extracting("businessProcess")
+                    .extracting("status")
+                    .isEqualTo("READY");
+            assertThat(ccjPaymentDetails.getCcjPaymentPaidSomeOption()).isEqualTo(ccjResponseForJudgement.getCcjPaymentPaidSomeOption());
+            assertThat(caseData.getTotalClaimAmount()).isEqualTo(ccjResponseForJudgement.getCcjJudgmentAmountClaimAmount());
+        }
+
+        private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
+            return mapper.convertValue(response.getData(), CaseData.class);
+        }
     }
 
     @Test
@@ -435,47 +472,5 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(handler.handledEvents()).containsOnly(CLAIMANT_RESPONSE_CUI);
     }
 
-    @Test
-    void shouldUpdateCCJRequestPaymentDetails() {
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YES)
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
-                .build();
-        CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build())
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build())
-                .caseDataLip(
-                        CaseDataLiP.builder()
-                                .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
-                                        ChooseHowToProceed.REQUEST_A_CCJ).build())
-                                .build())
-                .respondent1Represented(NO)
-                .specRespondent1Represented(NO)
-                .applicant1Represented(NO)
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .ccjPaymentDetails(ccjPaymentDetails)
-                .build();
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        CCJPaymentDetails ccjResponseForJudgement =
-                getCaseData(response).getCcjPaymentDetails();
-        assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("camundaEvent")
-                .isEqualTo(CLAIMANT_RESPONSE_CUI.name());
-        assertThat(response.getData())
-                .extracting("businessProcess")
-                .extracting("status")
-                .isEqualTo("READY");
-        assertThat(ccjPaymentDetails.getCcjPaymentPaidSomeOption()).isEqualTo(ccjResponseForJudgement.getCcjPaymentPaidSomeOption());
-        assertThat(caseData.getTotalClaimAmount()).isEqualTo(ccjResponseForJudgement.getCcjJudgmentAmountClaimAmount());
-    }
-
-    private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
-        return mapper.convertValue(response.getData(), CaseData.class);
-    }
 
 }

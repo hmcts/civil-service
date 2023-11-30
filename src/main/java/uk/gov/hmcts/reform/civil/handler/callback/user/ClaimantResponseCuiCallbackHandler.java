@@ -105,15 +105,16 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     }
 
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
-        if (updatedData.hasClaimantAgreedToFreeMediation() && updatedData.hasDefendantAgreedToFreeMediation()) {
+        if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
         } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
             response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());
-        } else if (!updatedData.hasApplicantProceededWithClaim()) {
-            response.state(updatedData.isClaimantConfirmAmountPaidPartAdmit() || updatedData.hasDefendantPayedTheAmountClaimed()
-                               ? CaseState.CASE_SETTLED.name()
-                               : CaseState.CASE_DISMISSED.name());
-        } else if (updatedData.hasApplicantRejectedRepaymentPlan() && updatedData.getRespondent1().isCompanyOROrganisation()) {
+        } else if (Objects.nonNull(updatedData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && updatedData.isClaimantIntentionSettlePartAdmit()) {
+            response.state(CaseState.CASE_SETTLED.name());
+        } else if (updatedData.hasApplicantNotProceededWithClaim()) {
+            response.state(CaseState.CASE_DISMISSED.name());
+        } else if (updatedData.hasApplicantRejectedRepaymentPlan()
+            && updatedData.getRespondent1().isCompanyOROrganisation()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
     }
@@ -129,5 +130,4 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
                 && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
     }
-
 }
