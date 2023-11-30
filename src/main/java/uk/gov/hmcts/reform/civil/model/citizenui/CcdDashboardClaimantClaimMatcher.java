@@ -148,6 +148,23 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
         return false;
     }
 
+    public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
+        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentSignedSettlementAgreement();
+    }
+
+    public boolean hasDefendantRejectedSettlementAgreement() {
+        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentRespondedToSettlementAgreement()
+            && !caseData.isRespondentSignedSettlementAgreement();
+    }
+
+    public boolean hasClaimantSignedSettlementAgreement() {
+        return caseData.hasApplicant1SignedSettlementAgreement() && !caseData.isSettlementAgreementDeadlineExpired();
+    }
+
+    public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
+        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isSettlementAgreementDeadlineExpired();
+    }
+
     @Override
     public boolean hasClaimantAcceptedPartialAdmissionAmount() {
         return hasDefendantStatedTheyPaid() && caseData.isResponseAcceptedByClaimant();
