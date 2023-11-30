@@ -45,6 +45,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_LIP;
@@ -61,6 +62,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
@@ -87,11 +89,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
@@ -547,6 +549,7 @@ public class FlowStateAllowedEventService {
                 JUDGMENT_PAID_IN_FULL,
                 RECORD_JUDGMENT,
                 TRANSFER_ONLINE_CASE,
+                CLAIMANT_RESPONSE_CUI,
                 asyncStitchingComplete
             )
         ),
@@ -605,11 +608,11 @@ public class FlowStateAllowedEventService {
             PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT.fullName(),
             List.of(
                 NOC_REQUEST,
-                    APPLY_NOC_DECISION,
-                    TAKE_CASE_OFFLINE,
-                    NOTIFY_DEFENDANT_OF_CLAIM,
-                    APPLICATION_OFFLINE_UPDATE_CLAIM,
-                    migrateCase
+                APPLY_NOC_DECISION,
+                TAKE_CASE_OFFLINE,
+                NOTIFY_DEFENDANT_OF_CLAIM,
+                APPLICATION_OFFLINE_UPDATE_CLAIM,
+                migrateCase
             )
         ),
         entry(
@@ -1108,7 +1111,9 @@ public class FlowStateAllowedEventService {
                 RECORD_JUDGMENT,
                 LIP_CLAIM_SETTLED,
                 TRANSFER_ONLINE_CASE,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                CLAIMANT_RESPONSE_CUI
+
             )
         ),
 
@@ -1259,7 +1264,7 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete
             )
         ),
-         entry(
+        entry(
             PART_ADMIT_NOT_SETTLED_NO_MEDIATION.fullName(),
             List.of(
                 ADD_DEFENDANT_LITIGATION_FRIEND,

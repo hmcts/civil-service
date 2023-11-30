@@ -28,9 +28,9 @@ public class DefendantSignSettlementAgreementCallbackHandler extends CallbackHan
     private final ObjectMapper objectMapper;
 
     private final Map<String, Callback> callbackMap = Map.of(
-            callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
+        callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+        callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -40,17 +40,17 @@ public class DefendantSignSettlementAgreementCallbackHandler extends CallbackHan
     @Override
     public List<CaseEvent> handledEvents() {
         return Collections.singletonList(
-                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+            DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
         );
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseDataUpdated = callbackParams.getCaseData().toBuilder()
-                .businessProcess(BusinessProcess.ready(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT))
-                .build();
+            .businessProcess(BusinessProcess.ready(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT))
+            .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(caseDataUpdated.toMap(objectMapper))
-                .build();
+            .data(caseDataUpdated.toMap(objectMapper))
+            .build();
     }
 }

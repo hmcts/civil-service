@@ -11,7 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenerator;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
@@ -30,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.convertFromUTC;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getHearingDays;
+import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.getLocationRefData;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +50,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
     private final HearingsService hearingsService;
     private final HearingNoticeHmcGenerator hearingNoticeHmcGenerator;
     private final ObjectMapper objectMapper;
+    private final LocationRefDataService locationRefDataService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -65,17 +71,20 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String processInstanceId = caseData.getBusinessProcess().getProcessInstanceId();
+        String bearerToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         var camundaVars = camundaService.getProcessVariables(processInstanceId);
         var hearing = hearingsService.getHearingResponse(
-            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            bearerToken,
             camundaVars.getHearingId()
         );
 
         var hearingStartDay = HmcDataUtils.getHearingStartDay(hearing);
         var hearingStartDate = convertFromUTC(hearingStartDay.getHearingStartDateTime());
+        String hearingLocation = getHearingLocation(camundaVars.getHearingId(), hearing,
+                                                    bearerToken, locationRefDataService);
 
-        buildDocument(callbackParams, caseDataBuilder, hearing);
+        buildDocument(callbackParams, caseDataBuilder, hearing, hearingLocation, camundaVars.getHearingId());
 
         camundaService.setProcessVariables(
             processInstanceId,
@@ -93,16 +102,22 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             .data(caseDataBuilder
                       .hearingDate(hearingStartDate.toLocalDate())
                       .hearingDueDate(HearingFeeUtils.calculateHearingDueDate(LocalDate.now(), hearingStartDate.toLocalDate()))
+                      .hearingLocation(DynamicList.builder().value(DynamicListElement.builder()
+                                                                       .label(hearingLocation)
+                                                                       .build()).build())
                       .build().toMap(objectMapper))
             .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder, HearingGetResponse hearing) {
+    private void buildDocument(CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> caseDataBuilder, HearingGetResponse hearing,
+                               String hearingLocation, String hearingId) {
         CaseData caseData = callbackParams.getCaseData();
         List<CaseDocument> caseDocuments = hearingNoticeHmcGenerator.generate(
             caseData,
             hearing,
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
+            callbackParams.getParams().get(BEARER_TOKEN).toString(),
+            hearingLocation,
+            hearingId
         );
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(caseDocuments.get(0)));
@@ -110,5 +125,18 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
             systemGeneratedCaseDocuments.addAll(caseData.getHearingDocuments());
         }
         caseDataBuilder.hearingDocuments(systemGeneratedCaseDocuments);
+    }
+
+    private String getHearingLocation(String hearingId, HearingGetResponse hearing,
+                                      String bearerToken, LocationRefDataService locationRefDataService) {
+        LocationRefData hearingLocation = getLocationRefData(
+            hearingId,
+            HmcDataUtils.getHearingStartDay(hearing).getHearingVenueId(),
+            bearerToken,
+            locationRefDataService);
+        if (hearingLocation != null) {
+            return LocationRefDataService.getDisplayEntry(hearingLocation);
+        }
+        return null;
     }
 }

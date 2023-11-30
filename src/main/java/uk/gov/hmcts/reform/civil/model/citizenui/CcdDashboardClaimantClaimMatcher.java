@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -13,12 +11,14 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
 @AllArgsConstructor
-public class CcdDashboardClaimMatcher implements Claim {
+public class CcdDashboardClaimantClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
     private CaseData caseData;
@@ -148,23 +148,6 @@ public class CcdDashboardClaimMatcher implements Claim {
         return false;
     }
 
-    public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentSignedSettlementAgreement();
-    }
-
-    public boolean hasDefendantRejectedSettlementAgreement() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentRespondedToSettlementAgreement()
-                && !caseData.isRespondentSignedSettlementAgreement();
-    }
-
-    public boolean hasClaimantSignedSettlementAgreement() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && !caseData.isSettlementAgreementDeadlineExpired();
-    }
-
-    public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isSettlementAgreementDeadlineExpired();
-    }
-
     @Override
     public boolean hasClaimantAcceptedPartialAdmissionAmount() {
         return hasDefendantStatedTheyPaid() && caseData.isResponseAcceptedByClaimant();
@@ -264,8 +247,9 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isCourtReviewing() {
         return (!hasSdoBeenDrawn()
-            && caseData.isRespondentResponseFullDefence()
-            && caseData.getCcdState().equals(CaseState.JUDICIAL_REFERRAL))
+            && (caseData.isRespondentResponseFullDefence()
+            || caseData.isPartAdmitClaimSpec())
+            && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState()))
             || (caseData.hasApplicantRejectedRepaymentPlan());
     }
 
@@ -295,7 +279,7 @@ public class CcdDashboardClaimMatcher implements Claim {
     @Override
     public boolean isPartialAdmissionRejected() {
         return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
-            && caseData.isPartAdmitClaimSpec();
+            && caseData.isPartAdmitClaimSpec() && YesOrNo.NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec());
     }
 
     @Override
@@ -310,5 +294,4 @@ public class CcdDashboardClaimMatcher implements Claim {
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
     }
-
 }

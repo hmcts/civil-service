@@ -190,6 +190,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfClaim;
     private final ClaimValue claimValue;
     private final Fee claimFee;
+    private final String serviceRequestReference;
     private final String paymentReference;
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimType claimType;
@@ -637,6 +638,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final TransferCaseDetails transferCaseDetails;
 
+    //SDO-R2
+    private YesOrNo isFlightDelayClaim;
+    private FlightDelayDetails flightDelayDetails;
+
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
@@ -667,6 +672,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isRespondent1LiP() {
         return YesOrNo.NO == getRespondent1Represented();
+    }
+
+    @JsonIgnore
+    public boolean isApplicantLiP() {
+        return YesOrNo.NO == getApplicant1Represented();
     }
 
     public YesOrNo getRespondent2Represented() {
@@ -823,6 +833,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean hasApplicantProceededWithClaim() {
         return YES == getApplicant1ProceedWithClaim()
             || YES == getApplicant1ProceedWithClaimSpec2v1();
+    }
+
+    @JsonIgnore
+    public boolean hasApplicantNotProceededWithClaim() {
+        return Objects.nonNull(getApplicant1ProceedWithClaim()) && NO == getApplicant1ProceedWithClaim();
     }
 
     @JsonIgnore
@@ -1060,6 +1075,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isHelpWithFees() {
+        return getCaseDataLiP() != null && getCaseDataLiP().getHelpWithFees() != null
+            && YES.equals(getCaseDataLiP().getHelpWithFees().getHelpWithFee());
+    }
+
+    @JsonIgnore
     public Address getRespondent1CorrespondenceAddress() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getRespondent1LiPResponse)
@@ -1120,6 +1141,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isSettlementAgreementDeadlineExpired() {
         return nonNull(respondent1RespondToSettlementAgreementDeadline)
-                && LocalDateTime.now().isAfter(respondent1RespondToSettlementAgreementDeadline);
+            && LocalDateTime.now().isAfter(respondent1RespondToSettlementAgreementDeadline);
+    }
+
+    @JsonIgnore
+    public boolean isRespondentSignSettlementAgreement() {
+        return getCaseDataLiP() != null && getCaseDataLiP().getRespondentSignSettlementAgreement() != null;
     }
 }

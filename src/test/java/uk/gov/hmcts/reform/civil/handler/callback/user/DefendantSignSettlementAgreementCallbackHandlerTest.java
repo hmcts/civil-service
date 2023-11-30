@@ -40,10 +40,10 @@ public class DefendantSignSettlementAgreementCallbackHandlerTest extends BaseCal
         @Test
         void shouldReturnNoError_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
-                    .caseDataLip(CaseDataLiP.builder()
-                            .respondentSignSettlementAgreement(YesOrNo.NO)
-                            .build())
-                    .build();
+                .caseDataLip(CaseDataLiP.builder()
+                                 .respondentSignSettlementAgreement(YesOrNo.NO)
+                                 .build())
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -67,13 +67,13 @@ public class DefendantSignSettlementAgreementCallbackHandlerTest extends BaseCal
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData())
-                    .extracting("businessProcess")
-                    .extracting("camundaEvent")
-                    .isEqualTo(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT.name());
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT.name());
             assertThat(response.getData())
-                    .extracting("businessProcess")
-                    .extracting("status")
-                    .isEqualTo("READY");
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
         }
     }
 

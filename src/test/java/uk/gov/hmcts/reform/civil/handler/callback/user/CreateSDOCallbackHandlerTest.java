@@ -1778,7 +1778,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidEventNegativeNumberOfWitness {
-        private static final String PAGE_ID = "validateInputValue";
+        private static final String PAGE_ID = "generate-sdo-order";
 
         @Test
         void shouldThrowErrorWhenEnteringNegativeNumberOfWitnessSmallClaim() {
@@ -1790,7 +1790,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
@@ -1806,7 +1806,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors().get(0)).isEqualTo("The number entered cannot be less than zero");
@@ -1822,11 +1822,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isNull();
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -1839,11 +1839,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response).isNotNull();
-            assertThat(response.getErrors()).isNull();
+            assertThat(response.getErrors()).isEmpty();
 
         }
     }
