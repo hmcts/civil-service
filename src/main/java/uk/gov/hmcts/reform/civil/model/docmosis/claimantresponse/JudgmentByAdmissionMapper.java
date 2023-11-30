@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
@@ -55,16 +57,17 @@ public class JudgmentByAdmissionMapper {
 
         JudgmentByAdmission.JudgmentByAdmissionBuilder builder = new JudgmentByAdmission.JudgmentByAdmissionBuilder();
         return builder
-            .formHeader("Judgment by admission")
+            .formHeader(getFormHeader(caseData))
+            .formName(getFormName(caseData))
             .claimant(claimant)
             .defendant(defendant)
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .totalClaimAmount(totalClaimAmount)
             .totalInterestAmount(totalInterest)
-            .paymentType(getPaymentType(caseData))
-            .paymentTypeDisplayValue(getPaymentType(caseData).getDisplayedValue())
-            .payBy(setPayByDate(caseData))
-            .repaymentPlan(addRepaymentPlan(caseData, builder))
+            //.paymentType(getPaymentType(caseData))
+            //.paymentTypeDisplayValue(getPaymentType(caseData).getDisplayedValue())
+            //.payBy(setPayByDate(caseData))
+            //.repaymentPlan(getRepaymentPlan(caseData))
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).toString())
             .ccjInterestToDate(totalInterest)
             .claimFee(judgementService.ccjJudgmentClaimFee(caseData).toString())
@@ -109,16 +112,33 @@ public class JudgmentByAdmissionMapper {
         return partyDetails.map(AdditionalLipPartyDetails::getContactPerson).orElse(null);
     }
 
-    private static RepaymentPlanTemplateData addRepaymentPlan(CaseData caseData, JudgmentByAdmission.JudgmentByAdmissionBuilder builder) {
+    private static RepaymentPlanTemplateData getRepaymentPlan(CaseData caseData) {
         RepaymentPlanLRspec repaymentPlan = caseData.getRespondent1RepaymentPlan();
         if (repaymentPlan != null) {
-            builder.repaymentPlan(RepaymentPlanTemplateData.builder()
+            return RepaymentPlanTemplateData.builder()
                                       .paymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay())
                                       .firstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
                                       .paymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount()))
-                                      .build());
+                                      .build();
         }
         return null;
     }
 
+    private String getFormHeader(CaseData caseData) {
+        String formHeader = "Judgment by %s";
+        String formType;
+        if (YesOrNo.YES.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec())
+            || YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())) {
+            formType = "admission";
+        } else {
+            formType = "determination";
+        }
+        return String.format(formHeader, formType);
+    }
+
+    private String getFormName(CaseData caseData) {
+        return RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
+            ? "OCON225"
+            : "OCON225a";
+    }
 }

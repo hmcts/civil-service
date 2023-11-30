@@ -19,7 +19,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGM
 @Service
 @Getter
 @RequiredArgsConstructor
-public class RequestJudgmentByAdmissionResponseDocGenerator implements TemplateDataGenerator<JudgmentByAdmission> {
+public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator implements TemplateDataGenerator<JudgmentByAdmission> {
 
     private final JudgmentByAdmissionMapper judgmentByAdmissionMapper;
     private final DocumentManagementService documentManagementService;
