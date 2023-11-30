@@ -219,10 +219,12 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             }
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        //determine claim path, and assign to CCD object for show hide functionality
+        //Evidence upload will have different screen for Fast claims and Small claims.
+        // We use show hide in CCD to do this, using utility field caseProgAllocatedTrack to hold the value of the claim track
+        // for either spec claims (ResponseClaimTrack) or unspec claims (AllocatedTrack)
         if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
             caseDataBuilder.caseProgAllocatedTrack(caseData.getAllocatedTrack().name());
-        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)){
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
             caseDataBuilder.caseProgAllocatedTrack(caseData.getResponseClaimTrack());
         }
         caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));

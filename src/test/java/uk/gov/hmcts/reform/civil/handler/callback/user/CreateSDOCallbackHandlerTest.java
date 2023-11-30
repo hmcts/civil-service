@@ -37,8 +37,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.model.finalorders.DatesFinalOrders;
-import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
