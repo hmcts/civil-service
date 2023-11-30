@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 import uk.gov.hmcts.reform.idam.client.models.AuthenticateUserResponse;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 
 @Service
@@ -14,7 +16,7 @@ public class CUIIdamClientService {
 
     private final IdamApi idamApi;
     private static String clientId = "cmc_citizen";
-    final static String redirectUri = "https://moneyclaims.aat.platform.hmcts.net/receiver";
+    String redirectUrl = "https://moneyclaims.aat.platform.hmcts.net/receiver";
 
     @Autowired
     public CUIIdamClientService(IdamApi idamApi) {
@@ -23,8 +25,9 @@ public class CUIIdamClientService {
 
     public int authenticatePinUser(String pin, String state)
         throws UnsupportedEncodingException {
+        final String encodedRedirectUrl = URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8);
 
-        final Response response = idamApi.authenticatePinUser(pin, clientId, redirectUri, state);
+        final Response response = idamApi.authenticatePinUser(pin, clientId, encodedRedirectUrl, state);
         return response.status();
     }
 }
