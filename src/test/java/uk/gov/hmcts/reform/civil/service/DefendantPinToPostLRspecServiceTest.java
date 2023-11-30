@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.service.pininpost.CUIIdamClientService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 
@@ -30,7 +31,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 @SpringBootTest(classes = {
     DefendantPinToPostLRspecService.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
 })
 class DefendantPinToPostLRspecServiceTest {
 
@@ -38,6 +39,9 @@ class DefendantPinToPostLRspecServiceTest {
 
     @Autowired
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+
+    @MockBean
+    private CUIIdamClientService cuiIdamClientService;
 
     @MockBean
     private CoreCaseDataService coreCaseDataService;
