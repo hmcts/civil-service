@@ -591,7 +591,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         System.out.print(caseData.getApplicant1LitigationFriend() + "\n");
 
         System.out.print("oldCaseData.getApplicant1LitigationFriend()>>>\n");
-        System.out.print(oldCaseData.getApplicant1LitigationFriend() +"\n");
+        System.out.print(oldCaseData.getApplicant1LitigationFriend() + "\n");
 
         if (caseData.getApplicant1LitigationFriend().getFlags() != null) {
             System.out.print("caseData.getApplicant1LitigationFriend().getFlags()>>>\n");
@@ -607,7 +607,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         System.out.print(caseData.getApplicant2LitigationFriend() + "\n");
 
         System.out.print("oldCaseData.getApplicant2LitigationFriend()>>>\n");
-        System.out.print(oldCaseData.getApplicant2LitigationFriend() +"\n");
+        System.out.print(oldCaseData.getApplicant2LitigationFriend() + "\n");
 
         if (caseData.getApplicant2LitigationFriend().getFlags() != null) {
             System.out.print("caseData.getApplicant2LitigationFriend().getFlags()>>>\n");
@@ -623,7 +623,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         System.out.print(caseData.getRespondent1LitigationFriend() + "\n");
 
         System.out.print("oldCaseData.getRespondent1LitigationFriend()>>>\n");
-        System.out.print(oldCaseData.getRespondent1LitigationFriend() +"\n");
+        System.out.print(oldCaseData.getRespondent1LitigationFriend() + "\n");
 
         if (caseData.getRespondent1LitigationFriend().getFlags() != null) {
             System.out.print("caseData.getRespondent1LitigationFriend().getFlags()>>>\n");
@@ -639,7 +639,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         System.out.print(caseData.getRespondent2LitigationFriend() + "\n");
 
         System.out.print("oldCaseData.getRespondent2LitigationFriend()>>>\n");
-        System.out.print(oldCaseData.getRespondent2LitigationFriend() +"\n");
+        System.out.print(oldCaseData.getRespondent2LitigationFriend() + "\n");
 
         if (caseData.getRespondent2LitigationFriend().getFlags() != null) {
             System.out.print("caseData.getRespondent2LitigationFriend().getFlags()>>>\n");
