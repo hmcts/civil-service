@@ -771,37 +771,76 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .build();
         }
 
-        @ParameterizedTest
-        @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
-        void shouldCopyFlagsForRespondents(String partyChosenId) {
+        @Nested
+        class retainFlags {
             Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
             Flags respondent2Flags = Flags.builder().partyName("respondent2name").roleOnCase("respondent2").build();
+            Flags applicant1Flags = Flags.builder().partyName("applicant1name").roleOnCase("applicant1").build();
+            Flags applicant2Flags = Flags.builder().partyName("applicant2name").roleOnCase("applicant2").build();
+
             CaseData caseDataBefore = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1(Party.builder().flags(applicant1Flags).build())
+                .applicant2(Party.builder().flags(applicant2Flags).build())
                 .respondent1(Party.builder().flags(respondent1Flags).build())
                 .respondent2(Party.builder().flags(respondent2Flags).build())
-                .buildClaimIssuedPaymentCaseData();
-            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateApplicantRespondToDefenceAndProceed()
-                .multiPartyClaimTwoDefendantSolicitors()
-                .updateDetailsForm(UpdateDetailsForm.builder()
-                                       .partyChosen(DynamicList.builder()
-                                                        .value(DynamicListElement.builder()
-                                                                   .code(partyChosenId)
-                                                                   .build())
-                                                        .build())
-                                       .partyChosenId(partyChosenId)
-                                       .build())
                 .build();
 
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            @BeforeEach
+            void setup() {
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
+            }
 
-            CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
-            assertThat(responseCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
+            @ParameterizedTest
+            @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
+            void shouldCopyFlagsForApplicants(String partyChosenId) {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .multiPartyClaimTwoApplicants()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .partyChosenId(partyChosenId)
+                                           .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(responseCaseData.getApplicant1().getFlags()).isEqualTo(applicant1Flags);
+                assertThat(responseCaseData.getApplicant2().getFlags()).isEqualTo(applicant2Flags);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
+            void shouldCopyFlagsForRespondents(String partyChosenId) {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .partyChosenId(partyChosenId)
+                                           .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+                assertThat(responseCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
+            }
         }
 
         @Test
@@ -1273,6 +1312,17 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
     class MidShowPartyField {
         private static final String PAGE_ID = "show-party-field";
 
+        @BeforeEach
+        void setup() {
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+        }
+
         @Test
         void shouldPopulatePartyChosenId() {
             CaseData caseData = CaseDataBuilder.builder()
@@ -1298,13 +1348,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
         void shouldPopulatePartyType(String partyChosenId) {
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            CaseData caseDataBefore = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(INDIVIDUAL).build())
-                .applicant2(Party.builder().type(INDIVIDUAL).build())
-                .respondent1(Party.builder().type(INDIVIDUAL).build())
-                .respondent2(Party.builder().type(INDIVIDUAL).build())
-                .buildClaimIssuedPaymentCaseData();
-            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
@@ -1329,13 +1372,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @ValueSource(strings = {CLAIMANT_ONE_LITIGATION_FRIEND_ID, CLAIMANT_TWO_LITIGATION_FRIEND_ID, DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
         void shouldPopulatePartyTypeForLitigationFriend(String partyChosenId) {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            CaseData caseDataBefore = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(INDIVIDUAL).build())
-                .applicant2(Party.builder().type(INDIVIDUAL).build())
-                .respondent1(Party.builder().type(INDIVIDUAL).build())
-                .respondent2(Party.builder().type(INDIVIDUAL).build())
-                .buildClaimIssuedPaymentCaseData();
-            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()

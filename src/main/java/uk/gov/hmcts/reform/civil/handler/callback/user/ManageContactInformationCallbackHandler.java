@@ -407,14 +407,9 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         updateExperts(partyChosenId, caseData, builder);
         updateWitnesses(partyChosenId, caseData, builder);
 
-        // persist flags for claimants
-        if (CLAIMANT_ONE_ID.equals(partyChosenId) || CLAIMANT_TWO_ID.equals(partyChosenId)) {
-            getFlagsForClaimants(callbackParams, caseData, builder);
-        }
-
-        // persist flags for respondents
-        if (DEFENDANT_ONE_ID.equals(partyChosenId) || DEFENDANT_TWO_ID.equals(partyChosenId)) {
-            getFlagsForRespondents(callbackParams, caseData, builder);
+        // persist party flags (ccd issue)
+        if (isParty(partyChosenId)) {
+            getFlagsForParty(callbackParams, caseData, builder);
         }
 
         if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
@@ -553,8 +548,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         }
     }
 
-    private void getFlagsForRespondents(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        // Party fields are empty in this mid event, this is a workaround
+    private void getFlagsForParty(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
         // persist respondent flags (ccd issue)
@@ -563,6 +557,13 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .build();
 
         builder.respondent1(updatedRespondent1);
+
+        // persist applicant flags (ccd issue)
+        var updatedApplicant1 = caseData.getApplicant1().toBuilder()
+            .flags(oldCaseData.getApplicant1().getFlags())
+            .build();
+
+        builder.applicant1(updatedApplicant1);
 
         // if present, persist the 2nd respondent flags in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
@@ -573,31 +574,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
             builder.respondent2(updatedRespondent2);
         }
-    }
-
-    private void getFlagsForClaimants(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        // Party fields are empty in this mid event, this is a workaround
-        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-
-        System.out.print("caseData.getApplicant1().getFlags()>>>\n");
-        System.out.print(caseData.getApplicant1().getFlags() + "\n");
-        System.out.print("oldCaseData.getApplicant1().getFlags()>>>\n");
-        System.out.print(oldCaseData.getApplicant1().getFlags() + "\n");
-
-        if (ofNullable(caseData.getApplicant2()).isPresent()
-            && ofNullable(oldCaseData.getApplicant2()).isPresent()) {
-            System.out.print("caseData.getApplicant2().getFlags()>>>\n");
-            System.out.print(caseData.getApplicant2().getFlags() + "\n");
-            System.out.print("oldCaseData.getApplicant2().getFlags()>>>\n");
-            System.out.print(oldCaseData.getApplicant2().getFlags() + "\n");
-        }
-
-        // persist applicant flags (ccd issue)
-        var updatedApplicant1 = caseData.getApplicant1().toBuilder()
-            .flags(oldCaseData.getApplicant1().getFlags())
-            .build();
-
-        builder.applicant1(updatedApplicant1);
 
         // if present, persist the 2nd applicant flags in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getApplicant2()).isPresent()
