@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CLAIM
 @Getter
 @RequiredArgsConstructor
 public class ClaimantLipManualDeterminationFormGenerator implements TemplateDataGenerator<ClaimantLipManualDeterminationForm> {
+    
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
 
