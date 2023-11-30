@@ -568,8 +568,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         if (toggleService.isSdoR2Enabled() && callbackParams.getCaseData().getIsFlightDelayClaim() != null && callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
             FlightDelayDetails flightDelayDetails = callbackParams.getCaseData().getFlightDelayDetails();
             String selectedAirlineCode = flightDelayDetails.getAirlineList().getValue().getCode();
-
-            dataBuilder.flightDelayDetails(FlightDelayDetails.builder()
+            dataBuilder.claimType(ClaimType.FLIGHT_DELAY)
+                .flightDelayDetails(FlightDelayDetails.builder()
                                         .airlineList(DynamicList.builder().value(flightDelayDetails.getAirlineList().getValue()).build())
                                         .nameOfAirline(flightDelayDetails.getNameOfAirline())
                                         .flightNumber(flightDelayDetails.getFlightNumber())
@@ -577,7 +577,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                         .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, callbackParams))
                                         .build());
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(dataBuilder.build().toMap(objectMapper))
@@ -956,17 +955,12 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         List<String> errors = new ArrayList<>();
         if (toggleService.isSdoR2Enabled()) {
-            caseDataBuilder.isFlightDelayClaim(callbackParams.getCaseData().getIsFlightDelayClaim());
             if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
                 LocalDate today = LocalDate.now();
                 LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
                 if (scheduledDate.isAfter(today)) {
                     errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
-                } else {
-                    caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
                 }
-            } else {
-                caseDataBuilder.claimType(null);
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()

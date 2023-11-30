@@ -1640,30 +1640,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class FlightDelayDetailsMidCallbacks {
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Enabled(Boolean toggleStat) {
-            // Given
-            YesOrNo yesOrNo = toggleStat ? YES : NO;
-            CaseData caseData = CaseData.builder().isFlightDelayClaim(yesOrNo)
-                .build();
-            if (toggleStat) {
-                caseData = CaseData.builder().isFlightDelayClaim(yesOrNo).flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now()).build()).build();
-            }
-            CallbackParams params = callbackParamsOf(caseData, MID, "validateDateAndSetFlightDelayClaimType");
-            // When
-            when(toggleService.isSdoR2Enabled()).thenReturn(true);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getData()).containsEntry("isFlightDelayClaim", toggleStat ? "Yes" : "No");
-            if (toggleStat) {
-                assertThat(response.getData()).containsEntry("claimType", "FLIGHT_DELAY");
-            } else {
-                assertThat(response.getData()).doesNotHaveToString("claimType");
-            }
-        }
 
         @Test
         void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Disabled() {
