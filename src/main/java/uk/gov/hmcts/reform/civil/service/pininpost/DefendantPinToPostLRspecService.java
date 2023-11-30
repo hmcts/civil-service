@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.pininpost;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -12,7 +13,11 @@ import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamApi;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.AuthenticateUserResponse;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,17 +31,29 @@ public class DefendantPinToPostLRspecService {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-
+    private CUIIdamClientService cuiIdamClientService;
     private static final int EXPIRY_PERIOD = 180;
 
     public void validatePin(CaseDetails caseDetails, String pin) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-        DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
-        if (pinInPostData == null || pinInPostData.getAccessCode() == null
-            || !pinInPostData.getAccessCode().equals(pin)
-            || pinInPostData.getExpiryDate().isBefore(LocalDate.now())) {
-            log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
-            throw new PinNotMatchException();
+
+        if (!pin.isEmpty() && pin.length() == 8) {
+            try {
+                int response= cuiIdamClientService.authenticatePinUser(pin, caseData.getLegacyCaseReference());
+                if (response != HttpStatus.FOUND.value()) {
+                    throw new PinNotMatchException();
+                }
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
+            if (pinInPostData == null || pinInPostData.getAccessCode() == null
+                || !pinInPostData.getAccessCode().equals(pin)
+                || pinInPostData.getExpiryDate().isBefore(LocalDate.now())) {
+                log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
+                throw new PinNotMatchException();
+            }
         }
     }
 
