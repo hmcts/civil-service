@@ -34,7 +34,7 @@ public class ClaimantResponseUtilsTest {
 
     @ParameterizedTest
     @CsvSource({"IMMEDIATELY,Immediately", "SET_DATE,By a set date", "REPAYMENT_PLAN,By installments"})
-    void ShouldReturnClaimantRepaymentOption(PaymentType input, String expectedOutput) {
+    void shouldReturnClaimantRepaymentOption(PaymentType input, String expectedOutput) {
         CaseData caseData = CaseData.builder()
                 .applicant1RepaymentOptionForDefendantSpec(input)
                 .build();
