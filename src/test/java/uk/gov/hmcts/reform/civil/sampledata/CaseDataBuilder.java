@@ -505,6 +505,8 @@ public class CaseDataBuilder {
 
     private DynamicList transferCourtLocationList;
     private String reasonForTransfer;
+
+    private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
@@ -5197,6 +5199,10 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder isFlightDelayClaim(YesOrNo isFlightDelayClaim) {
+        this.isFlightDelayClaim = isFlightDelayClaim;
+        return this;
+    }
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -6561,6 +6567,7 @@ public class CaseDataBuilder {
             .respondent1OrgIndividuals(respondent1OrgIndividuals)
             .respondent2OrgIndividuals(respondent2OrgIndividuals)
             .flightDelayDetails(flightDelayDetails)
+            .isFlightDelayClaim(isFlightDelayClaim)
             .build();
     }
 }

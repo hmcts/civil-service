@@ -2199,7 +2199,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedCourtLocation_whenAirlineExists() {
                 // Given
+
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .isFlightDelayClaim(YES)
                     .flightDelay(FlightDelayDetails.builder()
                                      .airlineList(
                                          DynamicList.builder()
