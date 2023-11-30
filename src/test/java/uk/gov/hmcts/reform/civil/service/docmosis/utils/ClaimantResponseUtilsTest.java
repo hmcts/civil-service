@@ -40,7 +40,7 @@ public class ClaimantResponseUtilsTest {
                 .build();
 
         String actualOutput = getClaimantRepaymentType(caseData);
-        Assertions.assertEquals(expectedOutput,actualOutput);
+        Assertions.assertEquals(expectedOutput, actualOutput);
     }
 
     @Test
