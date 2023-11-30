@@ -28,8 +28,6 @@ java:
     MANAGE_CASE_UI_BASE_URL: https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net
     ACA_SERVICE_API_BASEURL: http://aac-manage-case-assignment-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SPRING_SECURITY_ENABLED: true
-    CMC_DB_USERNAME: 'cmc@cmc-db-v11-{{ .Values.global.environment }}'
-    CMC_DB_HOST: cmc-db-v11-{{ .Values.global.environment }}.postgres.database.azure.com
     CMC_DB_CONNECTION_OPTIONS: '?sslmode=require&gssEncMode=disable'
     CMC_DB_NAME: cmc
     CMC_DB_PORT: 5432
@@ -81,27 +79,42 @@ java:
       resourceGroup: civil
       secrets:
         - civil-idam-client-secret
-        - microservicekey-civil-service
-        - system-update-user-username
-        - system-update-user-password
-        - cross-access-user-username
-        - cross-access-user-password
-        - prd-admin-user-username
-        - prd-admin-user-password
-        - appinsights-connection-string
-        - docmosis-api-key
-        - cmc-db-password-v11
+        - name: microservicekey-civil-service
+          alias: IDAM_S2S_AUTH_TOTP_SECRET
+        - name: system-update-user-username
+          alias: CIVIL_SYSTEM_UPDATE_USERNAME
+        - name: system-update-user-password
+          alias: CIVIL_SYSTEM_UPDATE_PASSWORD
+        - name: cross-access-user-username
+          alias: CIVIL_CROSS_ACCESS_USERNAME
+        - name: cross-access-user-password
+          alias: CIVIL_CROSS_ACCESS_PASSWORD
+        - name: prd-admin-user-username
+          alias: CIVIL_PRD_ADMIN_USERNAME
+        - name: prd-admin-user-password
+          alias: CIVIL_PRD_ADMIN_PASSWORD
+        - name: appinsights-connection-string
+          alias: AZURE_APPLICATION_INSIGHTS_INSTRUMENTATION_KEY
+        - name: docmosis-api-key
+          alias: DOCMOSIS_TORNADO_KEY
+        - name: cmc-db-password-v11
+          alias: CMC_DB_PASSWORD
         - gov-notify-api-key
         - sendgrid-api-key
         - robotics-notification-sender
         - robotics-notification-recipient
         - launch-darkly-sdk-key
         - robotics-notification-multipartyrecipient
-        - robotics-notification-recipient-spec
-        - robotics-notification-recipient-lipj
-        - ordnance-survey-api-key
+        - name: robotics-notification-recipient-spec
+          alias: ROBOTICS_NOTIFICATION_SPECRECIPIENT
+        - name: robotics-notification-recipient-lipj
+          alias: ROBOTICS_NOTIFICATION_LIPJRECIPIENT
+        - name: ordnance-survey-api-key
+          alias: OS_POSTCODE_LOOKUP_API_KEY
         - notification-caseworker-spec-receiver
-        - mediation-notification-sender
-        - mediation-notification-recipient
+        - name: mediation-notification-sender
+          alias: MEDIATION_EMAILS_SENDER
+        - name: mediation-notification-recipient
+          alias: MEDIATION_EMAILS_RECIPIENT
         - name: hmc-servicebus-shared-access-key-tf
           alias: HMC_HEARINGS_TOPIC_ACCESS_KEY
