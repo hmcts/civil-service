@@ -352,6 +352,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     CallbackResponse validateValuesParty(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness1,
+                                         List<Element<UploadEvidenceWitness>> uploadEvidenceWitness2,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness3,
                                          List<Element<UploadEvidenceDocumentType>> witnessDocumentReferred,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert1,
@@ -370,37 +371,43 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                  .getWitnessOptionUploadDate(),
                              "Invalid date: \"witness statement\" "
                                  + "date entered must not be in the future (2).");
+
+        checkDateCorrectness(time, errors, uploadEvidenceWitness2, date -> date.getValue()
+                                 .getWitnessOptionUploadDate(),
+                             "Invalid date: \"witness summary\" "
+                                 + "date entered must not be in the future (3).");
+
         checkDateCorrectness(time, errors, uploadEvidenceWitness3, date -> date.getValue()
                                  .getWitnessOptionUploadDate(),
                              "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
-                                 + "date entered must not be in the future (3).");
+                                 + "date entered must not be in the future (4).");
 
         checkDateCorrectness(time, errors, witnessDocumentReferred, date -> date.getValue()
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Documents referred to in the statement\" "
-                                 + "date entered must not be in the future (4).");
+                                 + "date entered must not be in the future (5).");
 
         checkDateCorrectness(time, errors, uploadEvidenceExpert1, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Expert's report\""
-                                 + " date entered must not be in the future (5).");
+                                 + " date entered must not be in the future (6).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert2, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Joint statement of experts\" "
-                                 + "date entered must not be in the future (6).");
+                                 + "date entered must not be in the future (7).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert3, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Questions for other party's expert or joint experts\" "
-                                 + "expert statement date entered must not be in the future (7).");
+                                 + "expert statement date entered must not be in the future (8).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert4, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Answers to questions asked by the other party\" "
-                                 + "date entered must not be in the future (8).");
+                                 + "date entered must not be in the future (9).");
 
         checkDateCorrectness(time, errors, trialDocumentEvidence, date -> date.getValue()
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Documentary evidence for trial\" "
-                                 + "date entered must not be in the future (9).");
+                                 + "date entered must not be in the future (10).");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -503,7 +510,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     RESPONDENT_ONE_WITNESS_SUMMARY,
                     RESPONDENT_TWO_WITNESS_SUMMARY:
                 prefix = "Witness Summary of";
-                renameUploadEvidenceWitness(documentUpload, prefix, false);
+                renameUploadEvidenceWitness(documentUpload, prefix, true);
                 break;
             case APPLICANT_WITNESS_HEARSAY,
                     APPLICANT_TWO_WITNESS_HEARSAY,
