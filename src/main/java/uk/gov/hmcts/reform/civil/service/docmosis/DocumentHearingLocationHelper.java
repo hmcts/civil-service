@@ -21,7 +21,7 @@ public class DocumentHearingLocationHelper {
     private final LocationRefDataService locationRefDataService;
 
     public LocationRefData getHearingLocation(String valueFromForm, CaseData caseData, String authorisation) {
-        if (StringUtils.isNotBlank(valueFromForm)) { // false
+        if (StringUtils.isNotBlank(valueFromForm)) {
             Optional<LocationRefData> fromForm = locationRefDataService.getLocationMatchingLabel(
                 valueFromForm,
                 authorisation
