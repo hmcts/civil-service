@@ -5203,6 +5203,7 @@ public class CaseDataBuilder {
         this.isFlightDelayClaim = isFlightDelayClaim;
         return this;
     }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
