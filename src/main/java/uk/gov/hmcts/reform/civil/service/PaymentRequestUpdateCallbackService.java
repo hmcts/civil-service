@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
+import uk.gov.hmcts.reform.civil.service.citizenui.SendGenericNotificationLipService;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.util.Map;
@@ -36,6 +37,7 @@ public class PaymentRequestUpdateCallbackService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
     private final FeatureToggleService featureToggleService;
+    private final SendGenericNotificationLipService notificationLipService;
     private final ObjectMapper objectMapper;
     private final Time time;
 
@@ -54,6 +56,10 @@ public class PaymentRequestUpdateCallbackService {
             caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
             if (feeType.equals(FeeType.HEARING.name()) || feeType.equals(FeeType.CLAIMISSUED.name())) {
                 createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
+            }
+
+            if (caseData.isLipvLipOneVOne()) {
+                notificationLipService.sendGenericNotificationLip(caseData);
             }
 
         } else {
