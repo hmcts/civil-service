@@ -757,11 +757,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             : callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        System.out.println("track claim is   " + caseData.getClaimsTrack());
-        System.out.println("small track claim is " + SdoHelper.isSmallClaimsTrack(caseData));
-        System.out.println("fast track claim is " + SdoHelper.isFastTrack(caseData));
-
-
         List<String> errors = new ArrayList<>();
         if (nonNull(caseData.getSmallClaimsWitnessStatement())) {
             String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
@@ -888,11 +883,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
             caseData.getSmallClaimsMethodInPerson()));
 
-        System.out.println("track claim is   " + caseData.getClaimsTrack());
-
         setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
-
-        System.out.println("before about to submit");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
@@ -902,25 +893,23 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     // During SDO the claim track can change based on judges selection. In this case we want to update claims track
     // to this decision, or maintain it, if it was not changed.
     private void setClaimsTrackBasedOnJudgeSelection(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData) {
-        // unspec claims will use allocatedTrack to hold claims track value
-        System.out.println("case type is " + caseData.getCaseAccessCategory());
-        if (caseData.getCaseAccessCategory().equals(CaseCategory.UNSPEC_CLAIM)) {
-            if (SdoHelper.isSmallClaimsTrack(caseData)) {
-                System.out.println("not small");
-                dataBuilder.allocatedTrack(SMALL_CLAIM);
-            } else if (SdoHelper.isFastTrack(caseData)) {
-                System.out.println("not fast");
-                dataBuilder.allocatedTrack(FAST_CLAIM);
-            }
-            System.out.println("trackkkkk " + caseData.getAllocatedTrack());
-        }
-        // spec claims will use responseClaimTrack to hold claims track value
-        if (caseData.getCaseAccessCategory().equals(CaseCategory.SPEC_CLAIM)) {
-            if (SdoHelper.isSmallClaimsTrack(caseData)) {
-                dataBuilder.responseClaimTrack(SMALL_CLAIM.name());
-            } else if (SdoHelper.isFastTrack(caseData)) {
-                dataBuilder.responseClaimTrack(FAST_CLAIM.name());
-            }
+        CaseCategory caseAccessCategory = caseData.getCaseAccessCategory();
+        switch (caseAccessCategory) {
+            case UNSPEC_CLAIM:// unspec use allocatedTrack to hold claims track value
+                if (SdoHelper.isSmallClaimsTrack(caseData)) {
+                    dataBuilder.allocatedTrack(SMALL_CLAIM);
+                } else if (SdoHelper.isFastTrack(caseData)) {
+                    dataBuilder.allocatedTrack(FAST_CLAIM);
+                }
+                break;
+            case SPEC_CLAIM:// spec claims use responseClaimTrack to hold claims track value
+                if (SdoHelper.isSmallClaimsTrack(caseData)) {
+                    dataBuilder.responseClaimTrack(SMALL_CLAIM.name());
+                } else if (SdoHelper.isFastTrack(caseData)) {
+                    dataBuilder.responseClaimTrack(FAST_CLAIM.name());
+                }
+                break;
+            default: break;
         }
     }
 
