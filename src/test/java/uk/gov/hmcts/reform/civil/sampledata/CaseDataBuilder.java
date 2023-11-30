@@ -187,6 +187,9 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration.MINUTES_12
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 
 public class CaseDataBuilder {
 
@@ -203,7 +206,7 @@ public class CaseDataBuilder {
     public static final BigDecimal FAST_TRACK_CLAIM_AMOUNT = BigDecimal.valueOf(10000);
     public static final LocalDate FUTURE_DATE = LocalDate.now().plusYears(1);
     public static final String CUSTOMER_REFERENCE = "12345";
-
+    public SRPbaDetails srPbaDetails;
     // Create Claim
     protected String caseNameHmctsInternal;
     protected Long ccdCaseReference;
@@ -278,11 +281,9 @@ public class CaseDataBuilder {
     protected ResponseDocument applicant1DefenceResponseDocument;
     protected ResponseDocument applicant2DefenceResponseDocument;
     protected BusinessProcess businessProcess;
-
     //Case proceeds in caseman
     protected ClaimProceedsInCaseman claimProceedsInCaseman;
     protected ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
-
     protected CloseClaim withdrawClaim;
     protected CloseClaim discontinueClaim;
     protected YesOrNo respondent1OrgRegistered;
@@ -293,10 +294,8 @@ public class CaseDataBuilder {
     protected YesOrNo addApplicant2;
     protected YesOrNo addRespondent2;
     protected CaseCategory caseAccessCategory;
-
     protected YesOrNo specRespondent1Represented;
     protected YesOrNo specRespondent2Represented;
-
     protected YesOrNo respondent2SameLegalRepresentative;
     protected LitigationFriend respondent1LitigationFriend;
     protected LitigationFriend respondent2LitigationFriend;
@@ -306,9 +305,7 @@ public class CaseDataBuilder {
     protected BreathingSpaceInfo breathing;
     protected BreathingSpaceEnterInfo enter;
     protected BreathingSpaceLiftInfo lift;
-
     protected List<Element<CaseNote>> caseNotes;
-
     //dates
     protected LocalDateTime submittedDate;
     protected LocalDateTime paymentSuccessfulDate;
@@ -336,14 +333,6 @@ public class CaseDataBuilder {
     protected LocalDateTime claimDismissedDate;
     protected LocalDateTime caseDismissedHearingFeeDueDate;
     protected LocalDate hearingDate;
-    private InterestClaimOptions interestClaimOptions;
-    private YesOrNo claimInterest;
-    private SameRateInterestSelection sameRateInterestSelection;
-    private InterestClaimFromType interestClaimFrom;
-    private InterestClaimUntilType interestClaimUntil;
-    private BigDecimal totalClaimAmount;
-    private LocalDate interestFromSpecificDate;
-    private BigDecimal breakDownInterestTotal;
     protected LocalDateTime respondent1LitigationFriendDate;
     protected LocalDateTime respondent2LitigationFriendDate;
     protected DynamicList defendantSolicitorNotifyClaimOptions;
@@ -351,9 +340,6 @@ public class CaseDataBuilder {
     protected DynamicList selectLitigationFriend;
     protected LocalDateTime respondent1LitigationFriendCreatedDate;
     protected LocalDateTime respondent2LitigationFriendCreatedDate;
-
-    public SRPbaDetails srPbaDetails;
-
     protected SolicitorOrganisationDetails respondentSolicitor1OrganisationDetails;
     protected SolicitorOrganisationDetails respondentSolicitor2OrganisationDetails;
     protected Address applicantSolicitor1ServiceAddress;
@@ -363,6 +349,24 @@ public class CaseDataBuilder {
     protected YesOrNo respondentSolicitor2ServiceAddressRequired;
     protected YesOrNo isRespondent1;
     protected YesOrNo isRespondent2;
+    protected String hearingReference;
+    protected ListingOrRelisting listingOrRelisting;
+    //workaround fields
+    protected Party respondent1Copy;
+    protected Party respondent2Copy;
+    protected PaymentType applicant1RepaymentOptionForDefendantSpec;
+    protected PaymentBySetDate applicant1RequestedPaymentDateForDefendantSpec;
+    protected BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
+    protected PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
+    protected LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
+    private InterestClaimOptions interestClaimOptions;
+    private YesOrNo claimInterest;
+    private SameRateInterestSelection sameRateInterestSelection;
+    private InterestClaimFromType interestClaimFrom;
+    private InterestClaimUntilType interestClaimUntil;
+    private BigDecimal totalClaimAmount;
+    private LocalDate interestFromSpecificDate;
+    private BigDecimal breakDownInterestTotal;
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
@@ -390,7 +394,6 @@ public class CaseDataBuilder {
     private Address specAoSRespondent2HomeAddressDetails;
     private YesOrNo respondent1DQWitnessesRequiredSpec;
     private List<Element<Witness>> respondent1DQWitnessesDetailsSpec;
-
     private String respondent1OrganisationIDCopy;
     private String respondent2OrganisationIDCopy;
     private String caseManagementOrderSelection;
@@ -410,57 +413,44 @@ public class CaseDataBuilder {
     private CaseLocationCivil caseManagementLocation;
     private DisposalHearingOrderMadeWithoutHearingDJ disposalHearingOrderMadeWithoutHearingDJ;
     private DisposalHearingFinalDisposalHearingTimeDJ disposalHearingFinalDisposalHearingTimeDJ;
-
     private YesOrNo generalAppVaryJudgementType;
     private Document generalAppN245FormUpload;
     private GAApplicationType generalAppType;
     private GAHearingDateGAspec generalAppHearingDate;
-
     private ChangeOfRepresentation changeOfRepresentation;
     private ChangeOrganisationRequest changeOrganisationRequest;
-
     private String unassignedCaseListDisplayOrganisationReferences;
     private String caseListDisplayDefendantSolicitorReferences;
     private  CertificateOfService cosNotifyClaimDefendant1;
     private  CertificateOfService cosNotifyClaimDefendant2;
     private CertificateOfService cosNotifyClaimDetails1;
     private CertificateOfService cosNotifyClaimDetails2;
-
     private FastTrackHearingTime fastTrackHearingTime;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
     private FastTrackOrderWithoutJudgement fastTrackOrderWithoutJudgement;
-
     private DisposalOrderWithoutHearing disposalOrderWithoutHearing;
     private DisposalHearingHearingTime disposalHearingHearingTime;
-
     private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
-
     private BigDecimal totalInterest;
     private YesOrNo applicant1AcceptAdmitAmountPaidSpec;
-
     private YesOrNo applicant1AcceptPartAdmitPaymentPlanSpec;
-
     private BigDecimal respondToAdmittedClaimOwingAmountPounds;
     //Trial Readiness
     private HearingDuration hearingDuration;
     private YesOrNo trialReadyApplicant;
     private YesOrNo trialReadyRespondent1;
     private YesOrNo trialReadyRespondent2;
-
     private RevisedHearingRequirements applicantRevisedHearingRequirements;
     private RevisedHearingRequirements respondent1RevisedHearingRequirements;
     private RevisedHearingRequirements respondent2RevisedHearingRequirements;
-
     private YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
     private YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
-
     private CCJPaymentDetails ccjPaymentDetails;
     private DisposalHearingMethod disposalHearingMethod;
     private DynamicList hearingMethodValuesDisposalHearing;
     private DynamicList hearingMethodValuesFastTrack;
     private DynamicList hearingMethodValuesSmallClaims;
-
     private List<Element<PartyFlagStructure>> applicantExperts;
     private List<Element<PartyFlagStructure>> applicantWitnesses;
     private List<Element<PartyFlagStructure>> respondent1Experts;
@@ -478,34 +468,27 @@ public class CaseDataBuilder {
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
     private FastTrackWitnessOfFact fastTrackWitnessOfFact;
     private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
-
     private HearingSupportRequirementsDJ hearingSupportRequirementsDJ;
     private List<Element<CaseDocument>> defaultJudgmentDocuments = new ArrayList<>();
     private IdamUserDetails claimantUserDetails;
-
     private UpdateDetailsForm updateDetailsForm;
-
     private TocTransferCaseReason tocTransferCaseReason;
-
     private NotSuitableSdoOptions notSuitableSdoOptions;
-
     private List<Element<PartyFlagStructure>> applicant1LRIndividuals;
     private List<Element<PartyFlagStructure>> respondent1LRIndividuals;
     private List<Element<PartyFlagStructure>> respondent2LRIndividuals;
-
     private List<Element<PartyFlagStructure>> applicant1OrgIndividuals;
     private List<Element<PartyFlagStructure>> applicant2OrgIndividuals;
     private List<Element<PartyFlagStructure>> respondent1OrgIndividuals;
     private List<Element<PartyFlagStructure>> respondent2OrgIndividuals;
-
-    protected String hearingReference;
-    protected ListingOrRelisting listingOrRelisting;
-
     private YesOrNo drawDirectionsOrderRequired;
-
     private DynamicList transferCourtLocationList;
     private String reasonForTransfer;
     private FlightDelayDetails flightDelayDetails;
+
+    public static CaseDataBuilder builder() {
+        return new CaseDataBuilder();
+    }
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -566,10 +549,6 @@ public class CaseDataBuilder {
         this.claimInterest = claimInterest;
         return this;
     }
-
-    //workaround fields
-    protected Party respondent1Copy;
-    protected Party respondent2Copy;
 
     public CaseDataBuilder respondent1ResponseDeadline(LocalDateTime deadline) {
         this.respondent1ResponseDeadline = deadline;
@@ -689,11 +668,11 @@ public class CaseDataBuilder {
     public CaseDataBuilder respondent1DQWithFixedRecoverableCosts() {
         respondent1DQ = respondent1DQ.toBuilder()
             .respondent1DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
-                                                   .isSubjectToFixedRecoverableCostRegime(YES)
-                                                   .band(BAND_1)
-                                                   .complexityBandingAgreed(YES)
-                                                   .reasons("Good reason")
-                                                   .build()).build();
+                                                    .isSubjectToFixedRecoverableCostRegime(YES)
+                                                    .band(BAND_1)
+                                                    .complexityBandingAgreed(YES)
+                                                    .reasons("Good reason")
+                                                    .build()).build();
         return this;
     }
 
@@ -880,7 +859,7 @@ public class CaseDataBuilder {
             .build();
         this.applicant1DQ = Applicant1DQ.builder()
             .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(YES)
-                                      .unavailableDates(wrapElements(List.of(unavailableDate))).build())
+                                     .unavailableDates(wrapElements(List.of(unavailableDate))).build())
             .build();
         return this;
     }
@@ -1122,14 +1101,14 @@ public class CaseDataBuilder {
             ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
 
         applicant1DQBuilder.applicant1RespondToClaimExperts(ExpertDetails.builder()
-                                                    .expertName("Mr Expert Defendant")
-                                                    .firstName("Expert")
-                                                    .lastName("Defendant")
-                                                    .phoneNumber("07123456789")
-                                                    .emailAddress("test@email.com")
-                                                    .fieldofExpertise("Roofing")
-                                                    .estimatedCost(new BigDecimal(434))
-                                                    .build()).build();
+                                                                .expertName("Mr Expert Defendant")
+                                                                .firstName("Expert")
+                                                                .lastName("Defendant")
+                                                                .phoneNumber("07123456789")
+                                                                .emailAddress("test@email.com")
+                                                                .fieldofExpertise("Roofing")
+                                                                .estimatedCost(new BigDecimal(434))
+                                                                .build()).build();
 
         applicant1DQ = applicant1DQBuilder.build();
         return this;
@@ -2427,11 +2406,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateSdoDisposal() {
         disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-             .input(String.format(
-            "Each party has the right to apply to have this Order set "
-                + "aside or varied. Any such application must be received "
-                + "by the Court (together with the appropriate fee) "
-                + "by 4pm on %s.", LocalDate.parse("2022-01-30")))
+            .input(String.format(
+                "Each party has the right to apply to have this Order set "
+                    + "aside or varied. Any such application must be received "
+                    + "by the Court (together with the appropriate fee) "
+                    + "by 4pm on %s.", LocalDate.parse("2022-01-30")))
             .build();
         disposalHearingHearingTime = DisposalHearingHearingTime.builder()
             .input("This claim will be listed for final disposal before a judge on the first available date after")
@@ -2614,10 +2593,10 @@ public class CaseDataBuilder {
             .build();
         trialOrderMadeWithoutHearingDJ = TrialOrderMadeWithoutHearingDJ.builder()
             .input("This order has been made without a hearing. "
-                    + "Each party has the right to apply to have this Order "
-                    + "set aside or varied. Any such application must be "
-                    + "received by the Court "
-                    + "(together with the appropriate fee) by 4pm on 01 12 2022.")
+                       + "Each party has the right to apply to have this Order "
+                       + "set aside or varied. Any such application must be "
+                       + "received by the Court "
+                       + "(together with the appropriate fee) by 4pm on 01 12 2022.")
             .build();
         return this;
     }
@@ -3718,7 +3697,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState1v2SameSolicitorDivergentResponse(RespondentResponseType respondent1Response,
-                                                       RespondentResponseType respondent2Response) {
+                                                                    RespondentResponseType respondent2Response) {
         atStateClaimDetailsNotified();
         respondent1ClaimResponseType = respondent1Response;
         respondent2Responds(respondent2Response);
@@ -3764,10 +3743,10 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addEnterBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
-                    .type(BreathingSpaceType.STANDARD)
-                    .reference("12345")
-                    .start(LocalDate.now())
-                    .build();
+            .type(BreathingSpaceType.STANDARD)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 
@@ -3776,10 +3755,10 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addEnterMentalHealthBreathingSpace() {
         this.enter = BreathingSpaceEnterInfo.builder()
-                    .type(BreathingSpaceType.MENTAL_HEALTH)
-                    .reference("12345")
-                    .start(LocalDate.now())
-                    .build();
+            .type(BreathingSpaceType.MENTAL_HEALTH)
+            .reference("12345")
+            .start(LocalDate.now())
+            .build();
 
         this.breathing = BreathingSpaceInfo.builder().enter(this.enter).build();
 
@@ -4142,9 +4121,9 @@ public class CaseDataBuilder {
         atStateTrialReadyCheck();
         trialReadyApplicant = YES;
         applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
-                                                                        .revisedHearingRequirements(YES)
-                                                                        .revisedHearingComments("Changes requested.")
-                                                                        .build();
+            .revisedHearingRequirements(YES)
+            .revisedHearingComments("Changes requested.")
+            .build();
 
         return this;
     }
@@ -4164,9 +4143,9 @@ public class CaseDataBuilder {
         atStateTrialReadyCheck();
         trialReadyRespondent1 = YES;
         respondent1RevisedHearingRequirements = RevisedHearingRequirements.builder()
-                                                                            .revisedHearingRequirements(YES)
-                                                                            .revisedHearingComments("Changes requested.")
-                                                                            .build();
+            .revisedHearingRequirements(YES)
+            .revisedHearingComments("Changes requested.")
+            .build();
         return this;
     }
 
@@ -4184,9 +4163,9 @@ public class CaseDataBuilder {
         atStateTrialReadyCheck();
         trialReadyRespondent2 = YES;
         applicantRevisedHearingRequirements = RevisedHearingRequirements.builder()
-                                                                        .revisedHearingRequirements(YES)
-                                                                        .revisedHearingComments("Changes requested.")
-                                                                        .build();
+            .revisedHearingRequirements(YES)
+            .revisedHearingComments("Changes requested.")
+            .build();
         return this;
     }
 
@@ -4209,7 +4188,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atState1v2SameSolicitorDivergentResponseSpec(RespondentResponseTypeSpec respondent1Response,
-                                                                       RespondentResponseTypeSpec respondent2Response) {
+                                                                        RespondentResponseTypeSpec respondent2Response) {
         atStateNotificationAcknowledged();
         respondent1ClaimResponseTypeForSpec = respondent1Response;
         respondent2RespondsSpec(respondent2Response);
@@ -4592,7 +4571,7 @@ public class CaseDataBuilder {
 
         tocTransferCaseReason = TocTransferCaseReason.builder()
             .reasonForCaseTransferJudgeTxt("This is more than 150 111111111111111111111111111111111111111111111111111111111111111111111111111"
-                       + "111111111111111111111111111111111111111111111111111111")
+                                               + "111111111111111111111111111111111111111111111111111111")
             .build();
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
@@ -4758,10 +4737,10 @@ public class CaseDataBuilder {
         atStateApplicantProceedAllMediation(mpScenario);
         applicantsProceedIntention = YES;
         caseDataLiP = CaseDataLiP.builder()
-                                      .applicant1ClaimMediationSpecRequiredLip(
-                                          ClaimantMediationLip.builder()
-                                              .hasAgreedFreeMediation(MediationDecision.Yes)
-                                              .build()).build();
+            .applicant1ClaimMediationSpecRequiredLip(
+                ClaimantMediationLip.builder()
+                    .hasAgreedFreeMediation(MediationDecision.Yes)
+                    .build()).build();
 
         mediation = Mediation.builder().unsuccessfulMediationReason("Unsuccessful").build();
 
@@ -5410,10 +5389,10 @@ public class CaseDataBuilder {
             .ccdState(PENDING_CASE_ISSUED)
             .claimFee(
                 Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                    .code("FE203")
+                    .calculatedAmountInPence(BigDecimal.valueOf(27500))
+                    .version("1")
+                    .build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .applicant1(Party.builder()
                             .individualFirstName("First name")
@@ -5569,15 +5548,15 @@ public class CaseDataBuilder {
                                                       LocalDate cos1Date, LocalDate cos2Date,
                                                       boolean file1, boolean file2) {
         List<Element<Document>> files = wrapElements(Document.builder()
-                .documentUrl("fake-url")
-                .documentFileName("file-name")
-                .documentBinaryUrl("binary-url")
-                .build());
+                                                         .documentUrl("fake-url")
+                                                         .documentFileName("file-name")
+                                                         .documentBinaryUrl("binary-url")
+                                                         .build());
         List<Element<Document>> files2 = wrapElements(Document.builder()
-                .documentUrl("fake-url2")
-                .documentFileName("file-name2")
-                .documentBinaryUrl("binary-url2")
-                .build());
+                                                          .documentUrl("fake-url2")
+                                                          .documentFileName("file-name2")
+                                                          .documentBinaryUrl("binary-url2")
+                                                          .build());
         ArrayList<String> cosUIStatement = new ArrayList<>();
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
@@ -5656,10 +5635,10 @@ public class CaseDataBuilder {
                                        .build())
             .build();
         this.applicantExperts = wrapElements(PartyFlagStructure.builder()
-                                                   .partyID("app-1-expert-party-id")
-                                                   .firstName("Applicant")
-                                                   .lastName("Expert")
-                                                   .build());
+                                                 .partyID("app-1-expert-party-id")
+                                                 .firstName("Applicant")
+                                                 .lastName("Expert")
+                                                 .build());
         this.applicantWitnesses = wrapElements(PartyFlagStructure.builder()
                                                    .partyID("app-1-witness-party-id")
                                                    .firstName("Applicant")
@@ -5725,14 +5704,14 @@ public class CaseDataBuilder {
             .build();
         this.respondent1Experts = wrapElements(PartyFlagStructure.builder()
                                                    .partyID("res-1-expert-party-id")
-                                                 .firstName("Respondent")
-                                                 .lastName("Expert")
-                                                 .build());
+                                                   .firstName("Respondent")
+                                                   .lastName("Expert")
+                                                   .build());
         this.respondent1Witnesses = wrapElements(PartyFlagStructure.builder()
                                                      .partyID("res-1-witness-party-id")
-                                                   .firstName("Respondent")
-                                                   .lastName("Witness")
-                                                   .build());
+                                                     .firstName("Respondent")
+                                                     .lastName("Witness")
+                                                     .build());
         return this;
     }
 
@@ -6037,6 +6016,31 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder applicant1RepaymentOptionForDefendantSpec(PaymentType repaymentOption) {
+        this.applicant1RepaymentOptionForDefendantSpec = repaymentOption;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate repaymentBySetDate) {
+        this.applicant1RequestedPaymentDateForDefendantSpec = repaymentBySetDate;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal suggestedInstallmentPayment) {
+        this.applicant1SuggestInstalmentsPaymentAmountForDefendantSpec = suggestedInstallmentPayment;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec repaymentFrequency) {
+        this.applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec = repaymentFrequency;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate firstRepaymentDate) {
+        this.applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec = firstRepaymentDate;
+        return this;
+    }
+
     public CaseDataBuilder defendantSingleResponseToBothClaimants(YesOrNo response) {
         this.defendantSingleResponseToBothClaimants = response;
         return this;
@@ -6265,10 +6269,6 @@ public class CaseDataBuilder {
             this.respondent2OrgIndividuals = individual;
         }
         return this;
-    }
-
-    public static CaseDataBuilder builder() {
-        return new CaseDataBuilder();
     }
 
     public CaseData build() {
@@ -6507,9 +6507,9 @@ public class CaseDataBuilder {
             .disposalHearingFinalDisposalHearingTimeDJ(disposalHearingFinalDisposalHearingTimeDJ)
             .trialHearingTimeDJ(trialHearingTimeDJ)
             .trialOrderMadeWithoutHearingDJ(trialOrderMadeWithoutHearingDJ)
-                //Certificate of Service
-                .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
-                .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
+            //Certificate of Service
+            .cosNotifyClaimDetails1(cosNotifyClaimDetails1)
+            .cosNotifyClaimDetails2(cosNotifyClaimDetails2)
             .ccjPaymentDetails(ccjPaymentDetails)
             .totalInterest(totalInterest)
             .applicant1AcceptAdmitAmountPaidSpec(applicant1AcceptAdmitAmountPaidSpec)
@@ -6528,6 +6528,11 @@ public class CaseDataBuilder {
             .respondentSolicitor2ServiceAddressRequired(respondentSolicitor2ServiceAddressRequired)
             .applicant1PartAdmitIntentionToSettleClaimSpec(applicant1PartAdmitIntentionToSettleClaimSpec)
             .applicant1PartAdmitConfirmAmountPaidSpec(applicant1PartAdmitConfirmAmountPaidSpec)
+            .applicant1RepaymentOptionForDefendantSpec(applicant1RepaymentOptionForDefendantSpec)
+            .applicant1RequestedPaymentDateForDefendantSpec(applicant1RequestedPaymentDateForDefendantSpec)
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(applicant1SuggestInstalmentsPaymentAmountForDefendantSpec)
+            .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec)
+            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec)
             .applicant1Represented(applicant1Represented)
             .caseDataLiP(caseDataLiP)
             .claimant2ResponseFlag(claimant2ResponseFlag)

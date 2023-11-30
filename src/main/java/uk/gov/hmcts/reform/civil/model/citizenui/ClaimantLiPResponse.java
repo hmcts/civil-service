@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class ClaimantLiPResponse {
     private HearingSupportLip applicant1DQHearingSupportLip;
     private YesOrNo applicant1SignedSettlementAgreement;
     private ChooseHowToProceed applicant1ChoosesHowToProceed;
+    private String applicant1RejectedRepaymentReason;
 
     @JsonIgnore
     public boolean hasApplicant1SignedSettlementAgreement() {

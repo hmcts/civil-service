@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.utils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
@@ -11,9 +9,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 
@@ -31,10 +27,10 @@ public class ClaimantResponseUtils {
             return "No payment type selected";
         }
 
-        if(claimantRepaymentOption == PaymentType.REPAYMENT_PLAN) {
+        if (claimantRepaymentOption == PaymentType.REPAYMENT_PLAN) {
             return "By installments";
         } else {
-           return claimantRepaymentOption.getDisplayedValue();
+            return claimantRepaymentOption.getDisplayedValue();
         }
 
     }
@@ -45,7 +41,7 @@ public class ClaimantResponseUtils {
             return "No payment type selected";
         }
 
-        if(defendantRepaymentOption == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
+        if (defendantRepaymentOption == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
             return "By installments";
         } else {
             return defendantRepaymentOption.getDisplayedValue();
@@ -63,7 +59,7 @@ public class ClaimantResponseUtils {
             return null;
         }
 
-        long numberOfInstallmentsAfterFirst = getNumberOfInstallmentsAfterFirst(claimantTotalAmount,paymentAmount);
+        long numberOfInstallmentsAfterFirst = getNumberOfInstallmentsAfterFirst(claimantTotalAmount, paymentAmount);
 
         return switch (repaymentFrequency) {
             case ONCE_ONE_WEEK -> firstRepaymentDate.plusWeeks(numberOfInstallmentsAfterFirst);
@@ -75,7 +71,7 @@ public class ClaimantResponseUtils {
 
     public static LocalDate getDefendantFinalRepaymentDate(CaseData caseData) {
         RepaymentPlanLRspec repaymentPlanLRspec = caseData.getRespondent1RepaymentPlan();
-        if(isNull(repaymentPlanLRspec)) {
+        if (isNull(repaymentPlanLRspec)) {
             return null;
         }
 
@@ -89,8 +85,8 @@ public class ClaimantResponseUtils {
             return null;
         }
 
-        BigDecimal defendantAdmittedAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
-        long numberOfInstallmentsAfterFirst = getNumberOfInstallmentsAfterFirst(defendantAdmittedAmount,paymentAmount);
+        BigDecimal defendantAdmittedAmount = getDefendantAdmittedAmount(caseData);
+        long numberOfInstallmentsAfterFirst = getNumberOfInstallmentsAfterFirst(defendantAdmittedAmount, paymentAmount);
         return switch (repaymentFrequency) {
             case ONCE_ONE_WEEK -> firstRepaymentDate.plusWeeks(numberOfInstallmentsAfterFirst);
             case ONCE_TWO_WEEKS -> firstRepaymentDate.plusWeeks(2 * numberOfInstallmentsAfterFirst);
@@ -102,7 +98,11 @@ public class ClaimantResponseUtils {
         return totalAmount.divide(paymentAmount, 0, RoundingMode.CEILING).longValue() - 1;
     }
 
-
-
-
+    private static BigDecimal getDefendantAdmittedAmount(CaseData caseData) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
+           return caseData.getTotalClaimAmount();
+        } else {
+            return caseData.getRespondToAdmittedClaimOwingAmountPounds();
+        }
+    }
 }

@@ -38,8 +38,8 @@ public class CaseDataLiP {
     @JsonProperty("respondentSignSettlementAgreement")
     private YesOrNo respondentSignSettlementAgreement;
 
-    @JsonProperty("courtDecision")
-    private RepaymentDecisionType courtDecision;
+    @JsonProperty("claimantCourtDecision")
+    private RepaymentDecisionType claimantCourtDecision;
 
     @JsonIgnore
     public boolean hasClaimantAgreedToFreeMediation() {

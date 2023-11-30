@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.civil.service.docmosis;
 
 import javax.validation.constraints.NotNull;
 
-public enum
-DocmosisTemplates {
+public enum DocmosisTemplates {
     N1("CV-UNS-CLM-ENG-01126.docx", "sealed_claim_form_%s.pdf"),
     N1_MULTIPARTY_SAME_SOL("CV-UNS-CLM-ENG-01125.docx", "sealed_claim_form_%s.pdf"),
     N2("CV-SPC-CLM-ENG-01349.docx", "sealed_claim_form_spec%s.pdf"),

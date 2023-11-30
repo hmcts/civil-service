@@ -26,21 +26,18 @@ public class InterlocutoryJudgementDocGenerator implements TemplateDataGenerator
     private final DocumentGeneratorService documentGeneratorService;
 
     public CaseDocument generateInterlocutoryJudgementDoc(CaseData caseData, String authorisation) {
-        DocmosisDocument docmosisDocument = null;
-        try {
-     docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-        getTemplateData(caseData),
-        INTERLOCUTORY_JUDGEMENT_DOCUMENT
-    );
-}
-catch (Exception e) {
-    e.printStackTrace();
-}
+
+        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
+            getTemplateData(caseData),
+            INTERLOCUTORY_JUDGEMENT_DOCUMENT
+        );
+
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(String.format(INTERLOCUTORY_JUDGEMENT_DOCUMENT.getDocumentTitle(), caseData.getLegacyCaseReference()),
-                    docmosisDocument.getBytes(),
-                    DocumentType.INTERLOCUTORY_JUDGEMENT
+            new PDF(
+                String.format(INTERLOCUTORY_JUDGEMENT_DOCUMENT.getDocumentTitle(), caseData.getLegacyCaseReference()),
+                docmosisDocument.getBytes(),
+                DocumentType.INTERLOCUTORY_JUDGEMENT
             )
         );
     }
