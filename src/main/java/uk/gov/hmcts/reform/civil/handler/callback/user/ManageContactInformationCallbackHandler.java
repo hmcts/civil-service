@@ -320,8 +320,10 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
         ArrayList<String> warnings = new ArrayList<>();
         List<String> errors = new ArrayList<>();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
-        if (partyHasLitigationFriend(partyChosen, caseData)) {
+        // oldCaseData needed because Litigation friend gets nullified in mid event
+        if (partyHasLitigationFriend(partyChosen, oldCaseData)) {
             warnings.add(CHECK_LITIGATION_FRIEND_ERROR_TITLE);
             warnings.add(CHECK_LITIGATION_FRIEND_ERROR);
         }
@@ -583,6 +585,106 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 .build();
 
             builder.applicant2(updatedApplicant2);
+        }
+
+        System.out.print("caseData.getApplicant1LitigationFriend()>>>\n");
+        System.out.print(caseData.getApplicant1LitigationFriend() + "\n");
+
+        System.out.print("oldCaseData.getApplicant1LitigationFriend()>>>\n");
+        System.out.print(oldCaseData.getApplicant1LitigationFriend()+"\n");
+
+        if (caseData.getApplicant1LitigationFriend().getFlags() != null) {
+            System.out.print("caseData.getApplicant1LitigationFriend().getFlags()>>>\n");
+            System.out.print(caseData.getApplicant1LitigationFriend().getFlags() + "\n");
+        }
+
+        if (oldCaseData.getApplicant1LitigationFriend().getFlags() != null) {
+            System.out.print("oldCaseData.getApplicant1LitigationFriend().getFlags()>>>\n");
+            System.out.print(oldCaseData.getApplicant1LitigationFriend().getFlags() + "\n");
+        }
+
+        System.out.print("caseData.getApplicant2LitigationFriend()>>>\n");
+        System.out.print(caseData.getApplicant2LitigationFriend() + "\n");
+
+        System.out.print("oldCaseData.getApplicant2LitigationFriend()>>>\n");
+        System.out.print(oldCaseData.getApplicant2LitigationFriend()+"\n");
+
+        if (caseData.getApplicant2LitigationFriend().getFlags() != null) {
+            System.out.print("caseData.getApplicant2LitigationFriend().getFlags()>>>\n");
+            System.out.print(caseData.getApplicant2LitigationFriend().getFlags() + "\n");
+        }
+
+        if (oldCaseData.getApplicant2LitigationFriend().getFlags() != null) {
+            System.out.print("oldCaseData.getApplicant2LitigationFriend().getFlags()>>>\n");
+            System.out.print(oldCaseData.getApplicant2LitigationFriend().getFlags() + "\n");
+        }
+
+        System.out.print("caseData.getRespondent1LitigationFriend()>>>\n");
+        System.out.print(caseData.getRespondent1LitigationFriend() + "\n");
+
+        System.out.print("oldCaseData.getRespondent1LitigationFriend()>>>\n");
+        System.out.print(oldCaseData.getRespondent1LitigationFriend()+"\n");
+
+        if (caseData.getRespondent1LitigationFriend().getFlags() != null) {
+            System.out.print("caseData.getRespondent1LitigationFriend().getFlags()>>>\n");
+            System.out.print(caseData.getRespondent1LitigationFriend().getFlags() + "\n");
+        }
+
+        if (oldCaseData.getRespondent1LitigationFriend().getFlags() != null) {
+            System.out.print("oldCaseData.getRespondent1LitigationFriend().getFlags()>>>\n");
+            System.out.print(oldCaseData.getRespondent1LitigationFriend().getFlags() + "\n");
+        }
+
+        System.out.print("caseData.getRespondent2LitigationFriend()>>>\n");
+        System.out.print(caseData.getRespondent2LitigationFriend() + "\n");
+
+        System.out.print("oldCaseData.getRespondent2LitigationFriend()>>>\n");
+        System.out.print(oldCaseData.getRespondent2LitigationFriend()+"\n");
+
+        if (caseData.getRespondent2LitigationFriend().getFlags() != null) {
+            System.out.print("caseData.getRespondent2LitigationFriend().getFlags()>>>\n");
+            System.out.print(caseData.getRespondent2LitigationFriend().getFlags() + "\n");
+        }
+
+        if (oldCaseData.getRespondent2LitigationFriend().getFlags() != null) {
+            System.out.print("oldCaseData.getRespondent2LitigationFriend().getFlags()>>>\n");
+            System.out.print(oldCaseData.getRespondent2LitigationFriend().getFlags() + "\n");
+        }
+
+        // Litigation Friend
+        if (ofNullable(oldCaseData.getApplicant1LitigationFriend()).isPresent()) {
+            var party = caseData.getApplicant1LitigationFriend().toBuilder()
+                .flags(oldCaseData.getApplicant1LitigationFriend().getFlags())
+                .build();
+
+            builder.applicant1LitigationFriend(party);
+        }
+
+        // Litigation Friend
+        if (ofNullable(oldCaseData.getApplicant2LitigationFriend()).isPresent()) {
+            var party = caseData.getApplicant2LitigationFriend().toBuilder()
+                .flags(oldCaseData.getApplicant2LitigationFriend().getFlags())
+                .build();
+
+            builder.applicant1LitigationFriend(party);
+        }
+
+        // Litigation Friend
+        if (ofNullable(oldCaseData.getRespondent1LitigationFriend()).isPresent()) {
+            var party = caseData.getRespondent1LitigationFriend().toBuilder()
+                .flags(oldCaseData.getRespondent1LitigationFriend().getFlags())
+                .build();
+
+            builder.applicant1LitigationFriend(party);
+        }
+
+        // Litigation Friend
+        if (ofNullable(oldCaseData.getRespondent2LitigationFriend()).isPresent()) {
+            var party = caseData.getRespondent2LitigationFriend().toBuilder()
+                .flags(oldCaseData.getRespondent2LitigationFriend().getFlags())
+                .build();
+
+            builder.applicant1LitigationFriend(party);
         }
     }
 
