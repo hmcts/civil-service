@@ -78,7 +78,8 @@ java:
     civil:
       resourceGroup: civil
       secrets:
-        - civil-idam-client-secret
+        - name: civil-idam-client-secret
+          alias: idam.client.secret
         - name: microservicekey-civil-service
           alias: idam.s2s-auth.totp_secret
         - name: system-update-user-username
@@ -99,14 +100,16 @@ java:
           alias: docmosis.tornado.key
         - name: cmc-db-password-v11
           alias: CMC_DB_PASSWORD
-        - gov-notify-api-key
+        - name: gov-notify-api-key
+          alias: GOV_NOTIFY_API_KEY
         - name: sendgrid-api-key
           alias: SENDGRID_API_KEY
         - name: robotics-notification-sender
           alias: robotics.notification.sender
         - name: robotics-notification-recipient
           alias: robotics.notification.recipient
-        - launch-darkly-sdk-key
+        - name: launch-darkly-sdk-key
+          alias: LAUNCH_DARKLY_SDK_KEY
         - name: robotics-notification-multipartyrecipient
           alias: robotics.notification.multipartyrecipient
         - name: robotics-notification-recipient-spec
