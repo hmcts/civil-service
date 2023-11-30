@@ -459,6 +459,11 @@ docmosis:
   tornado:
     url: http://localhost:5433
 
+mediation:
+  emails:
+    sender: hmcts.civil@gmail.com
+    recipient: civilmoneyclaimsdemo@gmail.com
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
@@ -489,12 +494,6 @@ notification:
   caseworker:
     spec:
       receiver: civilmoneyclaimsdemo@gmail.com
-
-mediation:
-  emails:
-    sender: hmcts.civil@gmail.com
-    recipient: civilmoneyclaimsdemo@gmail.com
-
 
 ---
 
