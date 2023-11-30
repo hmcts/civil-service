@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CYA_ON_AGREED_
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class CyaAgreedMediationNotificationHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CYA_ON_AGREED_MEDIATION);
@@ -63,7 +61,6 @@ public class CyaAgreedMediationNotificationHandler extends CallbackHandler imple
 
         Optional<EmailData> emailData = prepareEmail(caseData);
 
-        log.info("from " + mediationCSVEmailConfiguration.getSender());
         emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
