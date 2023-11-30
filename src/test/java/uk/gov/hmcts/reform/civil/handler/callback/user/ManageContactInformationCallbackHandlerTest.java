@@ -162,7 +162,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .handle(params);
 
             List<String> expected =
-                List.of("You will be able run to the manage contact information event once the claimant has responded.");
+                List.of("You will be able to run the manage contact information event once the claimant has responded.");
 
             assertEquals(expected, response.getErrors());
         }
@@ -1253,6 +1253,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .addRespondent2LitigationFriend()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getWarnings()).contains(errorTitle);
@@ -1260,7 +1261,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID, DEFENDANT_ONE_LITIGATION_FRIEND_ID})
+        @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID,
+            DEFENDANT_ONE_LITIGATION_FRIEND_ID})
         void shouldNotReturnWarning(String partyChosenId) {
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
@@ -1273,6 +1275,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getWarnings()).isEmpty();
@@ -1299,6 +1302,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
