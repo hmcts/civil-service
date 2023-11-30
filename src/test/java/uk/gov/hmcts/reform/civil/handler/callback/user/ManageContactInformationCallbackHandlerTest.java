@@ -162,7 +162,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .handle(params);
 
             List<String> expected =
-                List.of("You will be able run the manage contact information event once the claimant has responded.");
+                List.of("You will be able run to the manage contact information event once the claimant has responded.");
 
             assertEquals(expected, response.getErrors());
         }

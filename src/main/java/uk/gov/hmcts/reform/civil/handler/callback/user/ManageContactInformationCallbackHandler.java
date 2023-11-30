@@ -89,7 +89,7 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicito
 @RequiredArgsConstructor
 public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
-    private static final String INVALID_CASE_STATE_ERROR = "You will be able run the manage contact information " +
+    private static final String INVALID_CASE_STATE_ERROR = "You will be able to run the manage contact information " +
         "event once the claimant has responded.";
     private static final String CHECK_LITIGATION_FRIEND_ERROR_TITLE = "Check the litigation friend's details";
     private static final String CHECK_LITIGATION_FRIEND_ERROR = "After making these changes, please ensure that the "
