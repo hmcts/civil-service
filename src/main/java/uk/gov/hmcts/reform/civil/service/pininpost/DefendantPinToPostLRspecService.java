@@ -28,16 +28,16 @@ public class DefendantPinToPostLRspecService {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-    private CUIIdamClientService cuiIdamClientService;
+    private final CUIIdamClientService cuiIdamClientService;
     private static final int EXPIRY_PERIOD = 180;
 
     public void validatePin(CaseDetails caseDetails, String pin) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-
         if (!pin.isEmpty() && pin.length() == 8) {
             try {
-                int response= cuiIdamClientService.authenticatePinUser(pin, caseData.getLegacyCaseReference());
+                int response = cuiIdamClientService.authenticatePinUser(pin, caseData.getLegacyCaseReference());
                 if (response != HttpStatus.FOUND.value()) {
+                    log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
                     throw new PinNotMatchException();
                 }
             } catch (UnsupportedEncodingException e) {
