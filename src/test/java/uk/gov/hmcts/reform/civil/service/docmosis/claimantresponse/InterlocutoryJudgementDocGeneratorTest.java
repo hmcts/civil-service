@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class InterlocutoryJudgementDocGeneratorTest {
+
     private static final String AUTHORISATION = "authorisation";
     @Mock
     private InterlocutoryJudgementDocMapper mapper;
@@ -39,7 +40,7 @@ public class InterlocutoryJudgementDocGeneratorTest {
 
     @BeforeEach
     public void setup() {
-        generator = new InterlocutoryJudgementDocGenerator(mapper,documentManagementService,documentGeneratorService);
+        generator = new InterlocutoryJudgementDocGenerator(mapper, documentManagementService, documentGeneratorService);
     }
 
     @Test
@@ -51,19 +52,25 @@ public class InterlocutoryJudgementDocGeneratorTest {
         given(mapper.toInterlocutoryJudgementDoc(any())).willReturn(interlocutoryJudgementDoc);
         DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
 
-        given(documentGeneratorService.generateDocmosisDocument(any(InterlocutoryJudgementDoc.class), any())).willReturn(
+        given(documentGeneratorService.generateDocmosisDocument(
+            any(InterlocutoryJudgementDoc.class),
+            any()
+        )).willReturn(
             docmosisDocument);
 
         //When
         generator.generateInterlocutoryJudgementDoc(caseData, AUTHORISATION);
 
         //Then
-        verify(documentGeneratorService).generateDocmosisDocument(interlocutoryJudgementDoc, DocmosisTemplates.INTERLOCUTORY_JUDGEMENT_DOCUMENT);
+        verify(documentGeneratorService).generateDocmosisDocument(
+            interlocutoryJudgementDoc,
+            DocmosisTemplates.INTERLOCUTORY_JUDGEMENT_DOCUMENT
+        );
         verify(documentManagementService).uploadDocument(
             eq(AUTHORISATION),
             uploadDocumentArgumentCaptor.capture()
         );
-        
+
         PDF document = uploadDocumentArgumentCaptor.getValue();
         assertThat(document.getDocumentType()).isEqualTo(DocumentType.INTERLOCUTORY_JUDGEMENT);
     }

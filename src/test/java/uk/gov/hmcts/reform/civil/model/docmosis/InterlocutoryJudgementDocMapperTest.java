@@ -46,7 +46,7 @@ public class InterlocutoryJudgementDocMapperTest {
 
     @BeforeEach
     public void setup() {
-        mapper = new InterlocutoryJudgementDocMapper(calculatorService,repaymentPlanDecisionCalculator);
+        mapper = new InterlocutoryJudgementDocMapper(calculatorService, repaymentPlanDecisionCalculator);
     }
 
     @Test
@@ -54,7 +54,6 @@ public class InterlocutoryJudgementDocMapperTest {
 
         //Given
         caseData = getCaseData();
-        InterlocutoryJudgementDoc interlocutoryJudgementDoc = getInterlocutoryJudgementDoc();
         mockStatic(ClaimantResponseUtils.class);
 
         given(repaymentPlanDecisionCalculator.calculateDisposableIncome(
@@ -63,7 +62,7 @@ public class InterlocutoryJudgementDocMapperTest {
         given(ClaimantResponseUtils.getDefendantRepaymentOption(caseData)).willReturn("By a set date");
         given(ClaimantResponseUtils.getClaimantFinalRepaymentDate(caseData)).willReturn(null);
         given(ClaimantResponseUtils.getDefendantFinalRepaymentDate(caseData)).willReturn(LocalDate.of(2024, 10, 10));
-
+        InterlocutoryJudgementDoc interlocutoryJudgementDoc = getInterlocutoryJudgementDoc();
         // When
         InterlocutoryJudgementDoc actual = mapper.toInterlocutoryJudgementDoc(caseData);
 

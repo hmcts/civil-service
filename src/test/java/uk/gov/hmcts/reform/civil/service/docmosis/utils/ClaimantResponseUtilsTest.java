@@ -55,7 +55,7 @@ public class ClaimantResponseUtilsTest {
     }
 
     @Test
-    void ShouldReturnDefendantFinalRepaymentDateWhenPartAdmission() {
+    void shouldReturnDefendantFinalRepaymentDateWhenPartAdmission() {
         CaseData caseData = CaseData.builder()
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder().repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
                                           .firstRepaymentDate(LocalDate.of(2024, 1, 1))
@@ -72,7 +72,7 @@ public class ClaimantResponseUtilsTest {
     }
 
     @Test
-    void ShouldReturnDefendantFinalRepaymentDateWhenFullAdmission() {
+    void shouldReturnDefendantFinalRepaymentDateWhenFullAdmission() {
         CaseData caseData = CaseData.builder()
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder().repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
                                           .firstRepaymentDate(LocalDate.of(2024, 1, 1))
@@ -89,7 +89,7 @@ public class ClaimantResponseUtilsTest {
 
     @ParameterizedTest
     @CsvSource({"IMMEDIATELY,Immediately", "BY_SET_DATE,By a set date", "SUGGESTION_OF_REPAYMENT_PLAN,By installments"})
-    void ShouldReturnDefendantRepaymentOption(RespondentResponsePartAdmissionPaymentTimeLRspec input, String expectedOutput) {
+    void shouldReturnDefendantRepaymentOption(RespondentResponsePartAdmissionPaymentTimeLRspec input, String expectedOutput) {
         CaseData caseData = CaseData.builder()
             .defenceAdmitPartPaymentTimeRouteRequired(input)
             .build();
@@ -100,7 +100,7 @@ public class ClaimantResponseUtilsTest {
 
     @ParameterizedTest
     @CsvSource({"IMMEDIATELY,Immediately", "SET_DATE,By a set date", "REPAYMENT_PLAN,By installments"})
-    void ShouldReturnClaimantRepaymentOption(PaymentType input, String expectedOutput) {
+    void shouldReturnClaimantRepaymentOption(PaymentType input, String expectedOutput) {
         CaseData caseData = CaseData.builder()
             .applicant1RepaymentOptionForDefendantSpec(input)
             .build();
