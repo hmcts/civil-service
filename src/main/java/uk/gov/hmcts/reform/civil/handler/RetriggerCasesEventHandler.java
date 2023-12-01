@@ -56,7 +56,6 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
         } else {
             log.info("List id empty for: {}", caseEvent);
         }
-
     }
 
     public List<String> readCaseIds(String file) {
