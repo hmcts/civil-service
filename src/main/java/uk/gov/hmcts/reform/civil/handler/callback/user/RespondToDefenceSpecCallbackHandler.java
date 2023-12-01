@@ -387,13 +387,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
                                         Applicant1DQ.Applicant1DQBuilder dq, boolean forceClaimantCourt) {
         handleCourtLocationData(caseData, builder, dq, callbackParams);
-        Optional<RequestedCourt> newCourt = null;
+        Optional<RequestedCourt> newCourt = Optional.empty();
 
         if (forceClaimantCourt) {
             //This will be true only if its Small Claim & Flight Delay & Airline is OTHER
             newCourt = locationHelper.getClaimantRequestedCourt(builder.applicant1DQ(dq.build()).build());
         } else {
-            newCourt = locationHelper.getClaimantRequestedCourt(builder.applicant1DQ(dq.build()).build());
+            newCourt = locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build());
         }
 
         newCourt.ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
