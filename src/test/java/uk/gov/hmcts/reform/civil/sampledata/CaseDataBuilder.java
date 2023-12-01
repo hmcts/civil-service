@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -504,6 +505,7 @@ public class CaseDataBuilder {
 
     private DynamicList transferCourtLocationList;
     private String reasonForTransfer;
+    private FlightDelayDetails flightDelayDetails;
 
     private YesOrNo responseClaimExpertSpecRequired;
     private YesOrNo responseClaimExpertSpecRequired2;
@@ -5252,6 +5254,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder flightDelay(FlightDelayDetails flightDelayDetails) {
+        this.flightDelayDetails = flightDelayDetails;
+        return this;
+    }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -6614,6 +6621,7 @@ public class CaseDataBuilder {
             .applicant2OrgIndividuals(applicant2OrgIndividuals)
             .respondent1OrgIndividuals(respondent1OrgIndividuals)
             .respondent2OrgIndividuals(respondent2OrgIndividuals)
+            .flightDelayDetails(flightDelayDetails)
             .responseClaimExpertSpecRequired(responseClaimExpertSpecRequired)
             .responseClaimExpertSpecRequired2(responseClaimExpertSpecRequired2)
             .build();

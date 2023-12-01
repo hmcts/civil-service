@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Slf4j
 @AllArgsConstructor
-public class CcdDashboardClaimMatcher implements Claim {
+public class CcdDashboardDefendantClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
     private CaseData caseData;

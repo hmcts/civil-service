@@ -474,7 +474,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "documentIssuedDate,documentForDisclosureRes, Invalid date: \"Documents for disclosure\""
             + " date entered must not be in the future (1).",
         "documentIssuedDate,documentReferredInStatementRes, Invalid date: \"Documents referred to in the statement\""
-            + " date entered must not be in the future (4).",
+            + " date entered must not be in the future (5).",
     })
     void shouldReturnError_whenDocumentTypeUploadDateFutureOneRespondent(String dateField, String collectionField,
                                                             String expectedErrorMessage) {
@@ -554,13 +554,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "expertOptionUploadDate,documentExpertReportRes,Invalid date: \"Expert's report\""
-            + " date entered must not be in the future (5).",
+            + " date entered must not be in the future (6).",
         "expertOptionUploadDate,documentJointStatementRes,Invalid date: \"Joint statement of experts\" "
-            + "date entered must not be in the future (6).",
+            + "date entered must not be in the future (7).",
         "expertOptionUploadDate,documentQuestionsRes,Invalid date: \"Questions for other party's expert "
-            + "or joint experts\" expert statement date entered must not be in the future (7).",
+            + "or joint experts\" expert statement date entered must not be in the future (8).",
         "expertOptionUploadDate,documentAnswersRes,Invalid date: \"Answers to questions asked by the other party\" "
-            + "date entered must not be in the future (8).",
+            + "date entered must not be in the future (9).",
     })
     void shouldReturnError_whenExpertOptionUploadDateFutureOneRespondent(String dateField, String collectionField,
                                                             String expectedErrorMessage) {
@@ -587,8 +587,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @CsvSource({
         "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" "
             + "date entered must not be in the future (2).",
+        "witnessOptionUploadDate,documentWitnessSummaryRes,Invalid date: \"witness summary\" "
+            + "date entered must not be in the future (3).",
         "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on"
-            + " hearsay evidence\" date entered must not be in the future (3).",
+            + " hearsay evidence\" date entered must not be in the future (4).",
     })
     void shouldReturnError_whenWitnessOptionUploadDateInFutureOneRespondent(String dateField, String collectionField,
                                                                String expectedErrorMessage) {
@@ -665,10 +667,10 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @CsvSource({
         "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" date entered must not be in the future (2).",
         "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
-            "date entered must not be in the future (3).",
+            "date entered must not be in the future (4).",
         "witnessOptionUploadDate,documentWitnessStatementRes,Invalid date: \"witness statement\" date entered must not be in the future (2).",
         "witnessOptionUploadDate,documentHearsayNoticeRes,Invalid date: \"Notice of the intention to rely on hearsay evidence\" " +
-            "date entered must not be in the future (3)."
+            "date entered must not be in the future (4)."
     })
     void shouldReturnError_whenOneDateIsInFutureForWitnessStatementsOneRespondent(String dateField, String collectionField, String errorMessage) {
         //documentUploadWitness1 represents a collection so can have multiple dates entered at any time,
@@ -755,9 +757,9 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "documentIssuedDate,documentForDisclosureRes2, Invalid date: \"Documents for disclosure\""
             + " date entered must not be in the future (1).",
         "documentIssuedDate,documentReferredInStatementRes2, Invalid date: \"Documents referred to in the statement\""
-            + " date entered must not be in the future (4).",
+            + " date entered must not be in the future (5).",
         "documentIssuedDate,documentEvidenceForTrialRes2, Invalid date: \"Documentary evidence for trial\""
-            + " date entered must not be in the future (9).",
+            + " date entered must not be in the future (10).",
     })
     void shouldReturnError_whenDocumentTypeUploadDateFutureTwoRespondent(String dateField, String collectionField,
                                                             String expectedErrorMessage) {
@@ -843,13 +845,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "expertOptionUploadDate,documentExpertReportRes2,Invalid date: \"Expert's report\""
-            + " date entered must not be in the future (5).",
+            + " date entered must not be in the future (6).",
         "expertOptionUploadDate,documentJointStatementRes2,Invalid date: \"Joint statement of experts\" "
-            + "date entered must not be in the future (6).",
+            + "date entered must not be in the future (7).",
         "expertOptionUploadDate,documentQuestionsRes2,Invalid date: \"Questions for other party's expert "
-            + "or joint experts\" expert statement date entered must not be in the future (7).",
+            + "or joint experts\" expert statement date entered must not be in the future (8).",
         "expertOptionUploadDate,documentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
-            + "date entered must not be in the future (8)."
+            + "date entered must not be in the future (9)."
     })
     void shouldReturnError_whenExpertOptionUploadDateFuture(String dateField, String collectionField,
                                                             String expectedErrorMessage) {
@@ -879,11 +881,11 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         "witnessOptionUploadDate,documentWitnessStatementRes2,Invalid date: \"witness statement\" "
             + "date entered must not be in the future (2).",
         "witnessOptionUploadDate,documentHearsayNoticeRes2,Invalid date: \"Notice of the intention to rely on"
-            + " hearsay evidence\" date entered must not be in the future (3).",
+            + " hearsay evidence\" date entered must not be in the future (4).",
         "witnessOptionUploadDate,documentWitnessStatementRes2,Invalid date: \"witness statement\" "
             + "date entered must not be in the future (2).",
         "witnessOptionUploadDate,documentHearsayNoticeRes2,Invalid date: \"Notice of the intention to rely on"
-            + " hearsay evidence\" date entered must not be in the future (3)."
+            + " hearsay evidence\" date entered must not be in the future (4)."
     })
     void shouldReturnError_whenWitnessOptionUploadDateInFuture(String dateField, String collectionField,
                                                                String expectedErrorMessage) {
@@ -969,13 +971,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({
         "expertOptionUploadDate,documentExpertReportRes2,Invalid date: \"Expert's report\""
-            + " date entered must not be in the future (5).",
+            + " date entered must not be in the future (6).",
         "expertOptionUploadDate,documentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
-            + "date entered must not be in the future (8).",
+            + "date entered must not be in the future (9).",
         "expertOptionUploadDate,documentQuestionsRes2,Invalid date: \"Questions for other party's expert "
-            + "or joint experts\" expert statement date entered must not be in the future (7).",
+            + "or joint experts\" expert statement date entered must not be in the future (8).",
         "expertOptionUploadDate,documentAnswersRes2,Invalid date: \"Answers to questions asked by the other party\" "
-            + "date entered must not be in the future (8)."
+            + "date entered must not be in the future (9)."
     })
     void shouldReturnError_whenOneDateIsInFutureForExpertStatementsTwoRespondents(String dateField, String collectionField, String errorMessage) {
         //documentUploadWitness1 represents a collection so can have multiple dates entered at any time,
@@ -1360,7 +1362,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
         // Then applicant docs should have name changed
         assertThat(updatedData.getDocumentWitnessSummaryRes().get(0).getValue()
-                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Summary of ResOneWitness.pdf");
+                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Summary of ResOneWitness 10-02-2023.pdf");
         assertThat(updatedData.getDocumentWitnessStatementRes().get(0).getValue()
                 .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResOneWitness 10-02-2023.pdf");
         assertThat(updatedData.getDocumentHearsayNoticeRes().get(0).getValue()
@@ -1393,7 +1395,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         String both = "2";
         if (selected.equals(both)) {
             assertThat(updatedData.getDocumentWitnessSummaryRes2().get(0).getValue()
-                    .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Summary of ResOneWitness.pdf");
+                    .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Summary of ResOneWitness 10-02-2023.pdf");
             assertThat(updatedData.getDocumentWitnessSummaryRes2().get(0).getValue()
                     .getWitnessOptionDocument().getCategoryID()).isEqualTo(EvidenceUploadHandlerBase.RESPONDENT_TWO_WITNESS_SUMMARY);
             assertThat(updatedData.getDocumentWitnessStatementRes2().get(0).getValue()
@@ -1494,7 +1496,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
 
         // Then applicant docs should have name changed
         assertThat(updatedData.getDocumentWitnessSummaryRes2().get(0).getValue()
-                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Summary of ResTwoWitness.pdf");
+                .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Summary of ResTwoWitness 10-02-2023.pdf");
         assertThat(updatedData.getDocumentWitnessStatementRes2().get(0).getValue()
                 .getWitnessOptionDocument().getDocumentFileName()).isEqualTo("Witness Statement of ResTwoWitness 10-02-2023.pdf");
         assertThat(updatedData.getDocumentHearsayNoticeRes2().get(0).getValue()
