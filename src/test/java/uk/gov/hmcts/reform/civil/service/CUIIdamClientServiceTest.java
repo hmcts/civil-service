@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import feign.Request;
+import feign.Response;
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +26,8 @@ class CUIIdamClientServiceTest {
 
     @Mock
     CMCPinVerifyConfiguration cmcPinVerifyConfiguration;
+    @Mock
+    Request request;
 
 
     @BeforeEach
@@ -34,10 +39,11 @@ class CUIIdamClientServiceTest {
     void ShouldAuthenticatePinUser() {
         when(cmcPinVerifyConfiguration.getRedirectUrl()).thenReturn("dummy_redirect_url");
         when(cmcPinVerifyConfiguration.getClientId()).thenReturn("dummy_client_id");
-        when(idamApi.authenticatePinUser(anyString(), anyString(), anyString(), anyString())).thenReturn(null);
+        when(idamApi.authenticatePinUser(anyString(), anyString(), anyString(), anyString())).thenReturn(Response.builder().request(request).status(
+            HttpStatus.SC_OK).build());
 
         int response = cuiIdamClientService.authenticatePinUser("12345678", "000MC001");
-        assertThat(response).isNotNull();
+        assertThat(response).isEqualTo(HttpStatus.SC_OK);
     }
 
 }
