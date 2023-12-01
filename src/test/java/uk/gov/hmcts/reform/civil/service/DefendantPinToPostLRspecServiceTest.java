@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -161,7 +160,7 @@ class DefendantPinToPostLRspecServiceTest {
         }
 
         @Test
-        void shouldCheckPinNotValidForCMC_whenInvoked() throws UnsupportedEncodingException {
+        void shouldCheckPinNotValidForCMC_whenInvoked() {
             CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();

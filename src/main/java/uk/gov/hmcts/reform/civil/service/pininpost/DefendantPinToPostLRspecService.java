@@ -35,7 +35,7 @@ public class DefendantPinToPostLRspecService {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         if (!pin.isEmpty() && pin.length() == OCMC_PIN_LENGTH) {
             int response = cuiIdamClientService.authenticatePinUser(pin, caseData.getLegacyCaseReference());
-            if (response != HttpStatus.FOUND.value()) {
+            if (response != HttpStatus.OK.value()) {
                 log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
                 throw new PinNotMatchException();
             }
