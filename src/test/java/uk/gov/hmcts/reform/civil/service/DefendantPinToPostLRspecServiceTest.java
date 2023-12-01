@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,6 +174,20 @@ class DefendantPinToPostLRspecServiceTest {
             assertThrows(
                 PinNotMatchException.class,
                 () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST1234"));
+        }
+
+        @Test
+        void shouldCheckPinIsValidForCMC_whenInvoked() {
+            CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
+                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .build();
+
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
+
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+            when(cuiIdamClientService.authenticatePinUser(anyString(), anyString())).thenReturn(HttpStatus.OK.value());
+
+            Assertions.assertDoesNotThrow(() ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST1234"));
         }
     }
 
