@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @EqualsAndHashCode
 public class InterlocutoryJudgementDoc implements MappableObject {
-    
+
     private final String claimNumber;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMMM yyyy")
