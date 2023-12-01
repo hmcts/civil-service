@@ -16,6 +16,7 @@ public class ClaimantLiPResponse {
     private DQExtraDetailsLip applicant1DQExtraDetails;
     private HearingSupportLip applicant1DQHearingSupportLip;
     private YesOrNo applicant1SignedSettlementAgreement;
+    private ChooseHowToProceed applicant1ChoosesHowToProceed;
 
     @JsonIgnore
     public boolean hasApplicant1SignedSettlementAgreement() {
