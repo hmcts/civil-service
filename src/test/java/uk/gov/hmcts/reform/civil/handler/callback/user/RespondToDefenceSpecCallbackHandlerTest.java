@@ -110,6 +110,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPE
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
@@ -894,7 +895,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         class HandleCourtLocation {
 
             @Test
-            void shouldHandleCourtLocationData() {
+            void shouldHandleCourtLocationDataIfFastTrack() {
                 LocationRefData locationA = LocationRefData.builder()
                     .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
                     .courtAddress("Lane 1").postcode("123").build();
@@ -909,8 +910,46 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                             RequestedCourt.builder()
                                 .responseCourtLocations(DynamicList.builder().build())
                                 .build()).build())
+                    .responseClaimTrack(FAST_CLAIM.name())
                     .build();
 
+                CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("responseCourtLocations").isNull();
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("caseLocation")
+                    .extracting("region", "baseLocation")
+                    .containsExactly("regionId1", "epimmsId1");
+
+                assertThat(response.getData())
+                    .extracting("applicant1DQRequestedCourt")
+                    .extracting("responseCourtCode").isEqualTo("312");
+            }
+
+            void shouldHandleCourtLocationDataIfSmallTrackAndNotFlightDelay() {
+                LocationRefData locationA = LocationRefData.builder()
+                    .regionId("regionId1").epimmsId("epimmsId1").courtLocationCode("312").siteName("Site 1")
+                    .courtAddress("Lane 1").postcode("123").build();
+                when(courtLocationUtils.findPreferredLocationData(any(), any(DynamicList.class)))
+                    .thenReturn(locationA);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                    .applicant1DQ(
+                        Applicant1DQ.builder().applicant1DQRequestedCourt(
+                            RequestedCourt.builder()
+                                .responseCourtLocations(DynamicList.builder().build())
+                                .build()).build())
+                    .responseClaimTrack(SMALL_CLAIM.name())
+                    .build();
+
+                caseData.setIsFlightDelayClaim(NO);
                 CallbackParams callbackParams = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
 
