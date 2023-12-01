@@ -19,9 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
@@ -32,6 +30,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -41,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
@@ -65,6 +65,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_AGREE_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
@@ -4678,6 +4679,55 @@ class StateFlowEngineTest {
 
             // Then
             assertEquals(SIGN_SETTLEMENT_AGREEMENT.fullName(), fullState.getState().getName());
+        }
+
+        @Test
+        void shouldReturn_whenFullAdmitRepaymentAcceptedWithCCJ() {
+            // Given
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                .ccjPaymentPaidSomeOption(YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
+            DefendantPinToPostLRspec respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
+                .accessCode("TEST")
+                .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1UnrepresentedDefendant()
+                .applicant1Represented(NO)
+                .build().toBuilder()
+                .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
+                .takenOfflineDate(null)
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .caseAccessCategory(SPEC_CLAIM)
+                // claim issued
+                .claimNotificationDeadline(LocalDateTime.now())
+                .claimNotificationDate(LocalDateTime.now())
+                // CIV-9024
+                .respondent1ResponseDate(LocalDateTime.now())
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .build();
+
+            // When
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(FULL_ADMIT_AGREE_REPAYMENT.fullName());
+            assertThat(stateFlow.getFlags()).contains(
+                entry(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), true)
+            );
         }
     }
 }
