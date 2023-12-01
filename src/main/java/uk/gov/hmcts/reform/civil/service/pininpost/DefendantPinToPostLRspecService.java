@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchException;
 import uk.gov.hmcts.reform.civil.utils.AccessCodeGenerator;
 
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,18 +29,15 @@ public class DefendantPinToPostLRspecService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final CUIIdamClientService cuiIdamClientService;
     private static final int EXPIRY_PERIOD = 180;
+    private static final int OCMC_PIN_LENGTH = 8;
 
     public void validatePin(CaseDetails caseDetails, String pin) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-        if (!pin.isEmpty() && pin.length() == 8) {
-            try {
-                int response = cuiIdamClientService.authenticatePinUser(pin, caseData.getLegacyCaseReference());
-                if (response != HttpStatus.FOUND.value()) {
-                    log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
-                    throw new PinNotMatchException();
-                }
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
+        if (!pin.isEmpty() && pin.length() == OCMC_PIN_LENGTH) {
+            int response = cuiIdamClientService.authenticatePinUser(pin, caseData.getLegacyCaseReference());
+            if (response != HttpStatus.FOUND.value()) {
+                log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
+                throw new PinNotMatchException();
             }
         } else {
             DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();

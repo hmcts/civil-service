@@ -588,3 +588,8 @@ idam:
     url: http://ccd-test-stubs-service:5555
   api:
     url: http://ccd-test-stubs-service:5555
+
+ocmc:
+  client:
+    id: ${OCMC_CLIENT_ID:cmc_citizen}
+    url: ${OCMC_CLIENT_URL:http://localhost:3001}
