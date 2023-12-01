@@ -114,6 +114,11 @@ pin-in-post:
   cui-front-end:
     url: ${CUI_URL:http://localhost:3001}
 
+ocmc:
+  client:
+    id: ${OCMC_CLIENT_ID:cmc_citizen}
+    url: ${OCMC_CLIENT_URL:http://localhost:3001}
+
 manage-case-ui:
   baseurl: ${MANAGE_CASE_UI_BASE_URL:http://localhost:3333}
 
@@ -578,11 +583,6 @@ sendgrid:
   api-key: fake-key
 ---
 
-ocmc:
-  client:
-    id: ${OCMC_CLIENT_ID:cmc_citizen}
-    url: ${OCMC_CLIENT_URL:http://localhost:3001}
-
 spring:
   config:
     activate:
@@ -593,5 +593,3 @@ idam:
     url: http://ccd-test-stubs-service:5555
   api:
     url: http://ccd-test-stubs-service:5555
-
-
