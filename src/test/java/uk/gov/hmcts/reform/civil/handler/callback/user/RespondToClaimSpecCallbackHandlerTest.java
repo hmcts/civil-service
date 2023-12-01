@@ -786,6 +786,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Then
                 assertThat(response.getData())
                     .extracting("responseClaimExpertSpecRequired").isEqualTo("Yes");
+                assertThat(response.getData()).extracting("respondent1DQExperts").extracting("expertRequired").isEqualTo("Yes");
             }
 
             @Test
@@ -814,6 +815,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 // Then
                 assertThat(response.getData())
                     .extracting("responseClaimExpertSpecRequired").isEqualTo("No");
+                assertThat(response.getData()).extracting("respondent1DQExperts").extracting("expertRequired").isEqualTo("No");
             }
 
             @Test

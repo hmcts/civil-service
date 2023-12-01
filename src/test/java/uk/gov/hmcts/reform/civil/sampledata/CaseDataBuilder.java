@@ -509,6 +509,8 @@ public class CaseDataBuilder {
 
     private YesOrNo responseClaimExpertSpecRequired;
     private YesOrNo responseClaimExpertSpecRequired2;
+    private YesOrNo applicantMPClaimExpertSpecRequired;
+    private YesOrNo applicant1ClaimExpertSpecRequired;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -522,6 +524,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder responseClaimExpertSpecRequired2(YesOrNo responseClaimExpertSpecRequired2) {
         this.responseClaimExpertSpecRequired2 = responseClaimExpertSpecRequired2;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ClaimExpertSpecRequired(YesOrNo applicant1ClaimExpertSpecRequired) {
+        this.applicant1ClaimExpertSpecRequired = applicant1ClaimExpertSpecRequired;
+        return this;
+    }
+
+    public CaseDataBuilder applicantMPClaimExpertSpecRequired(YesOrNo applicantMPClaimExpertSpecRequired) {
+        this.applicantMPClaimExpertSpecRequired = applicantMPClaimExpertSpecRequired;
         return this;
     }
 
@@ -1174,37 +1186,51 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder applicant1DQSmallCalimExperts() {
+    public CaseDataBuilder applicant1DQSmallClaimExperts(ExpertDetails experts, YesOrNo expertsRequired) {
         var applicant1DQBuilder = applicant1DQ != null
             ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
 
-        applicant1DQBuilder.applicant1RespondToClaimExperts(ExpertDetails.builder()
-                                                    .expertName("Mr Expert Defendant")
-                                                    .firstName("Expert")
-                                                    .lastName("Defendant")
-                                                    .phoneNumber("07123456789")
-                                                    .emailAddress("test@email.com")
-                                                    .fieldofExpertise("Roofing")
-                                                    .estimatedCost(new BigDecimal(434))
-                                                    .build()).build();
+        ExpertDetails expertDetails = experts != null
+            ? experts
+            : (ExpertDetails.builder()
+            .expertName("Mr Expert Defendant")
+            .firstName("Expert")
+            .lastName("Defendant")
+            .phoneNumber("07123456789")
+            .emailAddress("test@email.com")
+            .fieldofExpertise("Roofing")
+            .estimatedCost(new BigDecimal(434))
+            .build());
+
+        applicant1DQBuilder.applicant1RespondToClaimExperts(expertDetails).build();
+        this.applicant1ClaimExpertSpecRequired(expertsRequired != null ? expertsRequired : YES);
 
         applicant1DQ = applicant1DQBuilder.build();
         return this;
     }
 
     public CaseDataBuilder applicant2DQSmallClaimExperts() {
+        return applicant2DQSmallClaimExperts(null, null);
+    }
+
+    public CaseDataBuilder applicant2DQSmallClaimExperts(ExpertDetails experts, YesOrNo expertsRequired) {
         var applicant2DQBuilder = applicant2DQ != null
             ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
 
-        applicant2DQBuilder.applicant2RespondToClaimExperts(ExpertDetails.builder()
-                                                                .expertName("Mr Expert Defendant")
-                                                                .firstName("Expert")
-                                                                .lastName("Defendant")
-                                                                .phoneNumber("07123456789")
-                                                                .emailAddress("test@email.com")
-                                                                .fieldofExpertise("Roofing")
-                                                                .estimatedCost(new BigDecimal(434))
-                                                                .build()).build();
+        ExpertDetails expertDetails = experts != null
+            ? experts
+            : (ExpertDetails.builder()
+            .expertName("Mr Expert Defendant")
+            .firstName("Expert")
+            .lastName("Defendant")
+            .phoneNumber("07123456789")
+            .emailAddress("test@email.com")
+            .fieldofExpertise("Roofing")
+            .estimatedCost(new BigDecimal(434))
+            .build());
+
+        applicant2DQBuilder.applicant2RespondToClaimExperts(expertDetails).build();
+        this.applicantMPClaimExpertSpecRequired(expertsRequired != null ? expertsRequired : YES);
 
         applicant2DQ = applicant2DQBuilder.build();
         return this;
@@ -6624,6 +6650,8 @@ public class CaseDataBuilder {
             .flightDelayDetails(flightDelayDetails)
             .responseClaimExpertSpecRequired(responseClaimExpertSpecRequired)
             .responseClaimExpertSpecRequired2(responseClaimExpertSpecRequired2)
+            .applicant1ClaimExpertSpecRequired(applicant1ClaimExpertSpecRequired)
+            .applicantMPClaimExpertSpecRequired(applicantMPClaimExpertSpecRequired)
             .build();
     }
 }
