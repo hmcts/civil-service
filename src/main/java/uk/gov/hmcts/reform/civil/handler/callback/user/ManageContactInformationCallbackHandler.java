@@ -25,7 +25,9 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -447,10 +450,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 caseData.getApplicant1DQ().getApplicant1DQExperts(), formData);
             builder.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
                                      .applicant1DQExperts(
-                                         caseData.getApplicant1DQ().getApplicant1DQExperts().toBuilder()
-                                             .expertRequired(mappedExperts.size() >= 1 ? YES : NO)
-                                             .details(mappedExperts)
-                                             .build())
+                                         buildExperts(caseData.getApplicant1DQ().getApplicant1DQExperts(), mappedExperts))
                                      .build());
             List<Element<PartyFlagStructure>> updatedApplicantExperts = updatePartyDQExperts(
                 unwrapElements(caseData.getApplicantExperts()),
@@ -462,10 +462,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 caseData.getRespondent1DQ().getRespondent1DQExperts(), formData);
             builder.respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                      .respondent1DQExperts(
-                                         caseData.getRespondent1DQ().getRespondent1DQExperts().toBuilder()
-                                             .expertRequired(mappedExperts.size() >= 1 ? YES : NO)
-                                             .details(mappedExperts)
-                                             .build())
+                                         buildExperts(caseData.getRespondent1DQ().getRespondent1DQExperts(), mappedExperts))
                                      .build());
             List<Element<PartyFlagStructure>> updatedRespondent1Experts = updatePartyDQExperts(
                 unwrapElements(caseData.getRespondent1Experts()),
@@ -477,10 +474,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 caseData.getRespondent2DQ().getRespondent2DQExperts(), formData);
             builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
                                      .respondent2DQExperts(
-                                         caseData.getRespondent2DQ().getRespondent2DQExperts().toBuilder()
-                                             .expertRequired(mappedExperts.size() >= 1 ? YES : NO)
-                                             .details(mappedExperts)
-                                             .build())
+                                         buildExperts(caseData.getRespondent2DQ().getRespondent2DQExperts(), mappedExperts))
                                      .build());
             List<Element<PartyFlagStructure>> updatedRespondent2Experts = updatePartyDQExperts(
                 unwrapElements(caseData.getRespondent2Experts()),
@@ -488,7 +482,22 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             );
             builder.respondent2Experts(updatedRespondent2Experts);
         }
+    }
 
+    private Experts buildExperts(Experts experts, List<Element<Expert>> mappedExperts) {
+        return ofNullable(experts)
+            .orElse(Experts.builder().build())
+            .toBuilder()
+            .expertRequired(mappedExperts.size() >= 1 ? YES : NO)
+            .details(mappedExperts).build();
+    }
+
+    private Witnesses buildWitnesses(Witnesses witnesses, List<Element<Witness>> mappedWitnesses) {
+        return ofNullable(witnesses)
+            .orElse(Witnesses.builder().build())
+            .toBuilder()
+            .witnessesToAppear(mappedWitnesses.size() >= 1 ? YES : NO)
+            .details(mappedWitnesses).build();
     }
 
     private void updateWitnesses(String partyId, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
@@ -500,10 +509,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 caseData.getApplicant1DQ().getApplicant1DQWitnesses(), formData);
             builder.applicant1DQ(caseData.getApplicant1DQ().toBuilder()
                                      .applicant1DQWitnesses(
-                                         caseData.getApplicant1DQ().getApplicant1DQWitnesses().toBuilder()
-                                             .witnessesToAppear(mappedWitnesses.size() >= 1 ? YES : NO)
-                                             .details(mappedWitnesses)
-                                             .build())
+                                         buildWitnesses(caseData.getApplicant1DQ().getApplicant1DQWitnesses(), mappedWitnesses))
                                      .build());
             List<Element<PartyFlagStructure>> updatedApplicantWitnesses = updatePartyDQWitnesses(
                 unwrapElements(caseData.getApplicantWitnesses()),
@@ -515,10 +521,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 caseData.getRespondent1DQ().getRespondent1DQWitnesses(), formData);
             builder.respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                  .respondent1DQWitnesses(
-                                     caseData.getRespondent1DQ().getRespondent1DQWitnesses().toBuilder()
-                                         .witnessesToAppear(mappedWitnesses.size() >= 1 ? YES : NO)
-                                         .details(mappedWitnesses)
-                                         .build())
+                                     buildWitnesses(caseData.getRespondent1DQ().getRespondent1DQWitnesses(), mappedWitnesses))
                                  .build());
             List<Element<PartyFlagStructure>> updatedRespondent1Witnesses = updatePartyDQWitnesses(
                 unwrapElements(caseData.getRespondent1Witnesses()),
@@ -530,10 +533,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 caseData.getRespondent2DQ().getRespondent2DQWitnesses(), formData);
             builder.respondent2DQ(caseData.getRespondent2DQ().toBuilder()
                                  .respondent2DQWitnesses(
-                                     caseData.getRespondent2DQ().getRespondent2DQWitnesses().toBuilder()
-                                         .witnessesToAppear(mappedWitnesses.size() >= 1 ? YES : NO)
-                                         .details(mappedWitnesses)
-                                         .build())
+                                     buildWitnesses(caseData.getRespondent2DQ().getRespondent2DQWitnesses(), mappedWitnesses))
                                  .build());
             List<Element<PartyFlagStructure>> updatedRespondent2Witnesses = updatePartyDQWitnesses(
                 unwrapElements(caseData.getRespondent2Witnesses()),
