@@ -188,6 +188,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         // Hearing fee will be different based on claim track.
         // for either spec claims (ResponseClaimTrack) or unspec claims (AllocatedTrack)
         String claimTrack = null;
+
         if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
             claimTrack = caseData.getAllocatedTrack().name();
         } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
