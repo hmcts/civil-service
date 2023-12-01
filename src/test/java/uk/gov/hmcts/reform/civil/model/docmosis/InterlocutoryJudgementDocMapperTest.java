@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -54,21 +55,24 @@ public class InterlocutoryJudgementDocMapperTest {
 
         //Given
         caseData = getCaseData();
-        mockStatic(ClaimantResponseUtils.class);
+        try (MockedStatic mocked = mockStatic(ClaimantResponseUtils.class)) {
+            given(repaymentPlanDecisionCalculator.calculateDisposableIncome(
+                caseData)).willReturn(-100.989999);
+            given(ClaimantResponseUtils.getClaimantSuggestedRepaymentType(caseData)).willReturn("Immediately");
+            given(ClaimantResponseUtils.getDefendantRepaymentOption(caseData)).willReturn("By a set date");
+            given(ClaimantResponseUtils.getClaimantFinalRepaymentDate(caseData)).willReturn(null);
+            given(ClaimantResponseUtils.getDefendantFinalRepaymentDate(caseData)).willReturn(LocalDate.of(
+                2024,
+                10,
+                10
+            ));
+            InterlocutoryJudgementDoc interlocutoryJudgementDoc = getInterlocutoryJudgementDoc();
+            // When
+            InterlocutoryJudgementDoc actual = mapper.toInterlocutoryJudgementDoc(caseData);
 
-        given(repaymentPlanDecisionCalculator.calculateDisposableIncome(
-            caseData)).willReturn(-100.989999);
-        given(ClaimantResponseUtils.getClaimantSuggestedRepaymentType(caseData)).willReturn("Immediately");
-        given(ClaimantResponseUtils.getDefendantRepaymentOption(caseData)).willReturn("By a set date");
-        given(ClaimantResponseUtils.getClaimantFinalRepaymentDate(caseData)).willReturn(null);
-        given(ClaimantResponseUtils.getDefendantFinalRepaymentDate(caseData)).willReturn(LocalDate.of(2024, 10, 10));
-        InterlocutoryJudgementDoc interlocutoryJudgementDoc = getInterlocutoryJudgementDoc();
-        // When
-        InterlocutoryJudgementDoc actual = mapper.toInterlocutoryJudgementDoc(caseData);
-
-        // Then
-        MatcherAssert.assertThat(actual, samePropertyValuesAs(interlocutoryJudgementDoc));
-
+            // Then
+            MatcherAssert.assertThat(actual, samePropertyValuesAs(interlocutoryJudgementDoc));
+        }
     }
 
     @Test
@@ -155,7 +159,10 @@ public class InterlocutoryJudgementDocMapperTest {
         caseData = caseData.toBuilder()
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
             .build();
-        given(calculatorService.calculateExtendedDeadline(any(LocalDate.class), anyInt())).willReturn(LocalDate.now().plusDays(5));
+        given(calculatorService.calculateExtendedDeadline(
+            any(LocalDate.class),
+            anyInt()
+        )).willReturn(LocalDate.now().plusDays(5));
 
         // When
         InterlocutoryJudgementDoc actual = mapper.toInterlocutoryJudgementDoc(caseData);
