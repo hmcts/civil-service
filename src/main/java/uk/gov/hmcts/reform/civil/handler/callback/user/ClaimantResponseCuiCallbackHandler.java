@@ -113,8 +113,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             response.state(CaseState.CASE_SETTLED.name());
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
             response.state(CaseState.CASE_DISMISSED.name());
-        } else if (updatedData.hasApplicantRejectedRepaymentPlan()
-            && updatedData.getRespondent1().isCompanyOROrganisation()) {
+        } else if ((updatedData.hasApplicantRejectedRepaymentPlan()
+            && updatedData.getRespondent1().isCompanyOROrganisation()) || hasCcjRequest(updatedData)) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
     }
