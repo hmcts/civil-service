@@ -20,15 +20,12 @@ import static org.mockito.Mockito.when;
 class CUIIdamClientServiceTest {
 
     private CUIIdamClientService cuiIdamClientService;
-
     @Mock
     private IdamApi idamApi;
-
     @Mock
     CMCPinVerifyConfiguration cmcPinVerifyConfiguration;
     @Mock
     Request request;
-
 
     @BeforeEach
     public void setup() {
