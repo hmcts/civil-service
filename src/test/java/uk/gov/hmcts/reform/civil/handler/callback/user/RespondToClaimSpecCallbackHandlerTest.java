@@ -55,6 +55,7 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
@@ -745,6 +746,141 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("respondent1").extracting("primaryAddress")
                 .extracting("AddressLine3").isEqualTo(changedAddress.getAddressLine3());
+        }
+
+        @Nested
+        class UpdateExperts {
+            @Test
+            void updateRespondent1Experts() {
+                // Given
+                when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+                when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+                when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+                ExpertDetails experts = ExpertDetails.builder()
+                    .expertName("Mr Expert Defendant")
+                    .firstName("Expert")
+                    .lastName("Defendant")
+                    .phoneNumber("07123456789")
+                    .emailAddress("test@email.com")
+                    .fieldofExpertise("Roofing")
+                    .estimatedCost(new BigDecimal(434))
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1DQSmallClaimExperts(experts, YES)
+                    .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                    .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                    .thenReturn(LocalDateTime.now());
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("responseClaimExpertSpecRequired").isEqualTo("Yes");
+            }
+
+            @Test
+            void updateRespondent1Experts_WhenNoExperts() {
+                // Given
+                when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+                when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+                when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1DQSmallClaimExperts(null, NO)
+                    .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                    .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                    .thenReturn(LocalDateTime.now());
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("responseClaimExpertSpecRequired").isEqualTo("No");
+            }
+
+            @Test
+            void updateRespondent2Experts() {
+                // Given
+                when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+                when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+                when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+                ExpertDetails experts = ExpertDetails.builder()
+                    .expertName("Mr Expert Defendant")
+                    .firstName("Expert")
+                    .lastName("Defendant")
+                    .phoneNumber("07123456789")
+                    .emailAddress("test@email.com")
+                    .fieldofExpertise("Roofing")
+                    .estimatedCost(new BigDecimal(434))
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent2DQSmallClaimExperts(experts, YES)
+                    .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                    .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                    .thenReturn(LocalDateTime.now());
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("responseClaimExpertSpecRequired2").isEqualTo("Yes");
+            }
+
+            @Test
+            void updateRespondent2Experts_WhenNoExperts() {
+                // Given
+                when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+                when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
+                when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(mockedStateFlow);
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent2DQSmallClaimExperts(null, NO)
+                    .atSpecAoSApplicantCorrespondenceAddressRequired(NO)
+                    .atSpecAoSApplicantCorrespondenceAddressDetails(AddressBuilder.maximal().build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                    .thenReturn(LocalDateTime.now());
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("responseClaimExpertSpecRequired2").isEqualTo("No");
+            }
         }
 
         @Test
