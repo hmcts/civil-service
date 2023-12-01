@@ -26,14 +26,14 @@ public class EventEmitterAspect {
     public Object emitBusinessProcessEvent(ProceedingJoinPoint joinPoint, CallbackParams callbackParams)
         throws Throwable {
         var data = callbackParams.getCaseData();
-        if(data != null) {
+        if (data != null) {
             System.out.println("TEST_LOGGING - CASE EVENT: " + callbackParams.getRequest().getEventId());
-            if(data.getApplicant1() != null) {
+            if (data.getApplicant1() != null) {
                 System.out.println("TEST_LOGGING - APPLICANT1 ADDRESS: ");
                 System.out.println(data.getApplicant1().getPrimaryAddress() != null ? "EXISTS" : "MISSING");
             }
 
-            if(data.getRespondent1() != null) {
+            if (data.getRespondent1() != null) {
                 System.out.println("TEST_LOGGING - RESPONDENT1 ADDRESS: ");
                 System.out.println(data.getRespondent1().getPrimaryAddress() != null ? "EXISTS" : "MISSING");
             }
