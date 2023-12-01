@@ -67,6 +67,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
@@ -155,6 +156,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.math.BigDecimal.ZERO;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Jacksonized
@@ -723,23 +725,6 @@ public class CaseDataParent implements MappableObject {
 
     private FastTrackAllocation fastTrackAllocation;
 
-    /**
-     * used to temporary hold addresses.
-     */
-    private final Address tempCorrespondenceAddress1;
-    /**
-     * used with tempCorrespondenceAddress1.
-     */
-    private final YesOrNo tempCorrespondenceAddress1Required;
-    /**
-     * used to temporary hold addresses.
-     */
-    private final Address tempCorrespondenceAddress2;
-    /**
-     * used with tempCorrespondenceAddress2.
-     */
-    private final YesOrNo tempCorrespondenceAddress2Required;
-
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
@@ -796,5 +781,13 @@ public class CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantNotAgreedToFreeMediation).isPresent();
+    }
+
+    @JsonIgnore
+    public String getHearingLocationText() {
+        return ofNullable(hearingLocation)
+            .map(DynamicList::getValue)
+            .map(DynamicListElement::getLabel)
+            .orElse(null);
     }
 }

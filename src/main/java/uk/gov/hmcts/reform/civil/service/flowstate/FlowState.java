@@ -84,7 +84,8 @@ public interface FlowState {
         IN_HEARING_READINESS,
         MEDIATION_UNSUCCESSFUL_PROCEED,
         All_FINAL_ORDERS_ISSUED,
-        PREPARE_FOR_HEARING_CONDUCT_HEARING;
+        PREPARE_FOR_HEARING_CONDUCT_HEARING,
+        SIGN_SETTLEMENT_AGREEMENT;
 
         public static final String FLOW_NAME = "MAIN";
 
