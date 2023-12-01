@@ -33,7 +33,7 @@ class CUIIdamClientServiceTest {
     }
 
     @Test
-    void ShouldAuthenticatePinUser() {
+    void shouldAuthenticatePinUser() {
         when(cmcPinVerifyConfiguration.getRedirectUrl()).thenReturn("dummy_redirect_url");
         when(cmcPinVerifyConfiguration.getClientId()).thenReturn("dummy_client_id");
         when(idamApi.authenticatePinUser(anyString(), anyString(), anyString(), anyString())).thenReturn(Response.builder().request(request).status(
