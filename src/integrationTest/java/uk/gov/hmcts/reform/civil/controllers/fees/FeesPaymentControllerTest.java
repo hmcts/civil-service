@@ -3,20 +3,15 @@ package uk.gov.hmcts.reform.civil.controllers.fees;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.retry.annotation.EnableRetry;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
@@ -38,9 +33,6 @@ import static uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController.F
 import static uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController.FEES_PAYMENT_STATUS_URL;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {FeesPaymentService.class})
-@EnableRetry
 public class FeesPaymentControllerTest extends BaseIntegrationTest {
 
     private static final CardPaymentServiceRequestDTO CARD_PAYMENT_SERVICE_REQUEST
