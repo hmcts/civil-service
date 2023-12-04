@@ -65,13 +65,8 @@ public class CreateSDOApplicantsNotificationHandlerTest extends BaseCallbackHand
             when(notificationsProperties.getSdoOrdered()).thenReturn("template-id");
             when(notificationsProperties.getSdoOrderedSpec()).thenReturn("template-id-spec");
             when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn("template-id-lip");
-            when(notificationsProperties.getSdoOrderedSpec()).thenReturn("template-id-spec");
-            when(notificationsProperties.getSdoOrderedEA()).thenReturn("template-id-EA");
-            when(notificationsProperties.getSdoOrderedSpecEA()).thenReturn("template-id-spec-EA");
-            when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn("template-id-lip");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
-            when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
         }
 
         @Test
