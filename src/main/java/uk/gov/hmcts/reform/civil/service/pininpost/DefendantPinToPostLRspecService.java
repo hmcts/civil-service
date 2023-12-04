@@ -31,15 +31,15 @@ public class DefendantPinToPostLRspecService {
     private static final int EXPIRY_PERIOD = 180;
     private static final int OCMC_PIN_LENGTH = 8;
 
-    public void validatePin(CaseDetails caseDetails, String pin) {
+    public void validatePin(CaseDetails caseDetails, String pin, String... legacyCaseRef) {
         log.info("Validate Pin called..");
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         if (!pin.isEmpty() && pin.length() == OCMC_PIN_LENGTH) {
             log.info("Its a OCMC claim");
-            int response = cuiIdamClientService.authenticatePinUser(pin, caseData.getLegacyCaseReference());
+            int response = cuiIdamClientService.authenticatePinUser(pin, legacyCaseRef[0]);
             log.info("Valid Pin : " + response);
             if (response != HttpStatus.OK.value()) {
-                log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
+                log.error("Pin does not match or expired for {}", legacyCaseRef[0]);
                 throw new PinNotMatchException();
             }
             log.info("Valid OCMC claim..");

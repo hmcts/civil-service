@@ -56,8 +56,10 @@ public class CaseAssignmentController {
         CaseDetails caseDetails = null;
         if (pin.getPin().length() != OCMC_PIN_LENGTH) {
             caseDetails = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
+            defendantPinToPostLRspecService.validatePin(caseDetails, pin.getPin());
+        } else {
+            defendantPinToPostLRspecService.validatePin(caseDetails, pin.getPin(), caseReference);
         }
-        defendantPinToPostLRspecService.validatePin(caseDetails, pin.getPin());
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
 
