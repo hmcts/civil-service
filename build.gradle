@@ -107,7 +107,7 @@ allprojects {
       }
 
       dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.77'
-      
+
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.13'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
@@ -234,7 +234,7 @@ task integration(type: Test) {
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
-  classpath = sourceSets.integrationTest.runtimeClasspath
+  classpath = sourceSets.integrationTest.runtimeClassp
   failFast = true
   testLogging.showStandardStreams = false
 }
@@ -370,7 +370,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons: '1.0.37'
+  implementation 'com.github.hmcts:civil-commons:1.0.37'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
