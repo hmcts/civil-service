@@ -234,7 +234,7 @@ task integration(type: Test) {
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
-  classpath = sourceSets.integrationTest.runtimeClassp
+  classpath = sourceSets.integrationTest.runtimeClasspath
   failFast = true
   testLogging.showStandardStreams = false
 }
