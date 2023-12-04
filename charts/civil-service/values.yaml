@@ -95,8 +95,8 @@ java:
           alias: CIVIL_PRD_ADMIN_USERNAME
         - name: prd-admin-user-password
           alias: CIVIL_PRD_ADMIN_PASSWORD
-        - name: app-insights-connection-string
-          alias: app-insights-connection-string
+        - name: appinsights-connection-string
+          alias: appinsights-connection-string
         - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
         - name: docmosis-api-key
