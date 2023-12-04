@@ -12,7 +12,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -36,6 +39,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CLAIMANT_RESPONSE_CUI);
 
     private final ResponseOneVOneShowTagService responseOneVOneService;
+    private final FeatureToggleService featureToggleService;
+    private final JudgementService judgementService;
 
     private final ObjectMapper objectMapper;
     private final Time time;
@@ -67,11 +72,13 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
                 .applicant1ResponseDate(LocalDateTime.now())
                 .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
+        updateCcjRequestPaymentDetails(builder, caseData);
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
@@ -106,9 +113,25 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             response.state(CaseState.CASE_SETTLED.name());
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
             response.state(CaseState.CASE_DISMISSED.name());
-        } else if (updatedData.hasApplicantRejectedRepaymentPlan()
-            && updatedData.getRespondent1().isCompanyOROrganisation()) {
+        } else if (isProceedInHeritageSystemAllowed(updatedData)) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
+    }
+
+    private void updateCcjRequestPaymentDetails(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
+        if (hasCcjRequest(caseData)) {
+            CCJPaymentDetails ccjPaymentDetails = judgementService.buildJudgmentAmountSummaryDetails(caseData);
+            builder.ccjPaymentDetails(ccjPaymentDetails).build();
+        }
+    }
+
+    private boolean hasCcjRequest(CaseData caseData) {
+        return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+            && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
+    }
+
+    private boolean isProceedInHeritageSystemAllowed(CaseData caseData) {
+        return ((caseData.hasApplicantRejectedRepaymentPlan()
+            && caseData.getRespondent1().isCompanyOROrganisation()) || hasCcjRequest(caseData));
     }
 }
