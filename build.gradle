@@ -106,7 +106,7 @@ allprojects {
         entry 'okio-jvm'
       }
 
-      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk15on', version: '1.70'
+      dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.77'
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.13'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
@@ -315,7 +315,7 @@ sonarqube {
     property "sonar.projectKey", "civil-service"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java"
-    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java"
+    property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
@@ -369,7 +369,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.28_10336'
+  implementation 'com.github.hmcts:civil-commons:1.0.35'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -396,7 +396,7 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
-  implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
+  implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.3'
 
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '12.4'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
@@ -417,7 +417,7 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.0-RELEASE'
   implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
-  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.9.3'
+  implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.1'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -496,6 +496,10 @@ dependencies {
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
+  // https://mvnrepository.com/artifact/com.opencsv/opencsv
+  implementation group: 'com.opencsv', name: 'opencsv', version: '5.8', {
+    exclude group: 'commons-collections', module: 'commons-collections'
+  }
 }
 
 mainClassName = 'uk.gov.hmcts.reform.civil.Application'

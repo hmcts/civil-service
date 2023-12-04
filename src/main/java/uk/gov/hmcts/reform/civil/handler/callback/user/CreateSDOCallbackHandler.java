@@ -91,6 +91,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -98,6 +99,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
+import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
@@ -161,7 +165,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .put(callbackKey(V_1, ABOUT_TO_START), this::prePopulateOrderDetailsPages)
             .put(callbackKey(MID, "order-details-navigation"), this::setOrderDetailsFlags)
             .put(callbackKey(MID, "generate-sdo-order"), this::generateSdoOrder)
-            .put(callbackKey(MID, "validateInputValue"), this::validateInputValue)
             .put(callbackKey(V_1, MID, "generate-sdo-order"), this::generateSdoOrder)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::submitSDO)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
@@ -219,7 +222,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.fastTrackMethodInPerson(locationsList);
         updatedData.smallClaimsMethodInPerson(locationsList);
 
-        List<OrderDetailsPagesSectionsToggle> checkList = List.of(OrderDetailsPagesSectionsToggle.SHOW);
+        List<OrderDetailsPagesSectionsToggle> checkList = List.of(SHOW);
         setCheckList(updatedData, checkList);
 
         DisposalHearingJudgesRecital tempDisposalHearingJudgesRecital = DisposalHearingJudgesRecital.builder()
@@ -711,15 +714,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             ));
         DynamicList locationsList;
         if (matchingLocation.isPresent()) {
-            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
                                                  matchingLocation.get(), true
             );
         } else {
-            locationsList = DynamicList.fromList(locations, LocationRefDataService::getDisplayEntry,
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
                                                  null, true
             );
         }
         return locationsList;
+    }
+
+    private String getLocationEpimms(LocationRefData location) {
+        return location.getEpimmsId();
     }
 
     private CallbackResponse setOrderDetailsFlags(CallbackParams callbackParams) {
@@ -732,9 +739,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.setFastTrackFlag(YesOrNo.NO).build();
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            updatedData.setSmallClaimsFlag(YesOrNo.YES).build();
+            updatedData.setSmallClaimsFlag(YES).build();
         } else if (SdoHelper.isFastTrack(caseData)) {
-            updatedData.setFastTrackFlag(YesOrNo.YES).build();
+            updatedData.setFastTrackFlag(YES).build();
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -748,17 +755,37 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             : callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
-        CaseDocument document = sdoGeneratorService.generate(
-            caseData,
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
-
-        if (document != null) {
-            updatedData.sdoOrderDocument(document);
+        List<String> errors = new ArrayList<>();
+        if (nonNull(caseData.getSmallClaimsWitnessStatement())) {
+            String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
+            String inputValue2 = caseData.getSmallClaimsWitnessStatement().getInput3();
+            final String witnessValidationErrorMessage = validateNegativeWitness(inputValue1, inputValue2);
+            if (!witnessValidationErrorMessage.isEmpty()) {
+                errors.add(witnessValidationErrorMessage);
+            }
+        } else if (nonNull(caseData.getFastTrackWitnessOfFact())) {
+            String inputValue1 = caseData.getFastTrackWitnessOfFact().getInput2();
+            String inputValue2 = caseData.getFastTrackWitnessOfFact().getInput3();
+            final String witnessValidationErrorMessage = validateNegativeWitness(inputValue1, inputValue2);
+            if (!witnessValidationErrorMessage.isEmpty()) {
+                errors.add(witnessValidationErrorMessage);
+            }
         }
-        assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
+
+        if (errors.isEmpty()) {
+            CaseDocument document = sdoGeneratorService.generate(
+                caseData,
+                callbackParams.getParams().get(BEARER_TOKEN).toString()
+            );
+
+            if (document != null) {
+                updatedData.sdoOrderDocument(document);
+            }
+            assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .data(updatedData.build().toMap(objectMapper))
             .build();
     }
@@ -836,16 +863,56 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        if (featureToggleService.isLocationWhiteListedForCaseProgression(
-            caseData.getCaseManagementLocation().getBaseLocation())) {
-            log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
-        } else {
-            log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+        if (featureToggleService.isEarlyAdoptersEnabled()) {
+            // LiP check ensures any LiP cases will always trigger takeCaseOffline task as CUI R1 does not account for LiPs
+            // ToDo: remove LiP check for CUI R2
+            if (!caseContainsLiP(caseData) && featureToggleService.isLocationWhiteListedForCaseProgression(
+                getEpimmsId(caseData))) {
+                log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YES);
+            } else {
+                log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
+                dataBuilder.eaCourtLocation(YesOrNo.NO);
+            }
         }
+
+        dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
+            caseData.getDisposalHearingMethodInPerson()));
+        dataBuilder.fastTrackMethodInPerson(deleteLocationList(
+            caseData.getFastTrackMethodInPerson()));
+        dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
+            caseData.getSmallClaimsMethodInPerson()));
+
+        System.out.println("before about to submit");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean caseContainsLiP(CaseData caseData) {
+        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
+    }
+
+    private DynamicList deleteLocationList(DynamicList list) {
+        if (isNull(list)) {
+            return null;
+        }
+        return DynamicList.builder().value(list.getValue()).build();
+    }
+
+    private String getEpimmsId(CaseData caseData) {
+
+        if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
+            return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
+        }
+        if (SdoHelper.isFastTrack(caseData)) {
+            return caseData.getFastTrackMethodInPerson().getValue().getCode();
+        }
+        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
+        }
+        throw new IllegalArgumentException("Could not determine claim track");
     }
 
     private boolean nonNull(Object object) {
@@ -856,40 +923,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CallbackResponse validateInputValue(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        //CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        List<String> errors = new ArrayList<>();
-        if (nonNull(caseData.getSmallClaimsWitnessStatement())) {
-            String inputValue1 = caseData.getSmallClaimsWitnessStatement().getInput2();
-            String inputValue2 = caseData.getSmallClaimsWitnessStatement().getInput3();
-            if (validateNegativeWitness(errors, inputValue1, inputValue2)) {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
-            }
-        } else if (nonNull(caseData.getFastTrackWitnessOfFact())) {
-            String inputValue1 = caseData.getFastTrackWitnessOfFact().getInput2();
-            String inputValue2 = caseData.getFastTrackWitnessOfFact().getInput3();
-            if (validateNegativeWitness(errors, inputValue1, inputValue2)) {
-                return AboutToStartOrSubmitCallbackResponse.builder()
-                    .errors(errors)
-                    .build();
-            }
-        }
-        return generateSdoOrder(callbackParams);
-    }
-
-    private boolean validateNegativeWitness(List<String> errors, String inputValue1, String inputValue2) {
+    private String validateNegativeWitness(String inputValue1, String inputValue2) {
+        final String errorMessage = "";
         if (inputValue1 != null && inputValue2 != null) {
             int number1 = Integer.parseInt(inputValue1);
             int number2 = Integer.parseInt(inputValue2);
             if (number1 < 0 || number2 < 0) {
-                errors.add("The number entered cannot be less than zero");
-                return true;
+                return "The number entered cannot be less than zero";
             }
         }
-        return false;
+        return errorMessage;
     }
 
     private CaseData.CaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {

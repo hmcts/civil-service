@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -488,6 +489,15 @@ public class CaseDataBuilder {
 
     private NotSuitableSdoOptions notSuitableSdoOptions;
 
+    private List<Element<PartyFlagStructure>> applicant1LRIndividuals;
+    private List<Element<PartyFlagStructure>> respondent1LRIndividuals;
+    private List<Element<PartyFlagStructure>> respondent2LRIndividuals;
+
+    private List<Element<PartyFlagStructure>> applicant1OrgIndividuals;
+    private List<Element<PartyFlagStructure>> applicant2OrgIndividuals;
+    private List<Element<PartyFlagStructure>> respondent1OrgIndividuals;
+    private List<Element<PartyFlagStructure>> respondent2OrgIndividuals;
+
     protected String hearingReference;
     protected ListingOrRelisting listingOrRelisting;
 
@@ -495,6 +505,7 @@ public class CaseDataBuilder {
 
     private DynamicList transferCourtLocationList;
     private String reasonForTransfer;
+    private FlightDelayDetails flightDelayDetails;
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -1854,6 +1865,7 @@ public class CaseDataBuilder {
         addRespondent2 = NO;
         respondent2 = null;
         respondent2Represented = null;
+        respondent2OrgRegistered = null;
         return this;
     }
 
@@ -2284,8 +2296,8 @@ public class CaseDataBuilder {
         atStateClaimSubmitted();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
-        respondent1OrgRegistered = NO;
-        respondent2OrgRegistered = NO;
+        respondent1OrgRegistered = null;
+        respondent2OrgRegistered = null;
         respondent1Represented = NO;
         respondent2Represented = NO;
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
@@ -5180,6 +5192,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder flightDelay(FlightDelayDetails flightDelayDetails) {
+        this.flightDelayDetails = flightDelayDetails;
+        return this;
+    }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -5762,7 +5779,7 @@ public class CaseDataBuilder {
             .partyID("res-1-party-id")
             .flags(Flags.builder()
                        .partyName(applicant1.getPartyName())
-                       .roleOnCase("Applicant 1")
+                       .roleOnCase("Claimant 1")
                        .details(flags)
                        .build())
             .build();
@@ -5775,7 +5792,7 @@ public class CaseDataBuilder {
                                                    .lastName("W last")
                                                    .flags(Flags.builder()
                                                               .partyName("W First W Last")
-                                                              .roleOnCase("Applicant 1 Witness")
+                                                              .roleOnCase("Claimant 1 Witness")
                                                               .details(flagDetails())
                                                               .build())
                                                    .build());
@@ -5788,7 +5805,7 @@ public class CaseDataBuilder {
                                                  .lastName("E last")
                                                  .flags(Flags.builder()
                                                             .partyName("E First E Last")
-                                                            .roleOnCase("Applicant 1 Expert")
+                                                            .roleOnCase("Claimant 1 Expert")
                                                             .details(flagDetails())
                                                             .build())
                                                  .build());
@@ -5799,7 +5816,7 @@ public class CaseDataBuilder {
         this.applicant1LitigationFriend = applicant1LitigationFriend.toBuilder()
             .flags(Flags.builder()
                        .partyName(applicant1LitigationFriend.getFullName())
-                       .roleOnCase("Applicant 1 Litigation Friend")
+                       .roleOnCase("Claimant 1 Litigation Friend")
                        .details(flagDetails())
                        .build())
             .build();
@@ -5810,7 +5827,7 @@ public class CaseDataBuilder {
         this.applicant2 = applicant2.toBuilder()
             .flags(Flags.builder()
                        .partyName(applicant2.getPartyName())
-                       .roleOnCase("Applicant 2")
+                       .roleOnCase("Claimant 2")
                        .details(flagDetails())
                        .build())
             .build();
@@ -5823,7 +5840,7 @@ public class CaseDataBuilder {
                                                    .lastName("W last")
                                                    .flags(Flags.builder()
                                                               .partyName("W First W Last")
-                                                              .roleOnCase("Applicant 2 Witness")
+                                                              .roleOnCase("Claimant 2 Witness")
                                                               .details(flagDetails())
                                                               .build())
                                                    .build());
@@ -5836,7 +5853,7 @@ public class CaseDataBuilder {
                                                  .lastName("E last")
                                                  .flags(Flags.builder()
                                                             .partyName("E First E Last")
-                                                            .roleOnCase("Applicant 2 Expert")
+                                                            .roleOnCase("Claimant 2 Expert")
                                                             .details(flagDetails())
                                                             .build())
                                                  .build());
@@ -5847,7 +5864,7 @@ public class CaseDataBuilder {
         this.applicant2LitigationFriend = applicant2LitigationFriend.toBuilder()
             .flags(Flags.builder()
                        .partyName(applicant2LitigationFriend.getFullName())
-                       .roleOnCase("Applicant 2 Litigation Friend")
+                       .roleOnCase("Claimant 2 Litigation Friend")
                        .details(flagDetails())
                        .build())
             .build();
@@ -5863,7 +5880,7 @@ public class CaseDataBuilder {
             .partyID("res-1-litfriend-party-id")
             .flags(Flags.builder()
                        .partyName(respondent1LitigationFriend.getFullName())
-                       .roleOnCase("Respondent 1 Litigation Friend")
+                       .roleOnCase("Defendant 1 Litigation Friend")
                        .details(flags)
                        .build())
             .build();
@@ -5879,7 +5896,7 @@ public class CaseDataBuilder {
             .partyID("res-1-party-id")
             .flags(Flags.builder()
                        .partyName(respondent1.getPartyName())
-                       .roleOnCase("Respondent 1")
+                       .roleOnCase("Defendant 1")
                        .details(flags)
                        .build())
             .build();
@@ -5894,7 +5911,7 @@ public class CaseDataBuilder {
                 .lastName("W last")
                 .flags(Flags.builder()
                            .partyName("W First W Last")
-                           .roleOnCase("Respondent 1 Witness")
+                           .roleOnCase("Defendant 1 Witness")
                            .details(flagDetails())
                            .build())
                 .build());
@@ -5909,7 +5926,7 @@ public class CaseDataBuilder {
                 .lastName("E last")
                 .flags(Flags.builder()
                            .partyName("E First E Last")
-                           .roleOnCase("Respondent 1 Expert")
+                           .roleOnCase("Defendant 1 Expert")
                            .details(flagDetails())
                            .build())
                 .build());
@@ -5920,7 +5937,7 @@ public class CaseDataBuilder {
         this.respondent2 = respondent2.toBuilder()
             .flags(Flags.builder()
                        .partyName(respondent2.getPartyName())
-                       .roleOnCase("Respondent 2")
+                       .roleOnCase("Defendant 2")
                        .details(flagDetails())
                        .build())
             .build();
@@ -5933,7 +5950,7 @@ public class CaseDataBuilder {
                                                    .lastName("E last")
                                                    .flags(Flags.builder()
                                                               .partyName("E First E Last")
-                                                              .roleOnCase("Respondent 2 Expert")
+                                                              .roleOnCase("Defendant 2 Expert")
                                                               .details(flagDetails())
                                                               .build())
                                                    .build());
@@ -5946,7 +5963,7 @@ public class CaseDataBuilder {
                                                      .lastName("W last")
                                                      .flags(Flags.builder()
                                                                 .partyName("W First W Last")
-                                                                .roleOnCase("Respondent 2 Witness")
+                                                                .roleOnCase("Defendant 2 Witness")
                                                                 .details(flagDetails())
                                                                 .build())
                                                      .build());
@@ -5957,7 +5974,7 @@ public class CaseDataBuilder {
         this.respondent2LitigationFriend = respondent2LitigationFriend.toBuilder()
             .flags(Flags.builder()
                        .partyName(respondent2LitigationFriend.getFullName())
-                       .roleOnCase("Respondent 2 Litigation Friend")
+                       .roleOnCase("Defendant 2 Litigation Friend")
                        .details(flagDetails())
                        .build())
             .build();
@@ -6076,8 +6093,8 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder updateDetailsForm(UpdateDetailsForm additionalDates) {
-        this.updateDetailsForm = additionalDates;
+    public CaseDataBuilder updateDetailsForm(UpdateDetailsForm form) {
+        this.updateDetailsForm = form;
         return this;
     }
 
@@ -6128,6 +6145,125 @@ public class CaseDataBuilder {
             .input3("-3")
             .build();
 
+        return this;
+    }
+
+    public CaseDataBuilder addApplicantLRIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("app-lr-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.applicant1LRIndividuals != null && !this.applicant1LRIndividuals.isEmpty()) {
+            this.applicant1LRIndividuals.addAll(individual);
+        } else {
+            this.applicant1LRIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1LRIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-1-lr-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.respondent1LRIndividuals != null && !this.respondent1LRIndividuals.isEmpty()) {
+            this.respondent1LRIndividuals.addAll(individual);
+        } else {
+            this.respondent1LRIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent2LRIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-2-lr-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.respondent2LRIndividuals != null && !this.respondent2LRIndividuals.isEmpty()) {
+            this.respondent2LRIndividuals.addAll(individual);
+        } else {
+            this.respondent2LRIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addApplicant1OrgIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("app-1-org-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.applicant1OrgIndividuals != null && !this.applicant1OrgIndividuals.isEmpty()) {
+            this.applicant1OrgIndividuals.addAll(individual);
+        } else {
+            this.applicant1OrgIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addApplicant2OrgIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("app-2-org-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.applicant2OrgIndividuals != null && !this.applicant2OrgIndividuals.isEmpty()) {
+            this.applicant2OrgIndividuals.addAll(individual);
+        } else {
+            this.applicant2OrgIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1OrgIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-1-org-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.respondent1OrgIndividuals != null && !this.respondent1OrgIndividuals.isEmpty()) {
+            this.respondent1OrgIndividuals.addAll(individual);
+        } else {
+            this.respondent1OrgIndividuals = individual;
+        }
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent2OrgIndividual(String firstName, String lastName) {
+        List<Element<PartyFlagStructure>> individual =
+            wrapElements(PartyFlagStructure.builder()
+                             .partyID("res-2-org-ind-party-id")
+                             .firstName(firstName)
+                             .lastName(lastName)
+                             .email("abc@def.ghi")
+                             .phone("07777777777")
+                             .build());
+        if (this.respondent2OrgIndividuals != null && !this.respondent2OrgIndividuals.isEmpty()) {
+            this.respondent2OrgIndividuals.addAll(individual);
+        } else {
+            this.respondent2OrgIndividuals = individual;
+        }
         return this;
     }
 
@@ -6416,6 +6552,15 @@ public class CaseDataBuilder {
             .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
             .transferCourtLocationList(transferCourtLocationList)
             .reasonForTransfer(reasonForTransfer)
+
+            .applicant1LRIndividuals(applicant1LRIndividuals)
+            .respondent1LRIndividuals(respondent1LRIndividuals)
+            .respondent2LRIndividuals(respondent2LRIndividuals)
+            .applicant1OrgIndividuals(applicant1OrgIndividuals)
+            .applicant2OrgIndividuals(applicant2OrgIndividuals)
+            .respondent1OrgIndividuals(respondent1OrgIndividuals)
+            .respondent2OrgIndividuals(respondent2OrgIndividuals)
+            .flightDelayDetails(flightDelayDetails)
             .build();
     }
 }

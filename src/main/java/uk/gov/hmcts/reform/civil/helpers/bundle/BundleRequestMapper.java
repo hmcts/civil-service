@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Collection;
@@ -34,7 +35,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -43,6 +46,7 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getExpertDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getWitnessDocsByPartyAndDocType;
@@ -114,6 +118,32 @@ public class BundleRequestMapper {
                 .build();
         bundlingCaseData = mapRespondent2Applicant2Details(bundlingCaseData, caseData);
         return bundlingCaseData;
+    }
+
+    private List<BundlingRequestDocument> mapParticularsOfClaimDocs(CaseData caseData) {
+        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+        if (Objects.nonNull(caseData.getServedDocumentFiles())
+                && Objects.nonNull((caseData.getServedDocumentFiles().getParticularsOfClaimDocument()))) {
+            caseData.getServedDocumentFiles()
+                    .getParticularsOfClaimDocument()
+                    .forEach(poc -> bundlingRequestDocuments.add(
+                            buildBundlingRequestDoc(getParticularsOfClaimName(caseData),
+                            poc.getValue(), "")));
+        }
+        return bundlingRequestDocuments;
+    }
+
+    private String getParticularsOfClaimName(CaseData caseData) {
+        LocalDate pocDate;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            pocDate = caseData.getIssueDate();
+        } else if (Objects.nonNull(caseData.getClaimDetailsNotificationDate())) {
+            pocDate = caseData.getClaimDetailsNotificationDate().toLocalDate();
+        } else {
+            pocDate = caseData.getSubmittedDate().toLocalDate();
+        }
+        return generateDocName(BundleFileNameList.PARTICULARS_OF_CLAIM.getDisplayName(),
+                null, null, pocDate);
     }
 
     private List<Element<BundlingRequestDocument>> mapJointStatementOfExperts(CaseData caseData) {
@@ -503,9 +533,7 @@ public class BundleRequestMapper {
             bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getDirectionOrderDocStaff(),
                                                                            BundleFileNameList.ORDER.getDisplayName()));
         }
-        if (caseData.getFinalOrderDocument() != null) {
-            bundlingRequestDocuments.add(buildBundlingRequestDoc(caseData.getFinalOrderDocument().getDocumentFileName(), caseData.getFinalOrderDocument(), ""));
-        }
+
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
@@ -518,6 +546,7 @@ public class BundleRequestMapper {
                                                                                && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals("detailsOfClaim"))
                                                                            .collect(Collectors.toList()),
                                                                        BundleFileNameList.CLAIM_FORM.getDisplayName()));
+        bundlingRequestDocuments.addAll(mapParticularsOfClaimDocs(caseData));
         List<Element<CaseDocument>> clAndDfDocList = caseData.getDefendantResponseDocuments();
         clAndDfDocList.addAll(caseData.getClaimantResponseDocuments());
         List<Element<CaseDocument>> sortedDefendantDefenceAndClaimantReply =
@@ -662,9 +691,8 @@ public class BundleRequestMapper {
                                                  isWitnessSelf ? party.getDisplayName() :
                                                      uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
                                                  null,
-                                                 documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())
-                                                     ? uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate() : uploadEvidenceWitnessElement
-                                                     .getValue().getCreatedDatetime().toLocalDate());
+                                                 uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate()
+                );
                 bundlingRequestDocuments.add(buildBundlingRequestDoc(docName, uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument(), documentType));
             });
         }
@@ -723,10 +751,7 @@ public class BundleRequestMapper {
                 partyName = partyName.concat(" counter");
             }
             if (documentType.equals(EvidenceUploadFiles.DOCUMENTS_REFERRED.name())) {
-                return generateDocName(fileNamePrefix,
-                                       index,
-                                       null,
-                                       uploadEvidence.getValue().getDocumentIssuedDate());
+                return getEvidenceUploadTypeWithNameFileName(fileNamePrefix, uploadEvidence.getValue());
             } else {
                 return generateDocName(fileNamePrefix, partyName, null,
                                        documentType.equals(EvidenceUploadFiles.CASE_SUMMARY.name()) || documentType.equals(
@@ -736,6 +761,13 @@ public class BundleRequestMapper {
                 );
             }
         }
+    }
+
+    private String getEvidenceUploadTypeWithNameFileName(String body, UploadEvidenceDocumentType uploadEvidence) {
+        return String.format(body, uploadEvidence.getTypeOfDocument(),
+                uploadEvidence.getWitnessOptionName(),
+                uploadEvidence.getDocumentIssuedDate()
+                .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK)));
     }
 
     private List<BundlingRequestDocument> covertExpertEvidenceTypeToBundleRequestDocs(List<Element<UploadEvidenceExpert>> evidenceUploadExpert,

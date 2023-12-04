@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -78,11 +77,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SERVICE_REQUES
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNameInternal;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
@@ -483,10 +482,8 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         handleCourtLocationData(caseData, dataBuilder, callbackParams);
 
-        if (toggleService.isNoticeOfChangeEnabled()) {
-            // LiP are not represented or registered
-            OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
-        }
+        // LiP are not represented or registered
+        OrgPolicyUtils.addMissingOrgPolicies(dataBuilder);
 
         // temporarily default to yes for CIV-2659
         if (YES.equals(caseData.getRespondent1Represented()) && caseData.getRespondent1OrgRegistered() == null) {
@@ -499,7 +496,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
         //casename
-        dataBuilder.caseNameHmctsInternal(caseParticipants(caseData).toString());
+        dataBuilder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
 
         //case management category
         CaseManagementCategoryElement civil =
@@ -511,20 +508,17 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         log.info("Case management equals: " + caseData.getCaseManagementCategory());
         log.info("CaseName equals: " + caseData.getCaseNameHmctsInternal());
 
-        //Adding variables for feature Certificate of Service
-        if (toggleService.isCertificateOfServiceEnabled()) {
-            if (caseData.getRespondent1Represented().equals(NO)) {
-                dataBuilder.defendant1LIPAtClaimIssued(YES);
-            } else {
-                dataBuilder.defendant1LIPAtClaimIssued(NO);
-            }
+        if (caseData.getRespondent1Represented().equals(NO)) {
+            dataBuilder.defendant1LIPAtClaimIssued(YES);
+        } else {
+            dataBuilder.defendant1LIPAtClaimIssued(NO);
+        }
 
-            if (YES.equals(caseData.getAddRespondent2())) {
-                if (caseData.getRespondent2Represented() == NO) {
-                    dataBuilder.defendant2LIPAtClaimIssued(YES);
-                } else {
-                    dataBuilder.defendant2LIPAtClaimIssued(NO);
-                }
+        if (YES.equals(caseData.getAddRespondent2())) {
+            if (caseData.getRespondent2Represented() == NO) {
+                dataBuilder.defendant2LIPAtClaimIssued(YES);
+            } else {
+                dataBuilder.defendant2LIPAtClaimIssued(NO);
             }
         }
         //assign category ids to documents uploaded as part of particulars of claim
@@ -607,18 +601,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
     private String getBody(CaseData caseData) {
         return areRespondentsRepresentedAndRegistered(caseData)
             ? getConfirmationSummary(caseData)
-            : toggleService.isCertificateOfServiceEnabled()
-              ? format(CONFIRMATION_BODY_LIP_COS,
+            : format(CONFIRMATION_BODY_LIP_COS,
                        format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
                        format(caseDocLocation, caseData.getCcdCaseReference()),
                        claimUrlsConfiguration.getResponsePackLink())
-                + exitSurveyContentService.applicantSurvey()
-              : format(CONFIRMATION_BODY_COS,
-               format("/cases/case-details/%s#Service%%20Request", caseData.getCcdCaseReference()),
-               format(caseDocLocation, caseData.getCcdCaseReference()),
-               claimUrlsConfiguration.getResponsePackLink())
-            + exitSurveyContentService.applicantSurvey();
-
+                + exitSurveyContentService.applicantSurvey();
     }
 
     private String getConfirmationSummary(CaseData caseData) {
@@ -637,30 +624,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             errorsMessages.add("Court location code is required");
         }
         return errorsMessages;
-    }
-
-    public StringBuilder caseParticipants(CaseData caseData) {
-        StringBuilder participantString = new StringBuilder();
-        MultiPartyScenario multiPartyScenario  = getMultiPartyScenario(caseData);
-        if (multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
-            || multiPartyScenario.equals(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)) {
-            participantString.append(caseData.getApplicant1().getPartyName())
-                .append(" v ").append(caseData.getRespondent1().getPartyName())
-                .append(" and ").append(caseData.getRespondent2().getPartyName());
-
-        } else if (multiPartyScenario.equals(MultiPartyScenario.TWO_V_ONE)) {
-            participantString.append(caseData.getApplicant1().getPartyName())
-                .append(" and ").append(caseData.getApplicant2().getPartyName()).append(" v ")
-                .append(caseData.getRespondent1()
-                .getPartyName());
-
-        } else {
-            participantString.append(caseData.getApplicant1().getPartyName()).append(" v ")
-                .append(caseData.getRespondent1()
-                .getPartyName());
-        }
-        return participantString;
-
     }
 
     private void handleCourtLocationData(CaseData caseData, CaseData.CaseDataBuilder dataBuilder,

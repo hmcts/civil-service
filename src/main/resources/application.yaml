@@ -16,6 +16,8 @@ management:
     case-document-am-api:
       enabled: true
 spring:
+  config:
+    import: "optional:configtree:/mnt/secrets/civil/"
   application:
     name: civil-service
   main:
@@ -114,6 +116,11 @@ pin-in-post:
   cui-front-end:
     url: ${CUI_URL:http://localhost:3001}
 
+ocmc:
+  client:
+    id: ${OCMC_CLIENT_ID:cmc_citizen}
+    url: ${OCMC_CLIENT_URL:http://localhost:3001}
+
 manage-case-ui:
   baseurl: ${MANAGE_CASE_UI_BASE_URL:http://localhost:3333}
 
@@ -128,6 +135,7 @@ payments:
 idam:
   s2s-auth:
     microservice: civil_service
+
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
@@ -158,6 +166,7 @@ civil:
   test-user:
     username: ${TEST_USERNAME:test@example.com}
     password: ${TEST_PASSWORD:Password12!}
+  authorised-services: ${CIVIL_S2S_AUTHORISED_SERVICES:payment_app,ccd_data,civil_service,civil-citizen-ui}
 
 core_case_data:
   api:
@@ -215,6 +224,7 @@ notifications:
   claimantSolicitorDefendantResponseForSpec: "28ea1d53-93b1-4e48-a7e5-7a876f910f86"
   claimantSolicitorImmediatelyDefendantResponseForSpec: "263d7737-933d-4d0b-9f08-23847613f6a4"
   respondentSolicitorDefendantResponseForSpec: "9527f77e-b346-4527-b93c-c2affd39fa51"
+  respondentSolicitorDefResponseSpecWithClaimantAction: "efbd38e8-3fe7-4db6-ad55-b751b96477b1"
   respondentDefendantResponseForSpec: "94c71894-9590-4995-aae0-edea94fc4594"
   sdoOrdered: "90667080-6b20-48f2-b9ea-349fa8ec78e4"
   sdoOrderedSpec: "1c1a200c-b3c1-45eb-9768-aeea56857420"
@@ -228,6 +238,8 @@ notifications:
   respondentSolicitorNotifyNotToProceedSpec: "4dc0b5bb-674f-401e-8a39-05686dc0302e"
   claimantSolicitorConfirmsToProceedSpec: "99786d26-ab90-43c7-aa20-9d450d8ce4eb"
   respondentSolicitorNotifyToProceedSpec: "ea6cb18e-ebba-4759-8df3-426e00f2f09c"
+  claimantSolicitorConfirmsToProceedSpecWithAction: "d454e5a9-8c56-4a1d-acce-53a1686376bc"
+  respondentSolicitorNotifyToProceedSpecWithAction: "c1bb435e-0300-4e51-89ec-56dd7f77ef27"
   applicantSolicitor1DefaultJudgmentReceived: "14a43ad4-e337-490a-bf8b-1288520dc9eb"
   claimantSolicitorCounterClaimForSpec: "256b6cf4-6201-48f0-bf1e-88a187712196"
   respondentSolicitorCounterClaimForSpec: "6cb3b3d5-f1aa-4236-ad03-685605a9235e"
@@ -307,11 +319,19 @@ notifications:
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
   notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "3d302844-ecdc-47e6-8aed-971c3f42a059"
+  notifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate: "a9c1ccba-eb72-414d-8dc7-d75f33c79b28"
   notifyLiPClaimantDefendantResponded: "4b1325dd-51ed-4dc2-bcc6-d9afb01a3f29"
   notifyLiPClaimantDefendantChangedContactDetails: "72a14146-c897-4fc6-be4f-474266da7398"
 
   notifyApplicant1EnteredBreathingSpaceLip: "7e34af74-ec20-476b-aea5-6a6508d3acaf"
   notifyEnteredBreathingSpaceForDefendantLip: "e551a04f-9da1-4654-a7be-2040e02925aa"
+
+  notifyLiPApplicantBreathingSpaceLifted: "b6dbc714-210e-475d-a1db-bf5ea28de98b"
+  notifyLiPRespondentBreathingSpaceLifted: "4ca3017b-b2fa-4ac0-a867-9bfada50a80c"
+
+  notifyApplicantLipRequestJudgementByAdmissionNotificationTemplate: "d6625ee3-f794-4a87-b0a3-bef7dd0663b9"
+  notifyRespondentLipRequestJudgementByAdmissionNotificationTemplate: "6ced7f9c-b0fd-4fad-a76c-745873b9a3a2"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
