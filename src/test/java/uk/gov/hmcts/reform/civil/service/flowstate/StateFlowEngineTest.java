@@ -81,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFIC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
@@ -4650,7 +4651,7 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturnProceedsInHeritageSystem_whenFullAdmitRepaymentAcceptedWithCCJ() {
+        void shouldReturnProceedsInHeritageSystem_whenPartAdmitRepaymentAcceptedWithCCJ() {
             // Given
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                     .ccjPaymentPaidSomeOption(YES)
@@ -4686,7 +4687,7 @@ class StateFlowEngineTest {
             assertThat(stateFlow.getState())
                     .extracting(State::getName)
                     .isNotNull()
-                    .isEqualTo(FULL_ADMIT_AGREE_REPAYMENT.fullName());
+                    .isEqualTo(PART_ADMIT_AGREE_REPAYMENT.fullName());
             assertThat(stateFlow.getFlags()).contains(
                     entry(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), true)
             );
