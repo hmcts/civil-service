@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 public class JudgmentAdmissionUtils {
+
     private JudgmentAdmissionUtils() {
         //NO-OP
     }

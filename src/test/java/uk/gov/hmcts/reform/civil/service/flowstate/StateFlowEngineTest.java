@@ -19,7 +19,11 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.*;
+import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
@@ -4644,6 +4648,49 @@ class StateFlowEngineTest {
             // Then
             assertEquals(SIGN_SETTLEMENT_AGREEMENT.fullName(), fullState.getState().getName());
         }
+
+        @Test
+        void shouldReturnProceedsInHeritageSystem_whenFullAdmitRepaymentAcceptedWithCCJ() {
+            // Given
+            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
+                    .ccjPaymentPaidSomeOption(YES)
+                    .build();
+            DefendantPinToPostLRspec respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
+                    .accessCode("TEST")
+                    .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued1v1UnrepresentedDefendant()
+                    .applicant1Represented(NO)
+                    .build().toBuilder()
+                    .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
+                    .takenOfflineDate(null)
+                    .paymentSuccessfulDate(null)
+                    .claimIssuedPaymentDetails(null)
+                    .caseAccessCategory(SPEC_CLAIM)
+                    .claimNotificationDeadline(LocalDateTime.now())
+                    .claimNotificationDate(LocalDateTime.now())
+                    .respondent1ResponseDate(LocalDateTime.now())
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .respondent1Represented(YesOrNo.NO)
+                    .applicant1Represented(YesOrNo.NO)
+                    .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
+                    .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+                    .ccjPaymentDetails(ccjPaymentDetails)
+                    .build();
+
+            // When
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                    .extracting(State::getName)
+                    .isNotNull()
+                    .isEqualTo(FULL_ADMIT_AGREE_REPAYMENT.fullName());
+            assertThat(stateFlow.getFlags()).contains(
+                    entry(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), true)
+            );
+        }
     }
 
     @Nested
@@ -4682,7 +4729,7 @@ class StateFlowEngineTest {
         }
 
         @Test
-        void shouldReturn_whenFullAdmitRepaymentAcceptedWithCCJ() {
+        void shouldReturnProceedsInHeritageSystemState_whenFullAdmitRepaymentAcceptedWithCCJ() {
             // Given
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                 .ccjPaymentPaidSomeOption(YES)
@@ -4702,10 +4749,8 @@ class StateFlowEngineTest {
                 .paymentSuccessfulDate(null)
                 .claimIssuedPaymentDetails(null)
                 .caseAccessCategory(SPEC_CLAIM)
-                // claim issued
                 .claimNotificationDeadline(LocalDateTime.now())
                 .claimNotificationDate(LocalDateTime.now())
-                // CIV-9024
                 .respondent1ResponseDate(LocalDateTime.now())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent1Represented(YesOrNo.NO)
