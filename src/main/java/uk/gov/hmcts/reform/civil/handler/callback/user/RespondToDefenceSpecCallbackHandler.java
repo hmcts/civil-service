@@ -695,8 +695,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private boolean isFlightDelaySmallClaimAndAirline(CaseData caseData) {
         //Update the Case Management Location when the Airline  is not Other
         return (isFlightDelayAndSmallClaim(caseData) && caseData.getFlightDelayDetails() != null
-            && caseData.getFlightDelayDetails().getAirlineList()
-            .getValue().getCode().equals("OTHER") == false);
+            && !caseData.getFlightDelayDetails().getAirlineList()
+            .getValue().getCode().equals("OTHER"));
     }
 
     private boolean isFlightDelaySmallClaimAndOther(CaseData caseData) {
