@@ -34,11 +34,11 @@ public class DefendantPinToPostLRspecService {
     public void validatePin(CaseDetails caseDetails, String pin, String... legacyCaseRef) {
         log.info("Validate Pin called..");
         if (!pin.isEmpty() && pin.length() == OCMC_PIN_LENGTH) {
-            log.info("Its a OCMC claim");
+            log.info("Its a cmc claim");
             int response = cuiIdamClientService.authenticatePinUser(pin, legacyCaseRef[0]);
-            log.info("Valid Pin : " + response);
+            log.info("valid Pin : " + response);
             if (response == HttpStatus.FOUND.value() || response == HttpStatus.OK.value()) {
-                log.info("Valid OCMC claim..");
+                log.info("It's a valid claim..");
             } else {
                 log.error("Pin does not match or expired for {}", legacyCaseRef[0]);
                 throw new PinNotMatchException();
@@ -55,7 +55,6 @@ public class DefendantPinToPostLRspecService {
             }
             log.info("Valid CUI Pin");
         }
-        log.info("Pin is valid hence moving fwd");
     }
 
     public void removePinInPostData(Long caseId, DefendantPinToPostLRspec pinInPostData) {
