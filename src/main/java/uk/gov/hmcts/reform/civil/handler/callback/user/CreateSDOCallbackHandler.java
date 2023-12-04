@@ -864,7 +864,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
         if (featureToggleService.isEarlyAdoptersEnabled()) {
-            if (featureToggleService.isLocationWhiteListedForCaseProgression(
+            // LiP check ensures any LiP cases will always trigger takeCaseOffline task as CUI R1 does not account for LiPs
+            // ToDo: remove LiP check for CUI R2
+            if (!caseContainsLiP(caseData) && featureToggleService.isLocationWhiteListedForCaseProgression(
                 getEpimmsId(caseData))) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(YES);
@@ -886,6 +888,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean caseContainsLiP(CaseData caseData) {
+        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
     }
 
     private DynamicList deleteLocationList(DynamicList list) {
