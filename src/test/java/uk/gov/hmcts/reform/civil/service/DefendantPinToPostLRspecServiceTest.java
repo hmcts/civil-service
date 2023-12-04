@@ -185,7 +185,7 @@ class DefendantPinToPostLRspecServiceTest {
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-            when(cuiIdamClientService.authenticatePinUser(anyString(), anyString())).thenReturn(HttpStatus.OK.value());
+            when(cuiIdamClientService.authenticatePinUser(anyString(), anyString())).thenReturn(HttpStatus.FOUND.value());
 
             Assertions.assertDoesNotThrow(() ->  defendantPinToPostLRspecService.validatePin(
                 caseDetails, "TEST1234", "620MC123"));
