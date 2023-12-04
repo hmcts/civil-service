@@ -600,7 +600,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 .flags(oldCaseData.getApplicant2LitigationFriend().getFlags())
                 .build();
 
-            builder.applicant1LitigationFriend(party);
+            builder.applicant2LitigationFriend(party);
         }
 
         // Litigation Friend
@@ -609,7 +609,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 .flags(oldCaseData.getRespondent1LitigationFriend().getFlags())
                 .build();
 
-            builder.applicant1LitigationFriend(party);
+            builder.respondent1LitigationFriend(party);
         }
 
         // Litigation Friend
@@ -618,7 +618,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 .flags(oldCaseData.getRespondent2LitigationFriend().getFlags())
                 .build();
 
-            builder.applicant1LitigationFriend(party);
+            builder.respondent2LitigationFriend(party);
         }
     }
 
