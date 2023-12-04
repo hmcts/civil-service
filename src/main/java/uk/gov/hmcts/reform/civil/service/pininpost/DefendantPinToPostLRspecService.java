@@ -33,7 +33,6 @@ public class DefendantPinToPostLRspecService {
 
     public void validatePin(CaseDetails caseDetails, String pin, String... legacyCaseRef) {
         log.info("Validate Pin called..");
-        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         if (!pin.isEmpty() && pin.length() == OCMC_PIN_LENGTH) {
             log.info("Its a OCMC claim");
             int response = cuiIdamClientService.authenticatePinUser(pin, legacyCaseRef[0]);
@@ -45,6 +44,7 @@ public class DefendantPinToPostLRspecService {
             log.info("Valid OCMC claim..");
         } else {
             log.info("Its a CUI claim..");
+            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
             if (pinInPostData == null || pinInPostData.getAccessCode() == null
                 || !pinInPostData.getAccessCode().equals(pin)
