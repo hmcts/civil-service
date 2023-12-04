@@ -246,7 +246,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
             .put(callbackKey(MID, "get-airline-list"), this::getAirlineList)
-            .put(callbackKey(MID, "validateDateAndSetFlightDelayClaimType"), this::validateDateAndSetFlightDelayClaimType)
+            .put(callbackKey(MID, "validateFlightDelayDate"), this::validateFlightDelayDate)
             .build();
     }
 
@@ -951,7 +951,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private CallbackResponse validateDateAndSetFlightDelayClaimType(CallbackParams callbackParams) {
+    private CallbackResponse validateFlightDelayDate(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         List<String> errors = new ArrayList<>();
         if (toggleService.isSdoR2Enabled()) {

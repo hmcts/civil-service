@@ -1647,7 +1647,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder().isFlightDelayClaim(YES)
                 .build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "validateDateAndSetFlightDelayClaimType");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
             when(toggleService.isSdoR2Enabled()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1691,7 +1691,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isFlightDelayClaim(YES)
                 .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().plusDays(1)).build()).build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "validateDateAndSetFlightDelayClaimType");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
             when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1708,7 +1708,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isFlightDelayClaim(YES)
                 .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().minusDays(days)).build()).build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "validateDateAndSetFlightDelayClaimType");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
             when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
