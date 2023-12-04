@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.pininpost;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -26,17 +27,26 @@ public class DefendantPinToPostLRspecService {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-
+    private final CUIIdamClientService cuiIdamClientService;
     private static final int EXPIRY_PERIOD = 180;
+    private static final int OCMC_PIN_LENGTH = 8;
 
     public void validatePin(CaseDetails caseDetails, String pin) {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-        DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
-        if (pinInPostData == null || pinInPostData.getAccessCode() == null
-            || !pinInPostData.getAccessCode().equals(pin)
-            || pinInPostData.getExpiryDate().isBefore(LocalDate.now())) {
-            log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
-            throw new PinNotMatchException();
+        if (!pin.isEmpty() && pin.length() == OCMC_PIN_LENGTH) {
+            int response = cuiIdamClientService.authenticatePinUser(pin, caseData.getLegacyCaseReference());
+            if (response != HttpStatus.OK.value()) {
+                log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
+                throw new PinNotMatchException();
+            }
+        } else {
+            DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
+            if (pinInPostData == null || pinInPostData.getAccessCode() == null
+                || !pinInPostData.getAccessCode().equals(pin)
+                || pinInPostData.getExpiryDate().isBefore(LocalDate.now())) {
+                log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
+                throw new PinNotMatchException();
+            }
         }
     }
 
