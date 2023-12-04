@@ -409,12 +409,10 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         updateExperts(partyChosenId, caseData, builder);
         updateWitnesses(partyChosenId, caseData, builder);
 
-        // persist party flags (ccd issue)
-        if (isParty(partyChosenId)) {
-            getFlagsForParty(callbackParams, caseData, builder);
-        }
-
         if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
+            // persist party flags (ccd issue)
+            getFlagsForParty(callbackParams, caseData, builder);
+
             // update case name for hmc if applicant/respondent/litigation friend was updated
             builder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
             builder.caseNamePublic(buildCaseNamePublic(caseData));
