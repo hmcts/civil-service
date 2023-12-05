@@ -12,8 +12,8 @@ public class CMCPinVerifyConfiguration {
     private final String clientId;
 
     public CMCPinVerifyConfiguration(
-        @Value("${ocmc.client.id}") String redirectUrl,
-        @Value("${ocmc.client.url}") String clientId
+        @Value("${ocmc.client.id}") String clientId,
+        @Value("${ocmc.client.url}") String redirectUrl
     ) {
         this.redirectUrl = redirectUrl;
         this.clientId = clientId;
