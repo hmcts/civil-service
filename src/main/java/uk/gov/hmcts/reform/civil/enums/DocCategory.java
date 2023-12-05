@@ -10,9 +10,9 @@ public enum DocCategory {
     DEF1_DEFENSE_DQ("defendant1DefenseDirectionsQuestionnaire"),
     DEF2_DEFENSE_DQ("defendant2DefenseDirectionsQuestionnaire"),
     APP1_DQ("directionsQuestionnaire"),
+    DQ_APP1("DQApplicant"),
     DQ_DEF1("DQRespondent"),
     DQ_DEF2("DQRespondentTwo"),
-    DQ_APP("DQApplicant"),
     HEARING_NOTICES("hearingNotices");
 
     private final String value;
