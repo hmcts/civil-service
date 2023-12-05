@@ -53,11 +53,11 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
     private CallbackResponse generateInterlocutoryJudgementDoc(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        boolean isCompanyOROrganisation = caseData.getApplicant1().isCompanyOROrganisation();
         ChooseHowToProceed chooseHowToProceed = getChooseHowToProceed(caseData);
         RepaymentDecisionType repaymentDecisionType = getRepaymentDecisionType(caseData);
 
-        // Generate the document only if applicant chosen formalises with ccj and in favour of defendant
-        if (chooseHowToProceed != ChooseHowToProceed.REQUEST_A_CCJ || repaymentDecisionType != RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT) {
+        if (isCompanyOROrganisation || chooseHowToProceed != ChooseHowToProceed.REQUEST_A_CCJ || repaymentDecisionType != RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT) {
             return SubmittedCallbackResponse.builder().build();
         }
 
@@ -88,8 +88,9 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
 
     private RepaymentDecisionType getRepaymentDecisionType(CaseData caseData) {
         return Optional.ofNullable(caseData).map(CaseDataParent::getCaseDataLiP)
-            .map(CaseDataLiP::getClaimantCourtDecision).orElse(null);
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .map(ClaimantLiPResponse::getClaimantCourtDecision)
+            .orElse(null);
     }
-
 }
 

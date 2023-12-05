@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
@@ -70,10 +71,12 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             anyString()
         )).willReturn(FORM);
         CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .caseDataLiP(CaseDataLiP.builder()
-                             .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
+
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                         .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
                                                         .build())
                              .build())
             .build();
@@ -86,10 +89,11 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     void shouldNotGenerateDocWhenCourtDecisionInFavourClaimant() {
         //Given
         CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .caseDataLiP(CaseDataLiP.builder()
-                             .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                         .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
                                                         .build())
                              .build())
             .build();
@@ -102,10 +106,11 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     void shouldNotGenerateDocWhenChoosesHowToProceedSignSettlementAgreement() {
         //Given
         CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).build())
             .caseDataLiP(CaseDataLiP.builder()
-                             .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
                              .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                                         .applicant1ChoosesHowToProceed(ChooseHowToProceed.SIGN_A_SETTLEMENT_AGREEMENT)
+                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
                                                         .build())
                              .build())
             .build();
