@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
 import java.util.List;
