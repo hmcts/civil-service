@@ -714,9 +714,8 @@ public class BundleRequestMapper {
                                                  isWitnessSelf ? party.getDisplayName() :
                                                      uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
                                                  null,
-                                                 documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())
-                                                     ? uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate() : uploadEvidenceWitnessElement
-                                                     .getValue().getCreatedDatetime().toLocalDate());
+                                                 uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate()
+                );
                 bundlingRequestDocuments.add(buildBundlingRequestDoc(docName, uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument(), documentType));
             });
         }
