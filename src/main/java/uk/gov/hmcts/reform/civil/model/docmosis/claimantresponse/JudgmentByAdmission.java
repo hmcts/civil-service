@@ -19,6 +19,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 public class JudgmentByAdmission implements MappableObject {
     private final String formHeader;
+    private final String formName;
     private final String claimReferenceNumber;
     private final LipFormParty claimant;
     private final LipFormParty defendant;
