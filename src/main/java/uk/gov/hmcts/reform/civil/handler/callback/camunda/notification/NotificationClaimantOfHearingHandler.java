@@ -76,9 +76,9 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private CallbackResponse notifyClaimantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean isApplicantLip = isApplicantLip(caseData);
-        String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
 
         if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING_HMC)) {
+            String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
             sendEmailHMC(caseData, recipient);
         } else if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING)) {
             sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip), isApplicantLip);
@@ -142,7 +142,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     }
 
     private String getRecipient(CaseData caseData, boolean isApplicantLip) {
-        return isApplicantLip ? caseData.getApplicant1().getPartyEmail()
+        return isApplicantLip ? caseData.getClaimantUserDetails().getEmail()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
