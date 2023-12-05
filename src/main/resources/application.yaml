@@ -16,6 +16,8 @@ management:
     case-document-am-api:
       enabled: true
 spring:
+  config:
+    import: "optional:configtree:/mnt/secrets/civil/"
   application:
     name: civil-service
   main:
