@@ -49,7 +49,4 @@ public class ClaimantLiPResponse {
             || ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_PLAN == claimantResponseOnCourtDecision;
     }
 
-    public boolean hasApplicant1AcceptedCcj() {
-        return ChooseHowToProceed.REQUEST_A_CCJ.equals(applicant1ChoosesHowToProceed);
-    }
 }
