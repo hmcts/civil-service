@@ -3,10 +3,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
@@ -24,11 +23,11 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class DefendantSignSettlementAgreementNotificationHandlerTest {
 
-    @InjectMocks
     private DefendantSignSettlementAgreementNotificationHandler handler;
+
     @Mock
     private NotificationService notificationService;
     @Mock
@@ -36,10 +35,15 @@ public class DefendantSignSettlementAgreementNotificationHandlerTest {
     @Mock
     private PinInPostConfiguration pipInPostConfiguration;
 
-    private static String templateId = "templateId";
+    private static final String templateId = "templateId";
 
     @BeforeEach
     void setup() {
+        handler = new DefendantSignSettlementAgreementNotificationHandler(
+            notificationService,
+            notificationsProperties,
+            pipInPostConfiguration
+        );
         when(pipInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
     }
 
