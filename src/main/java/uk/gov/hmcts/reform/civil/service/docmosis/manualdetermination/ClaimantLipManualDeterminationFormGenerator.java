@@ -32,14 +32,12 @@ public class ClaimantLipManualDeterminationFormGenerator implements TemplateData
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         ClaimantLipManualDeterminationForm templateData = getTemplateData(caseData);
-
         DocmosisTemplates template = getDocmosisTemplate();
-
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(templateData, template);
-
+        PDF lipManualDeterminationPdf = new PDF(getFileName(template, caseData), docmosisDocument.getBytes(), DocumentType.LIP_MANUAL_DETERMINATION);
         return documentManagementService.uploadDocument(
                 authorisation,
-                new PDF(getFileName(template, caseData), docmosisDocument.getBytes(), DocumentType.LIP_MANUAL_DETERMINATION));
+                lipManualDeterminationPdf);
     }
 
     private String getFileName(DocmosisTemplates template, CaseData caseData) {
