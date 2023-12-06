@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -97,7 +99,28 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             && (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation());
     }
 
-    private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
+    private boolean isProceedsInHeritageSystemAllowed(CaseData caseData) {
+        var applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .orElse(null);
+        boolean isCourtDecisionAccepted = applicant1Response != null &&
+            applicant1Response.hasClaimantAcceptedCourtDecision();
+        boolean isCourtDecisionRejected = applicant1Response != null &&
+            applicant1Response.hasClaimantRejectedCourtDecision();
+        boolean isCcjRequested = applicant1Response != null &&
+            applicant1Response.hasApplicant1RequestedCcj();
+
+        return (caseData.hasApplicantRejectedRepaymentPlan()
+            && caseData.getRespondent1().isCompanyOROrganisation())
+            || ((caseData.hasApplicantAcceptedRepaymentPlan()
+            || isCourtDecisionAccepted
+            || isCourtDecisionRejected)
+            && isCcjRequested);
+    }
+
+    private void updateClaimEndState(
+        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response,
+        CaseData updatedData) {
         if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
         } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
@@ -106,8 +129,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             response.state(CaseState.CASE_SETTLED.name());
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
             response.state(CaseState.CASE_DISMISSED.name());
-        } else if (updatedData.hasApplicantRejectedRepaymentPlan()
-            && updatedData.getRespondent1().isCompanyOROrganisation()) {
+        } else if (isProceedsInHeritageSystemAllowed(updatedData)) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
     }
