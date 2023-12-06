@@ -237,8 +237,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
      *
      * @param caseData current case data
      * @return true if and only if either of the following conditions are satisfied: (a) applicant does not
-     * accept the amount the defendant admitted owing, or (b) defendant rejects the whole claim and applicant
-     * wants to proceed with the claim
+     *     accept the amount the defendant admitted owing, or (b) defendant rejects the whole claim and applicant
+     *     wants to proceed with the claim
      */
     private boolean shouldVulnerabilityAppear(CaseData caseData) {
         return (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE
@@ -332,10 +332,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .build());
         }
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
-            builder,
-            featureToggleService.isUpdateContactDetailsEnabled()
-        );
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
+                                                                       featureToggleService.isUpdateContactDetailsEnabled());
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToApplicantExperts(builder);
@@ -573,9 +571,8 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
         if (caseData.getRespondent1ResponseDate() != null) {
             return deadlineCalculatorService.calculateExtendedDeadline(
-                    caseData.getRespondent1ResponseDate().toLocalDate(),
-                    RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY
-                )
+                caseData.getRespondent1ResponseDate().toLocalDate(),
+                RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY)
                 .format(DateTimeFormatter.ofPattern(datePattern, Locale.ENGLISH));
         }
         return null;
