@@ -86,8 +86,7 @@ public class DefendantPinToPostLRspecService {
             log.info("It's a valid ocmc claim..");
             return response.headers().get("Location").stream().findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Missing 'Location' header"));
-        }
-        else {
+        } else {
             log.error("Pin does not match or expired for {}", caseReference);
             throw new PinNotMatchException();
         }

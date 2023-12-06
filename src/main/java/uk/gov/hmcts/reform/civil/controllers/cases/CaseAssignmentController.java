@@ -69,10 +69,9 @@ public class CaseAssignmentController {
     public ResponseEntity<String> validateOcmcPin(
         @PathVariable("caseReference") String caseReference, @RequestBody PinDto pin) {
         log.info("case reference {}", caseReference);
-           String redirectUrl = defendantPinToPostLRspecService.validateOcmcPin(pin.getPin(), caseReference);
+        String redirectUrl = defendantPinToPostLRspecService.validateOcmcPin(pin.getPin(), caseReference);
         return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
     }
-
 
     @PostMapping(path = "/case/{caseId}/{caseRole}")
     @Operation(summary = "Assigns case to defendant")
