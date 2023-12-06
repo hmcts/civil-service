@@ -103,12 +103,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         var applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .orElse(null);
-        boolean isCourtDecisionAccepted = applicant1Response != null &&
-            applicant1Response.hasClaimantAcceptedCourtDecision();
-        boolean isCourtDecisionRejected = applicant1Response != null &&
-            applicant1Response.hasClaimantRejectedCourtDecision();
-        boolean isCcjRequested = applicant1Response != null &&
-            applicant1Response.hasApplicant1RequestedCcj();
+        boolean isCourtDecisionAccepted = applicant1Response != null
+            && applicant1Response.hasClaimantAcceptedCourtDecision();
+        boolean isCourtDecisionRejected = applicant1Response != null
+            && applicant1Response.hasClaimantRejectedCourtDecision();
+        boolean isCcjRequested = applicant1Response != null
+            && applicant1Response.hasApplicant1RequestedCcj();
 
         return (caseData.hasApplicantRejectedRepaymentPlan()
             && caseData.getRespondent1().isCompanyOROrganisation())
