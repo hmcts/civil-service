@@ -44,7 +44,9 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION_AD;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION_LR;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION_OG;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
@@ -99,7 +101,9 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private static final List<String> ADMIN_ROLES = List.of(
         "caseworker-civil-admin");
     private static final List<CaseEvent> EVENTS = List.of(
-        MANAGE_CONTACT_INFORMATION
+        MANAGE_CONTACT_INFORMATION_OG,
+        MANAGE_CONTACT_INFORMATION_LR,
+        MANAGE_CONTACT_INFORMATION_AD
     );
 
     private final CoreCaseUserService coreCaseUserService;
@@ -419,7 +423,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         }
 
         // last step before clearing update details form
-        caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION, builder);
+        caseFlagsInitialiser.initialiseCaseFlags(MANAGE_CONTACT_INFORMATION_OG, builder);
 
         // clear updateDetailsForm
         builder.updateDetailsForm(UpdateDetailsForm.builder().manageContactDetailsEventUsed(YES).build());

@@ -204,7 +204,7 @@ class CaseFlagsInitialiserTest {
                                    .build())
             .build();
 
-        caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.MANAGE_CONTACT_INFORMATION, caseData.toBuilder());
+        caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.MANAGE_CONTACT_INFORMATION_OG, caseData.toBuilder());
 
         verify(organisationService).findOrganisationById("id");
     }

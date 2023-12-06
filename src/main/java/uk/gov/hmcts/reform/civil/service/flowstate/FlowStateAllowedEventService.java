@@ -61,7 +61,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION_AD;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION_LR;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION_OG;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MEDIATION_UNSUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MOVE_TO_DECISION_OUTCOME;
@@ -1461,7 +1463,15 @@ public class FlowStateAllowedEventService {
             return true;
         }
 
-        if (caseEvent.equals(MANAGE_CONTACT_INFORMATION)) {
+        if (caseEvent.equals(MANAGE_CONTACT_INFORMATION_OG)) {
+            return true;
+        }
+
+        if (caseEvent.equals(MANAGE_CONTACT_INFORMATION_AD)) {
+            return true;
+        }
+
+        if (caseEvent.equals(MANAGE_CONTACT_INFORMATION_LR)) {
             return true;
         }
 

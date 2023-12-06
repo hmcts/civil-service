@@ -53,7 +53,7 @@ public class CaseFlagsInitialiser {
                 addApplicantExpertAndWitnessFlagsStructure(dataBuilder, caseData);
                 break;
             }
-            case MANAGE_CONTACT_INFORMATION: {
+            case MANAGE_CONTACT_INFORMATION_OG: {
                 createOrUpdateFlags(dataBuilder, caseData, organisationService);
                 break;
             }
