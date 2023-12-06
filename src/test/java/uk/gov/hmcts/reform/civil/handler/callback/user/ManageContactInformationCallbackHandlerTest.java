@@ -1557,7 +1557,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            List<String> expected = List.of("Please create an order to add more experts.");
+            List<String> expected = List.of("Adding a new expert is not permitted in this screen. Please delete any new experts.");
 
             assertEquals(expected, response.getErrors());
 
@@ -1619,7 +1619,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            List<String> expected = List.of("Please create an order to add more witnesses.");
+            List<String> expected = List.of("Adding a new witness is not permitted in this screen. Please delete any new witnesses.");
 
             assertEquals(expected, response.getErrors());
 
