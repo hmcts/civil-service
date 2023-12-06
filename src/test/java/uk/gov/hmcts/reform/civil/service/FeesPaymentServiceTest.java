@@ -82,7 +82,9 @@ class FeesPaymentServiceTest {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
             .data(Map.of(
                 "hearingFeePBADetails",
-                SRPbaDetails.builder().serviceReqReference("2023-1701090705688").build(),
+                SRPbaDetails.builder().serviceReqReference("2023-1701090705688")
+                    .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
+                    .build(),
                 "hearingFee",
                 Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
             )).build();

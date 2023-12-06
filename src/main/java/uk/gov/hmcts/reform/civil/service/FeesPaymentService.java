@@ -37,16 +37,17 @@ public class FeesPaymentService {
         CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-        SRPbaDetails hearingFeePaymentDetails = extractHearingFeePaymentDetails(feeType, caseData);
+        SRPbaDetails hearingFeePaymentDetails = feeType.equals(FeeType.HEARING)
+            ? caseData.getHearingFeePBADetails()
+            : caseData.getClaimIssuedPBADetails();
 
         String returnUrlSubPath = feeType.equals(FeeType.HEARING)
             ? "/hearing-payment-confirmation/" : "/claim-issued-payment-confirmation/";
 
         CardPaymentServiceRequestDTO requestDto = CardPaymentServiceRequestDTO.builder()
-            .amount(hearingFeePaymentDetails.getFee().getCalculatedAmountInPence().divide(
-                BigDecimal.valueOf(100),
-                RoundingMode.CEILING
-            ).setScale(2, RoundingMode.CEILING))
+            .amount(hearingFeePaymentDetails.getFee().getCalculatedAmountInPence()
+                        .divide(BigDecimal.valueOf(100), RoundingMode.CEILING)
+                        .setScale(2, RoundingMode.CEILING))
             .currency("GBP")
             .language("English")
             .returnUrl(pinInPostConfiguration.getCuiFrontEndUrl() + returnUrlSubPath + caseReference)
@@ -59,14 +60,6 @@ public class FeesPaymentService {
                 requestDto
             );
         return CardPaymentStatusResponse.from(govPayCardPaymentRequest);
-    }
-
-    private SRPbaDetails extractHearingFeePaymentDetails(FeeType feeType, CaseData caseData) {
-        if (feeType.equals(FeeType.HEARING)) {
-            return caseData.getHearingFeePBADetails().toBuilder().fee(caseData.getHearingFee()).build();
-        } else {
-            return caseData.getClaimIssuedPBADetails().toBuilder().fee(caseData.getClaimFee()).build();
-        }
     }
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(
