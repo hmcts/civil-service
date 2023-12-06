@@ -253,8 +253,9 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
     @Override
     public boolean isCourtReviewing() {
         return (!hasSdoBeenDrawn()
-            && caseData.isRespondentResponseFullDefence()
-            && caseData.getCcdState().equals(CaseState.JUDICIAL_REFERRAL))
+            && (caseData.isRespondentResponseFullDefence()
+            || caseData.isPartAdmitClaimSpec())
+            && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState()))
             || (caseData.hasApplicantRejectedRepaymentPlan());
     }
 
