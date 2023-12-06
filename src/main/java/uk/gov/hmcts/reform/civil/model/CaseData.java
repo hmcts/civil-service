@@ -914,7 +914,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (isPartAdmitClaimSpec()
                 && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
                 && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
-                && PaymentType.IMMEDIATELY.equals(getApplicant1RepaymentOptionForDefendantSpec());
+                && PaymentType.IMMEDIATELY.equals(getApplicant1RepaymentOptionForDefendantSpec()));
     }
 
     @JsonIgnore
