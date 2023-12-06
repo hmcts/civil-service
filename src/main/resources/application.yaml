@@ -326,11 +326,11 @@ notifications:
   notifyApplicantLipRequestJudgementByAdmissionNotificationTemplate: "d6625ee3-f794-4a87-b0a3-bef7dd0663b9"
   notifyRespondentLipRequestJudgementByAdmissionNotificationTemplate: "6ced7f9c-b0fd-4fad-a76c-745873b9a3a2"
 
-  notifyApplicantForSignedSettlementAgreement: "59f982a7-264e-4ce1-93bf-25a9fb354dc9"
-  notifyApplicantForNotAgreedSignSettlement: "44e8ed3e-b60c-4e5d-a5e5-1e2f4bf7637c"
+  notifyApplicantForSignedSettlementAgreement: "65459efd-a351-4a1b-814a-435aabe3beb5"
+  notifyApplicantForNotAgreedSignSettlement: "b775583b-7964-41f8-8b3b-d767557cffb2"
 
-  notifyRespondentForSignedSettlementAgreement: "ba0c20ee-810e-4fc1-874f-6bdb18d2259b"
-  notifyRespondentForNotAgreedSignSettlement: "237c8d29-531e-4c23-8a13-1d5f2b2b55b7"
+  notifyRespondentForSignedSettlementAgreement: "aeb3951e-4956-4542-a73b-e2e3abec8867"
+  notifyRespondentForNotAgreedSignSettlement: "1742841b-d915-43a9-9d76-b6d17a189ba5"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
