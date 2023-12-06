@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
@@ -366,6 +367,7 @@ public class CaseDataBuilder {
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
+    private PaymentType applicant1RepaymentOptionForDefendantSpec;
     private YesOrNo defendantSingleResponseToBothClaimants;
     private RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
@@ -1492,6 +1494,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addApplicant2() {
         this.addApplicant2 = YES;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1RepaymentOptionForDefendantSpec(PaymentType applicant1RepaymentOptionForDefendantSpec) {
+        this.applicant1RepaymentOptionForDefendantSpec = applicant1RepaymentOptionForDefendantSpec;
         return this;
     }
 
@@ -6347,7 +6354,7 @@ public class CaseDataBuilder {
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
             .claimantDefenceResDocToDefendant2(applicant2DefenceResponseDocument)
             .defendantDetails(defendantDetails)
-
+            .applicant1RepaymentOptionForDefendantSpec(applicant1RepaymentOptionForDefendantSpec)
             //Case procceds in Caseman
             .claimProceedsInCaseman(claimProceedsInCaseman)
             .claimProceedsInCasemanLR(claimProceedsInCasemanLR)

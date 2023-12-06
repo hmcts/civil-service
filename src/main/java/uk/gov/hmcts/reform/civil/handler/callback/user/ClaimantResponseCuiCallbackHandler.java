@@ -102,7 +102,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             response.state(CaseState.IN_MEDIATION.name());
         } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
             response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());
-        } else if (Objects.nonNull(updatedData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && updatedData.isClaimantIntentionSettlePartAdmit()) {
+        } else if (isCaseSettledAllowed(updatedData)){
             response.state(CaseState.CASE_SETTLED.name());
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
             response.state(CaseState.CASE_DISMISSED.name());
@@ -110,5 +110,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             && updatedData.getRespondent1().isCompanyOROrganisation()) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
+    }
+
+    private boolean isCaseSettledAllowed(CaseData caseData) {
+        return ((Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && caseData.isClaimantIntentionSettlePartAdmit()) ||
+                (caseData.isPartAdmitImmediatePaymentClaimSettled()));
     }
 }

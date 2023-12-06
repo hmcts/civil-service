@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -906,6 +907,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isPartAdmitClaimSpec() {
         return PART_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec());
+    }
+
+    @JsonIgnore
+    public boolean isPartAdmitImmediatePaymentClaimSettled() {
+        return (isPartAdmitClaimSpec()
+                && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
+                && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
+                && getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.IMMEDIATELY));
     }
 
     @JsonIgnore
