@@ -259,7 +259,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCertificateOfService_and_documents_cos1_whenSubmitted() {
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemedDate = localDateTime.minusDays(2).toLocalDate();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
@@ -284,7 +283,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateCertificateOfService_and_documents_cos2_whenSubmitted() {
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemedDate = localDateTime.minusDays(2).toLocalDate();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
@@ -309,7 +307,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdate_to_earliest_day_cos2_is_earliest_whenSubmitted() {
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             LocalDate cos1Date = localDateTime.minusDays(2).toLocalDate();
             LocalDate cos2Date = localDateTime.minusDays(3).toLocalDate();
             LocalDate deemed1Date = localDateTime.minusDays(2).toLocalDate();
@@ -337,7 +334,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdate_to_earliest_day_cos1_is_earliest_whenSubmitted() {
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             LocalDate cos1Date = localDateTime.minusDays(3).toLocalDate();
             LocalDate cos2Date = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemed1Date = localDateTime.minusDays(2).toLocalDate();
@@ -447,7 +443,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_with_cos_whenInvoked() {
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -510,7 +505,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnCoSConfirmation_whenCosNotifyDetailsSuccess() {
             LocalDate past = LocalDate.now().minusDays(1);
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDateTime.now());
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(any()))
                 .thenReturn(past.plusDays(14).atTime(16, 0));
@@ -526,7 +520,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnCoSConfirmation_1Lip1Lr_whenCosNotifyDetailsSuccess() {
             LocalDate past = LocalDate.now().minusDays(1);
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDateTime.now());
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(any()))
                 .thenReturn(past.plusDays(14).atTime(16, 0));
@@ -555,7 +548,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPassValidateCertificateOfService_whenDateIsPast() {
 
             LocalDate past = LocalDate.now().minusDays(1);
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
                 .thenReturn(LocalDate.now().plusDays(2));
@@ -579,7 +571,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPassValidateCertificateOfService_1Lip1Lr_whenDateIsPast() {
             LocalDate past = LocalDate.now().minusDays(1);
 
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDate.now().atTime(16, 05));
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
                 .thenReturn(LocalDate.now().plusDays(2));
@@ -603,7 +594,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPassValidateCertificateOfService_1Lr1Lip_whenServiceDateIsPast_notOlderThan14Days() {
             LocalDate past = LocalDate.now().minusDays(1);
 
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
                 .thenReturn(LocalDate.now().plusDays(2));
@@ -626,7 +616,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotPassValidateCertificateOfService_1Lr1Lip_whenServiceDateIsPast_OlderThan14Days() {
             LocalDate past = LocalDate.now().minusDays(15);
 
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(past.atTime(15, 05)))
                 .thenReturn(past.plusDays(14).atTime(16, 0));
@@ -646,7 +635,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotPassValidateCertificateOfService_1Lr1Lip_whenServiceDateIsPast_deadlineTodayDate_After16hrs() {
             LocalDate past = LocalDate.now().minusDays(14);
 
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDate.now().atTime(16, 05));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(any()))
                 .thenReturn(past.plusDays(14).atTime(16, 0));
@@ -663,44 +651,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldIgnoreValidateCertificateOfService_whenDisabled() {
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(false);
-            when(time.now()).thenReturn(LocalDateTime.now());
-            LocalDate past = LocalDate.now().minusDays(1);
-            LocalDate future = LocalDate.now().plusDays(1);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
-                .setCoSClaimDetailsWithDate(true, true, past, past, future, future, true, true)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails2");
-            AboutToStartOrSubmitCallbackResponse successResponse =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(successResponse.getErrors().size()).isEqualTo(0);
-        }
-
-        @Test
-        void shouldFailValidateCertificateOfService_whenDateIsFuture() {
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
-            when(time.now()).thenReturn(LocalDateTime.now());
-
-            LocalDate past = LocalDate.now().minusDays(1);
-            LocalDate future = LocalDate.now().plusDays(1);
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
-                .setCoSClaimDetailsWithDate(true, true, past, past, future, future, true, true)
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails2");
-            AboutToStartOrSubmitCallbackResponse successResponse =
-                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(successResponse.getErrors().size()).isEqualTo(2);
-        }
-
-        @Test
         void shouldFailValidateCertificateOfService_When1v2LIP_BothDefendant_DifferentDateOfService() {
             LocalDate def1pastDate = LocalDate.now().minusDays(1);
             LocalDate def2pastDate = LocalDate.now().minusDays(2);
 
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDateTime.now());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
                 .thenReturn(LocalDate.now().plusDays(2));
@@ -720,7 +674,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotFailValidateCertificateOfService_When1v2LIP_BothDefendant_SameDateOfService() {
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
                 .thenReturn(LocalDate.now().plusDays(2));
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
@@ -745,7 +698,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPassValidateCertificateOfService_whenHasFile() {
             LocalDate past = LocalDate.now().minusDays(1);
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDateTime.now());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
                 .thenReturn(LocalDate.now().plusDays(2));
@@ -766,7 +718,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldFailValidateCertificateOfService_whenHasNoFile() {
             LocalDate past = LocalDate.now().minusDays(1);
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDateTime.now());
             when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
                 .thenReturn(LocalDate.now().plusDays(2));
@@ -789,7 +740,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate.minusDays(15);
 
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
             when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
                 .thenReturn(LocalDate.of(2023, 10, 16));
@@ -816,7 +766,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate;
 
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
             when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
                 .thenReturn(LocalDate.now().plusDays(2));
@@ -843,7 +792,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate.plusDays(5);
 
-            when(featureToggleService.isCertificateOfServiceEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
             when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
                 .thenReturn(LocalDate.of(2023, 10, 16));
