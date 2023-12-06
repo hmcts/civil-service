@@ -39,7 +39,7 @@ class CUIIdamClientServiceTest {
         when(idamApi.authenticatePinUser(anyString(), anyString(), anyString(), anyString())).thenReturn(Response.builder().request(request).status(
             HttpStatus.SC_OK).build());
 
-        int response = cuiIdamClientService.authenticatePinUser("12345678", "000MC001");
+        Response response = cuiIdamClientService.authenticatePinUser("12345678", "000MC001");
         assertThat(response).isEqualTo(HttpStatus.SC_OK);
     }
 
