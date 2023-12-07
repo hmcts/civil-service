@@ -201,7 +201,7 @@ class DefendantPinToPostLRspecServiceTest {
             when(cuiIdamClientService.authenticatePinUser(anyString(), anyString())).thenReturn(Response.builder().request(request).status(
                 HttpStatus.SC_MOVED_TEMPORARILY).headers(headers).build());
 
-            Assertions.assertDoesNotThrow(() ->  defendantPinToPostLRspecService.validateOcmcPin( "TEST1234", "620MC123"));
+            Assertions.assertDoesNotThrow(() ->  defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
         }
     }
 
