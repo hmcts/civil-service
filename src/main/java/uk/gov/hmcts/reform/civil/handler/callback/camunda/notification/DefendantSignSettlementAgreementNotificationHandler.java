@@ -72,14 +72,9 @@ public class DefendantSignSettlementAgreementNotificationHandler extends Callbac
         Map<String, String> templateProperties = addProperties(caseData);
         String recipientEmail = isRespondentNotification(callbackParams) ? getRecipientEmailForRespondent(caseData) :
             caseData.getApplicant1Email();
-        String templateId = isRespondentNotification(callbackParams) ? getTemplateID(
+        String templateId = getTemplateID(
             caseData,
-            notificationsProperties.getNotifyRespondentForSignedSettlementAgreement(),
-            notificationsProperties.getNotifyRespondentForNotAgreedSignSettlement()
-        ) : getTemplateID(
-            caseData,
-            notificationsProperties.getNotifyApplicantForSignedSettlementAgreement(),
-            notificationsProperties.getNotifyApplicantForNotAgreedSignSettlement()
+            isRespondentNotification(callbackParams)
         );
         if (isNotEmpty(recipientEmail)) {
             notificationService.sendMail(
@@ -97,11 +92,23 @@ public class DefendantSignSettlementAgreementNotificationHandler extends Callbac
             .equals(NOTIFY_LIP_RESPONDENT_FOR_SIGN_SETTLEMENT_AGREEMENT.name());
     }
 
-    private String getTemplateID(CaseData caseData, String agreedTemplate, String notAgreedTemplate) {
+    private String getTemplateID(CaseData caseData, boolean isDefendantEvent) {
         Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(caseData.getCaseDataLiP());
         boolean isAgreed = optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementAgreement).orElse(false);
         boolean isNotAgreed = optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementNotAgreed).orElse(false);
-        return isAgreed ? agreedTemplate : (isNotAgreed ? notAgreedTemplate : null);
+        if (isAgreed && isDefendantEvent) {
+            return notificationsProperties.getNotifyRespondentForSignedSettlementAgreement();
+        }
+        if (isNotAgreed && isDefendantEvent) {
+            return notificationsProperties.getNotifyRespondentForNotAgreedSignSettlement();
+        }
+        if (isAgreed) {
+            return notificationsProperties.getNotifyApplicantForSignedSettlementAgreement();
+        }
+        if (isNotAgreed) {
+            return notificationsProperties.getNotifyApplicantForNotAgreedSignSettlement();
+        }
+        return null;
     }
 
     private String getRecipientEmailForRespondent(CaseData caseData) {
