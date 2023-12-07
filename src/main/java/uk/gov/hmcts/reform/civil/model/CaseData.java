@@ -192,6 +192,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String detailsOfClaim;
     private final ClaimValue claimValue;
     private final Fee claimFee;
+    private final String serviceRequestReference;
     private final String paymentReference;
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimType claimType;
@@ -836,6 +837,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean hasApplicantNotProceededWithClaim() {
+        return Objects.nonNull(getApplicant1ProceedWithClaim()) && NO == getApplicant1ProceedWithClaim();
+    }
+
+    @JsonIgnore
     public boolean isRespondentResponseFullDefence() {
         return (RespondentResponseTypeSpec.FULL_DEFENCE.equals(getRespondent1ClaimResponseTypeForSpec())
             && !isOneVTwoTwoLegalRep(this))
@@ -1067,6 +1073,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getHelpWithFees)
             .map(HelpWithFees::getHelpWithFeesReferenceNumber).orElse(null);
+    }
+
+    @JsonIgnore
+    public boolean isHelpWithFees() {
+        return getCaseDataLiP() != null && getCaseDataLiP().getHelpWithFees() != null
+            && YES.equals(getCaseDataLiP().getHelpWithFees().getHelpWithFee());
     }
 
     @JsonIgnore
