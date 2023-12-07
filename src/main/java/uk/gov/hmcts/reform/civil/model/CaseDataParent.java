@@ -460,7 +460,10 @@ public class CaseDataParent implements MappableObject {
     private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaim;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceRes;
     private final List<EvidenceUploadTrial> trialSelectionEvidenceSmallClaimRes;
-    //applicant
+
+    private final List<EvidenceUploadDisclosure> submitEvidenceUploadDisclosure;
+    private final YesOrNo selectAllDocuments;
+    //applicant draft
     private final List<Element<UploadEvidenceDocumentType>> documentDisclosureList;
     private final List<Element<UploadEvidenceDocumentType>> documentForDisclosure;
     private final List<Element<UploadEvidenceWitness>> documentWitnessStatement;
@@ -476,7 +479,23 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> documentAuthorities;
     private final List<Element<UploadEvidenceDocumentType>> documentCosts;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrial;
-    //applicant2
+    //applicant submitted
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentDisclosureList;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentForDisclosure;
+    private final List<Element<UploadEvidenceWitness>> submitDocumentWitnessStatement;
+    private final List<Element<UploadEvidenceWitness>> submitDocumentWitnessSummary;
+    private final List<Element<UploadEvidenceWitness>> submitDocumentHearsayNotice;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentReferredInStatement;
+    private final List<Element<UploadEvidenceExpert>> submitDocumentExpertReport;
+    private final List<Element<UploadEvidenceExpert>> submitDocumentJointStatement;
+    private final List<Element<UploadEvidenceExpert>> submitDocumentQuestions;
+    private final List<Element<UploadEvidenceExpert>> submitDocumentAnswers;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentCaseSummary;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentSkeletonArgument;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentAuthorities;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentCosts;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentEvidenceForTrial;
+    //applicant2 draft
     private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListApp2;
     private final List<Element<UploadEvidenceDocumentType>> documentForDisclosureApp2;
     private final List<Element<UploadEvidenceWitness>> documentWitnessStatementApp2;
@@ -492,6 +511,22 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<UploadEvidenceDocumentType>> documentAuthoritiesApp2;
     private final List<Element<UploadEvidenceDocumentType>> documentCostsApp2;
     private final List<Element<UploadEvidenceDocumentType>> documentEvidenceForTrialApp2;
+    //applicant2 submitted
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentDisclosureListApp2;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentForDisclosureApp2;
+    private final List<Element<UploadEvidenceWitness>> submitDocumentWitnessStatementApp2;
+    private final List<Element<UploadEvidenceWitness>> submitDocumentWitnessSummaryApp2;
+    private final List<Element<UploadEvidenceWitness>> submitDocumentHearsayNoticeApp2;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentReferredInStatementApp2;
+    private final List<Element<UploadEvidenceExpert>> submitDocumentExpertReportApp2;
+    private final List<Element<UploadEvidenceExpert>> submitDocumentJointStatementApp2;
+    private final List<Element<UploadEvidenceExpert>> submitDocumentQuestionsApp2;
+    private final List<Element<UploadEvidenceExpert>> submitDocumentAnswersApp2;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentCaseSummaryApp2;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentSkeletonArgumentApp2;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentAuthoritiesApp2;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentCostsApp2;
+    private final List<Element<UploadEvidenceDocumentType>> submitDocumentEvidenceForTrialApp2;
     private final LocalDateTime caseDocumentUploadDate;
     //respondent
     private final List<Element<UploadEvidenceDocumentType>> documentDisclosureListRes;
