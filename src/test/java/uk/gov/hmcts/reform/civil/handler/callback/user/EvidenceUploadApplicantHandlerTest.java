@@ -27,12 +27,10 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.IdValue;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceDocumentType;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
@@ -61,6 +59,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -134,10 +134,8 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .notificationText(null)
-            .claimType(ClaimType.CLINICAL_NEGLIGENCE)
-            .claimValue(ClaimValue.builder()
-                            .statementOfValueInPennies(BigDecimal.valueOf(5000))
-                            .build())
+            .allocatedTrack(SMALL_CLAIM)
+            .responseClaimTrack(null)
             .build();
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), any())).willReturn(false);
@@ -154,9 +152,10 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     void givenAboutToStart_assignCaseProgAllocatedTrackSpec() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .caseAccessCategory(SPEC_CLAIM)
             .notificationText(null)
-            .claimType(null)
-            .totalClaimAmount(BigDecimal.valueOf(12500))
+            .allocatedTrack(null)
+            .responseClaimTrack("FAST_CLAIM")
             .build();
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), any())).willReturn(false);
