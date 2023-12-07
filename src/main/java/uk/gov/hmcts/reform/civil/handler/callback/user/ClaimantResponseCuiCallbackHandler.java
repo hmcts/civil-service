@@ -118,9 +118,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             && isCcjRequested);
     }
 
-    private void updateClaimEndState(
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response,
-        CaseData updatedData) {
+    private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
         if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
             response.state(CaseState.IN_MEDIATION.name());
         } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
