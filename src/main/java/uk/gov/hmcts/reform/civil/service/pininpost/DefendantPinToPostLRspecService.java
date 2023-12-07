@@ -81,7 +81,7 @@ public class DefendantPinToPostLRspecService {
     public String validateOcmcPin(String pin, String caseReference) {
         log.info("Validate ocmc Pin called..");
         Response response = cuiIdamClientService.authenticatePinUser(pin, caseReference);
-        log.info("valid Pin : " + response);
+        log.info("valid Pin : " + response.status());
         if (response.status() == HttpStatus.FOUND.value()) {
             log.info("It's a valid ocmc claim..");
             return response.headers().get("Location").stream().findFirst()
