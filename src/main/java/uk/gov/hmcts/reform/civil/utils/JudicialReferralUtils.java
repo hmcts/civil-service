@@ -39,7 +39,8 @@ public class JudicialReferralUtils {
                     CaseCategory.UNSPEC_CLAIM.equals(caseCategory)
                         ? caseData.getClaimValue().toPounds()
                         : caseData.getTotalClaimAmount(),
-                    caseData.getClaimType()
+                    caseData.getClaimType(),
+                    caseData
                 );
             if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
                 return false;

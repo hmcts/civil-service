@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.enums;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.math.BigDecimal;
 
@@ -23,7 +24,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE", "PROFESSIONAL_NEGLIGENCE"})
         void shouldAllocatePersonalInjuryClaimTypesBelow1000ToSmallClaim(ClaimType claimType) {
-            AllocatedTrack track = getAllocatedTrack(BigDecimal.valueOf(999), claimType);
+            AllocatedTrack track = getAllocatedTrack(BigDecimal.valueOf(999), claimType, null);
 
             assertThat(track).isEqualTo(SMALL_CLAIM);
         }
@@ -33,7 +34,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE", "PROFESSIONAL_NEGLIGENCE"})
         void shouldReturnCorrectTrackForEmailSmallClaim(ClaimType claimType) {
-            AllocatedTrack track = getAllocatedTrack(BigDecimal.valueOf(999), claimType);
+            AllocatedTrack track = getAllocatedTrack(BigDecimal.valueOf(999), claimType, null);
 
             assertThat(toStringValueForEmail(track)).isEqualTo("Small Claim Track");
         }
@@ -43,7 +44,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"PROFESSIONAL_NEGLIGENCE"})
         void shouldAllocateProfessionalNegligenceClaimTypesOf1000ToFastClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(1000), claimType)).isEqualTo(SMALL_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(1000), claimType, null)).isEqualTo(SMALL_CLAIM);
         }
 
         @ParameterizedTest(name = "{0} has small claim track when claim value is 1000")
@@ -51,7 +52,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE"})
         void shouldAllocatePersonalInjuryClaimTypesOf1000ToSmallClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(1000), claimType)).isEqualTo(SMALL_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(1000), claimType, null)).isEqualTo(SMALL_CLAIM);
         }
 
         @ParameterizedTest(name = "{0} has small claim track when claim value is 1000")
@@ -59,7 +60,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"PROFESSIONAL_NEGLIGENCE"})
         void shouldReturnCorrectTrackForEmailFastClaimTypeProfessionalNegligence(ClaimType claimType) {
-            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(1000), claimType)))
+            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(1000), claimType, null)))
                 .isEqualTo("Small Claim Track");
         }
 
@@ -68,7 +69,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE"})
         void shouldReturnCorrectTrackForEmailFastClaim(ClaimType claimType) {
-            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(1000), claimType)))
+            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(1000), claimType, null)))
                 .isEqualTo("Small Claim Track");
         }
 
@@ -77,7 +78,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE", "PROFESSIONAL_NEGLIGENCE"})
         void shouldAllocatePersonalInjuryClaimTypesAbove1000AndBelow25000ToFastClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType)).isEqualTo(FAST_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType, null)).isEqualTo(FAST_CLAIM);
         }
 
         @ParameterizedTest(name = "{0} has multi claim track when claim value is more than 25000")
@@ -85,7 +86,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE", "PROFESSIONAL_NEGLIGENCE"})
         void shouldAllocatePersonalInjuryClaimTypesAbove25000ToMultiClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType)).isEqualTo(MULTI_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)).isEqualTo(MULTI_CLAIM);
         }
 
         @ParameterizedTest(name = "{0} has multi claim track when claim value is more than 25000")
@@ -93,8 +94,17 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"PERSONAL_INJURY", "CLINICAL_NEGLIGENCE", "PROFESSIONAL_NEGLIGENCE"})
         void shouldReturnCorrectTrackForEmailMultiClaim(ClaimType claimType) {
-            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(25001), claimType)))
+            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)))
                 .isEqualTo("Multi Track");
+        }
+
+        @ParameterizedTest(name = "{0} has fast track when NIHL type")
+        @EnumSource(
+            value = ClaimType.class,
+            names = {"PERSONAL_INJURY"})
+        void shouldReturnCorrectTrackForNoiseInducedHearingLossClaim(ClaimType claimType) {
+            CaseData caseData = CaseData.builder().personalInjuryType(PersonalInjuryType.NOISE_INDUCED_HEARING_LOSS).build();
+            assertThat(getAllocatedTrack(null, claimType, caseData)).isEqualTo(FAST_CLAIM);
         }
     }
 
@@ -106,7 +116,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"BREACH_OF_CONTRACT", "CONSUMER", "CONSUMER_CREDIT", "OTHER"})
         void shouldAllocateOtherClaimTypesBelow1000ToSmallClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(9999), claimType)).isEqualTo(SMALL_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(9999), claimType, null)).isEqualTo(SMALL_CLAIM);
         }
 
         @ParameterizedTest(name = "{0} has small claim track when claim value is less than 10000")
@@ -114,7 +124,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"BREACH_OF_CONTRACT", "CONSUMER", "CONSUMER_CREDIT", "OTHER"})
         void shouldReturnCorrectTrackForEmailSmallClaim(ClaimType claimType) {
-            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(9999), claimType)))
+            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(9999), claimType, null)))
                 .isEqualTo("Small Claim Track");
         }
 
@@ -123,7 +133,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"CONSUMER"})
         void shouldAllocateConsumerClaimTypesOf10000ToFastClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(10000), claimType)).isEqualTo(SMALL_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(10000), claimType, null)).isEqualTo(SMALL_CLAIM);
         }
 
         @ParameterizedTest(name = "{0} has fast claim track when claim value is 10000")
@@ -131,7 +141,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"BREACH_OF_CONTRACT", "CONSUMER_CREDIT", "OTHER"})
         void shouldAllocateOtherClaimTypesOf10000ToFastClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(10000), claimType)).isEqualTo(SMALL_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(10000), claimType, null)).isEqualTo(SMALL_CLAIM);
         }
 
         @ParameterizedTest(name = "{0} has small claim track when claim value is 10000")
@@ -139,7 +149,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"CONSUMER"})
         void shouldReturnCorrectTrackForEmailFastClaimForTypeConsumer(ClaimType claimType) {
-            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(10000), claimType)))
+            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(10000), claimType, null)))
                 .isEqualTo("Small Claim Track");
         }
 
@@ -148,7 +158,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"BREACH_OF_CONTRACT", "CONSUMER_CREDIT", "OTHER"})
         void shouldReturnCorrectTrackForEmailFastClaim(ClaimType claimType) {
-            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(10000), claimType)))
+            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(10000), claimType, null)))
                 .isEqualTo("Small Claim Track");
         }
 
@@ -157,7 +167,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"BREACH_OF_CONTRACT", "CONSUMER", "CONSUMER_CREDIT", "OTHER"})
         void shouldAllocateOtherClaimTypesAbove10000AndBelow25000ToFastClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType)).isEqualTo(FAST_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25000), claimType, null)).isEqualTo(FAST_CLAIM);
         }
 
         @ParameterizedTest(name = "{0} has multi claim track when claim value is more than 25000")
@@ -165,7 +175,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"BREACH_OF_CONTRACT", "CONSUMER", "CONSUMER_CREDIT", "OTHER"})
         void shouldAllocateOtherClaimTypesAbove25000ToMultiClaim(ClaimType claimType) {
-            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType)).isEqualTo(MULTI_CLAIM);
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)).isEqualTo(MULTI_CLAIM);
         }
 
         @ParameterizedTest(name = "{0} has multi claim track when claim value is more than 25000")
@@ -173,7 +183,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"BREACH_OF_CONTRACT", "CONSUMER", "CONSUMER_CREDIT", "OTHER"})
         void shouldReturnCorrectTrackForEmailMultiClaim(ClaimType claimType) {
-            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(25001), claimType)))
+            assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)))
                 .isEqualTo("Multi Track");
         }
     }

@@ -446,6 +446,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
             updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(
                 caseData.getTotalClaimAmount(),
+                null,
                 null
             ).name());
         }

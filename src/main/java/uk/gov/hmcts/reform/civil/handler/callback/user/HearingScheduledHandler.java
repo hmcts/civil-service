@@ -187,7 +187,7 @@ public class HearingScheduledHandler extends CallbackHandler {
 
         var allocatedTrack = caseData.getAllocatedTrack();
         if (isNull(caseData.getAllocatedTrack())) {
-            allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
+            allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null, null);
             caseDataBuilder.allocatedTrack(allocatedTrack);
         }
 
