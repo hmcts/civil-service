@@ -92,13 +92,13 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicito
 @RequiredArgsConstructor
 public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
-    private static final String INVALID_CASE_STATE_ERROR = "You will be able run the manage contact information " +
+    private static final String INVALID_CASE_STATE_ERROR = "You will be able to run the manage contact information " +
         "event once the claimant has responded.";
     private static final String CHECK_LITIGATION_FRIEND_ERROR_TITLE = "Check the litigation friend's details";
     private static final String CHECK_LITIGATION_FRIEND_ERROR = "After making these changes, please ensure that the "
         + "litigation friend's contact information is also up to date.";
-    private static final String CREATE_ORDER_ERROR_EXPERTS = "Please create an order to add more experts.";
-    private static final String CREATE_ORDER_ERROR_WITNESSES = "Please create an order to add more witnesses.";
+    private static final String CREATE_ORDER_ERROR_EXPERTS = "Adding a new expert is not permitted in this screen. Please delete any new experts.";
+    private static final String CREATE_ORDER_ERROR_WITNESSES = "Adding a new witness is not permitted in this screen. Please delete any new witnesses.";
     private static final List<String> ADMIN_ROLES = List.of(
         "caseworker-civil-admin");
     private static final List<CaseEvent> EVENTS = List.of(
@@ -324,8 +324,10 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
         ArrayList<String> warnings = new ArrayList<>();
         List<String> errors = new ArrayList<>();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
-        if (partyHasLitigationFriend(partyChosen, caseData)) {
+        // oldCaseData needed because Litigation friend gets nullified in mid event
+        if (partyHasLitigationFriend(partyChosen, oldCaseData)) {
             warnings.add(CHECK_LITIGATION_FRIEND_ERROR_TITLE);
             warnings.add(CHECK_LITIGATION_FRIEND_ERROR);
         }
@@ -411,17 +413,10 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         updateExperts(partyChosenId, caseData, builder);
         updateWitnesses(partyChosenId, caseData, builder);
 
-        // persist flags for claimants
-        if (CLAIMANT_ONE_ID.equals(partyChosenId) || CLAIMANT_TWO_ID.equals(partyChosenId)) {
-            getFlagsForClaimants(callbackParams, caseData, builder);
-        }
-
-        // persist flags for respondents
-        if (DEFENDANT_ONE_ID.equals(partyChosenId) || DEFENDANT_TWO_ID.equals(partyChosenId)) {
-            getFlagsForRespondents(callbackParams, caseData, builder);
-        }
-
         if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
+            // persist party flags (ccd issue)
+            getFlagsForParty(callbackParams, caseData, builder);
+
             // update case name for hmc if applicant/respondent/litigation friend was updated
             builder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
             builder.caseNamePublic(buildCaseNamePublic(caseData));
@@ -573,8 +568,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         }
     }
 
-    private void getFlagsForRespondents(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        // Party fields are empty in this mid event, this is a workaround
+    private void getFlagsForParty(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
         // persist respondent flags (ccd issue)
@@ -583,6 +577,13 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .build();
 
         builder.respondent1(updatedRespondent1);
+
+        // persist applicant flags (ccd issue)
+        var updatedApplicant1 = caseData.getApplicant1().toBuilder()
+            .flags(oldCaseData.getApplicant1().getFlags())
+            .build();
+
+        builder.applicant1(updatedApplicant1);
 
         // if present, persist the 2nd respondent flags in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getRespondent2()).isPresent()
@@ -593,31 +594,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
             builder.respondent2(updatedRespondent2);
         }
-    }
-
-    private void getFlagsForClaimants(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        // Party fields are empty in this mid event, this is a workaround
-        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-
-        System.out.print("caseData.getApplicant1().getFlags()>>>\n");
-        System.out.print(caseData.getApplicant1().getFlags() + "\n");
-        System.out.print("oldCaseData.getApplicant1().getFlags()>>>\n");
-        System.out.print(oldCaseData.getApplicant1().getFlags() + "\n");
-
-        if (ofNullable(caseData.getApplicant2()).isPresent()
-            && ofNullable(oldCaseData.getApplicant2()).isPresent()) {
-            System.out.print("caseData.getApplicant2().getFlags()>>>\n");
-            System.out.print(caseData.getApplicant2().getFlags() + "\n");
-            System.out.print("oldCaseData.getApplicant2().getFlags()>>>\n");
-            System.out.print(oldCaseData.getApplicant2().getFlags() + "\n");
-        }
-
-        // persist applicant flags (ccd issue)
-        var updatedApplicant1 = caseData.getApplicant1().toBuilder()
-            .flags(oldCaseData.getApplicant1().getFlags())
-            .build();
-
-        builder.applicant1(updatedApplicant1);
 
         // if present, persist the 2nd applicant flags in the same fashion as above, i.e ignore for 1v1
         if (ofNullable(caseData.getApplicant2()).isPresent()
@@ -627,6 +603,42 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 .build();
 
             builder.applicant2(updatedApplicant2);
+        }
+
+        // Litigation Friend
+        if (ofNullable(oldCaseData.getApplicant1LitigationFriend()).isPresent()) {
+            var party = caseData.getApplicant1LitigationFriend().toBuilder()
+                .flags(oldCaseData.getApplicant1LitigationFriend().getFlags())
+                .build();
+
+            builder.applicant1LitigationFriend(party);
+        }
+
+        // Litigation Friend
+        if (ofNullable(oldCaseData.getApplicant2LitigationFriend()).isPresent()) {
+            var party = caseData.getApplicant2LitigationFriend().toBuilder()
+                .flags(oldCaseData.getApplicant2LitigationFriend().getFlags())
+                .build();
+
+            builder.applicant2LitigationFriend(party);
+        }
+
+        // Litigation Friend
+        if (ofNullable(oldCaseData.getRespondent1LitigationFriend()).isPresent()) {
+            var party = caseData.getRespondent1LitigationFriend().toBuilder()
+                .flags(oldCaseData.getRespondent1LitigationFriend().getFlags())
+                .build();
+
+            builder.respondent1LitigationFriend(party);
+        }
+
+        // Litigation Friend
+        if (ofNullable(oldCaseData.getRespondent2LitigationFriend()).isPresent()) {
+            var party = caseData.getRespondent2LitigationFriend().toBuilder()
+                .flags(oldCaseData.getRespondent2LitigationFriend().getFlags())
+                .build();
+
+            builder.respondent2LitigationFriend(party);
         }
     }
 
