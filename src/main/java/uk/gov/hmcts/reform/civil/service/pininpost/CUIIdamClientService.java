@@ -9,6 +9,9 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -33,7 +36,11 @@ public class CUIIdamClientService {
             encodedRedirectUrl,
             state
         )) {
-            log.info("Response Headers: " + response.headers().get("Location"));
+            Map<String, Collection<String>> map = response.headers();
+            for (Map.Entry<String, Collection<String>> entry : map.entrySet()) {
+                System.out.println("Key : " + entry.getKey() +
+                                       " ,Value : " + entry.getValue());
+            }
             return response.status();
         }
     }
