@@ -76,7 +76,7 @@ public class DefendantSignSettlementAgreementNotificationHandler extends Callbac
             caseData,
             isRespondentNotification(callbackParams)
         );
-        if (isNotEmpty(recipientEmail)) {
+        if (isNotEmpty(recipientEmail) && templateId != null) {
             notificationService.sendMail(
                 recipientEmail,
                 templateId,
