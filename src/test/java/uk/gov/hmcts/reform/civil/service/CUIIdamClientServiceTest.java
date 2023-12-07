@@ -40,7 +40,7 @@ class CUIIdamClientServiceTest {
             HttpStatus.SC_OK).build());
 
         Response response = cuiIdamClientService.authenticatePinUser("12345678", "000MC001");
-        assertThat(response.status()).isNotNull();
+        assertThat(response.status()).isNotEqualTo(HttpStatus.SC_BAD_REQUEST);
     }
 
 }
