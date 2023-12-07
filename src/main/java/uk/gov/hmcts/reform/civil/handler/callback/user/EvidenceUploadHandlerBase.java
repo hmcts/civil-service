@@ -54,7 +54,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
@@ -218,11 +219,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             }
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        //determine claim path, and assign to CCD object for show hide functionality
-        if (caseData.getClaimType() == null) {
-            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getTotalClaimAmount(), null, null).name());
-        } else {
-            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType(), caseData).name());
+        //Evidence upload will have different screen for Fast claims and Small claims.
+        // We use show hide in CCD to do this, using utility field caseProgAllocatedTrack to hold the value of the claim track
+        // for either spec claims (ResponseClaimTrack) or unspec claims (AllocatedTrack)
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            caseDataBuilder.caseProgAllocatedTrack(caseData.getAllocatedTrack().name());
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            caseDataBuilder.caseProgAllocatedTrack(caseData.getResponseClaimTrack());
         }
         caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
         // was unable to null value properly in EvidenceUploadNotificationEventHandler after emails are sent,
