@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.idam.client.IdamApi;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 @Service
