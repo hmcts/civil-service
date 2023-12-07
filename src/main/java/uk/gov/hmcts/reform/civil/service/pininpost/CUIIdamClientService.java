@@ -33,6 +33,7 @@ public class CUIIdamClientService {
             encodedRedirectUrl,
             state
         )) {
+            log.info("Response Headers: " + response.headers().get("Location"));
             return response.status();
         }
     }
