@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -34,7 +33,6 @@ import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.utils.HearingReferenceNumber;
 
 import static java.lang.String.format;
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -42,6 +40,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
@@ -185,16 +185,20 @@ public class HearingScheduledHandler extends CallbackHandler {
         }
         CaseState caseState = HEARING_READINESS;
 
-        var allocatedTrack = caseData.getAllocatedTrack();
-        if (isNull(caseData.getAllocatedTrack())) {
-            allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData.getTotalClaimAmount(), null);
-            caseDataBuilder.allocatedTrack(allocatedTrack);
+        // Hearing fee will be different based on claim track.
+        // for either spec claims (ResponseClaimTrack) or unspec claims (AllocatedTrack)
+        String claimTrack = null;
+
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            claimTrack = caseData.getAllocatedTrack().name();
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            claimTrack = caseData.getResponseClaimTrack();
         }
 
         if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
             caseDataBuilder.hearingDueDate(
                 calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
-            caseDataBuilder.hearingFee(calculateAndApplyFee(hearingFeesService, caseData, allocatedTrack));
+            caseDataBuilder.hearingFee(calculateAndApplyFee(hearingFeesService, caseData, claimTrack));
         } else {
             caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
         }
