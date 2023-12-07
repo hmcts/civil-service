@@ -31,15 +31,21 @@ public class DefendantPinToPostLRspecService {
     private static final int EXPIRY_PERIOD = 180;
     private static final int OCMC_PIN_LENGTH = 8;
 
-    public void validatePin(CaseDetails caseDetails, String pin) {
-        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+    public void validatePin(CaseDetails caseDetails, String pin, String... legacyCaseRef) {
+        log.info("Validate Pin called..");
         if (!pin.isEmpty() && pin.length() == OCMC_PIN_LENGTH) {
-            int response = cuiIdamClientService.authenticatePinUser(pin, caseData.getLegacyCaseReference());
-            if (response != HttpStatus.OK.value()) {
-                log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
+            log.info("Its a cmc claim");
+            int response = cuiIdamClientService.authenticatePinUser(pin, legacyCaseRef[0]);
+            log.info("valid Pin : " + response);
+            if (response == HttpStatus.FOUND.value() || response == HttpStatus.OK.value()) {
+                log.info("It's a valid claim..");
+            } else {
+                log.error("Pin does not match or expired for {}", legacyCaseRef[0]);
                 throw new PinNotMatchException();
             }
         } else {
+            log.info("Its a CUI claim..");
+            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
             if (pinInPostData == null || pinInPostData.getAccessCode() == null
                 || !pinInPostData.getAccessCode().equals(pin)
@@ -47,6 +53,7 @@ public class DefendantPinToPostLRspecService {
                 log.error("Pin does not match or expired for {}", caseData.getLegacyCaseReference());
                 throw new PinNotMatchException();
             }
+            log.info("Valid CUI Pin");
         }
     }
 
