@@ -5256,6 +5256,13 @@ public class CaseDataBuilder {
             .build();
     }
 
+    public CaseData buildCuiCaseDataWithFee() {
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100)).code("CODE").build())
+            .build();
+    }
+
     public CaseData buildMakePaymentsCaseDataWithoutClaimIssuedPbaDetails() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();

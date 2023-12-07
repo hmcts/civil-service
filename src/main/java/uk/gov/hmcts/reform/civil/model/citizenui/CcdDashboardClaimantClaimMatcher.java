@@ -249,8 +249,9 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
     @Override
     public boolean isCourtReviewing() {
         return (!hasSdoBeenDrawn()
-            && caseData.isRespondentResponseFullDefence()
-            && caseData.getCcdState().equals(CaseState.JUDICIAL_REFERRAL))
+            && (caseData.isRespondentResponseFullDefence()
+            || caseData.isPartAdmitClaimSpec())
+            && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState()))
             || (caseData.hasApplicantRejectedRepaymentPlan());
     }
 
@@ -280,7 +281,7 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
     @Override
     public boolean isPartialAdmissionRejected() {
         return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
-            && caseData.isPartAdmitClaimSpec();
+            && caseData.isPartAdmitClaimSpec() && YesOrNo.NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec());
     }
 
     @Override
@@ -295,5 +296,4 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
     }
-
 }

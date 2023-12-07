@@ -40,6 +40,7 @@ public class CaseAssignmentController {
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
     private final AssignCaseService assignCaseService;
     private final LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
+    private static final int OCMC_PIN_LENGTH = 8;
 
     @PostMapping(path = {
         "/reference/{caseReference}"
@@ -52,8 +53,13 @@ public class CaseAssignmentController {
     public ResponseEntity<CaseDetails> validateCaseAndPin(
         @PathVariable("caseReference") String caseReference, @RequestBody PinDto pin) {
         log.info("case reference {}", caseReference);
-        CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
-        defendantPinToPostLRspecService.validatePin(caseDetails, pin.getPin());
+        CaseDetails caseDetails = null;
+        if (pin.getPin().length() != OCMC_PIN_LENGTH) {
+            caseDetails = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
+            defendantPinToPostLRspecService.validatePin(caseDetails, pin.getPin());
+        } else {
+            defendantPinToPostLRspecService.validatePin(caseDetails, pin.getPin(), caseReference);
+        }
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
 
