@@ -87,6 +87,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private boolean isJudicialReferralAllowed(CaseData caseData) {
         return (caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence() || caseData.isFullDefenceNotPaid())
             && ((Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation())
+            || caseData.hasDefendantNotAgreedToFreeMediation()
             || caseData.isFastTrackClaim());
     }
 
