@@ -58,7 +58,6 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
             .formattedDisposableIncome(getFormattedDisposableIncome(caseData))
             .rejectionReason(getApplicant1RejectedRepaymentReason(caseData))
             .build();
-
     }
 
     private LocalDate getClaimantRequestRepaymentLastDateBy(CaseData caseData) {
@@ -75,7 +74,6 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
     }
 
     private LocalDate getDefendantRepaymentLastDateBy(CaseData caseData) {
-
         RespondentResponsePartAdmissionPaymentTimeLRspec defendantPaymentOption = caseData.getDefenceAdmitPartPaymentTimeRouteRequired();
         if (defendantPaymentOption == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
             return ClaimantResponseUtils.getDefendantFinalRepaymentDate(caseData);
@@ -91,7 +89,6 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
 
     private String getFormattedDisposableIncome(CaseData caseData) {
         StringBuilder defendantDisposableIncome = new StringBuilder();
-
         BigDecimal disposableIncome = BigDecimal.valueOf(repaymentPlanDecisionCalculator.calculateDisposableIncome(
             caseData)).setScale(2, RoundingMode.CEILING);
         if (disposableIncome.compareTo(BigDecimal.ZERO) < 0) {

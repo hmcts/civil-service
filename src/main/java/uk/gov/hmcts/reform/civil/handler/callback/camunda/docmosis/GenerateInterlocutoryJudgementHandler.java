@@ -53,11 +53,7 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
     private CallbackResponse generateInterlocutoryJudgementDoc(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        boolean isCompanyOROrganisation = caseData.getApplicant1().isCompanyOROrganisation();
-        ChooseHowToProceed chooseHowToProceed = getChooseHowToProceed(caseData);
-        RepaymentDecisionType repaymentDecisionType = getRepaymentDecisionType(caseData);
-
-        if (isCompanyOROrganisation || chooseHowToProceed != ChooseHowToProceed.REQUEST_A_CCJ || repaymentDecisionType != RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT) {
+        if (isGenerateInterlocDocNotPermitted(callbackParams)) {
             return SubmittedCallbackResponse.builder().build();
         }
 
@@ -91,6 +87,15 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .map(ClaimantLiPResponse::getClaimantCourtDecision)
             .orElse(null);
+    }
+
+    private boolean isGenerateInterlocDocNotPermitted(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        ChooseHowToProceed chooseHowToProceed = getChooseHowToProceed(caseData);
+        RepaymentDecisionType repaymentDecisionType = getRepaymentDecisionType(caseData);
+        boolean isCompanyOROrganisation = caseData.getApplicant1().isCompanyOROrganisation();
+
+        return  isCompanyOROrganisation || chooseHowToProceed != ChooseHowToProceed.REQUEST_A_CCJ || repaymentDecisionType != RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
     }
 }
 

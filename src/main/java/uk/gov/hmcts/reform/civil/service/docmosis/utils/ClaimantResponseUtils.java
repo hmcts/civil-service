@@ -32,7 +32,6 @@ public class ClaimantResponseUtils {
         } else {
             return claimantRepaymentOption.getDisplayedValue();
         }
-
     }
 
     public static String getDefendantRepaymentOption(CaseData caseData) {
@@ -46,27 +45,23 @@ public class ClaimantResponseUtils {
         } else {
             return defendantRepaymentOption.getDisplayedValue();
         }
-
     }
 
     public static LocalDate getClaimantFinalRepaymentDate(CaseData caseData) {
         BigDecimal paymentAmount = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
         LocalDate firstRepaymentDate = caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec();
         PaymentFrequencyClaimantResponseLRspec repaymentFrequency = caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec();
-
         BigDecimal claimantTotalAmount = caseData.getTotalClaimAmount();
         if (isNull(firstRepaymentDate) || isNull(paymentAmount) || isNull(repaymentFrequency)) {
             return null;
         }
 
         long numberOfInstallmentsAfterFirst = getNumberOfInstallmentsAfterFirst(claimantTotalAmount, paymentAmount);
-
         return switch (repaymentFrequency) {
             case ONCE_ONE_WEEK -> firstRepaymentDate.plusWeeks(numberOfInstallmentsAfterFirst);
             case ONCE_TWO_WEEKS -> firstRepaymentDate.plusWeeks(2 * numberOfInstallmentsAfterFirst);
             default -> firstRepaymentDate.plusMonths(numberOfInstallmentsAfterFirst);
         };
-
     }
 
     public static LocalDate getDefendantFinalRepaymentDate(CaseData caseData) {
@@ -77,7 +72,6 @@ public class ClaimantResponseUtils {
 
         BigDecimal paymentAmountInPence = repaymentPlanLRspec.getPaymentAmount();
         BigDecimal paymentAmount = MonetaryConversions.penniesToPounds(paymentAmountInPence);
-
         LocalDate firstRepaymentDate = repaymentPlanLRspec.getFirstRepaymentDate();
         PaymentFrequencyLRspec repaymentFrequency = repaymentPlanLRspec.getRepaymentFrequency();
 

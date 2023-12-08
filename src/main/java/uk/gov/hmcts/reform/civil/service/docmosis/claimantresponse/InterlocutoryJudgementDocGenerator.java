@@ -26,7 +26,6 @@ public class InterlocutoryJudgementDocGenerator implements TemplateDataGenerator
     private final DocumentGeneratorService documentGeneratorService;
 
     public CaseDocument generateInterlocutoryJudgementDoc(CaseData caseData, String authorisation) {
-
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             getTemplateData(caseData),
             INTERLOCUTORY_JUDGEMENT_DOCUMENT
