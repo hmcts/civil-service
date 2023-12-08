@@ -48,16 +48,16 @@ public class CaseDataTest {
     @Test
     public void applicant1Proceed_when1v1() {
         CaseData caseData = CaseData.builder()
-            .applicant1ProceedWithClaim(YesOrNo.YES)
-            .build();
+                .applicant1ProceedWithClaim(YesOrNo.YES)
+                .build();
         assertEquals(YesOrNo.YES, caseData.getApplicant1ProceedsWithClaimSpec());
     }
 
     @Test
     public void applicant1Proceed_when2v1() {
         CaseData caseData = CaseData.builder()
-            .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
-            .build();
+                .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
+                .build();
         assertEquals(YesOrNo.YES, caseData.getApplicant1ProceedsWithClaimSpec());
     }
 
@@ -65,12 +65,12 @@ public class CaseDataTest {
     void givenApplicantAgreedToMediation_whenHasClaimantAgreedToFreeMediation_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                                          .hasAgreedFreeMediation(MediationDecision.Yes)
-                                                                          .build())
-                             .build())
-            .build();
+                .caseDataLiP(CaseDataLiP.builder()
+                        .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                .hasAgreedFreeMediation(MediationDecision.Yes)
+                                .build())
+                        .build())
+                .build();
         //When
         boolean result = caseData.hasClaimantAgreedToFreeMediation();
         //Then
@@ -91,12 +91,12 @@ public class CaseDataTest {
     void givenApplicantDidNotAgreeToFreeMediation_whenHasClaimantAgreedToFeeMediation_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                                          .hasAgreedFreeMediation(MediationDecision.No)
-                                                                          .build())
-                             .build())
-            .build();
+                .caseDataLiP(CaseDataLiP.builder()
+                        .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                .hasAgreedFreeMediation(MediationDecision.No)
+                                .build())
+                        .build())
+                .build();
         //When
         boolean result = caseData.hasClaimantAgreedToFreeMediation();
         //Then
@@ -127,11 +127,11 @@ public class CaseDataTest {
     void givenOneVTwoTwoLegalRepCaseRespondent1FullDefence_whenIsRespondentResponseFullDefence_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .respondent2(PartyBuilder.builder().build())
-            .applicant1(PartyBuilder.builder().build())
-            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
-            .build();
+                .respondent1(PartyBuilder.builder().build())
+                .respondent2(PartyBuilder.builder().build())
+                .applicant1(PartyBuilder.builder().build())
+                .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+                .build();
         //When
         boolean result = caseData.isRespondentResponseFullDefence();
         //Then
@@ -142,12 +142,12 @@ public class CaseDataTest {
     void givenOneVTwoTwoLegalRepCaseRespondent1And2FullDefence_whenIsRespondentResponseFullDefence_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .respondent2(PartyBuilder.builder().build())
-            .applicant1(PartyBuilder.builder().build())
-            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
-            .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
-            .build();
+                .respondent1(PartyBuilder.builder().build())
+                .respondent2(PartyBuilder.builder().build())
+                .applicant1(PartyBuilder.builder().build())
+                .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
+                .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
+                .build();
         //When
         boolean result = caseData.isRespondentResponseFullDefence();
         //Then
@@ -158,10 +158,10 @@ public class CaseDataTest {
     void applicant_partAdmitClaimSettled() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
-            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
-            .build();
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+                .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+                .build();
         //When
         //Then
         assertTrue(caseData.isPartAdmitClaimSettled());
@@ -171,10 +171,10 @@ public class CaseDataTest {
     void applicant_partAdmitClaimNotSettled() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
-            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
-            .build();
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+                .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+                .build();
         //When
         //Then
         assertTrue(caseData.isPartAdmitClaimNotSettled());
@@ -184,8 +184,8 @@ public class CaseDataTest {
     void applicant_isClaimPartAdmitSpec() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-            .build();
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                .build();
         //When
         //Then
         assertTrue(caseData.isPartAdmitClaimSpec());
@@ -195,8 +195,8 @@ public class CaseDataTest {
     void applicant_isPartAdmitIntentionToSettleClaim() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
-            .build();
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+                .build();
         //When
         //Then
         assertTrue(caseData.isClaimantIntentionSettlePartAdmit());
@@ -206,8 +206,8 @@ public class CaseDataTest {
     void applicant_isPartAdmitIntentionNotToSettleClaim() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
-            .build();
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+                .build();
         //When
         //Then
         assertTrue(caseData.isClaimantIntentionNotSettlePartAdmit());
@@ -217,8 +217,8 @@ public class CaseDataTest {
     void applicant_isPartAdmitConfirmAmountPaid() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
-            .build();
+                .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+                .build();
         //When
         //Then
         assertTrue(caseData.isClaimantConfirmAmountPaidPartAdmit());
@@ -228,8 +228,8 @@ public class CaseDataTest {
     void applicant_isPartAdmitConfirmAmountNotPaid() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
-            .build();
+                .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+                .build();
         assertTrue(caseData.isClaimantConfirmAmountNotPaidPartAdmit());
     }
 
@@ -237,11 +237,11 @@ public class CaseDataTest {
     public void givenRespondentUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.YES)
-            .respondent1(Party.builder().build())
-            .applicant1(Party.builder().build())
-            .build();
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1(Party.builder().build())
+                .applicant1(Party.builder().build())
+                .build();
         //Then
         assertTrue(caseData.isLRvLipOneVOne());
     }
@@ -250,11 +250,11 @@ public class CaseDataTest {
     public void givenRespondentRepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1Represented(YesOrNo.YES)
-            .applicant1Represented(YesOrNo.YES)
-            .respondent1(Party.builder().build())
-            .applicant1(Party.builder().build())
-            .build();
+                .respondent1Represented(YesOrNo.YES)
+                .applicant1Represented(YesOrNo.YES)
+                .respondent1(Party.builder().build())
+                .applicant1(Party.builder().build())
+                .build();
         //Then
         assertFalse(caseData.isLRvLipOneVOne());
     }
@@ -263,11 +263,11 @@ public class CaseDataTest {
     public void givenApplicantUnrepresentedAndOnevOne_whenIsLRvLipOneVOne_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().build())
-            .applicant1(Party.builder().build())
-            .build();
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1(Party.builder().build())
+                .applicant1(Party.builder().build())
+                .build();
         //Then
         assertFalse(caseData.isLRvLipOneVOne());
     }
@@ -276,11 +276,11 @@ public class CaseDataTest {
     public void givenRespondentUnrepresentedAndApplicantUnrepresentedAndOnevOne_whenIsLipvLipOneVOne_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().build())
-            .applicant1(Party.builder().build())
-            .build();
+                .respondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1(Party.builder().build())
+                .applicant1(Party.builder().build())
+                .build();
         //Then
         assertTrue(caseData.isLipvLipOneVOne());
     }
@@ -289,9 +289,9 @@ public class CaseDataTest {
     public void givenApplicantUnrepresented_whenIsApplicant1NotRepresented_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1Represented(YesOrNo.NO)
-            .applicant1(Party.builder().build())
-            .build();
+                .applicant1Represented(YesOrNo.NO)
+                .applicant1(Party.builder().build())
+                .build();
         //Then
         assertTrue(caseData.isApplicant1NotRepresented());
     }
@@ -300,9 +300,9 @@ public class CaseDataTest {
     public void givenApplicantRepresented_whenIsApplicant1NotRepresented_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1Represented(YesOrNo.YES)
-            .applicant1(Party.builder().build())
-            .build();
+                .applicant1Represented(YesOrNo.YES)
+                .applicant1(Party.builder().build())
+                .build();
         //Then
         assertFalse(caseData.isApplicant1NotRepresented());
     }
@@ -311,10 +311,10 @@ public class CaseDataTest {
     void isClaimantNotSettlePartAdmitClaim_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
-            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
-            .build();
+                .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .build();
         //When
         //Then
         assertTrue(caseData.isClaimantNotSettlePartAdmitClaim());
@@ -324,10 +324,10 @@ public class CaseDataTest {
     void isClaimantNotSettlePartAdmitClaim_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
-            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
-            .build();
+                .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+                .build();
         //When
         //Then
         assertFalse(caseData.isClaimantNotSettlePartAdmitClaim());
@@ -337,10 +337,10 @@ public class CaseDataTest {
     void doesPartPaymentRejectedOrItsFullDefenceResponse_fullDefence() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .applicant1ProceedWithClaim(YesOrNo.YES)
-            .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
-            .build();
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .applicant1ProceedWithClaim(YesOrNo.YES)
+                .applicant1ProceedWithClaimSpec2v1(YesOrNo.YES)
+                .build();
         //When
         //Then
         assertEquals(YesOrNo.YES, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
@@ -350,10 +350,10 @@ public class CaseDataTest {
     void doesPartPaymentRejectedOrItsFullDefenceResponse_partAdmitRejectYes() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
-            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
-            .build();
+                .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
+                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .build();
         //When
         //Then
         assertEquals(YesOrNo.YES, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
@@ -363,10 +363,10 @@ public class CaseDataTest {
     void doesPartPaymentRejectedOrItsFullDefenceResponse_partAdmitRejectNo() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
-            .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
-            .build();
+                .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+                .build();
         //When
         //Then
         assertEquals(YesOrNo.NO, caseData.doesPartPaymentRejectedOrItsFullDefenceResponse());
@@ -376,8 +376,8 @@ public class CaseDataTest {
     void hasDefendantNotAgreedToFreeMediation_Yes() {
         //Given
         CaseData caseData = CaseData.builder()
-            .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .build();
+                .responseClaimMediationSpecRequired(YesOrNo.YES)
+                .build();
         //When
         //Then
         assertFalse(caseData.hasDefendantNotAgreedToFreeMediation());
@@ -387,8 +387,8 @@ public class CaseDataTest {
     void hasDefendantNotAgreedToFreeMediation_No() {
         //Given
         CaseData caseData = CaseData.builder()
-            .responseClaimMediationSpecRequired(YesOrNo.NO)
-            .build();
+                .responseClaimMediationSpecRequired(YesOrNo.NO)
+                .build();
         //When
         //Then
         assertTrue(caseData.hasDefendantNotAgreedToFreeMediation());
@@ -398,8 +398,8 @@ public class CaseDataTest {
     void isFastTrackClaim_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
-            .build();
+                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+                .build();
         //When
         //Then
         assertTrue(caseData.isFastTrackClaim());
@@ -409,8 +409,8 @@ public class CaseDataTest {
     void isFastTrackClaim_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-            .build();
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .build();
         //When
         //Then
         assertFalse(caseData.isFastTrackClaim());
@@ -420,8 +420,8 @@ public class CaseDataTest {
     void isSmallClaim_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
-            .build();
+                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .build();
         //When
         //Then
         assertTrue(caseData.isSmallClaim());
@@ -431,8 +431,8 @@ public class CaseDataTest {
     void isSmallClaim_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
-            .build();
+                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+                .build();
         //When
         //Then
         assertFalse(caseData.isSmallClaim());
@@ -442,9 +442,9 @@ public class CaseDataTest {
     void isRejectWithMediation_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
-            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
-            .build();
+                .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
+                .build();
         //When
         //Then
         assertFalse(caseData.isRejectWithNoMediation());
@@ -454,9 +454,9 @@ public class CaseDataTest {
     void isRejectWithMediation_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
-            .responseClaimMediationSpecRequired(YesOrNo.NO)
-            .build();
+                .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.NO)
+                .responseClaimMediationSpecRequired(YesOrNo.NO)
+                .build();
         //When
         //Then
         assertTrue(caseData.isRejectWithNoMediation());
@@ -467,12 +467,12 @@ public class CaseDataTest {
         //Given
         String organisationId = "1245";
         CaseData caseData = CaseData.builder()
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(Organisation.builder()
-                                                                .organisationID(organisationId)
-                                                                .build())
-                                              .build())
-            .build();
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                        .organisation(Organisation.builder()
+                                .organisationID(organisationId)
+                                .build())
+                        .build())
+                .build();
         //When
         String result = caseData.getApplicantOrganisationId();
         //Then
@@ -493,7 +493,7 @@ public class CaseDataTest {
     void isTranslatedDocumentUploaded_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .systemGeneratedCaseDocuments(null).build();
+                .systemGeneratedCaseDocuments(null).build();
         //When
         //Then
         assertFalse(caseData.isTranslatedDocumentUploaded());
@@ -503,7 +503,7 @@ public class CaseDataTest {
     void isTranslatedDocumentUploaded_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DEFENCE_TRANSLATED_DOCUMENT).build())).build();
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DEFENCE_TRANSLATED_DOCUMENT).build())).build();
         //When
         //Then
         assertTrue(caseData.isTranslatedDocumentUploaded());
@@ -512,7 +512,7 @@ public class CaseDataTest {
     @Test
     void getSDOOrderDocument_WhenItPresent() {
         CaseData caseData = CaseData.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
+                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
         //When
         Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
         //Then
@@ -522,7 +522,7 @@ public class CaseDataTest {
     @Test
     void getSDOOrderDocument_WhenItsNull() {
         CaseData caseData = CaseData.builder()
-            .systemGeneratedCaseDocuments(null).build();
+                .systemGeneratedCaseDocuments(null).build();
         //When
         Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
         //Then
@@ -532,11 +532,11 @@ public class CaseDataTest {
     void isPartAdmitPayImmediatelyAccepted_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .applicant1AcceptAdmitAmountPaidSpec(YES)
-            .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
-            .caseAccessCategory(SPEC_CLAIM)
-            .build();
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1AcceptAdmitAmountPaidSpec(YES)
+                .showResponseOneVOneFlag(ResponseOneVOneShowTag.ONE_V_ONE_PART_ADMIT_PAY_IMMEDIATELY)
+                .caseAccessCategory(SPEC_CLAIM)
+                .build();
         //When
         //Then
         assertTrue(caseData.isPartAdmitPayImmediatelyAccepted());
@@ -554,16 +554,16 @@ public class CaseDataTest {
     @Test
     void shouldReturnTrueWhenResponseIsFullAdmit() {
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
-            .build();
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .build();
         assertTrue(caseData.isFullAdmitClaimSpec());
     }
 
     @Test
     void shouldReturnFalseWhenResponseIsNotFullAdmit() {
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-            .build();
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                .build();
         assertFalse(caseData.isFullAdmitClaimSpec());
     }
 
@@ -571,10 +571,10 @@ public class CaseDataTest {
     void shouldReturnRecurringIncomeForFullAdmitWhenTheyExist() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringIncomeFA(List.of(element(
-                RecurringIncomeLRspec.builder().build()))).build())
-            .build();
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringIncomeFA(List.of(element(
+                        RecurringIncomeLRspec.builder().build()))).build())
+                .build();
         //When
         List<Element<RecurringIncomeLRspec>> results = caseData.getRecurringIncomeForRespondent1();
         //Then
@@ -585,10 +585,10 @@ public class CaseDataTest {
     void shouldReturnRecurringIncomeForNonFullAdmitCaseWhenTheyExist() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringIncome(List.of(element(
-                RecurringIncomeLRspec.builder().build()))).build())
-            .build();
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringIncome(List.of(element(
+                        RecurringIncomeLRspec.builder().build()))).build())
+                .build();
         //When
         List<Element<RecurringIncomeLRspec>> results = caseData.getRecurringIncomeForRespondent1();
         //Then
@@ -609,10 +609,10 @@ public class CaseDataTest {
     void shouldReturnRecurringExpensesForFullAdmitWhenTheyExist() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringExpensesFA(List.of(element(
-                RecurringExpenseLRspec.builder().build()))).build())
-            .build();
+                .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringExpensesFA(List.of(element(
+                        RecurringExpenseLRspec.builder().build()))).build())
+                .build();
 
         //When
         List<Element<RecurringExpenseLRspec>> results = caseData.getRecurringExpensesForRespondent1();
@@ -624,10 +624,10 @@ public class CaseDataTest {
     void shouldReturnRecurringExpensesForNonFullAdmitWhenTheyExist() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-            .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringExpenses(List.of(element(
-                RecurringExpenseLRspec.builder().build()))).build())
-            .build();
+                .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
+                .respondent1DQ(Respondent1DQ.builder().respondent1DQRecurringExpenses(List.of(element(
+                        RecurringExpenseLRspec.builder().build()))).build())
+                .build();
 
         //When
         List<Element<RecurringExpenseLRspec>> results = caseData.getRecurringExpensesForRespondent1();
@@ -688,7 +688,7 @@ public class CaseDataTest {
         @Test
         public void shouldReturnNull_whenHearingLocationValueIsNull() {
             CaseData caseData = CaseData.builder()
-                .hearingLocation(DynamicList.builder().value(DynamicListElement.EMPTY).build()).build();
+                    .hearingLocation(DynamicList.builder().value(DynamicListElement.EMPTY).build()).build();
             String actual = caseData.getHearingLocationText();
 
             assertNull(actual);
@@ -697,8 +697,8 @@ public class CaseDataTest {
         @Test
         public void shouldExpectedString_whenHearingLocationValueLabelIsNotNull() {
             CaseData caseData = CaseData.builder()
-                .hearingLocation(DynamicList.builder().value(
-                    DynamicListElement.dynamicElement("label")).build()).build();
+                    .hearingLocation(DynamicList.builder().value(
+                            DynamicListElement.dynamicElement("label")).build()).build();
             String actual = caseData.getHearingLocationText();
 
             assertEquals("label", actual);
@@ -709,8 +709,8 @@ public class CaseDataTest {
 
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO).build())
-                .build();
+                    .caseDataLip(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO).build())
+                    .build();
 
             //When
             boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
@@ -724,8 +724,8 @@ public class CaseDataTest {
 
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder().build())
-                .build();
+                    .caseDataLip(CaseDataLiP.builder().build())
+                    .build();
 
             //When
             boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
