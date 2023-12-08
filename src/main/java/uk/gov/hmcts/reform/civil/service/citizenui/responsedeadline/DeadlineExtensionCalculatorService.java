@@ -29,6 +29,7 @@ public class DeadlineExtensionCalculatorService {
         if (workingDayIndicator.isWorkingDay(responseDate)) {
             workingDaysCounter++;
         }
+
         return workingDaysCounter == plusDays ? responseDate : calculateWorkingDays(responseDate.plusDays(1), plusDays);
     }
 }
