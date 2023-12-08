@@ -108,8 +108,8 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        return (!hasSdoBeenDrawn()) && caseData.getBusinessProcess().getCamundaEvent().equals(CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC.name())
-            && caseData.getBusinessProcess().getStatus().equals(BusinessProcessStatus.FINISHED);
+        return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
+            && !hasSdoBeenDrawn();
     }
 
     @Override
@@ -130,8 +130,7 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
         }
 
         return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
-            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            && Objects.isNull(caseData.getCcjPaymentDetails());
+            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }
 
     @Override
