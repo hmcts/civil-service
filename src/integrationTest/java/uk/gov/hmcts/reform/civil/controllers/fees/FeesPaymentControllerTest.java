@@ -38,7 +38,7 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     private static final CardPaymentServiceRequestDTO CARD_PAYMENT_SERVICE_REQUEST
         = CardPaymentServiceRequestDTO.builder()
         .returnUrl("http://localhost:3001/hearing-payment-confirmation/1701090368574910")
-        .language("English")
+        .language("En")
         .amount(new BigDecimal("232.00")).currency("GBP").build();
 
     @MockBean
