@@ -52,7 +52,6 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
 
     private CallbackResponse generateInterlocutoryJudgementDoc(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
         if (isGenerateInterlocDocNotPermitted(callbackParams)) {
             return SubmittedCallbackResponse.builder().build();
         }
@@ -61,7 +60,6 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-
         CaseData updatedCaseData = caseData.toBuilder()
             .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                 interlocutoryJudgementDoc,
@@ -94,7 +92,6 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
         ChooseHowToProceed chooseHowToProceed = getChooseHowToProceed(caseData);
         RepaymentDecisionType repaymentDecisionType = getRepaymentDecisionType(caseData);
         boolean isCompanyOROrganisation = caseData.getApplicant1().isCompanyOROrganisation();
-
         return  isCompanyOROrganisation || chooseHowToProceed != ChooseHowToProceed.REQUEST_A_CCJ || repaymentDecisionType != RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
     }
 }
