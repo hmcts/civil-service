@@ -182,7 +182,7 @@ public class PaymentsService {
                 feeResponse = caseData.getHearingFee().toFeeDto();
             } else {
                 feeResponse = HearingFeeUtils.calculateAndApplyFee(
-                    hearingFeesService, caseData, caseData.getAllocatedTrack()).toFeeDto();
+                    hearingFeesService, caseData, caseData.getAllocatedTrack().name()).toFeeDto();
             }
         }
 
