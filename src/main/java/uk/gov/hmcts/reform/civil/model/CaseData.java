@@ -894,15 +894,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
         LocalDate whenWillThisAmountBePaid =
             Optional.ofNullable(getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
         LocalDate firstRepaymentDate = Optional.ofNullable(getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(null);
-        if(isNull(whenWillThisAmountBePaid) && isNull(firstRepaymentDate)) {
+        if (isNull(whenWillThisAmountBePaid) && isNull(firstRepaymentDate)) {
             return true;
         }
-        if (nonNull(whenWillThisAmountBePaid) &&
-            whenWillThisAmountBePaid.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now())) {
+        if (nonNull(whenWillThisAmountBePaid)
+            && whenWillThisAmountBePaid.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now())) {
             return true;
         }
-        return nonNull(firstRepaymentDate) &&
-            firstRepaymentDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+        return nonNull(firstRepaymentDate)
+            && firstRepaymentDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
 
     @JsonIgnore
