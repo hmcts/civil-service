@@ -18,6 +18,7 @@ public class DeadlineExtensionCalculatorService {
     public LocalDate calculateExtendedDeadline(LocalDate responseDate, int plusDays) {
         workingDaysCounter = 0;
         requireNonNull(responseDate);
+
         if (plusDays == 0) {
             return workingDayIndicator.getNextWorkingDay(responseDate);
         }
@@ -28,6 +29,7 @@ public class DeadlineExtensionCalculatorService {
         if (workingDayIndicator.isWorkingDay(responseDate)) {
             workingDaysCounter++;
         }
+
         return workingDaysCounter == plusDays ? responseDate : calculateWorkingDays(responseDate.plusDays(1), plusDays);
     }
 }
