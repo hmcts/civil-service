@@ -85,6 +85,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_MEDIATION_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
@@ -1108,7 +1109,8 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 TRANSFER_ONLINE_CASE,
                 asyncStitchingComplete,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                UPLOAD_MEDIATION_DOCUMENTS
 
             )
         ),
@@ -1257,7 +1259,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                UPLOAD_MEDIATION_DOCUMENTS
             )
         ),
         entry(
@@ -1344,7 +1347,8 @@ public class FlowStateAllowedEventService {
         entry(
             PREPARE_FOR_HEARING_CONDUCT_HEARING.fullName(),
             List.of(
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                UPLOAD_MEDIATION_DOCUMENTS
             )
         ),
         entry(
