@@ -79,7 +79,7 @@ class HearingFeeUtilsTest {
         when(hearingFeesService.getFeeForHearingFastTrackClaims(any())).thenReturn(expected);
         when(hearingFeesService.getFeeForHearingMultiClaims(any())).thenReturn(expected);
 
-        assertThat(calculateAndApplyFee(hearingFeesService, caseData, allocatedTrack))
+        assertThat(calculateAndApplyFee(hearingFeesService, caseData, allocatedTrack.name()))
             .isEqualTo(expected);
     }
 
