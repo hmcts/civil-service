@@ -32,12 +32,15 @@ import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
+import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
+import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -4855,6 +4858,42 @@ public class CaseDataBuilder {
                                               .build()).build();
 
         mediation = Mediation.builder().unsuccessfulMediationReason("Unsuccessful").build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateMediationUnsuccessfulCarm(MultiPartyScenario mpScenario) {
+        atStateApplicantProceedAllMediation(mpScenario);
+        applicantsProceedIntention = YES;
+        caseDataLiP = CaseDataLiP.builder()
+            .applicant1ClaimMediationSpecRequiredLip(
+                ClaimantMediationLip.builder()
+                    .hasAgreedFreeMediation(MediationDecision.Yes)
+                    .build()).build();
+
+        mediation = Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(
+            List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE)).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateMediationSuccessful(MultiPartyScenario mpScenario) {
+        atStateApplicantProceedAllMediation(mpScenario);
+        applicantsProceedIntention = YES;
+        caseDataLiP = CaseDataLiP.builder()
+            .applicant1ClaimMediationSpecRequiredLip(
+                ClaimantMediationLip.builder()
+                    .hasAgreedFreeMediation(MediationDecision.Yes)
+                    .build()).build();
+
+        mediation = Mediation.builder()
+            .mediationSuccessful(MediationSuccessful.builder()
+                                     .mediationSettlementAgreedAt(now())
+                                     .mediationAgreement(MediationAgreementDocument.builder()
+                                                             .name("mediation")
+                                                             .build())
+                                     .build())
+            .build();
 
         return this;
     }

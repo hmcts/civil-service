@@ -728,6 +728,8 @@ public class CaseDataParent implements MappableObject {
 
     private FastTrackAllocation fastTrackAllocation;
 
+    private YesOrNo showCarmFields;
+
     @JsonUnwrapped
     private UploadMediationDocumentsForm uploadMediationDocumentsForm;
 
