@@ -746,6 +746,7 @@ public class CaseDataTest {
             //Then
             assertTrue(isJudgementDateNotPermitted);
         }
+
         @Test
         void shouldReturnTrueWhenFirstRepaymentDateIsAfterCurrentDate() {
             //Given
