@@ -1462,6 +1462,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
             assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEmpty();
             assertThat(updatedData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm()).isEmpty();
