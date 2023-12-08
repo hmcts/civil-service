@@ -287,7 +287,6 @@ public class CaseDataBuilder {
     protected PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
     protected LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
 
-
     //Case proceeds in caseman
     protected ClaimProceedsInCaseman claimProceedsInCaseman;
     protected ClaimProceedsInCasemanLR claimProceedsInCasemanLR;
