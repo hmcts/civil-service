@@ -766,6 +766,21 @@ public class CaseDataTest {
         assertTrue(isJudgementDateNotPermitted);
     }
 
+    @Test
+    void shouldReturnTrueWhenBothDatesAreNull() {
+
+        //Given
+        CaseData caseData = CaseData.builder()
+            .build();
+
+        //When
+        boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+
+        //Then
+        assertTrue(isJudgementDateNotPermitted);
+    }
+
+
 }
 
 
