@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.Map;
@@ -26,8 +27,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
     ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler.class,
@@ -44,6 +47,8 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
     private ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler handler;
     @MockBean
     OrganisationDetailsService organisationDetailsService;
+    @MockBean
+    FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -53,6 +58,7 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
         @BeforeEach
         void setUp() {
             when(notificationsProperties.getNotifyClaimantLrTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()).thenReturn("template-id-manual-determination");
             given(organisationDetailsService.getApplicantLegalOrganizationName(any())).willReturn(ORGANISATION_NAME);
         }
 
@@ -75,6 +81,28 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
             );
         }
 
+        @Test
+        void shouldNotifyClaimantLip_whenInvoked() {
+
+            given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_FOR_RESPONDENT1_REJECT_REPAYMENT")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "rambo@email.com",
+                "template-id-manual-determination",
+                getNotificationDataMapLip(caseData),
+                "claimant-reject-repayment-respondent-notification-000DC001"
+            );
+        }
+
         @NotNull
         public Map<String, String> getNotificationDataMapSolicitorSpec(CaseData caseData) {
             return Map.of(
@@ -83,5 +111,12 @@ class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandlerTest extend
             );
         }
 
+        @NotNull
+        public Map<String, String> getNotificationDataMapLip(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            );
+        }
     }
 }
