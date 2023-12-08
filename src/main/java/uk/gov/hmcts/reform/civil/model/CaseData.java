@@ -890,9 +890,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isJudgementDatePermitted() {
-        LocalDate whenWillThisAmountBePaid = getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
-        LocalDate firstRepaymentDate = getRespondent1RepaymentPlan().getFirstRepaymentDate();
+    public boolean isJudgementDateNotPermitted() {
+        LocalDate whenWillThisAmountBePaid =
+            Optional.ofNullable(getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(null);
+
+        LocalDate firstRepaymentDate = Optional.ofNullable(getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(null);
+
         if (nonNull(whenWillThisAmountBePaid) &&
             whenWillThisAmountBePaid.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now())) {
             return true;
@@ -908,7 +911,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String setUpJudgementFormattedPermittedDate(LocalDate extendedRespondent1ResponseDate) {
-        if (!isJudgementDatePermitted()) {
+        if (isJudgementDateNotPermitted()) {
             return formatLocalDateTime(
                 extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY),
                 DATE_TIME_AT

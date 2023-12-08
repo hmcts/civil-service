@@ -63,7 +63,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (!caseData.isJudgementDatePermitted()) {
+        if (caseData.isJudgementDateNotPermitted()) {
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())));
         }
 
