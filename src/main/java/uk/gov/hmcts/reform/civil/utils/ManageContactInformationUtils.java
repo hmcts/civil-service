@@ -456,15 +456,13 @@ public class ManageContactInformationUtils {
     }
 
     private static boolean shouldAddExperts(Experts experts) {
-        return experts != null
-            && YES.equals(experts.getExpertRequired())
+        return experts != null && YES.equals(experts.getExpertRequired())
             && experts.getDetails() != null
             && !experts.getDetails().isEmpty();
     }
 
     private static boolean shouldAddWitnesses(Witnesses witnesses) {
-        return witnesses != null
-            && YES.equals(witnesses.getWitnessesToAppear())
+        return witnesses != null && YES.equals(witnesses.getWitnessesToAppear())
             && witnesses.getDetails() != null
             && !witnesses.getDetails().isEmpty();
     }
