@@ -99,6 +99,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
@@ -703,7 +705,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private DynamicList getLocationList(CallbackParams callbackParams,
                                         CaseData.CaseDataBuilder<?, ?> updatedData,
                                         RequestedCourt preferredCourt) {
-        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocationsForJudgeFinalOrder(
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
@@ -883,13 +885,36 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
             caseData.getSmallClaimsMethodInPerson()));
 
-        System.out.println("before about to submit");
+        setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
 
+    // During SDO the claim track can change based on judges selection. In this case we want to update claims track
+    // to this decision, or maintain it, if it was not changed.
+    private void setClaimsTrackBasedOnJudgeSelection(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData) {
+        CaseCategory caseAccessCategory = caseData.getCaseAccessCategory();
+        switch (caseAccessCategory) {
+            case UNSPEC_CLAIM:// unspec use allocatedTrack to hold claims track value
+                if (SdoHelper.isSmallClaimsTrack(caseData)) {
+                    dataBuilder.allocatedTrack(SMALL_CLAIM);
+                } else if (SdoHelper.isFastTrack(caseData)) {
+                    dataBuilder.allocatedTrack(FAST_CLAIM);
+                }
+                break;
+            case SPEC_CLAIM:// spec claims use responseClaimTrack to hold claims track value
+                if (SdoHelper.isSmallClaimsTrack(caseData)) {
+                    dataBuilder.responseClaimTrack(SMALL_CLAIM.name());
+                } else if (SdoHelper.isFastTrack(caseData)) {
+                    dataBuilder.responseClaimTrack(FAST_CLAIM.name());
+                }
+                break;
+            default: break;
+        }
+    }
+      
     private boolean caseContainsLiP(CaseData caseData) {
         return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
     }
