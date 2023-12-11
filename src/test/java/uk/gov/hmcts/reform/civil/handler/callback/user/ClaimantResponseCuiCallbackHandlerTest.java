@@ -159,7 +159,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                                         .build()).build();
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
-                .applicant1ProceedWithClaim(YES)
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                 .applicant1DQ(applicant1DQ)
@@ -197,7 +196,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                     .caseDataLip(caseDataLiP)
                     .applicant1AcceptAdmitAmountPaidSpec(NO)
-                    .applicant1ProceedWithClaim(YES)
                     .atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -214,7 +212,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
                 .caseDataLip(caseDataLiP)
-                .applicant1ProceedWithClaim(YES)
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -233,7 +230,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData =
                 CaseDataBuilder.builder().caseDataLip(caseDataLiP).applicant1PartAdmitIntentionToSettleClaimSpec(NO)
                     .atStateClaimIssued()
-                    .applicant1ProceedWithClaim(YES)
                     .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -256,6 +252,82 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
+        }
+
+        @Test
+        void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation_NoBaseCourt() {
+            Applicant1DQ applicant1DQ =
+                Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
+                                                                      .caseLocation(CaseLocationCivil.builder()
+                                                                                        .build())
+                                                                      .build()).build();
+            Respondent1DQ respondent1DQ =
+                Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                        .caseLocation(CaseLocationCivil.builder()
+                                                                                          .build())
+                                                                        .build()).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
+                .applicant1AcceptAdmitAmountPaidSpec(NO)
+                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                        MediationDecision.No).build())
+                                 .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(CLAIMANT_RESPONSE_CUI.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
+
+            CaseData data = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(data.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()).isNull();
+        }
+
+        @Test
+        void shouldOnlyUpdateClaimStatus_whenPartAdmitNotSettled_NoMediation_NoCourtSelected() {
+            Applicant1DQ applicant1DQ =
+                Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
+                                                                      .build()).build();
+            Respondent1DQ respondent1DQ =
+                Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
+                                                                        .build()).build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
+                .applicant1AcceptAdmitAmountPaidSpec(NO)
+                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
+                        MediationDecision.No).build())
+                                 .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(CLAIMANT_RESPONSE_CUI.name());
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
+
+            CaseData data = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(data.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()).isNull();
         }
 
         @Test
@@ -295,7 +367,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
                 .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
                         MediationDecision.No).build()).build())
-                .applicant1ProceedWithClaim(YES)
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
                 .respondent1(Party.builder()
                                  .type(COMPANY)
@@ -313,7 +384,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsOrganisation_toAllFinalOrdersIssued() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
-                .applicant1ProceedWithClaim(YES)
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
                 .respondent1(Party.builder()
                                  .type(ORGANISATION)

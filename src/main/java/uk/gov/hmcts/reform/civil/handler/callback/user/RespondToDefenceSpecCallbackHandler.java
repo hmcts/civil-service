@@ -317,6 +317,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                                              .details(wrapElements(expert))
                                              .build())
                     .build());
+        } else if (caseData.getApplicant1DQ() != null
+            && (NO.equals(caseData.getApplicantMPClaimExpertSpecRequired())
+                || NO.equals(caseData.getApplicant1ClaimExpertSpecRequired()))) {
+            builder.applicant1DQ(
+                builder.build().getApplicant1DQ().toBuilder()
+                    .applicant1DQExperts(Experts.builder()
+                                             .expertRequired(NO)
+                                             .build())
+                    .build());
         }
 
         if (caseData.getApplicant2DQ() != null
@@ -327,6 +336,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                     .applicant2DQExperts(Experts.builder()
                                              .expertRequired(caseData.getApplicantMPClaimExpertSpecRequired())
                                              .details(wrapElements(expert))
+                                             .build())
+                    .build());
+        } else if (caseData.getApplicant2DQ() != null
+            && caseData.getApplicantMPClaimExpertSpecRequired() != null
+            && NO.equals(caseData.getApplicantMPClaimExpertSpecRequired())) {
+            builder.applicant2DQ(
+                builder.build().getApplicant2DQ().toBuilder()
+                    .applicant2DQExperts(Experts.builder()
+                                             .expertRequired(NO)
                                              .build())
                     .build());
         }

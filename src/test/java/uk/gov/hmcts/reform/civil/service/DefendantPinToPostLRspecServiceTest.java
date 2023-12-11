@@ -173,7 +173,7 @@ class DefendantPinToPostLRspecServiceTest {
 
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST1234"));
+                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST1234", "620MC123"));
         }
 
         @Test
@@ -187,7 +187,8 @@ class DefendantPinToPostLRspecServiceTest {
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
             when(cuiIdamClientService.authenticatePinUser(anyString(), anyString())).thenReturn(HttpStatus.OK.value());
 
-            Assertions.assertDoesNotThrow(() ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST1234"));
+            Assertions.assertDoesNotThrow(() ->  defendantPinToPostLRspecService.validatePin(
+                caseDetails, "TEST1234", "620MC123"));
         }
     }
 

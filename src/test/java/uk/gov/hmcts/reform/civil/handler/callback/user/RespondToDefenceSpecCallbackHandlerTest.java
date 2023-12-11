@@ -79,7 +79,6 @@ import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.civil.validation.UnavailableDateValidator;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -970,6 +969,111 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("responseCourtCode").isEqualTo("312");
             }
 
+        }
+
+        @Nested
+        class UpdateExperts {
+            @Test
+            void updateApplicant1Experts() {
+                ExpertDetails experts = ExpertDetails.builder()
+                    .expertName("Mr Expert Defendant")
+                    .firstName("Expert")
+                    .lastName("Defendant")
+                    .phoneNumber("07123456789")
+                    .emailAddress("test@email.com")
+                    .fieldofExpertise("Roofing")
+                    .estimatedCost(new BigDecimal(434))
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .applicant1DQSmallClaimExperts(experts, YES)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("applicant1ClaimExpertSpecRequired").isEqualTo("Yes");
+                assertThat(response.getData()).extracting("applicant1DQExperts").extracting("expertRequired").isEqualTo("Yes");
+            }
+
+            @Test
+            void updateApplicant1Experts_NoExperts() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .applicant1DQSmallClaimExperts(null, NO)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                when(deadlinesCalculator.calculateApplicantResponseDeadlineSpec(any(), any()))
+                    .thenReturn(LocalDateTime.now());
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("applicant1ClaimExpertSpecRequired").isEqualTo("No");
+                assertThat(response.getData()).extracting("applicant1DQExperts").extracting("expertRequired").isEqualTo("No");
+            }
+
+            @Test
+            void updateApplicant2Experts() {
+                ExpertDetails experts = ExpertDetails.builder()
+                    .expertName("Mr Expert Defendant")
+                    .firstName("Expert")
+                    .lastName("Defendant")
+                    .phoneNumber("07123456789")
+                    .emailAddress("test@email.com")
+                    .fieldofExpertise("Roofing")
+                    .estimatedCost(new BigDecimal(434))
+                    .build();
+
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent2(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .applicant2DQSmallClaimExperts(experts, YES)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("applicantMPClaimExpertSpecRequired").isEqualTo("Yes");
+                assertThat(response.getData()).extracting("applicant2DQExperts").extracting("expertRequired").isEqualTo("Yes");
+            }
+
+            @Test
+            void updateApplicant2Experts_WhenNoExperts() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .respondent1(PartyBuilder.builder().individual().build())
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .applicant2DQSmallClaimExperts(null, NO)
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                // When
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                // Then
+                assertThat(response.getData())
+                    .extracting("applicantMPClaimExpertSpecRequired").isEqualTo("No");
+                assertThat(response.getData()).extracting("applicant2DQExperts").extracting("expertRequired").isEqualTo("No");
+            }
         }
 
         @Test
