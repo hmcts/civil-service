@@ -138,6 +138,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
@@ -509,6 +510,7 @@ public class CaseDataBuilder {
 
     private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
+    private ReasonForReconsideration reasonForReconsideration;
 
     private YesOrNo responseClaimExpertSpecRequired;
     private YesOrNo responseClaimExpertSpecRequired2;
@@ -5298,6 +5300,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder reasonForReconsideration(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsideration = reasonForReconsideration;
+        return this;
+    }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -6674,6 +6681,7 @@ public class CaseDataBuilder {
             .applicant1ClaimExpertSpecRequired(applicant1ClaimExpertSpecRequired)
             .applicantMPClaimExpertSpecRequired(applicantMPClaimExpertSpecRequired)
             .isFlightDelayClaim(isFlightDelayClaim)
+            .reasonForReconsideration(reasonForReconsideration)
             .build();
     }
 }
