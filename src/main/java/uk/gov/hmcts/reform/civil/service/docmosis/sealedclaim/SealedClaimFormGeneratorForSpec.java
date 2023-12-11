@@ -1,18 +1,12 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakup;
@@ -26,21 +20,27 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.Representative;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimFormForSpec;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.TimelineEventDetailsDocmosis;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.RepresentativeService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import static java.util.Objects.nonNull;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1_LIP;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
+import static uk.gov.hmcts.reform.civil.utils.DateUtils.isAfterFourPM;
 
 @Service
 @RequiredArgsConstructor
@@ -157,14 +158,14 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                 + "Section 69 of the County Courts Act 1984" : null)
             .interestFromDate(caseData.getInterestFromSpecificDate() != null
                                   ? caseData.getInterestFromSpecificDate() :
-                                  (isAfterFourPM()
+                                  (isAfterFourPM(localDateTime)
                                       ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate()))
             .whenAreYouClaimingInterestFrom(caseData.getInterestClaimFrom() != null
                                                 ? caseData.getInterestClaimFrom().name()
                 .equals("FROM_CLAIM_SUBMIT_DATE")
                 ? "From the date the claim was issued"
                 : caseData.getInterestFromSpecificDateDescription() : null)
-            .interestEndDate(isAfterFourPM() ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate())
+            .interestEndDate(isAfterFourPM(localDateTime) ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate())
             .interestEndDateDescription(caseData.getBreakDownInterestDescription() != null
                                             ? caseData.getBreakDownInterestDescription() + "" : null)
             .totalClaimAmount(caseData.getTotalClaimAmount() + "")
@@ -231,7 +232,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
         deadlinesCalculator.calculateFirstWorkingDay(date.plusDays(29));
         var notificationDeadline = formatLocalDate(
             deadlinesCalculator
-                .calculateFirstWorkingDay(isAfterFourPM() ? date.plusDays(29) : date.plusDays(28)),
+                .calculateFirstWorkingDay(isAfterFourPM(localDateTime) ? date.plusDays(29) : date.plusDays(28)),
             DATE
         );
         return END_OF_BUSINESS_DAY + notificationDeadline;
@@ -329,8 +330,4 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .build();
     }
 
-    private boolean isAfterFourPM() {
-        LocalTime localTime = localDateTime.toLocalTime();
-        return localTime.getHour() > 15;
-    }
 }
