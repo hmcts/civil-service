@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 
 @ExtendWith(SpringExtension.class)
@@ -311,10 +312,12 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     void shouldGetDueDateAndFeeFastAndClaimValueClaim_whenAboutToSubmit() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .caseAccessCategory(SPEC_CLAIM)
             .addRespondent2(NO)
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .hearingDate(time.now().toLocalDate().plusWeeks(5))
-            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+            .allocatedTrack(null)
+            .responseClaimTrack("FAST_CLAIM")
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -333,10 +336,12 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     void shouldGetDueDateAndFeeFastAndNoClaimValueClaim_whenAboutToSubmit() {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .caseAccessCategory(SPEC_CLAIM)
             .addRespondent2(NO)
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .hearingDate(time.now().toLocalDate().plusWeeks(5))
-            .allocatedTrack(AllocatedTrack.FAST_CLAIM)
+            .allocatedTrack(null)
+            .responseClaimTrack("SMALL_CLAIM")
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .claimValue(null)
             .totalInterest(BigDecimal.TEN)
@@ -345,7 +350,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         Fee expectedFee = Fee.builder()
             .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
-        given(feesService.getFeeForHearingFastTrackClaims(any())).willReturn(expectedFee);
+        given(feesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
 
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -362,7 +367,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .hearingDate(time.now().toLocalDate().plusWeeks(5))
-            .allocatedTrack(null)
+            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
             .claimValue(null)
             .totalClaimAmount(new BigDecimal(123))
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
