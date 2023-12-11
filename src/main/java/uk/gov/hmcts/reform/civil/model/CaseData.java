@@ -102,6 +102,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -1123,10 +1125,31 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public List<ClaimAmountBreakupDetails> getClaimAmountBreakupDetails() {
+        return Optional.ofNullable(getClaimAmountBreakup())
+            .map(Collection::stream)
+            .map(claimAmountBreakupStream -> claimAmountBreakupStream
+                .map(item -> new ClaimAmountBreakupDetails(
+                    MonetaryConversions.penniesToPounds(item.getValue().getClaimAmount()),
+                    item.getValue().getClaimReason()
+                ))
+                .toList())
+            .orElse(Collections.emptyList());
+
+    }
+
+    @JsonIgnore
+    public BigDecimal getCalculatedClaimFeeInPence() {
+        return Optional.ofNullable(getClaimFee())
+            .map(Fee::getCalculatedAmountInPence)
+            .orElse(BigDecimal.ZERO);
+    }
+
     public boolean hasApplicant1SignedSettlementAgreement() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasApplicant1SignedSettlementAgreement).isPresent();
+
     }
 
     @JsonIgnore
