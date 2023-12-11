@@ -1,21 +1,21 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class JudgmentByAdmissionMapper {
+public class JudgmentByAdmissionOrDeterminationMapper {
 
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final JudgementService judgementService;
@@ -64,10 +64,10 @@ public class JudgmentByAdmissionMapper {
             .claimReferenceNumber(caseData.getLegacyCaseReference())
             .totalClaimAmount(totalClaimAmount)
             .totalInterestAmount(totalInterest)
-            //.paymentType(getPaymentType(caseData))
-            //.paymentTypeDisplayValue(getPaymentType(caseData).getDisplayedValue())
-            //.payBy(setPayByDate(caseData))
-            //.repaymentPlan(getRepaymentPlan(caseData))
+            .paymentType(getPaymentType(caseData))
+            .paymentTypeDisplayValue(getPaymentType(caseData).getDisplayedValue())
+            .payBy(setPayByDate(caseData))
+            .repaymentPlan(addRepaymentPlan(caseData))
             .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).toString())
             .ccjInterestToDate(totalInterest)
             .claimFee(judgementService.ccjJudgmentClaimFee(caseData).toString())
@@ -80,9 +80,9 @@ public class JudgmentByAdmissionMapper {
     }
 
     private LocalDate setPayByDate(CaseData caseData) {
-        if (caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.SET_DATE)) {
-            return caseData.getPaymentSetDate();
-        } else if(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY)) {
+        if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.SET_DATE)) {
+            return caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate();
+        } else if(caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.IMMEDIATELY)) {
             LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
                 LocalDate.now(),
                 RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
@@ -93,11 +93,11 @@ public class JudgmentByAdmissionMapper {
     }
 
     private ApplicantResponsePaymentPlan getPaymentType(CaseData caseData) {
-        if(caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.IMMEDIATELY)) {
+        if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.IMMEDIATELY)) {
             return ApplicantResponsePaymentPlan.IMMEDIATELY;
-        } else if (caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.SET_DATE)) {
+        } else if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.SET_DATE)) {
             return ApplicantResponsePaymentPlan.SET_DATE;
-        } else if (caseData.getPaymentTypeSelection().equals(DJPaymentTypeSelection.REPAYMENT_PLAN)) {
+        } else if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.REPAYMENT_PLAN)) {
             return ApplicantResponsePaymentPlan.REPAYMENT_PLAN;
         }
         return null;
@@ -112,14 +112,14 @@ public class JudgmentByAdmissionMapper {
         return partyDetails.map(AdditionalLipPartyDetails::getContactPerson).orElse(null);
     }
 
-    private static RepaymentPlanTemplateData getRepaymentPlan(CaseData caseData) {
-        RepaymentPlanLRspec repaymentPlan = caseData.getRespondent1RepaymentPlan();
-        if (repaymentPlan != null) {
-            return RepaymentPlanTemplateData.builder()
-                                      .paymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay())
-                                      .firstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
-                                      .paymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount()))
-                                      .build();
+    private static RepaymentPlanTemplateData addRepaymentPlan(CaseData caseData) {
+        RepaymentPlanTemplateData.RepaymentPlanTemplateDataBuilder builder = RepaymentPlanTemplateData.builder();
+        if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.REPAYMENT_PLAN)) {
+            return builder
+                .firstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
+                .paymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec())
+                .paymentFrequencyDisplay(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec().getLabel())
+                .build();
         }
         return null;
     }

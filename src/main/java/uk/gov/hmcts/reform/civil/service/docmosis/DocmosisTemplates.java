@@ -64,7 +64,7 @@ public enum DocmosisTemplates {
     ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
     SETTLEMENT_AGREEMENT_PDF("CV-SPC-CLM-ENG-00001-SETTLEMENT.docx", "%s-settlement-agreement.pdf"),
     CLAIMANT_LIP_MANUAL_DETERMINATION_PDF("CV-SPC-CLM-ENG-00001-LIP-MD.docx", "%s_request-org-repayment-amount.pdf"),
-    JUDGMENT_BY_ADMISSION("CV-SPC-CLM-ENG-00001-JBA.docx", "%s-ccj-request-admission.pdf");
+    JUDGMENT_BY_ADMISSION_OR_DETERMINATION("CV-SPC-CLM-ENG-00001-JBA-JBD.docx", "%s-ccj-request-%s.pdf");
     private final String template;
     private final String documentTitle;
 

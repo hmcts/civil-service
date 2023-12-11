@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantResponse.RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
 
@@ -36,18 +37,27 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
 
     private CallbackResponse generateResponseDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        CaseDocument claimantResponseDoc = requestJudgmentByAdmissionOrDeterminationResponseDocGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
-        CaseData updatedCaseData = caseData.toBuilder()
-            .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
+        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
+        CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder();
+        if (shouldGenerateJudgmentDoc(caseData)) {
+            CaseDocument claimantResponseDoc = requestJudgmentByAdmissionOrDeterminationResponseDocGenerator.generate(
+                caseEvent,
+                caseData,
+                callbackParams.getParams().get(BEARER_TOKEN).toString()
+            );
+            updatedCaseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
                 claimantResponseDoc,
                 caseData
-            ))
-            .build();
-        if (true) throw new RuntimeException("Dummy exception");
+            ));
+
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(updatedCaseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean shouldGenerateJudgmentDoc(CaseData caseData) {
+        return caseData.getCaseDataLiP().getApplicant1LiPResponse().getApplicant1ChoosesHowToProceed().equals(ChooseHowToProceed.REQUEST_A_CCJ);
     }
 
     @Override
