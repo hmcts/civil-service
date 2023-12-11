@@ -15,8 +15,10 @@ import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -38,6 +40,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
     private final Time time;
+    private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -56,9 +59,13 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData updatedData = getUpdatedCaseData(callbackParams);
 
-        boolean responseLanguageIsBilingual = updatedData.isRespondentResponseBilingual();
+        CaseData.CaseDataBuilder<?, ?> builder = updatedData.toBuilder();
+        updateCourtLocationForRespondent1DQ(updatedData, callbackParams, builder);
+        CaseData updatedCaseData = builder.build();
+
+        boolean responseLanguageIsBilingual = updatedCaseData.isRespondentResponseBilingual();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
-            AboutToStartOrSubmitCallbackResponse.builder().data(updatedData.toMap(objectMapper));
+            AboutToStartOrSubmitCallbackResponse.builder().data(updatedCaseData.toMap(objectMapper));
 
         if (!responseLanguageIsBilingual) {
             responseBuilder.state(CaseState.AWAITING_APPLICANT_INTENTION.name());
@@ -83,5 +90,10 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             ))
             .build();
         return updatedData;
+    }
+
+    private void updateCourtLocationForRespondent1DQ(CaseData caseData, CallbackParams callbackParams, CaseData.CaseDataBuilder<?, ?> builder) {
+        final List<LocationRefData> availableLocations = updateCaseManagementLocationDetailsService.fetchLocationData(callbackParams);
+        updateCaseManagementLocationDetailsService.updateRespondent1RequestedCourtDetails(caseData, builder, availableLocations);
     }
 }
