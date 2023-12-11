@@ -109,12 +109,15 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             && applicant1Response.hasClaimantRejectedCourtDecision();
         boolean isCcjRequested = applicant1Response != null
             && applicant1Response.hasApplicant1RequestedCcj();
+        boolean isInFavourOfClaimant = applicant1Response != null
+            && applicant1Response.hasCourtDecisionInFavourOfClaimant();
 
         return (caseData.hasApplicantRejectedRepaymentPlan()
             && caseData.getRespondent1().isCompanyOROrganisation())
             || ((caseData.hasApplicantAcceptedRepaymentPlan()
             || isCourtDecisionAccepted
-            || isCourtDecisionRejected)
+            || isCourtDecisionRejected
+            || isInFavourOfClaimant)
             && isCcjRequested);
     }
 

@@ -33,12 +33,19 @@ public class ClaimantLiPResponse {
     }
 
     @JsonIgnore
+    public boolean hasCourtDecisionInFavourOfClaimant() {
+        return RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT.equals(claimantCourtDecision);
+    }
+
+    @JsonIgnore
     public boolean hasClaimantAcceptedCourtDecision() {
-        return ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE.equals(claimantResponseOnCourtDecision);
+        return ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE.equals(claimantResponseOnCourtDecision)
+            || ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_PLAN.equals(claimantResponseOnCourtDecision);
     }
 
     @JsonIgnore
     public boolean hasClaimantRejectedCourtDecision() {
-        return ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE.equals(claimantResponseOnCourtDecision);
+        return ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE.equals(claimantResponseOnCourtDecision)
+            || ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_PLAN.equals(claimantResponseOnCourtDecision);
     }
 }
