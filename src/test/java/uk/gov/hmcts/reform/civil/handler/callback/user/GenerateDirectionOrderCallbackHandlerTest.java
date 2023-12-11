@@ -235,7 +235,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocationsForJudgeFinalOrder(any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             String advancedDate = LocalDate.now().plusDays(14).toString();
             when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
@@ -324,7 +324,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
             List<LocationRefData> locations = new ArrayList<>();
             locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
-            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+            when(locationRefDataService.getHearingCourtLocationsForJudgeFinalOrder(any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             String advancedDate = LocalDate.now().plusDays(14).toString();
             when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
