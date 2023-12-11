@@ -169,6 +169,8 @@ allprojects {
       }
       // Solves CVE-2023-24998
       dependency group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
+      //Solves CVE-2023-6481
+      dependency group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.3'
