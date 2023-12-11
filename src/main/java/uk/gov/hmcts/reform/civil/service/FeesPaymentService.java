@@ -72,7 +72,7 @@ public class FeesPaymentService {
             .externalReference(cardPaymentDetails.getExternalReference())
             .dateCreated(cardPaymentDetails.getDateCreated());
 
-        if (!paymentStatus.equals("Success")) {
+        if (paymentStatus.equals("Failed")) {
             Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
                 .filter(h -> h.getStatus().equals(paymentStatus))
                 .findFirst()

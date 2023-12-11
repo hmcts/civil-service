@@ -247,24 +247,15 @@ class FeesPaymentServiceTest {
     private StatusHistoryDto[] getStatusHistories(String status) {
 
         StatusHistoryDto initiatedHistory = StatusHistoryDto.builder().status("Initiated").build();
-        StatusHistoryDto successHistory = StatusHistoryDto.builder().status("Success").build();
         StatusHistoryDto failedHistory = StatusHistoryDto.builder().status("Failed")
             .errorCode("CA-E0001")
             .errorMessage("Payment request failed. PBA account accountName have insufficient funds available").build();
-        StatusHistoryDto declinedHistory = StatusHistoryDto.builder().status("Declined")
-            .errorCode("CA-E0003").errorMessage("Your account is on hold").build();
-        StatusHistoryDto pendingHistory = StatusHistoryDto.builder().status("Pending")
-            .errorCode("CA-E0004").errorMessage("Your account is deleted").build();
         List<StatusHistoryDto> histories = new ArrayList<>();
         histories.add(initiatedHistory);
-        if (status.equals("Success")) {
-            histories.add(successHistory);
-        } else if (status.equals("Failed")) {
+        if (status.equals("Failed")) {
             histories.add(failedHistory);
-        } else if (status.equals("Declined")) {
-            histories.add(declinedHistory);
         } else {
-            histories.add(pendingHistory);
+            histories.add(StatusHistoryDto.builder().status(status).build());
         }
         StatusHistoryDto[] result = new StatusHistoryDto[histories.size()];
         return histories.toArray(result);
@@ -281,13 +272,8 @@ class FeesPaymentServiceTest {
         if (status.equals("Failed")) {
             payment.errorCode("CA-E0001")
                 .errorDescription("Payment request failed. PBA account accountName have insufficient funds available");
-        } else if (status.equals("Declined")) {
-            payment.errorCode("CA-E0003")
-                .errorDescription("Your account is on hold");
-        } else if (status.equals("Pending")) {
-            payment.errorCode("CA-E0004")
-                .errorDescription("Your account is deleted");
         }
+
         return payment.build();
     }
 
