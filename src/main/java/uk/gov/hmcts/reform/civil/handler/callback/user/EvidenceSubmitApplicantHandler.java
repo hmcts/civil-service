@@ -90,8 +90,6 @@ public class EvidenceSubmitApplicantHandler extends CallbackHandler {
     }
 
     <T> List<Element<T>> copyDraftDocumentToSubmitted(List<Element<T>> draftDocumentToSubmit) {
-        System.out.println("CALLED");
-
         return draftDocumentToSubmit;
     }
 
