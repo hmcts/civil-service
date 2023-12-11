@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,6 +84,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateBusinessProcessAndClaimStatus_whenDefendantResponseLangIsEnglish() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
+                .totalClaimAmount(BigDecimal.valueOf(5000))
                 .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("ENGLISH").build()).build())
                 .build();
 
@@ -105,6 +107,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldOnlyUpdateClaimStatus_whenDefendantResponseLangIsBilingual() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
+                .totalClaimAmount(BigDecimal.valueOf(5000))
                 .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
