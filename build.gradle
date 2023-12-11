@@ -300,7 +300,7 @@ task smoke(description: 'Runs the smoke tests.') {
 
 task functional(description: 'Runs the functional tests.') {
   dependsOn(inStrictOrder(awaitApplicationReadiness,
-    runNonProdApiTests, runNightlyApiTests))
+    runProdApiTests,runNonProdApiTests, runNightlyApiTests))
 }
 
 task crossbrowser(description: 'Runs the crossbrowser tests.') {
