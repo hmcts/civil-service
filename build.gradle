@@ -169,6 +169,11 @@ allprojects {
       }
       // Solves CVE-2023-24998
       dependency group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
+      //Solves CVE-2023-6481
+      dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
+        entry 'logback-core'
+        entry 'logback-classic'
+      }
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.3'
@@ -370,7 +375,7 @@ configurations.all {
 
 dependencies {
 
-  implementation 'com.github.hmcts:civil-commons:1.0.36'
+  implementation 'com.github.hmcts:civil-commons:1.0.39'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
