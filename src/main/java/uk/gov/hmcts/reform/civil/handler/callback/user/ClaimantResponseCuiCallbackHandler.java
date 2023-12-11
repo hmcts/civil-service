@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -72,7 +73,9 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                 .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
-
+        if (caseData.hasClaimantAgreedToFreeMediation() && caseData.hasDefendantAgreedToFreeMediation()) {
+            builder.claimMovedToMediationOn(LocalDate.now());
+        }
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
