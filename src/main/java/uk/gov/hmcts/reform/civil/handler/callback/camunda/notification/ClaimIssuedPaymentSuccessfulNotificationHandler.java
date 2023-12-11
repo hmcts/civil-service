@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandler extends CallbackHan
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final FeatureToggleService toggleService;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_CLAIMANT_FOR_SUCCESSFUL_PAYMENT);
     private static final String REFERENCE_TEMPLATE = "claim-issued-claimant-notification-%s";
     public static final String TASK_ID_CLAIMANT = "ClaimIssuedNotifyApplicant1ForSpec";
@@ -48,12 +50,14 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandler extends CallbackHan
     private CallbackResponse notifyClaimantRejectRepayment(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        notificationService.sendMail(
-            addEmail(caseData),
-            addTemplate(caseData),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
+            notificationService.sendMail(
+                addEmail(caseData),
+                addTemplate(caseData),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 

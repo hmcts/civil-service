@@ -9,12 +9,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +34,8 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandlerTest extends BaseCal
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private FeatureToggleService toggleService;
     @Mock
     private NotificationsProperties notificationsProperties;
 
@@ -47,10 +53,17 @@ public class ClaimIssuedPaymentSuccessfulNotificationHandlerTest extends BaseCal
 
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateSpec1v1ClaimSubmitted()
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .respondent1ResponseDeadline(LocalDateTime.MAX)
+                .respondent1Represented(YesOrNo.NO)
+                .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_FOR_SUCCESSFUL_PAYMENT").build()).build();
 
+            when(toggleService.isLipVLipEnabled()).thenReturn(true);
             handler.handle(params);
 
             verify(notificationService).sendMail(
