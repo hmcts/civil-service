@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
@@ -125,6 +126,7 @@ public class PartyDetailsChangedUtilTest {
                 .firstName("John")
                 .lastName("Doe")
                 .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .hasSameAddressAsLitigant(YesOrNo.NO)
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
@@ -152,6 +154,7 @@ public class PartyDetailsChangedUtilTest {
                 .firstName("John")
                 .lastName("Doe")
                 .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .hasSameAddressAsLitigant(YesOrNo.NO)
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
@@ -179,6 +182,7 @@ public class PartyDetailsChangedUtilTest {
                 .firstName("John")
                 .lastName("Doe")
                 .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .hasSameAddressAsLitigant(YesOrNo.NO)
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()

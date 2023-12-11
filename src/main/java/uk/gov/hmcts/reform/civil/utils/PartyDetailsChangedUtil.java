@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
@@ -24,6 +25,14 @@ public class PartyDetailsChangedUtil {
 
     private static String NAME_LABEL = "Name";
     private static String ADDRESS_LABEL = "Address";
+
+    private LitigationFriend updateLitigationFriendAddress(LitigationFriend litigationFriend, Party party) {
+        if (litigationFriend != null && litigationFriend.getHasSameAddressAsLitigant() != null
+            && litigationFriend.getHasSameAddressAsLitigant().equals(YesOrNo.YES)) {
+            return litigationFriend.toBuilder().primaryAddress(party.getPrimaryAddress()).build();
+        }
+        return litigationFriend;
+    }
 
     /**
      * Builds a ContactDetailsUpdatedEvent based on changes detected between two CaseData instances.
@@ -48,15 +57,22 @@ public class PartyDetailsChangedUtil {
         } else if (hasChanged(current.getApplicant1LitigationFriend(), updated.getApplicant1LitigationFriend())) {
             return buildChangesEvent(
                 "Applicant Litigation Friend Details Changed",
-                getChanges(current.getApplicant1LitigationFriend(), updated.getApplicant1LitigationFriend()));
+                getChanges(
+                    updateLitigationFriendAddress(current.getApplicant1LitigationFriend(), current.getApplicant1()),
+                    updateLitigationFriendAddress(updated.getApplicant1LitigationFriend(), updated.getApplicant1()))
+            );
         } else if (hasChanged(current.getRespondent1LitigationFriend(), updated.getRespondent1LitigationFriend())) {
             return buildChangesEvent(
                 "Respondent 1 Litigation Friend Details Changed",
-                getChanges(current.getRespondent1LitigationFriend(), updated.getRespondent1LitigationFriend()));
+                getChanges(
+                    updateLitigationFriendAddress(current.getRespondent1LitigationFriend(), current.getRespondent1()),
+                    updateLitigationFriendAddress(updated.getRespondent1LitigationFriend(), updated.getRespondent1())));
         } else if (hasChanged(current.getRespondent2LitigationFriend(), updated.getRespondent2LitigationFriend())) {
             return buildChangesEvent(
                 "Respondent 2 Litigation Friend Details changed",
-                getChanges(current.getRespondent2LitigationFriend(), updated.getRespondent2LitigationFriend()));
+                getChanges(
+                    updateLitigationFriendAddress(current.getRespondent2LitigationFriend(), current.getRespondent2()),
+                    updateLitigationFriendAddress(updated.getRespondent2LitigationFriend(), updated.getRespondent2())));
         }
         return null;
     }
