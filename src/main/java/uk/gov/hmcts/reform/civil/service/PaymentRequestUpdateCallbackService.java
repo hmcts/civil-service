@@ -58,7 +58,7 @@ public class PaymentRequestUpdateCallbackService {
                 createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
             }
 
-            if (caseData.isLipvLipOneVOne()) {
+            if (caseData.isLipvLipOneVOne() && feeType.equals(FeeType.HEARING.name())) {
                 notificationLipService.sendGenericNotificationLip(caseData);
             }
 
