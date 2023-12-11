@@ -347,10 +347,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
             .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
                         + "list of documents by 4pm on")
-            .date1(LocalDate.now().plusWeeks(4))
+            .date1(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 28))
+
             .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
                         + "the other party by 4pm on")
-            .date2(LocalDate.now().plusWeeks(6))
+            .date2(LocalDate.now().plusWeeks(4))
             .input3("Requests will be complied with within 7 days of the receipt of the request.")
             .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
                         + " rely at trial by 4pm on")
@@ -914,7 +915,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             default: break;
         }
     }
-      
+
     private boolean caseContainsLiP(CaseData caseData) {
         return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
     }
