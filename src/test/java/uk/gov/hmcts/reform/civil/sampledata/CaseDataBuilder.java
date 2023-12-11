@@ -513,6 +513,8 @@ public class CaseDataBuilder {
 
     private DynamicList transferCourtLocationList;
     private String reasonForTransfer;
+
+    private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
 
     private YesOrNo responseClaimExpertSpecRequired;
@@ -5293,6 +5295,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder isFlightDelayClaim(YesOrNo isFlightDelayClaim) {
+        this.isFlightDelayClaim = isFlightDelayClaim;
+        return this;
+    }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -6697,6 +6704,7 @@ public class CaseDataBuilder {
             .responseClaimExpertSpecRequired2(responseClaimExpertSpecRequired2)
             .applicant1ClaimExpertSpecRequired(applicant1ClaimExpertSpecRequired)
             .applicantMPClaimExpertSpecRequired(applicantMPClaimExpertSpecRequired)
+            .isFlightDelayClaim(isFlightDelayClaim)
             .build();
     }
 }
