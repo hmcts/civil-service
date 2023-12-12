@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
@@ -176,6 +177,35 @@ public class UnavailabilityDatesUtilsTest {
                 .unavailableDateType(SINGLE_DATE)
                 .build();
             UnavailableDate result = unwrapElements(builder.build().getApplicant1().getUnavailableDates()).get(0);
+            assertEquals(expected.getDate(), result.getDate());
+            assertEquals(expected.getUnavailableDateType(), result.getUnavailableDateType());
+        }
+
+        @Test
+        public void shouldReturnSingleUnavailabilityDateWhenProvidedForRespondent2() {
+            UnavailableDate unavailableDate = UnavailableDate.builder()
+                    .date(LocalDate.now().plusDays(1))
+                    .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                    .build();
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .respondent2SameLegalRepresentative(YesOrNo.NO)
+                    .respondent2DQWithUnavailableDateRange()
+                    .respondent2ResponseDate(issueDate.atStartOfDay())
+                    .respondent2DQ(Respondent2DQ.builder()
+                            .respondent2DQHearing(Hearing.builder()
+                                    .unavailableDatesRequired(YES)
+                                    .unavailableDates(wrapElements(List.of(unavailableDate))).build())
+                            .build())
+                    .build();
+            CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            UnavailabilityDatesUtils.rollUpUnavailabilityDatesForRespondent(builder, true);
+            UnavailableDate expected = UnavailableDate.builder()
+                    .date(LocalDate.now().plusDays(1))
+                    .unavailableDateType(SINGLE_DATE)
+                    .build();
+            UnavailableDate result = unwrapElements(builder.build().getRespondent2().getUnavailableDates()).get(0);
             assertEquals(expected.getDate(), result.getDate());
             assertEquals(expected.getUnavailableDateType(), result.getUnavailableDateType());
         }
