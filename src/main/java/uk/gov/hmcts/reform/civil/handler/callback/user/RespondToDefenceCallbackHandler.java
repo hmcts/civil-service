@@ -374,7 +374,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 DocCategory.APP1_DQ.getValue()
             );
             List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
-                    claimantUploads, "DQApplicant");
+                    claimantUploads, DocCategory.DQ_APP1.getValue());
             if (Objects.nonNull(copy)) {
                 claimantUploads.addAll(copy);
             }
