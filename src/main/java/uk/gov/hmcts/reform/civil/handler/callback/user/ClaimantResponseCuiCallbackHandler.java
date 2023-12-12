@@ -13,9 +13,9 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -113,8 +113,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             response.state(CaseState.CASE_SETTLED.name());
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
             response.state(CaseState.CASE_DISMISSED.name());
-        } else if (updatedData.hasApplicantRejectedRepaymentPlan()
-                && updatedData.getRespondent1().isCompanyOROrganisation()) {
+        } else if (isProceedInHeritageSystemAllowed(updatedData)) {
             response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
         }
     }
@@ -128,11 +127,11 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private boolean hasCcjRequest(CaseData caseData) {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-            && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
+                && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
     }
 
     private boolean isProceedInHeritageSystemAllowed(CaseData caseData) {
         return ((caseData.hasApplicantRejectedRepaymentPlan()
-            && caseData.getRespondent1().isCompanyOROrganisation()) || hasCcjRequest(caseData));
+                && caseData.getRespondent1().isCompanyOROrganisation()) || hasCcjRequest(caseData));
     }
 }
