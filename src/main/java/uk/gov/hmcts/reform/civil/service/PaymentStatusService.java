@@ -39,8 +39,11 @@ public class PaymentStatusService {
         try {
             PaymentDto cardPaymentStatus = paymentsClient.getGovPayCardPaymentStatus(paymentReference, authorization);
             String status = cardPaymentStatus.getStatus();
+            log.info("Payment status for payment reference {} is {}", paymentReference, status);
+
             if (status.equals("Initiated")) {
-                String message = "Need to check payment status again as current payment status is still Initiated";
+                String message = "Need to check payment status again as current payment status is still Initiated for "
+                    + paymentReference;
                 throw new RetryablePaymentException(message);
             }
             return cardPaymentStatus;

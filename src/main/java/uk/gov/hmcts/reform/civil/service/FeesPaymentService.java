@@ -19,6 +19,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
 
+import static java.util.Objects.requireNonNull;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -37,15 +39,18 @@ public class FeesPaymentService {
         CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
 
-        SRPbaDetails hearingFeePaymentDetails = feeType.equals(FeeType.HEARING)
+        SRPbaDetails feePaymentDetails = feeType.equals(FeeType.HEARING)
             ? caseData.getHearingFeePBADetails()
             : caseData.getClaimIssuedPBADetails();
+
+        requireNonNull(feePaymentDetails, "Fee Payment details cannot be null");
+        requireNonNull(feePaymentDetails.getServiceReqReference(), "Fee Payment service request cannot be null");
 
         String returnUrlSubPath = feeType.equals(FeeType.HEARING)
             ? "/hearing-payment-confirmation/" : "/claim-issued-payment-confirmation/";
 
         CardPaymentServiceRequestDTO requestDto = CardPaymentServiceRequestDTO.builder()
-            .amount(hearingFeePaymentDetails.getFee().getCalculatedAmountInPence()
+            .amount(feePaymentDetails.getFee().getCalculatedAmountInPence()
                         .divide(BigDecimal.valueOf(100), RoundingMode.CEILING)
                         .setScale(2, RoundingMode.CEILING))
             .currency("GBP")
@@ -55,7 +60,7 @@ public class FeesPaymentService {
 
         CardPaymentServiceRequestResponse govPayCardPaymentRequest = paymentStatusService
             .createGovPayCardPaymentRequest(
-                hearingFeePaymentDetails.getServiceReqReference(),
+                feePaymentDetails.getServiceReqReference(),
                 authorization,
                 requestDto
             );
@@ -64,6 +69,7 @@ public class FeesPaymentService {
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(
         FeeType feeType, String paymentReference, String authorization) {
+        log.info("Checking payment status for {} of fee type {}", paymentReference, feeType);
         PaymentDto cardPaymentDetails = paymentStatusService.getCardPaymentDetails(paymentReference, authorization);
         String paymentStatus = cardPaymentDetails.getStatus();
         CardPaymentStatusResponse.CardPaymentStatusResponseBuilder response = CardPaymentStatusResponse.builder()
