@@ -48,4 +48,5 @@ public class ClaimantLiPResponse {
         return ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE.equals(claimantResponseOnCourtDecision)
             || ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_PLAN.equals(claimantResponseOnCourtDecision);
     }
+
 }
