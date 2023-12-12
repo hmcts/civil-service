@@ -1168,4 +1168,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return nonNull(respondent1RespondToSettlementAgreementDeadline)
             && LocalDateTime.now().isAfter(respondent1RespondToSettlementAgreementDeadline);
     }
+
+    @JsonIgnore
+    public boolean hasApplicant1AcceptedCcj() {
+        return Optional.ofNullable(getCaseDataLiP())
+                .map(CaseDataLiP::getApplicant1LiPResponse)
+                .filter(ClaimantLiPResponse::hasApplicant1AcceptedCcj).isPresent();
+    }
+
 }
