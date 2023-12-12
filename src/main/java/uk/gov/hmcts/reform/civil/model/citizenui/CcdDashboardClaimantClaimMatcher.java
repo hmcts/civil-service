@@ -17,12 +17,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
-@AllArgsConstructor
-public class CcdDashboardClaimantClaimMatcher implements Claim {
+public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
-    private CaseData caseData;
     private FeatureToggleService featureToggleService;
+
+    public CcdDashboardClaimantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
+        super(caseData);
+        this.featureToggleService = featureToggleService;
+    }
 
     @Override
     public boolean hasResponsePending() {
@@ -146,23 +149,6 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
     @Override
     public boolean hasClaimantAskedToSignSettlementAgreement() {
         return false;
-    }
-
-    public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentSignedSettlementAgreement();
-    }
-
-    public boolean hasDefendantRejectedSettlementAgreement() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isRespondentRespondedToSettlementAgreement()
-            && !caseData.isRespondentSignedSettlementAgreement();
-    }
-
-    public boolean hasClaimantSignedSettlementAgreement() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && !caseData.isSettlementAgreementDeadlineExpired();
-    }
-
-    public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
-        return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isSettlementAgreementDeadlineExpired();
     }
 
     @Override
