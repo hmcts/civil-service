@@ -34,8 +34,8 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     private final MediationCsvServiceFactory mediationCsvServiceFactory;
     private final SendGridClient sendGridClient;
     private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
-    private final String subject = "OCMC Mediation Data";
-    private final String filename = "ocmc_mediation_data.csv";
+    private static final String subject = "OCMC Mediation Data";
+    private static final String filename = "ocmc_mediation_data.csv";
 
     @Override
     public void handleTask(ExternalTask externalTask) {
@@ -49,9 +49,8 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
             "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
         StringBuilder csvColContent = new StringBuilder();
         if (!inMediationCases.isEmpty()) {
-            inMediationCases.forEach(caseData -> {
-                csvColContent.append(generateCsvContent(caseData));
-            });
+            inMediationCases.forEach(caseData ->
+                csvColContent.append(generateCsvContent(caseData)));
 
             String generateCsvData = generateCSVRow(headers) + csvColContent;
             Optional<EmailData> emailData = prepareEmail(generateCsvData);
@@ -62,7 +61,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
 
     private  Predicate<CaseData> checkMediationMovedDate = caseData ->
         caseData.getClaimMovedToMediationOn() != null
-            && (now().minusDays(1).equals(caseData.getClaimMovedToMediationOn()));
+            && now().minusDays(1).equals(caseData.getClaimMovedToMediationOn());
 
     private Optional<EmailData> prepareEmail(String generateCsvData) {
         InputStreamSource inputSource = new ByteArrayResource(generateCsvData.getBytes(StandardCharsets.UTF_8));
