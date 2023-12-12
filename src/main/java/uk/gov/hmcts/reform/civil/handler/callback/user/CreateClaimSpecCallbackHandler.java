@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -245,9 +246,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             )
             .put(callbackKey(MID, "validate-spec-defendant-legal-rep-email"), this::validateSpecRespondentRepEmail)
             .put(callbackKey(MID, "validate-spec-defendant2-legal-rep-email"), this::validateSpecRespondent2RepEmail)
-            .put(callbackKey(MID, "is-flight-delay-claim"), this::isFlightDelayClaim)
             .put(callbackKey(MID, "get-airline-list"), this::getAirlineList)
-            .put(callbackKey(MID, "validate-date-of-flight"), this::validateDateOfFlight)
+            .put(callbackKey(MID, "validateFlightDelayDate"), this::validateFlightDelayDate)
             .build();
     }
 
@@ -544,9 +544,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             List<Element<String>> stdRequestIdList = new ArrayList<>();
             stdRequestIdList.add(element(caseData.getSdtRequestIdFromSdt()));
             dataBuilder.sdtRequestId(stdRequestIdList);
-            //TODO implement bulk claims that have interest added.
-            BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
+            BigDecimal bulkInterest = interestCalculator.calculateBulkInterest(caseData);
+            if (!bulkInterest.equals(BigDecimal.ZERO)) {
+                dataBuilder.interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST);
+            }
+            dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(bulkInterest)));
             //PBA manual selection
             List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
             dataBuilder.applicantSolicitor1PbaAccounts(DynamicList.builder()
@@ -566,11 +568,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                     caseData.getSpecRespondentCorrespondenceAddressdetails());
         }
 
-        if ((toggleService.isSdoR2Enabled() && callbackParams.getCaseData().getFlightDelayDetails() != null)) {
+        if (toggleService.isSdoR2Enabled() && callbackParams.getCaseData().getIsFlightDelayClaim() != null && callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
             FlightDelayDetails flightDelayDetails = callbackParams.getCaseData().getFlightDelayDetails();
             String selectedAirlineCode = flightDelayDetails.getAirlineList().getValue().getCode();
-
-            dataBuilder.flightDelayDetails(FlightDelayDetails.builder()
+            dataBuilder.claimType(ClaimType.FLIGHT_DELAY)
+                .flightDelayDetails(FlightDelayDetails.builder()
                                         .airlineList(DynamicList.builder().value(flightDelayDetails.getAirlineList().getValue()).build())
                                         .nameOfAirline(flightDelayDetails.getNameOfAirline())
                                         .flightNumber(flightDelayDetails.getFlightNumber())
@@ -578,7 +580,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
                                         .flightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, callbackParams))
                                         .build());
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(dataBuilder.build().toMap(objectMapper))
@@ -929,36 +930,45 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             .build();
     }
 
-    private CallbackResponse isFlightDelayClaim(CallbackParams callbackParams) {
+    private CallbackResponse getAirlineList(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-
         if (toggleService.isSdoR2Enabled()) {
-            caseDataBuilder.isFlightDelayClaim(callbackParams.getCaseData().getIsFlightDelayClaim());
-            if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
-                caseDataBuilder.claimType(ClaimType.FLIGHT_DELAY);
-            } else {
-                caseDataBuilder.claimType(null);
-            }
-        }
+            List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
+            DynamicList airlineList = DynamicList
+                .fromList(
+                    airlineEpimsIDList.stream()
+                        .map(AirlineEpimsId::getAirline).toList(),
+                    Object::toString,
+                    Object::toString,
+                    null,
+                    false
+                );
+            DynamicList dropdownAirlineList = DynamicList.builder()
+                .listItems(airlineList.getListItems()).build();
 
+            FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().airlineList(dropdownAirlineList).build();
+            caseDataBuilder.flightDelayDetails(flightDelayDetails);
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private CallbackResponse getAirlineList(CallbackParams callbackParams) {
+    private CallbackResponse validateFlightDelayDate(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
-        List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>(airlineEpimsDataLoader.getAirlineEpimsIDList());
-        DynamicList airlineList = DynamicList
-            .fromList(airlineEpimsIDList.stream()
-                          .map(AirlineEpimsId::getAirline).toList(), Object::toString, Object::toString, null, false);
-        DynamicList dropdownAirlineList = DynamicList.builder()
-            .listItems(airlineList.getListItems()).build();
-
-        FlightDelayDetails flightDelayDetails = FlightDelayDetails.builder().airlineList(dropdownAirlineList).build();
-        caseDataBuilder.flightDelayDetails(flightDelayDetails);
+        List<String> errors = new ArrayList<>();
+        if (toggleService.isSdoR2Enabled()) {
+            if (callbackParams.getCaseData().getIsFlightDelayClaim().equals(YES)) {
+                LocalDate today = LocalDate.now();
+                LocalDate scheduledDate = callbackParams.getCaseData().getFlightDelayDetails().getScheduledDate();
+                if (scheduledDate.isAfter(today)) {
+                    errors.add(ERROR_MESSAGE_SCHEDULED_DATE_OF_FLIGHT_MUST_BE_TODAY_OR_IN_THE_PAST);
+                }
+            }
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
+            .errors(errors)
             .build();
     }
 
