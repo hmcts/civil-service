@@ -34,7 +34,11 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -111,6 +115,46 @@ class FeesPaymentServiceTest {
         );
         assertThat(govPaymentRequest).isEqualTo(CardPaymentStatusResponse.from(response));
 
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldNotCreateGovPayPaymentUrlForMissingHearingFeePbaDetails() {
+        CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
+            .data(Map.of(
+                "hearingFee",
+                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
+            )).build();
+
+        when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
+
+        assertThatThrownBy(
+            () -> feesPaymentService.createGovPaymentRequest(HEARING, "1701090368574910", BEARER_TOKEN)
+        ).isInstanceOf(NullPointerException.class)
+            .hasMessage("Fee Payment details cannot be null");
+
+        verify(paymentsClient, never()).createGovPayCardPaymentRequest(anyString(), anyString(), any());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldNotCreateGovPayPaymentUrlForMissingHearingFeeServiceRequest() {
+        CaseDetails expectedCaseDetails = CaseDetails.builder().id(1701090368574910L)
+            .data(Map.of(
+                "hearingFeePBADetails",
+                SRPbaDetails.builder().build(),
+                "hearingFee",
+                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
+            )).build();
+
+        when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
+
+        assertThatThrownBy(
+            () -> feesPaymentService.createGovPaymentRequest(HEARING, "1701090368574910", BEARER_TOKEN)
+        ).isInstanceOf(NullPointerException.class)
+            .hasMessage("Fee Payment service request cannot be null");
+
+        verify(paymentsClient, never()).createGovPayCardPaymentRequest(anyString(), anyString(), any());
     }
 
     @Test
