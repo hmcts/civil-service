@@ -1,6 +1,9 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
+  devcpuRequests: 500m
+  devmemoryRequests: 2048Mi
+  devmemoryLimits: 4096Mi
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
     OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
@@ -43,6 +46,8 @@ java:
         - name: prd-admin-user-password
           alias: CIVIL_PRD_ADMIN_PASSWORD
         - name: appinsights-connection-string
+          alias: appinsights-connection-string
+        - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
         - name: docmosis-api-key
           alias: docmosis.tornado.key

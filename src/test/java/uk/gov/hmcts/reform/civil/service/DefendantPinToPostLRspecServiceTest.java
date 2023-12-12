@@ -1,17 +1,23 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import feign.Request;
+import feign.Response;
+import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -51,6 +57,8 @@ class DefendantPinToPostLRspecServiceTest {
 
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
+    @Mock
+    Request request;
 
     @Nested
     class BuildDefendantPinToPost {
@@ -169,11 +177,12 @@ class DefendantPinToPostLRspecServiceTest {
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
             when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-            when(cuiIdamClientService.authenticatePinUser(anyString(), anyString())).thenReturn(HttpStatus.UNAUTHORIZED.value());
+            when(cuiIdamClientService.authenticatePinUser(anyString(), anyString())).thenReturn(Response.builder().request(request).status(
+                HttpStatus.SC_OK).build());
 
             assertThrows(
                 PinNotMatchException.class,
-                () ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST1234"));
+                () ->  defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
         }
 
         @Test
@@ -184,10 +193,15 @@ class DefendantPinToPostLRspecServiceTest {
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
-            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
-            when(cuiIdamClientService.authenticatePinUser(anyString(), anyString())).thenReturn(HttpStatus.OK.value());
+            Map<String, Collection<String>> headers = new HashMap<>();
+            List<String> header = Arrays.asList("Location");
+            headers.put("Location", header);
 
-            Assertions.assertDoesNotThrow(() ->  defendantPinToPostLRspecService.validatePin(caseDetails, "TEST1234"));
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+            when(cuiIdamClientService.authenticatePinUser(anyString(), anyString())).thenReturn(Response.builder().request(request).status(
+                HttpStatus.SC_MOVED_TEMPORARILY).headers(headers).build());
+
+            Assertions.assertDoesNotThrow(() ->  defendantPinToPostLRspecService.validateOcmcPin("TEST1234", "620MC123"));
         }
     }
 

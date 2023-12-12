@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
@@ -10,8 +9,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 
 public class HearingFeeUtils {
 
@@ -35,7 +32,7 @@ public class HearingFeeUtils {
     }
 
     public static Fee calculateAndApplyFee(HearingFeesService hearingFeesService,
-                                           CaseData caseData, AllocatedTrack allocatedTrack) {
+                                           CaseData caseData, String claimTrack) {
         BigDecimal claimAmount;
         if (nonNull(caseData.getClaimValue())) {
             claimAmount = caseData.getClaimValue().toPounds();
@@ -47,9 +44,9 @@ public class HearingFeeUtils {
             claimAmount = caseData.getTotalClaimAmount().setScale(2, RoundingMode.UNNECESSARY);
         }
 
-        if (SMALL_CLAIM.equals(allocatedTrack)) {
+        if (claimTrack.equals("SMALL_CLAIM")) {
             return hearingFeesService.getFeeForHearingSmallClaims(claimAmount);
-        } else if (FAST_CLAIM.equals(allocatedTrack)) {
+        } else if (claimTrack.equals("FAST_CLAIM")) {
             return hearingFeesService.getFeeForHearingFastTrackClaims(claimAmount);
         } else {
             return hearingFeesService.getFeeForHearingMultiClaims(claimAmount);
