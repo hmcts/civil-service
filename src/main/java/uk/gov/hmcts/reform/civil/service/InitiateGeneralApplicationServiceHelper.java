@@ -40,7 +40,6 @@ public class InitiateGeneralApplicationServiceHelper {
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
-    public CaseAssignedUserRolesResource userRoles;
 
     public boolean isGAApplicantSameAsPCClaimant(CaseData caseData, String organisationIdentifier) {
 
@@ -63,7 +62,7 @@ public class InitiateGeneralApplicationServiceHelper {
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
-        userRoles = getUserRoles(parentCaseId);
+        CaseAssignedUserRolesResource userRoles = getUserRoles(parentCaseId);
 
         /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
         List<CaseAssignedUserRole> respondentSolicitors = userRoles.getCaseAssignedUserRoles().stream()
@@ -260,10 +259,8 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     public CaseAssignedUserRolesResource getUserRoles(String parentCaseId) {
-        if (Objects.isNull(userRoles)) {
-            userRoles = caseAccessDataStoreApi.getUserRoles(
+        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
                 getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
-        }
         log.info("UserRoles from API :" + userRoles);
         return userRoles;
     }
