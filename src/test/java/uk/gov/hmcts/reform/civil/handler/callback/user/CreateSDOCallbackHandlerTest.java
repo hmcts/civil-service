@@ -1085,7 +1085,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             newDate = LocalDate.of(2020, 1, 15);
             localDateTime = LocalDateTime.of(2020, 1, 1, 12, 0, 0);
-            nextWorkingDayDate = LocalDate.of(2020,1,2);
+            nextWorkingDayDate = LocalDate.of(2020, 1, 2);
             when(time.now()).thenReturn(localDateTime);
             when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class))).thenReturn(nextWorkingDayDate);
             when(deadlinesCalculator.plusWorkingDays(any(LocalDate.class), anyInt())).thenReturn(newDate);
