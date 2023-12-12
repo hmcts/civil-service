@@ -24,6 +24,4 @@ public class CcdDashboardClaimMatcher {
     public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
         return caseData.hasApplicant1SignedSettlementAgreement() && caseData.isSettlementAgreementDeadlineExpired();
     }
-
-
 }
