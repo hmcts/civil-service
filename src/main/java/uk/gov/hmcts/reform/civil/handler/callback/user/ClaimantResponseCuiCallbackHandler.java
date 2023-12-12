@@ -123,9 +123,9 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             && caseData.getRespondent1().isCompanyOROrganisation())
             || ((caseData.hasApplicantAcceptedRepaymentPlan()
             || isCourtDecisionAccepted
-            || isCourtDecisionRejected
             || isInFavourOfClaimant)
-            && isCcjRequested);
+            && isCcjRequested)
+            || isCourtDecisionRejected;
     }
 
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {

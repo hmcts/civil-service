@@ -513,7 +513,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                             .claimantResponseOnCourtDecision(
                                                                 ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE
                                                             )
-                                                            .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
                                                             .build()).build())
                 .respondent1(Party.builder()
                                  .type(Party.Type.INDIVIDUAL)
