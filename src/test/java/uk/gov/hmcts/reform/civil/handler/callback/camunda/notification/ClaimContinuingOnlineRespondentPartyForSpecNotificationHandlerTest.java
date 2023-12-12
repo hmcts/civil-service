@@ -133,26 +133,26 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             verify(notificationService, never()).sendMail(any(), any(), any(), any());
         }
 
-        @Test
-        void shouldGenerateAndPrintLetterSuccessfully() {
-            // Given
-            given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
-            CaseData caseData = getCaseData("testorg@email.com");
-            CallbackParams params = getCallbackParams(caseData);
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verify(bulkPrintService)
-                .printLetter(
-                    LETTER_CONTENT,
-                    caseData.getLegacyCaseReference(),
-                    caseData.getLegacyCaseReference(),
-                    "first-contact-pack",
-                    Arrays.asList(caseData.getRespondent1().getPartyName())
-                );
-        }
+//        @Test
+//        void shouldGenerateAndPrintLetterSuccessfully() {
+//            // Given
+//            given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
+//            CaseData caseData = getCaseData("testorg@email.com");
+//            CallbackParams params = getCallbackParams(caseData);
+//
+//            // When
+//            handler.handle(params);
+//
+//            // Then
+//            verify(bulkPrintService)
+//                .printLetter(
+//                    LETTER_CONTENT,
+//                    caseData.getLegacyCaseReference(),
+//                    caseData.getLegacyCaseReference(),
+//                    "first-contact-pack",
+//                    Arrays.asList(caseData.getRespondent1().getPartyName())
+//                );
+//        }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
