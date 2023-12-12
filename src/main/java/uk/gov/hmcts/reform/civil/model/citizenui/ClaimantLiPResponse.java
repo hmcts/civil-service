@@ -18,8 +18,8 @@ public class ClaimantLiPResponse {
     private HearingSupportLip applicant1DQHearingSupportLip;
     private YesOrNo applicant1SignedSettlementAgreement;
     private ChooseHowToProceed applicant1ChoosesHowToProceed;
-    private String applicant1RejectedRepaymentReason;
     private RepaymentDecisionType claimantCourtDecision;
+    private String applicant1RejectedRepaymentReason;
 
     @JsonIgnore
     public boolean hasApplicant1SignedSettlementAgreement() {
