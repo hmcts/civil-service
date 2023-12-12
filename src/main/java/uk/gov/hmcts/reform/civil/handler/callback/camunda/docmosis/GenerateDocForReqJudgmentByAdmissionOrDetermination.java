@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
-import uk.gov.hmcts.reform.civil.service.docmosis.claimantResponse.RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,6 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
     private final ObjectMapper objectMapper;
     private final RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator requestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
-
 
     private CallbackResponse generateResponseDocument(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();

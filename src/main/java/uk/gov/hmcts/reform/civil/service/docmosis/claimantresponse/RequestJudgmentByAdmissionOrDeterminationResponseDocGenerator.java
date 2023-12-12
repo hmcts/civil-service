@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.claimantResponse;
+package uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse.JudgmentByAdmission;
+import uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse.JudgmentByAdmissionOrDetermination;
 import uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse.JudgmentByAdmissionOrDeterminationMapper;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
@@ -22,7 +22,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGM
 @Service
 @Getter
 @RequiredArgsConstructor
-public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator implements TemplateDataGenerator<JudgmentByAdmission> {
+public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator implements TemplateDataGenerator<JudgmentByAdmissionOrDetermination> {
 
     private final JudgmentByAdmissionOrDeterminationMapper judgmentByAdmissionOrDeterminationMapper;
     private final DocumentManagementService documentManagementService;
@@ -43,7 +43,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         );
     }
 
-    public JudgmentByAdmission getTemplateData(CaseData caseData) {
+    public JudgmentByAdmissionOrDetermination getTemplateData(CaseData caseData) {
         return judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData);
     }
 
