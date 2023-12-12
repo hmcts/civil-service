@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @AllArgsConstructor
 public class CcdDashboardClaimMatcher {
