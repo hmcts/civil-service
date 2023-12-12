@@ -70,6 +70,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
@@ -571,7 +572,9 @@ class FlowStateAllowedEventServiceTest {
                         JUDGMENT_PAID_IN_FULL,
                         RECORD_JUDGMENT,
                         TRANSFER_ONLINE_CASE,
-                        asyncStitchingComplete
+                        asyncStitchingComplete,
+                        CLAIMANT_RESPONSE_CUI,
+                        REQUEST_FOR_RECONSIDERATION
                     }
                 ),
                 of(

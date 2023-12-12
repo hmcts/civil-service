@@ -1,13 +1,19 @@
 package uk.gov.hmcts.reform.civil.utils;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
+import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
+import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mockStatic;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -39,8 +46,25 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.appe
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapExpertsToUpdatePartyDetailsForm;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapUpdatePartyDetailsFormToDQWitnesses;
+import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapWitnessesToUpdatePartyDetailsForm;
 
+@SuppressWarnings("unchecked")
 class ManageContactInformationUtilsTest {
+
+    private static final String PARTY_ID = "party-id";
+    private static MockedStatic partyIdMock;
+
+    @BeforeAll
+    static void setupSuite() {
+        partyIdMock = mockStatic(PartyUtils.class, Mockito.CALLS_REAL_METHODS);
+        partyIdMock.when(PartyUtils::createPartyId).thenReturn(PARTY_ID);
+    }
+
+    @AfterAll
+    static void tearDown() {
+        partyIdMock.reset();
+        partyIdMock.close();
+    }
 
     @Test
     void shouldAddCorrectOptions_forClaimant1AsLegalRep() {
@@ -269,18 +293,37 @@ class ManageContactInformationUtilsTest {
         Expert expert1 = Expert.builder().firstName("First").lastName("Name").partyID("id").eventAdded("event").build();
         Expert expert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
             .phoneNumber("1").emailAddress("email").partyID("id2").build();
+        Experts experts = Experts.builder().details(wrapElements(expert1, expert2)).build();
         UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
             .partyId("id").build();
         UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("expert")
             .fieldOfExpertise("field").phoneNumber("1").emailAddress("email").partyId("id2").build();
 
-        assertThat(mapExpertsToUpdatePartyDetailsForm(wrapElements(expert1, expert2)))
-            .isEqualTo(wrapElements(party, party2));
+        assertThat(mapExpertsToUpdatePartyDetailsForm(experts)).isEqualTo(wrapElements(party, party2));
     }
 
     @Test
     void shouldMapExpertsToUpdatePartyDetailsForm_ifEmpty() {
         assertThat(mapExpertsToUpdatePartyDetailsForm(null)).isEqualTo(new ArrayList<>());
+    }
+
+    @Test
+    void shouldMapWitnessesToUpdatePartyDetailsForm() {
+        Witness witness1 = Witness.builder().firstName("First").lastName("Name").partyID("id").eventAdded("event").build();
+        Witness witness2 = Witness.builder().firstName("Second").lastName("expert").reasonForWitness("reason")
+            .phoneNumber("1").emailAddress("email").partyID("id2").build();
+        Witnesses witnesses = Witnesses.builder().details(wrapElements(witness1, witness2)).build();
+        UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
+            .partyId("id").build();
+        UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("expert")
+            .phoneNumber("1").emailAddress("email").partyId("id2").build();
+
+        assertThat(mapWitnessesToUpdatePartyDetailsForm(witnesses)).isEqualTo(wrapElements(party, party2));
+    }
+
+    @Test
+    void shouldMapWitnessesToUpdatePartyDetailsForm_ifEmpty() {
+        assertThat(mapWitnessesToUpdatePartyDetailsForm(null)).isEqualTo(new ArrayList<>());
     }
 
     @Nested
@@ -303,8 +346,9 @@ class ManageContactInformationUtilsTest {
                 .eventAdded("event").dateAdded(date).estimatedCost(BigDecimal.valueOf(10000)).build();
             Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
                 .eventAdded("event").dateAdded(date).phoneNumber("1").emailAddress("expertemail").partyID("id2").build();
+            Experts experts = Experts.builder().details(wrapElements(expert1, expert2)).build();
 
-            assertThat(mapUpdatePartyDetailsFormToDQExperts(wrapElements(expert1, expert2), wrapElements(party, party2)))
+            assertThat(mapUpdatePartyDetailsFormToDQExperts(experts, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedExpert1, expectedExpert2));
         }
 
@@ -312,12 +356,12 @@ class ManageContactInformationUtilsTest {
         void shouldAddExperts() {
             Expert expectedExpert1 = Expert.builder().firstName("Lewis").lastName("John")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-                .partyID(null) //change this for CIV-10382
+                .partyID(PARTY_ID)
                 .build();
             Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
                 .emailAddress("expertemail")
-                .partyID(null) //change this for CIV-10382
+                .partyID(PARTY_ID)
                 .build();
 
             assertThat(mapUpdatePartyDetailsFormToDQExperts(null, wrapElements(party, party2)))
@@ -331,10 +375,12 @@ class ManageContactInformationUtilsTest {
             Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
                 .emailAddress("expertemail")
-                .partyID(null) //change this for CIV-10382
+                .partyID(PARTY_ID)
                 .build();
 
-            assertThat(mapUpdatePartyDetailsFormToDQExperts(wrapElements(expert1), wrapElements(party, party2)))
+            Experts experts = Experts.builder().details(wrapElements(expert1)).build();
+
+            assertThat(mapUpdatePartyDetailsFormToDQExperts(experts, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedExpert1, expectedExpert2));
         }
     }
@@ -353,6 +399,8 @@ class ManageContactInformationUtilsTest {
         Witness witness2 = Witness.builder().firstName("Second").lastName("expert").eventAdded("event")
             .dateAdded(date).phoneNumber("1").emailAddress("email").partyID("id2").build();
 
+        Witnesses witnesses = Witnesses.builder().details(wrapElements(witness1, witness2)).build();
+
         @Test
         void shouldEditWitnesses() {
             Witness expectedWitness1 = Witness.builder().firstName("Lewis").lastName("John")
@@ -362,7 +410,7 @@ class ManageContactInformationUtilsTest {
                 .eventAdded("event").dateAdded(date).phoneNumber("1").emailAddress("witnessemail")
                 .partyID("id2").build();
 
-            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(wrapElements(witness1, witness2), wrapElements(party, party2)))
+            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(witnesses, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
         }
 
@@ -370,11 +418,11 @@ class ManageContactInformationUtilsTest {
         void shouldAddWitnesses() {
             Witness expectedWitness1 = Witness.builder().firstName("Lewis").lastName("John")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-                .partyID(null).build(); // CIV-10382
+                .partyID(PARTY_ID).build();
             Witness expectedWitness2 = Witness.builder().firstName("Second").lastName("witness")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
                 .emailAddress("witnessemail")
-                .partyID(null).build(); // CIV-10382
+                .partyID(PARTY_ID).build();
 
             assertThat(mapUpdatePartyDetailsFormToDQWitnesses(null, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
@@ -382,7 +430,7 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldRemoveWitnesses() {
-            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(wrapElements(witness1, witness2), null))
+            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(witnesses, null))
                 .isEmpty();
         }
 
@@ -393,10 +441,12 @@ class ManageContactInformationUtilsTest {
             Witness expectedWitness2 = Witness.builder().firstName("Second").lastName("witness")
                 .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
                 .emailAddress("witnessemail")
-                .partyID(null) //change this for CIV-10382
+                .partyID(PARTY_ID)
                 .build();
 
-            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(wrapElements(witness1), wrapElements(party, party2)))
+            Witnesses witnesses = Witnesses.builder().details(wrapElements(witness1)).build();
+
+            assertThat(mapUpdatePartyDetailsFormToDQWitnesses(witnesses, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
         }
     }

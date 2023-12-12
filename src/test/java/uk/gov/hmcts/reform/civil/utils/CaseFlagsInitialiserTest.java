@@ -76,19 +76,19 @@ class CaseFlagsInitialiserTest {
                 applicant1.toBuilder().flags(
                     Flags.builder()
                         .partyName("Mr. John Rambo")
-                        .roleOnCase("Applicant 1")
+                        .roleOnCase("Claimant 1")
                         .details(List.of()).build()).build())
             .applicant2(
                 applicant2.toBuilder().flags(
                     Flags.builder()
                         .partyName("Company ltd")
-                        .roleOnCase("Applicant 2")
+                        .roleOnCase("Claimant 2")
                         .details(List.of()).build()).build())
             .applicant1LitigationFriend(
                 applicant1LitFriend.toBuilder().flags(
                     Flags.builder()
                         .partyName("Jason Wilson")
-                        .roleOnCase("Applicant 1 Litigation Friend")
+                        .roleOnCase("Claimant 1 Litigation Friend")
                         .details(List.of()).build())
                     .build()
                 )
@@ -96,20 +96,20 @@ class CaseFlagsInitialiserTest {
                 applicant2LitFriend.toBuilder().flags(
                         Flags.builder()
                             .partyName("Jenny Carter")
-                            .roleOnCase("Applicant 2 Litigation Friend")
+                            .roleOnCase("Claimant 2 Litigation Friend")
                             .details(List.of()).build())
                     .build())
             .respondent1(
                 respondent1.toBuilder().flags(
                     Flags.builder()
                         .partyName("Mr. Sole Trader")
-                        .roleOnCase("Respondent 1")
+                        .roleOnCase("Defendant 1")
                         .details(List.of()).build()).build())
             .respondent2(
                 respondent2.toBuilder().flags(
                     Flags.builder()
                         .partyName("The Organisation")
-                        .roleOnCase("Respondent 2")
+                        .roleOnCase("Defendant 2")
                         .details(List.of()).build()).build())
             .build();
 
@@ -136,7 +136,7 @@ class CaseFlagsInitialiserTest {
                 respondent1LitFriend.toBuilder().flags(
                         Flags.builder()
                             .partyName("Jason Wilson")
-                            .roleOnCase("Respondent 1 Litigation Friend")
+                            .roleOnCase("Defendant 1 Litigation Friend")
                             .details(List.of()).build())
                     .build()
             )
@@ -144,7 +144,7 @@ class CaseFlagsInitialiserTest {
                 respondent2LitFriend.toBuilder().flags(
                         Flags.builder()
                             .partyName("Jenny Carter")
-                            .roleOnCase("Respondent 2 Litigation Friend")
+                            .roleOnCase("Defendant 2 Litigation Friend")
                             .details(List.of()).build())
                     .build())
             .build();
@@ -228,19 +228,19 @@ class CaseFlagsInitialiserTest {
                 applicant1.toBuilder().flags(
                     Flags.builder()
                         .partyName("Mr. John Rambo")
-                        .roleOnCase("Applicant 1")
+                        .roleOnCase("Claimant 1")
                         .details(List.of()).build()).build())
             .applicant2(
                 applicant2.toBuilder().flags(
                     Flags.builder()
                         .partyName("Company ltd")
-                        .roleOnCase("Applicant 2")
+                        .roleOnCase("Claimant 2")
                         .details(List.of()).build()).build())
             .applicant1LitigationFriend(
                 applicant1LitFriend.toBuilder().flags(
                         Flags.builder()
                             .partyName("Jason Wilson")
-                            .roleOnCase("Applicant 1 Litigation Friend")
+                            .roleOnCase("Claimant 1 Litigation Friend")
                             .details(List.of()).build())
                     .build()
             )
@@ -248,14 +248,14 @@ class CaseFlagsInitialiserTest {
                 applicant2LitFriend.toBuilder().flags(
                         Flags.builder()
                             .partyName("Jenny Carter")
-                            .roleOnCase("Applicant 2 Litigation Friend")
+                            .roleOnCase("Claimant 2 Litigation Friend")
                             .details(List.of()).build())
                     .build())
             .respondent1(
                 respondent1.toBuilder().flags(
                     Flags.builder()
                         .partyName("Mr. Sole Trader")
-                        .roleOnCase("Respondent 1")
+                        .roleOnCase("Defendant 1")
                         .details(List.of()).build()).build())
             .applicantWitnesses(wrapElements(List.of(
                 PartyFlagStructure.builder()
@@ -418,19 +418,19 @@ class CaseFlagsInitialiserTest {
                 applicant1.toBuilder().flags(
                     Flags.builder()
                         .partyName("Mr. John Rambo")
-                        .roleOnCase("Applicant 1")
+                        .roleOnCase("Claimant 1")
                         .details(List.of()).build()).build())
             .applicant2(
                 applicant2.toBuilder().flags(
                     Flags.builder()
                         .partyName("Company ltd")
-                        .roleOnCase("Applicant 2")
+                        .roleOnCase("Claimant 2")
                         .details(List.of()).build()).build())
             .applicant1LitigationFriend(
                 applicant1LitFriend.toBuilder().flags(
                         Flags.builder()
                             .partyName("Jason Wilson")
-                            .roleOnCase("Applicant 1 Litigation Friend")
+                            .roleOnCase("Claimant 1 Litigation Friend")
                             .details(List.of()).build())
                     .build()
             )
@@ -438,20 +438,20 @@ class CaseFlagsInitialiserTest {
                 applicant2LitFriend.toBuilder().flags(
                         Flags.builder()
                             .partyName("Jenny Carter")
-                            .roleOnCase("Applicant 2 Litigation Friend")
+                            .roleOnCase("Claimant 2 Litigation Friend")
                             .details(List.of()).build())
                     .build())
             .respondent1(
                 respondent1.toBuilder().flags(
                     Flags.builder()
                         .partyName("Mr. Sole Trader")
-                        .roleOnCase("Respondent 1")
+                        .roleOnCase("Defendant 1")
                         .details(List.of()).build()).build())
             .respondent2(
                 respondent2.toBuilder().flags(
                     Flags.builder()
                         .partyName("The Organisation")
-                        .roleOnCase("Respondent 2")
+                        .roleOnCase("Defendant 2")
                         .details(List.of()).build()).build())
             .applicantWitnesses(wrapElements(List.of(
                 PartyFlagStructure.builder()
@@ -720,19 +720,19 @@ class CaseFlagsInitialiserTest {
                 applicant1.toBuilder().flags(
                     Flags.builder()
                         .partyName("Mr. John Rambo")
-                        .roleOnCase("Applicant 1")
+                        .roleOnCase("Claimant 1")
                         .details(List.of()).build()).build())
             .applicant2(
                 applicant2.toBuilder().flags(
                     Flags.builder()
                         .partyName("Company ltd")
-                        .roleOnCase("Applicant 2")
+                        .roleOnCase("Claimant 2")
                         .details(List.of()).build()).build())
             .applicant1LitigationFriend(
                 applicant1LitFriend.toBuilder().flags(
                         Flags.builder()
                             .partyName("Jason Wilson")
-                            .roleOnCase("Applicant 1 Litigation Friend")
+                            .roleOnCase("Claimant 1 Litigation Friend")
                             .details(List.of()).build())
                     .build()
             )
@@ -740,20 +740,20 @@ class CaseFlagsInitialiserTest {
                 applicant2LitFriend.toBuilder().flags(
                         Flags.builder()
                             .partyName("Jenny Carter")
-                            .roleOnCase("Applicant 2 Litigation Friend")
+                            .roleOnCase("Claimant 2 Litigation Friend")
                             .details(List.of()).build())
                     .build())
             .respondent1(
                 respondent1.toBuilder().flags(
                     Flags.builder()
                         .partyName("Mr. Sole Trader")
-                        .roleOnCase("Respondent 1")
+                        .roleOnCase("Defendant 1")
                         .details(List.of()).build()).build())
             .respondent2(
                 respondent2.toBuilder().flags(
                     Flags.builder()
                         .partyName("The Organisation")
-                        .roleOnCase("Respondent 2")
+                        .roleOnCase("Defendant 2")
                         .details(List.of()).build()).build())
             .applicantWitnesses(wrapElements(List.of(
                 PartyFlagStructure.builder()

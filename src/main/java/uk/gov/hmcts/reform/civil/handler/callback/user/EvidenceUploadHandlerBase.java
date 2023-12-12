@@ -54,7 +54,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
@@ -218,11 +219,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             }
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        //determine claim path, and assign to CCD object for show hide functionality
-        if (caseData.getClaimType() == null) {
-            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getTotalClaimAmount(), null).name());
-        } else {
-            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
+        //Evidence upload will have different screen for Fast claims and Small claims.
+        // We use show hide in CCD to do this, using utility field caseProgAllocatedTrack to hold the value of the claim track
+        // for either spec claims (ResponseClaimTrack) or unspec claims (AllocatedTrack)
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            caseDataBuilder.caseProgAllocatedTrack(caseData.getAllocatedTrack().name());
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            caseDataBuilder.caseProgAllocatedTrack(caseData.getResponseClaimTrack());
         }
         caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
         // was unable to null value properly in EvidenceUploadNotificationEventHandler after emails are sent,
@@ -352,6 +355,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     CallbackResponse validateValuesParty(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness1,
+                                         List<Element<UploadEvidenceWitness>> uploadEvidenceWitness2,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness3,
                                          List<Element<UploadEvidenceDocumentType>> witnessDocumentReferred,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert1,
@@ -370,37 +374,43 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                  .getWitnessOptionUploadDate(),
                              "Invalid date: \"witness statement\" "
                                  + "date entered must not be in the future (2).");
+
+        checkDateCorrectness(time, errors, uploadEvidenceWitness2, date -> date.getValue()
+                                 .getWitnessOptionUploadDate(),
+                             "Invalid date: \"witness summary\" "
+                                 + "date entered must not be in the future (3).");
+
         checkDateCorrectness(time, errors, uploadEvidenceWitness3, date -> date.getValue()
                                  .getWitnessOptionUploadDate(),
                              "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
-                                 + "date entered must not be in the future (3).");
+                                 + "date entered must not be in the future (4).");
 
         checkDateCorrectness(time, errors, witnessDocumentReferred, date -> date.getValue()
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Documents referred to in the statement\" "
-                                 + "date entered must not be in the future (4).");
+                                 + "date entered must not be in the future (5).");
 
         checkDateCorrectness(time, errors, uploadEvidenceExpert1, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Expert's report\""
-                                 + " date entered must not be in the future (5).");
+                                 + " date entered must not be in the future (6).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert2, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Joint statement of experts\" "
-                                 + "date entered must not be in the future (6).");
+                                 + "date entered must not be in the future (7).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert3, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Questions for other party's expert or joint experts\" "
-                                 + "expert statement date entered must not be in the future (7).");
+                                 + "expert statement date entered must not be in the future (8).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert4, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Answers to questions asked by the other party\" "
-                                 + "date entered must not be in the future (8).");
+                                 + "date entered must not be in the future (9).");
 
         checkDateCorrectness(time, errors, trialDocumentEvidence, date -> date.getValue()
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Documentary evidence for trial\" "
-                                 + "date entered must not be in the future (9).");
+                                 + "date entered must not be in the future (10).");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -455,8 +465,8 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     RESPONDENT_TWO_WITNESS_REFERRED,
                     APPLICANT_WITNESS_REFERRED,
                     APPLICANT_TWO_WITNESS_REFERRED:
-                prefix = "Referred Document";
-                renameUploadEvidenceDocumentType(documentUpload, prefix);
+                prefix = " referred to in the statement of ";
+                renameUploadEvidenceDocumentTypeWithName(documentUpload, prefix);
                 break;
             case RESPONDENT_ONE_TRIAL_DOC_CORRESPONDENCE,
                     RESPONDENT_TWO_TRIAL_DOC_CORRESPONDENCE,
@@ -503,7 +513,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     RESPONDENT_ONE_WITNESS_SUMMARY,
                     RESPONDENT_TWO_WITNESS_SUMMARY:
                 prefix = "Witness Summary of";
-                renameUploadEvidenceWitness(documentUpload, prefix, false);
+                renameUploadEvidenceWitness(documentUpload, prefix, true);
                 break;
             case APPLICANT_WITNESS_HEARSAY,
                     APPLICANT_TWO_WITNESS_HEARSAY,
@@ -561,6 +571,21 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     + (question ? type.getExpertDocumentQuestion() : type.getExpertDocumentAnswer())
                     + END + ext;
             type.getExpertDocument().setDocumentFileName(newName);
+        });
+    }
+
+    private <T> void renameUploadEvidenceDocumentTypeWithName(final List<Element<T>> documentUpload, String body) {
+        documentUpload.forEach(x -> {
+            UploadEvidenceDocumentType type = (UploadEvidenceDocumentType) x.getValue();
+            String ext = FilenameUtils.getExtension(type.getDocumentUpload().getDocumentFileName());
+            String newName = type.getTypeOfDocument()
+                    + body
+                    + type.getWitnessOptionName()
+                    + SPACE
+                    + type.getDocumentIssuedDate()
+                    .format(DateTimeFormatter.ofPattern(DATE_FORMAT, Locale.UK))
+                    + END + ext;
+            type.getDocumentUpload().setDocumentFileName(newName);
         });
     }
 
@@ -1010,6 +1035,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     .documentUrl(from.getValue().getDocumentUpload().getDocumentUrl())
                     .build();
             UploadEvidenceDocumentType type = UploadEvidenceDocumentType.builder()
+                    .witnessOptionName(from.getValue().getWitnessOptionName())
                     .documentIssuedDate(from.getValue().getDocumentIssuedDate())
                     .typeOfDocument(from.getValue().getTypeOfDocument())
                     .createdDatetime(from.getValue().getCreatedDatetime())
@@ -1149,6 +1175,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                 && uploadEvidenceDocumentType.getValue().getCreatedDatetime()
                 .isAfter(bundleDetails.get().getCreatedOn().get())) {
                 uploadedEvidenceAfterBundle.add(ElementUtils.element(UploadEvidenceDocumentType.builder()
+                                                                         .witnessOptionName(uploadEvidenceDocumentType.getValue().getWitnessOptionName())
                                                                          .typeOfDocument(docType)
                                                                          .createdDatetime(uploadEvidenceDocumentType.getValue().getCreatedDatetime())
                                                                          .documentUpload(uploadEvidenceDocumentType.getValue().getDocumentUpload())

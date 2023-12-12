@@ -16,6 +16,8 @@ management:
     case-document-am-api:
       enabled: true
 spring:
+  config:
+    import: "optional:configtree:/mnt/secrets/civil/"
   application:
     name: civil-service
   main:
@@ -114,6 +116,11 @@ pin-in-post:
   cui-front-end:
     url: ${CUI_URL:http://localhost:3001}
 
+ocmc:
+  client:
+    id: ${OCMC_CLIENT_ID:cmc_citizen}
+    url: ${OCMC_CLIENT_URL:http://localhost:3001}
+
 manage-case-ui:
   baseurl: ${MANAGE_CASE_UI_BASE_URL:http://localhost:3333}
 
@@ -128,6 +135,7 @@ payments:
 idam:
   s2s-auth:
     microservice: civil_service
+
 
 document_management:
   userRoles: "caseworker-civil,caseworker-civil-solicitor"
@@ -158,6 +166,7 @@ civil:
   test-user:
     username: ${TEST_USERNAME:test@example.com}
     password: ${TEST_PASSWORD:Password12!}
+  authorised-services: ${CIVIL_S2S_AUTHORISED_SERVICES:payment_app,ccd_data,civil_service,civil-citizen-ui}
 
 core_case_data:
   api:
@@ -275,6 +284,7 @@ notifications:
   generateOrderNotificationTemplate: "78532d45-aadf-4223-89fd-4932b4cbe411"
 
   notifyClaimantLrTemplate: "adcf4c5f-2b9c-482d-8311-a4b8ffe7ef45"
+  notifyClaimantLipTemplateManualDetermination: "bdc1b126-4137-43b0-a637-6d3874053ac0"
   notifyDefendantLrTemplate: "2d86f90b-95e8-4592-af88-06ae7936cc57"
   notifyDefendantLipTemplate: "d40a8b04-b226-4232-a881-f7249a61d038"
   notifyDefendantLipWelshTemplate : "d63b744a-97c8-42bd-95a2-3d86dd703c3d"
@@ -310,6 +320,7 @@ notifications:
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
   notifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate: "3d302844-ecdc-47e6-8aed-971c3f42a059"
+  notifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate: "a9c1ccba-eb72-414d-8dc7-d75f33c79b28"
   notifyLiPClaimantDefendantResponded: "4b1325dd-51ed-4dc2-bcc6-d9afb01a3f29"
   notifyLiPClaimantDefendantChangedContactDetails: "72a14146-c897-4fc6-be4f-474266da7398"
 
@@ -318,6 +329,9 @@ notifications:
 
   notifyLiPApplicantBreathingSpaceLifted: "b6dbc714-210e-475d-a1db-bf5ea28de98b"
   notifyLiPRespondentBreathingSpaceLifted: "4ca3017b-b2fa-4ac0-a867-9bfada50a80c"
+
+  notifyApplicantLipRequestJudgementByAdmissionNotificationTemplate: "d6625ee3-f794-4a87-b0a3-bef7dd0663b9"
+  notifyRespondentLipRequestJudgementByAdmissionNotificationTemplate: "6ced7f9c-b0fd-4fad-a76c-745873b9a3a2"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
