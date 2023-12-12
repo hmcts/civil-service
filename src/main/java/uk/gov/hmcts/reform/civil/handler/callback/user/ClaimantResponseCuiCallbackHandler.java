@@ -119,13 +119,13 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         boolean isInFavourOfClaimant = applicant1Response != null
             && applicant1Response.hasCourtDecisionInFavourOfClaimant();
 
-        return ((caseData.hasApplicantRejectedRepaymentPlan()
-                && caseData.getRespondent1().isCompanyOROrganisation()) 
-                || ((caseData.hasApplicantAcceptedRepaymentPlan()
-                || isCourtDecisionAccepted
-                || isCourtDecisionRejected
-                || isInFavourOfClaimant)
-                && isCcjRequested);
+        return (caseData.hasApplicantRejectedRepaymentPlan()
+            && caseData.getRespondent1().isCompanyOROrganisation())
+            || ((caseData.hasApplicantAcceptedRepaymentPlan()
+            || isCourtDecisionAccepted
+            || isCourtDecisionRejected
+            || isInFavourOfClaimant)
+            && isCcjRequested);
     }
 
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
