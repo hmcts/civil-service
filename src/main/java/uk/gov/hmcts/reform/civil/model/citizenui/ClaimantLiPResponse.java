@@ -24,4 +24,9 @@ public class ClaimantLiPResponse {
     public boolean hasApplicant1SignedSettlementAgreement() {
         return YesOrNo.YES.equals(applicant1SignedSettlementAgreement);
     }
+
+    @JsonIgnore
+    public boolean hasApplicant1AcceptedCcj() {
+        return ChooseHowToProceed.REQUEST_A_CCJ.equals(applicant1ChoosesHowToProceed);
+    }
 }
