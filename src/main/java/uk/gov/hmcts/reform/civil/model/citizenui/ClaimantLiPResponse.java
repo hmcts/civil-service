@@ -29,16 +29,16 @@ public class ClaimantLiPResponse {
 
     @JsonIgnore
     public boolean hasApplicant1RequestedCcj() {
-        return ChooseHowToProceed.REQUEST_A_CCJ.equals(applicant1ChoosesHowToProceed);
+        return ChooseHowToProceed.REQUEST_A_CCJ == applicant1ChoosesHowToProceed;
     }
 
     @JsonIgnore
     public boolean hasClaimantAcceptedCourtDecision() {
-        return ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE.equals(claimantResponseOnCourtDecision);
+        return ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE == claimantResponseOnCourtDecision;
     }
 
     @JsonIgnore
     public boolean hasClaimantRejectedCourtDecision() {
-        return ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE.equals(claimantResponseOnCourtDecision);
+        return ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE == claimantResponseOnCourtDecision;
     }
 }
