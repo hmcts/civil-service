@@ -53,14 +53,24 @@ public class CaseAssignmentController {
     public ResponseEntity<CaseDetails> validateCaseAndPin(
         @PathVariable("caseReference") String caseReference, @RequestBody PinDto pin) {
         log.info("case reference {}", caseReference);
-        CaseDetails caseDetails = null;
-        if (pin.getPin().length() != OCMC_PIN_LENGTH) {
-            caseDetails = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
-            defendantPinToPostLRspecService.validatePin(caseDetails, pin.getPin());
-        } else {
-            defendantPinToPostLRspecService.validatePin(caseDetails, pin.getPin(), caseReference);
-        }
+        CaseDetails caseDetails = caseByLegacyReferenceSearchService.getCaseDataByLegacyReference(caseReference);
+        defendantPinToPostLRspecService.validatePin(caseDetails, pin.getPin());
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
+    }
+
+    @PostMapping(path = {
+        "/reference/ocmc/{caseReference}"
+    })
+    @Operation(summary = "Validates case reference and pin")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "302", description = "FOUND"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<String> validateOcmcPin(
+        @PathVariable("caseReference") String caseReference, @RequestBody PinDto pin) {
+        log.info("case reference {}", caseReference);
+        String redirectUrl = defendantPinToPostLRspecService.validateOcmcPin(pin.getPin(), caseReference);
+        return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
     }
 
     @PostMapping(path = "/case/{caseId}/{caseRole}")
