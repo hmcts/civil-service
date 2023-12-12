@@ -347,7 +347,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
             .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
                         + "list of documents by 4pm on")
-            .date1(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 28))
+            .date1(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 20))
 
             .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
                         + "the other party by 4pm on")
