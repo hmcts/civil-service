@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
@@ -28,7 +26,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final JudgementService judgementService;
 
-    public JudgmentByAdmission toClaimantResponseForm(CaseData caseData) {
+    public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
         Optional<AdditionalLipPartyDetails> applicantDetails =
             caseDataLip.map(CaseDataLiP::getApplicant1AdditionalLipPartyDetails);
@@ -54,8 +52,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
         String totalInterest = judgementService.ccjJudgmentInterest(caseData).toString();
 
-
-        JudgmentByAdmission.JudgmentByAdmissionBuilder builder = new JudgmentByAdmission.JudgmentByAdmissionBuilder();
+        JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
         return builder
             .formHeader(getFormHeader(caseData))
             .formName(getFormName(caseData))
@@ -82,7 +79,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     private LocalDate setPayByDate(CaseData caseData) {
         if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.SET_DATE)) {
             return caseData.getApplicant1RequestedPaymentDateForDefendantSpec().getPaymentSetDate();
-        } else if(caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.IMMEDIATELY)) {
+        } else if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.IMMEDIATELY)) {
             LocalDate whenBePaid = deadlineCalculatorService.calculateExtendedDeadline(
                 LocalDate.now(),
                 RespondentResponsePartAdmissionPaymentTimeLRspec.DAYS_TO_PAY_IMMEDIATELY);
@@ -102,7 +99,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         }
         return null;
     }
-
 
     private Address getCorrespondenceAddress(Optional<AdditionalLipPartyDetails> partyDetails) {
         return partyDetails.map(AdditionalLipPartyDetails::getCorrespondenceAddress).orElse(null);

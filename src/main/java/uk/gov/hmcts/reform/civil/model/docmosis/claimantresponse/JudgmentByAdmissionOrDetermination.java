@@ -17,7 +17,8 @@ import java.time.LocalDate;
 @Builder
 @Getter
 @EqualsAndHashCode
-public class JudgmentByAdmission implements MappableObject {
+public class JudgmentByAdmissionOrDetermination implements MappableObject {
+
     private final String formHeader;
     private String formName;
     private final String claimReferenceNumber;
@@ -43,5 +44,4 @@ public class JudgmentByAdmission implements MappableObject {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate generationDate;
-
 }

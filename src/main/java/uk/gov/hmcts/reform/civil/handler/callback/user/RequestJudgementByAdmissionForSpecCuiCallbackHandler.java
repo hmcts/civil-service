@@ -67,7 +67,6 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             errors.add(format(NOT_VALID_DJ_BY_ADMISSION, caseData.setUpJudgementFormattedPermittedDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())));
         }
 
-        System.out.println("CaseData : "+ caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(errors.isEmpty() ? caseDataBuilder.build().toMap(objectMapper) : null)
