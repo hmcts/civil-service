@@ -138,6 +138,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
@@ -505,8 +506,11 @@ public class CaseDataBuilder {
 
     private DynamicList transferCourtLocationList;
     private String reasonForTransfer;
+
+    private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
     private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
+    private ReasonForReconsideration reasonForReconsideration;
     private YesOrNo responseClaimExpertSpecRequired;
     private YesOrNo responseClaimExpertSpecRequired2;
     private YesOrNo applicantMPClaimExpertSpecRequired;
@@ -5285,6 +5289,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder isFlightDelayClaim(YesOrNo isFlightDelayClaim) {
+        this.isFlightDelayClaim = isFlightDelayClaim;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForReconsideration(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsideration = reasonForReconsideration;
+        return this;
+    }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -6670,6 +6684,8 @@ public class CaseDataBuilder {
             .responseClaimExpertSpecRequired2(responseClaimExpertSpecRequired2)
             .applicant1ClaimExpertSpecRequired(applicant1ClaimExpertSpecRequired)
             .applicantMPClaimExpertSpecRequired(applicantMPClaimExpertSpecRequired)
+            .isFlightDelayClaim(isFlightDelayClaim)
+            .reasonForReconsideration(reasonForReconsideration)
             .build();
     }
 }
