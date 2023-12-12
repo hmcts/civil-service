@@ -22,6 +22,8 @@ public class BundlingCaseData {
     private final List<Element<BundlingRequestDocument>> trialDocuments;
     @JsonProperty("statementsOfCaseDocuments")
     private final List<Element<BundlingRequestDocument>> statementsOfCaseDocuments;
+    @JsonProperty("directionsQuestionnaires")
+    private final List<Element<BundlingRequestDocument>> directionsQuestionnaires;
     @JsonProperty("particularsOfClaim")
     private final List<Element<BundlingRequestDocument>> particularsOfClaim;
     @JsonProperty("ordersDocuments")
