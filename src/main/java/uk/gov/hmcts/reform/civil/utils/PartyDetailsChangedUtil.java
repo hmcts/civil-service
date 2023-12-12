@@ -56,10 +56,18 @@ public class PartyDetailsChangedUtil {
                 "Respondent 2 Details Changed",  getChanges(current.getRespondent2(), updated.getRespondent2()));
         } else if (hasChanged(current.getApplicant1LitigationFriend(), updated.getApplicant1LitigationFriend())) {
             return buildChangesEvent(
-                "Applicant Litigation Friend Details Changed",
+                "Applicant 1 Litigation Friend Details Changed",
                 getChanges(
                     updateLitigationFriendAddress(current.getApplicant1LitigationFriend(), current.getApplicant1()),
                     updateLitigationFriendAddress(updated.getApplicant1LitigationFriend(), updated.getApplicant1()))
+            );
+        } else if (hasChanged(current.getApplicant2LitigationFriend(), updated.getApplicant2LitigationFriend())) {
+            return buildChangesEvent(
+                "Applicant 2 Litigation Friend Details Changed",
+                getChanges(
+                    updateLitigationFriendAddress(current.getApplicant2LitigationFriend(), current.getApplicant2()),
+                    updateLitigationFriendAddress(updated.getApplicant2LitigationFriend(), updated.getApplicant2())
+                )
             );
         } else if (hasChanged(current.getRespondent1LitigationFriend(), updated.getRespondent1LitigationFriend())) {
             return buildChangesEvent(
@@ -69,7 +77,7 @@ public class PartyDetailsChangedUtil {
                     updateLitigationFriendAddress(updated.getRespondent1LitigationFriend(), updated.getRespondent1())));
         } else if (hasChanged(current.getRespondent2LitigationFriend(), updated.getRespondent2LitigationFriend())) {
             return buildChangesEvent(
-                "Respondent 2 Litigation Friend Details changed",
+                "Respondent 2 Litigation Friend Details Changed",
                 getChanges(
                     updateLitigationFriendAddress(current.getRespondent2LitigationFriend(), current.getRespondent2()),
                     updateLitigationFriendAddress(updated.getRespondent2LitigationFriend(), updated.getRespondent2())));
