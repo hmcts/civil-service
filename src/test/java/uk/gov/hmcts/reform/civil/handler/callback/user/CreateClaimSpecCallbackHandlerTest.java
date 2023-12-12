@@ -1640,27 +1640,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class FlightDelayDetailsMidCallbacks {
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Enabled(Boolean toggleStat) {
-            // Given
-            YesOrNo yesOrNo = toggleStat ? YES : NO;
-            CaseData caseData = CaseData.builder().isFlightDelayClaim(yesOrNo)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, "is-flight-delay-claim");
-            // When
-            when(toggleService.isSdoR2Enabled()).thenReturn(true);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getData()).containsEntry("isFlightDelayClaim", toggleStat ? "Yes" : "No");
-            if (toggleStat) {
-                assertThat(response.getData()).containsEntry("claimType", "FLIGHT_DELAY");
-            } else {
-                assertThat(response.getData()).doesNotHaveToString("claimType");
-            }
-        }
 
         @Test
         void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Disabled() {
@@ -1668,7 +1647,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder().isFlightDelayClaim(YES)
                 .build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "is-flight-delay-claim");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
             when(toggleService.isSdoR2Enabled()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1692,6 +1671,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
 
             // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -1708,10 +1688,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
             // Given
             CaseData caseData = CaseData.builder()
+                .isFlightDelayClaim(YES)
                 .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().plusDays(1)).build()).build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -1723,10 +1705,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotReturnErrorWhenDateOfFlightIsTodayOrInThePast(Integer days) {
             // Given
             CaseData caseData = CaseData.builder()
+                .isFlightDelayClaim(YES)
                 .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().minusDays(days)).build()).build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "validate-date-of-flight");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             // Then
@@ -1783,7 +1767,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
             given(feesService.getFeeDataByTotalClaimAmount(any())).willReturn(feeData);
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1800,7 +1784,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1828,7 +1812,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1838,8 +1822,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().contains("12345");
             assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().doesNotContain("98765");
         }
-
-        //TODO implement tests for bulk claims that have interest added.
 
         @Test
         void shouldSetCaseCategoryToSpec_whenInvoked() {
@@ -2191,7 +2173,9 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnExpectedCourtLocation_whenAirlineExists() {
                 // Given
+
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .isFlightDelayClaim(YES)
                     .flightDelay(FlightDelayDetails.builder()
                                      .airlineList(
                                          DynamicList.builder()
