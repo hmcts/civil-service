@@ -33,6 +33,7 @@ def type = "java"
 def product = "civil"
 def component = "service"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
+def ccdBranch = "master"
 
 static Map<String, Object> secret(String secretName, String envVariable) {
   [$class     : 'AzureKeyVaultSecret',
@@ -75,6 +76,9 @@ withNightlyPipeline(type, product, component) {
   enableFullFunctionalTest(200)
 
   before('fullFunctionalTest') {
+    sh """
+      ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+    """
     yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
   }
