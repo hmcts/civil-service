@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.RequestJudgme
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
@@ -56,7 +57,8 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
     }
 
     private boolean shouldGenerateJudgmentDoc(CaseData caseData) {
-        return caseData.getCaseDataLiP().getApplicant1LiPResponse().getApplicant1ChoosesHowToProceed().equals(ChooseHowToProceed.REQUEST_A_CCJ);
+        return nonNull(caseData.getCaseDataLiP()) && nonNull(caseData.getCaseDataLiP()) && nonNull(caseData.getCaseDataLiP().getApplicant1LiPResponse())
+            && ChooseHowToProceed.REQUEST_A_CCJ.equals(caseData.getCaseDataLiP().getApplicant1LiPResponse().getApplicant1ChoosesHowToProceed());
     }
 
     @Override
