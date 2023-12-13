@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
 
+import java.time.OffsetDateTime;
+
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Slf4j
@@ -53,9 +55,15 @@ public class FeesPaymentController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @PathVariable("feeType") FeeType feeType,
         @PathVariable("paymentReference") String paymentReference) {
-
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse().builder()
+            .status("Success")
+            .externalReference("lbh2ogknloh9p3b4lchngdfg63")
+            .paymentReference("RC-1701-0909-0602-0418")
+            .nextUrl("https://card.payments.service.gov.uk/secure/7b0716b2-40c4-413e-b62e-72c599c91960")
+            .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"))
+            .build();
         return new ResponseEntity<>(
-            feesPaymentService.getGovPaymentRequestStatus(feeType, paymentReference, authorization),
+            response,
             HttpStatus.OK
         );
     }
