@@ -59,7 +59,7 @@ public class CaseAssignmentController {
     }
 
     @PostMapping(path = {
-        "/reference/ocmc/{caseReference}"
+        "/reference/{caseReference}/ocmc"
     })
     @Operation(summary = "Validates case reference and pin")
     @ApiResponses(value = {
