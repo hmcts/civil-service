@@ -264,6 +264,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        checkPartyAddress(caseData);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
@@ -704,6 +705,20 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
+
+    private void checkPartyAddress(CaseData caseData) {
+
+        if (null != caseData.getApplicant1()
+            && null == caseData.getApplicant1().getPrimaryAddress()
+            && null != caseData.getSpecApplicantCorrespondenceAddressdetails()) {
+            caseData.getApplicant1().setPrimaryAddress(caseData.getSpecApplicantCorrespondenceAddressdetails());
+        }
+        if (null != caseData.getRespondent1()
+            && null == caseData.getRespondent1().getPrimaryAddress()
+            && null != caseData.getRespondent1DetailsForClaimDetailsTab()) {
+            caseData.getRespondent1().setPrimaryAddress(caseData.getRespondent1DetailsForClaimDetailsTab().getPrimaryAddress());
+        }
+
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
         return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
             && caseData.getIsFlightDelayClaim().equals(YES)
@@ -722,5 +737,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         return (isFlightDelayAndSmallClaim(caseData) && caseData.getFlightDelayDetails() != null
             && caseData.getFlightDelayDetails().getAirlineList()
             .getValue().getCode().equals("OTHER"));
+
     }
 }
