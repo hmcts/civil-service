@@ -251,13 +251,6 @@ task contract(type: Test) {
   classpath = sourceSets.contractTest.runtimeClasspath
 }
 
-task pullTestAsset(type: Exec, description: 'Installs Yarn dependencies.') {
-  onlyIf {
-    return System.env.NIGHTLY_RUN == 'true'
-  }
-  commandLine './bin/pull-latest-ccd-files.sh', 'master'
-}
-
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.')  {
   getMainClass().set("uk.gov.hmcts.fortifyclient.FortifyClientMainApp")
   classpath += sourceSets.test.runtimeClasspath
@@ -303,7 +296,7 @@ task smoke(description: 'Runs the smoke tests.') {
 }
 
 task functional(description: 'Runs the functional tests.') {
-  dependsOn(inStrictOrder(awaitApplicationReadiness, pullTestAsset,
+  dependsOn(inStrictOrder(awaitApplicationReadiness,
     runProdApiTests, runNonProdApiTests, runNightlyApiTests))
 }
 
