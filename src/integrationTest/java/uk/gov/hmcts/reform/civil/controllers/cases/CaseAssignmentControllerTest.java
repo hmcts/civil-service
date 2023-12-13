@@ -23,6 +23,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     private static final String CASES_URL = "/assignment";
     private static final String VALIDATE_PIN_URL = CASES_URL + "/reference/{caseReference}";
+    private static final String VALIDATE_OCMC_PIN_URL = CASES_URL + "/reference/ocmc/{caseReference}";
     private static final String ASSIGN_CASE = CASES_URL + "/case/{caseId}/{caseRole}";
 
     @MockBean
@@ -64,6 +65,19 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
         );
 
         doPost("", "123", VALIDATE_PIN_URL, "123")
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @SneakyThrows
+    void givenIncorrectPin_whenValidateOcmcPin_shouldReturnBadRequest() {
+        givenCaseIsFound();
+        doThrow(new PinNotMatchException()).when(defendantPinToPostLRspecService).validateOcmcPin(
+            anyString(),
+            anyString()
+        );
+
+        doPost("", "123", VALIDATE_OCMC_PIN_URL, "123")
             .andExpect(status().isBadRequest());
     }
 
