@@ -705,7 +705,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-
     private void checkPartyAddress(CaseData caseData) {
 
         if (null != caseData.getApplicant1()
