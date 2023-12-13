@@ -32,7 +32,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             getTemplateData(caseData),
-                JUDGMENT_BY_ADMISSION_OR_DETERMINATION
+            JUDGMENT_BY_ADMISSION_OR_DETERMINATION
         );
         return documentManagementService.uploadDocument(
             authorisation,
