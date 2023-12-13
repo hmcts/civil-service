@@ -63,7 +63,6 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
         );
         CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(
                 acknowledgementOfClaim, "");
-
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(acknowledgementOfClaim));
         if (Objects.nonNull(copy)) {

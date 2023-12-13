@@ -335,6 +335,12 @@ notifications:
   
   notifyClaimantLipHelpWithFees: "242171a6-98c8-4fe3-b6d2-1748b39d2c9b"
 
+  notifyApplicantForSignedSettlementAgreement: "65459efd-a351-4a1b-814a-435aabe3beb5"
+  notifyApplicantForNotAgreedSignSettlement: "b775583b-7964-41f8-8b3b-d767557cffb2"
+
+  notifyRespondentForSignedSettlementAgreement: "aeb3951e-4956-4542-a73b-e2e3abec8867"
+  notifyRespondentForNotAgreedSignSettlement: "1742841b-d915-43a9-9d76-b6d17a189ba5"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
