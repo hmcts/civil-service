@@ -57,7 +57,7 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
     }
 
     private boolean shouldGenerateJudgmentDoc(CaseData caseData) {
-        return nonNull(caseData.getCaseDataLiP()) && nonNull(caseData.getCaseDataLiP()) && nonNull(caseData.getCaseDataLiP().getApplicant1LiPResponse())
+        return nonNull(caseData.getCaseDataLiP()) && nonNull(caseData.getCaseDataLiP().getApplicant1LiPResponse())
             && ChooseHowToProceed.REQUEST_A_CCJ.equals(caseData.getCaseDataLiP().getApplicant1LiPResponse().getApplicant1ChoosesHowToProceed());
     }
 
