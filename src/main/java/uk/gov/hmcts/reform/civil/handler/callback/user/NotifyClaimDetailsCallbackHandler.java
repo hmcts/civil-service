@@ -206,17 +206,17 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         LocalDateTime date = time.now();
 
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
-            && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) {
+            && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant())) {
             LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
-                    .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
+                    .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
             if (cosDate1.isBefore(date)) {
                 date = cosDate1;
             }
         }
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
-            && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
+            && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant())) {
             LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
-                    .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
+                    .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
             if (cosDate2.isBefore(date)) {
                 date = cosDate2;
             }
@@ -475,8 +475,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private boolean isBothDefendantWithSameDateOfService(CaseData caseData) {
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
             && Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
-            if (caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant()
-                .equals(caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
+            if (caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant()
+                .equals(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant())) {
                 return true;
             }
         }
