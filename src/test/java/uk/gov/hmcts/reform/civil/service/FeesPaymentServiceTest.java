@@ -247,7 +247,7 @@ class FeesPaymentServiceTest {
             () -> feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "RC-1701-0909-0602-0418", BEARER_TOKEN)
         );
 
-        verify(paymentsClient, times(3)).getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
+        verify(paymentsClient, times(5)).getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
     }
 
     @Test

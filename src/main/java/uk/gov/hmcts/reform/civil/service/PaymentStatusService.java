@@ -34,7 +34,7 @@ public class PaymentStatusService {
         }
     }
 
-    @Retryable(value = RetryablePaymentException.class, backoff = @Backoff(delay = 500))
+    @Retryable(value = RetryablePaymentException.class, maxAttempts = 5, backoff = @Backoff(delay = 500))
     public PaymentDto getCardPaymentDetails(String paymentReference, String authorization) {
         try {
             PaymentDto cardPaymentStatus = paymentsClient.getGovPayCardPaymentStatus(paymentReference, authorization);
