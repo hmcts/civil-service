@@ -85,7 +85,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private final LocalDateTime notificationDate = LocalDateTime.now();
     private final LocalDateTime deadline = notificationDate.toLocalDate().atTime(END_OF_BUSINESS_DAY);
-    public static final String DOC_SERVED_DATE_IN_FUTURE = "Date you served the documents must be today or in the past";
+    public static final String DOC_SERVED_DATE_IN_FUTURE = "On what day did you serve must be today or in the past";
     private static final String ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT = "There is a problem"
         + "\n"
         + "This action cannot currently be performed because it has either already"
