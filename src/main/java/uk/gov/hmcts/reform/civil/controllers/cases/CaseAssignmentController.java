@@ -61,7 +61,7 @@ public class CaseAssignmentController {
     @PostMapping(path = {
         "/reference/{caseReference}/ocmc"
     })
-    @Operation(summary = "Validates case reference and pin")
+    @Operation(summary = "Validates case reference and pin for ocmc")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "302", description = "FOUND"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),
