@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.service.FeesPaymentService;
-
 import java.time.OffsetDateTime;
-
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Slf4j
