@@ -865,11 +865,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
-        log.info( " before featureToggleService.isEarlyAdoptersEnabled() check");
+        log.info("before featureToggleService.isEarlyAdoptersEnabled() check");
+
         if (featureToggleService.isEarlyAdoptersEnabled()) {
             // LiP check ensures any LiP cases will always trigger takeCaseOffline task as CUI R1 does not account for LiPs
             // ToDo: remove LiP check for CUI R2
-            log.info(" case contains lip check " + caseContainsLiP(caseData));
+
+            log.info("case contains lip check " + caseContainsLiP(caseData));
+
             if (!caseContainsLiP(caseData)
                 // If both SDO court AND case managment location is a EA approved court.
                 // check epimm from judge selected court in SDO journey
