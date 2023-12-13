@@ -736,6 +736,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
     }
+        
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
         return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
             && caseData.getIsFlightDelayClaim().equals(YES)
