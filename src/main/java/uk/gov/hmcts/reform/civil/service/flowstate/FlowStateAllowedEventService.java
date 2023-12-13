@@ -75,6 +75,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESET_PIN;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
@@ -547,7 +548,8 @@ public class FlowStateAllowedEventService {
                 RECORD_JUDGMENT,
                 TRANSFER_ONLINE_CASE,
                 CLAIMANT_RESPONSE_CUI,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                REQUEST_FOR_RECONSIDERATION
             )
         ),
 
@@ -1110,8 +1112,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 asyncStitchingComplete,
                 CLAIMANT_RESPONSE_CUI,
-                UPLOAD_MEDIATION_DOCUMENTS
-
+                UPLOAD_MEDIATION_DOCUMENTS,
+                REQUEST_FOR_RECONSIDERATION
             )
         ),
 
