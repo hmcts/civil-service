@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -107,7 +108,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     }
 
     private boolean isProceedsInHeritageSystemAllowed(CaseData caseData) {
-        var applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
+        ClaimantLiPResponse applicant1Response = Optional.ofNullable(caseData.getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .orElse(null);
         boolean isCourtDecisionAccepted = applicant1Response != null
