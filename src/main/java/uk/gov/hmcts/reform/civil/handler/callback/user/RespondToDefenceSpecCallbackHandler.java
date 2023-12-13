@@ -718,6 +718,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && null != caseData.getRespondent1DetailsForClaimDetailsTab()) {
             caseData.getRespondent1().setPrimaryAddress(caseData.getRespondent1DetailsForClaimDetailsTab().getPrimaryAddress());
         }
+    }
 
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
         return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
