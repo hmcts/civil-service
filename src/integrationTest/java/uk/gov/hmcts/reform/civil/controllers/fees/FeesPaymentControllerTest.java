@@ -107,8 +107,7 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             .paymentFor("hearing");
 
         if (status.equals("Failed")) {
-            payment.errorCode("CA-E0001")
-                .errorDescription("Payment request failed. PBA account accountName have insufficient funds available");
+            payment.errorCode("P0030").errorDescription("Payment was cancelled by the user");
         }
         return payment.build();
     }
