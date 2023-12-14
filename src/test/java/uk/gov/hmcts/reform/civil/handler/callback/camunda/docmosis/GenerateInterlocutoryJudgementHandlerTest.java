@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
-import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.service.CaseWorkerDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.InterlocutoryJudgementDocGenerator;
 
 import java.time.LocalDateTime;
@@ -48,7 +48,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
     @Mock
     private InterlocutoryJudgementDocGenerator interlocutoryJudgementDocGenerator;
     @Mock
-    private SystemGeneratedDocumentService systemGeneratedDocumentService;
+    private CaseWorkerDocumentService caseWorkerDocumentService;
 
     private GenerateInterlocutoryJudgementHandler handler;
 
@@ -58,7 +58,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
         handler = new GenerateInterlocutoryJudgementHandler(
             mapper,
             interlocutoryJudgementDocGenerator,
-            systemGeneratedDocumentService
+            caseWorkerDocumentService
         );
 
     }

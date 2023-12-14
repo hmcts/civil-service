@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
-import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
+import uk.gov.hmcts.reform.civil.service.CaseWorkerDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.InterlocutoryJudgementDocGenerator;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.GENERATE_INTERLOCUTORY_JUDGEMENT_DOCUMENT);
     private final ObjectMapper objectMapper;
     private final InterlocutoryJudgementDocGenerator interlocutoryJudgementDocGenerator;
-    private final SystemGeneratedDocumentService systemGeneratedDocumentService;
+    private final CaseWorkerDocumentService caseWorkerDocumentService;
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
         this::generateInterlocutoryJudgementDoc
@@ -61,10 +61,8 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         CaseData updatedCaseData = caseData.toBuilder()
-            .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                interlocutoryJudgementDoc,
-                caseData
-            ))
+            .caseWorkerDocuments(
+                caseWorkerDocumentService.getCaseWorkerDocumentsWithAddedDocument(interlocutoryJudgementDoc, caseData))
             .build();
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -92,7 +90,7 @@ public class GenerateInterlocutoryJudgementHandler extends CallbackHandler {
         ChooseHowToProceed chooseHowToProceed = getChooseHowToProceed(caseData);
         RepaymentDecisionType repaymentDecisionType = getRepaymentDecisionType(caseData);
         boolean isCompanyOROrganisation = caseData.getApplicant1().isCompanyOROrganisation();
-        return  isCompanyOROrganisation || chooseHowToProceed != ChooseHowToProceed.REQUEST_A_CCJ || repaymentDecisionType != RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
+        return isCompanyOROrganisation || chooseHowToProceed != ChooseHowToProceed.REQUEST_A_CCJ || repaymentDecisionType != RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
     }
 }
 

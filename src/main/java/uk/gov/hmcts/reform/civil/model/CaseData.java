@@ -645,6 +645,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private FlightDelayDetails flightDelayDetails;
     private ReasonForReconsideration reasonForReconsideration;
 
+    @Builder.Default
+    private final List<Element<CaseDocument>> caseWorkerDocuments = new ArrayList<>();
+
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
