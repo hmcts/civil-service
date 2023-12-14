@@ -35,6 +35,14 @@ public class AirlineEpimsDataLoader {
             });
         } catch (IOException | CsvException  e) {
             log.error("Error occurred while loading the airline_ePimsID.csv file: " + CSV_FILE_PATH + e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    log.error("Error occurred while closing inputStream for the airline_ePimsID.csv");
+                }
+            }
         }
     }
 
