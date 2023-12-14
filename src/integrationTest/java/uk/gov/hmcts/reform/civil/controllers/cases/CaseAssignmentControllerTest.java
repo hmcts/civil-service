@@ -23,7 +23,7 @@ public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     private static final String CASES_URL = "/assignment";
     private static final String VALIDATE_PIN_URL = CASES_URL + "/reference/{caseReference}";
-    private static final String VALIDATE_OCMC_PIN_URL = CASES_URL + "/reference/ocmc/{caseReference}";
+    private static final String VALIDATE_OCMC_PIN_URL = CASES_URL + "/reference/{caseReference}/ocmc";
     private static final String ASSIGN_CASE = CASES_URL + "/case/{caseId}/{caseRole}";
 
     @MockBean
