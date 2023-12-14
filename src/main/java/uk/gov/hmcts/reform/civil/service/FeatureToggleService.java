@@ -61,7 +61,7 @@ public class FeatureToggleService {
     }
 
     public boolean isLipVLipEnabled() {
-        return true; //featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
+        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
