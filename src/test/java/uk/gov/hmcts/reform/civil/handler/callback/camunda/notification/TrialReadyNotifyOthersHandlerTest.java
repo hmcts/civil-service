@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -57,7 +58,7 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(notificationsProperties.getOtherPartyTrialReady()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("cui-template-id");
         }
 
         @Test
@@ -88,7 +89,25 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
             verify(notificationService).sendMail(
                 "rambo@email.com",
-                "template-id",
+                "cui-template-id",
+                getLiPNotificationDataMap(true, caseData),
+                "other-party-trial-ready-notification-000MC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantWithNoEmail_whenInvoked() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheckLiP(false)
+                .claimantUserDetails(new IdamUserDetails().toBuilder().email("email@email.com").build()).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR_FOR_OTHER_TRIAL_READY.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "email@email.com",
+                "cui-template-id",
                 getLiPNotificationDataMap(true, caseData),
                 "other-party-trial-ready-notification-000MC001"
             );
@@ -122,7 +141,7 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
-                "template-id",
+                "cui-template-id",
                 getLiPNotificationDataMap(false, caseData),
                 "other-party-trial-ready-notification-000MC001"
             );
@@ -139,7 +158,7 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
             verify(notificationService, never()).sendMail(
                 "sole.trader@email.com",
-                "template-id",
+                "cui-template-id",
                 getLiPNotificationDataMap(false, caseData),
                 "other-party-trial-ready-notification-000MC001"
             );
@@ -173,7 +192,7 @@ public class TrialReadyNotifyOthersHandlerTest extends BaseCallbackHandlerTest {
 
             verify(notificationService).sendMail(
                 "rambo@email.com",
-                "template-id",
+                "cui-template-id",
                 getLiPNotificationDataMap(false, caseData),
                 "other-party-trial-ready-notification-000MC001"
             );
