@@ -33,7 +33,6 @@ class CaseWorkerDocumentServiceTest {
             caseDocument,
             caseData
         );
-
         //Then
         assertThat(result.get(0)).isNotNull();
         assertThat(result.get(0).getValue().getDocumentName()).isEqualTo(FILE_NAME_1);

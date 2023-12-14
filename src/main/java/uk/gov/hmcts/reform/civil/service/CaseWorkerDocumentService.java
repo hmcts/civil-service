@@ -12,7 +12,6 @@ import java.util.List;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
-@Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CaseWorkerDocumentService {
 
     public List<Element<CaseDocument>> getCaseWorkerDocumentsWithAddedDocument(CaseDocument caseDocument, CaseData caseData) {
@@ -20,5 +19,4 @@ public class CaseWorkerDocumentService {
         caseWorkerDocuments.add(element(caseDocument));
         return caseWorkerDocuments;
     }
-
 }
