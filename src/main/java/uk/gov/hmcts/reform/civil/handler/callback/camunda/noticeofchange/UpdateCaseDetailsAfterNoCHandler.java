@@ -26,6 +26,9 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DETAILS_AFTER_NOC;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
@@ -117,6 +120,8 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
             }
         }
 
+        clearLRIndividuals(replacedSolicitorCaseRole, caseDataBuilder.build(), caseDataBuilder, caseData);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
@@ -125,6 +130,30 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     private void unassignCaseFromDefendantLip(CaseData caseData) {
         if (caseData.isRespondent1LiP() && caseData.getDefendantUserDetails() != null) {
             coreCaseUserService.unassignCase(caseData.getCcdCaseReference().toString(), caseData.getDefendantUserDetails().getId(), null, CaseRole.DEFENDANT);
+        }
+    }
+
+    private void clearLRIndividuals(String replacedSolicitorCaseRole, CaseData caseData,
+                                    CaseData.CaseDataBuilder<?, ?> caseDataBuilder, CaseData oldCaseData) {
+        if (CaseRole.APPLICANTSOLICITORONE.getFormattedName().equals(replacedSolicitorCaseRole)) {
+            caseDataBuilder.applicant1LRIndividuals(null);
+        } else if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(replacedSolicitorCaseRole)) {
+            if (ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(caseData))) {
+                // if it's diff to same sol after noc, copy from defendant 2
+                caseDataBuilder.respondent1LRIndividuals(caseData.getRespondent2LRIndividuals());
+                caseDataBuilder.respondent2LRIndividuals(null);
+            } else {
+                // if it's same to diff sol after noc, copy into def 2 and clear def 1
+                if (ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData))
+                    && ONE_V_TWO_ONE_LEGAL_REP.equals(getMultiPartyScenario(oldCaseData))) {
+                    caseDataBuilder.respondent2LRIndividuals(caseData.getRespondent1LRIndividuals());
+                }
+                caseDataBuilder.respondent1LRIndividuals(null);
+            }
+        } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(replacedSolicitorCaseRole)) {
+            // always clear for defendant 2 because even if it goes from DS to SS,
+            // LR individuals are always stored against defendant 1
+            caseDataBuilder.respondent2LRIndividuals(null);
         }
     }
 
