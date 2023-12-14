@@ -169,6 +169,11 @@ allprojects {
       }
       // Solves CVE-2023-24998
       dependency group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
+      //Solves CVE-2023-6481
+      dependencySet(group: 'ch.qos.logback', version: '1.2.13') {
+        entry 'logback-core'
+        entry 'logback-classic'
+      }
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2021.0.3'
@@ -410,7 +415,7 @@ dependencies {
     exclude group: 'java-logging', module: ' java-logging'
   }
 
-  implementation('com.github.hmcts:payments-java-client:1.5.2') {
+  implementation('com.github.hmcts:payments-java-client:1.6.6') {
     exclude group: 'java-logging', module: ' java-logging'
   }
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
