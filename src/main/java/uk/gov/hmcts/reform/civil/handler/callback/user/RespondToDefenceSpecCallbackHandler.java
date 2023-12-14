@@ -484,11 +484,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             howMuchWasPaid.ifPresent(howMuchWasPaidValue -> updatedCaseData.partAdmitPaidValuePounds(
                 MonetaryConversions.penniesToPounds(howMuchWasPaidValue)));
 
-            updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(
-                caseData.getTotalClaimAmount(),
-                null,
-                null
-            ).name());
+            updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(caseData).name());
         }
         // add direction questionaire document from system generated documents, to placeholder field for preview during event.
         // Or add sealed response form  from system generated documents, to placeholder field for preview during event.

@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.fees.client.model.Fee2Dto;
 import uk.gov.hmcts.reform.fees.client.model.FeeLookupResponseDto;
@@ -88,11 +90,9 @@ public class FeesClient {
      * @return boolean
      */
     private boolean isFastTrackClaimAndHearingEvent(BigDecimal amount, String event) {
-
-        return EVENT_HEARING.equalsIgnoreCase(event) && AllocatedTrack.FAST_CLAIM == AllocatedTrack.getAllocatedTrack(
-            amount,
-            null,
-            null
-        );
+        CaseData caseData = CaseData.builder().claimValue(
+            ClaimValue.builder().statementOfValueInPennies(amount.scaleByPowerOfTen(2)).build()).build();
+        return EVENT_HEARING.equalsIgnoreCase(event) && AllocatedTrack.FAST_CLAIM
+            == AllocatedTrack.getAllocatedTrack(caseData);
     }
 }
