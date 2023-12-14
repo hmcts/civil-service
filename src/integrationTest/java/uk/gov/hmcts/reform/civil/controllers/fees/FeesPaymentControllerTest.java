@@ -119,11 +119,9 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         CardPaymentStatusResponse.CardPaymentStatusResponseBuilder payment
             = CardPaymentStatusResponse.builder()
             .paymentReference("RC-1701-0909-0602-0418")
-            .externalReference("lbh2ogknloh9p3b4lchngdfg63")
             .status(status)
             .paymentAmount(new BigDecimal(200))
-            .paymentFor("hearing")
-            .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"));
+            .paymentFor("hearing");
 
         if (status.equals("Failed")) {
             payment.errorCode("CA-E0001")
