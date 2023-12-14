@@ -107,10 +107,10 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {
         return PaymentDto.builder()
             .externalReference("lbh2ogknloh9p3b4lchngdfg63")
-            .paymentReference("RC-1701-0909-0602-0418")
+            .reference("RC-1701-0909-0602-0418")
             .status(status)
             .currency("GBP")
-            .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"))
+            .amount(new BigDecimal(200))
             .statusHistories(getStatusHistories(status))
             .build();
     }
@@ -121,6 +121,8 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             .paymentReference("RC-1701-0909-0602-0418")
             .externalReference("lbh2ogknloh9p3b4lchngdfg63")
             .status(status)
+            .paymentAmount(new BigDecimal(200))
+            .paymentFor("hearing")
             .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"));
 
         if (status.equals("Failed")) {
@@ -134,8 +136,8 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
 
         StatusHistoryDto initiatedHistory = StatusHistoryDto.builder().status("Initiated").build();
         StatusHistoryDto failedHistory = StatusHistoryDto.builder().status("Failed")
-            .errorCode("CA-E0001")
-            .errorMessage("Payment request failed. PBA account accountName have insufficient funds available").build();
+            .errorCode("P0030")
+            .errorMessage("Payment was cancelled by the user").build();
         List<StatusHistoryDto> histories = new ArrayList<>();
         histories.add(initiatedHistory);
         if (status.equals("Failed")) {
