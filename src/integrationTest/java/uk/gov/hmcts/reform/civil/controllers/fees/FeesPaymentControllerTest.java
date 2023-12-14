@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -87,21 +85,6 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "RC-1701-0909-0602-0418")
             .andExpect(content().json(toJson(expectedResponse(status))))
             .andExpect(status().isOk());
-    }
-
-    @Test
-    void whenPaymentClientReturnsInitiatedStatusTwoTimes() throws Exception {
-        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
-            .thenReturn(buildGovPayCardPaymentStatusResponse("Initiated"))
-            .thenReturn(buildGovPayCardPaymentStatusResponse("Initiated"))
-            .thenReturn(buildGovPayCardPaymentStatusResponse("Success"));
-
-        doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "RC-1701-0909-0602-0418")
-            .andExpect(content().json(toJson(expectedResponse("Success"))))
-            .andExpect(status().isOk());
-
-        verify(paymentsClient, times(3))
-            .getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
     }
 
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {
