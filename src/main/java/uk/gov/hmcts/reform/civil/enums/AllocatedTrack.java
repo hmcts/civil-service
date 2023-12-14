@@ -8,8 +8,7 @@ public enum AllocatedTrack {
     MULTI_CLAIM;
 
     public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType) {
-        //The FLIGHT_DELAY ClaimType is only applicable for SPEC cases at the moment.
-        if (claimType != null && claimType != ClaimType.FLIGHT_DELAY) {
+        if (claimType != null) {
             switch (claimType) {
                 case PERSONAL_INJURY:
                 case CLINICAL_NEGLIGENCE:
