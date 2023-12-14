@@ -90,13 +90,6 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         return response.build();
     }
 
-    private boolean isJudicialReferralAllowed(CaseData caseData) {
-        return (caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence() || caseData.isFullDefenceNotPaid())
-            && ((Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation())
-            || caseData.hasDefendantNotAgreedToFreeMediation()
-            || caseData.isFastTrackClaim());
-    }
-
     private String setUpCaseState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
         if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();
@@ -125,6 +118,21 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private boolean hasCcjRequest(CaseData caseData) {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
                 && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
+    }
+
+    private boolean isJudicialReferralAllowed(CaseData caseData) {
+        return isProceedOrNotSettleClaim(caseData)
+            && (isClaimantOrDefendantRejectMediation(caseData)
+            || caseData.isFastTrackClaim());
+    }
+
+    private boolean isProceedOrNotSettleClaim(CaseData caseData) {
+        return caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence() || caseData.isFullDefenceNotPaid();
+    }
+
+    private boolean isClaimantOrDefendantRejectMediation(CaseData caseData) {
+        return (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation())
+            || caseData.hasDefendantNotAgreedToFreeMediation();
     }
 
     private boolean isProceedInHeritageSystemAllowed(CaseData caseData) {
