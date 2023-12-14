@@ -4223,6 +4223,7 @@ public class CaseDataBuilder {
         atStateHearingFeeDuePaid().setClaimTypeToSpecClaim();
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         if (!hasEmailAddress) {
+            applicant1 = applicant1.toBuilder().partyEmail(null).build();
             respondent1 = respondent1.toBuilder().partyEmail("").build();
             respondent2 = respondent2.toBuilder().partyEmail("").build();
         }
