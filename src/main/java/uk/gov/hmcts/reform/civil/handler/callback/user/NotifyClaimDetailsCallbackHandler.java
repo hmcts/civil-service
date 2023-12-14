@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -53,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
@@ -134,6 +136,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         LocalDateTime currentDateTime = notificationDateTime;
         LocalDate notificationDate = notificationDateTime.toLocalDate();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
+
+        log.info("MultipartyScenario: {}", multiPartyScenario);
 
         caseData = saveCoSDetailsDoc(caseData, 1);
         caseData = saveCoSDetailsDoc(caseData, 2);
