@@ -230,7 +230,7 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"FLIGHT_DELAY"})
         void shouldReturnCorrectTrackForFlightDelayClaim(ClaimType claimType) {
-            CaseData caseData = CaseData.builder().claimType(claimType).totalClaimAmount(BigDecimal.valueOf(99999)).build();
+            CaseData caseData = CaseData.builder().claimType(claimType).totalClaimAmount(BigDecimal.valueOf(9999)).build();
             assertThat(getAllocatedTrack(caseData)).isEqualTo(SMALL_CLAIM);
         }
     }
