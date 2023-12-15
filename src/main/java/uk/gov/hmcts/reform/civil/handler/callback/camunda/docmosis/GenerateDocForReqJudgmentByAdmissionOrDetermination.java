@@ -60,11 +60,7 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
     }
 
     private boolean shouldGenerateJudgmentDoc(CaseData caseData) {
-        return Optional.ofNullable(caseData.getCaseDataLiP())
-            .map(CaseDataLiP::getApplicant1LiPResponse)
-            .map(ClaimantLiPResponse::getApplicant1ChoosesHowToProceed)
-            .filter(howToProceed -> howToProceed == ChooseHowToProceed.REQUEST_A_CCJ)
-            .isPresent();
+        return caseData.hasApplicant1AcceptedCcj();
     }
 
     @Override

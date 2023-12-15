@@ -65,4 +65,14 @@ public class CaseDataLiP {
             .map(RespondentLiPResponse::getTimelineComment)
             .orElse("");
     }
+
+    @JsonIgnore
+    public boolean isDefendantSignedSettlementAgreement() {
+        return YesOrNo.YES.equals(respondentSignSettlementAgreement);
+    }
+
+    @JsonIgnore
+    public boolean isDefendantSignedSettlementNotAgreed() {
+        return YesOrNo.NO.equals(respondentSignSettlementAgreement);
+    }
 }

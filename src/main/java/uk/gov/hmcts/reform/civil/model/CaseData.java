@@ -1161,6 +1161,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean hasApplicant1AcceptedCcj() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
-            .filter(ClaimantLiPResponse::hasApplicant1AcceptedCcj).isPresent();
+            .filter(ClaimantLiPResponse::hasApplicant1RequestedCcj).isPresent();
     }
 }
