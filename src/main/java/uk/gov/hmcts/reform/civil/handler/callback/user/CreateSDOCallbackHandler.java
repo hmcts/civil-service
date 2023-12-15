@@ -705,7 +705,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private DynamicList getLocationList(CallbackParams callbackParams,
                                         CaseData.CaseDataBuilder<?, ?> updatedData,
                                         RequestedCourt preferredCourt) {
-        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
@@ -914,7 +914,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             default: break;
         }
     }
-      
+
     private boolean caseContainsLiP(CaseData caseData) {
         return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
     }

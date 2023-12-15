@@ -138,6 +138,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
@@ -215,6 +216,7 @@ public class CaseDataBuilder {
     protected Party applicant2;
     protected YesOrNo applicant1Represented;
     protected YesOrNo applicant1LitigationFriendRequired;
+    protected YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
     protected YesOrNo applicant2LitigationFriendRequired;
     protected Party respondent1;
     protected Party respondent2;
@@ -505,12 +507,20 @@ public class CaseDataBuilder {
 
     private DynamicList transferCourtLocationList;
     private String reasonForTransfer;
+
+    private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
+    private ReasonForReconsideration reasonForReconsideration;
 
     private YesOrNo responseClaimExpertSpecRequired;
     private YesOrNo responseClaimExpertSpecRequired2;
     private YesOrNo applicantMPClaimExpertSpecRequired;
     private YesOrNo applicant1ClaimExpertSpecRequired;
+
+    public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
+        this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
+        return this;
+    }
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -4208,6 +4218,7 @@ public class CaseDataBuilder {
         atStateHearingFeeDuePaid().setClaimTypeToSpecClaim();
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         if (!hasEmailAddress) {
+            applicant1 = applicant1.toBuilder().partyEmail(null).build();
             respondent1 = respondent1.toBuilder().partyEmail("").build();
             respondent2 = respondent2.toBuilder().partyEmail("").build();
         }
@@ -5282,6 +5293,16 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder flightDelay(FlightDelayDetails flightDelayDetails) {
         this.flightDelayDetails = flightDelayDetails;
+        return this;
+    }
+
+    public CaseDataBuilder isFlightDelayClaim(YesOrNo isFlightDelayClaim) {
+        this.isFlightDelayClaim = isFlightDelayClaim;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForReconsideration(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsideration = reasonForReconsideration;
         return this;
     }
 
@@ -6461,6 +6482,7 @@ public class CaseDataBuilder {
             .respondent1LitigationFriend(respondent1LitigationFriend)
             .applicant1LitigationFriend(applicant1LitigationFriend)
             .applicant1LitigationFriendRequired(applicant1LitigationFriendRequired)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(applicant1AcceptFullAdmitPaymentPlanSpec)
             .applicant2LitigationFriend(applicant2LitigationFriend)
             .applicant2LitigationFriendRequired(applicant2LitigationFriendRequired)
             .respondent1LitigationFriendDate(respondent1LitigationFriendDate)
@@ -6659,6 +6681,8 @@ public class CaseDataBuilder {
             .responseClaimExpertSpecRequired2(responseClaimExpertSpecRequired2)
             .applicant1ClaimExpertSpecRequired(applicant1ClaimExpertSpecRequired)
             .applicantMPClaimExpertSpecRequired(applicantMPClaimExpertSpecRequired)
+            .isFlightDelayClaim(isFlightDelayClaim)
+            .reasonForReconsideration(reasonForReconsideration)
             .build();
     }
 }
