@@ -90,7 +90,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         "On what day did you serve should not be more than 14 days old";
 
     public static final String DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS =
-        "Date of service must be no greater than 2 working days in the future";
+        "The date of service must be no greater than 2 working days in the future";
 
     public static final String DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS =
         "The date of service should not be more than 14 days old";
@@ -207,25 +207,32 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private LocalDateTime getEarliestDateOfService(CaseData caseData) {
-        LocalDateTime date = time.now();
+        LocalDateTime date1 = null;
+        LocalDateTime date2 = null;
 
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
             && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant())) {
-            LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
-                    .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
-            if (cosDate1.isBefore(date)) {
-                date = cosDate1;
-            }
+            date1 = caseData.getCosNotifyClaimDetails1()
+                .getCosDateDeemedServedForDefendant().atTime(LocalDateTime.now().toLocalTime());
         }
+
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
             && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant())) {
-            LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
-                    .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
-            if (cosDate2.isBefore(date)) {
-                date = cosDate2;
-            }
+            date2 = caseData.getCosNotifyClaimDetails2()
+                .getCosDateDeemedServedForDefendant().atTime(LocalDateTime.now().toLocalTime());
         }
-        return date;
+
+        return getEarliestDate(date1, date2);
+    }
+
+    private LocalDateTime getEarliestDate(LocalDateTime date1, LocalDateTime date2) {
+        if (date1 == null) {
+            return date2;
+        } else if (date2 == null) {
+            return date1;
+        } else {
+            return date1.isBefore(date2) ? date1 : date2;
+        }
     }
 
     private CaseData saveCoSDetailsDoc(CaseData caseData, int lipNumber) {
@@ -449,13 +456,31 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        return time.now().isAfter(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
-                                                                                  .atTime(time.now().toLocalTime())));
+        LocalDateTime notificationDeadline = deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
+                                                                                             .atTime(time.now().toLocalTime()));
+        LocalDateTime currentDateTime = time.now();
+        LocalDateTime today4pm = currentDateTime.toLocalDate().atTime(16, 0);
+
+        boolean isAfter4pmToday = currentDateTime.isAfter(today4pm)
+            && currentDateTime.toLocalDate().equals(notificationDeadline.toLocalDate());
+
+        boolean isAfter14DaysAt4pmDeadline = currentDateTime.isAfter(notificationDeadline);
+
+        return isAfter14DaysAt4pmDeadline || isAfter4pmToday;
     }
 
     private boolean isDeemedServedDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        return time.now().isAfter(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
-                                                                                  .atTime(time.now().toLocalTime())));
+        LocalDateTime deemedServedDeadline = deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
+                                                                                             .atTime(time.now().toLocalTime()));
+        LocalDateTime currentDateTime = time.now();
+        LocalDateTime today4pm = currentDateTime.toLocalDate().atTime(16, 0);
+
+        boolean isAfter4pmToday = currentDateTime.isAfter(today4pm)
+            && currentDateTime.toLocalDate().equals(deemedServedDeadline.toLocalDate());
+
+        boolean isAfter14DaysAt4pmDeadline = currentDateTime.isAfter(deemedServedDeadline);
+
+        return isAfter14DaysAt4pmDeadline || isAfter4pmToday;
     }
 
     public boolean isDeemedServedWithinMaxWorkingDays(LocalDate cosDateOfServiceForDefendant) {
