@@ -51,7 +51,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         return switch (caseEvent) {
             case GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC -> "admission";
             case GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC -> "determination";
-            default -> null;
+            default -> throw new IllegalArgumentException(String.format("No DocumentType available for %s event", caseEvent));
         };
     }
 
@@ -59,7 +59,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         return switch (caseEvent) {
             case GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC -> CCJ_REQUEST_ADMISSION;
             case GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC -> CCJ_REQUEST_DETERMINATION;
-            default -> null;
+            default -> throw new IllegalArgumentException(String.format("No DocumentType available for %s event", caseEvent));
         };
     }
 }
