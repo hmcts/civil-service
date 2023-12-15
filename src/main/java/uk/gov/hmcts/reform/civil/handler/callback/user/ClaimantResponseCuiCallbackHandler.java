@@ -125,9 +125,9 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         } else if (Objects.nonNull(updatedData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && updatedData.isClaimantIntentionSettlePartAdmit()) {
             return CaseState.CASE_SETTLED.name();
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
-            return response.state(CaseState.CASE_DISMISSED.name());
+            return CaseState.CASE_DISMISSED.name();
         } else if (isProceedsInHeritageSystemAllowed(updatedData)) {
-            return response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            return CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
         } else {
             return response.build().getState();
         }
@@ -158,11 +158,6 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private boolean isClaimantOrDefendantRejectMediation(CaseData caseData) {
         return (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation())
             || caseData.hasDefendantNotAgreedToFreeMediation();
-    }
-
-    private boolean isProceedInHeritageSystemAllowed(CaseData caseData) {
-        return ((caseData.hasApplicantRejectedRepaymentPlan()
-                && caseData.getRespondent1().isCompanyOROrganisation()) || hasCcjRequest(caseData));
     }
 
     private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
