@@ -90,8 +90,7 @@ public class FeesClient {
      * @return boolean
      */
     private boolean isFastTrackClaimAndHearingEvent(BigDecimal amount, String event) {
-        CaseData caseData = CaseData.builder().claimValue(
-            ClaimValue.builder().statementOfValueInPennies(amount.scaleByPowerOfTen(2)).build()).build();
+        CaseData caseData = CaseData.builder().totalClaimAmount(amount).build();
         return EVENT_HEARING.equalsIgnoreCase(event) && AllocatedTrack.FAST_CLAIM
             == AllocatedTrack.getAllocatedTrack(caseData);
     }
