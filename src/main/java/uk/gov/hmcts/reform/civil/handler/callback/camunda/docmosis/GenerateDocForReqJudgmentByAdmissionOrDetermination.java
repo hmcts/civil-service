@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -11,7 +12,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
 
@@ -57,8 +60,11 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
     }
 
     private boolean shouldGenerateJudgmentDoc(CaseData caseData) {
-        return nonNull(caseData.getCaseDataLiP()) && nonNull(caseData.getCaseDataLiP().getApplicant1LiPResponse())
-            && ChooseHowToProceed.REQUEST_A_CCJ.equals(caseData.getCaseDataLiP().getApplicant1LiPResponse().getApplicant1ChoosesHowToProceed());
+        return Optional.ofNullable(caseData.getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .map(ClaimantLiPResponse::getApplicant1ChoosesHowToProceed)
+            .filter(howToProceed -> howToProceed == ChooseHowToProceed.REQUEST_A_CCJ)
+            .isPresent();
     }
 
     @Override

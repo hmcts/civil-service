@@ -12,6 +12,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,21 +31,19 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse.RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateDocForReqJudgmentByAdmissionOrDetermination.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class GenerateDocForReqJudgmentByAdmissionOrDeterminationTest extends BaseCallbackHandlerTest {
 
-    @Autowired
+    @Mock
     private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
+
+    @InjectMocks
     private GenerateDocForReqJudgmentByAdmissionOrDetermination handler;
-    @MockBean
+
+    @Mock
     private RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator formGenerator;
 
-    @MockBean
+    @Mock
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
 
     private static final CaseDocument FORM = CaseDocument.builder()
