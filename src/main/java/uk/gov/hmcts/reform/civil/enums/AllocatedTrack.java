@@ -12,52 +12,66 @@ public enum AllocatedTrack {
     MULTI_CLAIM;
 
     public static AllocatedTrack getAllocatedTrack(CaseData caseData) {
-        BigDecimal statementOfValueInPounds;
-        boolean noClaimValue;
-        if (caseData.getClaimValue() != null) {
-            statementOfValueInPounds = caseData.getClaimValue().toPounds();
-            noClaimValue = false;
-        } else {
-            statementOfValueInPounds = null;
-            noClaimValue = true;
-        }
-
         if (caseData.getClaimType() != null) {
             ClaimType claimType = caseData.getClaimType();
             if (claimType == ClaimType.PERSONAL_INJURY || claimType == ClaimType.CLINICAL_NEGLIGENCE) {
-                if (caseData.getPersonalInjuryType() != null
-                    && (caseData.getPersonalInjuryType().equals(NOISE_INDUCED_HEARING_LOSS))) {
-                    return FAST_CLAIM;
-                }
-
-                if (!noClaimValue && isValueSmallerThanOrEqualTo(statementOfValueInPounds, 1000)) {
-                    return SMALL_CLAIM;
-                } else if (!noClaimValue && isBigDecimalValueWithinRange(statementOfValueInPounds, BigDecimal.valueOf(1000.01),
-                        BigDecimal.valueOf(25000))) {
-                    return FAST_CLAIM;
-                } else {
-                    return MULTI_CLAIM;
-                }
+                return getAllocatedTrackForUnSpecPersonalInjuryOrClinicalNegligence(caseData);
             }
-
-            if (!noClaimValue && isValueSmallerThanOrEqualTo(statementOfValueInPounds, 10000)) {
-                return SMALL_CLAIM;
-            } else if (!noClaimValue && isBigDecimalValueWithinRange(statementOfValueInPounds, BigDecimal.valueOf(10000.01),
-                    BigDecimal.valueOf(25000))) {
-                return FAST_CLAIM;
-            } else {
-                return MULTI_CLAIM;
-            }
-
+            return getAllocatedTrackForUnSpecDefault(caseData);
         } else { //For Spec Claims
-            if (!noClaimValue && isValueSmallerThan(statementOfValueInPounds, 10000)) {
+            return getAllocatedTrackForSpec(caseData);
+        }
+    }
+
+    private static AllocatedTrack getAllocatedTrackForUnSpecPersonalInjuryOrClinicalNegligence(CaseData caseData) {
+        BigDecimal statementOfValueInPounds;
+        if (caseData.getPersonalInjuryType() != null
+            && (caseData.getPersonalInjuryType().equals(NOISE_INDUCED_HEARING_LOSS))) {
+            return FAST_CLAIM;
+        }
+        if (caseData.getClaimValue() != null) {
+            statementOfValueInPounds = caseData.getClaimValue().toPounds();
+            if (isValueSmallerThanOrEqualTo(statementOfValueInPounds, 1000)) {
                 return SMALL_CLAIM;
-            } else if (!noClaimValue && isValueWithinRange(statementOfValueInPounds, 10000, 25000)) {
+            } else if (isBigDecimalValueWithinRange(
+                statementOfValueInPounds,
+                BigDecimal.valueOf(1000.01),
+                BigDecimal.valueOf(25000)
+            )) {
                 return FAST_CLAIM;
-            } else {
-                return MULTI_CLAIM;
             }
         }
+        return MULTI_CLAIM;
+    }
+
+    private static AllocatedTrack getAllocatedTrackForUnSpecDefault(CaseData caseData) {
+        BigDecimal statementOfValueInPounds;
+        if (caseData.getClaimValue() != null) {
+            statementOfValueInPounds = caseData.getClaimValue().toPounds();
+            if (isValueSmallerThanOrEqualTo(statementOfValueInPounds, 10000)) {
+                return SMALL_CLAIM;
+            } else if (isBigDecimalValueWithinRange(
+                statementOfValueInPounds,
+                BigDecimal.valueOf(10000.01),
+                BigDecimal.valueOf(25000)
+            )) {
+                return FAST_CLAIM;
+            }
+        }
+        return MULTI_CLAIM;
+    }
+
+    private static AllocatedTrack getAllocatedTrackForSpec(CaseData caseData) {
+        BigDecimal statementOfValueInPounds;
+        if (caseData.getTotalClaimAmount() != null) {
+            statementOfValueInPounds = caseData.getTotalClaimAmount();
+            if (isValueSmallerThan(statementOfValueInPounds, 10000)) {
+                return SMALL_CLAIM;
+            } else if (isValueWithinRange(statementOfValueInPounds, 10000, 25000)) {
+                return FAST_CLAIM;
+            }
+        }
+        return MULTI_CLAIM;
     }
 
     public static int getDaysToAddToDeadline(AllocatedTrack track) {
