@@ -224,5 +224,14 @@ class AllocatedTrackTest {
             assertThat(toStringValueForEmail(getAllocatedTrack(caseData)))
                 .isEqualTo("Multi Track");
         }
+
+        @ParameterizedTest(name = "{0} has small track when Flight Delay type is less than 1000")
+        @EnumSource(
+            value = ClaimType.class,
+            names = {"FLIGHT_DELAY"})
+        void shouldReturnCorrectTrackForFlightDelayClaim(ClaimType claimType) {
+            CaseData caseData = CaseData.builder().claimType(claimType).totalClaimAmount(BigDecimal.valueOf(99999)).build();
+            assertThat(getAllocatedTrack(caseData)).isEqualTo(SMALL_CLAIM);
+        }
     }
 }
