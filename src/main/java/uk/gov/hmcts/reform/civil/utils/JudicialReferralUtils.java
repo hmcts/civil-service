@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -35,7 +36,10 @@ public class JudicialReferralUtils {
             };
         } else {
             AllocatedTrack allocatedTrack =
-                getAllocatedTrack(caseData);
+                getAllocatedTrack(CaseCategory.UNSPEC_CLAIM.equals(caseCategory)
+                ? CaseData.builder().claimType(ClaimType.OTHER).claimValue(caseData.getClaimValue()).build()
+                : CaseData.builder().totalClaimAmount(caseData.getTotalClaimAmount()).build()
+                );
             if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
                 return false;
             }
