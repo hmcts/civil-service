@@ -12,7 +12,8 @@ public enum AllocatedTrack {
     MULTI_CLAIM;
 
     public static AllocatedTrack getAllocatedTrack(CaseData caseData) {
-        if (caseData.getClaimType() != null) {
+        //The FLIGHT_DELAY ClaimType is only applicable for SPEC cases at the moment.
+        if (caseData.getClaimType() != null && caseData.getClaimType() != ClaimType.FLIGHT_DELAY) {
             ClaimType claimType = caseData.getClaimType();
             if (claimType == ClaimType.PERSONAL_INJURY || claimType == ClaimType.CLINICAL_NEGLIGENCE) {
                 return getAllocatedTrackForUnSpecPersonalInjuryOrClinicalNegligence(caseData);
