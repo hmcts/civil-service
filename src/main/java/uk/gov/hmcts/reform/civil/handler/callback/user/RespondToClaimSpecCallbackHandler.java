@@ -242,7 +242,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     updatedCase.specDisputesOrPartAdmission(NO);
                 }
             }
-            AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData);
+            AllocatedTrack allocatedTrack = getAllocatedTrack(caseData);
             updatedCase.responseClaimTrack(allocatedTrack.name());
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -335,7 +335,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             updatedCaseData.specFullAdmitPaid(NO);
         }
         if (SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC.equals(callbackParams.getRequest().getEventId())) {
-            AllocatedTrack allocatedTrack = AllocatedTrack.getAllocatedTrack(caseData);
+            AllocatedTrack allocatedTrack = getAllocatedTrack(caseData);
             updatedCaseData.responseClaimTrack(allocatedTrack.name());
         }
         Set<DefendantResponseShowTag> currentShowFlags = new HashSet<>(caseData.getShowConditionFlags());
@@ -1050,6 +1050,10 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 updated.respondent1ClaimResponsePaymentAdmissionForSpec(null).build();
             }
         }
+    }
+
+    private AllocatedTrack getAllocatedTrack(CaseData caseData) {
+        return AllocatedTrack.getAllocatedTrack(CaseData.builder().totalClaimAmount(caseData.getTotalClaimAmount()).build());
     }
 
     private CallbackResponse validateCorrespondenceApplicantAddress(CallbackParams callbackParams) {
