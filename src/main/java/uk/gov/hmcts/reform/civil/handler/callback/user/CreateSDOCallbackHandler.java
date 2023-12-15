@@ -707,7 +707,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private DynamicList getLocationList(CallbackParams callbackParams,
                                         CaseData.CaseDataBuilder<?, ?> updatedData,
                                         RequestedCourt preferredCourt) {
-        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocationsForJudgeFinalOrder(
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
