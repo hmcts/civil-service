@@ -1174,8 +1174,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .applicant2(Party.builder().type(INDIVIDUAL).build())
                     .respondent1(Party.builder().type(INDIVIDUAL).build())
                     .respondent2(Party.builder().type(INDIVIDUAL).build())
-                    .atStateApplicantRespondToDefenceAndProceed()
-                    .buildClaimIssuedPaymentCaseData();
+                    .build();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
