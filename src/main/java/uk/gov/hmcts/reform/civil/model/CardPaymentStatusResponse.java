@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Data
@@ -21,6 +22,8 @@ public class CardPaymentStatusResponse {
     private OffsetDateTime dateCreated;
     private String errorCode;
     private String errorDescription;
+    private String paymentFor;
+    private BigDecimal paymentAmount;
 
     public static CardPaymentStatusResponse from(CardPaymentServiceRequestResponse cardPaymentServiceRequestResponse) {
         return CardPaymentStatusResponse.builder()
