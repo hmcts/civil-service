@@ -118,7 +118,7 @@ public class HearingScheduledHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         List<LocationRefData> locations = (locationRefDataService
-            .getCourtLocationsForDefaultJudgments(authToken));
+            .getHearingCourtLocations(authToken));
         caseDataBuilder.hearingLocation(getLocationsFromList(locations))
             .build();
 
