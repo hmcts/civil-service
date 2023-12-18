@@ -30,13 +30,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class DraftClaimFormMapperTest {
+class ClaimFormMapperTest {
 
     @Mock
     private InterestCalculator interestCalculator;
 
     @InjectMocks
-    private DraftClaimFormMapper draftClaimFormMapper;
+    private ClaimFormMapper claimFormMapper;
 
     private static final String INDIVIDUAL_TITLE = "Mr.";
     private static final String INDIVIDUAL_FIRST_NAME = "Hot";
@@ -81,7 +81,7 @@ class DraftClaimFormMapperTest {
                              .build())
             .build();
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getClaimant().name()).isEqualTo(caseData.getApplicant1().getPartyName());
         assertThat(form.getDefendant().name()).isEqualTo(caseData.getRespondent1().getPartyName());
@@ -109,7 +109,7 @@ class DraftClaimFormMapperTest {
                              .build())
             .build();
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getClaimant().name()).isEqualTo(caseData.getApplicant1().getPartyName());
         assertThat(form.getDefendant().name()).isEqualTo(caseData.getRespondent1().getPartyName());
@@ -136,7 +136,7 @@ class DraftClaimFormMapperTest {
                              .build())
             .build();
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getClaimant().name()).isEqualTo(COMPANY);
         assertThat(form.getDefendant().name()).isEqualTo(COMPANY);
@@ -161,7 +161,7 @@ class DraftClaimFormMapperTest {
                              .build())
             .build();
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getClaimant().name()).isEqualTo(ORGANISATION);
         assertThat(form.getDefendant().name()).isEqualTo(ORGANISATION);
@@ -172,7 +172,7 @@ class DraftClaimFormMapperTest {
         //Given
         given(interestCalculator.calculateInterest(CASE_DATA)).willReturn(INTEREST);
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getInterestAmount()).isEqualTo(INTEREST.toString());
         assertThat(form.getTotalInterestAmount()).isEqualTo(INTEREST.toString());
@@ -183,7 +183,7 @@ class DraftClaimFormMapperTest {
         //Given
         given(interestCalculator.calculateInterest(CASE_DATA)).willReturn(null);
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getInterestAmount()).isNull();
         assertThat(form.getTotalInterestAmount()).isNull();
@@ -196,7 +196,7 @@ class DraftClaimFormMapperTest {
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
             .build();
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getHowTheInterestWasCalculated())
             .isEqualTo(InterestClaimOptions.SAME_RATE_INTEREST.getDescription());
@@ -205,7 +205,7 @@ class DraftClaimFormMapperTest {
     @Test
     void shouldReturnNullForHowInterestWasCalculated_whenInterestOptionIsNull() {
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getHowTheInterestWasCalculated()).isNull();
     }
@@ -218,7 +218,7 @@ class DraftClaimFormMapperTest {
                                            .differentRate(INTEREST).build())
             .build();
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getInterestRate()).isEqualTo(INTEREST.toString());
     }
@@ -230,7 +230,7 @@ class DraftClaimFormMapperTest {
             .sameRateInterestSelection(SameRateInterestSelection.builder().build())
             .build();
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getInterestRate()).isEqualTo(STANDARD_INTEREST_RATE);
     }
@@ -238,7 +238,7 @@ class DraftClaimFormMapperTest {
     @Test
     void shouldReturnNull_whenSameInterestSelectionIsNull() {
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getInterestRate()).isNull();
     }
@@ -253,9 +253,9 @@ class DraftClaimFormMapperTest {
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
 
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
-        assertThat(form.getInterestExplanationText()).isEqualTo(DraftClaimFormMapper.EXPLANATION_OF_INTEREST_RATE);
+        assertThat(form.getInterestExplanationText()).isEqualTo(ClaimFormMapper.EXPLANATION_OF_INTEREST_RATE);
     }
 
     @Test
@@ -268,7 +268,7 @@ class DraftClaimFormMapperTest {
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getInterestExplanationText()).isEqualTo(DIFFERENT_RATE_EXPLANATION);
     }
@@ -276,7 +276,7 @@ class DraftClaimFormMapperTest {
     @Test
     void shouldReturnNullForInterestExplanation_whenNoInterestRateSelection() {
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getInterestExplanationText()).isNull();
     }
@@ -289,7 +289,7 @@ class DraftClaimFormMapperTest {
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getInterestFromDate()).isEqualTo(INTEREST_FROM_SPECIFIC_DATE);
     }
@@ -302,7 +302,7 @@ class DraftClaimFormMapperTest {
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getInterestFromDate()).isEqualTo(SUBMITTED_DATE.toLocalDate());
     }
@@ -310,7 +310,7 @@ class DraftClaimFormMapperTest {
     @Test
     void shouldReturnNullForInterestFromDate_whenSubmittedDateIsNull() {
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getInterestFromDate()).isNull();
     }
@@ -318,7 +318,7 @@ class DraftClaimFormMapperTest {
     @Test
     void shouldReturnNullForWhenAreYouPlanningInterestFrom_whenInterestFromIsNull() {
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getWhenAreYouClaimingInterestFrom()).isNull();
     }
@@ -332,10 +332,10 @@ class DraftClaimFormMapperTest {
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getWhenAreYouClaimingInterestFrom())
-            .isEqualTo(DraftClaimFormMapper.INTEREST_START_FROM_CLAIM_ISSUED_DATE);
+            .isEqualTo(ClaimFormMapper.INTEREST_START_FROM_CLAIM_ISSUED_DATE);
     }
 
     @Test
@@ -348,7 +348,7 @@ class DraftClaimFormMapperTest {
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getWhenAreYouClaimingInterestFrom())
             .isEqualTo(caseData.getInterestFromSpecificDateDescription());
@@ -362,7 +362,7 @@ class DraftClaimFormMapperTest {
                 IdamUserDetails.builder().email(EMAIL).build()
             ).totalClaimAmount(null).build();
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getTotalClaimAmount()).isEqualTo("0");
     }
@@ -370,7 +370,7 @@ class DraftClaimFormMapperTest {
     @Test
     void shouldReturnTotalClaimAmount_whenTotalClaimAmountExists() {
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getTotalClaimAmount()).isEqualTo(TOTAL_CLAIM_AMOUNT.toString());
     }
@@ -384,7 +384,7 @@ class DraftClaimFormMapperTest {
             .build();
         given(interestCalculator.calculateInterest(caseData)).willReturn(INTEREST);
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getTotalAmountOfClaim())
             .isEqualTo(INTEREST.add(TOTAL_CLAIM_AMOUNT).add(MonetaryConversions.penniesToPounds(CLAIM_FEE)).toString());
@@ -398,7 +398,7 @@ class DraftClaimFormMapperTest {
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getInterestEndDate()).isNotNull();
     }
@@ -411,7 +411,7 @@ class DraftClaimFormMapperTest {
             .breakDownInterestDescription(DIFFERENT_RATE_EXPLANATION)
             .build();
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getInterestEndDate()).isNull();
     }
@@ -426,7 +426,7 @@ class DraftClaimFormMapperTest {
 
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(caseData);
+        ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then
         assertThat(form.getInterestEndDateDescription()).isEqualTo(DIFFERENT_RATE_EXPLANATION);
     }
@@ -434,13 +434,31 @@ class DraftClaimFormMapperTest {
     @Test
     void shouldReturnNullForInterestEndDateDescription_whenBreakDownInterestDescriptionIsNull() {
         //When
-        DraftClaimForm form = draftClaimFormMapper.toDraftClaimForm(CASE_DATA);
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
         assertThat(form.getInterestEndDateDescription()).isNull();
     }
 
+    @Test
+    void shouldMapIssueDate() {
+        //When
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
+        //Then
+        assertThat(form.getClaimIssuedDate()).isEqualTo(LocalDate.now());
+    }
+
+    @Test
+    void shouldMapClaimNumber() {
+        //When
+        ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
+        //Then
+        assertThat(form.getClaimNumber()).isEqualTo("000MC038");
+    }
+
+
     private static CaseData getCaseData() {
         CaseData caseData = CaseData.builder()
+            .legacyCaseReference("000MC038")
             .applicant1(Party.builder()
                             .companyName(ORGANISATION)
                             .partyEmail(EMAIL)
@@ -460,6 +478,7 @@ class DraftClaimFormMapperTest {
                                                                        .builder()
                                                                        .build())
                              .build())
+            .issueDate(LocalDate.now())
             .build();
         return caseData;
     }
