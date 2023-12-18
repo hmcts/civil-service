@@ -252,6 +252,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final ResponseDocument respondentSharedClaimResponseDocument;
     private final CaseDocument respondent1GeneratedResponseDocument;
     private final CaseDocument respondent2GeneratedResponseDocument;
+    private final LocalDate claimMovedToMediationOn;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defendantResponseDocuments = new ArrayList<>();
@@ -1160,8 +1161,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean hasApplicant1AcceptedCcj() {
         return Optional.ofNullable(getCaseDataLiP())
-                .map(CaseDataLiP::getApplicant1LiPResponse)
-                .filter(ClaimantLiPResponse::hasApplicant1AcceptedCcj).isPresent();
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasApplicant1RequestedCcj).isPresent();
     }
 
 }
