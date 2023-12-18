@@ -205,7 +205,7 @@ public class HearingScheduledHandler extends CallbackHandler {
             } else {
                 caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
             }
-            // If hearing notice type is OTHER and is first time being listed, do not calculate fee and fee due date
+            // If hearing notice type is OTHER and is being listed, do not calculate fee and fee due date
             // If relisted, again do not calculate fee and fee due date, but move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
         } else {
             if (ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) {
