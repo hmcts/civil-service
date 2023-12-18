@@ -131,4 +131,8 @@ public class DeadlinesCalculator {
         dateTime = dateTime.plusDays(daysToAdd);
         return dateTime.toLocalDate();
     }
+
+    public LocalDateTime getRespondToSettlementAgreementDeadline(LocalDateTime fromDateTime) {
+        return plusWorkingDays(fromDateTime.toLocalDate(), 7).atTime(END_OF_BUSINESS_DAY);
+    }
 }
