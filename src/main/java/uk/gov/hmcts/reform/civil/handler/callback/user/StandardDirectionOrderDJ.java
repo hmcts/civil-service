@@ -666,8 +666,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.hearingNotes(getHearingNotes(caseData));
 
         if (featureToggleService.isEarlyAdoptersEnabled()) {
-            if (featureToggleService.isLocationWhiteListedForCaseProgression(
-                getEpimmsId(caseData))) {
+            // check epimm from judge selected court in SDO journey
+            if (featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
+                // check epimm from case management location
+                && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 caseDataBuilder.eaCourtLocation(YesOrNo.YES);
             } else {
