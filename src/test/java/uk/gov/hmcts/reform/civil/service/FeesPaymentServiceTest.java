@@ -280,10 +280,10 @@ class FeesPaymentServiceTest {
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {
         return PaymentDto.builder()
             .externalReference("lbh2ogknloh9p3b4lchngdfg63")
-            .paymentReference("RC-1701-0909-0602-0418")
+            .reference("RC-1701-0909-0602-0418")
             .status(status)
+            .amount(new BigDecimal(200))
             .currency("GBP")
-            .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"))
             .statusHistories(getStatusHistories(status))
             .build();
     }
@@ -292,8 +292,8 @@ class FeesPaymentServiceTest {
 
         StatusHistoryDto initiatedHistory = StatusHistoryDto.builder().status("Initiated").build();
         StatusHistoryDto failedHistory = StatusHistoryDto.builder().status("Failed")
-            .errorCode("CA-E0001")
-            .errorMessage("Payment request failed. PBA account accountName have insufficient funds available").build();
+            .errorCode("P0030")
+            .errorMessage("Payment was cancelled by the user").build();
         List<StatusHistoryDto> histories = new ArrayList<>();
         histories.add(initiatedHistory);
         if (status.equals("Failed")) {
@@ -309,13 +309,14 @@ class FeesPaymentServiceTest {
         CardPaymentStatusResponse.CardPaymentStatusResponseBuilder payment
             = CardPaymentStatusResponse.builder()
             .paymentReference("RC-1701-0909-0602-0418")
-            .externalReference("lbh2ogknloh9p3b4lchngdfg63")
             .status(status)
-            .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"));
+            .paymentAmount(new BigDecimal(200))
+            .paymentFor("hearing")
+            .status(status);
 
         if (status.equals("Failed")) {
-            payment.errorCode("CA-E0001")
-                .errorDescription("Payment request failed. PBA account accountName have insufficient funds available");
+            payment.errorCode("P0030")
+                .errorDescription("Payment was cancelled by the user");
         }
 
         return payment.build();
