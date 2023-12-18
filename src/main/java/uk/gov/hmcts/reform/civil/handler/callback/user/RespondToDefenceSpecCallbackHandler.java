@@ -375,6 +375,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
+        if (V_2.equals(callbackParams.getVersion())
+            && featureToggleService.isPinInPostEnabled()
+            && isOneVOne(caseData)
+            && caseData.hasClaimantAgreedToFreeMediation()) {
+            builder.claimMovedToMediationOn(LocalDate.now());
+        }
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
