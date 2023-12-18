@@ -97,7 +97,7 @@ public class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCall
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-        assertThat(handler.camundaActivityId(params)).isEqualTo("Generate_Settlement_Agreement");
+        assertThat(handler.camundaActivityId(params)).isEqualTo("GenerateSignSettlementAgreement");
     }
 
     @Test
