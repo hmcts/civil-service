@@ -520,7 +520,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .code("00002").label("court 2 - 2 address - Y02 7RB").build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
             .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
             .fastTrackMethodInPerson(options)
@@ -564,7 +564,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .code("00002").label("court 2 - 2 address - Y02 7RB").build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .disposalHearingMethod(DisposalHearingMethod.disposalHearingMethodInPerson)
             .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
             .fastTrackMethodInPerson(options)
@@ -609,7 +609,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .code("00002").label("court 2 - 2 address - Y02 7RB").build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .disposalHearingMethodInPerson(options)
             .fastTrackMethodInPerson(options)
@@ -652,7 +652,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .code("00002").label("court 2 - 2 address - Y02 7RB").build();
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000").build())
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
             .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson)
             .smallClaimsMethodInPerson(options)
             .fastTrackMethodInPerson(options.toBuilder().value(selectedCourt).build())
