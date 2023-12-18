@@ -363,7 +363,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            assertThat(response.getData()).extracting("claimMovedToMediationOn").isNotNull();
             assertThat(response.getState()).isEqualTo(CaseState.IN_MEDIATION.name());
         }
 
