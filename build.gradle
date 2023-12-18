@@ -9,7 +9,7 @@ plugins {
   id 'org.sonarqube' version '3.4.0.2513'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "6.6.3"
-  id "org.flywaydb.flyway" version "9.21.0"
+  id "org.flywaydb.flyway" version "10.3.0"
 }
 
 group = 'uk.gov.hmcts.reform'
