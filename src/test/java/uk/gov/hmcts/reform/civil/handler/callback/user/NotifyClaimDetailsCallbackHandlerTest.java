@@ -216,6 +216,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(localDateTime)).thenReturn(newDate);
             when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(6, localDateTime.toLocalDate()))
                 .thenReturn(sixMonthDate);
+            when(workingDayIndicator.isWeekend(any(LocalDate.class))).thenReturn(true);
+            when(deadlinesCalculator.plusWorkingDays(localDateTime.toLocalDate(), 2))
+                .thenReturn(LocalDate.of(2023, 10, 16));
         }
 
         @Test
@@ -285,9 +288,16 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateCertificateOfService_and_documents_cos2_whenSubmitted() {
             LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemedDate = localDateTime.minusDays(2).toLocalDate();
+            LocalDate currentDate = LocalDate.now();
+
+            when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
+                .thenReturn(LocalDate.now().plusDays(2));
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedDate.atTime(15, 05)))
+                .thenReturn(newDate.minusDays(2));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
 
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -536,10 +546,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class MidEventValidateCos {
         public static final String DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS =
-            "Date of service must be no greater than 2 working days in the future";
+            "The date of service must be no greater than 2 working days in the future";
 
         public static final String DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS =
-            "Date of service must be no greater than 2 working days in the future";
+            "The date of service must be no greater than 2 working days in the future";
 
         public static final String DATE_OF_SERVICE_DATE_IS_WORKING_DAY =
             "For the date of service please enter a working day";
