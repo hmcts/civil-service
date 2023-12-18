@@ -138,6 +138,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
@@ -215,6 +216,7 @@ public class CaseDataBuilder {
     protected Party applicant2;
     protected YesOrNo applicant1Represented;
     protected YesOrNo applicant1LitigationFriendRequired;
+    protected YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
     protected YesOrNo applicant2LitigationFriendRequired;
     protected Party respondent1;
     protected Party respondent2;
@@ -508,11 +510,17 @@ public class CaseDataBuilder {
 
     private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
-
+    private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
+    private ReasonForReconsideration reasonForReconsideration;
     private YesOrNo responseClaimExpertSpecRequired;
     private YesOrNo responseClaimExpertSpecRequired2;
     private YesOrNo applicantMPClaimExpertSpecRequired;
     private YesOrNo applicant1ClaimExpertSpecRequired;
+
+    public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
+        this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
+        return this;
+    }
 
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
@@ -4210,6 +4218,7 @@ public class CaseDataBuilder {
         atStateHearingFeeDuePaid().setClaimTypeToSpecClaim();
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         if (!hasEmailAddress) {
+            applicant1 = applicant1.toBuilder().partyEmail(null).build();
             respondent1 = respondent1.toBuilder().partyEmail("").build();
             respondent2 = respondent2.toBuilder().partyEmail("").build();
         }
@@ -5292,6 +5301,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder reasonForReconsideration(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsideration = reasonForReconsideration;
+        return this;
+    }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -6250,6 +6264,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePriorToRespondToSettlementAgreementDeadline() {
+        this.respondent1RespondToSettlementAgreementDeadline = LocalDateTime.now().plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStatePastRespondToSettlementAgreementDeadline() {
+        this.respondent1RespondToSettlementAgreementDeadline = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder addApplicantLRIndividual(String firstName, String lastName) {
         List<Element<PartyFlagStructure>> individual =
             wrapElements(PartyFlagStructure.builder()
@@ -6468,6 +6492,7 @@ public class CaseDataBuilder {
             .respondent1LitigationFriend(respondent1LitigationFriend)
             .applicant1LitigationFriend(applicant1LitigationFriend)
             .applicant1LitigationFriendRequired(applicant1LitigationFriendRequired)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(applicant1AcceptFullAdmitPaymentPlanSpec)
             .applicant2LitigationFriend(applicant2LitigationFriend)
             .applicant2LitigationFriendRequired(applicant2LitigationFriendRequired)
             .respondent1LitigationFriendDate(respondent1LitigationFriendDate)
@@ -6654,6 +6679,7 @@ public class CaseDataBuilder {
             .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
             .transferCourtLocationList(transferCourtLocationList)
             .reasonForTransfer(reasonForTransfer)
+            .respondent1RespondToSettlementAgreementDeadline(respondent1RespondToSettlementAgreementDeadline)
             .applicant1LRIndividuals(applicant1LRIndividuals)
             .respondent1LRIndividuals(respondent1LRIndividuals)
             .respondent2LRIndividuals(respondent2LRIndividuals)
@@ -6667,6 +6693,7 @@ public class CaseDataBuilder {
             .applicant1ClaimExpertSpecRequired(applicant1ClaimExpertSpecRequired)
             .applicantMPClaimExpertSpecRequired(applicantMPClaimExpertSpecRequired)
             .isFlightDelayClaim(isFlightDelayClaim)
+            .reasonForReconsideration(reasonForReconsideration)
             .build();
     }
 }
