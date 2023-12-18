@@ -109,6 +109,11 @@ public class Party {
     }
 
     @JsonIgnore
+    public boolean isIndividualORSoleTrader() {
+        return this.isIndividual() || this.isSoleTrader();
+    }
+
+    @JsonIgnore
     public LocalDate getDateOfBirth() {
         return Optional.ofNullable(individualDateOfBirth).orElse(soleTraderDateOfBirth);
     }
