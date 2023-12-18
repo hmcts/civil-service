@@ -137,8 +137,6 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         LocalDate notificationDate = notificationDateTime.toLocalDate();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        log.info("MultipartyScenario: {}", multiPartyScenario);
-
         caseData = saveCoSDetailsDoc(caseData, 1);
         caseData = saveCoSDetailsDoc(caseData, 2);
 
@@ -207,22 +205,23 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private LocalDateTime getEarliestDateOfService(CaseData caseData) {
-        LocalDateTime date1 = null;
-        LocalDateTime date2 = null;
+        LocalDateTime date = time.now();
 
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
             && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant())) {
-            date1 = caseData.getCosNotifyClaimDetails1()
-                .getCosDateDeemedServedForDefendant().atTime(LocalDateTime.now().toLocalTime());
+            LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
+                .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
+            date = getEarliestDate(date, cosDate1);
         }
 
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
             && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant())) {
-            date2 = caseData.getCosNotifyClaimDetails2()
-                .getCosDateDeemedServedForDefendant().atTime(LocalDateTime.now().toLocalTime());
+            LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
+                .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
+            date = getEarliestDate(date, cosDate2);
         }
 
-        return getEarliestDate(date1, date2);
+        return date;
     }
 
     private LocalDateTime getEarliestDate(LocalDateTime date1, LocalDateTime date2) {

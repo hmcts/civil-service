@@ -267,11 +267,14 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedDate.atTime(15, 05)))
+                .thenReturn(newDate.minusDays(2));
 
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
                     .setCoSClaimDetailsWithDate(true, false, cosDate, deemedDate, null,  null, true, false)
                     .build();
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
