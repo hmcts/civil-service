@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import java.util.List;
@@ -808,6 +809,42 @@ public class CaseDataTest {
             assertTrue(isRespondentSignSettlementAgreement);
         }
 
+        @Test
+        void shouldReturnTrueWhenWillThisAmountBePaidIsAfterCurrentDate() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(LocalDate.now().plusDays(1)).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnTrueWhenFirstRepaymentDateIsAfterCurrentDate() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                              .firstRepaymentDate(LocalDate.now().plusDays(1)).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnTrueWhenBothDatesAreNull() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
     }
 }
 
