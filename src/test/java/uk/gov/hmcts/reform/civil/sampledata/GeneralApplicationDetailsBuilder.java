@@ -57,7 +57,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements.OT
 import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -1604,7 +1604,7 @@ public class GeneralApplicationDetailsBuilder {
                                 .organisationID(STRING_CONSTANT).build())
                         .orgPolicyReference(STRING_CONSTANT).build())
                 .generalAppType(GAApplicationType.builder()
-                        .types(singletonList(VARY_JUDGEMENT))
+                        .types(singletonList(VARY_PAYMENT_TERMS_OF_JUDGMENT))
                         .build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                         .hasAgreed(YES)

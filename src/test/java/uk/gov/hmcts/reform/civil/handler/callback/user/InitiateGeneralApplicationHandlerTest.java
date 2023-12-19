@@ -65,7 +65,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SETTLE_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
@@ -241,7 +241,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenGaTypeIsVaryJudgement() {
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
 
@@ -257,7 +257,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenGaTypeIsMultipleTypeWithVaryJudgement() {
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
 
@@ -300,7 +300,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldThrowErrorsWhenHearingDateIsPast() {
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                 .builder()
                 .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledPreferenceYesNo(YES)
@@ -319,7 +319,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenHearingDateIsPresent() {
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_PAYMENT_TERMS_OF_JUDGMENT);
 
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -337,7 +337,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenHearingDateIsFuture() {
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_PAYMENT_TERMS_OF_JUDGMENT);
 
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -736,7 +736,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee275)
                             .version(FEE_VERSION).build());
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                     .builder().generalAppType(GAApplicationType.builder().types(types).build())
                     .build()
@@ -923,7 +923,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldWithNotice_whenVaryApplicationIsUnConsented() {
             GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().fee(feeFromFeeService).build();
 
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                     .builder().generalAppType(GAApplicationType.builder().types(types).build())
                     .build()
