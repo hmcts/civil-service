@@ -16,9 +16,11 @@ public enum AllocatedTrack {
                 case PERSONAL_INJURY:
                     if (personalInjuryType != null && personalInjuryType.equals(NOISE_INDUCED_HEARING_LOSS)) {
                         return FAST_CLAIM;
+                    } else {
+                        return getAllocatedTrackForOtherPersonalInjuryAndClinicalNegligence(statementOfValueInPounds);
                     }
                 case CLINICAL_NEGLIGENCE:
-                    return getAllocatedTrackForClinicalNegligence(statementOfValueInPounds);
+                    return getAllocatedTrackForOtherPersonalInjuryAndClinicalNegligence(statementOfValueInPounds);
                 default:
                     return getAllocatedTrackForUnSpecDefault(statementOfValueInPounds);
             }
@@ -33,7 +35,7 @@ public enum AllocatedTrack {
         }
     }
 
-    private static AllocatedTrack getAllocatedTrackForClinicalNegligence(BigDecimal statementOfValueInPounds) {
+    private static AllocatedTrack getAllocatedTrackForOtherPersonalInjuryAndClinicalNegligence(BigDecimal statementOfValueInPounds) {
         if (isValueSmallerThanOrEqualTo(statementOfValueInPounds, 1000)) {
             return SMALL_CLAIM;
         } else if (isBigDecimalValueWithinRange(statementOfValueInPounds, BigDecimal.valueOf(1000.01),
