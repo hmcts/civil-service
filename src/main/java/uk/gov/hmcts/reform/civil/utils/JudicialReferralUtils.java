@@ -40,7 +40,7 @@ public class JudicialReferralUtils {
                         ? caseData.getClaimValue().toPounds()
                         : caseData.getTotalClaimAmount(),
                     caseData.getClaimType(),
-                    caseData
+                    caseData.getPersonalInjuryType()
                 );
             if (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack)) {
                 return false;

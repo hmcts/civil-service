@@ -222,7 +222,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         if (caseData.getClaimType() == null) {
             caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getTotalClaimAmount(), null, null).name());
         } else {
-            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType(), caseData).name());
+            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType(), caseData.getPersonalInjuryType()).name());
         }
         caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
         // was unable to null value properly in EvidenceUploadNotificationEventHandler after emails are sent,

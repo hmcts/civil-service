@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.enums;
 
-import uk.gov.hmcts.reform.civil.model.CaseData;
-
 import java.math.BigDecimal;
 
 import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.NOISE_INDUCED_HEARING_LOSS;
@@ -11,31 +9,18 @@ public enum AllocatedTrack {
     FAST_CLAIM,
     MULTI_CLAIM;
 
-    public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType, CaseData caseData) {
-        if (claimType != null) {
-            if (claimType == ClaimType.PERSONAL_INJURY || claimType == ClaimType.CLINICAL_NEGLIGENCE) {
-                if (caseData != null && caseData.getPersonalInjuryType() != null
-                    && (caseData.getPersonalInjuryType().equals(NOISE_INDUCED_HEARING_LOSS))) {
-                    return FAST_CLAIM;
-                }
-                if (isValueSmallerThanOrEqualTo(statementOfValueInPounds, 1000)) {
-                    return SMALL_CLAIM;
-                } else if (isBigDecimalValueWithinRange(statementOfValueInPounds, BigDecimal.valueOf(1000.01),
-                        BigDecimal.valueOf(25000)
-                )) {
-                    return FAST_CLAIM;
-                } else {
-                    return MULTI_CLAIM;
-                }
-            }
-            if (isValueSmallerThanOrEqualTo(statementOfValueInPounds, 10000)) {
-                return SMALL_CLAIM;
-            } else if (isBigDecimalValueWithinRange(statementOfValueInPounds, BigDecimal.valueOf(10000.01),
-                    BigDecimal.valueOf(25000)
-            )) {
-                return FAST_CLAIM;
-            } else {
-                return MULTI_CLAIM;
+    public static AllocatedTrack getAllocatedTrack(BigDecimal statementOfValueInPounds, ClaimType claimType, PersonalInjuryType personalInjuryType) {
+        //The FLIGHT_DELAY ClaimType is only applicable for SPEC cases at the moment.
+        if (claimType != null && claimType != ClaimType.FLIGHT_DELAY) {
+            switch (claimType) {
+                case PERSONAL_INJURY:
+                    if (personalInjuryType != null && personalInjuryType.equals(NOISE_INDUCED_HEARING_LOSS)) {
+                        return FAST_CLAIM;
+                    }
+                case CLINICAL_NEGLIGENCE:
+                    return getAllocatedTrackForClinicalNegligence(statementOfValueInPounds);
+                default:
+                    return getAllocatedTrackForUnSpecDefault(statementOfValueInPounds);
             }
         } else { //For Spec Claims
             if (isValueSmallerThan(statementOfValueInPounds, 10000)) {
@@ -45,6 +30,30 @@ public enum AllocatedTrack {
             } else {
                 return MULTI_CLAIM;
             }
+        }
+    }
+
+    private static AllocatedTrack getAllocatedTrackForClinicalNegligence(BigDecimal statementOfValueInPounds) {
+        if (isValueSmallerThanOrEqualTo(statementOfValueInPounds, 1000)) {
+            return SMALL_CLAIM;
+        } else if (isBigDecimalValueWithinRange(statementOfValueInPounds, BigDecimal.valueOf(1000.01),
+                                                BigDecimal.valueOf(25000)
+        )) {
+            return FAST_CLAIM;
+        } else {
+            return MULTI_CLAIM;
+        }
+    }
+
+    private static AllocatedTrack getAllocatedTrackForUnSpecDefault(BigDecimal statementOfValueInPounds) {
+        if (isValueSmallerThanOrEqualTo(statementOfValueInPounds, 10000)) {
+            return SMALL_CLAIM;
+        } else if (isBigDecimalValueWithinRange(statementOfValueInPounds, BigDecimal.valueOf(10000.01),
+                                                BigDecimal.valueOf(25000)
+        )) {
+            return FAST_CLAIM;
+        } else {
+            return MULTI_CLAIM;
         }
     }
 

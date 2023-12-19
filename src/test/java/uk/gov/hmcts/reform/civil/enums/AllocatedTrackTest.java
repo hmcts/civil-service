@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.enums;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.math.BigDecimal;
 
@@ -103,8 +102,8 @@ class AllocatedTrackTest {
             value = ClaimType.class,
             names = {"PERSONAL_INJURY"})
         void shouldReturnCorrectTrackForNoiseInducedHearingLossClaim(ClaimType claimType) {
-            CaseData caseData = CaseData.builder().personalInjuryType(PersonalInjuryType.NOISE_INDUCED_HEARING_LOSS).build();
-            assertThat(getAllocatedTrack(null, claimType, caseData)).isEqualTo(FAST_CLAIM);
+            assertThat(getAllocatedTrack(null, claimType, PersonalInjuryType.NOISE_INDUCED_HEARING_LOSS))
+                .isEqualTo(FAST_CLAIM);
         }
     }
 
@@ -185,6 +184,14 @@ class AllocatedTrackTest {
         void shouldReturnCorrectTrackForEmailMultiClaim(ClaimType claimType) {
             assertThat(toStringValueForEmail(getAllocatedTrack(BigDecimal.valueOf(25001), claimType, null)))
                 .isEqualTo("Multi Track");
+        }
+
+        @ParameterizedTest(name = "{0} has small track when Flight Delay type is less than 1000")
+        @EnumSource(
+            value = ClaimType.class,
+            names = {"FLIGHT_DELAY"})
+        void shouldReturnCorrectTrackForFlightDelayClaim(ClaimType claimType) {
+            assertThat(getAllocatedTrack(BigDecimal.valueOf(9999), claimType, null)).isEqualTo(SMALL_CLAIM);
         }
     }
 }
