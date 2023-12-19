@@ -1431,13 +1431,15 @@ public class FlowStateAllowedEventService {
         entry(
             PART_ADMIT_AGREE_REPAYMENT.fullName(),
             List.of(
-                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC
             )
         ),
         entry(
             FULL_ADMIT_AGREE_REPAYMENT.fullName(),
             List.of(
-                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC
             )
         )
     );
