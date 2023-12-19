@@ -160,7 +160,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
             List<LocationRefData> locations = (locationRefDataService
-                .getCourtLocationsForDefaultJudgments(authToken));
+                .getHearingCourtLocations(authToken));
             caseDataBuilder = populateFields(caseDataBuilder, locations, caseData, authToken);
         } else {
             caseDataBuilder = populateFreeFormFields(caseDataBuilder);

@@ -21,10 +21,13 @@ import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import java.util.List;
 
+import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -41,6 +44,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 public class CaseDataTest {
+
+    private static final BigDecimal CLAIM_FEE = new BigDecimal(2000);
 
     private static final String FILE_NAME_1 = "Some file 1";
 
@@ -673,6 +678,92 @@ public class CaseDataTest {
 
     }
 
+    @Test
+    void shouldReturnTrueWhenRespondentSignSettlementAgreementIsNotNull() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+                .caseDataLip(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO).build())
+                .build();
+
+        //When
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentRespondedToSettlementAgreement();
+
+        //Then
+        assertTrue(isRespondentSignSettlementAgreement);
+    }
+
+    @Test
+    void shouldReturnFalseWhenRespondentSignSettlementAgreementIsNull() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+                .caseDataLip(CaseDataLiP.builder().build())
+                .build();
+
+        //When
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentRespondedToSettlementAgreement();
+
+        //Then
+        assertFalse(isRespondentSignSettlementAgreement);
+    }
+
+    @Test
+    void isSignSettlementAgreementDeadlineNotExpired_thenFalse() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStatePriorToRespondToSettlementAgreementDeadline().build();
+        //When
+        //Then
+        assertThat(caseData.isSettlementAgreementDeadlineExpired()).isFalse();
+    }
+
+    @Test
+    void isSignSettlementAgreementDeadlineExpired_thenTrue() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStatePastRespondToSettlementAgreementDeadline().build();
+        //When
+        //Then
+        assertThat(caseData.isSettlementAgreementDeadlineExpired()).isTrue();
+    }
+
+    void shouldReturnClaimFeeInPence_whenClaimFeeExists() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE).build())
+            .build();
+        //When
+        BigDecimal fee = caseData.getCalculatedClaimFeeInPence();
+        //Then
+        assertThat(fee).isEqualTo(CLAIM_FEE);
+    }
+
+    @Test
+    void shouldReturnClaimAmountBreakupDetails_whenExists() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .claimAmountBreakup(List.of(ClaimAmountBreakup.builder()
+                                            .id("1").value(ClaimAmountBreakupDetails.builder()
+                                                               .claimAmount(new BigDecimal("122"))
+                                                               .claimReason("Reason")
+                                                               .build())
+                                            .build()))
+            .build();
+        //When
+        List<ClaimAmountBreakupDetails> result = caseData.getClaimAmountBreakupDetails();
+        //Then
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    void shouldReturnZero_whenClaimFeeIsNull() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        BigDecimal fee = caseData.getCalculatedClaimFeeInPence();
+        //Then
+        assertThat(fee).isEqualTo(ZERO);
+    }
+
     @Nested
     class GetHearingLocationText {
 
@@ -712,25 +803,47 @@ public class CaseDataTest {
                     .build();
 
             //When
-            boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
+            boolean isRespondentSignSettlementAgreement = caseData.isRespondentRespondedToSettlementAgreement();
 
             //Then
             assertTrue(isRespondentSignSettlementAgreement);
         }
 
         @Test
-        void shouldReturnFalseWhenRespondentSignSettlementAgreementIsNull() {
-
+        void shouldReturnTrueWhenWillThisAmountBePaidIsAfterCurrentDate() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder()
-                    .caseDataLip(CaseDataLiP.builder().build())
-                    .build();
-
+            CaseData caseData = CaseData.builder()
+                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                                   .whenWillThisAmountBePaid(LocalDate.now().plusDays(1)).build())
+                .build();
             //When
-            boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
-
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
             //Then
-            assertFalse(isRespondentSignSettlementAgreement);
+            assertTrue(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnTrueWhenFirstRepaymentDateIsAfterCurrentDate() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                              .firstRepaymentDate(LocalDate.now().plusDays(1)).build())
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
+        }
+
+        @Test
+        void shouldReturnTrueWhenBothDatesAreNull() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .build();
+            //When
+            boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
+            //Then
+            assertTrue(isJudgementDateNotPermitted);
         }
     }
 }
