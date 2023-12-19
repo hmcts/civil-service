@@ -552,7 +552,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             "The date of service must be no greater than 2 working days in the future";
 
         public static final String DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS =
-            "The date of service must be no greater than 2 working days in the future";
+            "The date of service should not be more than 14 days old";
 
         public static final String DATE_OF_SERVICE_DATE_IS_WORKING_DAY =
             "For the date of service please enter a working day";
@@ -630,8 +630,11 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate past = LocalDate.now().minusDays(15);
 
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
+                .thenReturn(LocalDate.now().plusDays(2));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(past.atTime(15, 05)))
                 .thenReturn(past.plusDays(14).atTime(16, 0));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_1Lr_1Lip()
@@ -640,7 +643,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(successResponse.getErrors().size()).isEqualTo(1);
+            assertThat(successResponse.getErrors().size()).isEqualTo(2);
             assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
         }
 
@@ -648,9 +651,12 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotPassValidateCertificateOfService_1Lr1Lip_whenServiceDateIsPast_deadlineTodayDate_After16hrs() {
             LocalDate past = LocalDate.now().minusDays(14);
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(16, 05));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any()))
+            when(time.now()).thenReturn(LocalDate.now().atTime(17, 05));
+            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
+                .thenReturn(LocalDate.now().plusDays(2));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(past.atTime(17, 05)))
                 .thenReturn(past.plusDays(14).atTime(16, 0));
+            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_1Lr_1Lip()
@@ -659,7 +665,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(successResponse.getErrors().size()).isEqualTo(1);
+            assertThat(successResponse.getErrors().size()).isEqualTo(2);
             assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
         }
 
@@ -755,7 +761,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
             when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
-                .thenReturn(LocalDate.of(2023, 10, 16));
+                .thenReturn(LocalDate.now().plusDays(2));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(currentDate.atTime(16, 0)))
                 .thenReturn(LocalDateTime.of(currentDate, LocalTime.of(16, 0)));
             when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedServedDate.atTime(16, 0)))

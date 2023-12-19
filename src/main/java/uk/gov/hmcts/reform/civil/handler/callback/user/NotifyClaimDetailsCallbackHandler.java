@@ -102,7 +102,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             "Supporting evidence is required";
 
     public static final String BOTH_CERTIFICATE_SERVED_SAME_DATE =
-        "Date of Service for both certificate must be the same";
+        "The date of Service for defendant 1 and defendant 2 must be the same";
 
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
@@ -375,12 +375,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             caseData.getCosNotifyClaimDetails1().setCosDocSaved(NO);
         }
 
-        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(
-            caseData.getCosNotifyClaimDetails1());
+        List<String> dateValidationErrorMessages = getServiceOfDateValidationMessages(caseData.getCosNotifyClaimDetails1());
+        errors.addAll(dateValidationErrorMessages);
 
-        if (!dateValidationErrorMessage.isEmpty()) {
-            errors.add(dateValidationErrorMessage);
-        }
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
                 && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails1())) {
             errors.add(DOC_SERVED_MANDATORY);
@@ -402,12 +399,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
             caseData.getCosNotifyClaimDetails2().setCosDocSaved(NO);
         }
-        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(
-            caseData.getCosNotifyClaimDetails2());
-
-        if (!dateValidationErrorMessage.isEmpty()) {
-            errors.add(dateValidationErrorMessage);
-        }
+        List<String> dateValidationErrorMessages = getServiceOfDateValidationMessages(caseData.getCosNotifyClaimDetails2());
+        errors.addAll(dateValidationErrorMessages);
 
         if (isBothDefendantLip(caseData) && !isBothDefendantWithSameDateOfService(caseData)) {
             errors.add(BOTH_CERTIFICATE_SERVED_SAME_DATE);
@@ -432,22 +425,32 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         return Objects.isNull(certificateOfService.getCosEvidenceDocument());
     }
 
-    private String getServiceOfDateValidationMessage(CertificateOfService certificateOfService) {
-        final String errorMessage = "";
+    private List<String> getServiceOfDateValidationMessages(CertificateOfService certificateOfService) {
+        List<String> errorMessages = new ArrayList<>();
+
         if (Objects.nonNull(certificateOfService)) {
             if (isCosDefendantNotifyDateFutureDate(certificateOfService.getCosDateOfServiceForDefendant())) {
-                return DOC_SERVED_DATE_IN_FUTURE;
-            } else if (isCosDefendantNotifyDateOlderThan14Days(certificateOfService.getCosDateOfServiceForDefendant())) {
-                return DOC_SERVED_DATE_OLDER_THAN_14DAYS;
-            } else if (isDeemedServedWithinMaxWorkingDays(certificateOfService.getCosDateDeemedServedForDefendant())) {
-                return DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS;
-            } else if (isDeemedServedDateIsNotWorkingDay(certificateOfService.getCosDateDeemedServedForDefendant())) {
-                return DATE_OF_SERVICE_DATE_IS_WORKING_DAY;
-            } else if (isDeemedServedDateOlderThan14Days(certificateOfService.getCosDateDeemedServedForDefendant())) {
-                return DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS;
+                errorMessages.add(DOC_SERVED_DATE_IN_FUTURE);
+            }
+
+            if (isCosDefendantNotifyDateOlderThan14Days(certificateOfService.getCosDateOfServiceForDefendant())) {
+                errorMessages.add(DOC_SERVED_DATE_OLDER_THAN_14DAYS);
+            }
+
+            if (isDeemedServedWithinMaxWorkingDays(certificateOfService.getCosDateDeemedServedForDefendant())) {
+                errorMessages.add(DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS);
+            }
+
+            if (isDeemedServedDateIsNotWorkingDay(certificateOfService.getCosDateDeemedServedForDefendant())) {
+                errorMessages.add(DATE_OF_SERVICE_DATE_IS_WORKING_DAY);
+            }
+
+            if (isDeemedServedDateOlderThan14Days(certificateOfService.getCosDateDeemedServedForDefendant())) {
+                errorMessages.add(DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS);
             }
         }
-        return errorMessage;
+
+        return errorMessages;
     }
 
     private boolean isCosDefendantNotifyDateFutureDate(LocalDate cosDateOfServiceForDefendant) {
