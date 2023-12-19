@@ -252,6 +252,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final ResponseDocument respondentSharedClaimResponseDocument;
     private final CaseDocument respondent1GeneratedResponseDocument;
     private final CaseDocument respondent2GeneratedResponseDocument;
+    private final LocalDate claimMovedToMediationOn;
 
     @Builder.Default
     private final List<Element<CaseDocument>> defendantResponseDocuments = new ArrayList<>();
@@ -461,6 +462,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
     private final LocalDateTime respondent2LitigationFriendDate;
+    private final LocalDateTime respondent1RespondToSettlementAgreementDeadline;
     private final String paymentTypePBA;
     private final String paymentTypePBASpec;
     private final String whenToBePaidText;
@@ -1127,6 +1129,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isRespondentRespondedToSettlementAgreement() {
+        return getCaseDataLiP() != null && getCaseDataLiP().getRespondentSignSettlementAgreement() != null;
+    }
+
+    @JsonIgnore
+    public boolean isRespondentSignedSettlementAgreement() {
+        return getCaseDataLiP() != null && YesOrNo.YES.equals(getCaseDataLiP().getRespondentSignSettlementAgreement());
+    }
+
+    @JsonIgnore
     public List<ClaimAmountBreakupDetails> getClaimAmountBreakupDetails() {
         return Optional.ofNullable(getClaimAmountBreakup())
             .map(Collection::stream)
@@ -1155,8 +1167,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isRespondentSignSettlementAgreement() {
-        return getCaseDataLiP() != null && getCaseDataLiP().getRespondentSignSettlementAgreement() != null;
+    public boolean isSettlementAgreementDeadlineExpired() {
+        return nonNull(respondent1RespondToSettlementAgreementDeadline)
+            && LocalDateTime.now().isAfter(respondent1RespondToSettlementAgreementDeadline);
     }
 
     @JsonIgnore
