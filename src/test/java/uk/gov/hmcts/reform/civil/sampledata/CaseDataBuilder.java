@@ -510,8 +510,8 @@ public class CaseDataBuilder {
 
     private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
+    private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
     private ReasonForReconsideration reasonForReconsideration;
-
     private YesOrNo responseClaimExpertSpecRequired;
     private YesOrNo responseClaimExpertSpecRequired2;
     private YesOrNo applicantMPClaimExpertSpecRequired;
@@ -6264,6 +6264,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePriorToRespondToSettlementAgreementDeadline() {
+        this.respondent1RespondToSettlementAgreementDeadline = LocalDateTime.now().plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStatePastRespondToSettlementAgreementDeadline() {
+        this.respondent1RespondToSettlementAgreementDeadline = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder addApplicantLRIndividual(String firstName, String lastName) {
         List<Element<PartyFlagStructure>> individual =
             wrapElements(PartyFlagStructure.builder()
@@ -6669,6 +6679,7 @@ public class CaseDataBuilder {
             .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
             .transferCourtLocationList(transferCourtLocationList)
             .reasonForTransfer(reasonForTransfer)
+            .respondent1RespondToSettlementAgreementDeadline(respondent1RespondToSettlementAgreementDeadline)
             .applicant1LRIndividuals(applicant1LRIndividuals)
             .respondent1LRIndividuals(respondent1LRIndividuals)
             .respondent2LRIndividuals(respondent2LRIndividuals)
