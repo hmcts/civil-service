@@ -186,7 +186,7 @@ class AllocatedTrackTest {
                 .isEqualTo("Multi Track");
         }
 
-        @ParameterizedTest(name = "{0} has small track when Flight Delay type is less than 1000")
+        @ParameterizedTest(name = "{0} has small track when Flight Delay type is less than 10000")
         @EnumSource(
             value = ClaimType.class,
             names = {"FLIGHT_DELAY"})
