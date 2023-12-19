@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.draft.ClaimFormGenerator;
 
 import java.util.List;
@@ -61,8 +60,8 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
 
         CaseData updatedCaseData = updateCaseData(caseData, caseDocument, caseEvent);
         return AboutToStartOrSubmitCallbackResponse.builder()
-                .data(updatedCaseData.toMap(objectMapper))
-                .build();
+            .data(updatedCaseData.toMap(objectMapper))
+            .build();
     }
 
     private CaseData updateCaseData(CaseData caseData, CaseDocument caseDocument, CaseEvent caseEvent) {
@@ -89,6 +88,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
         // Remove Draft form from claimant documents
         claimantDocuments = claimantDocuments.stream().filter(claimDoc -> claimDoc.getValue().getDocumentType() != DocumentType.DRAFT_CLAIM_FORM)
             .collect(Collectors.toList());
+
         claimantDocuments.add(element(caseDocument));
 
         return caseData.toBuilder()

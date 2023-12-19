@@ -455,7 +455,6 @@ class ClaimFormMapperTest {
         assertThat(form.getClaimNumber()).isEqualTo("000MC038");
     }
 
-
     private static CaseData getCaseData() {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("000MC038")

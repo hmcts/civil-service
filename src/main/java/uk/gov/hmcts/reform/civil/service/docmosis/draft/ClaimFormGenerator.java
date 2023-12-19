@@ -32,7 +32,7 @@ public class ClaimFormGenerator implements TemplateDataGenerator<ClaimForm> {
     private final DocumentGeneratorService documentGeneratorService;
 
     public CaseDocument generate(CaseData caseData, String authorisation, CaseEvent caseEvent) {
-       DocmosisTemplates docmosisTemplates = getDocmosisTemplate(caseEvent);
+        DocmosisTemplates docmosisTemplates = getDocmosisTemplate(caseEvent);
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             getTemplateData(caseData),
             docmosisTemplates
@@ -40,18 +40,23 @@ public class ClaimFormGenerator implements TemplateDataGenerator<ClaimForm> {
 
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(String.format(docmosisTemplates.getDocumentTitle(), caseData.getLegacyCaseReference()),
-                    docmosisDocument.getBytes(),
-                    getDocumentType(caseEvent)
+            new PDF(
+                String.format(docmosisTemplates.getDocumentTitle(), caseData.getLegacyCaseReference()),
+                docmosisDocument.getBytes(),
+                getDocumentType(caseEvent)
             )
         );
     }
+
     private DocmosisTemplates getDocmosisTemplate(CaseEvent caseEvent) {
         return switch (caseEvent) {
             case GENERATE_DRAFT_FORM -> DRAFT_CLAIM_FORM;
             case GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC -> GENERATE_LIP_CLAIMANT_CLAIM_FORM;
             case GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC -> GENERATE_LIP_DEFENDANT_CLAIM_FORM;
-            default -> throw new IllegalArgumentException(String.format("No Docmosis Template available for %s event", caseEvent));
+            default -> throw new IllegalArgumentException(String.format(
+                "No Docmosis Template available for %s event",
+                caseEvent
+            ));
         };
     }
 
@@ -60,10 +65,10 @@ public class ClaimFormGenerator implements TemplateDataGenerator<ClaimForm> {
             case GENERATE_DRAFT_FORM -> DocumentType.DRAFT_CLAIM_FORM;
             case GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC -> CLAIMANT_CLAIM_FORM;
             case GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC -> SEALED_CLAIM;
-            default -> throw new IllegalArgumentException(String.format("No DocumentType available for %s event", caseEvent));
+            default ->
+                throw new IllegalArgumentException(String.format("No DocumentType available for %s event", caseEvent));
         };
     }
-
 
     @Override
     public ClaimForm getTemplateData(CaseData caseData) {

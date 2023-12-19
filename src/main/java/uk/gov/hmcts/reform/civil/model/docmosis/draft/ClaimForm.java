@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model.docmosis.draft;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -49,9 +48,8 @@ public class ClaimForm implements MappableObject {
     private final String interestAmount;
     private final String claimFee;
     private final String totalAmountOfClaim;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate generationDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy 'at' HH:mm a")
+    private final LocalDateTime generationDate;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMM yyyy")
     private final LocalDate claimIssuedDate;
 }

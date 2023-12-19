@@ -91,7 +91,6 @@ class ClaimFormGeneratorTest {
         assertThat(document.getDocumentType()).isEqualTo(DocumentType.CLAIMANT_CLAIM_FORM);
     }
 
-
     @Test
     void shouldGenerateDefendantClaimForm() {
         //Given

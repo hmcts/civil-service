@@ -79,7 +79,7 @@ public class ClaimFormMapper {
                 getCorrespondenceAddress(defendantDetails),
                 getContactPerson(defendantDetails)
             ))
-            .generationDate(LocalDate.now())
+            .generationDate(LocalDateTime.now())
             .claimIssuedDate(caseData.getIssueDate())
             .claimNumber(caseData.getLegacyCaseReference())
             .build();
