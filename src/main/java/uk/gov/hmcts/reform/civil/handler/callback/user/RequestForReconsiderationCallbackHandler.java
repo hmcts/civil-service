@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REQUEST_FOR_RECONSIDERATION);
     protected final ObjectMapper objectMapper;
+    private static final String ERROR_MESSAGE_14_DAYS_ELAPSED = "You can no longer request a reconsideration because the deadline has expired";
     private static final String CONFIRMATION_HEADER = "# Your request has been submitted";
     private static final String CONFIRMATION_BODY = "### What happens next \n" +
         "You should receive an update on your request for determination after 10 days, please monitor" +
@@ -36,9 +38,17 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_START), this::validateWithinAllowedPeriod)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::saveRequestForReconsiderationReason)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
+            .build();
+    }
+
+    private CallbackResponse validateWithinAllowedPeriod(CallbackParams callbackParams) {
+        List<String> errors = new ArrayList<>();
+        errors.add(ERROR_MESSAGE_14_DAYS_ELAPSED);
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors)
             .build();
     }
 
