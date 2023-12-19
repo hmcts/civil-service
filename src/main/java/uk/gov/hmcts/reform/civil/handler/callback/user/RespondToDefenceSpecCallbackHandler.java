@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenera
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -114,6 +115,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final PaymentDateService paymentDateService;
     private final ResponseOneVOneShowTagService responseOneVOneShowTagService;
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -264,6 +266,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        checkPartyAddress(caseData, callbackParams);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
@@ -375,6 +378,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
+        if (V_2.equals(callbackParams.getVersion())
+            && featureToggleService.isPinInPostEnabled()
+            && isOneVOne(caseData)
+            && caseData.hasClaimantAgreedToFreeMediation()) {
+            builder.claimMovedToMediationOn(LocalDate.now());
+        }
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
@@ -704,6 +713,36 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
+    private void checkPartyAddress(CaseData caseData, CallbackParams callbackParams) {
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        if (null != caseData.getApplicant1()
+            && null == caseData.getApplicant1().getPrimaryAddress()
+            && null != oldCaseData && null != oldCaseData.getApplicant1()
+            && null != oldCaseData.getApplicant1().getPrimaryAddress()) {
+            caseData.getApplicant1().setPrimaryAddress(oldCaseData.getApplicant1().getPrimaryAddress());
+        }
+        if (null != caseData.getRespondent1()
+            && null == caseData.getRespondent1().getPrimaryAddress()
+            && null != oldCaseData && null != oldCaseData.getRespondent1()
+            && null != oldCaseData.getRespondent1().getPrimaryAddress()) {
+            caseData.getRespondent1().setPrimaryAddress(oldCaseData.getRespondent1().getPrimaryAddress());
+        }
+        if (null != caseData.getApplicant2()
+            && null == caseData.getApplicant2().getPrimaryAddress()
+            && null != oldCaseData && null != oldCaseData.getApplicant2()
+            && null != oldCaseData.getApplicant2().getPrimaryAddress()) {
+            caseData.getApplicant2().setPrimaryAddress(oldCaseData.getApplicant2().getPrimaryAddress());
+        }
+        if (null != caseData.getRespondent2()
+            && null == caseData.getRespondent2().getPrimaryAddress()
+            && null != oldCaseData && null != oldCaseData.getRespondent2()
+            && null != oldCaseData.getRespondent2().getPrimaryAddress()) {
+            caseData.getRespondent2().setPrimaryAddress(oldCaseData.getRespondent2().getPrimaryAddress());
+        }
+
+    }
+        
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
         return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
             && caseData.getIsFlightDelayClaim().equals(YES)
