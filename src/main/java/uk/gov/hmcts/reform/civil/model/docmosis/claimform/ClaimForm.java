@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.docmosis.draft;
+package uk.gov.hmcts.reform.civil.model.docmosis.claimform;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

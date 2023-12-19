@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.draft;
+package uk.gov.hmcts.reform.civil.service.docmosis.claimform;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +13,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.draft.ClaimForm;
-import uk.gov.hmcts.reform.civil.model.docmosis.draft.ClaimFormMapper;
+import uk.gov.hmcts.reform.civil.model.docmosis.claimform.ClaimForm;
+import uk.gov.hmcts.reform.civil.model.docmosis.claimform.ClaimFormMapper;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 
 import static org.assertj.core.api.Assertions.assertThat;

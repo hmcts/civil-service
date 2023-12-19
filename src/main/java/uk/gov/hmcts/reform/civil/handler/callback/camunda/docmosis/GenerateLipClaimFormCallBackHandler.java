@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.docmosis.draft.ClaimFormGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
 
 import java.util.List;
 import java.util.Map;

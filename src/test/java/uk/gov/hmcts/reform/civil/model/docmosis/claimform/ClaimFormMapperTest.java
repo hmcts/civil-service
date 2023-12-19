@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.docmosis.draft;
+package uk.gov.hmcts.reform.civil.model.docmosis.claimform;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

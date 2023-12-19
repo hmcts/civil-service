@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.docmosis.draft.ClaimFormGenerator;
+import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
 
 import java.time.LocalDateTime;
 import java.util.Map;
