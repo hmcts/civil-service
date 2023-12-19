@@ -1767,7 +1767,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
             given(feesService.getFeeDataByTotalClaimAmount(any())).willReturn(feeData);
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1784,7 +1784,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1812,7 +1812,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1822,8 +1822,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().contains("12345");
             assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().doesNotContain("98765");
         }
-
-        //TODO implement tests for bulk claims that have interest added.
 
         @Test
         void shouldSetCaseCategoryToSpec_whenInvoked() {

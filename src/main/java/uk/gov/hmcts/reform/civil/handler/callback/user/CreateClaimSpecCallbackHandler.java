@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
+import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -543,9 +544,11 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
             List<Element<String>> stdRequestIdList = new ArrayList<>();
             stdRequestIdList.add(element(caseData.getSdtRequestIdFromSdt()));
             dataBuilder.sdtRequestId(stdRequestIdList);
-            //TODO implement bulk claims that have interest added.
-            BigDecimal interest = interestCalculator.calculateInterest(caseData);
-            dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(interest)));
+            BigDecimal bulkInterest = interestCalculator.calculateBulkInterest(caseData);
+            if (!bulkInterest.equals(BigDecimal.ZERO)) {
+                dataBuilder.interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST);
+            }
+            dataBuilder.claimFee(feesService.getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount().add(bulkInterest)));
             //PBA manual selection
             List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
             dataBuilder.applicantSolicitor1PbaAccounts(DynamicList.builder()
