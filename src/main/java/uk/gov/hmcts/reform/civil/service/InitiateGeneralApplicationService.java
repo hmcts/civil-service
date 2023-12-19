@@ -149,7 +149,7 @@ public class InitiateGeneralApplicationService {
 
         if (caseData.getGeneralAppRespondentAgreement() != null) {
             if (YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
-                    && !caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
+                    && !caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
 
                 GAStatementOfTruth gaStatementOfTruth = ofNullable(caseData.getGeneralAppStatementOfTruth())
                     .map(GAStatementOfTruth::toBuilder)
@@ -195,7 +195,7 @@ public class InitiateGeneralApplicationService {
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
 
-        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)
+        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)
             && ! Objects.isNull(caseData.getGeneralAppN245FormUpload())) {
             if (Objects.isNull(caseData.getGeneralAppN245FormUpload().getCategoryID())) {
                 caseData.getGeneralAppN245FormUpload().setCategoryID(GA_DOC_CATEGORY_ID);
