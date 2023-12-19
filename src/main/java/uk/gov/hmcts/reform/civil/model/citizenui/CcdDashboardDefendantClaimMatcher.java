@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
-import lombok.AllArgsConstructor;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -11,17 +12,18 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
-@AllArgsConstructor
-public class CcdDashboardDefendantClaimMatcher implements Claim {
+public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
+
+    public CcdDashboardDefendantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
+        super(caseData);
+        this.featureToggleService = featureToggleService;
+    }
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
-    private CaseData caseData;
     private FeatureToggleService featureToggleService;
 
     @Override

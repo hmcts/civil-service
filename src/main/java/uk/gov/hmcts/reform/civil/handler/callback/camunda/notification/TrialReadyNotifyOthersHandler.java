@@ -107,7 +107,7 @@ public class TrialReadyNotifyOthersHandler extends CallbackHandler implements No
     private String getEmail(boolean isApplicant, boolean isRespondent2, boolean isLiP, CaseData caseData) {
         String email;
         if (isApplicant) {
-            email = isLiP ? caseData.getApplicant1().getPartyEmail() : caseData.getApplicantSolicitor1UserDetails().getEmail();
+            email = isLiP ? caseData.getApplicant1Email() : caseData.getApplicantSolicitor1UserDetails().getEmail();
         } else if (isRespondent2) {
             email = isLiP ? caseData.getRespondent2().getPartyEmail() : caseData.getRespondentSolicitor2EmailAddress();
         } else {
