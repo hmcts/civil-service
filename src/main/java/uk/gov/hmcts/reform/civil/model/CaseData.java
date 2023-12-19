@@ -42,8 +42,8 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
-import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -84,10 +84,10 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
@@ -120,8 +120,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVOne;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
-import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
@@ -454,7 +454,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDateTime takenOfflineDate;
     private final LocalDateTime takenOfflineByStaffDate;
     private final LocalDateTime unsuitableSDODate;
-    private final OtherDetails  otherDetails;
+    private final OtherDetails otherDetails;
     private final LocalDateTime claimDismissedDate;
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
@@ -645,12 +645,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private FlightDelayDetails flightDelayDetails;
     private ReasonForReconsideration reasonForReconsideration;
 
-    @Builder.Default
-    private final List<Element<CaseDocument>> claimantDocuments = new ArrayList<>();
-
-    @Builder.Default
-    private final List<Element<CaseDocument>> defendantDocuments = new ArrayList<>();
-
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
@@ -723,7 +717,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isPayImmediately() {
-        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(getDefenceAdmitPartPaymentTimeRouteRequired());
+        return RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY.equals(
+            getDefenceAdmitPartPaymentTimeRouteRequired());
     }
 
     @JsonIgnore
@@ -908,7 +903,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public String setUpJudgementFormattedPermittedDate(LocalDate extendedRespondent1ResponseDate) {
         if (isJudgementDateNotPermitted()) {
-            return formatLocalDateTime(extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY), DATE_TIME_AT);
+            return formatLocalDateTime(
+                extendedRespondent1ResponseDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY),
+                DATE_TIME_AT
+            );
         }
         return null;
     }
@@ -1014,8 +1012,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public Optional<Element<CaseDocument>> getSDODocument() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                   .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
         }
         return Optional.empty();
     }
@@ -1108,8 +1106,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isTranslatedDocumentUploaded() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                   .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
         }
         return false;
     }

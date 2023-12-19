@@ -65,44 +65,17 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
     }
 
     private CaseData updateCaseData(CaseData caseData, CaseDocument caseDocument, CaseEvent caseEvent) {
-        return switch (caseEvent) {
-            case GENERATE_DRAFT_FORM -> buildDraftClaimFormCaseData(caseData, caseDocument);
-            case GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC -> buildClaimantFormCaseData(caseData, caseDocument);
-            case GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC -> buildDefendantClaimFormData(caseData, caseDocument);
-            default -> throw new IllegalArgumentException("case event not found");
-        };
-    }
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
+        systemGeneratedCaseDocuments.add(element(caseDocument));
 
-    private CaseData buildDraftClaimFormCaseData(CaseData caseData, CaseDocument caseDocument) {
-        List<Element<CaseDocument>> claimantDocuments = caseData.getClaimantDocuments();
-        claimantDocuments.add(element(caseDocument));
+        // Remove Draft claim form
+        if(caseEvent == GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC) {
+            systemGeneratedCaseDocuments = systemGeneratedCaseDocuments.stream().filter(claimDoc -> claimDoc.getValue().getDocumentType() != DocumentType.DRAFT_CLAIM_FORM)
+                .collect(Collectors.toList());
+        }
 
         return caseData.toBuilder()
-            .claimantDocuments(claimantDocuments)
+            .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
             .build();
     }
-
-    private CaseData buildClaimantFormCaseData(CaseData caseData, CaseDocument caseDocument) {
-        List<Element<CaseDocument>> claimantDocuments = caseData.getClaimantDocuments();
-
-        // Remove Draft form from claimant documents
-        claimantDocuments = claimantDocuments.stream().filter(claimDoc -> claimDoc.getValue().getDocumentType() != DocumentType.DRAFT_CLAIM_FORM)
-            .collect(Collectors.toList());
-
-        claimantDocuments.add(element(caseDocument));
-
-        return caseData.toBuilder()
-            .claimantDocuments(claimantDocuments)
-            .build();
-    }
-
-    private CaseData buildDefendantClaimFormData(CaseData caseData, CaseDocument caseDocument) {
-        List<Element<CaseDocument>> defendantDocuments = caseData.getDefendantDocuments();
-        defendantDocuments.add(element(caseDocument));
-
-        return caseData.toBuilder()
-            .defendantDocuments(defendantDocuments)
-            .build();
-    }
-
 }

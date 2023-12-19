@@ -63,7 +63,7 @@ public enum DocmosisTemplates {
     FREE_FORM_ORDER_PDF("CV-UNS-DEC-ENG-01099.docx", "Order_%s.pdf"),
     ASSISTED_ORDER_PDF("CV-UNS-DEC-ENG-01283.docx", "Order_%s.pdf"),
     GENERATE_LIP_CLAIMANT_CLAIM_FORM("CV-SPC-CLM-ENG-CLAIMANT-CLAIM-FORM.docx", "%s-claim-form-claimant-copy.pdf"),
-    GENERATE_LIP_DEFENDANT_CLAIM_FORM("CV-SPC-CLM-ENG-DEFENDANT-CLAIM-FORM.docx", "sealed_claim_form_%s.pdf");
+    GENERATE_LIP_DEFENDANT_CLAIM_FORM("CV-SPC-CLM-ENG-DEFENDANT-CLAIM-FORM.docx", "%s-sealed-claim-form.pdf");
 
     private final String template;
     private final String documentTitle;
