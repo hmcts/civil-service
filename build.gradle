@@ -6,10 +6,10 @@ plugins {
   id 'org.springframework.boot' version '2.7.11'
   id 'org.owasp.dependencycheck' version '9.0.4'
   id 'com.github.ben-manes.versions' version '0.47.0'
-  id 'org.sonarqube' version '3.4.0.2513'
+  id 'org.sonarqube' version '4.4.1.3373'
   id 'au.com.dius.pact' version '4.2.14'
   id "io.freefair.lombok" version "6.6.3"
-  id "org.flywaydb.flyway" version "9.21.0"
+  id "org.flywaydb.flyway" version "10.3.0"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -109,7 +109,7 @@ allprojects {
       // CVE-2018-10237 - Unbounded memory allocation
       dependency group: 'org.mybatis', name: 'mybatis', version: '3.5.13'
       // CVE-2020-26945 - Mishandles deserialization of object streams.
-      dependencySet(group: 'com.google.guava', version: '32.1.1-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.0.0-jre') {
         entry 'guava'
       }
       dependency group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: '1.8.20'
@@ -335,7 +335,7 @@ def versions = [
   junitPlatform      : '1.10.0',
   reformLogging      : '5.1.7',
   springBoot         : springBoot.class.package.implementationVersion,
-  springStatemachine : '3.2.0',
+  springStatemachine : '4.0.0',
   lombok             : '1.18.26',
   pact               : '3.5.24',
   springSecurity     : '5.8.5'
@@ -361,7 +361,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.41-CIV-11209'
+  implementation 'com.github.hmcts:civil-commons:1.0.43'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -390,7 +390,7 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.3'
 
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '12.4'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.1'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   implementation group: 'com.github.hmcts', name: 'java-logging', version: '6.0.1'

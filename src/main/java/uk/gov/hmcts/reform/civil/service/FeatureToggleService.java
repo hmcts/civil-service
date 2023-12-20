@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -61,7 +64,7 @@ public class FeatureToggleService {
     }
 
     public boolean isLipVLipEnabled() {
-        return true;
+        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
@@ -83,5 +86,13 @@ public class FeatureToggleService {
 
     public boolean isSdoR2Enabled() {
         return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
+    }
+
+    public boolean isCarmEnabledForCase(LocalDateTime submittedDate) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        long epoch = submittedDate.atZone(zoneId).toEpochSecond();
+        return featureToggleApi.isFeatureEnabled("carm")
+            && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
+                                                            epoch, false);
     }
 }

@@ -21,7 +21,6 @@ public class ClaimantResponse {
     private String paymentReceived;
     private String settleForAmount;
     private CourtDetermination courtDetermination;
-    private FormaliseOption formaliseOption;
 
     @JsonIgnore
     public boolean hasCourtDetermination() {
