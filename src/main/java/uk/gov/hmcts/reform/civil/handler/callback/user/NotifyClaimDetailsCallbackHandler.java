@@ -473,7 +473,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        LocalDateTime notificationDeadline = deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
+        LocalDateTime notificationDeadline = deadlinesCalculator.plus14DaysDeadline(cosDateOfServiceForDefendant
                                                                                              .atTime(time.now().toLocalTime()));
         LocalDateTime currentDateTime = time.now();
         LocalDateTime today4pm = currentDateTime.toLocalDate().atTime(16, 0);
@@ -487,7 +487,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private boolean isDeemedServedDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        LocalDateTime deemedServedDeadline = deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
+        LocalDateTime deemedServedDeadline = deadlinesCalculator.plus14DaysDeadline(cosDateOfServiceForDefendant
                                                                                              .atTime(time.now().toLocalTime()));
         LocalDateTime currentDateTime = time.now();
         LocalDateTime today4pm = currentDateTime.toLocalDate().atTime(16, 0);
