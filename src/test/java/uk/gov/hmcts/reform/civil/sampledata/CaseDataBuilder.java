@@ -32,12 +32,15 @@ import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
+import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
+import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
@@ -130,6 +133,10 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsReferredInStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -186,6 +193,8 @@ import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.MORE_THAN_DAY;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 import static uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration.MINUTES_120;
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
+import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
+import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.REFERRED_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -510,8 +519,10 @@ public class CaseDataBuilder {
 
     private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
-    private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
     private ReasonForReconsideration reasonForReconsideration;
+
+    private UploadMediationDocumentsForm uploadDocumentsForm;
+
     private YesOrNo responseClaimExpertSpecRequired;
     private YesOrNo responseClaimExpertSpecRequired2;
     private YesOrNo applicantMPClaimExpertSpecRequired;
@@ -4862,6 +4873,42 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateMediationUnsuccessfulCarm(MultiPartyScenario mpScenario) {
+        atStateApplicantProceedAllMediation(mpScenario);
+        applicantsProceedIntention = YES;
+        caseDataLiP = CaseDataLiP.builder()
+            .applicant1ClaimMediationSpecRequiredLip(
+                ClaimantMediationLip.builder()
+                    .hasAgreedFreeMediation(MediationDecision.Yes)
+                    .build()).build();
+
+        mediation = Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(
+            List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE)).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateMediationSuccessful(MultiPartyScenario mpScenario) {
+        atStateApplicantProceedAllMediation(mpScenario);
+        applicantsProceedIntention = YES;
+        caseDataLiP = CaseDataLiP.builder()
+            .applicant1ClaimMediationSpecRequiredLip(
+                ClaimantMediationLip.builder()
+                    .hasAgreedFreeMediation(MediationDecision.Yes)
+                    .build()).build();
+
+        mediation = Mediation.builder()
+            .mediationSuccessful(MediationSuccessful.builder()
+                                     .mediationSettlementAgreedAt(now())
+                                     .mediationAgreement(MediationAgreementDocument.builder()
+                                                             .name("mediation")
+                                                             .build())
+                                     .build())
+            .build();
+
+        return this;
+    }
+
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
         return this;
@@ -6266,16 +6313,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder atStatePriorToRespondToSettlementAgreementDeadline() {
-        this.respondent1RespondToSettlementAgreementDeadline = LocalDateTime.now().plusDays(1);
-        return this;
-    }
-
-    public CaseDataBuilder atStatePastRespondToSettlementAgreementDeadline() {
-        this.respondent1RespondToSettlementAgreementDeadline = LocalDateTime.now().minusDays(1);
-        return this;
-    }
-
     public CaseDataBuilder addApplicantLRIndividual(String firstName, String lastName) {
         List<Element<PartyFlagStructure>> individual =
             wrapElements(PartyFlagStructure.builder()
@@ -6393,6 +6430,54 @@ public class CaseDataBuilder {
             this.respondent2OrgIndividuals = individual;
         }
         return this;
+    }
+
+    public CaseDataBuilder uploadMediationDocumentsChooseOptions(String partyChosen, List<MediationDocumentsType> documentTypes) {
+        List<Element<MediationNonAttendanceStatement>> mediationNonAttendanceStatement;
+        List<Element<MediationDocumentsReferredInStatement>> documentsReferred;
+        if (documentTypes.contains(NON_ATTENDANCE_STATEMENT)) {
+            mediationNonAttendanceStatement = buildMediationNonAttendanceStatement();
+        } else {
+            mediationNonAttendanceStatement = null;
+        }
+        if (documentTypes.contains(REFERRED_DOCUMENTS)) {
+            documentsReferred = buildMediationDocumentsReferred();
+        } else {
+            documentsReferred = null;
+        }
+        this.uploadDocumentsForm = UploadMediationDocumentsForm.builder()
+            .uploadMediationDocumentsPartyChosen(DynamicList.builder()
+                                                     .value(DynamicListElement.builder()
+                                                                .code(partyChosen)
+                                                                .build())
+                                                     .build())
+            .mediationDocumentsType(documentTypes)
+            .documentsReferredForm(documentsReferred)
+            .nonAttendanceStatementForm(mediationNonAttendanceStatement)
+            .build();
+        return this;
+    }
+
+    private List<Element<MediationNonAttendanceStatement>> buildMediationNonAttendanceStatement() {
+        return wrapElements(MediationNonAttendanceStatement.builder()
+                                .yourName("My name")
+                                .document(Document.builder()
+                                              .documentFileName("Mediation non attendance")
+                                              .build())
+                                .documentDate(LocalDate.of(2023, 4, 2))
+                                .documentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1))
+                                .build());
+    }
+
+    private List<Element<MediationDocumentsReferredInStatement>> buildMediationDocumentsReferred() {
+        return wrapElements(MediationDocumentsReferredInStatement.builder()
+                                .documentType("type")
+                                .document(Document.builder()
+                                              .documentFileName("Referred documents")
+                                              .build())
+                                .documentDate(LocalDate.of(2023, 4, 2))
+                                .documentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1))
+                                .build());
     }
 
     public static CaseDataBuilder builder() {
@@ -6681,7 +6766,6 @@ public class CaseDataBuilder {
             .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
             .transferCourtLocationList(transferCourtLocationList)
             .reasonForTransfer(reasonForTransfer)
-            .respondent1RespondToSettlementAgreementDeadline(respondent1RespondToSettlementAgreementDeadline)
             .applicant1LRIndividuals(applicant1LRIndividuals)
             .respondent1LRIndividuals(respondent1LRIndividuals)
             .respondent2LRIndividuals(respondent2LRIndividuals)
@@ -6690,6 +6774,7 @@ public class CaseDataBuilder {
             .respondent1OrgIndividuals(respondent1OrgIndividuals)
             .respondent2OrgIndividuals(respondent2OrgIndividuals)
             .flightDelayDetails(flightDelayDetails)
+            .uploadMediationDocumentsForm(uploadDocumentsForm)
             .responseClaimExpertSpecRequired(responseClaimExpertSpecRequired)
             .responseClaimExpertSpecRequired2(responseClaimExpertSpecRequired2)
             .applicant1ClaimExpertSpecRequired(applicant1ClaimExpertSpecRequired)
