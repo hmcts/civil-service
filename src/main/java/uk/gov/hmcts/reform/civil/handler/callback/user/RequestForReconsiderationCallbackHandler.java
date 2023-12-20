@@ -35,7 +35,8 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REQUEST_FOR_RECONSIDERATION);
     protected final ObjectMapper objectMapper;
-    private static final String ERROR_MESSAGE_14_DAYS_ELAPSED = "You can no longer request a reconsideration because the deadline has expired";
+    private static final String ERROR_MESSAGE_14_DAYS_ELAPSED
+        = "You can no longer request a reconsideration because the deadline has expired";
     private static final String CONFIRMATION_HEADER = "# Your request has been submitted";
     private static final String CONFIRMATION_BODY = "### What happens next \n" +
         "You should receive an update on your request for determination after 10 days, please monitor" +
@@ -44,18 +45,18 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::validateWithinAllowedPeriod)
+            .put(callbackKey(ABOUT_TO_START), this::validateRequestEligibility)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::saveRequestForReconsiderationReason)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
             .build();
     }
 
-    private CallbackResponse validateWithinAllowedPeriod(CallbackParams callbackParams) {
+    private CallbackResponse validateRequestEligibility(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
-        Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments().stream().filter(
-            caseDocumentElement -> caseDocumentElement.getValue().getDocumentType().equals(
-                DocumentType.SDO_ORDER)).sorted(Comparator.comparing(
-            caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
+        Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments()
+            .stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
+                .equals(DocumentType.SDO_ORDER))
+            .sorted(Comparator.comparing(caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
             Comparator.reverseOrder())).findFirst();
         if (sdoDocLatest.isPresent()) {
             LocalDateTime sdoDocLatestDate = sdoDocLatest.get().getValue().getCreatedDatetime();
