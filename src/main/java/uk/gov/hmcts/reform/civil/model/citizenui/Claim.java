@@ -42,14 +42,6 @@ public interface Claim {
 
     boolean hasClaimantAskedToSignSettlementAgreement();
 
-    boolean hasClaimantAndDefendantSignedSettlementAgreement();
-
-    boolean hasDefendantRejectedSettlementAgreement();
-
-    boolean hasClaimantSignedSettlementAgreement();
-
-    boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired();
-
     boolean hasClaimantAcceptedPartialAdmissionAmount();
 
     boolean haveBothPartiesSignedSettlementAgreement();
