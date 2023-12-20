@@ -676,20 +676,21 @@ public class CaseDataTest {
         assertThat(caseData.getManageDocumentsList()).isNotNull();
         assertThat(caseData.getManageDocumentsList()).isEmpty();
 
-        @Test
-        void shouldReturnTrueWhenBilingual() {
+    }
 
-            //Given
-            CaseData caseData = CaseDataBuilder.builder()
-                .build();
-            caseData.setClaimantBilingualLanguagePreference("BOTH");
+    @Test
+    void shouldReturnTrueWhenBilingual() {
 
-            //When
-            boolean result = caseData.isBilingual();
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .build();
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
 
-            //Then
-            assertTrue(result);
-        }
+        //When
+        boolean result = caseData.isBilingual();
+
+        //Then
+        assertTrue(result);
     }
 
     @Test
