@@ -461,7 +461,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String claimAmountBreakupSummaryObject;
     private final LocalDateTime respondent1LitigationFriendDate;
     private final LocalDateTime respondent2LitigationFriendDate;
-    private final LocalDateTime respondent1RespondToSettlementAgreementDeadline;
     private final String paymentTypePBA;
     private final String paymentTypePBASpec;
     private final String whenToBePaidText;
@@ -1134,16 +1133,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isRespondentRespondedToSettlementAgreement() {
-        return getCaseDataLiP() != null && getCaseDataLiP().getRespondentSignSettlementAgreement() != null;
-    }
-
-    @JsonIgnore
-    public boolean isRespondentSignedSettlementAgreement() {
-        return getCaseDataLiP() != null && YesOrNo.YES.equals(getCaseDataLiP().getRespondentSignSettlementAgreement());
-    }
-
-    @JsonIgnore
     public List<ClaimAmountBreakupDetails> getClaimAmountBreakupDetails() {
         return Optional.ofNullable(getClaimAmountBreakup())
             .map(Collection::stream)
@@ -1172,9 +1161,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isSettlementAgreementDeadlineExpired() {
-        return nonNull(respondent1RespondToSettlementAgreementDeadline)
-            && LocalDateTime.now().isAfter(respondent1RespondToSettlementAgreementDeadline);
+    public boolean isRespondentSignSettlementAgreement() {
+        return getCaseDataLiP() != null && getCaseDataLiP().getRespondentSignSettlementAgreement() != null;
     }
 
     @JsonIgnore
