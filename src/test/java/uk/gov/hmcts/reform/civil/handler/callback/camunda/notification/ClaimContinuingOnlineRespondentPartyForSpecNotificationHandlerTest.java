@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUED_ON;
@@ -161,6 +162,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 ISSUED_ON, formatLocalDate(LocalDate.now(), DATE),
                 RESPOND_URL, "dummy_respond_to_claim_url",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_16_DIGIT_NUMBER, CASE_ID.toString(),
                 PIN, "TEST1234",
                 RESPONSE_DEADLINE, formatLocalDate(
                     caseData.getRespondent1ResponseDeadline()
