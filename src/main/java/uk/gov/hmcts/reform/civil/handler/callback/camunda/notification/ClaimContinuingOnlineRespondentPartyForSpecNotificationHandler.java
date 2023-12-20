@@ -10,11 +10,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
-
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
@@ -90,6 +89,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
             RESPOND_URL, pipInPostConfiguration.getRespondToClaimUrl(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
             PIN, caseData.getRespondent1PinToPostLRspec().getAccessCode(),
             RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
                                                    .toLocalDate(), DATE),
