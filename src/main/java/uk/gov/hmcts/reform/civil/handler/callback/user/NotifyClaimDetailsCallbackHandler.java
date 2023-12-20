@@ -137,6 +137,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             updatedCaseData = caseData.toBuilder()
                     .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
                     .claimDetailsNotificationDate(currentDateTime)
+                    .addLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
+                    .addLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
                     .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
                     .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
                     .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
@@ -164,12 +166,25 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 builder.respondent1ResponseDeadline(
                         deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
             }
+
+            if (Objects.nonNull(caseData.getRespondent1())
+                && NO.equals(caseData.getRespondent1Represented())) {
+                builder.addLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
+            }
+
             if (Objects.nonNull(caseData.getRespondent2())
                 && YES.equals(caseData.getAddRespondent2())) {
                 builder.respondent2ResponseDeadline(
                         deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
             }
-            if (areAnyRespondentsLitigantInPerson(caseData)) {
+
+            if (Objects.nonNull(caseData.getRespondent2())
+                   && YES.equals(caseData.getAddRespondent2())
+                && NO.equals(caseData.getRespondent2Represented())) {
+                builder.addLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
+            }
+
+            if (areAnyRespondentsLitigantInPerson(caseData))  {
                 if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
                     builder
                         .cosNotifyClaimDetails1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails1()))
