@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidat
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -459,13 +458,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        LocalDateTime fakeDateTime = time.now().toLocalDate().atTime(16, 10);
         LocalDateTime notificationDeadline = deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
-                                                                                             .atTime(LocalTime.from(fakeDateTime
-                                                                                                 )));
-
-        LocalDateTime currentDateTime = fakeDateTime;
-
+                                                                                             .atTime(time.now().toLocalTime()));
+        LocalDateTime currentDateTime = time.now();
         LocalDateTime today4pm = currentDateTime.toLocalDate().atTime(16, 0);
 
         boolean isAfter4pmToday = currentDateTime.isAfter(today4pm)
