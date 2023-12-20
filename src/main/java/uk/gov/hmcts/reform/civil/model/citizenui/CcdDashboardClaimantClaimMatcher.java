@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -16,15 +17,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
-public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
+@AllArgsConstructor
+public class CcdDashboardClaimantClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
+    private CaseData caseData;
     private FeatureToggleService featureToggleService;
-
-    public CcdDashboardClaimantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
-        super(caseData);
-        this.featureToggleService = featureToggleService;
-    }
 
     @Override
     public boolean hasResponsePending() {
