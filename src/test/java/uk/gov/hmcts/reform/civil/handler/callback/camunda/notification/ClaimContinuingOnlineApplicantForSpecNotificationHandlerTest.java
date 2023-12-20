@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -69,6 +70,8 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
     public static final String REFERENCE = "claim-continuing-online-notification-000DC001";
     public static final String TEMPLATE = "template-id";
     public static final String TEMPLATE_1v2 = "template-id-1v2-two-legal-reps";
+    public static final String RESPONSE_DEADLINE = "responseDeadline";
+    public static final String PARTY_NAME = "partyName";
 
     @Nested
     class AboutToSubmitCallback {
@@ -206,8 +209,9 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
             if (caseData.getRespondent2() != null) {
                 properties.put(RESPONDENT_ONE_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
                 properties.put(RESPONDENT_TWO_NAME, getPartyNameBasedOnType(caseData.getRespondent2()));
-            } else {
+            } else if (caseData.getRespondent1() != null) {
                 properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
+                properties.put(RESPONSE_DEADLINE, formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT));
             }
 
             return properties;
@@ -244,7 +248,36 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
         @Test
         void shouldNotifyClaimantSolicitor_whenRespondent1NotRepresented() {
             CaseData caseData =
-                CaseDataBuilder.builder().atStateClaimDetailsNotified().respondent1Represented(YesOrNo.NO).build();
+                CaseDataBuilder.builder()
+                    .respondent1(Party.builder().partyName(PARTY_NAME).build())
+                    .atStateClaimDetailsNotified().respondent1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder()
+                             .eventId("NOTIFY_CLAIMANT_LR_SPEC")
+                             .build())
+                .build();
+
+            // When
+            handler.handle(params);
+
+            Map<String, String> expectedProperties = getNotificationDataMap(caseData);
+
+            // Then
+            verify(notificationService).sendMail(
+                APPLICANT_SOLICITOR_EMAIL,
+                TEMPLATE,
+                expectedProperties,
+                REFERENCE
+            );
+        }
+
+        @Test
+        void shouldNotifyClaimantSolicitor_whenRespondent1IsRepresented() {
+            CaseData caseData =
+                CaseDataBuilder.builder()
+                    .respondent1(Party.builder().partyName(PARTY_NAME).build())
+                    .atStateClaimDetailsNotified().respondent1Represented(YesOrNo.YES).build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder()
