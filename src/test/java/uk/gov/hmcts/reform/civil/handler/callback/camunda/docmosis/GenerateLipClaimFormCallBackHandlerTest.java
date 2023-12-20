@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.claimform.ClaimFormGenerator;
 
 import java.time.LocalDateTime;
@@ -34,6 +35,8 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private ClaimFormGenerator claimFormGenerator;
+    @Mock
+    private SystemGeneratedDocumentService systemGeneratedDocumentService;
     @Mock
     private ObjectMapper mapper;
     @InjectMocks
@@ -87,6 +90,7 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
             anyString(),
             eq(GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC)
         )).willReturn(generateForm(SEALED_CLAIM));
+
         CaseData caseData = CaseData.builder().build();
         CallbackParams callbackParams = buildCallbackParams(caseData, "GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC");
 
