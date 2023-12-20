@@ -214,6 +214,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             sixMonthDate = LocalDateTime.of(2020, 7, 1, 0, 0, 0);
             when(time.now()).thenReturn(localDateTime);
             when(deadlinesCalculator.plus14DaysDeadline(localDateTime)).thenReturn(newDate);
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(localDateTime)).thenReturn(newDate);
             when(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(6, localDateTime.toLocalDate()))
                 .thenReturn(sixMonthDate);
             when(workingDayIndicator.isWeekend(any(LocalDate.class))).thenReturn(true);
@@ -265,6 +266,8 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemedDate = localDateTime.minusDays(2).toLocalDate();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atTime(15, 05)))
+                .thenReturn(newDate.minusDays(2));
             when(deadlinesCalculator.plus14DaysDeadline(cosDate.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
             when(deadlinesCalculator.plus14DaysDeadline(deemedDate.atTime(15, 05)))
@@ -296,9 +299,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
                 .thenReturn(LocalDate.now().plusDays(2));
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-            when(deadlinesCalculator.plus14DaysDeadline(cosDate.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
-            when(deadlinesCalculator.plus14DaysDeadline(deemedDate.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedDate.atTime(15, 05)))
                 .thenReturn(newDate.minusDays(2));
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
 
@@ -325,9 +328,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate deemed1Date = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemed2Date = localDateTime.minusDays(3).toLocalDate();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-            when(deadlinesCalculator.plus14DaysDeadline(cos1Date.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
-            when(deadlinesCalculator.plus14DaysDeadline(cos2Date.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(3));
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -352,6 +355,10 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate deemed1Date = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemed2Date = localDateTime.minusDays(3).toLocalDate();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atTime(15, 05)))
+                .thenReturn(newDate.minusDays(3));
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atTime(15, 05)))
+                .thenReturn(newDate.minusDays(2));
             when(deadlinesCalculator.plus14DaysDeadline(cos1Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(3));
             when(deadlinesCalculator.plus14DaysDeadline(cos2Date.atTime(15, 05)))
