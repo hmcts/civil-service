@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,4 +18,5 @@ public class Mediation {
     @JsonUnwrapped
     private MediationSuccessful mediationSuccessful;
     private String unsuccessfulMediationReason;
+    private List<MediationUnsuccessfulReason> mediationUnsuccessfulReasonsMultiSelect;
 }
