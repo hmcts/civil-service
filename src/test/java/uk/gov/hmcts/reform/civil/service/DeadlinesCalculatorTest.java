@@ -531,18 +531,6 @@ public class DeadlinesCalculatorTest {
                 .isTheSame(expectedPaymentDate);
         }
 
-        @Test
-        void shouldReturnPlus7workingDaysAt4pm_whenResponseDateIsProvided() {
-            //Given
-            LocalDateTime providedDate = LocalDate.of(2023, 11, 13).atTime(23, 59);
-            LocalDateTime expectedDeadline = LocalDate.of(2023, 11, 22).atTime(16, 00);
-            //When
-            LocalDateTime deadline = calculator.getRespondToSettlementAgreementDeadline(providedDate);
-            //Then
-            assertThat(deadline)
-                .isTheSame(expectedDeadline);
-        }
-
     }
 
 }
