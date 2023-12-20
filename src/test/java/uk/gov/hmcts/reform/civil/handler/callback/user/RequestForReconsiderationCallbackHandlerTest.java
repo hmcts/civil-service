@@ -44,7 +44,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         "You should receive an update on your request for determination after 10 days, please monitor" +
         " your notifications/dashboard for an update.";
 
-    private static final String ERROR_MESSAGE_14_DAYS_ELAPSED = "You can no longer request a reconsideration because the deadline has expired";
+    private static final String ERROR_MESSAGE_DEADLINE_EXPIRED
+        = "You can no longer request a reconsideration because the deadline has expired";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
@@ -54,13 +55,13 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
     @Nested
     class AboutToStartCallback {
         @Test
-        void shouldAllowRequestIfLessThan14DaysElapsed() {
-            //Given : Casedata containing an SDO order created 13 days ago
+        void shouldAllowRequestIfLessThan7DaysElapsed() {
+            //Given : Casedata containing an SDO order created 6 days ago
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
                                                   .element(CaseDocument.builder()
                                                                .documentType(DocumentType.SDO_ORDER)
-                                                               .createdDatetime(LocalDateTime.now().minusDays(13))
+                                                               .createdDatetime(LocalDateTime.now().minusDays(6))
                                                                .build())))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -73,13 +74,13 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @Test
-        void shouldSendErrorMessageIf14DaysElapsed() {
-            //Given : Casedata containing an SDO order created 14 days ago
+        void shouldSendErrorMessageIf7DaysElapsed() {
+            //Given : Casedata containing an SDO order created 7 days ago
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
                                                           .element(CaseDocument.builder()
                                                                        .documentType(DocumentType.SDO_ORDER)
-                                                                       .createdDatetime(LocalDateTime.now().minusDays(14))
+                                                                       .createdDatetime(LocalDateTime.now().minusDays(7))
                                                                        .build())))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -88,7 +89,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: The error should be displayed
-            assertThat(response.getErrors().contains(ERROR_MESSAGE_14_DAYS_ELAPSED));
+            assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
         }
     }
 

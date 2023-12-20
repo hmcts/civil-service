@@ -35,7 +35,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = Collections.singletonList(REQUEST_FOR_RECONSIDERATION);
     protected final ObjectMapper objectMapper;
-    private static final String ERROR_MESSAGE_14_DAYS_ELAPSED
+    private static final String ERROR_MESSAGE_DEADLINE_EXPIRED
         = "You can no longer request a reconsideration because the deadline has expired";
     private static final String CONFIRMATION_HEADER = "# Your request has been submitted";
     private static final String CONFIRMATION_BODY = "### What happens next \n" +
@@ -60,8 +60,8 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             Comparator.reverseOrder())).findFirst();
         if (sdoDocLatest.isPresent()) {
             LocalDateTime sdoDocLatestDate = sdoDocLatest.get().getValue().getCreatedDatetime();
-            if (LocalDateTime.now().isAfter(sdoDocLatestDate.plusDays(14))) {
-                errors.add(ERROR_MESSAGE_14_DAYS_ELAPSED);
+            if (LocalDateTime.now().isAfter(sdoDocLatestDate.plusDays(7))) {
+                errors.add(ERROR_MESSAGE_DEADLINE_EXPIRED);
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
