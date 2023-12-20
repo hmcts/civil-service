@@ -101,12 +101,13 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         List<LocationRefData>  locationRefData = locationRefDataService.getCourtLocationsForDefaultJudgments(authorisation);
-        locationRefData.forEach(location -> {if (location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())) {
-            caseManagementLocationDetails = location;
-        } else {
-            throw new NullPointerException("Base Court Location not found, in location data");}
+        locationRefData.forEach(location -> {
+            if (location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())) {
+                caseManagementLocationDetails = location;
+            } else {
+                throw new NullPointerException("Base Court Location not found, in location data");
+            }
         });
-
 
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
@@ -143,10 +144,12 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private JudgeFinalOrderForm getAssistedOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
         List<LocationRefData>  locationRefData = locationRefDataService.getCourtLocationsForDefaultJudgments(authorisation);
-        locationRefData.forEach(location -> {if (location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())) {
-            caseManagementLocationDetails = location;
-        } else {
-            throw new NullPointerException("Base Court Location not found, in location data");}
+        locationRefData.forEach(location -> {
+            if (location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())) {
+                caseManagementLocationDetails = location;
+            } else {
+                throw new NullPointerException("Base Court Location not found, in location data");
+            }
         });
 
         var assistedFormOrderBuilder = JudgeFinalOrderForm.builder()
