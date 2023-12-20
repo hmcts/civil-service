@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -45,6 +48,18 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
 
     @MockBean
     private NotificationsProperties notificationsProperties;
+
+    @Captor
+    private ArgumentCaptor<String> targetEmail;
+
+    @Captor
+    private ArgumentCaptor<String> emailTemplate;
+
+    @Captor
+    private ArgumentCaptor<Map<String, String>> notificationDataMap;
+
+    @Captor
+    private ArgumentCaptor<String> reference;
 
     @Autowired
     private ClaimReconsiderationUpheldDefendantNotificationHandler handler;
@@ -95,13 +110,23 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
 
             handler.handle(params);
 
-            verify(notificationService).sendMail(
-                "sole.trader@email.com",
-                TEMPLATE_ID,
-                getNotificationDataMap(caseData),
-                "hearing-fee-unpaid-applicant-notification-000DC001"
+            verify(notificationService, times(2)).sendMail(
+                targetEmail.capture(),
+                emailTemplate.capture(),
+                notificationDataMap.capture(),
+                reference.capture()
             );
-            //I have to capture teh second sendMail call and check it
+            //Email to respondent1
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo("sole.trader@email.com");
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo("template-id");
+            assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationDataMap(caseData));
+            assertThat(reference.getAllValues().get(0)).isEqualTo("hearing-fee-unpaid-applicant-notification-000DC001");
+            //Email to respondent2
+            assertThat(targetEmail.getAllValues().get(1)).isEqualTo("respondentsolicitor2@example.com");
+            assertThat(emailTemplate.getAllValues().get(1)).isEqualTo("template-id");
+            assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap2(caseData));
+            assertThat(reference.getAllValues().get(1)).isEqualTo("hearing-fee-unpaid-applicant-notification-000DC001");
+
         }
 
     }
@@ -113,6 +138,27 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
             PARTY_NAME, caseData.getRespondent1().getPartyName()
         );
+    }
+    @NotNull
+    private Map<String, String> getNotificationDataMap2(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
+            PARTY_NAME, getLegalOrganizationDef2Name(caseData)
+        );
+    }
+
+    @NotNull
+    private String getLegalOrganizationDef2Name(final CaseData caseData) {
+        Optional<Organisation> organisation = organisationService
+            .findOrganisationById(caseData.getApplicant2OrganisationPolicy() != null
+                                      ? caseData.getApplicant2OrganisationPolicy()
+                .getOrganisation().getOrganisationID() : caseData.getApplicant1OrganisationPolicy()
+                .getOrganisation().getOrganisationID());
+        if (organisation.isPresent()) {
+            return organisation.get().getName();
+        }
+        return caseData.getApplicant2().getPartyName();
     }
 
 }
