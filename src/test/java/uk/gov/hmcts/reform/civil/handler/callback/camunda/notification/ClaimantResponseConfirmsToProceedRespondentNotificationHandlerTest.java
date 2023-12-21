@@ -66,6 +66,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
 
         @BeforeEach
         void setup() {
+            when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("offline-template-id");
             when(notificationsProperties.getClaimantSolicitorConfirmsToProceed()).thenReturn("template-id");
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
             when(notificationsProperties.getRespondentSolicitorNotifyToProceedSpec()).thenReturn("spec-template-id");
@@ -317,6 +318,27 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                 "sole.trader@email.com",
                 "spec-template-id",
                 getNotificationDataMapLRvLiP(caseData),
+                "claimant-confirms-to-proceed-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondent_whenMultiTrack() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .setMultiTrackClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_SOLICITOR1_FOR_CLAIMANT_CONFIRMS_TO_PROCEED")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                caseData.getRespondentSolicitor1EmailAddress(),
+                "offline-template-id",
+                getNotificationDataMap(caseData),
                 "claimant-confirms-to-proceed-respondent-notification-000DC001"
             );
         }
