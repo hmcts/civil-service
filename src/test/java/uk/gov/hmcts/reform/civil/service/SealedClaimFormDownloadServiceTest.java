@@ -15,9 +15,12 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 
+import java.util.ArrayList;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -57,6 +60,32 @@ class SealedClaimFormDownloadServiceTest {
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(null).build();
+
+        // when
+        byte [] document = sealedClaimFormDownloadService.downloadDocument(BEARER_TOKEN, caseData);
+
+        // then
+        assertThat(document).isNullOrEmpty();
+    }
+    @Test
+    void shouldNotDownloadDocument_whenEmpty() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(new ArrayList<>()).build();
+
+        // when
+        byte [] document = sealedClaimFormDownloadService.downloadDocument(BEARER_TOKEN, caseData);
+
+        // then
+        assertThat(document).isNullOrEmpty();
+    }
+
+    @Test
+    void shouldNotDownloadDocument_whenNotPresent() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).documentLink(DOCUMENT_LINK).build()))
+            .build();
 
         // when
         byte [] document = sealedClaimFormDownloadService.downloadDocument(BEARER_TOKEN, caseData);
