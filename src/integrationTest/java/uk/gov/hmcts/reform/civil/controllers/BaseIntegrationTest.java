@@ -22,8 +22,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
+import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -61,6 +63,9 @@ public abstract class BaseIntegrationTest {
         .roles(of("caseworker-civil-solicitor"))
         .build();
 
+    protected static final String s2sToken = "s2s AuthToken";
+    @MockBean
+    private ServiceAuthorisationApi serviceAuthorisationApi;
     @MockBean
     protected UserService userService;
     @MockBean
@@ -69,6 +74,8 @@ public abstract class BaseIntegrationTest {
     protected SecurityContext securityContext;
     @MockBean
     protected JwtDecoder jwtDecoder;
+    @MockBean
+    public AuthorisationService authorisationService;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -78,11 +85,13 @@ public abstract class BaseIntegrationTest {
 
     @BeforeEach
     public void setUpBase() {
+        when(authorisationService.isServiceAuthorized(any())).thenReturn(true);
         when(userService.getAccessToken(any(), any())).thenReturn("arbitrary access token");
         when(userService.getUserInfo(anyString())).thenReturn(USER_INFO);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         setSecurityAuthorities(authentication);
+        when(serviceAuthorisationApi.getServiceName(any())).thenReturn("payment_app");
         when(jwtDecoder.decode(anyString())).thenReturn(getJwt());
     }
 

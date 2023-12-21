@@ -50,12 +50,14 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDism
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.casemanMarksMediationUnsuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certificateOfServiceEnabled;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotifiedTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmitted1v1RespondentOneUnregistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothRespondentUnrepresented;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothUnregisteredSolicitors;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
@@ -171,6 +173,21 @@ class FlowPredicateTest {
                 .takenOfflineByStaff()
                 .build();
             assertTrue(takenOfflineByStaffBeforeClaimIssued.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenRespondentSolicitorUnregistered() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimSubmittedRespondent1Unregistered()
+                .addRespondent2(NO)
+                .build();
+            assertTrue(claimSubmitted1v1RespondentOneUnregistered.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenRespondentSolicitorRegistered() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
+            assertFalse(claimSubmitted1v1RespondentOneUnregistered.test(caseData));
         }
     }
 
@@ -1787,7 +1804,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenTakenOfflineByStaffMediationUnsuccessful() {
+        void shouldReturnFalse_whenTakenOfflineByStaffAfterMediationUnsuccessful() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
                 .takenOfflineByStaff()
@@ -1797,7 +1814,17 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenTakenOfflineByStaffInMediation() {
+        void shouldReturnFalse_whenTakenOfflineByStaffAfterMediationUnsuccessfulCarm() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build();
+
+            assertFalse(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffInMediationBeforeMediationUnsuccessful() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
                 .takenOfflineByStaff()
@@ -1806,6 +1833,36 @@ class FlowPredicateTest {
                 .build();
 
             assertTrue(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseworkerMarksMediationUnsuccessful() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
+                .build().toBuilder()
+                .build();
+
+            assertTrue(casemanMarksMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseworkerMarksMediationUnsuccessfulCarm() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_ONE)
+                .build().toBuilder()
+                .build();
+
+            assertTrue(casemanMarksMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseworkerMarksMediationSuccessful() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationSuccessful(MultiPartyScenario.ONE_V_ONE)
+                .build().toBuilder()
+                .build();
+
+            assertFalse(casemanMarksMediationUnsuccessful.test(caseData));
         }
     }
 

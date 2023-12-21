@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -806,6 +807,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
                 .disposalHearingMethodInPersonDJ(options)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(options.getValue().getCode()))).thenReturn(
@@ -832,6 +834,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
                 .toBuilder()
                 .disposalHearingMethodInPersonDJ(options)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation("11111").build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(false);
@@ -860,6 +863,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build()
             .toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(options.getValue().getCode()).build())
             .trialHearingMethodInPersonDJ(options)
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

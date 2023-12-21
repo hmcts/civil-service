@@ -11,11 +11,16 @@ import uk.gov.hmcts.reform.civil.model.docmosis.hearing.HearingForm;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
+
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import java.time.LocalDate;
@@ -25,9 +30,13 @@ import java.util.List;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_APPLICATION_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_FAST_TRACK_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_OTHER_AHN;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARING_SMALL_CLAIMS_AHN;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.formatHearingDuration;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingTimeFormatted;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingType;
@@ -39,11 +48,14 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
     private final AssignCategoryId assignCategoryId;
+    private final FeatureToggleService featureToggleService;
+    private final LocationRefDataService locationRefDataService;
+    private final CourtLocationUtils courtLocationUtils;
 
     public List<CaseDocument> generate(CaseData caseData, String authorisation) {
 
         List<CaseDocument> caseDocuments = new ArrayList<>();
-        HearingForm templateData = getTemplateData(caseData);
+        HearingForm templateData = getTemplateData(caseData, authorisation);
         DocmosisTemplates template = getTemplate(caseData);
         DocmosisDocument document =
             documentGeneratorService.generateDocmosisDocument(templateData, template);
@@ -60,13 +72,14 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
         return caseDocuments;
     }
 
-    @Override
-    public HearingForm getTemplateData(CaseData caseData) {
+    public HearingForm getTemplateData(CaseData caseData, String authorisation) {
+        List<LocationRefData> locations = (locationRefDataService.getHearingCourtLocations(authorisation));
 
         return HearingForm.builder()
+            .courtName(courtLocationUtils.findPreferredLocationData(locations, caseData.getHearingLocation()).getSiteName())
             .listingOrRelisting(caseData.getListingOrRelisting().toString())
             .court(caseData.getHearingLocation().getValue().getLabel())
-            .caseNumber(caseData.getLegacyCaseReference())
+            .caseNumber(caseData.getCcdCaseReference().toString())
             .creationDate(getDateFormatted(LocalDate.now()))
             .claimant(caseData.getApplicant1().getPartyName())
             .claimantReference(checkReference(caseData)
@@ -115,15 +128,28 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     }
 
     private DocmosisTemplates getTemplate(CaseData caseData) {
-        switch (caseData.getHearingNoticeList()) {
-            case SMALL_CLAIMS:
-                return HEARING_SMALL_CLAIMS;
-            case FAST_TRACK_TRIAL:
-                return HEARING_FAST_TRACK;
-            case HEARING_OF_APPLICATION:
-                return HEARING_APPLICATION;
-            default:
-                return HEARING_OTHER;
+        if (!featureToggleService.isAutomatedHearingNoticeEnabled()) {
+            switch (caseData.getHearingNoticeList()) {
+                case SMALL_CLAIMS:
+                    return HEARING_SMALL_CLAIMS;
+                case FAST_TRACK_TRIAL:
+                    return HEARING_FAST_TRACK;
+                case HEARING_OF_APPLICATION:
+                    return HEARING_APPLICATION;
+                default:
+                    return HEARING_OTHER;
+            }
+        } else {
+            switch (caseData.getHearingNoticeList()) {
+                case SMALL_CLAIMS:
+                    return HEARING_SMALL_CLAIMS_AHN;
+                case FAST_TRACK_TRIAL:
+                    return HEARING_FAST_TRACK_AHN;
+                case HEARING_OF_APPLICATION:
+                    return HEARING_APPLICATION_AHN;
+                default:
+                    return HEARING_OTHER_AHN;
+            }
         }
     }
 }

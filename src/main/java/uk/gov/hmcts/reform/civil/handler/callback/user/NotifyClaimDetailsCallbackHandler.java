@@ -124,13 +124,11 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         LocalDate notificationDate = notificationDateTime.toLocalDate();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        if (featureToggleService.isCertificateOfServiceEnabled()) {
-            caseData = saveCoSDetailsDoc(caseData, 1);
-            caseData = saveCoSDetailsDoc(caseData, 2);
+        caseData = saveCoSDetailsDoc(caseData, 1);
+        caseData = saveCoSDetailsDoc(caseData, 2);
 
-            if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && isConfirmationForLip(caseData)) {
-                multiPartyScenario = null;
-            }
+        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && isConfirmationForLip(caseData)) {
+            multiPartyScenario = null;
         }
         CaseData updatedCaseData;
 
@@ -139,6 +137,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             updatedCaseData = caseData.toBuilder()
                     .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
                     .claimDetailsNotificationDate(currentDateTime)
+                    .addLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
+                    .addLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
                     .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
                     .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
                     .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
@@ -166,12 +166,25 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 builder.respondent1ResponseDeadline(
                         deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
             }
+
+            if (Objects.nonNull(caseData.getRespondent1())
+                && NO.equals(caseData.getRespondent1Represented())) {
+                builder.addLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
+            }
+
             if (Objects.nonNull(caseData.getRespondent2())
                 && YES.equals(caseData.getAddRespondent2())) {
                 builder.respondent2ResponseDeadline(
                         deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
             }
-            if (featureToggleService.isCertificateOfServiceEnabled() && areAnyRespondentsLitigantInPerson(caseData)) {
+
+            if (Objects.nonNull(caseData.getRespondent2())
+                   && YES.equals(caseData.getAddRespondent2())
+                && NO.equals(caseData.getRespondent2Represented())) {
+                builder.addLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
+            }
+
+            if (areAnyRespondentsLitigantInPerson(caseData))  {
                 if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
                     builder
                         .cosNotifyClaimDetails1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails1()))
@@ -196,22 +209,20 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private LocalDateTime getEarliestDateOfService(CaseData caseData) {
         LocalDateTime date = time.now();
 
-        if (featureToggleService.isCertificateOfServiceEnabled()) {
-            if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
-                && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) {
-                LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
-                        .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
-                if (cosDate1.isBefore(date)) {
-                    date = cosDate1;
-                }
+        if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
+            && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) {
+            LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
+                    .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
+            if (cosDate1.isBefore(date)) {
+                date = cosDate1;
             }
-            if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
-                && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
-                LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
-                        .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
-                if (cosDate2.isBefore(date)) {
-                    date = cosDate2;
-                }
+        }
+        if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
+            && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
+            LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
+                    .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
+            if (cosDate2.isBefore(date)) {
+                date = cosDate2;
             }
         }
         return date;
@@ -273,23 +284,15 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 || caseData.getDefendantSolicitorNotifyClaimDetailsOptions() == null
                 ? CONFIRMATION_SUMMARY
                 : NOTIFICATION_ONE_PARTY_SUMMARY;
-        if (featureToggleService.isCertificateOfServiceEnabled()) {
-            return isConfirmationForLip(caseData)
-                    ? CONFIRMATION_COS_SUMMARY
-                    : confirmationTextLR;
-        } else {
-            return confirmationTextLR;
-        }
+        return isConfirmationForLip(caseData)
+                ? CONFIRMATION_COS_SUMMARY
+                : confirmationTextLR;
     }
 
     private String getConfirmationHeader(CaseData caseData) {
-        if (featureToggleService.isCertificateOfServiceEnabled()) {
-            return isConfirmationForLip(caseData)
-                    ? CONFIRMATION_COS_HEADER
-                    : CONFIRMATION_HEADER;
-        } else {
-            return CONFIRMATION_HEADER;
-        }
+        return isConfirmationForLip(caseData)
+                ? CONFIRMATION_COS_HEADER
+                : CONFIRMATION_HEADER;
     }
 
     private boolean isConfirmationForLip(CaseData caseData) {
@@ -362,23 +365,21 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         CaseData caseData = callbackParams.getCaseData();
 
         ArrayList<String> errors = new ArrayList<>();
-        CertificateOfService certificateOfService = caseData.getCosNotifyClaimDetails1();
-        if (featureToggleService.isCertificateOfServiceEnabled()) {
-            if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
-                caseData.getCosNotifyClaimDetails1().setCosDocSaved(NO);
-            }
-
-            final String dateValidationErrorMessage = getServiceOfDateValidationMessage(
-                caseData.getCosNotifyClaimDetails1());
-
-            if (!dateValidationErrorMessage.isEmpty()) {
-                errors.add(dateValidationErrorMessage);
-            }
-            if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
-                    && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails1())) {
-                errors.add(DOC_SERVED_MANDATORY);
-            }
+        if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
+            caseData.getCosNotifyClaimDetails1().setCosDocSaved(NO);
         }
+
+        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(
+            caseData.getCosNotifyClaimDetails1());
+
+        if (!dateValidationErrorMessage.isEmpty()) {
+            errors.add(dateValidationErrorMessage);
+        }
+        if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
+                && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails1())) {
+            errors.add(DOC_SERVED_MANDATORY);
+        }
+        CertificateOfService certificateOfService = caseData.getCosNotifyClaimDetails1();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.cosNotifyClaimDetails1(certificateOfService.toBuilder()
                                                    .build());
@@ -391,28 +392,26 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private CallbackResponse validateCoSDetailsDefendant2(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDetails2();
         ArrayList<String> errors = new ArrayList<>();
-        if (featureToggleService.isCertificateOfServiceEnabled()) {
-            if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
-                caseData.getCosNotifyClaimDetails2().setCosDocSaved(NO);
-            }
-            final String dateValidationErrorMessage = getServiceOfDateValidationMessage(
-                caseData.getCosNotifyClaimDetails2());
-
-            if (!dateValidationErrorMessage.isEmpty()) {
-                errors.add(dateValidationErrorMessage);
-            }
-
-            if (isBothDefendantLip(caseData) && !isBothDefendantWithSameDateOfService(caseData)) {
-                errors.add(BOTH_CERTIFICATE_SERVED_SAME_DATE);
-            }
-
-            if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
-                && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails2())) {
-                errors.add(DOC_SERVED_MANDATORY);
-            }
+        if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
+            caseData.getCosNotifyClaimDetails2().setCosDocSaved(NO);
         }
+        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(
+            caseData.getCosNotifyClaimDetails2());
+
+        if (!dateValidationErrorMessage.isEmpty()) {
+            errors.add(dateValidationErrorMessage);
+        }
+
+        if (isBothDefendantLip(caseData) && !isBothDefendantWithSameDateOfService(caseData)) {
+            errors.add(BOTH_CERTIFICATE_SERVED_SAME_DATE);
+        }
+
+        if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
+            && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails2())) {
+            errors.add(DOC_SERVED_MANDATORY);
+        }
+        CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDetails2();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.cosNotifyClaimDetails2(certificateOfServiceDef2.toBuilder()
                                                    .build());

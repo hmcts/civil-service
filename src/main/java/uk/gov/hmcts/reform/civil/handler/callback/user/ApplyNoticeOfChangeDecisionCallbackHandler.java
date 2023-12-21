@@ -57,6 +57,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         CaseDetails caseDetails = callbackParams.getRequest().getCaseDetails();
         CaseData preDecisionCaseData = objectMapper.convertValue(caseDetails.getData(), CaseData.class);
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String caseRole = callbackParams.getCaseData().getChangeOrganisationRequestField().getCaseRoleId().getValue().getCode();
 
         updateOrgPoliciesForLiP(callbackParams.getRequest().getCaseDetails());
 
@@ -68,6 +69,8 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
         CaseData postDecisionCaseData = objectMapper.convertValue(applyDecision.getData(), CaseData.class);
         CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = postDecisionCaseData.toBuilder();
+
+        setAddLegalRepDeadlinesToNull(updatedCaseDataBuilder, caseRole);
 
         updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
             updatedCaseDataBuilder,
@@ -189,6 +192,14 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             }
         }
         return null;
+    }
+
+    private void setAddLegalRepDeadlinesToNull(CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder, String caseRole) {
+        if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
+            updatedCaseDataBuilder.addLegalRepDeadlineRes1(null);
+        } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
+            updatedCaseDataBuilder.addLegalRepDeadlineRes2(null);
+        }
     }
 
     private String getFormerEmail(String caseRole, CaseData caseData) {

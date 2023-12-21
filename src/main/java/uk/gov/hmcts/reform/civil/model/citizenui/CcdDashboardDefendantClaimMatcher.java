@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Slf4j
 @AllArgsConstructor
-public class CcdDashboardClaimMatcher implements Claim {
+public class CcdDashboardDefendantClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
     private CaseData caseData;
@@ -231,8 +231,10 @@ public class CcdDashboardClaimMatcher implements Claim {
     public boolean isMediationUnsuccessful() {
         return !hasSdoBeenDrawn()
             && Objects.nonNull(caseData.getMediation())
-            && Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
-            && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty();
+            && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
+                && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
+            || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
+                && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
     }
 
     @Override

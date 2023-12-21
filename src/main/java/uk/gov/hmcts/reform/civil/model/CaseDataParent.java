@@ -67,6 +67,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.DisposalHearingBundleDJ;
@@ -94,6 +95,9 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsReferredInStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -155,6 +159,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.math.BigDecimal.ZERO;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Jacksonized
@@ -723,6 +728,23 @@ public class CaseDataParent implements MappableObject {
 
     private FastTrackAllocation fastTrackAllocation;
 
+    private YesOrNo showCarmFields;
+
+    @JsonUnwrapped
+    private UploadMediationDocumentsForm uploadMediationDocumentsForm;
+
+    private List<Element<MediationNonAttendanceStatement>> app1MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> app1MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> app2MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> app2MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> res1MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> res2MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> res2MediationDocumentsReferred;
+
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
         return applicant1AcceptAdmitAmountPaidSpec == YesOrNo.YES
@@ -779,5 +801,13 @@ public class CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1ClaimMediationSpecRequiredLip)
             .filter(ClaimantMediationLip::hasClaimantNotAgreedToFreeMediation).isPresent();
+    }
+
+    @JsonIgnore
+    public String getHearingLocationText() {
+        return ofNullable(hearingLocation)
+            .map(DynamicList::getValue)
+            .map(DynamicListElement::getLabel)
+            .orElse(null);
     }
 }
