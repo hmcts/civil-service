@@ -16,7 +16,7 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.lo
 
 @Service
 @RequiredArgsConstructor
-public class SealedClaimFromDownloadService {
+public class SealedClaimFormDownloadService {
 
     private final DocumentDownloadService documentDownloadService;
 

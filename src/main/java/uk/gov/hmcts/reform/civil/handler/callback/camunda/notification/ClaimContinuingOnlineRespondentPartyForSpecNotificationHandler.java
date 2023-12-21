@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.service.SealedClaimFromDownloadService;
+import uk.gov.hmcts.reform.civil.service.SealedClaimFormDownloadService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
@@ -49,7 +49,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private final PinInPostConfiguration pipInPostConfiguration;
     private final PiPLetterGenerator pipLetterGenerator;
     private final BulkPrintService bulkPrintService;
-    private final SealedClaimFromDownloadService sealedClaimFormDownloadService;
+    private final SealedClaimFormDownloadService sealedClaimFormDownloadService;
 
     @Override
     protected Map<String, Callback> callbacks() {

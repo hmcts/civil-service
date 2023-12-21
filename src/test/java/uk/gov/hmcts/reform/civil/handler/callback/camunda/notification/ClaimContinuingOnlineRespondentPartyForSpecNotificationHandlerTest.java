@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.SealedClaimFromDownloadService;
+import uk.gov.hmcts.reform.civil.service.SealedClaimFormDownloadService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -79,7 +79,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     @MockBean
     private PiPLetterGenerator pipLetterGenerator;
     @MockBean
-    private SealedClaimFromDownloadService sealedClaimFromDownloadService;
+    private SealedClaimFormDownloadService sealedClaimFormDownloadService;
     @MockBean
     private Time time;
 
@@ -104,7 +104,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
             when(pinInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
-            when(sealedClaimFromDownloadService.downloadDocument(any(), any())).thenReturn(LETTER_CONTENT);
+            when(sealedClaimFormDownloadService.downloadDocument(any(), any())).thenReturn(LETTER_CONTENT);
             given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
         }
 
