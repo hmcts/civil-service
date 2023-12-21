@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.lo
 @Service
 @RequiredArgsConstructor
 public class SealedClaimFromDownloadService {
+
     private final DocumentDownloadService documentDownloadService;
 
     public byte[] downloadDocument(String authorisation, CaseData caseData) {

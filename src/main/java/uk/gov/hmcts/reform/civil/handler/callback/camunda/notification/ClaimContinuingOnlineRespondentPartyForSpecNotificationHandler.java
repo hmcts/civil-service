@@ -112,7 +112,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             outputStream.write(pinLetter);
             outputStream.write(sealedFormContent);
-            byte[] letter = outputStream.toByteArray( );
+            byte[] letter = outputStream.toByteArray();
             List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
             log.debug("----------- generatePiPLetter - ready to printLetter -----------");
             bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
