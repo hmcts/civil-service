@@ -7,6 +7,7 @@ import java.util.Map;
 public interface NotificationData {
 
     String CLAIM_REFERENCE_NUMBER = "claimReferenceNumber";
+    String CLAIM_16_DIGIT_NUMBER = "claim16DigitNumber";
     String RESPONDENT_NAME = "defendantName";
     String ISSUED_ON = "issuedOn";
     String CLAIM_NOTIFICATION_DEADLINE = "claimNotificationDeadline";

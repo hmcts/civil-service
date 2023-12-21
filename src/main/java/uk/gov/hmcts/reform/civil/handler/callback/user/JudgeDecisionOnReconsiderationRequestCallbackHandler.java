@@ -20,8 +20,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
-
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -64,7 +67,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments().stream().filter(
             caseDocumentElement -> caseDocumentElement.getValue().getDocumentType().equals(
                 DocumentType.SDO_ORDER)).sorted(Comparator.comparing(
-            caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
+                    caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
             Comparator.reverseOrder()
         )).findFirst();
 
