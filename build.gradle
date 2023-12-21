@@ -230,7 +230,7 @@ tasks.withType(Test) {
 }
 
 test {
-  failFast = false
+  failFast = true
 }
 
 task integration(type: Test) {
@@ -309,7 +309,6 @@ sonarqube {
     property "sonar.coverage.exclusions", "**/model/**, **/config/**/*Configuration.java, **/testingsupport/**, **/*ExternalTaskListener.java, **/*BaseExternalTaskHandler.java, **/stereotypes/**, **/*Exception.java, **/EventHistoryMapper*.java, **/model/hearingvalues/**, **/enums/hearing/**, **/fees/client/**, **/enums/sdo/**, **/service/PaymentsService.java"
     property "sonar.cpd.exclusions", "**/*DocumentManagementService.java, **/*Spec*.java, **/*CcdDashboardClaimantClaimMatcher.java"
     property "sonar.exclusions", "**/hmc/model/**, **/model/hearingvalues/**"
-    property "sonar.gradle.skipCompile", true
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
   }
 }
