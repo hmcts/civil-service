@@ -20,8 +20,12 @@ import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.*;
+import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.SealedClaimFromDownloadService;
+import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
@@ -99,6 +103,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             when(deadlinesCalculator.plus14DaysDeadline(any())).thenReturn(responseDeadline);
             when(pinInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
+            when(sealedClaimFromDownloadService.downloadDocument(any(), any())).thenReturn(LETTER_CONTENT);
         }
 
         @Test
@@ -136,7 +141,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
         void shouldGenerateAndPrintLetterSuccessfully() {
             // Given
             given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
-            given(sealedClaimFromDownloadService.downloadDocument(any(),any())).willReturn(LETTER_CONTENT);
+            given(sealedClaimFromDownloadService.downloadDocument(any(), any())).willReturn(LETTER_CONTENT);
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
