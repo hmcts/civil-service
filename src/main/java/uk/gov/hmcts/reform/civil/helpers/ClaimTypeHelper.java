@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 
 public class ClaimTypeHelper {
 
@@ -9,8 +9,8 @@ public class ClaimTypeHelper {
         // Utility class, no instances
     }
 
-    public static ClaimType copyClaimTypeUnspecToClaimType(CaseData caseData) {
-        switch (caseData.getClaimTypeUnSpec()) {
+    public static ClaimType getClaimTypeFromClaimTypeUnspec(ClaimTypeUnspec claimTypeUnspec) {
+        switch (claimTypeUnspec) {
             case PERSONAL_INJURY:
                 return ClaimType.PERSONAL_INJURY;
             case CLINICAL_NEGLIGENCE:

@@ -566,7 +566,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
 
         //Copy Unspec Claim Type into Spec claim Type
-        ClaimType claimType = ClaimTypeHelper.copyClaimTypeUnspecToClaimType(caseData);
+        ClaimType claimType = ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(caseData.getClaimTypeUnSpec());
         dataBuilder.claimType(claimType);
 
         dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), claimType));
