@@ -14,16 +14,21 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.SealedClaimFromDownloadService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
+import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -44,6 +49,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private final PinInPostConfiguration pipInPostConfiguration;
     private final PiPLetterGenerator pipLetterGenerator;
     private final BulkPrintService bulkPrintService;
+    private final SealedClaimFromDownloadService sealedClaimFormDownloadService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -98,11 +104,23 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     }
 
     private void generatePIPLetter(CallbackParams callbackParams) {
+        log.debug("----------- generatePiPLetter - entry point -----------");
         CaseData caseData = callbackParams.getCaseData();
-        byte[] letter = pipLetterGenerator.downloadLetter(caseData);
-        List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
-        bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
+        byte[] pinLetter = pipLetterGenerator.downloadLetter(caseData);
+        byte[] sealedFormContent = sealedClaimFormDownloadService.downloadDocument(callbackParams.getParams().get(BEARER_TOKEN).toString(), caseData);
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            outputStream.write(pinLetter);
+            outputStream.write(sealedFormContent);
+            byte[] letter = outputStream.toByteArray( );
+            List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
+            log.debug("----------- generatePiPLetter - ready to printLetter -----------");
+            bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
+                                         caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
+            log.debug("----------- generatePiPLetter - exit point -----------");
+        } catch (IOException e) {
+            log.error("Failed getting PiP letter content");
+        }
     }
 
     private void generatePIPEmail(CaseData caseData) {
