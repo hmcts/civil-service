@@ -17,9 +17,6 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_RECONSIDERATION_UPHELD_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_RECONSIDERATION_UPHELD_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
 
 @Service
