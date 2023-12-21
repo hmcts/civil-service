@@ -224,7 +224,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateBusinessProcess_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
+                .setCoSClaimDetailsWithDate(true, false, localDateTime.toLocalDate(), localDateTime.toLocalDate(), null, null, true, false)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -328,9 +330,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate deemed1Date = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemed2Date = localDateTime.minusDays(3).toLocalDate();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemed1Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemed2Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(3));
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -402,7 +404,8 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .other(documentList).build();
 
             return Stream.of(
-                arguments(CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                arguments(CaseDataBuilder.builder().atStateClaimDraft()
+                              .build().toBuilder()
                               .uploadParticularsOfClaim(YES)
                               .servedDocumentFiles(documentToUpload)
                               .build())
@@ -413,7 +416,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @MethodSource("caseDataStream")
         void shouldAssignCategoryIds_whenDocumentExist(CaseData caseData) {
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
             // When

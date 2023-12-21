@@ -221,31 +221,30 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private LocalDateTime getEarliestDateOfService(CaseData caseData) {
         LocalDateTime date = time.now();
+        LocalDateTime deemedDate1 = null;
+        LocalDateTime deemedDate2 = null;
 
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
             && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant())) {
-            LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
+            deemedDate1 = caseData.getCosNotifyClaimDetails1()
                 .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
-            date = getEarliestDate(date, cosDate1);
         }
 
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
             && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant())) {
-            LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
+            deemedDate2 = caseData.getCosNotifyClaimDetails2()
                 .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
-            date = getEarliestDate(date, cosDate2);
         }
 
-        return date;
-    }
-
-    private LocalDateTime getEarliestDate(LocalDateTime date1, LocalDateTime date2) {
-        if (date1 == null) {
-            return date2;
-        } else if (date2 == null) {
-            return date1;
+        if (deemedDate1 != null && deemedDate2 != null) {
+            return deemedDate1.isBefore(deemedDate2) ? deemedDate1 : deemedDate2;
+        } else if (deemedDate1 != null) {
+            return deemedDate1;
+        } else if (deemedDate2 != null) {
+            return deemedDate2;
         } else {
-            return date1.isBefore(date2) ? date1 : date2;
+            // If both deemedDate1 and deemedDate2 are null, use the current date and time
+            return date;
         }
     }
 
