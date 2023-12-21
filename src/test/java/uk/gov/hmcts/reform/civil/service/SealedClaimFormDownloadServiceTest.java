@@ -67,6 +67,7 @@ class SealedClaimFormDownloadServiceTest {
         // then
         assertThat(document).isNullOrEmpty();
     }
+
     @Test
     void shouldNotDownloadDocument_whenEmpty() {
         // given
