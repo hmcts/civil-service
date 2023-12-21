@@ -14,8 +14,12 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_RECONSIDERATION_UPHELD;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -84,6 +88,11 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         if (!callbackParams.getCaseData().getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
             caseDataBuilder.upholdingPreviousOrderReason(null);
         }
+
+        if(callbackParams.getCaseData().getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())){
+            caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_CLAIM_RECONSIDERATION_UPHELD));
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
