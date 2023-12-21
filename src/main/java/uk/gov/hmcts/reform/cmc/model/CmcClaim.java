@@ -23,9 +23,7 @@ import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT;
 import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORMAT;
-import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_TIME_FORMAT_CMC;
 
 @Data
 @Builder
@@ -241,18 +239,18 @@ public class CmcClaim implements Claim {
 
     private boolean hasClaimantSignedSettlementAgreementOfferAccepted() {
         return Objects.nonNull(settlement) && settlement.isOfferAccepted() && settlement.isThroughAdmissions()
-                && Objects.nonNull(claimantResponse) && !claimantResponse.hasCourtDetermination();
+            && Objects.nonNull(claimantResponse) && !claimantResponse.hasCourtDetermination();
     }
 
     private boolean hasClaimantSignedSettlementAgreementChosenByCourt() {
         return Objects.nonNull(settlement) && settlement.isOfferAccepted() && !settlement.isRejectedByDefendant() && settlement.isThroughAdmissions()
-                && Objects.nonNull(claimantResponse) && claimantResponse.hasCourtDetermination();
+            && Objects.nonNull(claimantResponse) && claimantResponse.hasCourtDetermination();
     }
 
     @Override
     public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
         return Objects.nonNull(settlement) && settlement.isOfferAccepted() && settlement.isThroughAdmissions()
-                && Objects.nonNull(claimantRespondedAt) && claimantRespondedAt.plusDays(7).isBefore(LocalDateTime.now());
+            && Objects.nonNull(claimantRespondedAt) && claimantRespondedAt.plusDays(7).isBefore(LocalDateTime.now());
     }
 
     @Override
@@ -266,7 +264,7 @@ public class CmcClaim implements Claim {
             return false;
         }
         return claimantResponse.getFormaliseOption() == FormaliseOption.SETTLEMENT
-                && Objects.nonNull(settlement) && settlement.isOfferRejected();
+            && Objects.nonNull(settlement) && settlement.isOfferRejected();
     }
 
     @Override

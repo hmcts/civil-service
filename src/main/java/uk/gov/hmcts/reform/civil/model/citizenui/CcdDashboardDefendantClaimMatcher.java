@@ -233,8 +233,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isMediationUnsuccessful() {
         return !hasSdoBeenDrawn()
             && Objects.nonNull(caseData.getMediation())
-            && Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
-            && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty();
+            && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
+                && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
+            || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
+                && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
     }
 
     @Override
