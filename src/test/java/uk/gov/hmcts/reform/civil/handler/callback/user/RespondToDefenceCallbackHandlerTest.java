@@ -697,6 +697,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -759,6 +760,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -821,6 +823,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -883,6 +886,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -937,6 +941,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -991,6 +996,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -1050,6 +1056,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -1109,6 +1116,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -1169,6 +1177,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
