@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -14,8 +15,12 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(SpringExtension.class)
@@ -27,6 +32,39 @@ class MediationUnsuccessfulHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private MediationUnsuccessfulHandler handler;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
+    @Nested
+    class AboutToStartCallback {
+
+        @Test
+        void shouldPopulateCarmShowCondition_whenCarmApplicableToCase() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued().build();
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldPopulateCarmShowCondition_whenCarmNotApplicableToCase() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued().build();
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("No");
+        }
+    }
 
     @Nested
     class AboutToSubmitCallback {

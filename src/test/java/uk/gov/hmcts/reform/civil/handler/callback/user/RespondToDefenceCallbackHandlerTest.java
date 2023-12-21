@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -82,6 +84,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DE
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -97,6 +100,9 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     AssignCategoryId.class
 })
 class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
+
+    @MockBean
+    private CaseDetailsConverter caseDetailsConverter;
 
     @MockBean
     private Time time;
@@ -550,6 +556,17 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void setup() {
             when(time.now()).thenReturn(localDateTime);
             given(toggleConfiguration.getFeatureToggle()).willReturn("WA 3.5");
+
+            Address address = Address.builder()
+                .postCode("E11 5BB")
+                .build();
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
         }
 
         @ParameterizedTest
@@ -680,6 +697,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -742,6 +760,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -804,6 +823,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -866,6 +886,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -920,6 +941,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -974,6 +996,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -1033,6 +1056,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -1092,6 +1116,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(
@@ -1152,6 +1177,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
                 .applicant1DefenceResponseDocument(ResponseDocument.builder()
                                                        .file(DocumentBuilder.builder().documentName(

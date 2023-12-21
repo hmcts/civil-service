@@ -83,6 +83,8 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapU
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapWitnessesToUpdatePartyDetailsForm;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQWitnesses;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForLitigationFriendParties;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
@@ -406,15 +408,18 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        // persist party flags (ccd issue)
+        persistFlagsForParties(oldCaseData, caseData, builder);
+        persistFlagsForLitigationFriendParties(oldCaseData, caseData, builder);
+
         String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
 
         updateExperts(partyChosenId, caseData, builder);
         updateWitnesses(partyChosenId, caseData, builder);
 
         if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
-            // persist party flags (ccd issue)
-            getFlagsForParty(callbackParams, caseData, builder);
-
             // update case name for hmc if applicant/respondent/litigation friend was updated
             builder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
             builder.caseNamePublic(buildCaseNamePublic(caseData));
@@ -544,80 +549,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
                 unwrapElements(mappedWitnesses)
             );
             builder.respondent2Witnesses(updatedRespondent2Witnesses);
-        }
-    }
-
-    private void getFlagsForParty(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
-        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-
-        // persist respondent flags (ccd issue)
-        var updatedRespondent1 = caseData.getRespondent1().toBuilder()
-            .flags(oldCaseData.getRespondent1().getFlags())
-            .build();
-
-        builder.respondent1(updatedRespondent1);
-
-        // persist applicant flags (ccd issue)
-        var updatedApplicant1 = caseData.getApplicant1().toBuilder()
-            .flags(oldCaseData.getApplicant1().getFlags())
-            .build();
-
-        builder.applicant1(updatedApplicant1);
-
-        // if present, persist the 2nd respondent flags in the same fashion as above, i.e ignore for 1v1
-        if (ofNullable(caseData.getRespondent2()).isPresent()
-            && ofNullable(oldCaseData.getRespondent2()).isPresent()) {
-            var updatedRespondent2 = caseData.getRespondent2().toBuilder()
-                .flags(oldCaseData.getRespondent2().getFlags())
-                .build();
-
-            builder.respondent2(updatedRespondent2);
-        }
-
-        // if present, persist the 2nd applicant flags in the same fashion as above, i.e ignore for 1v1
-        if (ofNullable(caseData.getApplicant2()).isPresent()
-            && ofNullable(oldCaseData.getApplicant2()).isPresent()) {
-            var updatedApplicant2 = caseData.getApplicant2().toBuilder()
-                .flags(oldCaseData.getApplicant2().getFlags())
-                .build();
-
-            builder.applicant2(updatedApplicant2);
-        }
-
-        // Litigation Friend
-        if (ofNullable(oldCaseData.getApplicant1LitigationFriend()).isPresent()) {
-            var party = caseData.getApplicant1LitigationFriend().toBuilder()
-                .flags(oldCaseData.getApplicant1LitigationFriend().getFlags())
-                .build();
-
-            builder.applicant1LitigationFriend(party);
-        }
-
-        // Litigation Friend
-        if (ofNullable(oldCaseData.getApplicant2LitigationFriend()).isPresent()) {
-            var party = caseData.getApplicant2LitigationFriend().toBuilder()
-                .flags(oldCaseData.getApplicant2LitigationFriend().getFlags())
-                .build();
-
-            builder.applicant2LitigationFriend(party);
-        }
-
-        // Litigation Friend
-        if (ofNullable(oldCaseData.getRespondent1LitigationFriend()).isPresent()) {
-            var party = caseData.getRespondent1LitigationFriend().toBuilder()
-                .flags(oldCaseData.getRespondent1LitigationFriend().getFlags())
-                .build();
-
-            builder.respondent1LitigationFriend(party);
-        }
-
-        // Litigation Friend
-        if (ofNullable(oldCaseData.getRespondent2LitigationFriend()).isPresent()) {
-            var party = caseData.getRespondent2LitigationFriend().toBuilder()
-                .flags(oldCaseData.getRespondent2LitigationFriend().getFlags())
-                .build();
-
-            builder.respondent2LitigationFriend(party);
         }
     }
 

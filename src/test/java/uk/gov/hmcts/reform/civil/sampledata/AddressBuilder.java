@@ -14,6 +14,7 @@ public class AddressBuilder {
             .addressLine2("address line 2")
             .addressLine3("address line 3")
             .postCode("SW1 1AA")
+            .postTown("London")
             .county("London")
             .country("UK");
     }
