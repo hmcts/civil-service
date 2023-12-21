@@ -88,6 +88,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
 
     public static final String TASK_ID_Respondent1 = "CreateClaimContinuingOnlineNotifyRespondent1ForSpec";
     private static final byte[] LETTER_CONTENT = new byte[]{1, 2, 3, 4};
+    private static final byte[] LETTER_CONTENT_APPEND = new byte[]{1, 2, 3, 4, 1, 2, 3, 4};
 
     @Nested
     class AboutToSubmitCallback {
@@ -104,6 +105,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             when(pinInPostConfiguration.getRespondToClaimUrl()).thenReturn("dummy_respond_to_claim_url");
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
             when(sealedClaimFromDownloadService.downloadDocument(any(), any())).thenReturn(LETTER_CONTENT);
+            given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
         }
 
         @Test
@@ -140,8 +142,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
         @Test
         void shouldGenerateAndPrintLetterSuccessfully() {
             // Given
-            given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
-            given(sealedClaimFromDownloadService.downloadDocument(any(), any())).willReturn(LETTER_CONTENT);
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
@@ -151,7 +151,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             // Then
             verify(bulkPrintService)
                 .printLetter(
-                    LETTER_CONTENT,
+                    LETTER_CONTENT_APPEND,
                     caseData.getLegacyCaseReference(),
                     caseData.getLegacyCaseReference(),
                     "first-contact-pack",
