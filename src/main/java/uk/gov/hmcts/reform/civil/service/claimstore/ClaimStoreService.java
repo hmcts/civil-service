@@ -43,11 +43,8 @@ public class ClaimStoreService {
     }
 
     private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
-
         return cmcClaims.stream().map(cmcClaim ->
-                                      {
-                                          System.out.println(cmcClaim);
-                                  return        DashboardClaimInfo.builder()
+                                          DashboardClaimInfo.builder()
                                               .createdDate(createAtToCreateDate(cmcClaim))
                                               .claimId(cmcClaim.getExternalId())
                                               .claimNumber(cmcClaim.getReferenceNumber())
@@ -55,8 +52,8 @@ public class ClaimStoreService {
                                               .defendantName(cmcClaim.getDefendantName())
                                               .responseDeadline(cmcClaim.getResponseDeadline())
                                               .responseDeadlineTime(Optional.ofNullable(cmcClaim.getResponseDeadline()).map(
-                                                  LocalDate::atStartOfDay).orElse(null)
-                                              )
+                                                                        LocalDate::atStartOfDay).orElse(null)
+                                                  )
                                               .claimAmount(cmcClaim.getTotalAmountTillToday())
                                               .paymentDate(cmcClaim.getBySpecifiedDate())
                                               .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
@@ -66,8 +63,7 @@ public class ClaimStoreService {
                                                                                            .map(Response::getAmount)
                                                                                            .orElse(null))
                                               .status(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
-                                              .build();
-                                      }
+                                              .build()
         ).collect(Collectors.toList());
     }
 
