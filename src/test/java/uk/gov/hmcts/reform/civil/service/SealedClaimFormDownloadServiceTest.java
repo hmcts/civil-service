@@ -33,7 +33,7 @@ class SealedClaimFormDownloadServiceTest {
     private SealedClaimFormDownloadService sealedClaimFormDownloadService;
     private static final String TEST = "test";
     private static final Document DOCUMENT_LINK = new Document("document/url", TEST, TEST, TEST, TEST);
-    private static final byte[] DOCUMENT_CONTENT = new byte[]{1,2,3,4,5};
+    private static final byte[] DOCUMENT_CONTENT = new byte[]{1, 2, 3, 4, 5};
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     @Test
