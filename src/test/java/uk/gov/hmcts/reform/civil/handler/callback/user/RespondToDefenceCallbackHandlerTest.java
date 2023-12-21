@@ -100,6 +100,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     AssignCategoryId.class
 })
 class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
+
     @MockBean
     private CaseDetailsConverter caseDetailsConverter;
 
