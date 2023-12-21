@@ -112,6 +112,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
@@ -443,6 +444,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final LocalDateTime claimDetailsNotificationDate;
     private final LocalDateTime respondent1ResponseDeadline;
     private final LocalDateTime respondent2ResponseDeadline;
+    private final LocalDateTime addLegalRepDeadlineRes1;
+    private final LocalDateTime addLegalRepDeadlineRes2;
     private final LocalDateTime claimDismissedDeadline;
     private final LocalDateTime respondent1TimeExtensionDate;
     private final LocalDateTime respondent2TimeExtensionDate;
@@ -898,9 +901,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isJudgementDateNotPermitted() {
-        return nonNull(getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())
-            && getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()
-            .atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+        LocalDate whenWillThisAmountBePaid =
+            Optional.ofNullable(getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
+                null);
+        LocalDate firstRepaymentDate = Optional.ofNullable(getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(
+            null);
+
+        return (isNull(whenWillThisAmountBePaid) && isNull(firstRepaymentDate))
+            || isPaymentDateAfterToday(whenWillThisAmountBePaid)
+            || isPaymentDateAfterToday(firstRepaymentDate);
     }
 
     @JsonIgnore
@@ -1168,4 +1177,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .filter(ClaimantLiPResponse::hasApplicant1RequestedCcj).isPresent();
     }
 
+    @JsonIgnore
+    private boolean isPaymentDateAfterToday(LocalDate paymentDate) {
+        return nonNull(paymentDate)
+            && paymentDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+    }
 }
