@@ -7,5 +7,6 @@ public enum FastTrack {
     fastClaimEmployersLiability,
     fastClaimHousingDisrepair,
     fastClaimPersonalInjury,
-    fastClaimRoadTrafficAccident
+    fastClaimRoadTrafficAccident,
+    fastClaimNoiseInducedHearingLoss
 }
