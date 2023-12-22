@@ -2233,7 +2233,7 @@ public class CaseDataBuilder {
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
             .build();
         claimType = ClaimType.PERSONAL_INJURY;
-        claimTypeUnSpec = ClaimTypeUnspec.PERSONAL_INJURY;
+        claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
         applicantSolicitor1PbaAccounts = DynamicList.builder()
             .value(DynamicListElement.builder().label("PBA0077597").build())
