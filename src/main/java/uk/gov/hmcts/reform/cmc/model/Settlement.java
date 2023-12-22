@@ -45,23 +45,6 @@ public class Settlement {
     }
 
     @JsonIgnore
-    public boolean isRejectedByDefendant() {
-        return getPartyStatementStream()
-                .anyMatch(partyStatement -> partyStatement.isRejected()
-                        && partyStatement.isMadeByDefendant());
-    }
-
-    @JsonIgnore
-    public boolean isOfferAccepted() {
-        return getPartyStatementStream().anyMatch(PartyStatement::isAccepted);
-    }
-
-    @JsonIgnore
-    public boolean isOfferRejected() {
-        return getPartyStatementStream().anyMatch(PartyStatement::isRejected);
-    }
-
-    @JsonIgnore
     public boolean isSettled() {
         Stream<PartyStatement> partyStatementsStream = getPartyStatementStream();
         return partyStatementsStream.anyMatch(PartyStatement::isCounterSigned);
