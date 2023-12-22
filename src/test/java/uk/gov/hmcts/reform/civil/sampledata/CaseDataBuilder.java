@@ -2233,7 +2233,7 @@ public class CaseDataBuilder {
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
             .build();
         claimType = ClaimType.PERSONAL_INJURY;
-        //claimTypeUnSpec = ClaimTypeUnspec.PERSONAL_INJURY;
+        claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
         applicantSolicitor1PbaAccounts = DynamicList.builder()
             .value(DynamicListElement.builder().label("PBA0077597").build())
@@ -6183,11 +6183,6 @@ public class CaseDataBuilder {
         return wrapElements(details1, details2, details3, details4);
     }
 
-    public CaseDataBuilder claimTypeUnSpec(ClaimTypeUnspec claimTypeUnspec) {
-        this.claimTypeUnSpec = claimTypeUnspec;
-        return this;
-    }
-
     public CaseDataBuilder applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo intentionToSettle) {
         this.applicant1PartAdmitIntentionToSettleClaimSpec = intentionToSettle;
         return this;
@@ -6505,6 +6500,7 @@ public class CaseDataBuilder {
             .claimValue(claimValue)
             .uploadParticularsOfClaim(uploadParticularsOfClaim)
             .claimType(claimType)
+            .claimTypeUnSpec(claimTypeUnSpec)
             .claimTypeOther(claimTypeOther)
             .personalInjuryType(personalInjuryType)
             .personalInjuryTypeOther(personalInjuryTypeOther)

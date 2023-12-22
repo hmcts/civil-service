@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -1292,12 +1291,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldsetClaimTypeFromClaimTypeUnspec_when_sdoR2Enabled() {
 
-            CaseData caseData = CaseDataBuilder.builder().claimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
             assertThat(response.getData())
-                .containsEntry("claimType", ClaimType.PERSONAL_INJURY.name());
+                .containsEntry("claimType", ClaimType.CLINICAL_NEGLIGENCE.name());
         }
 
         @Test
