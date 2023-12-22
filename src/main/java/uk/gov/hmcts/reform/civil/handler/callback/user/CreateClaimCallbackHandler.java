@@ -565,11 +565,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
 
-        //Copy Unspec Claim Type into Spec claim Type
-        ClaimType claimType = ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(caseData.getClaimTypeUnSpec());
-        dataBuilder.claimType(claimType);
+        //Copy Unspec Claim Type into Spec claim Type if SDO R" feature toggle is on
+        if (toggleService.isSdoR2Enabled()) {
+            ClaimType claimType = ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(caseData.getClaimTypeUnSpec());
+            dataBuilder.claimType(claimType);
+            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), claimType));
+        } else {
+            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()));
+        }
 
-        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), claimType));
         dataBuilder.submittedDate(time.now());
 
         //set check email field to null for GDPR
