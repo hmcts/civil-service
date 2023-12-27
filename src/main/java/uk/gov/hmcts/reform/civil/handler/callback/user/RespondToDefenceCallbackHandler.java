@@ -222,6 +222,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         LocalDateTime currentTime = time.now();
 
+        // DO NOT MERGE THIS CHANGE
+        if ("excAbout".equals(caseData.getApplicant1().getPartyName())) {
+            throw new RuntimeException("Test exception during about to submit callback");
+        }
+        // END DO NOT MERGE THIS CHANGE
+
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE))
             .applicant1ResponseDate(currentTime);
@@ -384,6 +390,13 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        // DO NOT MERGE THIS CHANGE
+        if ("excSubmit".equals(caseData.getApplicant1().getPartyName())) {
+            throw new RuntimeException("Test exception during about to submit callback");
+        }
+        // END DO NOT MERGE THIS CHANGE
+
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         String claimNumber = caseData.getLegacyCaseReference();
         String title;

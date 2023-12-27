@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.service.robotics.exception.JsonSchemaValidationException;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
@@ -108,5 +109,11 @@ public class ResourceExceptionHandler {
     public ResponseEntity<Object> handleJsonSchemaValidationException(JsonSchemaValidationException exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.EXPECTATION_FAILED);
+    }
+
+    @ExceptionHandler(value = HttpServerErrorException.BadGateway.class)
+    public ResponseEntity<Object> badGateway(Exception exception) {
+        log.debug(exception.getMessage(), exception);
+        return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_GATEWAY);
     }
 }
