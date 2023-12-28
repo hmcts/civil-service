@@ -208,4 +208,18 @@ class ResourceExceptionHandlerTest {
         );
     }
 
+    @Test
+    public void testBadGatewayException() {
+        testTemplate(
+            "BadGatewayException",
+            str -> new FeignException.InternalServerError(
+                "BadGatewayException",
+                Mockito.mock(feign.Request.class),
+                new byte[]{},
+                Collections.emptyMap()
+            ),
+            handler::handleBadGateway,
+            HttpStatus.BAD_GATEWAY
+        );
+    }
 }

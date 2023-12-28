@@ -112,7 +112,7 @@ public class ResourceExceptionHandler {
     }
 
     @ExceptionHandler(value = HttpServerErrorException.BadGateway.class)
-    public ResponseEntity<Object> badGateway(Exception exception) {
+    public ResponseEntity<Object> handleBadGateway(Exception exception) {
         log.debug(exception.getMessage(), exception);
         return new ResponseEntity<>(exception.getMessage(), new HttpHeaders(), HttpStatus.BAD_GATEWAY);
     }

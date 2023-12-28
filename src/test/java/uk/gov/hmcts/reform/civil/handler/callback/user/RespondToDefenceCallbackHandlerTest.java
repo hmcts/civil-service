@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.ExitSurveyConfiguration;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -27,8 +29,6 @@ import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
@@ -37,7 +37,6 @@ import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant2DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
@@ -45,11 +44,13 @@ import uk.gov.hmcts.reform.civil.model.dq.Experts;
 import uk.gov.hmcts.reform.civil.model.dq.Hearing;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.DocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -800,6 +801,52 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void testToRemove2() {
+            when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            var caseData = CaseDataBuilder.builder().build().toBuilder()
+                .respondent1(Party.builder().companyName("company").type(Party.Type.COMPANY).build())
+                .applicant1DefenceResponseDocument(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def1.pdf").build())
+                                                       .build())
+                .claimantDefenceResDocToDefendant2(ResponseDocument.builder()
+                                                       .file(DocumentBuilder.builder().documentName(
+                                                           "claimant-response-def2.pdf").build())
+                                                       .build())
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-1-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .addApplicant2(YesOrNo.YES)
+                .applicant2DQ(Applicant2DQ.builder()
+                                  .applicant2DQDraftDirections(DocumentBuilder.builder().documentName(
+                                          "claimant-2-draft-dir.pdf")
+                                                                   .build())
+                                  .build())
+                .build().toBuilder()
+                .courtLocation(CourtLocation.builder().applicantPreferredCourt("127").build())
+                .claimValue(ClaimValue.builder()
+                                .statementOfValueInPennies(BigDecimal.valueOf(1000_00))
+                                .build())
+                .applicant1ProceedWithClaimMultiParty2v1(NO)
+                .applicant2ProceedWithClaimMultiParty2v1(YES)
+                .build();
+
+            caseData = caseData.toBuilder()
+                .applicant1(Party.builder()
+                                .companyName("excAbout")
+                                .type(Party.Type.COMPANY)
+                                .build())
+                .build();
+
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            Assertions.assertThrows(RuntimeException.class, () -> handler.handle(params));
+        }
+
+        @Test
         void shouldAssembleClaimantResponseDocuments2v1NotProceed() {
             when(time.now()).thenReturn(LocalDateTime.of(2022, 2, 18, 12, 10, 55));
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
@@ -1469,6 +1516,23 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
                                 + "<p>The case will be stayed if you do not proceed within the allowed "
                                 + "timescale.</p>" + exitSurveyContentService.applicantSurvey())
                         .build());
+            }
+
+            @Test
+            void testToRemove1() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndNotProceed_2v1()
+                    .multiPartyClaimTwoApplicants()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .applicant1(caseData.getApplicant1().toBuilder()
+                                    .type(Party.Type.COMPANY)
+                                    .companyName("excSubmit")
+                                    .build())
+                    .build();
+                CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+                Assertions.assertThrows(RuntimeException.class, () -> handler.handle(params));
             }
 
             @Test
