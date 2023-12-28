@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -116,12 +117,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         caseData.getDefendantResponseDocuments().forEach(document -> {
             if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)) {
                 updatedData.respondent1ClaimResponseDocument(ResponseDocument.builder()
-                                                                      .file(document.getValue().getDocumentLink())
-                                                                      .build());
+                                                                 .file(document.getValue().getDocumentLink())
+                                                                 .build());
                 if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
                     updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
-                                                                     .file(document.getValue().getDocumentLink())
-                                                                     .build());
+                                                                          .file(document.getValue().getDocumentLink())
+                                                                          .build());
                 }
             }
         });
@@ -223,9 +224,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         LocalDateTime currentTime = time.now();
 
         // DO NOT MERGE THIS CHANGE
-        if ("excAbout".equals(caseData.getApplicant1().getPartyName())) {
-            throw new RuntimeException("Test exception during about to submit callback");
-        }
+        Optional.ofNullable(caseData.getApplicant1())
+            .map(Party::getPartyName)
+            .filter("excAbout"::equalsIgnoreCase)
+            .ifPresent(s -> {
+                throw new RuntimeException("Test exception during about to submit callback");
+            });
         // END DO NOT MERGE THIS CHANGE
 
         CaseData.CaseDataBuilder builder = caseData.toBuilder()
@@ -257,8 +261,10 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         assembleResponseDocuments(caseData, builder);
 
-        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(builder,
-                                                                       featureToggleService.isUpdateContactDetailsEnabled());
+        UnavailabilityDatesUtils.rollUpUnavailabilityDatesForApplicant(
+            builder,
+            featureToggleService.isUpdateContactDetailsEnabled()
+        );
 
         if (featureToggleService.isUpdateContactDetailsEnabled()) {
             addEventAndDateAddedToApplicantExperts(builder);
@@ -380,7 +386,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
                 DocCategory.APP1_DQ.getValue()
             );
             List<Element<CaseDocument>> copy = assignCategoryId.copyCaseDocumentListWithCategoryId(
-                    claimantUploads, DocCategory.DQ_APP1.getValue());
+                claimantUploads, DocCategory.DQ_APP1.getValue());
             if (Objects.nonNull(copy)) {
                 claimantUploads.addAll(copy);
             }
@@ -392,9 +398,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         CaseData caseData = callbackParams.getCaseData();
 
         // DO NOT MERGE THIS CHANGE
-        if ("excSubmit".equals(caseData.getApplicant1().getPartyName())) {
-            throw new RuntimeException("Test exception during about to submit callback");
-        }
+        Optional.ofNullable(caseData.getApplicant1())
+            .map(Party::getPartyName)
+            .filter("excSubmit"::equalsIgnoreCase)
+            .ifPresent(s -> {
+                throw new RuntimeException("Test exception during about to submit callback");
+            });
         // END DO NOT MERGE THIS CHANGE
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
