@@ -228,7 +228,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .map(Party::getPartyName)
             .filter("excAbout"::equalsIgnoreCase)
             .ifPresent(s -> {
-                throw new RuntimeException("Test exception during about to submit callback");
+                throw new ExceptionToRemove("Test exception during about to submit callback");
             });
         // END DO NOT MERGE THIS CHANGE
 
@@ -402,7 +402,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .map(Party::getPartyName)
             .filter("excSubmit"::equalsIgnoreCase)
             .ifPresent(s -> {
-                throw new RuntimeException("Test exception during about to submit callback");
+                throw new ExceptionToRemove("Test exception during about to submit callback");
             });
         // END DO NOT MERGE THIS CHANGE
 
@@ -450,5 +450,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .confirmationHeader(format(title, claimNumber))
             .confirmationBody(body + exitSurveyContentService.applicantSurvey())
             .build();
+    }
+
+    public static class ExceptionToRemove extends RuntimeException {
+        public ExceptionToRemove(String message) {
+            super(message);
+        }
     }
 }

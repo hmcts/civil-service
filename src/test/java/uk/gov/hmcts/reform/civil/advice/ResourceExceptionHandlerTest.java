@@ -209,7 +209,7 @@ class ResourceExceptionHandlerTest {
     }
 
     @Test
-    public void testBadGatewayException() {
+    void testBadGatewayException() {
         testTemplate(
             "BadGatewayException",
             str -> new FeignException.InternalServerError(
