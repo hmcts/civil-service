@@ -98,10 +98,8 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
                                                           LocalDate.now().toString()));
         }
 
-        //LiP Claim form guidance needs be sent as the 2nd doc to go on the back of the claim form
         if (stitchEnabled) {
-            if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
-                || YesOrNo.NO.equals(caseData.getSpecRespondent2Represented())) {
+            if (YesOrNo.NO.equals(caseData.getRespondent1Represented())) {
 
                 CaseDocument lipForm = litigantInPersonFormGenerator.generate(
                     caseData,
