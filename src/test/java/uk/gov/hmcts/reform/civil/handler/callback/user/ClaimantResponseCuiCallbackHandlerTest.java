@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,7 +38,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
@@ -84,8 +82,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     private LocationHelper locationHelper;
     @MockBean
     private LocationRefDataService locationRefDataService;
-    @MockBean
-    private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private ClaimantResponseCuiCallbackHandler handler;
     private static final String  courtLocation = "Site 1 - Adr 1 - AAA 111";
@@ -132,7 +128,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             given(time.now()).willReturn(submittedDate);
             given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(locationRefData));
-            given(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).willReturn(LocalDateTime.MAX);
         }
 
         @Test
@@ -571,8 +566,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
-            CaseData data = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(data.getRespondent1RespondToSettlementAgreementDeadline()).isEqualTo(LocalDateTime.MAX);
         }
 
         @Test
