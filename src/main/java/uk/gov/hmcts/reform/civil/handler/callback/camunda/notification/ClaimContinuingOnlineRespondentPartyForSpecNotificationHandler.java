@@ -69,7 +69,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
 
-
         if (caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
             generatePIPEmail(caseData);
         }
@@ -110,9 +109,9 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
         CaseDocument document = pipLetterGenerator.downloadLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
 
         return document;
-//        List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
-//        bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
-//                                     caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
+        //List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
+        //bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
+        //                             caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
     }
 
     private void generatePIPEmail(CaseData caseData) {

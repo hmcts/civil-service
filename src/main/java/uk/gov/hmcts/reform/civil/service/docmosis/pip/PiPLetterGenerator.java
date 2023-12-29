@@ -55,7 +55,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
                 DocumentType.ACKNOWLEDGEMENT_OF_CLAIM
             )
         );
-        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData,pipLetterCaseDocument, authorisation);
+        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, pipLetterCaseDocument, authorisation);
         CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
             documentMetaDataList,
             authorisation,
@@ -65,7 +65,6 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
         );
         return stitchedDocument;
     }
-
 
     @Override
     public PiPLetter getTemplateData(CaseData caseData) {
@@ -93,13 +92,11 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
             .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
                 .getDocumentType().equals(DocumentType.SEALED_CLAIM)).findAny();
 
-
         if (optionalSealedDocument.isPresent()) {
             documentMetaDataList.add(new DocumentMetaData(optionalSealedDocument.get().getValue().getDocumentLink(),
                                                           "Sealed Claim form",
                                                           LocalDate.now().toString()));
         }
-
 
         //LiP Claim form guidance needs be sent as the 2nd doc to go on the back of the claim form
         if (stitchEnabled) {
