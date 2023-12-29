@@ -1,11 +1,19 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.pip;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.ArgumentMatchers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
@@ -14,6 +22,8 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.pip.PiPLetter;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
+import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,21 +31,34 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_IN_THE_POST_LETTER;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.*;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.*;
 
 @ExtendWith(SpringExtension.class)
+@SpringBootTest(classes = {
+    PiPLetterGenerator.class,
+    JacksonAutoConfiguration.class,
+})
 class PiPLetterGeneratorTest {
 
-    @Mock
-    private DocumentGeneratorService documentGeneratorService;
-    @Mock
+    @MockBean
     private PinInPostConfiguration pipInPostConfiguration;
-    @InjectMocks
+    @MockBean
+    private DocumentGeneratorService documentGeneratorService;
+    @MockBean
+    private CivilDocumentStitchingService civilDocumentStitchingService;
+    @MockBean
+    private LitigantInPersonFormGenerator litigantInPersonFormGenerator;
+    @MockBean
+    private DocumentManagementService documentManagementService;
+    @Autowired
     private PiPLetterGenerator piPLetterGenerator;
+
 
     private static final LocalDateTime RESPONSE_DEADLINE = LocalDateTime.now();
     private static final Address RESPONDENT_ADDRESS = Address.builder().addressLine1("123 road")
@@ -79,6 +102,58 @@ class PiPLetterGeneratorTest {
     private static final DocmosisDocument LETTER = DocmosisDocument.builder()
         .bytes(new byte[]{1, 2, 3, 4, 5, 6})
         .build();
+    private static final CaseDocument CLAIM_FORM =
+        CaseDocument.builder()
+            .createdBy("John")
+            .documentName(String.format(N1.getDocumentTitle(), "000DC001"))
+            .documentSize(0L)
+            .documentType(SEALED_CLAIM)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+
+    private static final CaseDocument LIP_FORM =
+        CaseDocument.builder()
+            .createdBy("John")
+            .documentName(String.format(LIP_CLAIM_FORM.getDocumentTitle(), "000DC001"))
+            .documentSize(0L)
+            .documentType(LITIGANT_IN_PERSON_CLAIM_FORM)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+
+    private static final CaseDocument STITCHED_DOC =
+        CaseDocument.builder()
+            .createdBy("John")
+            .documentName("Stitched document")
+            .documentSize(0L)
+            .documentType(SEALED_CLAIM)
+            .createdDatetime(LocalDateTime.now())
+            .documentLink(Document.builder()
+                              .documentUrl("fake-url")
+                              .documentFileName("file-name")
+                              .documentBinaryUrl("binary-url")
+                              .build())
+            .build();
+
+    @BeforeEach
+    void setup() {
+        when(documentManagementService
+                 .uploadDocument((String) any(), (PDF) any()))
+            .thenReturn(CLAIM_FORM);
+
+        when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
+        when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
+                                                  any(CaseData.class))).thenReturn(STITCHED_DOC);
+    }
 
     @Test
     void shouldGenerateAndDownloadLetterSuccessfully() {
@@ -86,9 +161,9 @@ class PiPLetterGeneratorTest {
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
             .willReturn(LETTER);
 
-        //CaseDocument downloadedLetter = piPLetterGenerator.downloadLetter(CASE_DATA, "111");
+        CaseDocument downloadedLetter = piPLetterGenerator.downloadLetter(CASE_DATA, "111");
 
-        assertThat(LETTER.getBytes()).isEqualTo(LETTER.getBytes());
+        assertThat(downloadedLetter).isEqualTo(STITCHED_DOC);
         verify(documentGeneratorService, times(1)).generateDocmosisDocument(
             refEq(LETTER_TEMPLATE_DATA),
             refEq(PIN_IN_THE_POST_LETTER)

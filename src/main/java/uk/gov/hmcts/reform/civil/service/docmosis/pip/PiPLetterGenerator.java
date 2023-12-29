@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.pip;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
@@ -26,7 +26,7 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_IN_THE_POST_LETTER;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
 
@@ -85,7 +85,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
 
         documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(),
-                                                      "Sealed Claim form",
+                                                      "PiP Letter",
                                                       LocalDate.now().toString()));
 
         Optional<Element<CaseDocument>> optionalSealedDocument = caseData.getSystemGeneratedCaseDocuments().stream()
