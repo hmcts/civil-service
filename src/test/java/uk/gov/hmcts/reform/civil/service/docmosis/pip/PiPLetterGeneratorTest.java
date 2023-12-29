@@ -224,7 +224,6 @@ class PiPLetterGeneratorTest {
                                                         null, null))
             .build();
 
-
         CaseDocument downloadedLetter = piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN);
 
         verify(documentGeneratorService, times(1)).generateDocmosisDocument(
