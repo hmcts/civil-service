@@ -34,10 +34,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.*;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.*;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.LIP_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_IN_THE_POST_LETTER;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -58,7 +62,6 @@ class PiPLetterGeneratorTest {
     private DocumentManagementService documentManagementService;
     @Autowired
     private PiPLetterGenerator piPLetterGenerator;
-
 
     private static final LocalDateTime RESPONSE_DEADLINE = LocalDateTime.now();
     private static final Address RESPONDENT_ADDRESS = Address.builder().addressLine1("123 road")
