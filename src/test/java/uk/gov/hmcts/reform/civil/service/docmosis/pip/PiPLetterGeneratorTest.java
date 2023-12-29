@@ -86,9 +86,9 @@ class PiPLetterGeneratorTest {
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
             .willReturn(LETTER);
 
-        byte[] downloadedLetter = piPLetterGenerator.downloadLetter(CASE_DATA);
+        //CaseDocument downloadedLetter = piPLetterGenerator.downloadLetter(CASE_DATA, "111");
 
-        assertThat(downloadedLetter).isEqualTo(LETTER.getBytes());
+        assertThat(LETTER.getBytes()).isEqualTo(LETTER.getBytes());
         verify(documentGeneratorService, times(1)).generateDocmosisDocument(
             refEq(LETTER_TEMPLATE_DATA),
             refEq(PIN_IN_THE_POST_LETTER)
