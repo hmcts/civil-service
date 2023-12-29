@@ -22,8 +22,14 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
-                .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION"))));
+                        .must(rangeQuery("data.applicant1ResponseDeadline").lt("now"))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION"))))
+            .should(boolQuery()
+                        .must(rangeQuery("data.addLegalRepDeadlineRes1").lt("now"))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))))
+            .should(boolQuery()
+                        .must(rangeQuery("data.addLegalRepDeadlineRes2").lt("now"))
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_RESPONDENT_ACKNOWLEDGEMENT"))));
 
         return new Query(query, List.of("reference"), fromValue);
     }
