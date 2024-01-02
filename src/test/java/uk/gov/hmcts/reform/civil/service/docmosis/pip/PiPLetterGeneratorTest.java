@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.pip.PiPLetter;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
 import java.math.BigDecimal;
@@ -42,10 +41,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.LITIGANT_IN_PERSON_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.LIP_CLAIM_FORM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_IN_THE_POST_LETTER;
 
@@ -62,8 +59,6 @@ class PiPLetterGeneratorTest {
     private DocumentGeneratorService documentGeneratorService;
     @MockBean
     private CivilDocumentStitchingService civilDocumentStitchingService;
-    @MockBean
-    private LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     @MockBean
     private DocumentManagementService documentManagementService;
     @Autowired
@@ -127,20 +122,6 @@ class PiPLetterGeneratorTest {
                               .build())
             .build();
 
-    private static final CaseDocument LIP_FORM =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(LIP_CLAIM_FORM.getDocumentTitle(), "000DC001"))
-            .documentSize(0L)
-            .documentType(LITIGANT_IN_PERSON_CLAIM_FORM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
-
     private static final CaseDocument STITCHED_DOC =
         CaseDocument.builder()
             .createdBy("John")
@@ -162,15 +143,10 @@ class PiPLetterGeneratorTest {
         when(documentManagementService
                  .uploadDocument((String) any(), (PDF) any()))
             .thenReturn(CLAIM_FORM);
-
-        when(litigantInPersonFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(LIP_FORM);
         when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
                                                   any(CaseData.class))).thenReturn(STITCHED_DOC);
         specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                             "PiP Letter",
-                                                            LocalDate.now().toString()));
-        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
-                                                            "Litigant in person claim form",
                                                             LocalDate.now().toString()));
         specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
                                                             "Claim timeline",

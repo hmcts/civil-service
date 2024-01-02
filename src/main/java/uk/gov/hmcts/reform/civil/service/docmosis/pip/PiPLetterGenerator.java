@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -17,12 +16,12 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_IN_THE_POST_LETTER;
@@ -34,7 +33,6 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
     private final DocumentGeneratorService documentGeneratorService;
     private final PinInPostConfiguration pipInPostConfiguration;
     private final CivilDocumentStitchingService civilDocumentStitchingService;
-    private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     private final DocumentManagementService documentManagementService;
     @Value("${stitching.enabled}")
     private boolean stitchEnabled;
@@ -99,31 +97,15 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
                                                           LocalDate.now().toString()));
         }
 
-        if (stitchEnabled) {
-            if (YesOrNo.NO.equals(caseData.getRespondent1Represented())) {
-
-                CaseDocument lipForm = litigantInPersonFormGenerator.generate(
-                    caseData,
-                    authorisation
-                );
-
-                documentMetaDataList.add(new DocumentMetaData(
-                    lipForm.getDocumentLink(),
-                    "Litigant in person claim form",
-                    LocalDate.now().toString()
-                ));
-
-            }
-        }
-
-        if (caseData.getSpecClaimTemplateDocumentFiles() != null) {
+        if (Objects.nonNull(caseData.getSpecClaimTemplateDocumentFiles())) {
             documentMetaDataList.add(new DocumentMetaData(
                 caseData.getSpecClaimTemplateDocumentFiles(),
                 "Claim timeline",
                 LocalDate.now().toString()
             ));
         }
-        if (caseData.getSpecClaimDetailsDocumentFiles() != null) {
+
+        if (Objects.nonNull(caseData.getSpecClaimDetailsDocumentFiles())) {
             documentMetaDataList.add(new DocumentMetaData(
                 caseData.getSpecClaimDetailsDocumentFiles(),
                 "Supported docs",
