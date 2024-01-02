@@ -27,7 +27,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_
 @RequiredArgsConstructor
 public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC, GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC, GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC);
+    private static final List<CaseEvent> EVENTS = List.of(
+        GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC,
+        GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC,
+        GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC
+    );
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateResponseDocument);
 
     private final ObjectMapper objectMapper;
