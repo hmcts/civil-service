@@ -85,4 +85,19 @@ public class GenerateDocForReqJudgmentByAdmissionOrDeterminationTest extends Bas
         handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));
         verifyNoInteractions(formGenerator);
     }
+
+    @Test
+    void shouldGenerateForm_ifDefaultCcjHasBeenRequested() {
+        CaseEvent event = CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
+        given(formGenerator.generate(any(CaseEvent.class), any(CaseData.class), anyString())).willReturn(FORM);
+        CaseData caseData = CaseData.builder()
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                        .build())
+                             .build())
+            .build();
+
+        handler.handle(callbackParamsOf(caseData, event, ABOUT_TO_SUBMIT));
+        verify(formGenerator).generate(event, caseData, BEARER_TOKEN);
+    }
 }
