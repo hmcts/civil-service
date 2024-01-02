@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.pip;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
@@ -17,15 +18,18 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_IN_THE_POST_LETTER;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
@@ -34,6 +38,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
     private final PinInPostConfiguration pipInPostConfiguration;
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final DocumentManagementService documentManagementService;
+    private final AssignCategoryId assignCategoryId;
     @Value("${stitching.enabled}")
     private boolean stitchEnabled;
 
@@ -62,6 +67,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
             pipLetterCaseDocument.getDocumentName(),
             caseData
         );
+        assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "detailsOfClaim");
         return stitchedDocument;
     }
 
@@ -97,20 +103,38 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
                                                           LocalDate.now().toString()));
         }
 
-        if (Objects.nonNull(caseData.getSpecClaimTemplateDocumentFiles())) {
-            documentMetaDataList.add(new DocumentMetaData(
+        if (Objects.nonNull(caseData.getServedDocumentFiles())) {
+            if (Objects.nonNull(caseData.getServedDocumentFiles().getTimelineEventUpload())) {
+                log.info("Claim Has TimeLine doc" + caseData.getServedDocumentFiles().getTimelineEventUpload().size());
+                documentMetaDataList.addAll(caseData.getServedDocumentFiles().getTimelineEventUpload().stream()
+                                                .map(doc -> new DocumentMetaData(
+                                                    doc.getValue(),
+                                                    "Claim timeline",
+                                                    LocalDate.now().toString()
+                                                ))
+                                                .collect(Collectors.toList()));
+            /*documentMetaDataList.add(new DocumentMetaData(
                 caseData.getSpecClaimTemplateDocumentFiles(),
                 "Claim timeline",
                 LocalDate.now().toString()
-            ));
-        }
+            ));*/
+            }
 
-        if (Objects.nonNull(caseData.getSpecClaimDetailsDocumentFiles())) {
-            documentMetaDataList.add(new DocumentMetaData(
+            if (Objects.nonNull(caseData.getServedDocumentFiles().getParticularsOfClaimDocument())) {
+                log.info("Claim Has Claim details doc" + caseData.getServedDocumentFiles().getParticularsOfClaimDocument().size());
+                documentMetaDataList.addAll(caseData.getServedDocumentFiles().getParticularsOfClaimDocument().stream()
+                                                .map(doc -> new DocumentMetaData(
+                                                    doc.getValue(),
+                                                    "Supported docs",
+                                                    LocalDate.now().toString()
+                                                ))
+                                                .collect(Collectors.toList()));
+            /*documentMetaDataList.add(new DocumentMetaData(
                 caseData.getSpecClaimDetailsDocumentFiles(),
                 "Supported docs",
                 LocalDate.now().toString()
-            ));
+            ));*/
+            }
         }
 
         return documentMetaDataList;
