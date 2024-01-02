@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.pip.PiPLetter;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
+import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
@@ -50,7 +51,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
         CaseDocument pipLetterCaseDocument =  documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                "pinInPostLetteer",
+                PIN_IN_THE_POST_LETTER.name(),
                 pipLetter.getBytes(),
                 DocumentType.ACKNOWLEDGEMENT_OF_CLAIM
             )
