@@ -19,6 +19,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC;
 
@@ -26,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_
 @RequiredArgsConstructor
 public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC, GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC);
+    private static final List<CaseEvent> EVENTS = List.of(GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC, GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC, GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC);
     private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateResponseDocument);
 
     private final ObjectMapper objectMapper;
@@ -37,7 +38,7 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
         CaseData caseData = callbackParams.getCaseData();
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder();
-        if (shouldGenerateJudgmentDoc(caseData)) {
+        if (shouldGenerateJudgmentDoc(caseEvent, caseData)) {
             CaseDocument claimantResponseDoc = requestJudgmentByAdmissionOrDeterminationResponseDocGenerator.generate(
                 caseEvent,
                 caseData,
@@ -54,8 +55,8 @@ public class GenerateDocForReqJudgmentByAdmissionOrDetermination extends Callbac
             .build();
     }
 
-    private boolean shouldGenerateJudgmentDoc(CaseData caseData) {
-        return caseData.hasApplicant1AcceptedCcj();
+    private boolean shouldGenerateJudgmentDoc(CaseEvent caseEvent, CaseData caseData) {
+        return caseEvent == CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC || caseData.hasApplicant1AcceptedCcj();
     }
 
     @Override
