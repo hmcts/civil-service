@@ -51,7 +51,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
         CaseDocument pipLetterCaseDocument =  documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                PIN_IN_THE_POST_LETTER.name(),
+                DocmosisTemplates.PIN_IN_THE_POST_LETTER.getDocumentTitle(),
                 pipLetter.getBytes(),
                 DocumentType.ACKNOWLEDGEMENT_OF_CLAIM
             )
