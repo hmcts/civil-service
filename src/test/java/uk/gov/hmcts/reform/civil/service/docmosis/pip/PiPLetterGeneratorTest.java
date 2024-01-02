@@ -218,12 +218,12 @@ class PiPLetterGeneratorTest {
     private ServedDocumentFiles setupParticularsOfClaimDocs() {
         final String TEST_URL = "fake-url";
         final String TEST_FILE_NAME = "file-name";
-        final String TEST_BINARY_URL = "binary-url";
+        final String BIN_URL = "binary-url";
 
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
-        Document document1 = Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).documentBinaryUrl(TEST_BINARY_URL).build();
+        Document document1 = Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).documentBinaryUrl(BIN_URL).build();
         particularsOfClaim.add(ElementUtils.element(document1));
-        Document document2 = Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).documentBinaryUrl(TEST_BINARY_URL).build();
+        Document document2 = Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).documentBinaryUrl(BIN_URL).build();
         List<Element<Document>> timelineOfEvents = new ArrayList<>();
         timelineOfEvents.add(ElementUtils.element(document2));
         return ServedDocumentFiles.builder().timelineEventUpload(timelineOfEvents)
