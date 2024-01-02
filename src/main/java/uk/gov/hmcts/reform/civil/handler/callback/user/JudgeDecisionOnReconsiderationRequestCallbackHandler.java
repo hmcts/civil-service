@@ -50,7 +50,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
     private static final String CONFIRMATION_BODY_CREATE_GENERAL_ORDER = "### Amend previous order and create a " +
         "general order" +
         " \n" +
-        "To make a bespoke order in this claim,select 'General order' from the dropdown menu on the right of the " +
+        "To make a bespoke order in this claim, select 'General order' from the dropdown menu on the right of the " +
         "screen on your dashboard.";
     private static final String upholdingPreviousOrderReason = "Having read the application for reconsideration of " +
         "the Legal Advisor's order dated %s and the court file \n 1.The application for reconsideration of the order " +
