@@ -113,11 +113,6 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
                                                     LocalDate.now().toString()
                                                 ))
                                                 .collect(Collectors.toList()));
-            /*documentMetaDataList.add(new DocumentMetaData(
-                caseData.getSpecClaimTemplateDocumentFiles(),
-                "Claim timeline",
-                LocalDate.now().toString()
-            ));*/
             }
 
             if (Objects.nonNull(caseData.getServedDocumentFiles().getParticularsOfClaimDocument())) {
@@ -129,11 +124,6 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
                                                     LocalDate.now().toString()
                                                 ))
                                                 .collect(Collectors.toList()));
-            /*documentMetaDataList.add(new DocumentMetaData(
-                caseData.getSpecClaimDetailsDocumentFiles(),
-                "Supported docs",
-                LocalDate.now().toString()
-            ));*/
             }
         }
 

@@ -19,12 +19,17 @@ import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.pip.PiPLetter;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -50,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_I
 @SpringBootTest(classes = {
     PiPLetterGenerator.class,
     JacksonAutoConfiguration.class,
+    AssignCategoryId.class,
 })
 class PiPLetterGeneratorTest {
 
@@ -63,6 +69,10 @@ class PiPLetterGeneratorTest {
     private DocumentManagementService documentManagementService;
     @Autowired
     private PiPLetterGenerator piPLetterGenerator;
+    @Autowired
+    private AssignCategoryId assignCategoryId;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private static final LocalDateTime RESPONSE_DEADLINE = LocalDateTime.now();
@@ -158,6 +168,8 @@ class PiPLetterGeneratorTest {
 
     @Test
     void shouldGenerateAndDownloadLetterSuccessfully() {
+        //Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
         given(pipInPostConfiguration.getRespondToClaimUrl()).willReturn(CUI_URL);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
             .willReturn(LETTER);
@@ -173,6 +185,7 @@ class PiPLetterGeneratorTest {
 
     @Test
     void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByRespondent() {
+        //Given
         given(pipInPostConfiguration.getRespondToClaimUrl()).willReturn(CUI_URL);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
             .willReturn(LETTER);
@@ -189,15 +202,7 @@ class PiPLetterGeneratorTest {
             .totalClaimAmount(TOTAL_CLAIM_AMOUNT)
             .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
             .specRespondent1Represented(YES)
-            .specClaimTemplateDocumentFiles(new Document("fake-url",
-                                                         "binary-url",
-                                                         "file-name",
-                                                         null, null))
-
-            .specClaimDetailsDocumentFiles(new Document("fake-url",
-                                                        "binary-url",
-                                                        "file-name",
-                                                        null, null))
+            .servedDocumentFiles(setupParticularsOfClaimDocs())
             .build();
 
         CaseDocument downloadedLetter = piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN);
@@ -206,8 +211,23 @@ class PiPLetterGeneratorTest {
             refEq(LETTER_TEMPLATE_DATA),
             refEq(PIN_IN_THE_POST_LETTER)
         );
-        verify(civilDocumentStitchingService).bundle(eq(specClaimTimelineDocuments), anyString(), anyString(),
-                                                     anyString(), eq(caseData));
+        verify(civilDocumentStitchingService).bundle(eq(specClaimTimelineDocuments), eq("BEARER_TOKEN"), eq("sealed_claim_form_000DC001.pdf"),
+                                                     eq("sealed_claim_form_000DC001.pdf"), eq(caseData));
+    }
+
+    private ServedDocumentFiles setupParticularsOfClaimDocs() {
+        final String TEST_URL = "fake-url";
+        final String TEST_FILE_NAME = "file-name";
+        final String TEST_BINARY_URL = "binary-url";
+
+        List<Element<Document>> particularsOfClaim = new ArrayList<>();
+        Document document1 = Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).documentBinaryUrl(TEST_BINARY_URL).build();
+        particularsOfClaim.add(ElementUtils.element(document1));
+        Document document2 = Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).documentBinaryUrl(TEST_BINARY_URL).build();
+        List<Element<Document>> timelineOfEvents = new ArrayList<>();
+        timelineOfEvents.add(ElementUtils.element(document2));
+        return ServedDocumentFiles.builder().timelineEventUpload(timelineOfEvents)
+            .particularsOfClaimDocument(particularsOfClaim).build();
     }
 
 }
