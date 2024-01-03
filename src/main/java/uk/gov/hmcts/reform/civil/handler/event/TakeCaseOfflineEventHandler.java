@@ -34,11 +34,15 @@ public class TakeCaseOfflineEventHandler {
     }
 
     private CaseDataContent getCaseContent(CaseData caseData, StartEventResponse startEventResponse) {
+        String rpaReason = "RPA Reason: Claim dismissed after no response from applicant past response deadline.";
+        if (caseData.getAddLegalRepDeadlineRes1() != null || caseData.getAddLegalRepDeadlineRes2() != null) {
+            rpaReason = "RPA Reason: No Defendant Solicitor appointed.";
+        }
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder()
                        .id(startEventResponse.getEventId())
-                       .summary("RPA Reason: Claim dismissed after no response from applicant past response deadline.")
+                       .summary(rpaReason)
                        .build())
             .data(new HashMap<>(startEventResponse.getCaseDetails().getData()))
             .build();
