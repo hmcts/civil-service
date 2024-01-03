@@ -89,16 +89,6 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
-    public boolean isSettled() {
-        return !caseData.isRespondentResponseFullDefence()
-            && (caseData.respondent1PaidInFull()
-            || caseData.isResponseAcceptedByClaimant())
-            && Objects.isNull(caseData.getCcjPaymentDetails())
-            && !caseData.hasApplicantRejectedRepaymentPlan()
-            || caseData.isPartAdmitClaimSettled();
-    }
-
-    @Override
     public boolean isSentToCourt() {
         return false;
     }
