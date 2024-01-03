@@ -42,7 +42,7 @@ public class ClaimStoreService {
         }
     }
 
-    private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
+ private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
         return cmcClaims.stream().map(cmcClaim ->
                                       {
                                           System.out.println(
