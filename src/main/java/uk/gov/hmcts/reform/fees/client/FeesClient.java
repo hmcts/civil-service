@@ -61,10 +61,18 @@ public class FeesClient {
                 jurisdiction2 = this.jurisdiction2;
             }
 
-            return null;
+            return this.feesApi.lookupFee(
+                service,
+                jurisdiction1,
+                jurisdiction2,
+                channel,
+                event,
+                keyword,
+                amount
+            );
 
         } else {
-            return null;
+            return this.feesApi.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
         }
     }
 
