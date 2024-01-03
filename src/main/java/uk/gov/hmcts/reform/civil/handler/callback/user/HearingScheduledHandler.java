@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -195,13 +196,23 @@ public class HearingScheduledHandler extends CallbackHandler {
             claimTrack = caseData.getResponseClaimTrack();
         }
 
-        if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
-            caseDataBuilder.hearingDueDate(
-                calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
-            caseDataBuilder.hearingFee(calculateAndApplyFee(hearingFeesService, caseData, claimTrack));
+        // If hearing notice type if FAST or SMALL and it is a first time being listed, calculate fee and fee due date.
+        // If relisted, do not recalculate fee and fee due date, and move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
+        if (!caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)) {
+            if (ListingOrRelisting.LISTING.equals(caseData.getListingOrRelisting())) {
+                caseDataBuilder.hearingDueDate(calculateHearingDueDate(time.now().toLocalDate(), caseData.getHearingDate()));
+                caseDataBuilder.hearingFee(calculateAndApplyFee(hearingFeesService, caseData, claimTrack));
+            } else {
+                caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+            }
+            // If hearing notice type is OTHER and is being listed, do not calculate fee and fee due date
+            // If relisted, again do not calculate fee and fee due date, but move state to PREPARE_FOR_HEARING_CONDUCT_HEARING
         } else {
-            caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+            if (ListingOrRelisting.RELISTING.equals(caseData.getListingOrRelisting())) {
+                caseState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
+            }
         }
+
         caseDataBuilder.businessProcess(BusinessProcess.ready(HEARING_SCHEDULED));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .state(caseState.name())
