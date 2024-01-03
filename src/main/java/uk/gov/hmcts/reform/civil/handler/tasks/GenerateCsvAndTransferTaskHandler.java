@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.CaseStateSearchService;
@@ -36,6 +37,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
     private static final String subject = "OCMC Mediation Data";
     private static final String filename = "ocmc_mediation_data.csv";
+    private final FeatureToggleService toggleService;
 
     @Override
     public void handleTask(ExternalTask externalTask) {
@@ -45,8 +47,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
             .map(caseDetailsConverter::toCaseData)
             .filter(checkMediationMovedDate).toList();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), inMediationCases.size());
-        String[] headers = {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
-            "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
+        String[] headers = getCSVHeaders();
         StringBuilder csvColContent = new StringBuilder();
         if (!inMediationCases.isEmpty()) {
             inMediationCases.forEach(caseData ->
@@ -74,9 +75,9 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     }
 
     private String generateCsvContent(CaseData caseData) {
-
+        boolean isR2FlagEnabled = toggleService.isLipVLipEnabled();
         MediationCSVService mediationCSVService = mediationCsvServiceFactory.getMediationCSVService(caseData);
-        return mediationCSVService.generateCSVContent(caseData);
+        return mediationCSVService.generateCSVContent(caseData, isR2FlagEnabled);
 
     }
 
@@ -91,4 +92,12 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
         return builder.toString();
     }
 
+    private String[] getCSVHeaders() {
+        if (toggleService.isLipVLipEnabled()) {
+            return new String[] {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME", "CONTACT_NAME",
+                "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT", "WELSH_FLAG"};
+        }
+        return new String[] {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
+            "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
+    }
 }

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.service.mediation;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 @Service
 @AllArgsConstructor

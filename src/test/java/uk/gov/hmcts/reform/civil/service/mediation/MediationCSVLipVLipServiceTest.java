@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.mediation;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 
@@ -11,7 +12,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(classes = {
-        MediationCSVLipVLipService.class
+    MediationCSVLipVLipService.class
 })
 public class MediationCSVLipVLipServiceTest {
 
@@ -35,6 +36,8 @@ public class MediationCSVLipVLipServiceTest {
     private static final String ID = "123456789";
     private static final String RESPONDENT = "2";
     private static final String APPLICANT = "1";
+    private static final String BILINGUAL_FLAG  = "Yes";
+    private static final String BILINGUAL_FLAG_NO  = "No";
 
     @Autowired
     private MediationCSVLipVLipService service;
@@ -42,9 +45,9 @@ public class MediationCSVLipVLipServiceTest {
     @Test
     void shouldReturn_properDataForFile_ForIndividual() {
         //Given
-        CaseData caseData = getCaseData(Party.Type.INDIVIDUAL);
+        CaseData caseData = getCaseData(Party.Type.INDIVIDUAL, Language.BOTH.toString());
         //When
-        String result = service.generateCSVContent(caseData);
+        String result = service.generateCSVContent(caseData, true);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(APPLICANT);
@@ -56,14 +59,15 @@ public class MediationCSVLipVLipServiceTest {
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
+        assertThat(result).contains(BILINGUAL_FLAG);
     }
 
     @Test
     void shouldReturn_properDataForFile_ForCompany() {
         //Given
-        CaseData caseData = getCaseData(Party.Type.COMPANY);
+        CaseData caseData = getCaseData(Party.Type.COMPANY, Language.ENGLISH.toString());
         //When
-        String result = service.generateCSVContent(caseData);
+        String result = service.generateCSVContent(caseData, true);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(APPLICANT);
@@ -75,14 +79,15 @@ public class MediationCSVLipVLipServiceTest {
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
+        assertThat(result).contains(BILINGUAL_FLAG_NO);
     }
 
     @Test
     void shouldReturn_properDataForFile_ForOrganisation() {
         //Given
-        CaseData caseData = getCaseData(Party.Type.ORGANISATION);
+        CaseData caseData = getCaseData(Party.Type.ORGANISATION,  Language.WELSH.toString());
         //When
-        String result = service.generateCSVContent(caseData);
+        String result = service.generateCSVContent(caseData, true);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(APPLICANT);
@@ -94,14 +99,15 @@ public class MediationCSVLipVLipServiceTest {
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
+        assertThat(result).contains(BILINGUAL_FLAG);
     }
 
     @Test
     void shouldReturn_properDataForFile_ForSoleTrader() {
         //Given
-        CaseData caseData = getCaseData(Party.Type.SOLE_TRADER);
+        CaseData caseData = getCaseData(Party.Type.SOLE_TRADER, Language.ENGLISH.toString());
         //When
-        String result = service.generateCSVContent(caseData);
+        String result = service.generateCSVContent(caseData, true);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(APPLICANT);
@@ -113,12 +119,34 @@ public class MediationCSVLipVLipServiceTest {
         assertThat(result).contains(TOTAL_AMOUNT);
         assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
         assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
+        assertThat(result).contains(BILINGUAL_FLAG_NO);
     }
 
-    private CaseData getCaseData(Party.Type partyType) {
+    @Test
+    void shouldReturn_properDataForFile_ForBilingualFlag() {
+        //Given
+        CaseData caseData = getCaseData(Party.Type.SOLE_TRADER, Language.BOTH.toString());
+        //When
+        String result = service.generateCSVContent(caseData, true);
+        //Then
+        assertThat(result).contains(ID);
+        assertThat(result).contains(APPLICANT);
+        assertThat(result).contains(APPLICANT_INDIVIDUAL_SOLE_TRADER_FIRST_NAME + " " + APPLICANT_INDIVIDUAL_SOLE_TRADER_LAST_NAME);
+        assertThat(result).contains(APPLICANT_PHONE_NUMBER);
+        assertThat(result).contains(APPLICANT_EMAIL_ADDRESS);
+        assertThat(result).contains(RESPONDENT);
+        assertThat(result).contains(RESPONDENT_INDIVIDUAL_SOLE_TRADER_FIRST_NAME + " " + RESPONDENT_INDIVIDUAL_SOLE_TRADER_LAST_NAME);
+        assertThat(result).contains(TOTAL_AMOUNT);
+        assertThat(result).contains(RESPONDENT_PHONE_NUMBER);
+        assertThat(result).contains(RESPONDENT_EMAIL_ADDRESS);
+        assertThat(result).contains(BILINGUAL_FLAG);
+    }
+
+    private CaseData getCaseData(Party.Type partyType, String bilingualFlag) {
         CaseData caseData = CaseData.builder()
                 .legacyCaseReference(ID)
                 .totalClaimAmount(new BigDecimal(9000))
+                .claimantBilingualLanguagePreference(bilingualFlag)
                 .applicant1(Party.builder()
                         .type(partyType)
                         .companyName(APPLICANT_COMPANY_NAME)
