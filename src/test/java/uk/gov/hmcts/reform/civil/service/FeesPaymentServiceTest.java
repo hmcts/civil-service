@@ -42,7 +42,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 
 @ExtendWith(SpringExtension.class)
@@ -70,12 +69,6 @@ class FeesPaymentServiceTest {
         .language("En")
         .amount(new BigDecimal("232.00")).currency("GBP").build();
 
-    private static final CardPaymentServiceRequestDTO CARD_PAYMENT_SERVICE_REQUEST_CLAIM
-        = CardPaymentServiceRequestDTO.builder()
-        .returnUrl("http://localhost:3001/claim-issued-payment-confirmation/1701090368574910")
-        .language("En")
-        .amount(new BigDecimal("232.00")).currency("GBP").build();
-
     @Autowired
     private FeesPaymentService feesPaymentService;
     @MockBean
@@ -97,10 +90,7 @@ class FeesPaymentServiceTest {
                     .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
                     .build(),
                 "hearingFee",
-                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build(),
-                "serviceRequestReference", "2023-1701090705688",
-                "claimFee", Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
-
+                Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
             )).build();
 
         when(coreCaseDataService.getCase(1701090368574910L)).thenReturn(expectedCaseDetails);
@@ -120,26 +110,6 @@ class FeesPaymentServiceTest {
 
         CardPaymentStatusResponse govPaymentRequest = feesPaymentService.createGovPaymentRequest(
             HEARING,
-            "1701090368574910",
-            BEARER_TOKEN
-        );
-        assertThat(govPaymentRequest).isEqualTo(CardPaymentStatusResponse.from(response));
-
-    }
-
-    @Test
-    @SneakyThrows
-    void shouldCreateGovPayPaymentUrlForServiceRequestPaymentClaimIssued() {
-        CardPaymentServiceRequestResponse response = buildServiceRequestResponse();
-
-        when(paymentsClient.createGovPayCardPaymentRequest(
-            "2023-1701090705688",
-            BEARER_TOKEN,
-            CARD_PAYMENT_SERVICE_REQUEST_CLAIM
-        )).thenReturn(response);
-
-        CardPaymentStatusResponse govPaymentRequest = feesPaymentService.createGovPaymentRequest(
-            CLAIMISSUED,
             "1701090368574910",
             BEARER_TOKEN
         );
