@@ -386,7 +386,6 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         String claimNumber = caseData.getLegacyCaseReference();
         String title;
@@ -431,11 +430,5 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
             .confirmationHeader(format(title, claimNumber))
             .confirmationBody(body + exitSurveyContentService.applicantSurvey())
             .build();
-    }
-
-    public static class ExceptionToRemove extends RuntimeException {
-        public ExceptionToRemove(String message) {
-            super(message);
-        }
     }
 }
