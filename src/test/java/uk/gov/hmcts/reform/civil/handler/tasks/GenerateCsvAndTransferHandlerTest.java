@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVLipVLipService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCSVLrvLipService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.CaseStateSearchService;
@@ -60,6 +62,10 @@ class GenerateCsvAndTransferHandlerTest {
     private  MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
     @MockBean
     private MediationCSVLrvLipService mediationCSVLrvLipService;
+    @MockBean
+    private FeatureToggleService toggleService;
+    @MockBean
+    private MediationCSVLipVLipService mediationCSVLipvLipService;
 
     private CaseDetails caseDetailsWithInMediationState;
     private CaseDetails caseDetailsWithInMediationStateNotToProcess;
@@ -79,6 +85,7 @@ class GenerateCsvAndTransferHandlerTest {
         when(mediationCsvServiceFactory.getMediationCSVService(any())).thenReturn(mediationCSVLrvLipService);
         when(mediationCSVEmailConfiguration.getRecipient()).thenReturn(SENDER);
         when(mediationCSVEmailConfiguration.getSender()).thenReturn(RECIPIENT);
+        when(toggleService.isLipVLipEnabled()).thenReturn(false);
     }
 
     @Test
@@ -106,6 +113,20 @@ class GenerateCsvAndTransferHandlerTest {
         verify(externalTaskService).complete(externalTask);
     }
 
+    @Test
+    void shouldGenerateCsvAndSendEmailSuccessfully_R2LipVLipFlagEnabled() {
+        when(toggleService.isLipVLipEnabled()).thenReturn(true);
+        when(mediationCsvServiceFactory.getMediationCSVService(any())).thenReturn(mediationCSVLipvLipService);
+        when(searchService.getCases()).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
+        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
+        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
+
+        inMediationCsvHandler.execute(externalTask, externalTaskService);
+        verify(searchService).getCases();
+        verify(sendGridClient).sendEmail(anyString(), any());
+        verify(sendGridClient, times(1)).sendEmail(anyString(), any());
+        verify(externalTaskService).complete(externalTask);
+    }
     private CaseDetails getCaseDetails(Long ccdId, LocalDate claimMovedToMediation) {
 
         return CaseDetails.builder().id(ccdId).data(
