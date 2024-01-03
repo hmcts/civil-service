@@ -154,8 +154,8 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         var generalAppTypes = caseData.getGeneralAppType().getTypes();
         if (generalAppTypes.size() > 1
-            && generalAppTypes.contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
-            errors.add("It is not possible to select an additional application type when applying to vary judgment");
+            && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
+            errors.add("It is not possible to select an additional application type when applying to vary payment terms of judgment");
         }
         if (generalAppTypes.size() > 1
                 && generalAppTypes.contains(GeneralApplicationTypes.SETTLE_BY_CONSENT)) {
@@ -164,7 +164,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         }
 
         if (generalAppTypes.size() == 1
-            && generalAppTypes.contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+            && generalAppTypes.contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             caseDataBuilder.generalAppVaryJudgementType(YesOrNo.YES)
                     .generalAppInformOtherParty(
                             GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build());
@@ -303,7 +303,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private CaseData setWithNoticeByType(CaseData caseData) {
         if (Objects.nonNull(caseData.getGeneralAppType())
                 && caseData.getGeneralAppType().getTypes().size() == 1
-                && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+                && caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
             caseData = caseData.toBuilder()
                     .generalAppInformOtherParty(
                             GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
