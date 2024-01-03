@@ -42,9 +42,16 @@ public class ClaimStoreService {
         }
     }
 
-    private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
+ private List<DashboardClaimInfo> translateCmcClaimToClaimInfo(List<CmcClaim> cmcClaims) {
         return cmcClaims.stream().map(cmcClaim ->
-                                          DashboardClaimInfo.builder()
+                                      {
+                                          System.out.println(
+                                              "====================CMC CLAIM DATA======================================");
+                                          System.out.println(cmcClaim);
+                                          System.out.println(
+                                              "====================CUI DATA======================================");
+                                          System.out.println("Claim Number " + cmcClaim.getReferenceNumber());
+                                          DashboardClaimInfo dashboardClaimInfo = DashboardClaimInfo.builder()
                                               .createdDate(createAtToCreateDate(cmcClaim))
                                               .claimId(cmcClaim.getExternalId())
                                               .claimNumber(cmcClaim.getReferenceNumber())
@@ -52,8 +59,8 @@ public class ClaimStoreService {
                                               .defendantName(cmcClaim.getDefendantName())
                                               .responseDeadline(cmcClaim.getResponseDeadline())
                                               .responseDeadlineTime(Optional.ofNullable(cmcClaim.getResponseDeadline()).map(
-                                                                        LocalDate::atStartOfDay).orElse(null)
-                                                  )
+                                                  LocalDate::atStartOfDay).orElse(null)
+                                              )
                                               .claimAmount(cmcClaim.getTotalAmountTillToday())
                                               .paymentDate(cmcClaim.getBySpecifiedDate())
                                               .ccjRequestedDate(cmcClaim.getCountyCourtJudgmentRequestedAt())
@@ -63,7 +70,12 @@ public class ClaimStoreService {
                                                                                            .map(Response::getAmount)
                                                                                            .orElse(null))
                                               .status(dashboardClaimStatusFactory.getDashboardClaimStatus(cmcClaim))
-                                              .build()
+                                              .build();
+                                          System.out.println("Claim Dashboard Status" + dashboardClaimInfo.getStatus());
+                                          System.out.println(
+                                              "====================END CUI DATA======================================");
+                                          return dashboardClaimInfo;
+                                      }
         ).collect(Collectors.toList());
     }
 
