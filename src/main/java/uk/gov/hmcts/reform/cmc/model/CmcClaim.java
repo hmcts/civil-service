@@ -238,24 +238,27 @@ public class CmcClaim implements Claim {
     }
 
     private boolean hasClaimantSignedSettlementAgreementOfferAccepted() {
-        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && settlement.isThroughAdmissions()
+        System.out.println(settlement.isOfferAccepted() +"***** HasCourtDetermination "+claimantResponse.hasCourtDetermination()+ "*** isThroughAdmissions"+settlement.isThroughAdmissions());
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted()
             && Objects.nonNull(claimantResponse) && !claimantResponse.hasCourtDetermination();
     }
 
     private boolean hasClaimantSignedSettlementAgreementChosenByCourt() {
-        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && !settlement.isRejectedByDefendant() && settlement.isThroughAdmissions()
+        System.out.println(settlement.isOfferAccepted() +"***** HasCourtDetermination"+claimantResponse.hasCourtDetermination()+"*** isRejectedByDefendant"+settlement.isRejectedByDefendant() + "*** isThroughAdmissions"+settlement.isThroughAdmissions());
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && !settlement.isRejectedByDefendant()
             && Objects.nonNull(claimantResponse) && claimantResponse.hasCourtDetermination();
     }
 
     @Override
     public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
-        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && settlement.isThroughAdmissions()
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted()
             && Objects.nonNull(claimantRespondedAt) && claimantRespondedAt.plusDays(7).isBefore(LocalDateTime.now());
     }
 
     @Override
     public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
-        return Objects.nonNull(settlement) && !settlement.isRejectedByDefendant() && settlement.isSettled() && settlement.isThroughAdmissions();
+        System.out.println(settlement.isOfferAccepted() +"***** HasCourtDetermination"+claimantResponse.hasCourtDetermination()+"*** isRejectedByDefendant"+settlement.isRejectedByDefendant() + "*** isThroughAdmissions"+settlement.isThroughAdmissions());
+        return Objects.nonNull(settlement) && !settlement.isRejectedByDefendant() && settlement.isSettled();
     }
 
     @Override
