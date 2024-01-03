@@ -34,9 +34,6 @@ public class CaseDataLiP {
     private AdditionalLipPartyDetails respondent1AdditionalLipPartyDetails;
     @JsonProperty("applicant1AdditionalLipPartyDetails")
     private AdditionalLipPartyDetails applicant1AdditionalLipPartyDetails;
-    @JsonProperty("applicant1RepaymentPlan")
-    private RepaymentPlanLRspec applicant11RepaymentPlan;
-
     @JsonProperty("respondentSignSettlementAgreement")
     private YesOrNo respondentSignSettlementAgreement;
 
