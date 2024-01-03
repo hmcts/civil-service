@@ -42,15 +42,6 @@ public enum DashboardClaimStatus {
     TRANSFERRED(
         Claim::isSentToCourt
     ),
-    SETTLED(
-        Claim::isSettled
-    ),
-    DEFENDANT_PART_ADMIT_PAID(
-        Claim::hasDefendantStatedTheyPaid
-    ),
-    DEFENDANT_PART_ADMIT(
-        Claim::defendantRespondedWithPartAdmit
-    ),
     CLAIMANT_AND_DEFENDANT_SIGNED_SETTLEMENT_AGREEMENT(
         Claim::hasClaimantAndDefendantSignedSettlementAgreement
     ),
@@ -62,6 +53,15 @@ public enum DashboardClaimStatus {
     ),
     CLAIMANT_SIGNED_SETTLEMENT_AGREEMENT(
         Claim::hasClaimantSignedSettlementAgreement
+    ),
+    SETTLED(
+        Claim::isSettled
+    ),
+    DEFENDANT_PART_ADMIT_PAID(
+        Claim::hasDefendantStatedTheyPaid
+    ),
+    DEFENDANT_PART_ADMIT(
+        Claim::defendantRespondedWithPartAdmit
     ),
     SETTLEMENT_SIGNED(
         Claim::haveBothPartiesSignedSettlementAgreement
