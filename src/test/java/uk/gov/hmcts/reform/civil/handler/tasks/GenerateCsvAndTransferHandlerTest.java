@@ -127,6 +127,7 @@ class GenerateCsvAndTransferHandlerTest {
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask);
     }
+    
     private CaseDetails getCaseDetails(Long ccdId, LocalDate claimMovedToMediation) {
 
         return CaseDetails.builder().id(ccdId).data(
