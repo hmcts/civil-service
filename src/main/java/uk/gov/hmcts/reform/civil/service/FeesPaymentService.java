@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
@@ -41,7 +42,7 @@ public class FeesPaymentService {
 
         SRPbaDetails feePaymentDetails = feeType.equals(FeeType.HEARING)
             ? caseData.getHearingFeePBADetails()
-            : caseData.getClaimIssuedPBADetails();
+            : getClaimIssuePbaDetails(caseData.getServiceRequestReference(), caseData.getClaimFee());
 
         requireNonNull(feePaymentDetails, "Fee Payment details cannot be null");
         requireNonNull(feePaymentDetails.getServiceReqReference(), "Fee Payment service request cannot be null");
@@ -87,5 +88,12 @@ public class FeesPaymentService {
         }
 
         return response.build();
+    }
+
+    private SRPbaDetails getClaimIssuePbaDetails(String serviceReference, Fee claimFee) {
+        return SRPbaDetails.builder()
+            .serviceReqReference(serviceReference)
+            .fee(claimFee)
+            .build();
     }
 }
