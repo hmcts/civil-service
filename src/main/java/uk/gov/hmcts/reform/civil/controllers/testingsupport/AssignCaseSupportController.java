@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.service.citizen.defendant.LipDefendantCaseAssignmentService;
 
 import java.util.Optional;
 
@@ -38,6 +39,7 @@ public class AssignCaseSupportController {
     private final OrganisationService organisationService;
     private final CaseAssignmentSupportService assignCaseSupportService;
     private final AssignCaseService assignCaseService;
+    private final LipDefendantCaseAssignmentService lipDefendantCaseAssignmentService;
 
     @PostMapping(value = {"/assign-case/{caseId}", "/assign-case/{caseId}/{caseRole}"})
     @Operation(summary = "Assign case to user")
@@ -45,6 +47,9 @@ public class AssignCaseSupportController {
                            @PathVariable("caseId") String caseId,
                            @PathVariable("caseRole") Optional<CaseRole> caseRole) {
         assignCaseService.assignCase(authorisation, caseId, caseRole);
+        if (caseRole.equals(CaseRole.DEFENDANT)) {
+            lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(authorisation, caseId);
+        }
     }
 
     @PostMapping(value = {"/unassign-user", "/unassign-user"})
