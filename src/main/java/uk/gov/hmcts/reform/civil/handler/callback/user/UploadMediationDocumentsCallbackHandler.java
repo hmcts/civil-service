@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CaseDataParent;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
@@ -64,6 +66,7 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
     private final UserService userService;
     private final ObjectMapper objectMapper;
     private final Time time;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -128,6 +131,9 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
 
         // clear form
         builder.uploadMediationDocumentsForm(null);
+
+        //assign category ids to documents uploaded as part of upload mediation documents
+        assignMediationDocumentsCategoryIds(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(builder.build().toMap(objectMapper))
@@ -232,6 +238,25 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         if (time.now().toLocalDate().isBefore(date)) {
             errors.add(DOC_DATE_IN_FUTURE);
         }
+    }
+
+    private void assignMediationDocumentsCategoryIds(CaseDataParent caseDataParent) {
+        assignCategoryId.assignCategoryIdToCollection(caseDataParent.getApp1MediationNonAttendanceDocs(),
+                                                      document -> document.getValue().getDocument(), "ClaimantOneMediationDocs");
+        assignCategoryId.assignCategoryIdToCollection(caseDataParent.getApp1MediationDocumentsReferred(),
+                                                      document -> document.getValue().getDocument(), "ClaimantOneMediationDocs");
+        assignCategoryId.assignCategoryIdToCollection(caseDataParent.getApp2MediationNonAttendanceDocs(),
+                                                      document -> document.getValue().getDocument(), "ClaimantTwoMediationDocs");
+        assignCategoryId.assignCategoryIdToCollection(caseDataParent.getApp2MediationDocumentsReferred(),
+                                                      document -> document.getValue().getDocument(), "ClaimantTwoMediationDocs");
+        assignCategoryId.assignCategoryIdToCollection(caseDataParent.getRes1MediationNonAttendanceDocs(),
+                                                      document -> document.getValue().getDocument(), "DefendantOneMediationDocs");
+        assignCategoryId.assignCategoryIdToCollection(caseDataParent.getRes1MediationDocumentsReferred(),
+                                                      document -> document.getValue().getDocument(), "DefendantOneMediationDocs");
+        assignCategoryId.assignCategoryIdToCollection(caseDataParent.getRes2MediationNonAttendanceDocs(),
+                                                      document -> document.getValue().getDocument(), "DefendantTwoMediationDocs");
+        assignCategoryId.assignCategoryIdToCollection(caseDataParent.getRes2MediationDocumentsReferred(),
+                                                      document -> document.getValue().getDocument(), "DefendantTwoMediationDocs");
     }
 
     @Override
