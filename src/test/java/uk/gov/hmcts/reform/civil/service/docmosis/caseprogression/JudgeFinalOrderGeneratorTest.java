@@ -157,7 +157,7 @@ public class JudgeFinalOrderGeneratorTest {
         when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(List.of(
             locationRefData
         ));
-        when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString())).thenReturn(List.of(locationRefData));
+        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(List.of(locationRefData));
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
     }
 

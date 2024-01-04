@@ -100,7 +100,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-        List<LocationRefData>  locationRefData = locationRefDataService.getCourtLocationsForDefaultJudgments(authorisation);
+        List<LocationRefData>  locationRefData = locationRefDataService.getHearingCourtLocations(authorisation);
         locationRefData.forEach(location -> {
             if (location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())) {
                 caseManagementLocationDetails = location;
@@ -143,7 +143,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private JudgeFinalOrderForm getAssistedOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-        List<LocationRefData>  locationRefData = locationRefDataService.getCourtLocationsForDefaultJudgments(authorisation);
+        List<LocationRefData>  locationRefData = locationRefDataService.getHearingCourtLocations(authorisation);
         locationRefData.forEach(location -> {
             if (location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())) {
                 caseManagementLocationDetails = location;
