@@ -378,7 +378,7 @@ class GeneralAppFeesServiceTest {
         @Test
         void mix_default_vary_should_be_14() {
             List<GeneralApplicationTypes> randomList = getRandomDefaultTypes();
-            randomList.add(GeneralApplicationTypes.VARY_JUDGEMENT);
+            randomList.add(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseDataOutside14Days = getFeeCase(
                     randomList,
                     YesOrNo.YES, YesOrNo.YES, LocalDate.now().plusDays(15));
