@@ -41,7 +41,7 @@ public abstract class MediationCSVService {
         };
 
         return generateCSVRow(claimantData)
-                + generateCSVRow(respondentData);
+            + generateCSVRow(respondentData);
     }
 
     protected abstract ApplicantContactDetails getApplicantContactDetails();
@@ -68,4 +68,5 @@ public abstract class MediationCSVService {
     protected String getCsvCompanyName(Party party) {
         return (party.isCompany() || party.isOrganisation()) ? party.getPartyName() : null;
     }
+
 }

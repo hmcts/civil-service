@@ -74,6 +74,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     }
 
     private String generateCsvContent(CaseData caseData) {
+
         MediationCSVService mediationCSVService = mediationCsvServiceFactory.getMediationCSVService(caseData);
         return mediationCSVService.generateCSVContent(caseData);
 
@@ -89,4 +90,5 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
 
         return builder.toString();
     }
+
 }
