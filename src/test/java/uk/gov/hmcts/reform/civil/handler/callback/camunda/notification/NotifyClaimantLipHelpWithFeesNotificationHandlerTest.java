@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -61,6 +62,13 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandlerTest {
                 getNotificationDataMap(caseData),
                 "notify-claimant-lip-help-with-fees-notification-000DC001"
             );
+        }
+
+        @Test
+        void shouldReturnCamundaTask() {
+            String response = handler.camundaActivityId(CallbackParamsBuilder.builder().build());
+
+            assertThat(response).isEqualTo("NotifyClaimantHwf");
         }
 
         @NotNull
