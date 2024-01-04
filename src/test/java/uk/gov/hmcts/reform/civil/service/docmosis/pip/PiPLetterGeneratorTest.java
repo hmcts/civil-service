@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -90,7 +91,9 @@ class PiPLetterGeneratorTest {
         .build();
     private static final BigDecimal TOTAL_CLAIM_AMOUNT = new BigDecimal("1000");
     private static final String PIN = "1234789";
-
+    private static final String testUrl = "url";
+    private static final String testFileName = "testFileName.pdf";
+    private static final String testBinaryUrl = "binary-url";
     private static final String CUI_URL = "CUI response url";
     private static final PiPLetter LETTER_TEMPLATE_DATA = PiPLetter.builder()
         .pin(PIN)
@@ -113,8 +116,18 @@ class PiPLetterGeneratorTest {
         .respondent1Represented(YesOrNo.NO)
         .respondent1ResponseDeadline(RESPONSE_DEADLINE)
         .totalClaimAmount(TOTAL_CLAIM_AMOUNT)
+        .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocs())
         .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
         .build();
+
+    private static final List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        CaseDocument caseDocumentClaim =
+            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
+                testUrl).documentFileName(testFileName).documentBinaryUrl(testBinaryUrl).build()).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
+        return systemGeneratedCaseDocuments;
+    }
     private static final DocmosisDocument LETTER = DocmosisDocument.builder()
         .bytes(new byte[]{1, 2, 3, 4, 5, 6})
         .build();
@@ -126,9 +139,9 @@ class PiPLetterGeneratorTest {
             .documentType(SEALED_CLAIM)
             .createdDatetime(LocalDateTime.now())
             .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
+                              .documentUrl(testUrl)
+                              .documentFileName(testFileName)
+                              .documentBinaryUrl(testBinaryUrl)
                               .build())
             .build();
 
@@ -159,10 +172,7 @@ class PiPLetterGeneratorTest {
                                                             "PiP Letter",
                                                             LocalDate.now().toString()));
         specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
-                                                            "Claim timeline",
-                                                            LocalDate.now().toString()));
-        specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
-                                                            "Supported docs",
+                                                            "Sealed Claim form",
                                                             LocalDate.now().toString()));
     }
 
@@ -200,6 +210,7 @@ class PiPLetterGeneratorTest {
             .respondent1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(RESPONSE_DEADLINE)
             .totalClaimAmount(TOTAL_CLAIM_AMOUNT)
+            .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocs())
             .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
             .specRespondent1Represented(YES)
             .servedDocumentFiles(setupParticularsOfClaimDocs())

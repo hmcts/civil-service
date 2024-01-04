@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.pip;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -23,9 +22,7 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.PIN_IN_THE_POST_LETTER;
 
@@ -39,8 +36,6 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final DocumentManagementService documentManagementService;
     private final AssignCategoryId assignCategoryId;
-    @Value("${stitching.enabled}")
-    private boolean stitchEnabled;
 
     private DocmosisDocument generate(CaseData caseData) {
         return documentGeneratorService.generateDocmosisDocument(
@@ -59,7 +54,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
                 DocumentType.ACKNOWLEDGEMENT_OF_CLAIM
             )
         );
-        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, pipLetterCaseDocument, authorisation);
+        List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, pipLetterCaseDocument);
         CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
             documentMetaDataList,
             authorisation,
@@ -86,7 +81,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
             .build();
     }
 
-    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument, String authorisation) {
+    private List<DocumentMetaData> fetchDocumentsFromCaseData(CaseData caseData, CaseDocument caseDocument) {
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
 
         documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(),
@@ -97,35 +92,11 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
             .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
                 .getDocumentType().equals(DocumentType.SEALED_CLAIM)).findAny();
 
-        if (optionalSealedDocument.isPresent()) {
-            documentMetaDataList.add(new DocumentMetaData(optionalSealedDocument.get().getValue().getDocumentLink(),
-                                                          "Sealed Claim form",
-                                                          LocalDate.now().toString()));
-        }
-
-        if (Objects.nonNull(caseData.getServedDocumentFiles())) {
-            if (Objects.nonNull(caseData.getServedDocumentFiles().getTimelineEventUpload())) {
-                log.info("Claim Has TimeLine doc" + caseData.getServedDocumentFiles().getTimelineEventUpload().size());
-                documentMetaDataList.addAll(caseData.getServedDocumentFiles().getTimelineEventUpload().stream()
-                                                .map(doc -> new DocumentMetaData(
-                                                    doc.getValue(),
-                                                    "Claim timeline",
-                                                    LocalDate.now().toString()
-                                                ))
-                                                .collect(Collectors.toList()));
-            }
-
-            if (Objects.nonNull(caseData.getServedDocumentFiles().getParticularsOfClaimDocument())) {
-                log.info("Claim Has Claim details doc" + caseData.getServedDocumentFiles().getParticularsOfClaimDocument().size());
-                documentMetaDataList.addAll(caseData.getServedDocumentFiles().getParticularsOfClaimDocument().stream()
-                                                .map(doc -> new DocumentMetaData(
-                                                    doc.getValue(),
-                                                    "Supported docs",
-                                                    LocalDate.now().toString()
-                                                ))
-                                                .collect(Collectors.toList()));
-            }
-        }
+        optionalSealedDocument.ifPresent(caseDocumentElement -> documentMetaDataList.add(new DocumentMetaData(
+            caseDocumentElement.getValue().getDocumentLink(),
+            "Sealed Claim form",
+            LocalDate.now().toString()
+        )));
 
         return documentMetaDataList;
     }
