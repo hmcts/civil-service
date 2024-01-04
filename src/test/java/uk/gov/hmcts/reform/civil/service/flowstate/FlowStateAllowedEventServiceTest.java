@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PA
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
@@ -574,7 +575,8 @@ class FlowStateAllowedEventServiceTest {
                         TRANSFER_ONLINE_CASE,
                         asyncStitchingComplete,
                         CLAIMANT_RESPONSE_CUI,
-                        REQUEST_FOR_RECONSIDERATION
+                        REQUEST_FOR_RECONSIDERATION,
+                        DECISION_ON_RECONSIDERATION_REQUEST
                     }
                 ),
                 of(
