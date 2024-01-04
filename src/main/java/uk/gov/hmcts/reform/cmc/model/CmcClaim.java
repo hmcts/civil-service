@@ -14,12 +14,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.civil.model.citizenui.Claim;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,6 +37,7 @@ public class CmcClaim implements Claim {
 
     @JsonIgnore
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
+    public Response response;
     private String submitterId;
     private String letterHolderId;
     private String defendantId;
@@ -42,15 +46,12 @@ public class CmcClaim implements Claim {
     private BigDecimal totalAmountTillToday;
     @JsonProperty("claim")
     private ClaimData claimData;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate responseDeadline;
     private boolean moreTimeRequested;
     private String submitterEmail;
-
-    public Response response;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
@@ -238,27 +239,26 @@ public class CmcClaim implements Claim {
     }
 
     private boolean hasClaimantSignedSettlementAgreementOfferAccepted() {
-        System.out.println(settlement.isOfferAccepted() +"***** HasCourtDetermination "+claimantResponse.hasCourtDetermination()+ "*** isThroughAdmissions"+settlement.isThroughAdmissions());
-        return Objects.nonNull(settlement) && settlement.isOfferAccepted()
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && isThroughAdmissions(settlement)
             && Objects.nonNull(claimantResponse) && !claimantResponse.hasCourtDetermination();
     }
 
     private boolean hasClaimantSignedSettlementAgreementChosenByCourt() {
-        System.out.println(settlement.isOfferAccepted() +"***** HasCourtDetermination"+claimantResponse.hasCourtDetermination()+"*** isRejectedByDefendant"+settlement.isRejectedByDefendant() + "*** isThroughAdmissions"+settlement.isThroughAdmissions());
-        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && !settlement.isRejectedByDefendant()
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && !settlement.isRejectedByDefendant() && isThroughAdmissions(
+            settlement)
             && Objects.nonNull(claimantResponse) && claimantResponse.hasCourtDetermination();
     }
 
     @Override
     public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
-        return Objects.nonNull(settlement) && settlement.isOfferAccepted()
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && isThroughAdmissions(settlement)
             && Objects.nonNull(claimantRespondedAt) && claimantRespondedAt.plusDays(7).isBefore(LocalDateTime.now());
     }
 
     @Override
     public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
-        System.out.println(settlement.isOfferAccepted() +"***** HasCourtDetermination"+claimantResponse.hasCourtDetermination()+"*** isRejectedByDefendant"+settlement.isRejectedByDefendant() + "*** isThroughAdmissions"+settlement.isThroughAdmissions());
-        return Objects.nonNull(settlement) && !settlement.isRejectedByDefendant() && settlement.isSettled();
+        return Objects.nonNull(settlement) && !settlement.isRejectedByDefendant() && settlement.isSettled() && isThroughAdmissions(
+            settlement);
     }
 
     @Override
@@ -442,5 +442,25 @@ public class CmcClaim implements Claim {
     @Override
     public boolean isClaimantDefaultJudgement() {
         return false;
+    }
+
+    /**
+     * @param settlement Returns true if last offer has paymentIndention object.
+     */
+    private boolean isThroughAdmissions(Settlement settlement) {
+        List<PartyStatement> partyStatements = settlement.getPartyStatements();
+        if (CollectionUtils.isEmpty(partyStatements) || !settlement.hasOffer()) {
+            return false;
+        }
+
+        //get the last offer
+        Collections.reverse(partyStatements);
+
+        return partyStatements.stream()
+            .filter(PartyStatement::hasOffer)
+            .findFirst()
+            .map(PartyStatement::getOffer)
+            .map(Offer::getPaymentIntention)
+            .isPresent();
     }
 }
