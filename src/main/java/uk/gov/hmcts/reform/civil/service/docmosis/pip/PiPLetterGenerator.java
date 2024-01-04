@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentDownloadException;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -16,9 +17,10 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
     private final PinInPostConfiguration pipInPostConfiguration;
     private final CivilDocumentStitchingService civilDocumentStitchingService;
     private final DocumentManagementService documentManagementService;
-    private final AssignCategoryId assignCategoryId;
+    private final DocumentDownloadService documentDownloadService;
 
     private DocmosisDocument generate(CaseData caseData) {
         return documentGeneratorService.generateDocmosisDocument(
@@ -44,7 +46,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
         );
     }
 
-    public CaseDocument downloadLetter(CaseData caseData, String authorisation) {
+    public byte[] downloadLetter(CaseData caseData, String authorisation) {
         DocmosisDocument pipLetter = generate(caseData);
         CaseDocument pipLetterCaseDocument =  documentManagementService.uploadDocument(
             authorisation,
@@ -54,6 +56,7 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
                 DocumentType.ACKNOWLEDGEMENT_OF_CLAIM
             )
         );
+
         List<DocumentMetaData> documentMetaDataList = fetchDocumentsFromCaseData(caseData, pipLetterCaseDocument);
         CaseDocument stitchedDocument = civilDocumentStitchingService.bundle(
             documentMetaDataList,
@@ -62,8 +65,18 @@ public class PiPLetterGenerator implements TemplateDataGenerator<PiPLetter> {
             pipLetterCaseDocument.getDocumentName(),
             caseData
         );
-        assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocument, "detailsOfClaim");
-        return stitchedDocument;
+
+        String documentUrl = stitchedDocument.getDocumentLink().getDocumentUrl();
+        String documentId = documentUrl.substring(documentUrl.lastIndexOf("/") + 1);
+        byte[] letterContent;
+
+        try {
+            letterContent = documentDownloadService.downloadDocument(authorisation, documentId).file().getInputStream().readAllBytes();
+        } catch (IOException e) {
+            log.error("Failed getting letter content for Pip Stitched Letter ");
+            throw new DocumentDownloadException(stitchedDocument.getDocumentLink().getDocumentFileName(), e);
+        }
+        return letterContent;
     }
 
     @Override

@@ -10,16 +10,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +44,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private final Time time;
     private final PinInPostConfiguration pipInPostConfiguration;
     private final PiPLetterGenerator pipLetterGenerator;
-    private final SystemGeneratedDocumentService systemGeneratedDocumentService;
     private final BulkPrintService bulkPrintService;
 
     @Override
@@ -68,22 +66,17 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private CallbackResponse notifyRespondentForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
+        final CaseData.CaseDataBuilder caseDataBuilder
+            = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
 
         if (caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
             generatePIPEmail(caseData);
         }
 
-        CaseDocument document = generatePIPLetter(callbackParams);
-
-        CaseData updatedCaseData = caseData.toBuilder()
-            .claimNotificationDate(claimNotificationDate)
-            .systemGeneratedCaseDocuments(systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
-                document,
-                caseData
-            )).build();
+        generatePIPLetter(callbackParams);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedCaseData.toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .state("AWAITING_RESPONDENT_ACKNOWLEDGEMENT")
             .build();
     }
@@ -104,14 +97,13 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
         );
     }
 
-    private CaseDocument generatePIPLetter(CallbackParams callbackParams) {
+    private void generatePIPLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseDocument document = pipLetterGenerator.downloadLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+        byte[] letterContent = pipLetterGenerator.downloadLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
 
-        return document;
-        //List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
-        //bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
-        //                             caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
+        List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
+        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
+                                     caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
     }
 
     private void generatePIPEmail(CaseData caseData) {
