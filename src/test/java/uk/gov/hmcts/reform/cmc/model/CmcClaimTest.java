@@ -6,7 +6,7 @@ import org.elasticsearch.core.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatus;
 import uk.gov.hmcts.reform.civil.model.citizenui.DashboardClaimStatusFactory;
@@ -18,7 +18,7 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class CmcClaimTest {
 
     private static final String NAME = "Mr John Clark";
@@ -155,6 +155,9 @@ public class CmcClaimTest {
                         .partyStatements(List.of(
                                 PartyStatement.builder()
                                         .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
                                         .build(),
                                 PartyStatement.builder()
                                         .type(StatementType.ACCEPTATION)
@@ -179,6 +182,9 @@ public class CmcClaimTest {
                         .partyStatements(List.of(
                                 PartyStatement.builder()
                                         .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
                                         .build(),
                                 PartyStatement.builder()
                                         .type(StatementType.ACCEPTATION)
@@ -205,6 +211,9 @@ public class CmcClaimTest {
                         .partyStatements(List.of(
                                 PartyStatement.builder()
                                         .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
                                         .build(),
                                 PartyStatement.builder()
                                         .type(StatementType.ACCEPTATION)
@@ -229,6 +238,9 @@ public class CmcClaimTest {
                         .partyStatements(List.of(
                                 PartyStatement.builder()
                                         .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
                                         .build(),
                                 PartyStatement.builder()
                                         .type(StatementType.ACCEPTATION)
@@ -255,6 +267,9 @@ public class CmcClaimTest {
                         .partyStatements(List.of(
                                 PartyStatement.builder()
                                         .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
                                         .build(),
                                 PartyStatement.builder()
                                         .type(StatementType.REJECTION)

@@ -80,7 +80,7 @@ public class Settlement {
             .noneMatch(PartyStatement::hasPaymentIntention);
     }
 
-    private boolean hasOffer() {
+    public boolean hasOffer() {
         return getPartyStatementStream()
             .anyMatch(PartyStatement::hasOffer);
     }

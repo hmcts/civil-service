@@ -14,12 +14,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minidev.json.annotate.JsonIgnore;
+import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.civil.model.citizenui.Claim;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -238,24 +242,24 @@ public class CmcClaim implements Claim {
     }
 
     private boolean hasClaimantSignedSettlementAgreementOfferAccepted() {
-        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && settlement.isThroughAdmissions()
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && isThroughAdmissions(settlement)
             && Objects.nonNull(claimantResponse) && !claimantResponse.hasCourtDetermination();
     }
 
     private boolean hasClaimantSignedSettlementAgreementChosenByCourt() {
-        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && !settlement.isRejectedByDefendant() && settlement.isThroughAdmissions()
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && !settlement.isRejectedByDefendant() && isThroughAdmissions(settlement)
             && Objects.nonNull(claimantResponse) && claimantResponse.hasCourtDetermination();
     }
 
     @Override
     public boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired() {
-        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && settlement.isThroughAdmissions()
+        return Objects.nonNull(settlement) && settlement.isOfferAccepted() && isThroughAdmissions(settlement)
             && Objects.nonNull(claimantRespondedAt) && claimantRespondedAt.plusDays(7).isBefore(LocalDateTime.now());
     }
 
     @Override
     public boolean hasClaimantAndDefendantSignedSettlementAgreement() {
-        return Objects.nonNull(settlement) && !settlement.isRejectedByDefendant() && settlement.isSettled() && settlement.isThroughAdmissions();
+        return Objects.nonNull(settlement) && !settlement.isRejectedByDefendant() && settlement.isSettled() && isThroughAdmissions(settlement);
     }
 
     @Override
@@ -439,5 +443,25 @@ public class CmcClaim implements Claim {
     @Override
     public boolean isClaimantDefaultJudgement() {
         return false;
+    }
+
+    /**
+     * @param settlement Returns true if last offer has paymentIndention object.
+     */
+    private boolean isThroughAdmissions(Settlement settlement) {
+        List<PartyStatement> partyStatements = new ArrayList<>(settlement.getPartyStatements());
+        if (CollectionUtils.isEmpty(partyStatements) || !settlement.hasOffer()) {
+            return false;
+        }
+
+        //get the last offer
+        Collections.reverse(partyStatements);
+
+        return partyStatements.stream()
+            .filter(PartyStatement::hasOffer)
+            .findFirst()
+            .map(PartyStatement::getOffer)
+            .map(Offer::getPaymentIntention)
+            .isPresent();
     }
 }
