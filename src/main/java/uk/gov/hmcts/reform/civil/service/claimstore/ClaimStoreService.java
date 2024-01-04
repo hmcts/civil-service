@@ -46,9 +46,6 @@ public class ClaimStoreService {
         return cmcClaims.stream().map(cmcClaim ->
                                       {
                                           System.out.println(
-                                              "====================CMC CLAIM DATA======================================");
-                                          System.out.println(cmcClaim);
-                                          System.out.println(
                                               "====================CUI DATA======================================");
                                           System.out.println("Claim Number " + cmcClaim.getReferenceNumber());
                                           DashboardClaimInfo dashboardClaimInfo = DashboardClaimInfo.builder()

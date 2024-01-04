@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -448,7 +449,7 @@ public class CmcClaim implements Claim {
      * @param settlement Returns true if last offer has paymentIndention object.
      */
     private boolean isThroughAdmissions(Settlement settlement) {
-        List<PartyStatement> partyStatements = settlement.getPartyStatements();
+        List<PartyStatement> partyStatements = new ArrayList<>(settlement.getPartyStatements());
         if (CollectionUtils.isEmpty(partyStatements) || !settlement.hasOffer()) {
             return false;
         }

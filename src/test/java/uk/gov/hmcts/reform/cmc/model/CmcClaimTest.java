@@ -155,6 +155,9 @@ public class CmcClaimTest {
                         .partyStatements(List.of(
                                 PartyStatement.builder()
                                         .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
                                         .build(),
                                 PartyStatement.builder()
                                         .type(StatementType.ACCEPTATION)
@@ -179,6 +182,9 @@ public class CmcClaimTest {
                         .partyStatements(List.of(
                                 PartyStatement.builder()
                                         .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
                                         .build(),
                                 PartyStatement.builder()
                                         .type(StatementType.ACCEPTATION)
@@ -205,6 +211,9 @@ public class CmcClaimTest {
                         .partyStatements(List.of(
                                 PartyStatement.builder()
                                         .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
                                         .build(),
                                 PartyStatement.builder()
                                         .type(StatementType.ACCEPTATION)
@@ -229,6 +238,9 @@ public class CmcClaimTest {
                         .partyStatements(List.of(
                                 PartyStatement.builder()
                                         .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
                                         .build(),
                                 PartyStatement.builder()
                                         .type(StatementType.ACCEPTATION)
@@ -255,6 +267,9 @@ public class CmcClaimTest {
                         .partyStatements(List.of(
                                 PartyStatement.builder()
                                         .type(StatementType.OFFER)
+                                        .offer(Offer.builder()
+                                               .paymentIntention(PaymentIntention.builder().build())
+                                               .build())
                                         .build(),
                                 PartyStatement.builder()
                                         .type(StatementType.REJECTION)
