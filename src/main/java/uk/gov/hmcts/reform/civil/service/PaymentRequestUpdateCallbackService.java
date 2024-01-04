@@ -45,7 +45,8 @@ public class PaymentRequestUpdateCallbackService {
 
     public void processCallback(ServiceRequestUpdateDto serviceRequestUpdateDto, String feeType) {
         log.info("Processing the callback for the caseId {} with status {}", serviceRequestUpdateDto.getCcdCaseNumber(),
-                 serviceRequestUpdateDto.getServiceRequestStatus());
+                 serviceRequestUpdateDto.getServiceRequestStatus()
+        );
 
         if (serviceRequestUpdateDto.getServiceRequestStatus().equalsIgnoreCase(PAID)) {
 
@@ -58,13 +59,11 @@ public class PaymentRequestUpdateCallbackService {
                 createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
             }
 
-            if (caseData.isLipvLipOneVOne() && feeType.equals(FeeType.HEARING.name())) {
-                notificationLipService.sendGenericNotificationLip(caseData);
-            }
-
         } else {
-            log.info("Service request status is not PAID for Case id {}",
-                      serviceRequestUpdateDto.getCcdCaseNumber());
+            log.info(
+                "Service request status is not PAID for Case id {}",
+                serviceRequestUpdateDto.getCcdCaseNumber()
+            );
         }
     }
 
