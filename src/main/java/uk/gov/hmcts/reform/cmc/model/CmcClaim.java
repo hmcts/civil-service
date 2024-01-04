@@ -445,9 +445,6 @@ public class CmcClaim implements Claim {
         return false;
     }
 
-    /**
-     * @param settlement Returns true if last offer has paymentIndention object.
-     */
     private boolean isThroughAdmissions(Settlement settlement) {
         List<PartyStatement> partyStatements = new ArrayList<>(settlement.getPartyStatements());
         if (CollectionUtils.isEmpty(partyStatements) || !settlement.hasOffer()) {
