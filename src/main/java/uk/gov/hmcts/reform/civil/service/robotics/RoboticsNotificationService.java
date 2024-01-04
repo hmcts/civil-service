@@ -204,13 +204,11 @@ public class RoboticsNotificationService {
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
         if (isSpecClaim) {
-            log.info(String.format("EMAIl:--------- %s", roboticsEmailConfiguration.getSpecRecipient()));
             return roboticsEmailConfiguration.getSpecRecipient();
         }
         String recipient = isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
 
-        log.info(String.format("EMAIl:--------- %s", recipient));
         return recipient;
     }
 
