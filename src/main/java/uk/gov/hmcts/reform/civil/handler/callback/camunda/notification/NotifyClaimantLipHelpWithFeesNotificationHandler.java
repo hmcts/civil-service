@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.user;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -27,6 +26,7 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandler extends CallbackHa
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIMANT_LIP_HELP_WITH_FEES);
 
     private static final String REFERENCE_TEMPLATE = "notify-claimant-lip-help-with-fees-notification-%s";
+    public static final String TASK_ID = "NotifyClaimantHwf";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
@@ -41,6 +41,11 @@ public class NotifyClaimantLipHelpWithFeesNotificationHandler extends CallbackHa
     @Override
     public List<CaseEvent> handledEvents() {
         return EVENTS;
+    }
+
+    @Override
+    public String camundaActivityId(CallbackParams callbackParams) {
+        return TASK_ID;
     }
 
     private CallbackResponse notifyClaimantLipHelpWithFees(CallbackParams callbackParams) {

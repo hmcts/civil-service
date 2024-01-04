@@ -608,6 +608,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String respondent1DocumentURL;
     private final String respondent2DocumentURL;
     private final String respondent2DocumentGeneration;
+    private final String hearingHelpFeesReferenceNumber;
 
     // judge final orders
     private final FinalOrderSelection finalOrderSelection;
