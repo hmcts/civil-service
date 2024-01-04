@@ -128,6 +128,7 @@ class PiPLetterGeneratorTest {
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
         return systemGeneratedCaseDocuments;
     }
+
     private static final DocmosisDocument LETTER = DocmosisDocument.builder()
         .bytes(new byte[]{1, 2, 3, 4, 5, 6})
         .build();
