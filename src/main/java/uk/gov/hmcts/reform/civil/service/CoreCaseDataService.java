@@ -187,7 +187,9 @@ public class CoreCaseDataService {
     }
 
     private String createQuery(String authorization, int startIndex, String userEmailField) {
+        log.info("-----------Toggle enabled ??  -------------"+ featureToggleService.isLipVLipEnabled());
         if (featureToggleService.isLipVLipEnabled()) {
+            log.info("-----------Toggle is enabled -------------");
             UserDetails defendantInfo = idamClient.getUserDetails(authorization);
             return new SearchSourceBuilder()
                 .query(QueryBuilders.boolQuery()
