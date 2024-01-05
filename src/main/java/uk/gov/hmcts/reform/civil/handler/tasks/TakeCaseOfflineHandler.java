@@ -26,8 +26,10 @@ public class TakeCaseOfflineHandler implements BaseExternalTaskHandler {
 
         cases.forEach(caseDetails -> {
             try {
+                log.info("Started Taking case offline event caseId '{}'", caseDetails.getId());
                 log.info("Current case status '{}'", caseDetails.getState());
                 applicationEventPublisher.publishEvent(new TakeCaseOfflineEvent(caseDetails.getId()));
+                log.info("Finished Taking case offline caseId '{}'", caseDetails.getId());
             } catch (Exception e) {
                 //Continue for other cases if there is some error in some cases, as we don't want
                 // to stop processing other valid cases because error happened in some.
