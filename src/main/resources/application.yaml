@@ -340,8 +340,8 @@ notifications:
   notifyRespondentForSignedSettlementAgreement: "aeb3951e-4956-4542-a73b-e2e3abec8867"
   notifyRespondentForNotAgreedSignSettlement: "1742841b-d915-43a9-9d76-b6d17a189ba5"
 
-  notifyRespondentLipForClaimantRepresented: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
-
+  notifyRespondentLipForClaimantRepresentedTemplate: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
+  notifyClaimantLipForNoLongerAccessTemplate: "8bf1b6c6-2ee7-442d-8b72-550d2aca9bdf"
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
@@ -353,7 +353,7 @@ os-postcode-lookup:
 stitching:
   api:
     url: "${EM_CCD_ORCHESTRATOR_URL:http://localhost:8084}/api/stitch-ccd-bundles"
-  enabled: ${STITCHING_API_ENABLED:true}
+  enabled: ${STITCHING_API_ENABLED:false}
 
 bundle:
   api:
