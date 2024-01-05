@@ -106,7 +106,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         if (!foundLocations.isEmpty()) {
             caseManagementLocationDetails = foundLocations.get(0);
         } else {
-            throw new IllegalArgumentException ("Base Court Location not found, in location data");
+            throw new IllegalArgumentException("Base Court Location not found, in location data");
         }
 
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
@@ -149,7 +149,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
         if (!foundLocations.isEmpty()) {
             caseManagementLocationDetails = foundLocations.get(0);
         } else {
-            throw new IllegalArgumentException ("Base Court Location not found, in location data");
+            throw new IllegalArgumentException("Base Court Location not found, in location data");
         }
 
         var assistedFormOrderBuilder = JudgeFinalOrderForm.builder()
