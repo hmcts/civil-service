@@ -29,13 +29,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED;
 
 @SpringBootTest(classes = {
-    NotifyLIPDefendantClaimantRepresented.class,
+    NotificationForClaimantRepresented.class,
     JacksonAutoConfiguration.class,
 })
-public class NotifyLIPDefendantClaimantRepresentedTest extends BaseCallbackHandlerTest {
+public class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerTest {
 
     @Autowired
-    private NotifyLIPDefendantClaimantRepresented notificationHandler;
+    private NotificationForClaimantRepresented notificationHandler;
     @MockBean
     private NotificationService notificationService;
     @MockBean

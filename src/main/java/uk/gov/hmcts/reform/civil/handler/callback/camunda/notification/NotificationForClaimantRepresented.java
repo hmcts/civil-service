@@ -22,11 +22,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_LIP_
 
 @Service
 @RequiredArgsConstructor
-public class NotifyLIPDefendantClaimantRepresented extends CallbackHandler implements NotificationData {
+public class NotificationForClaimantRepresented extends CallbackHandler implements NotificationData {
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private static final String REFERENCE_TEMPLATE = "notify-defendant-lip-claimant-represented-notification-%s";
+    private static final String REFERENCE_TEMPLATE_DEFENDANT = "notify-defendant-lip-claimant-represented-notification-%s";
     public static final String TASK_ID = "NotifyDefendantLipClaimantRepresented";
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantLIP
@@ -50,7 +50,7 @@ public class NotifyLIPDefendantClaimantRepresented extends CallbackHandler imple
                 caseData.getRespondent1().getPartyEmail(),
                 notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate(),
                 addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+                String.format(REFERENCE_TEMPLATE_DEFENDANT, caseData.getLegacyCaseReference())
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
