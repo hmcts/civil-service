@@ -160,6 +160,7 @@ import java.util.Set;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Jacksonized
@@ -411,6 +412,7 @@ public class CaseDataParent implements MappableObject {
      */
     private final ResponseOneVOneShowTag showResponseOneVOneFlag;
     private final YesOrNo applicant1AcceptAdmitAmountPaidSpec;
+    private final YesOrNo applicant1FullDefenceConfirmAmountPaidSpec;
     private final YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
     private final YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
     private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
@@ -435,7 +437,7 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
-        return this.applicant1Represented == YesOrNo.NO;
+        return this.applicant1Represented == NO;
     }
 
     @JsonIgnore
@@ -815,4 +817,10 @@ public class CaseDataParent implements MappableObject {
             .map(DynamicListElement::getLabel)
             .orElse(null);
     }
+
+    @JsonIgnore
+    public boolean isFullDefenceNotPaid() {
+        return NO.equals(getApplicant1FullDefenceConfirmAmountPaidSpec());
+    }
+
 }
