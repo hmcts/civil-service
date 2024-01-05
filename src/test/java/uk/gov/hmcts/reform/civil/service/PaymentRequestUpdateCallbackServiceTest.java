@@ -67,6 +67,7 @@ class PaymentRequestUpdateCallbackServiceTest {
     FeatureToggleService featureToggleService;
     @MockBean
     CaseDetailsConverter caseDetailsConverter;
+
     @BeforeEach
     public void setup() {
         when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
