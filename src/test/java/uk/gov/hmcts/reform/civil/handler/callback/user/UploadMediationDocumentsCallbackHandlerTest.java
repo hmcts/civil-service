@@ -843,6 +843,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedData.getApp2MediationNonAttendanceDocs().get(0).getValue().getDocument().getCategoryID())
                 .isEqualTo("ClaimantTwoMediationDocs");
         }
+
         @Test
         void shouldAssignCategoryIds_whenDocumentExist_ClaimantTwo_DocRef() {
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
@@ -890,7 +891,6 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedData.getRes1MediationDocumentsReferred().get(0).getValue().getDocument().getCategoryID())
                 .isEqualTo("DefendantOneMediationDocs");
         }
-
 
         @Test
         void shouldAssignCategoryIds_whenDocumentExist_DefendantTwo_NonAtt() {
