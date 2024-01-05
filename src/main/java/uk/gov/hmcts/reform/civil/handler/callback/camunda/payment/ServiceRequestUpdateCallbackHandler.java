@@ -46,7 +46,7 @@ public class ServiceRequestUpdateCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
-        if(caseData.isLipvLipOneVOne()){
+        if (caseData.isLipvLipOneVOne()) {
             dataBuilder.businessProcess(BusinessProcess.ready(SERVICE_REQUEST_RECEIVED));
         }
 
