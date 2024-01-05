@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.citizenui.SendGenericNotificationLipService;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
@@ -68,9 +67,6 @@ class PaymentRequestUpdateCallbackServiceTest {
     FeatureToggleService featureToggleService;
     @MockBean
     CaseDetailsConverter caseDetailsConverter;
-    @MockBean
-    SendGenericNotificationLipService sendGenericNotificationLipService;
-
     @BeforeEach
     public void setup() {
         when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));

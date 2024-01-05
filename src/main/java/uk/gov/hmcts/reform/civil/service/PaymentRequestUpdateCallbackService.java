@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
-import uk.gov.hmcts.reform.civil.service.citizenui.SendGenericNotificationLipService;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.util.Map;
@@ -36,8 +35,6 @@ public class PaymentRequestUpdateCallbackService {
     public static final String serviceRequestReceived = "ServiceRequestReceived";
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
-    private final FeatureToggleService featureToggleService;
-    private final SendGenericNotificationLipService notificationLipService;
     private final ObjectMapper objectMapper;
     private final Time time;
 
