@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.cas.model.DecisionRequest;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,12 +29,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLY_NOC_DECISION_LIP;
 
 @Service
 @RequiredArgsConstructor
 public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(APPLY_NOC_DECISION);
+    private static final List<CaseEvent> EVENTS =
+        List.of(APPLY_NOC_DECISION, APPLY_NOC_DECISION_LIP);
 
     private final AuthTokenGenerator authTokenGenerator;
     private final CaseAssignmentApi caseAssignmentApi;
@@ -78,7 +79,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         );
 
         updatedCaseDataBuilder
-            .businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
+            .businessProcess(BusinessProcess.ready(getBussinessProcessEvent(postDecisionCaseData)))
             .changeOfRepresentation(getChangeOfRepresentation(
                     callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
 
@@ -215,6 +216,13 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
     private boolean isApplicant(String caseRole) {
         return caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
+    }
+
+    private CaseEvent getBussinessProcessEvent(CaseData postDecisionCaseData) {
+        if (postDecisionCaseData.isApplicantLiP()) {
+            return APPLY_NOC_DECISION_LIP;
+        }
+        return APPLY_NOC_DECISION;
     }
 
     @Override
