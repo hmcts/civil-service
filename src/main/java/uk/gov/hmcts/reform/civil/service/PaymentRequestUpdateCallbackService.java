@@ -57,10 +57,8 @@ public class PaymentRequestUpdateCallbackService {
             }
 
         } else {
-            log.info(
-                "Service request status is not PAID for Case id {}",
-                serviceRequestUpdateDto.getCcdCaseNumber()
-            );
+            log.info("Service request status is not PAID for Case id {}",
+                     serviceRequestUpdateDto.getCcdCaseNumber());
         }
     }
 
