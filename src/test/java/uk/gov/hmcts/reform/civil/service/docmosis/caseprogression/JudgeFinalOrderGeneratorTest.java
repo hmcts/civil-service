@@ -174,7 +174,7 @@ public class JudgeFinalOrderGeneratorTest {
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000888").build())
             .build();
 
-        assertThrows(NullPointerException.class, () -> generator.generate(caseData, BEARER_TOKEN));
+        assertThrows(IllegalArgumentException.class, () -> generator.generate(caseData, BEARER_TOKEN));
     }
 
     @Test
