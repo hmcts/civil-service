@@ -47,7 +47,8 @@ public class AssignCaseSupportController {
                            @PathVariable("caseId") String caseId,
                            @PathVariable("caseRole") Optional<CaseRole> caseRole) {
         assignCaseService.assignCase(authorisation, caseId, caseRole);
-        if (caseRole.equals(CaseRole.DEFENDANT)) {
+        boolean isCitizen = !caseRole.map(CaseRole::isProfessionalRole).orElse(false);
+        if (isCitizen) {
             lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(authorisation, caseId);
         }
     }
