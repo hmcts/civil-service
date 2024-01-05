@@ -340,6 +340,8 @@ notifications:
   notifyRespondentForSignedSettlementAgreement: "aeb3951e-4956-4542-a73b-e2e3abec8867"
   notifyRespondentForNotAgreedSignSettlement: "1742841b-d915-43a9-9d76-b6d17a189ba5"
 
+  notifyRespondentLipForClaimantRepresented: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
