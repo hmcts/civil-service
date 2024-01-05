@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,6 +72,52 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
 
             //Then: No errors should be displayed
             assertThat(response.getErrors().isEmpty());
+        }
+
+        @Test
+        void shouldAllowRequestIfLessThan7DaysElapsedForLatestSDO() {
+            //Given : Casedata containing two SDO order and latest created 6 days ago
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .systemGeneratedCaseDocuments(Arrays.asList(
+                    ElementUtils.element(CaseDocument.builder()
+                                             .documentType(DocumentType.SDO_ORDER)
+                                             .createdDatetime(LocalDateTime.now().minusDays(10))
+                                             .build()),
+                    ElementUtils.element(CaseDocument.builder()
+                                             .documentType(DocumentType.SDO_ORDER)
+                                             .createdDatetime(LocalDateTime.now().minusDays(6))
+                                             .build())))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            //When: handler is called with ABOUT_TO_START event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: No errors should be displayed
+            assertThat(response.getErrors().isEmpty());
+        }
+
+        @Test
+        void shouldSendErrorMessageIf7DaysElapsedForLatestSDO() {
+            //Given : Casedata containing two SDO order and latest created 7 days ago
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .systemGeneratedCaseDocuments(Arrays.asList(
+                    ElementUtils.element(CaseDocument.builder()
+                                             .documentType(DocumentType.SDO_ORDER)
+                                             .createdDatetime(LocalDateTime.now().minusDays(10))
+                                             .build()),
+                    ElementUtils.element(CaseDocument.builder()
+                                             .documentType(DocumentType.SDO_ORDER)
+                                             .createdDatetime(LocalDateTime.now().minusDays(7))
+                                             .build())))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            //When: handler is called with ABOUT_TO_START event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: The error should be displayed
+            assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
         }
 
         @Test
