@@ -25,7 +25,7 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
     implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIM_RECONSIDERATION_UPHELD_CLAIMANT);
-    public static final String TASK_ID = "NotifyClaimRreconsiderationUpheld";
+    public static final String TASK_ID = "NotifyClaimReconsiderationUpheld";
     private static final String REFERENCE_TEMPLATE =
         "hearing-fee-unpaid-applicant-notification-%s";
 
@@ -53,7 +53,7 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
     private CallbackResponse notifyClaimReconsiderationUpheld(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         notificationService.sendMail(
-            caseData.getApplicant1Email(),
+            getApplicantEmail(caseData),
             getTemplate(),
             addProperties(caseData),
             getReferenceTemplate(caseData)
@@ -77,5 +77,8 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
 
     private String getReferenceTemplate(CaseData caseData) {
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
+    }
+    private String getApplicantEmail(CaseData caseData) {
+        return caseData.getApplicantSolicitor1UserDetails().getEmail() != null ? caseData.getApplicantSolicitor1UserDetails().getEmail() : caseData.getClaimantUserDetails().getEmail();
     }
 }
