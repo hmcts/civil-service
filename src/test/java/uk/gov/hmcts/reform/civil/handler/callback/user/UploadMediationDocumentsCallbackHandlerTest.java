@@ -24,7 +24,9 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement
 import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
@@ -53,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.utils.UploadMediationDocumentsUtils.DEFE
 @SpringBootTest(classes = {
     UploadMediationDocumentsCallbackHandler.class,
     JacksonAutoConfiguration.class,
+    AssignCategoryId.class
 })
 class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -61,6 +64,12 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private AssignCategoryId assignCategoryId;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @MockBean
     private CoreCaseUserService coreCaseUserService;
@@ -785,6 +794,70 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertThat(actual).containsExactly(EXPECTED_REFFERED_DOCS_ONE, EXPECTED_REFFERED_DOCS_TWO);
                 assertThat(res2actual).hasSize(0);
             }
+        }
+
+        @Test
+        void shouldAssignCategoryIds_whenDocumentExist_ClaimantOne() {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            // When
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .uploadMediationDocumentsChooseOptions(CLAIMANT_ONE_ID, MEDIATION_NON_ATTENDANCE_OPTION)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getApp1MediationNonAttendanceDocs().get(0).getValue().getDocument().getCategoryID())
+                .isEqualTo("ClaimantOneMediationDocs");
+        }
+
+        @Test
+        void shouldAssignCategoryIds_whenDocumentExist_ClaimantTwo() {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            // When
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .uploadMediationDocumentsChooseOptions(CLAIMANT_TWO_ID, DOCUMENTS_REFERRED_OPTION)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getApp2MediationDocumentsReferred().get(0).getValue().getDocument().getCategoryID())
+                .isEqualTo("ClaimantTwoMediationDocs");
+        }
+
+        @Test
+        void shouldAssignCategoryIds_whenDocumentExist_DefendantOne() {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            // When
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .uploadMediationDocumentsChooseOptions(DEFENDANT_ONE_ID, MEDIATION_NON_ATTENDANCE_OPTION)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getRes1MediationNonAttendanceDocs().get(0).getValue().getDocument().getCategoryID())
+                .isEqualTo("DefendantOneMediationDocs");
+        }
+
+        @Test
+        void shouldAssignCategoryIds_whenDocumentExist_DefendantTwo() {
+            when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+            // When
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .uploadMediationDocumentsChooseOptions(DEFENDANT_TWO_ID, DOCUMENTS_REFERRED_OPTION)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            // Then
+            assertThat(updatedData.getRes2MediationDocumentsReferred().get(0).getValue().getDocument().getCategoryID())
+                .isEqualTo("DefendantTwoMediationDocs");
         }
 
         @Test
