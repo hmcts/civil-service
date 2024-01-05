@@ -20,6 +20,8 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -78,6 +80,14 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);
         caseDataBuilder.upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
                                                          .reasonForReconsiderationTxtYes(String.format(upholdingPreviousOrderReason, sdoDate)).build());
+        if (sdoDocLatest.isPresent()) {
+            String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);
+            caseDataBuilder.upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
+                                                             .reasonForReconsiderationTxtYes(String.format(
+                                                                 upholdingPreviousOrderReason,
+                                                                 sdoDate
+                                                             )).build());
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
