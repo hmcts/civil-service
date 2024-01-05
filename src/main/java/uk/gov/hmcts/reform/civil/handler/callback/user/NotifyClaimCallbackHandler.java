@@ -312,8 +312,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        LocalDateTime notificationDeadline = deadlinesCalculator.plus14DaysDeadline(cosDateOfServiceForDefendant
-                                                                                             .atTime(time.now().toLocalTime()));
+        LocalDateTime notificationDeadline = cosDateOfServiceForDefendant.atTime(time.now().toLocalTime()).plusDays(14);
         LocalDateTime currentDateTime = time.now();
         LocalDateTime today4pm = currentDateTime.toLocalDate().atTime(16, 0);
 
@@ -326,8 +325,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private boolean isDeemedServedDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        LocalDateTime deemedServedDeadline = deadlinesCalculator.plus14DaysDeadline(cosDateOfServiceForDefendant
-                                                                                             .atTime(time.now().toLocalTime()));
+        LocalDateTime deemedServedDeadline = cosDateOfServiceForDefendant.atTime(time.now().toLocalTime()).plusDays(14);
         LocalDateTime currentDateTime = time.now();
         LocalDateTime today4pm = currentDateTime.toLocalDate().atTime(16, 0);
 
@@ -347,7 +345,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private boolean isDeemedServedDateIsNotWorkingDay(LocalDate cosDateOfServiceForDefendant) {
-        return !workingDayIndicator.isWorkingDay(cosDateOfServiceForDefendant);
+        boolean isOlderThan14Days = isDeemedServedDateOlderThan14Days(cosDateOfServiceForDefendant);
+        return !isOlderThan14Days && !workingDayIndicator.isWorkingDay(cosDateOfServiceForDefendant);
     }
 
     private boolean isConfirmationForLip(CaseData caseData) {
@@ -378,12 +377,12 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
                 errorMessages.add(DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS);
             }
 
-            if (isDeemedServedDateIsNotWorkingDay(certificateOfService.getCosDateDeemedServedForDefendant())) {
-                errorMessages.add(DATE_OF_SERVICE_DATE_IS_WORKING_DAY);
-            }
-
             if (isDeemedServedDateOlderThan14Days(certificateOfService.getCosDateDeemedServedForDefendant())) {
                 errorMessages.add(DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS);
+            }
+
+            if (isDeemedServedDateIsNotWorkingDay(certificateOfService.getCosDateDeemedServedForDefendant())) {
+                errorMessages.add(DATE_OF_SERVICE_DATE_IS_WORKING_DAY);
             }
         }
         return errorMessages;
