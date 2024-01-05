@@ -25,6 +25,8 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentWithName;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CaseNoteService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -52,6 +55,8 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
     private ObjectMapper objectMapper;
     @MockBean
     private CaseNoteService caseNoteService;
+    @MockBean
+    private IdamClient idamClient;
 
     @MockBean
     private Time time;
@@ -66,6 +71,8 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .caseNoteType(CaseNoteType.NOTE_ONLY)
                 .build();
+            given(idamClient.getUserDetails(any()))
+                .willReturn(UserDetails.builder().email("email").id("userId").build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler
