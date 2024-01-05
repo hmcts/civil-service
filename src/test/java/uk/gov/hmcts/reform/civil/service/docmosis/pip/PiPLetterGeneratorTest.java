@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -28,6 +30,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.pip.PiPLetter;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -68,10 +71,10 @@ class PiPLetterGeneratorTest {
     private CivilDocumentStitchingService civilDocumentStitchingService;
     @MockBean
     private DocumentManagementService documentManagementService;
+    @MockBean
+    private DocumentDownloadService documentDownloadService;
     @Autowired
     private PiPLetterGenerator piPLetterGenerator;
-    @Autowired
-    private AssignCategoryId assignCategoryId;
     @MockBean
     private FeatureToggleService featureToggleService;
 
@@ -145,6 +148,7 @@ class PiPLetterGeneratorTest {
                               .documentBinaryUrl(testBinaryUrl)
                               .build())
             .build();
+    private static final byte[] STITCHED_DOC_BYTES = new byte[]{1, 2, 3, 4};
 
     private static final CaseDocument STITCHED_DOC =
         CaseDocument.builder()
@@ -165,8 +169,11 @@ class PiPLetterGeneratorTest {
     @BeforeEach
     void setup() {
         when(documentManagementService
-                 .uploadDocument((String) any(), (PDF) any()))
+                 .uploadDocument(any(), (PDF) any()))
             .thenReturn(CLAIM_FORM);
+        when(documentDownloadService
+                 .downloadDocument(any(), any()))
+            .thenReturn(new DownloadedDocumentResponse(new ByteArrayResource(STITCHED_DOC_BYTES), "test", "test"));
         when(civilDocumentStitchingService.bundle(ArgumentMatchers.anyList(), anyString(), anyString(), anyString(),
                                                   any(CaseData.class))).thenReturn(STITCHED_DOC);
         specClaimTimelineDocuments.add(new DocumentMetaData(CLAIM_FORM.getDocumentLink(),
@@ -184,10 +191,10 @@ class PiPLetterGeneratorTest {
         given(pipInPostConfiguration.getRespondToClaimUrl()).willReturn(CUI_URL);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
             .willReturn(LETTER);
-
-        CaseDocument downloadedLetter = piPLetterGenerator.downloadLetter(CASE_DATA, BEARER_TOKEN);
-
-        assertThat(downloadedLetter).isEqualTo(STITCHED_DOC);
+        //Whem
+        byte[] downloadedLetter = piPLetterGenerator.downloadLetter(CASE_DATA, BEARER_TOKEN);
+        //Then
+        assertThat(downloadedLetter).isEqualTo(STITCHED_DOC_BYTES);
         verify(documentGeneratorService, times(1)).generateDocmosisDocument(
             refEq(LETTER_TEMPLATE_DATA),
             refEq(PIN_IN_THE_POST_LETTER)
@@ -195,7 +202,7 @@ class PiPLetterGeneratorTest {
     }
 
     @Test
-    void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByRespondent() {
+    void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByApplicant() {
         //Given
         given(pipInPostConfiguration.getRespondToClaimUrl()).willReturn(CUI_URL);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
@@ -216,9 +223,9 @@ class PiPLetterGeneratorTest {
             .specRespondent1Represented(YES)
             .servedDocumentFiles(setupParticularsOfClaimDocs())
             .build();
-
-        CaseDocument downloadedLetter = piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN);
-
+        //When
+        piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN);
+        //Then
         verify(documentGeneratorService, times(1)).generateDocmosisDocument(
             refEq(LETTER_TEMPLATE_DATA),
             refEq(PIN_IN_THE_POST_LETTER)

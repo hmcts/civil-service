@@ -12,8 +12,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -33,6 +31,7 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -81,7 +80,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     private PiPLetterGenerator pipLetterGenerator;
     @MockBean
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
-
     @MockBean
     private Time time;
 
@@ -141,10 +139,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
         @Test
         void shouldGenerateAndPrintLetterSuccessfully() {
             // Given
-            CaseDocument order = CaseDocument.builder().documentLink(
-                    Document.builder().documentUrl("url").build())
-                .build();
-            given(pipLetterGenerator.downloadLetter(any(), any())).willReturn(order);
+            given(pipLetterGenerator.downloadLetter(any(), any())).willReturn(LETTER_CONTENT);
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
@@ -152,14 +147,14 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             handler.handle(params);
 
             // Then
-            //verify(bulkPrintService)
-            //    .printLetter(
-            //        LETTER_CONTENT,
-            //        caseData.getLegacyCaseReference(),
-            //        caseData.getLegacyCaseReference(),
-            //        "first-contact-pack",
-            //        Arrays.asList(caseData.getRespondent1().getPartyName())
-            //    );
+            verify(bulkPrintService)
+                .printLetter(
+                    LETTER_CONTENT,
+                    caseData.getLegacyCaseReference(),
+                    caseData.getLegacyCaseReference(),
+                    "first-contact-pack",
+                    Arrays.asList(caseData.getRespondent1().getPartyName())
+                );
         }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
