@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseNoteType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
@@ -649,6 +650,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
     private ReasonForReconsideration reasonForReconsideration;
+    private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
+    private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
