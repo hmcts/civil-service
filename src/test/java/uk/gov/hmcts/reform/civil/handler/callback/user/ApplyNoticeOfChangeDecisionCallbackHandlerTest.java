@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.cas.client.CaseAssignmentApi;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -410,6 +411,45 @@ public class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallback
                 assertOrgIDIsUpdated(response, RESPONDENT_TWO_ORG_POLICY);
                 assertCamundaEventIsReady(response);
             }
+        }
+
+        @Test
+        void shouldApplyNoticeOfChange_whenInvokedByApplicant1ForClaimantLip() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .changeOrganisationRequestField(true, false, "1234", null, REQUESTER_EMAIL)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+            CallbackParams params = callbackParamsOf(
+                caseData,
+                CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                ABOUT_TO_SUBMIT
+            );
+
+            CaseDetails caseDetailsAfterNoCApplied =
+                caseDetailsAfterNoCApplied(
+                    CaseDetails.builder().data(caseData.toMap(mapper)).build(),
+                    APPLICANT_ONE_ORG_POLICY
+                );
+
+            when(caseAssignmentApi.applyDecision(
+                params.getParams().get(BEARER_TOKEN).toString(),
+                authTokenGenerator.generate(),
+                DecisionRequest.decisionRequest(
+                    params.getRequest().getCaseDetails())
+            ))
+                .thenReturn(
+                    AboutToStartOrSubmitCallbackResponse.builder()
+                        .data(caseDetailsAfterNoCApplied.getData()).build());
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertChangeOrganisationFieldIsUpdated(response);
+            assertOrgIDIsUpdated(response, APPLICANT_ONE_ORG_POLICY);
+            assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("status", "camundaEvent")
+                .contains("READY", "APPLY_NOC_DECISION_LIP");
         }
 
         @Nested

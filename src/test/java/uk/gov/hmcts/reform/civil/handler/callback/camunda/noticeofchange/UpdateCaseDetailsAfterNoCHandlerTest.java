@@ -772,6 +772,31 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedCaseData.getRespondent2LRIndividuals()).isNull();
         }
 
+        @Test
+        void shouldUpdateSolicitorDetails_afterNocSubmittedByApplicantSolicitorForClaimantLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .caseAccessCategory(CaseCategory.SPEC_CLAIM)
+                .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
+                .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
+                .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
+                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .applicant1Represented(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedCaseData.getApplicantSolicitor1PbaAccounts()).isNull();
+            assertThat(updatedCaseData.getApplicantSolicitor1PbaAccountsIsEmpty()).isEqualTo(YES);
+            assertThat(updatedCaseData.getChangeOrganisationRequestField()).isNull();
+            assertThat(updatedCaseData.getApplicantSolicitor1UserDetails().getEmail())
+                .isEqualTo("requester@example.com");
+            assertThat(updatedCaseData.getApplicant1Represented()).isEqualTo(YES);
+        }
+
         private void assertSolicitorReferences(boolean isApplicant, boolean isRespondent1, boolean respondent2Exists,
                                                CaseData caseData, CaseData updatedCaseData) {
             if (isApplicant) {

@@ -438,6 +438,11 @@ public class CaseDataParent implements MappableObject {
         return this.applicant1Represented == YesOrNo.NO;
     }
 
+    @JsonIgnore
+    public boolean isApplicantRepresented() {
+        return this.applicant1Represented == YES;
+    }
+    
     /**
      * Adding for Certificate of Service.
      */
