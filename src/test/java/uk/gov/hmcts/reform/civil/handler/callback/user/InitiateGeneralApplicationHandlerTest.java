@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService;
 import uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationServiceHelper;
@@ -65,7 +67,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SETTLE_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_JUDGEMENT;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_SETTLE_BY_CONSENT;
 import static uk.gov.hmcts.reform.civil.service.InitiateGeneralApplicationService.INVALID_TRIAL_DATE_RANGE;
@@ -111,6 +113,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     protected UserRoleCaching userRoleCaching;
+    @MockBean
+    protected FeatureToggleService featureToggleService;
 
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
@@ -121,6 +125,34 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private final BigDecimal fee275 = new BigDecimal("27500");
     private static final String FEE_CODE = "test_fee_code";
     private static final String FEE_VERSION = "1";
+
+    @Test
+    void shouldThrowError_whenEpimsIdIsNotAValidRegion() {
+        CaseData caseData = CaseDataBuilder.builder().caseManagementLocation(CaseLocationCivil.builder()
+                                                                                 .baseLocation("45678")
+                                                                                 .region("4").build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(false);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isNotNull();
+    }
+
+    @Test
+    void shouldNotThrowError_whenEpimsIdIsValidRegion() {
+        CaseData caseData = CaseDataBuilder.builder().caseManagementLocation(CaseLocationCivil.builder()
+                                                                                 .baseLocation("45678")
+                                                                                 .region("4").build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(true);
+        given(initiateGeneralAppService.respondentAssigned(any(), any())).willReturn(true);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isEmpty();
+    }
 
     @Nested
     class MidEventForUrgencyCheck extends LocationRefSampleDataBuilder {
@@ -241,7 +273,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenGaTypeIsVaryJudgement() {
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
 
@@ -257,7 +289,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenGaTypeIsMultipleTypeWithVaryJudgement() {
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                 .builder().generalAppType(GAApplicationType.builder().types(types).build()).build();
 
@@ -269,7 +301,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(responseCaseData.getGeneralAppVaryJudgementType()).isEqualTo(NO);
             assertThat(response.getErrors().size()).isEqualTo(1);
-            assertThat(response.getErrors().get(0).equals("It is not possible to select an additional application type when applying to vary judgment"));
+            assertThat(response.getErrors().get(0).equals("It is not possible to select an additional application type when applying to vary payment terms of judgment"));
         }
 
         @Test
@@ -300,7 +332,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldThrowErrorsWhenHearingDateIsPast() {
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                 .builder()
                 .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledPreferenceYesNo(YES)
@@ -319,7 +351,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenHearingDateIsPresent() {
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_PAYMENT_TERMS_OF_JUDGMENT);
 
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -337,7 +369,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCauseAnyErrorsWhenHearingDateIsFuture() {
-            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT, SUMMARY_JUDGEMENT, VARY_PAYMENT_TERMS_OF_JUDGMENT);
 
             CaseData caseData = CaseDataBuilder
                 .builder()
@@ -736,7 +768,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                             .code(FEE_CODE)
                             .calculatedAmountInPence(fee275)
                             .version(FEE_VERSION).build());
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                     .builder().generalAppType(GAApplicationType.builder().types(types).build())
                     .build()
@@ -923,7 +955,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         void shouldWithNotice_whenVaryApplicationIsUnConsented() {
             GAPbaDetails generalAppPBADetails = GAPbaDetails.builder().fee(feeFromFeeService).build();
 
-            List<GeneralApplicationTypes> types = List.of(VARY_JUDGEMENT);
+            List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
             CaseData caseData = CaseDataBuilder
                     .builder().generalAppType(GAApplicationType.builder().types(types).build())
                     .build()
