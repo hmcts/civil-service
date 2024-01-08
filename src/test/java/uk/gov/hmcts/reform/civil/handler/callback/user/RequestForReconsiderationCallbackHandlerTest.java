@@ -30,13 +30,10 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
@@ -83,12 +80,13 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                                                                .build())))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
             //When: handler is called with ABOUT_TO_START event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: No errors should be displayed
-            assertThat(response.getErrors().isEmpty());
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test
@@ -106,12 +104,13 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                                              .build())))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
             //When: handler is called with ABOUT_TO_START event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then: No errors should be displayed
-            assertThat(response.getErrors().isEmpty());
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test
@@ -129,6 +128,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                                              .build())))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
 
             //When: handler is called with ABOUT_TO_START event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -148,6 +149,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                                                                        .build())))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
 
             //When: handler is called with ABOUT_TO_START event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -155,14 +158,16 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             //Then: The error should be displayed
             assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
         }
-    }
 
-    @Nested
-    class AboutToStartCallback {
         @Test
         void shouldGetApplicantUserRole() {
             //Given : Casedata and return applicant solicitor role
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .systemGeneratedCaseDocuments(List.of(ElementUtils
+                                                          .element(CaseDocument.builder()
+                                                                       .documentType(DocumentType.SDO_ORDER)
+                                                                       .createdDatetime(LocalDateTime.now().minusDays(5))
+                                                                       .build()))).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
@@ -178,7 +183,12 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldGetRespondent1UserRole() {
             //Given : Casedata and return respondent solicitor1 role
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .systemGeneratedCaseDocuments(List.of(ElementUtils
+                                                          .element(CaseDocument.builder()
+                                                                       .documentType(DocumentType.SDO_ORDER)
+                                                                       .createdDatetime(LocalDateTime.now().minusDays(5))
+                                                                       .build()))).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
@@ -194,7 +204,12 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void shouldGetRespondent2UserRole() {
             //Given : Casedata and return respondent solicitor2 role
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .systemGeneratedCaseDocuments(List.of(ElementUtils
+                                                          .element(CaseDocument.builder()
+                                                                       .documentType(DocumentType.SDO_ORDER)
+                                                                       .createdDatetime(LocalDateTime.now().minusDays(5))
+                                                                       .build()))).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORTWO"));

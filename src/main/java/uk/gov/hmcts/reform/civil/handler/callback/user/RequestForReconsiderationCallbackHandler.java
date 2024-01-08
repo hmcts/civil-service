@@ -62,7 +62,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private CallbackResponse validateRequestEligibility(CallbackParams callbackParams) {
+    private CallbackResponse validateRequestEligibilityAndGetPartyDetails(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
         Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments()
             .stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
@@ -75,12 +75,19 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                 errors.add(ERROR_MESSAGE_DEADLINE_EXPIRED);
             }
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .build();
+        if (errors.isEmpty()) {
+            CaseData.CaseDataBuilder<?, ?> updatedData = getPartyDetails(callbackParams);
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(updatedData.build().toMap(objectMapper))
+                .build();
+        } else {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(errors)
+                .build();
+        }
     }
 
-    private CallbackResponse getPartyDetails(CallbackParams callbackParams) {
+    private CaseData.CaseDataBuilder<?, ?>  getPartyDetails(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         List<String> roles = getUserRole(callbackParams);
@@ -93,9 +100,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         else if (isRespondentSolicitorTwo(roles)) {
             updatedData.casePartyRequestForReconsideration("Respondent2");
         }
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
-            .build();
+        return updatedData;
     }
 
     private boolean applicant2Present(CaseData caseData) {
