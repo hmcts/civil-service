@@ -78,7 +78,9 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
     private String getReferenceTemplate(CaseData caseData) {
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
+
     private String getApplicantEmail(CaseData caseData) {
-        return caseData.getApplicantSolicitor1UserDetails().getEmail() != null ? caseData.getApplicantSolicitor1UserDetails().getEmail() : caseData.getClaimantUserDetails().getEmail();
+        return caseData.getApplicantSolicitor1UserDetails().getEmail() != null
+            ? caseData.getApplicantSolicitor1UserDetails().getEmail() : caseData.getClaimantUserDetails().getEmail();
     }
 }

@@ -362,7 +362,7 @@ configurations.all {
 
 dependencies {
 
-  implementation 'com.github.hmcts:civil-commons:v1.0.44-CIV-10909'
+  implementation 'com.github.hmcts:civil-commons:v1.0.45-CIV10909'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -403,7 +403,7 @@ dependencies {
     exclude group: 'java-logging', module: ' java-logging'
   }
 
-  implementation('com.github.hmcts:payments-java-client:1.5.2') {
+  implementation('com.github.hmcts:payments-java-client:1.6.7') {
     exclude group: 'java-logging', module: ' java-logging'
   }
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'

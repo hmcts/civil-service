@@ -69,7 +69,7 @@ class ClaimReconsiderationUpheldClaimantNotificationHandlerTest extends BaseCall
             handler.handle(params);
 
             verify(notificationService, times(1)).sendMail(
-                "rambo@email.com",
+                "applicantsolicitor@example.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
                 "hearing-fee-unpaid-applicant-notification-000DC001"

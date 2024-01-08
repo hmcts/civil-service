@@ -77,9 +77,6 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
             Comparator.reverseOrder()
         )).findFirst();
 
-        String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);
-        caseDataBuilder.upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
-                                                         .reasonForReconsiderationTxtYes(String.format(upholdingPreviousOrderReason, sdoDate)).build());
         if (sdoDocLatest.isPresent()) {
             String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);
             caseDataBuilder.upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
@@ -97,10 +94,6 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         if (!callbackParams.getCaseData().getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
             caseDataBuilder.upholdingPreviousOrderReason(null);
-        }
-
-        if(callbackParams.getCaseData().getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())){
-            caseDataBuilder.businessProcess(BusinessProcess.ready(NOTIFY_CLAIM_RECONSIDERATION_UPHELD));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
