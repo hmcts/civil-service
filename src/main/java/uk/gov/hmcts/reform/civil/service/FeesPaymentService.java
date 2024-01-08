@@ -74,9 +74,10 @@ public class FeesPaymentService {
         String paymentStatus = cardPaymentDetails.getStatus();
         CardPaymentStatusResponse.CardPaymentStatusResponseBuilder response = CardPaymentStatusResponse.builder()
             .status(paymentStatus)
-            .paymentReference(cardPaymentDetails.getPaymentReference())
-            .externalReference(cardPaymentDetails.getExternalReference())
-            .dateCreated(cardPaymentDetails.getDateCreated());
+            .paymentReference(cardPaymentDetails.getReference())
+            .externalReference(cardPaymentDetails.getPaymentGroupReference())
+            .paymentFor(feeType.name().toLowerCase())
+            .paymentAmount(cardPaymentDetails.getAmount());
 
         if (paymentStatus.equals("Failed")) {
             Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()

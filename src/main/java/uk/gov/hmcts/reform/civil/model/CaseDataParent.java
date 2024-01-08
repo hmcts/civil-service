@@ -95,6 +95,9 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsReferredInStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -724,6 +727,23 @@ public class CaseDataParent implements MappableObject {
     private final UpdateDetailsForm updateDetailsForm;
 
     private FastTrackAllocation fastTrackAllocation;
+
+    private YesOrNo showCarmFields;
+
+    @JsonUnwrapped
+    private UploadMediationDocumentsForm uploadMediationDocumentsForm;
+
+    private List<Element<MediationNonAttendanceStatement>> app1MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> app1MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> app2MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> app2MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> res1MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> res2MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> res2MediationDocumentsReferred;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {

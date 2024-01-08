@@ -170,6 +170,19 @@ additional information where necessary.
 
    Still, you shouldn't be doing it so make sure you get in touch with a Technical Lead soon afterwards.
 
+## Gradle Dependency Check - Running Locally
+In the local environment, as of 15/12/2023 where dependency check is mandated to use version 9 or above:
+https://github.com/jeremylong/DependencyCheck?tab=readme-ov-file#900-upgrade-notice
+
+Users will now need to generate a NVD API key for themselves in order to run some gradle dependency commands:
+https://nvd.nist.gov/developers/request-an-api-key
+
+Example
+```
+./gradlew -DdependencyCheck.failBuild=true -Dnvd.api.check.validforhours=24 -Dnvd.api.key=<YOUR_API_KEY_HERE> dependencyCheckAggregate
+```
+
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details

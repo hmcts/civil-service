@@ -229,6 +229,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
             .addRespondent2(NO)
             .hearingDate(time.now().toLocalDate().plusWeeks(2))
             .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .listingOrRelisting(listingOrRelisting)
             .build();
@@ -246,6 +247,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
+            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .hearingDate(time.now().toLocalDate().plusWeeks(2))
             .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
@@ -272,6 +274,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
                 DynamicListElement.builder().label("element 1").code("E0").build(),
                 DynamicListElement.builder().label("element 2").code("E1").build())).build())
             .addRespondent2(NO)
+            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .hearingDate(time.now().toLocalDate().plusWeeks(2))
             .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
@@ -292,6 +295,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
+            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
             .listingOrRelisting(ListingOrRelisting.RELISTING)
             .hearingDate(time.now().toLocalDate().plusWeeks(2))
             .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
@@ -314,6 +318,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .caseAccessCategory(SPEC_CLAIM)
             .addRespondent2(NO)
+            .hearingNoticeList(HearingNoticeList.FAST_TRACK_TRIAL)
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .hearingDate(time.now().toLocalDate().plusWeeks(5))
             .allocatedTrack(null)
@@ -338,6 +343,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .caseAccessCategory(SPEC_CLAIM)
             .addRespondent2(NO)
+            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .hearingDate(time.now().toLocalDate().plusWeeks(5))
             .allocatedTrack(null)
@@ -365,6 +371,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
+            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .hearingDate(time.now().toLocalDate().plusWeeks(5))
             .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
@@ -390,6 +397,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
+            .hearingNoticeList(HearingNoticeList.FAST_TRACK_TRIAL)
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .hearingDate(time.now().toLocalDate().plusWeeks(5))
             .allocatedTrack(AllocatedTrack.MULTI_CLAIM)
@@ -429,6 +437,44 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
                                                                       .confirmationHeader(header)
                                                                       .confirmationBody(String.format(body))
                                                                       .build());
+    }
+
+    @Test
+    void shouldNotGetDueDateAndFeeCalculationAndIsOther_whenAboutToSubmit() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .hearingNoticeList(HearingNoticeList.OTHER)
+            .listingOrRelisting(ListingOrRelisting.LISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(5))
+            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+            .totalClaimAmount(new BigDecimal(12300))
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // Then
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedData.getHearingFee()).isNull();
+        assertThat(updatedData.getHearingDueDate()).isNull();
+    }
+
+    @Test
+    void shouldTriggerBusinessProcessHearingScheduledOtherAndRelisting_whenAboutToSubmit() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .hearingNoticeList(HearingNoticeList.OTHER)
+            .listingOrRelisting(ListingOrRelisting.RELISTING)
+            .hearingDate(time.now().toLocalDate().plusWeeks(2))
+            .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+            .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        // Then
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(HEARING_SCHEDULED.name());
     }
 
     private String prepareHHmmString(LocalDateTime localDateTime) {

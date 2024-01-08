@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -89,28 +87,13 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
             .andExpect(status().isOk());
     }
 
-    @Test
-    void whenPaymentClientReturnsInitiatedStatusTwoTimes() throws Exception {
-        when(paymentsClient.getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN))
-            .thenReturn(buildGovPayCardPaymentStatusResponse("Initiated"))
-            .thenReturn(buildGovPayCardPaymentStatusResponse("Initiated"))
-            .thenReturn(buildGovPayCardPaymentStatusResponse("Success"));
-
-        doGet(BEARER_TOKEN, FEES_PAYMENT_STATUS_URL, HEARING.name(), "RC-1701-0909-0602-0418")
-            .andExpect(content().json(toJson(expectedResponse("Success"))))
-            .andExpect(status().isOk());
-
-        verify(paymentsClient, times(3))
-            .getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
-    }
-
     private PaymentDto buildGovPayCardPaymentStatusResponse(String status) {
         return PaymentDto.builder()
             .externalReference("lbh2ogknloh9p3b4lchngdfg63")
-            .paymentReference("RC-1701-0909-0602-0418")
+            .reference("RC-1701-0909-0602-0418")
             .status(status)
             .currency("GBP")
-            .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"))
+            .amount(new BigDecimal(200))
             .statusHistories(getStatusHistories(status))
             .build();
     }
@@ -119,13 +102,12 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         CardPaymentStatusResponse.CardPaymentStatusResponseBuilder payment
             = CardPaymentStatusResponse.builder()
             .paymentReference("RC-1701-0909-0602-0418")
-            .externalReference("lbh2ogknloh9p3b4lchngdfg63")
             .status(status)
-            .dateCreated(OffsetDateTime.parse("2023-11-27T13:15:06.313+00:00"));
+            .paymentAmount(new BigDecimal(200))
+            .paymentFor("hearing");
 
         if (status.equals("Failed")) {
-            payment.errorCode("CA-E0001")
-                .errorDescription("Payment request failed. PBA account accountName have insufficient funds available");
+            payment.errorCode("P0030").errorDescription("Payment was cancelled by the user");
         }
         return payment.build();
     }
@@ -134,8 +116,8 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
 
         StatusHistoryDto initiatedHistory = StatusHistoryDto.builder().status("Initiated").build();
         StatusHistoryDto failedHistory = StatusHistoryDto.builder().status("Failed")
-            .errorCode("CA-E0001")
-            .errorMessage("Payment request failed. PBA account accountName have insufficient funds available").build();
+            .errorCode("P0030")
+            .errorMessage("Payment was cancelled by the user").build();
         List<StatusHistoryDto> histories = new ArrayList<>();
         histories.add(initiatedHistory);
         if (status.equals("Failed")) {

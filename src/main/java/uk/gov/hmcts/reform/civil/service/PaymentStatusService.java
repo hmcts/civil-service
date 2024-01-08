@@ -38,14 +38,7 @@ public class PaymentStatusService {
     public PaymentDto getCardPaymentDetails(String paymentReference, String authorization) {
         try {
             PaymentDto cardPaymentStatus = paymentsClient.getGovPayCardPaymentStatus(paymentReference, authorization);
-            String status = cardPaymentStatus.getStatus();
-            log.info("Payment status for payment reference {} is {}", paymentReference, status);
-
-            if (status.equals("Initiated")) {
-                String message = "Need to check payment status again as current payment status is still Initiated for "
-                    + paymentReference;
-                throw new RetryablePaymentException(message);
-            }
+            log.info("Payment status for payment reference {} is {}", paymentReference, cardPaymentStatus.getStatus());
             return cardPaymentStatus;
         } catch (FeignException.InternalServerError ex) {
             throw new RetryablePaymentException(ex.contentUTF8(), ex);
