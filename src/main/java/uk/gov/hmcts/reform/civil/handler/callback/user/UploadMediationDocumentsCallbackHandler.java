@@ -59,7 +59,16 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(UPLOAD_MEDIATION_DOCUMENTS);
 
     public static final String DOC_DATE_IN_FUTURE = "Document date cannot be in the future";
+
     public static final String INVALID_PARTY_OPTION = "Invalid party option selected";
+
+    public static final String CLAIMANT_ONE_CATEGORY_ID = "ClaimantOneMediationDocs";
+
+    public static final String CLAIMANT_TWO_CATEGORY_ID = "ClaimantTwoMediationDocs";
+
+    public static final String DEFENDANT_ONE_CATEGORY_ID = "DefendantOneMediationDocs";
+
+    public static final String DEFENDANT_TWO_CATEGORY_ID = "DefendantTwoMediationDocs";
 
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
@@ -241,21 +250,21 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
 
     private void assignMediationDocumentsCategoryIds(CaseData caseData) {
         assignCategoryId.assignCategoryIdToCollection(caseData.getApp1MediationNonAttendanceDocs(),
-                                                      document -> document.getValue().getDocument(), "ClaimantOneMediationDocs");
+                                                      document -> document.getValue().getDocument(), CLAIMANT_ONE_CATEGORY_ID);
         assignCategoryId.assignCategoryIdToCollection(caseData.getApp1MediationDocumentsReferred(),
-                                                      document -> document.getValue().getDocument(), "ClaimantOneMediationDocs");
+                                                      document -> document.getValue().getDocument(), CLAIMANT_ONE_CATEGORY_ID);
         assignCategoryId.assignCategoryIdToCollection(caseData.getApp2MediationNonAttendanceDocs(),
-                                                      document -> document.getValue().getDocument(), "ClaimantTwoMediationDocs");
+                                                      document -> document.getValue().getDocument(), CLAIMANT_TWO_CATEGORY_ID);
         assignCategoryId.assignCategoryIdToCollection(caseData.getApp2MediationDocumentsReferred(),
-                                                      document -> document.getValue().getDocument(), "ClaimantTwoMediationDocs");
+                                                      document -> document.getValue().getDocument(), CLAIMANT_TWO_CATEGORY_ID);
         assignCategoryId.assignCategoryIdToCollection(caseData.getRes1MediationNonAttendanceDocs(),
-                                                      document -> document.getValue().getDocument(), "DefendantOneMediationDocs");
+                                                      document -> document.getValue().getDocument(), DEFENDANT_ONE_CATEGORY_ID);
         assignCategoryId.assignCategoryIdToCollection(caseData.getRes1MediationDocumentsReferred(),
-                                                      document -> document.getValue().getDocument(), "DefendantOneMediationDocs");
+                                                      document -> document.getValue().getDocument(), DEFENDANT_ONE_CATEGORY_ID);
         assignCategoryId.assignCategoryIdToCollection(caseData.getRes2MediationNonAttendanceDocs(),
-                                                      document -> document.getValue().getDocument(), "DefendantTwoMediationDocs");
+                                                      document -> document.getValue().getDocument(), DEFENDANT_TWO_CATEGORY_ID);
         assignCategoryId.assignCategoryIdToCollection(caseData.getRes2MediationDocumentsReferred(),
-                                                      document -> document.getValue().getDocument(), "DefendantTwoMediationDocs");
+                                                      document -> document.getValue().getDocument(), DEFENDANT_TWO_CATEGORY_ID);
     }
 
     @Override
