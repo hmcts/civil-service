@@ -116,34 +116,33 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         return caseData.getRespondent2SameLegalRepresentative() != null
             && caseData.getRespondent2SameLegalRepresentative() == YES;
     }
+
     private CallbackResponse saveRequestForReconsiderationReason(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
         List<String> roles = getUserRole(callbackParams);
         StringBuilder partyName = new StringBuilder();
         if (isApplicantSolicitor(roles)) {
-            ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationApplicant();
             partyName.append("Applicant - ");
             partyName.append(caseData.getApplicant1().getPartyName());
             partyName.append(applicant2Present(caseData) ?
             " and " + caseData.getApplicant2().getPartyName() : "");
+            ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationApplicant();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
-        }
-        else if (isRespondentSolicitorOne(roles)) {
-            ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationRespondent1();
+        } else if (isRespondentSolicitorOne(roles)) {
             partyName.append("Defendant - ");
             partyName.append(caseData.getRespondent1().getPartyName());
-            partyName.append(respondent2Present(caseData) && respondent2HasSameLegalRep(caseData) ?
-                        " and " + caseData.getRespondent2().getPartyName() : "");
+            partyName.append(respondent2Present(caseData) && respondent2HasSameLegalRep(caseData)
+                                 ? " and " + caseData.getRespondent2().getPartyName() : "");
 
+            ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationRespondent1();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent1(reasonForReconsideration);
-        }
-        else if (isRespondentSolicitorTwo(roles)) {
+        } else if (isRespondentSolicitorTwo(roles)) {
             partyName.append("Defendant - ");
-            ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationRespondent2();
             partyName.append(respondent2Present(caseData) ? caseData.getRespondent2().getPartyName() : "");
+            ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationRespondent2();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationRespondent2(reasonForReconsideration);
         }
