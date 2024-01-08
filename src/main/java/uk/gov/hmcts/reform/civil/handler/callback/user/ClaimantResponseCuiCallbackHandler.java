@@ -139,7 +139,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             response.state(CaseState.IN_MEDIATION.name());
         } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
             response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());
-        } else if (Objects.nonNull(updatedData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && updatedData.isClaimantIntentionSettlePartAdmit()) {
+        } else if (Objects.nonNull(updatedData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && updatedData.isClaimantIntentionSettlePartAdmit() || updatedData.isClaimantAcceptedClaimAmount() ) {
             response.state(CaseState.CASE_SETTLED.name());
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
             response.state(CaseState.CASE_DISMISSED.name());
