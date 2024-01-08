@@ -85,7 +85,6 @@ public class CasesController {
         );
 
         var caseDetailsResponse = coreCaseDataService.getCase(caseId, authorisation);
-        log.info("Returning case details: {}", caseDetailsResponse);
 
         return new ResponseEntity<>(caseDetailsResponse, HttpStatus.OK);
     }
@@ -165,7 +164,6 @@ public class CasesController {
             .event(eventDto.getEvent())
             .updates(eventDto.getCaseDataUpdate())
             .build();
-        log.info(eventDto.getCaseDataUpdate().toString());
         CaseDetails caseDetails = caseEventService.submitEvent(params);
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
@@ -210,7 +208,6 @@ public class CasesController {
                 .event(submitEventDto.getEvent())
                 .updates(submitEventDto.getData())
                 .build();
-            log.info("Updated case data:  " + submitEventDto.getData().toString());
             CaseDetails caseDetails = caseworkerCaseEventService.submitEventForNewClaimCaseWorker(params);
             return new ResponseEntity<>(caseDetails, HttpStatus.CREATED);
         } catch (Exception ex) {
