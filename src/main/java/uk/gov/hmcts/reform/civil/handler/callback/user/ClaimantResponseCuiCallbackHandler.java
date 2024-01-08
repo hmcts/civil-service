@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
@@ -51,8 +50,6 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final Time time;
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
 
-    private final DeadlinesCalculator deadlinesCalculator;
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -79,12 +76,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime applicant1ResponseDate = LocalDateTime.now();
 
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                .applicant1ResponseDate(applicant1ResponseDate)
-                .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
-                .respondent1RespondToSettlementAgreementDeadline(getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate));
+                .applicant1ResponseDate(LocalDateTime.now())
+                .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
@@ -102,11 +97,6 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         updateClaimEndState(response, updatedData);
 
         return response.build();
-    }
-
-    private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
-        return caseData.hasApplicant1SignedSettlementAgreement()
-            ? deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate) : null;
     }
 
     private void updateClaimStateJudicialReferral(

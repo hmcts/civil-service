@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -44,6 +45,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUED_ON;
@@ -76,7 +78,8 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     private BulkPrintService bulkPrintService;
     @MockBean
     private PiPLetterGenerator pipLetterGenerator;
-
+    @MockBean
+    private SystemGeneratedDocumentService systemGeneratedDocumentService;
     @MockBean
     private Time time;
 
@@ -136,7 +139,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
         @Test
         void shouldGenerateAndPrintLetterSuccessfully() {
             // Given
-            given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
+            given(pipLetterGenerator.downloadLetter(any(), any())).willReturn(LETTER_CONTENT);
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
@@ -161,6 +164,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 ISSUED_ON, formatLocalDate(LocalDate.now(), DATE),
                 RESPOND_URL, "dummy_respond_to_claim_url",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_16_DIGIT_NUMBER, CASE_ID.toString(),
                 PIN, "TEST1234",
                 RESPONSE_DEADLINE, formatLocalDate(
                     caseData.getRespondent1ResponseDeadline()
