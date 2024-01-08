@@ -96,7 +96,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void setup() {
-            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData = CaseDataBuilder.builder().atStateClaimDraft().applicant1OrganisationPolicy(null).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             given(time.now()).willReturn(submittedDate);
             given(specReferenceNumberRepository.getSpecReferenceNumber()).willReturn(REFERENCE_NUMBER);
@@ -115,6 +115,21 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME));
 
+        }
+
+        @Test
+        void shouldSetOrganisationPolicies_whenInvoked() {
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("respondent1OrganisationPolicy.OrgPolicyCaseAssignedRole")
+                .isEqualTo("[RESPONDENTSOLICITORONE]");
+            assertThat(response.getData())
+                .extracting("applicant1OrganisationPolicy.OrgPolicyCaseAssignedRole")
+                .isEqualTo("[APPLICANTSOLICITORONE]");
         }
     }
 }

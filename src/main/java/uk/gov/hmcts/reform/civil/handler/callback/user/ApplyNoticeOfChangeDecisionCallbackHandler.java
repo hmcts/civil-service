@@ -80,7 +80,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         updatedCaseDataBuilder
             .businessProcess(BusinessProcess.ready(APPLY_NOC_DECISION))
             .changeOfRepresentation(getChangeOfRepresentation(
-                    callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
+                callbackParams.getCaseData().getChangeOrganisationRequestField(), postDecisionCaseData));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseDataBuilder.build().toMap(objectMapper)).build();
@@ -203,7 +203,8 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     }
 
     private String getFormerEmail(String caseRole, CaseData caseData) {
-        if (caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())) {
+        if (caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+            && caseData.getApplicantSolicitor1UserDetails() != null) {
             return caseData.getApplicantSolicitor1UserDetails().getEmail();
         } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
             return caseData.getRespondentSolicitor1EmailAddress();
