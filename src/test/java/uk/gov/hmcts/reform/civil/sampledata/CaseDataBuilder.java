@@ -5354,10 +5354,12 @@ public class CaseDataBuilder {
         this.reasonForReconsiderationApplicant = reasonForReconsideration;
         return this;
     }
+
     public CaseDataBuilder reasonForReconsiderationRespondent1(ReasonForReconsideration reasonForReconsideration) {
         this.reasonForReconsiderationRespondent1 = reasonForReconsideration;
         return this;
     }
+
     public CaseDataBuilder reasonForReconsiderationRespondent2(ReasonForReconsideration reasonForReconsideration) {
         this.reasonForReconsiderationRespondent2 = reasonForReconsideration;
         return this;

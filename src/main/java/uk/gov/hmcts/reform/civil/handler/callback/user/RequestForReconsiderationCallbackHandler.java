@@ -93,11 +93,9 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         List<String> roles = getUserRole(callbackParams);
         if (isApplicantSolicitor(roles)) {
             updatedData.casePartyRequestForReconsideration("Applicant");
-        }
-        else if (isRespondentSolicitorOne(roles)) {
+        } else if (isRespondentSolicitorOne(roles)) {
             updatedData.casePartyRequestForReconsideration("Respondent1");
-        }
-        else if (isRespondentSolicitorTwo(roles)) {
+        } else if (isRespondentSolicitorTwo(roles)) {
             updatedData.casePartyRequestForReconsideration("Respondent2");
         }
         return updatedData;
@@ -125,8 +123,8 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
         if (isApplicantSolicitor(roles)) {
             partyName.append("Applicant - ");
             partyName.append(caseData.getApplicant1().getPartyName());
-            partyName.append(applicant2Present(caseData) ?
-            " and " + caseData.getApplicant2().getPartyName() : "");
+            partyName.append(applicant2Present(caseData)
+                                 ? " and " + caseData.getApplicant2().getPartyName() : "");
             ReasonForReconsideration reasonForReconsideration = caseData.getReasonForReconsiderationApplicant();
             reasonForReconsideration.setRequestor(partyName.toString());
             updatedData.reasonForReconsiderationApplicant(reasonForReconsideration);
