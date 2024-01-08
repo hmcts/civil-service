@@ -505,7 +505,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     }
 
     private boolean isDeemedServedDateIsNotWorkingDay(LocalDate cosDateOfServiceForDefendant) {
-        return !workingDayIndicator.isWorkingDay(cosDateOfServiceForDefendant);
+        boolean isOlderThan14Days = isDeemedServedDateOlderThan14Days(cosDateOfServiceForDefendant);
+        return !isOlderThan14Days && !workingDayIndicator.isWorkingDay(cosDateOfServiceForDefendant);
     }
 
     private boolean isBothDefendantLip(CaseData caseData) {
