@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -87,6 +88,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         + "\n"
         + "This action cannot currently be performed because it has either already"
         + " been completed or another action must be completed first.";
+
+    public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0, 0);
+
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
@@ -312,7 +316,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        LocalDateTime notificationDeadline = cosDateOfServiceForDefendant.atTime(time.now().toLocalTime()).plusDays(14);
+        LocalDateTime notificationDeadline = cosDateOfServiceForDefendant.atTime(END_OF_BUSINESS_DAY).plusDays(14);
         LocalDateTime currentDateTime = time.now();
         LocalDateTime today4pm = currentDateTime.toLocalDate().atTime(16, 0);
 
@@ -325,7 +329,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     }
 
     private boolean isDeemedServedDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        LocalDateTime deemedServedDeadline = cosDateOfServiceForDefendant.atTime(time.now().toLocalTime()).plusDays(14);
+        LocalDateTime deemedServedDeadline = cosDateOfServiceForDefendant.atTime(END_OF_BUSINESS_DAY).plusDays(14);
         LocalDateTime currentDateTime = time.now();
         LocalDateTime today4pm = currentDateTime.toLocalDate().atTime(16, 0);
 
