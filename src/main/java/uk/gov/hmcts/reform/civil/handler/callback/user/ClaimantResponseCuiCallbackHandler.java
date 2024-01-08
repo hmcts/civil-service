@@ -93,23 +93,9 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.toMap(objectMapper));
 
-        updateClaimStateJudicialReferral(response, updatedData);
         updateClaimEndState(response, updatedData);
 
         return response.build();
-    }
-
-    private void updateClaimStateJudicialReferral(
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response,
-        CaseData caseData) {
-        if (isJudicialReferralAllowed(caseData)) {
-            response.state(CaseState.JUDICIAL_REFERRAL.name());
-        }
-    }
-
-    private boolean isJudicialReferralAllowed(CaseData caseData) {
-        return (caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence())
-            && (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation());
     }
 
     private boolean isProceedsInHeritageSystemAllowed(CaseData caseData) {
@@ -134,17 +120,21 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             || isCourtDecisionRejected;
     }
 
-    private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
-        if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
-            response.state(CaseState.IN_MEDIATION.name());
+    private String setUpCaseState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
+        if (isJudicialReferralAllowed(updatedData)) {
+            return CaseState.JUDICIAL_REFERRAL.name();
+        } else if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
+            return CaseState.IN_MEDIATION.name();
         } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
-            response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            return CaseState.All_FINAL_ORDERS_ISSUED.name();
         } else if (Objects.nonNull(updatedData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && updatedData.isClaimantIntentionSettlePartAdmit()) {
-            response.state(CaseState.CASE_SETTLED.name());
+            return CaseState.CASE_SETTLED.name();
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
-            response.state(CaseState.CASE_DISMISSED.name());
+            return CaseState.CASE_DISMISSED.name();
         } else if (isProceedsInHeritageSystemAllowed(updatedData)) {
-            response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            return CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+        } else {
+            return response.build().getState();
         }
     }
 
@@ -158,5 +148,24 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private boolean hasCcjRequest(CaseData caseData) {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
                 && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
+    }
+
+    private boolean isJudicialReferralAllowed(CaseData caseData) {
+        return isProceedOrNotSettleClaim(caseData)
+            && (isClaimantOrDefendantRejectMediation(caseData)
+            || caseData.isFastTrackClaim());
+    }
+
+    private boolean isProceedOrNotSettleClaim(CaseData caseData) {
+        return caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence() || caseData.isFullDefenceNotPaid();
+    }
+
+    private boolean isClaimantOrDefendantRejectMediation(CaseData caseData) {
+        return (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation())
+            || caseData.hasDefendantNotAgreedToFreeMediation();
+    }
+
+    private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
+        response.state(setUpCaseState(response, updatedData));
     }
 }
