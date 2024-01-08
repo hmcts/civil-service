@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -10,14 +9,17 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED;
 
 @Service
@@ -26,10 +28,12 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private static final String REFERENCE_TEMPLATE_DEFENDANT = "notify-defendant-lip-claimant-represented-notification-%s";
-    public static final String TASK_ID = "NotifyDefendantLipClaimantRepresented";
+    private static final String REFERENCE_TEMPLATE_DEFENDANT =
+        "notify-lip-after-noc-approval-%s";
+    public static final String TASK_ID_APPLICANT = "NotifyClaimantLipAfterNocApproval";
+    public static final String TASK_ID_RESPONDENT = "NotifyDefendantLipClaimantRepresented";
     private final Map<String, Callback> callbackMap = Map.of(
-        callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantLIP
+        callbackKey(ABOUT_TO_SUBMIT), this::notifyLipAfterNocApproval
     );
 
     @Override
@@ -39,16 +43,20 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return TASK_ID;
+        return isRespondentNotification(callbackParams) ? TASK_ID_RESPONDENT : TASK_ID_APPLICANT;
     }
 
-    private CallbackResponse notifyDefendantLIP(CallbackParams callbackParams) {
+    private CallbackResponse notifyLipAfterNocApproval(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        if (StringUtils.isNotEmpty(caseData.getRespondent1().getPartyEmail())) {
+        String recipientEmail = isRespondentNotification(callbackParams) ? getRecipientEmailForRespondent(caseData) :
+            caseData.getApplicant1Email();
+        String templateId = getTemplateID(
+            isRespondentNotification(callbackParams)
+        );
+        if (isNotEmpty(recipientEmail) && templateId != null) {
             notificationService.sendMail(
-                caseData.getRespondent1().getPartyEmail(),
-                notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate(),
+                recipientEmail,
+                templateId,
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE_DEFENDANT, caseData.getLegacyCaseReference())
             );
@@ -58,8 +66,9 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return Collections.singletonList(
-            NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED
+        return List.of(
+            NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED,
+            NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL
         );
     }
 
@@ -70,5 +79,23 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         );
+    }
+
+    private boolean isRespondentNotification(CallbackParams callbackParams) {
+        return callbackParams.getRequest().getEventId()
+            .equals(NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED.name());
+    }
+
+    private String getRecipientEmailForRespondent(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1())
+            .map(Party::getPartyEmail)
+            .orElse("");
+    }
+
+    private String getTemplateID(boolean isDefendantEvent) {
+        if (isDefendantEvent) {
+            return notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate();
+        }
+        return notificationsProperties.getNotifyClaimantLipForNoLongerAccessTemplate();
     }
 }

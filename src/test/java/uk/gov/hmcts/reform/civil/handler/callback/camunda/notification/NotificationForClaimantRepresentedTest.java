@@ -26,6 +26,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_LIP_CLAIMANT_REPRESENTED;
 
 @SpringBootTest(classes = {
@@ -53,6 +54,7 @@ public class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerT
     class AboutToSubmitCallback {
 
         private static final String DEFENDANT_EMAIL_ADDRESS = "defendantmail@hmcts.net";
+        private static final String APPLICANT_EMAIL_ADDRESS = "applicantmail@hmcts.net";
         private static final String DEFENDANT_PARTY_NAME = "ABC ABC";
         private static final String REFERENCE_NUMBER = "8372942374";
         private static final String EMAIL_TEMPLATE = "test-notification-id";
@@ -61,6 +63,7 @@ public class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerT
         @BeforeEach
         void setUp() {
             given(notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate()).willReturn(EMAIL_TEMPLATE);
+            given(notificationsProperties.getNotifyClaimantLipForNoLongerAccessTemplate()).willReturn(EMAIL_TEMPLATE);
         }
 
         @Test
@@ -87,5 +90,31 @@ public class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerT
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
         }
 
+        @Test
+        public void notifyApplicantAfterNocApproval() {
+
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
+                    DEFENDANT_EMAIL_ADDRESS).build())
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME)
+                                .partyEmail(APPLICANT_EMAIL_ADDRESS).build())
+                .legacyCaseReference(REFERENCE_NUMBER)
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL.name()).build())
+                .build();
+            //When
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(targetEmail.capture(),
+                                                           emailTemplate.capture(),
+                                                           notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(APPLICANT_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
+        }
     }
 }
