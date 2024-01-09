@@ -62,7 +62,7 @@ class ClaimReconsiderationUpheldClaimantNotificationHandlerTest extends BaseCall
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
-                             .eventId(CaseEvent.NOTIFY_CLAIM_RECONSIDERATION_UPHELD_CLAIMANT.name())
+                             .eventId(CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST.name())
                              .build())
                 .build();
 

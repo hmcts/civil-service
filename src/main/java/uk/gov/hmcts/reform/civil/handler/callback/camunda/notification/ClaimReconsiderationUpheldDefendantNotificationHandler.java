@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_RECONSIDERATION_UPHELD_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
 
 @Service
@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant
 public class ClaimReconsiderationUpheldDefendantNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIM_RECONSIDERATION_UPHELD_DEFENDANT);
+    private static final List<CaseEvent> EVENTS = List.of(DECISION_ON_RECONSIDERATION_REQUEST);
     public static final String TASK_ID = "NotifyClaimRreconsiderationUpheld";
     private static final String REFERENCE_TEMPLATE =
         "hearing-fee-unpaid-applicant-notification-%s";
