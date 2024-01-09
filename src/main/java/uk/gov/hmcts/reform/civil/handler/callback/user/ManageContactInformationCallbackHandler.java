@@ -414,7 +414,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         persistFlagsForParties(oldCaseData, caseData, builder);
         persistFlagsForLitigationFriendParties(oldCaseData, caseData, builder);
 
-
         String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
 
         updateExperts(partyChosenId, caseData, builder);
