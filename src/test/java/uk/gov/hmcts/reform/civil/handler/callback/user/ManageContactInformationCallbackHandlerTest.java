@@ -768,6 +768,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .firstName("First")
                 .lastName("Name")
                 .build();
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
         }
 
         @Test
@@ -1166,6 +1174,18 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             String errorMessage = "After making these changes, please ensure that the "
                 + "litigation friend's contact information is also up to date.";
 
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .addApplicant1LitigationFriend()
+                .addApplicant2LitigationFriend()
+                .addRespondent1LitigationFriend()
+                .addRespondent2LitigationFriend()
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
@@ -1199,6 +1219,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                        .build())
                 .build();
 
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1208,6 +1236,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnPostcodeError() {
             given(postcodeValidator.validate(any())).willReturn(List.of("Please enter Postcode"));
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
