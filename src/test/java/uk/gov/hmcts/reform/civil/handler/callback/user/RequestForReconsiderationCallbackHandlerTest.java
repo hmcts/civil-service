@@ -162,7 +162,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"APPLICANTSOLICITORONE","RESPONDENTSOLICITORONE","RESPONDENTSOLICITORTWO"})
+        @ValueSource(strings = {"APPLICANTSOLICITORONE", "RESPONDENTSOLICITORONE", "RESPONDENTSOLICITORTWO"})
         void shouldGetSelectedUserRole(String userRole) {
             //Given : Casedata and return applicant solicitor role
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
