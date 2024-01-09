@@ -719,6 +719,16 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(time.now()).thenReturn(localDateTime);
+            Address address = Address.builder()
+                .postCode("E11 5BB")
+                .build();
+            CaseData oldCaseData = CaseDataBuilder.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(address).build())
+                .build();
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(oldCaseData);
         }
 
         @ParameterizedTest
@@ -1265,6 +1275,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldChangeCaseState_WhenApplicant1AcceptFullAdmitPaymentPlanSpecNoAndFlagV2() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.NO)
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
@@ -1281,6 +1292,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YES)
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
@@ -1299,6 +1311,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
@@ -1316,6 +1329,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldChangeCaseState_WhenApplicant1AcceptPartAdmitPaymentPlanSpecNoAndFlagV2() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
@@ -1334,6 +1348,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
             CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1(Party.builder()
                                  .primaryAddress(Address.builder().build())
                                  .type(Party.Type.COMPANY)
@@ -1355,6 +1370,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldChangeCaseState_WhenApplicant1NotAcceptPartAdmitAmountWithoutMediationAndFlagV2() {
             given(featureToggleService.isPinInPostEnabled()).willReturn(true);
             CaseData caseData = CaseData.builder().applicant1AcceptAdmitAmountPaidSpec(NO)
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
                 .responseClaimMediationSpecRequired(NO)
                 .applicant1DQ(Applicant1DQ.builder().applicant1RespondToClaimExperts(
@@ -1396,6 +1412,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseStateToJudicialReferral_ONE_V_ONE() {
             CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .applicant1ProceedWithClaim(YES)
@@ -1415,6 +1432,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseStateToJudicialReferral_TWO_V_ONE() {
             CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .applicant2(Party.builder()
@@ -1444,6 +1462,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseStateToJudicialReferral_ONE_V_TWO_ONE_REP() {
             CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -1469,6 +1488,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseStateToJudicialReferral_ONE_V_TWO_TWO_REP() {
             CaseData caseData = CaseData.builder()
+                .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
                 .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
@@ -2112,6 +2132,7 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
 
             CallbackParams params = callbackParamsOf(V_2, caseData, ABOUT_TO_SUBMIT);
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
         }
