@@ -83,6 +83,8 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapU
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapWitnessesToUpdatePartyDetailsForm;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQWitnesses;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForLitigationFriendParties;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
@@ -322,8 +324,10 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
         ArrayList<String> warnings = new ArrayList<>();
         List<String> errors = new ArrayList<>();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
-        if (partyHasLitigationFriend(partyChosen, caseData)) {
+        // oldCaseData needed because Litigation friend gets nullified in mid event
+        if (partyHasLitigationFriend(partyChosen, oldCaseData)) {
             warnings.add(CHECK_LITIGATION_FRIEND_ERROR_TITLE);
             warnings.add(CHECK_LITIGATION_FRIEND_ERROR);
         }
@@ -404,12 +408,18 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
-        String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
-        updateExperts(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
-        updateWitnesses(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
+        // persist party flags (ccd issue)
+        persistFlagsForParties(oldCaseData, caseData, builder);
+        persistFlagsForLitigationFriendParties(oldCaseData, caseData, builder);
 
-        if (isParty(partyChosen) || isLitigationFriend(partyChosen)) {
+        String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
+
+        updateExperts(partyChosenId, caseData, builder);
+        updateWitnesses(partyChosenId, caseData, builder);
+
+        if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
             // update case name for hmc if applicant/respondent/litigation friend was updated
             builder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
             builder.caseNamePublic(buildCaseNamePublic(caseData));
