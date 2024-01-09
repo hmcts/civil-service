@@ -45,7 +45,8 @@ public class PaymentRequestUpdateCallbackService {
 
     public void processCallback(ServiceRequestUpdateDto serviceRequestUpdateDto, String feeType) {
         log.info("Processing the callback for the caseId {} with status {}", serviceRequestUpdateDto.getCcdCaseNumber(),
-                 serviceRequestUpdateDto.getServiceRequestStatus());
+                 serviceRequestUpdateDto.getServiceRequestStatus()
+        );
 
         if (serviceRequestUpdateDto.getServiceRequestStatus().equalsIgnoreCase(PAID)) {
 
@@ -64,7 +65,7 @@ public class PaymentRequestUpdateCallbackService {
 
         } else {
             log.info("Service request status is not PAID for Case id {}",
-                      serviceRequestUpdateDto.getCcdCaseNumber());
+                     serviceRequestUpdateDto.getCcdCaseNumber());
         }
     }
 
