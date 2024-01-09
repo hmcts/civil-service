@@ -321,7 +321,6 @@ public enum CaseEvent {
     SEND_FINAL_ORDER_TO_LIP_DEFENDANT(CAMUNDA),
     SEND_FINAL_ORDER_TO_LIP_CLAIMANT(CAMUNDA);
 
-
     private final UserType userType;
 
     public boolean isCamundaEvent() {
