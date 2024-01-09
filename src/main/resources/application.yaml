@@ -318,6 +318,7 @@ notifications:
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifyUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
+  notifyClaimantLipHelpWithFees: "242171a6-98c8-4fe3-b6d2-1748b39d2c9b"
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
