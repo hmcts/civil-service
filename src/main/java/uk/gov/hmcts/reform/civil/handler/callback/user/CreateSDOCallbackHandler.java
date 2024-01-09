@@ -562,7 +562,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         SmallClaimsDocuments tempSmallClaimsDocuments = SmallClaimsDocuments.builder()
             .input1("Each party must upload to the Digital Portal copies of all documents which they wish the court to"
-                        + " consider when reaching its decision not less than 14 days before the hearing.")
+                        + " consider when reaching its decision not less than 21 days before the hearing.")
             .input2("The court may refuse to consider any document which has not been uploaded to the "
                         + "Digital Portal by the above date.")
             .build();
@@ -572,7 +572,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
             .smallClaimsNumberOfWitnessesToggle(checkList)
             .input1("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
-                        + " upon whose evidence they intend to rely at the hearing not less than 14 days before"
+                        + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
                         + " the hearing.")
             .input2("2")
             .input3("2")
@@ -656,7 +656,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         SmallClaimsRoadTrafficAccident tempSmallClaimsRoadTrafficAccident = SmallClaimsRoadTrafficAccident.builder()
             .input("Photographs and/or a place of the accident location shall be prepared and agreed by the parties"
-                       + " and uploaded to the Digital Portal no later than 14 days before the hearing.")
+                       + " and uploaded to the Digital Portal no later than 21 days before the hearing.")
             .build();
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();

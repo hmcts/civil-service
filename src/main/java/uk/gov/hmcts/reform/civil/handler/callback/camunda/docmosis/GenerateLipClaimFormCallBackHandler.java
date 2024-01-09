@@ -66,35 +66,25 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
             .build();
     }
 
-    private CaseData updateCaseData(CaseData caseData, CaseDocument caseDocument, CaseEvent caseEvent) {
+    private CaseData updateCaseData(CaseData caseData,CaseDocument caseDocument, CaseEvent caseEvent) {
         return switch (caseEvent) {
-            case GENERATE_DRAFT_FORM, GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC ->
-                buildClaimantFormCaseData(caseData, caseDocument, caseEvent);
-            case GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC -> buildDefendantClaimFormData(caseDocument, caseData);
+            case GENERATE_DRAFT_FORM, GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC, GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC ->
+                buildClaimFormData(caseData, caseDocument, caseEvent);
             default -> throw new IllegalArgumentException("case event not found");
         };
     }
 
-    private CaseData buildClaimantFormCaseData(CaseData caseData, CaseDocument caseDocument, CaseEvent event) {
-        List<Element<CaseDocument>> claimantDocuments = caseData.getClaimantDocuments();
-
-        // Remove Draft form from claimant documents
-        if (event == GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC) {
-            claimantDocuments = claimantDocuments.stream().filter(claimDoc -> claimDoc.getValue().getDocumentType() != DocumentType.DRAFT_CLAIM_FORM)
-                .collect(Collectors.toList());
-        }
-
-        claimantDocuments.add(element(caseDocument));
-        return caseData.toBuilder()
-            .claimantDocuments(claimantDocuments)
-            .build();
-    }
-
-    private CaseData buildDefendantClaimFormData(CaseDocument caseDocument, CaseData caseData) {
+    private CaseData buildClaimFormData(CaseData caseData,CaseDocument caseDocument, CaseEvent event) {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
             caseDocument,
             caseData
         );
+
+        // Remove Draft form from documents
+        if (event == GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC) {
+            systemGeneratedCaseDocuments = systemGeneratedCaseDocuments.stream().filter(claimDoc -> claimDoc.getValue().getDocumentType() != DocumentType.DRAFT_CLAIM_FORM)
+                .collect(Collectors.toList());
+        }
 
         return caseData.toBuilder()
             .systemGeneratedCaseDocuments(systemGeneratedCaseDocuments)
