@@ -652,9 +652,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
 
-    @Builder.Default
-    private final List<Element<CaseDocument>> caseWorkerDocuments = new ArrayList<>();
-
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
