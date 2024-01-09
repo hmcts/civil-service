@@ -25,7 +25,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DRAFT_FORM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
 @RequiredArgsConstructor
@@ -36,10 +35,10 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
         GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC,
         GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC
     );
-    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm);
     private final ObjectMapper objectMapper;
     private final ClaimFormGenerator claimFormGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
+    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::generateClaimForm);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -66,7 +65,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
             .build();
     }
 
-    private CaseData updateCaseData(CaseData caseData,CaseDocument caseDocument, CaseEvent caseEvent) {
+    private CaseData updateCaseData(CaseData caseData, CaseDocument caseDocument, CaseEvent caseEvent) {
         return switch (caseEvent) {
             case GENERATE_DRAFT_FORM, GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC, GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC ->
                 buildClaimFormData(caseData, caseDocument, caseEvent);
@@ -74,7 +73,7 @@ public class GenerateLipClaimFormCallBackHandler extends CallbackHandler {
         };
     }
 
-    private CaseData buildClaimFormData(CaseData caseData,CaseDocument caseDocument, CaseEvent event) {
+    private CaseData buildClaimFormData(CaseData caseData, CaseDocument caseDocument, CaseEvent event) {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = systemGeneratedDocumentService.getSystemGeneratedDocumentsWithAddedDocument(
             caseDocument,
             caseData
