@@ -30,7 +30,8 @@ public class HmcDataUtils {
         // NO OP
     }
 
-    private static final int MAX_HOURS_PER_DAY = 6;
+    private static final int HOURS_PER_DAY = 6;
+    private static final int MINUTES_PER_HOUR = 60;
 
     public static HearingDaySchedule getHearingStartDay(HearingGetResponse hearing) {
         var scheduledDays = getScheduledDays(hearing);
@@ -100,12 +101,12 @@ public class HmcDataUtils {
     }
 
     /**
-     * Calculates the duration in hours for a given hearing day.
-     * @return duration of the hearing day in hours
+     * Calculates the duration in minutes for a given hearing day.
+     * @return duration of the hearing day in minutes
      */
-    private static int getHearingDayHoursDuration(HearingDaySchedule day) {
+    private static int getHearingDayMinutesDuration(HearingDaySchedule day) {
         return ((Long)convertFromUTC(day.getHearingStartDateTime()).until(convertFromUTC(day.getHearingEndDateTime()),
-                                                                          ChronoUnit.HOURS)).intValue();
+                                                                          ChronoUnit.MINUTES)).intValue();
     }
 
     /**
@@ -116,7 +117,7 @@ public class HmcDataUtils {
      */
     private static int actualHours(int hearingDayHours) {
 
-        return hearingDayHours == MAX_HOURS_PER_DAY ? 5 : hearingDayHours;
+        return hearingDayHours == HOURS_PER_DAY ? 5 : hearingDayHours;
     }
 
     /**
@@ -125,12 +126,15 @@ public class HmcDataUtils {
      * @return e.g. "30 June 2023 at 10:00 for 3 hours"
      */
     private static String formatDay(HearingDaySchedule day) {
-        var dateString = convertFromUTC(day.getHearingStartDateTime()).toLocalDate()
+        String dateString = convertFromUTC(day.getHearingStartDateTime()).toLocalDate()
             .format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
-        var timeString = convertFromUTC(day.getHearingStartDateTime()).toLocalTime().toString();
-        var duration = actualHours(getHearingDayHoursDuration(day));
+        String timeString = convertFromUTC(day.getHearingStartDateTime()).toLocalTime().toString();
 
-        return String.format("%s at %s for %d %s", dateString, timeString, duration, duration > 1 ? "hours" : "hour");
+        int hearingDayDurationInMinutes = getHearingDayMinutesDuration(day);
+        int hours = (int)Math.floor((double)hearingDayDurationInMinutes / MINUTES_PER_HOUR);
+        int minutes = hearingDayDurationInMinutes - (hours * MINUTES_PER_HOUR);
+
+        return String.format("%s at %s for %s", dateString, timeString, hoursMinutesFormat(actualHours(hours), minutes));
     }
 
     /**
@@ -154,6 +158,18 @@ public class HmcDataUtils {
     }
 
     /**
+     * Calculates the total hearing duration in minutes.
+     *
+     * @param hearing the hearing object
+     * @return the total hearing duration in minutes
+     */
+    public static Integer getTotalHearingDurationInMinutes(HearingGetResponse hearing) {
+        return hearing.getHearingResponse().getHearingDaySchedule().stream()
+            .map(day -> getHearingDayMinutesDuration(day))
+            .reduce((aac, day) -> aac + day).orElse(null);
+    }
+
+    /**
      * Returns the total number of days and hours the hearing has been listed for.
      *  duration = takes total hearing hours from getHearingDayHoursDuration()
      * Formatting has been added to generate plural of day/hour when necessary
@@ -162,30 +178,69 @@ public class HmcDataUtils {
      *           Else: returns duration in hours format only e.g. 3 hours returns "3 hours"
      */
     public static String getTotalHearingDurationText(HearingGetResponse hearing) {
-        var duration = hearing.getHearingResponse().getHearingDaySchedule().stream()
-            .map(day -> getHearingDayHoursDuration(day))
-            .reduce((aac, day) -> aac + day).orElse(null);
-
-        var totalDays = (Double)Math.floor((double)duration / MAX_HOURS_PER_DAY);
-
-        if (duration != null) {
-            if (duration % MAX_HOURS_PER_DAY == 0) {
-                return String.format("%s %s", totalDays.intValue(), textToPlural(totalDays.intValue(), "day"));
-            } else if (duration > MAX_HOURS_PER_DAY) {
-                var hours = duration - (totalDays.intValue() * MAX_HOURS_PER_DAY);
-                return String.format(
-                    "%s %s and %s %s",
-                    totalDays.intValue(),
-                    textToPlural(totalDays.intValue(), "day"),
-                    hours,
-                    textToPlural(hours, "hour")
-                );
-            } else {
-                return String.format("%s %s", duration, textToPlural(duration, "hour"));
-            }
-        } else {
+        Integer totalDurationInMinutes = getTotalHearingDurationInMinutes(hearing);
+        if (totalDurationInMinutes == null) {
             return null;
         }
+
+        var totalDurationInHours = Math.floor((double)totalDurationInMinutes / MINUTES_PER_HOUR);
+
+        int days = (int)Math.floor((double)totalDurationInHours / HOURS_PER_DAY);
+        int hours = (int)(totalDurationInHours - (days * HOURS_PER_DAY));
+        int minutes = (int)(totalDurationInMinutes - (totalDurationInHours * MINUTES_PER_HOUR));
+
+        return daysHoursMinutesFormat(days, hours, minutes);
+    }
+
+    /**
+     * Concatenates the given list of strings with "and" as a separator.
+     *
+     * @param strings the list of strings to concatenate
+     * @return the concatenated string
+     */
+    private static String concatWithAnd(List<String> strings) {
+        return strings.stream()
+            .filter((string) -> string != null & !string.equals(""))
+            .reduce((acc, displayText) -> String.format("%s and %s", acc, displayText))
+            .orElse("");
+    }
+
+    /**
+     * Concatenates the given hours and minutes with "and" as a separator.
+     *
+     * @param hours the number of hours
+     * @param minutes the number of minutes
+     * @return the concatenated string
+     */
+    private static String hoursMinutesFormat(int hours, int minutes) {
+        String hoursText = formatValueWithLabel(hours, "hour");
+        String minutesText = formatValueWithLabel(minutes, "minute");
+        return concatWithAnd(List.of(hoursText, minutesText));
+    }
+
+    /**
+     * Concatenates the given days, hours and minutes with "and" as a separator.
+     *
+     * @param days the number of days
+     * @param hours the number of hours
+     * @param minutes the number of minutes
+     * @return the concatenated string
+     */
+    private static String daysHoursMinutesFormat(int days, int hours, int minutes) {
+        String daysText = formatValueWithLabel(days, "day");
+        return concatWithAnd(List.of(daysText, hoursMinutesFormat(hours, minutes)));
+    }
+
+    /**
+     * Formats the given value with the given label in plural form if the value is greater than 1.
+     * Will return empty if value is less than 1.
+     *
+     * @param value the value to format
+     * @param labelSingular the singular form of the label
+     * @return the formatted string
+     */
+    private static String formatValueWithLabel(int value, String labelSingular) {
+        return value > 0 ? String.format("%s %s", value, textToPlural(value, labelSingular)) : "";
     }
 
     private static boolean hasHearings(HearingsResponse hearings) {

@@ -1055,6 +1055,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private AllocatedTrack getAllocatedTrack(CaseData caseData) {
         return AllocatedTrack.getAllocatedTrack(
             caseData.getTotalClaimAmount(),
+            null,
             null
         );
     }

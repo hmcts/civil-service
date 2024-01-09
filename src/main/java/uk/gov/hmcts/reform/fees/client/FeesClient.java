@@ -91,6 +91,7 @@ public class FeesClient {
 
         return EVENT_HEARING.equalsIgnoreCase(event) && AllocatedTrack.FAST_CLAIM == AllocatedTrack.getAllocatedTrack(
             amount,
+            null,
             null
         );
     }

@@ -20,8 +20,6 @@ public abstract class MediationCSVService {
     }
 
     private String getCSVContent(MediationParams params) {
-        String[] headers = {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
-            "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
         CaseData data = params.getCaseData();
         ApplicantContactDetails applicantContactDetails = getApplicantContactDetails();
         DefendantContactDetails defendantContactDetails = getDefendantContactDetails();
@@ -42,8 +40,7 @@ public abstract class MediationCSVService {
             isPilot(data.getTotalClaimAmount())
         };
 
-        return generateCSVRow(headers)
-            + generateCSVRow(claimantData)
+        return generateCSVRow(claimantData)
             + generateCSVRow(respondentData);
     }
 

@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.spec.CaseDataToTextGenera
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationHeaderGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.RespondToResponseConfirmationTextGenerator;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -89,6 +90,8 @@ import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDeta
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistPartyAddress;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
@@ -114,6 +117,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     private final PaymentDateService paymentDateService;
     private final ResponseOneVOneShowTagService responseOneVOneShowTagService;
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
+    private final CaseDetailsConverter caseDetailsConverter;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -264,9 +268,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        caseData = persistPartyAddress(oldCaseData, caseData);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
+
+        // persist party flags (ccd issue)
+        persistFlagsForParties(oldCaseData, caseData, builder);
 
         // null/delete the document used for preview, otherwise it will show as duplicate within case file view
         if (featureToggleService.isCaseFileViewEnabled()) {
@@ -375,6 +385,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
+        if (V_2.equals(callbackParams.getVersion())
+            && featureToggleService.isPinInPostEnabled()
+            && isOneVOne(caseData)
+            && caseData.hasClaimantAgreedToFreeMediation()) {
+            builder.claimMovedToMediationOn(LocalDate.now());
+        }
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
@@ -486,6 +502,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
             updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(
                 caseData.getTotalClaimAmount(),
+                null,
                 null
             ).name());
         }
