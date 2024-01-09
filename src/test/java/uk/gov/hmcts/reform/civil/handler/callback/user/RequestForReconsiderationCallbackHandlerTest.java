@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -159,8 +161,9 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
             assertThat(response.getErrors().contains(ERROR_MESSAGE_DEADLINE_EXPIRED));
         }
 
-        @Test
-        void shouldGetApplicantUserRole() {
+        @ParameterizedTest
+        @ValueSource(strings = {"APPLICANTSOLICITORONE","RESPONDENTSOLICITORONE","RESPONDENTSOLICITORTWO"})
+        void shouldGetSelectedUserRole(String userRole) {
             //Given : Casedata and return applicant solicitor role
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
@@ -170,56 +173,22 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                                                                        .build()))).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(userRole));
 
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            //Then: It should set casePartyRequestForReconsideration to Applicant
-            assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
-                .isEqualTo("Applicant");
-        }
-
-        @Test
-        void shouldGetRespondent1UserRole() {
-            //Given : Casedata and return respondent solicitor1 role
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .systemGeneratedCaseDocuments(List.of(ElementUtils
-                                                          .element(CaseDocument.builder()
-                                                                       .documentType(DocumentType.SDO_ORDER)
-                                                                       .createdDatetime(LocalDateTime.now().minusDays(5))
-                                                                       .build()))).build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
-
-            //When: handler is called with ABOUT_TO_SUBMIT event
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            //Then: It should set casePartyRequestForReconsideration to Respondent1
-            assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
-                .isEqualTo("Respondent1");
-        }
-
-        @Test
-        void shouldGetRespondent2UserRole() {
-            //Given : Casedata and return respondent solicitor2 role
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .systemGeneratedCaseDocuments(List.of(ElementUtils
-                                                          .element(CaseDocument.builder()
-                                                                       .documentType(DocumentType.SDO_ORDER)
-                                                                       .createdDatetime(LocalDateTime.now().minusDays(5))
-                                                                       .build()))).build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORTWO"));
-
-            //When: handler is called with ABOUT_TO_SUBMIT event
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            //Then: It should set casePartyRequestForReconsideration to Respondent2
-            assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
-                .isEqualTo("Respondent2");
+            //Then: It should set casePartyRequestForReconsideration to selected user
+            if (userRole.equals("APPLICANTSOLICITORONE")) {
+                assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
+                    .isEqualTo("Applicant");
+            } else if (userRole.equals("RESPONDENTSOLICITORONE")) {
+                assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
+                    .isEqualTo("Respondent1");
+            } else {
+                assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
+                    .isEqualTo("Respondent2");
+            }
         }
     }
 
