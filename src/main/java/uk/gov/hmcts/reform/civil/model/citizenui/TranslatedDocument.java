@@ -27,7 +27,7 @@ public class TranslatedDocument {
         switch (documentType) {
             case DEFENDANT_RESPONSE : return DEFENCE_TRANSLATED_DOCUMENT;
             case CLAIM_ISSUE : return CLAIM_ISSUE_TRANSLATED_DOCUMENT;
-            case CLAIMANT_INTENTION : return CLAIM_INTENTION_TRANSLATED_DOCUMENT;
+            case CLAIMANT_INTENTION : return CLAIMANT_INTENTION_TRANSLATED_DOCUMENT;
             default: throw new DocumentUploadException("No document file type found for Translated document");
         }
     }
