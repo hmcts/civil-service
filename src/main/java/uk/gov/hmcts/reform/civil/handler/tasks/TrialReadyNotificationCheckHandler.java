@@ -22,7 +22,7 @@ public class TrialReadyNotificationCheckHandler implements BaseExternalTaskHandl
     @Override
     public void handleTask(ExternalTask externalTask) {
         List<CaseDetails> cases = caseSearchService.getCases();
-        log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
+        log.info("TEST Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
         cases.forEach(caseDetails -> {
             try {
