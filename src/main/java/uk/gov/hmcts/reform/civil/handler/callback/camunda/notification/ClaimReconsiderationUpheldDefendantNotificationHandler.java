@@ -11,13 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIM_RECONSIDERATION_UPHELD_DEFENDANT;
@@ -96,23 +94,11 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
-    private String getLegalOrganizationDef2Name(final CaseData caseData) {
-        Optional<Organisation> organisation = organisationService
-            .findOrganisationById(caseData.getApplicant2OrganisationPolicy() != null
-                                      ? caseData.getApplicant2OrganisationPolicy()
-                .getOrganisation().getOrganisationID() : caseData.getApplicant1OrganisationPolicy()
-                .getOrganisation().getOrganisationID());
-        if (organisation.isPresent()) {
-            return organisation.get().getName();
-        }
-        return caseData.getApplicant2().getPartyName();
-    }
-
     public Map<String, String> addPropertiesDef2(final CaseData caseData) {
         return new HashMap<>(Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
-            PARTY_NAME, getLegalOrganizationDef2Name(caseData)
+            PARTY_NAME, caseData.getRespondent2().getPartyName()
         ));
     }
 }
