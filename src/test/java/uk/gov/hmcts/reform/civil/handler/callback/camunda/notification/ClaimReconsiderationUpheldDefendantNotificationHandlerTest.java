@@ -96,7 +96,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
                 "sole.trader@email.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
-                "hearing-fee-unpaid-applicant-notification-000DC001"
+                "reconsideration-upheld-applicant-notification-000DC001"
             );
         }
 
@@ -124,12 +124,12 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo("sole.trader@email.com");
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo("template-id");
             assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationDataMap(caseData));
-            assertThat(reference.getAllValues().get(0)).isEqualTo("hearing-fee-unpaid-applicant-notification-000DC001");
+            assertThat(reference.getAllValues().get(0)).isEqualTo("reconsideration-upheld-applicant-notification-000DC001");
             //Email to respondent2
             assertThat(targetEmail.getAllValues().get(1)).isEqualTo("respondentsolicitor2@example.com");
             assertThat(emailTemplate.getAllValues().get(1)).isEqualTo("template-id");
             assertThat(notificationDataMap.getAllValues().get(1)).isEqualTo(getNotificationDataMap2(caseData));
-            assertThat(reference.getAllValues().get(1)).isEqualTo("hearing-fee-unpaid-applicant-notification-000DC001");
+            assertThat(reference.getAllValues().get(1)).isEqualTo("reconsideration-upheld-applicant-notification-000DC001");
 
         }
 

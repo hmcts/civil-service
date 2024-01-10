@@ -27,7 +27,7 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_CLAIM_RECONSIDERATION_UPHELD_CLAIMANT);
     public static final String TASK_ID = "NotifyDecisionOnReconsiderationRequest";
     private static final String REFERENCE_TEMPLATE =
-        "hearing-fee-unpaid-applicant-notification-%s";
+        "reconsideration-upheld-applicant-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
