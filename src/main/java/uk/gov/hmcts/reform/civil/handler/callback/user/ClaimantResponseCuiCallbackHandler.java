@@ -14,10 +14,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
@@ -50,7 +50,6 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
-
     private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
@@ -82,9 +81,9 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         LocalDateTime applicant1ResponseDate = LocalDateTime.now();
 
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                .applicant1ResponseDate(applicant1ResponseDate)
-                .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
-                .respondent1RespondToSettlementAgreementDeadline(getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate));
+            .applicant1ResponseDate(applicant1ResponseDate)
+            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
+            .respondent1RespondToSettlementAgreementDeadline(getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate));
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
@@ -98,7 +97,6 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.toMap(objectMapper));
 
-        updateClaimStateJudicialReferral(response, updatedData);
         updateClaimEndState(response, updatedData);
 
         return response.build();
@@ -107,19 +105,6 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
         return caseData.hasApplicant1SignedSettlementAgreement()
             ? deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate) : null;
-    }
-
-    private void updateClaimStateJudicialReferral(
-        AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response,
-        CaseData caseData) {
-        if (isJudicialReferralAllowed(caseData)) {
-            response.state(CaseState.JUDICIAL_REFERRAL.name());
-        }
-    }
-
-    private boolean isJudicialReferralAllowed(CaseData caseData) {
-        return (caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence())
-            && (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation());
     }
 
     private boolean isProceedsInHeritageSystemAllowed(CaseData caseData) {
@@ -144,17 +129,21 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             || isCourtDecisionRejected;
     }
 
-    private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
-        if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
-            response.state(CaseState.IN_MEDIATION.name());
+    private String setUpCaseState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
+        if (isJudicialReferralAllowed(updatedData)) {
+            return CaseState.JUDICIAL_REFERRAL.name();
+        } else if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
+            return CaseState.IN_MEDIATION.name();
         } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
-            response.state(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            return CaseState.All_FINAL_ORDERS_ISSUED.name();
         } else if (Objects.nonNull(updatedData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && updatedData.isClaimantIntentionSettlePartAdmit()) {
-            response.state(CaseState.CASE_SETTLED.name());
+            return CaseState.CASE_SETTLED.name();
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
-            response.state(CaseState.CASE_DISMISSED.name());
+            return CaseState.CASE_DISMISSED.name();
         } else if (isProceedsInHeritageSystemAllowed(updatedData)) {
-            response.state(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
+            return CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name();
+        } else {
+            return response.build().getState();
         }
     }
 
@@ -168,5 +157,24 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private boolean hasCcjRequest(CaseData caseData) {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
                 && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
+    }
+
+    private boolean isJudicialReferralAllowed(CaseData caseData) {
+        return isProceedOrNotSettleClaim(caseData)
+            && (isClaimantOrDefendantRejectMediation(caseData)
+            || caseData.isFastTrackClaim());
+    }
+
+    private boolean isProceedOrNotSettleClaim(CaseData caseData) {
+        return caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence() || caseData.isFullDefenceNotPaid();
+    }
+
+    private boolean isClaimantOrDefendantRejectMediation(CaseData caseData) {
+        return (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation())
+            || caseData.hasDefendantNotAgreedToFreeMediation();
+    }
+
+    private void updateClaimEndState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
+        response.state(setUpCaseState(response, updatedData));
     }
 }
