@@ -648,6 +648,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
             return mapper.convertValue(response.getData(), CaseData.class);
         }
+
         @Test
         void shouldChangeCaseState_whenApplicantAgreeClaimSettlement() {
             CaseData caseData = CaseDataBuilder.builder()
