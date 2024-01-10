@@ -199,7 +199,7 @@ notifications:
   respondentSolicitorAcknowledgeClaim: "b7ade9ca-da8b-4605-a296-ccee3d7d7a93"
   failedPayment: "b7b98d09-6794-4d8d-8550-cc219c91ee8c"
   solicitorClaimDismissedWithin4Months: "5f415268-b48c-49b1-9dd0-3784a62b64aa"
-  solicitorClaimDismissedWithin14Days: "1bd4b095-e812-4677-a0f4-0f91ed9f6515"
+  solicitorClaimDismissedWithin14Days: "a437bb82-5293-45aa-8ac9-a7536bdab4fe"
   solicitorClaimDismissedWithinDeadline: "7da39b72-f772-46a7-8296-35bef9521f43"
   claimantSolicitorCaseWillProgressOffline: "d004304d-a7f4-4440-a13b-753cb2d57a74"
   claimantSolicitorAgreedExtensionDate: "0b731d97-bba5-4994-944b-10dfbed2ce6b"
