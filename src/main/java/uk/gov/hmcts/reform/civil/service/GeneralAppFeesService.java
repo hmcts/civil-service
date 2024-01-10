@@ -45,7 +45,7 @@ public class GeneralAppFeesService {
             .calculatedAmountInPence(BigDecimal.ZERO).code(FREE_REF).version("1").build();
 
     protected static final List<GeneralApplicationTypes> VARY_TYPES
-            = Arrays.asList(GeneralApplicationTypes.VARY_JUDGEMENT,
+            = Arrays.asList(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT,
             GeneralApplicationTypes.VARY_ORDER);
     protected static final List<GeneralApplicationTypes> SET_ASIDE
             = List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT);
@@ -58,7 +58,7 @@ public class GeneralAppFeesService {
         Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
         int typeSize = caseData.getGeneralAppType().getTypes().size();
         if (CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), VARY_TYPES)) {
-            //only minus 1 as VARY_JUDGEMENT can't be multi selected
+            //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected
             typeSize--;
             result = getFeeForGA(feesConfiguration.getAppnToVaryOrSuspend(), "miscellaneous", "other");
         }
