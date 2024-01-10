@@ -1193,15 +1193,15 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    private boolean isPaymentDateAfterToday(LocalDate paymentDate) {
-        return nonNull(paymentDate)
-            && paymentDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
-    }
-
-    @JsonIgnore
     public boolean hasApplicant1AcceptedCcj() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
-            .filter(ClaimantLiPResponse::hasApplicant1AcceptedCcj).isPresent();
+            .filter(ClaimantLiPResponse::hasApplicant1RequestedCcj).isPresent();
+    }
+
+    @JsonIgnore
+    private boolean isPaymentDateAfterToday(LocalDate paymentDate) {
+        return nonNull(paymentDate)
+            && paymentDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
 }
