@@ -84,6 +84,7 @@ public enum CaseEvent {
 
     REVIEW_HEARING_EXCEPTION(USER),
     UPDATE_NEXT_HEARING_DETAILS(USER),
+    UpdateNextHearingInfo(USER),
 
     ASSIGN_LIP_DEFENDANT(USER),
 
