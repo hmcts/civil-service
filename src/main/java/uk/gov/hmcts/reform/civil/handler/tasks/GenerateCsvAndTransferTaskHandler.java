@@ -18,6 +18,8 @@ import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.CaseStateSearchService;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -36,14 +38,22 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
     private static final String subject = "OCMC Mediation Data";
     private static final String filename = "ocmc_mediation_data.csv";
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-
         List<CaseDetails> cases = caseSearchService.getCases();
-        List<CaseData> inMediationCases = cases.stream()
-            .map(caseDetailsConverter::toCaseData)
-            .filter(checkMediationMovedDate).toList();
+        List<CaseData> inMediationCases;
+        if (externalTask.getVariable("claimMovedDate") != null) {
+            LocalDate erroredDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
+            inMediationCases = cases.stream()
+               .map(caseDetailsConverter::toCaseData)
+               .filter(checkErrorCasesWithDate(erroredDate)).toList();
+        } else {
+            inMediationCases = cases.stream()
+               .map(caseDetailsConverter::toCaseData)
+               .filter(checkMediationMovedDate).toList();
+        }
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), inMediationCases.size());
         String[] headers = {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
             "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
@@ -62,6 +72,12 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     private  Predicate<CaseData> checkMediationMovedDate = caseData ->
         caseData.getClaimMovedToMediationOn() != null
             && now().minusDays(1).equals(caseData.getClaimMovedToMediationOn());
+
+    private Predicate<CaseData> checkErrorCasesWithDate(LocalDate errorDate) {
+        return caseData ->
+            caseData.getClaimMovedToMediationOn() != null && errorDate != null
+                && errorDate.equals(caseData.getClaimMovedToMediationOn());
+    }
 
     private Optional<EmailData> prepareEmail(String generateCsvData) {
         InputStreamSource inputSource = new ByteArrayResource(generateCsvData.getBytes(StandardCharsets.UTF_8));
