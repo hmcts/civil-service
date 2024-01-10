@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIM_ISSUE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIM_INTENTION_TRANSLATED_DOCUMENT;
+
 
 @Data
 @AllArgsConstructor
@@ -26,6 +28,7 @@ public class TranslatedDocument {
         switch (documentType) {
             case DEFENDANT_RESPONSE : return DEFENCE_TRANSLATED_DOCUMENT;
             case CLAIM_ISSUE : return CLAIM_ISSUE_TRANSLATED_DOCUMENT;
+            case CLAIM_INTENTION : return CLAIM_INTENTION_TRANSLATED_DOCUMENT;
             default: throw new DocumentUploadException("No document file type found for Translated document");
         }
     }

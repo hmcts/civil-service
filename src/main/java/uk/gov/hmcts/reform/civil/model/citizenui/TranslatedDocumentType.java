@@ -2,5 +2,6 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 public enum TranslatedDocumentType {
     DEFENDANT_RESPONSE,
-    CLAIM_ISSUE;
+    CLAIM_ISSUE,
+    CLAIM_INTENTION;
 }
