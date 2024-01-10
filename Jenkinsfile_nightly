@@ -85,7 +85,7 @@ withNightlyPipeline(type, product, component) {
 
   afterAlways('fullFunctionalTest') {
     archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
-    env.TESTS_FOR_ACCESSIBILITY = false
+    env.TESTS_FOR_ACCESSIBILITY = true
   }
 
   afterAlways('fortify-scan') {
