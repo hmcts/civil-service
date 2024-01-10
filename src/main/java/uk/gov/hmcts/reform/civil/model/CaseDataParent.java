@@ -820,6 +820,7 @@ public class CaseDataParent implements MappableObject {
                 && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
     }
 
+    @JsonIgnore
     public boolean isFullDefenceNotPaid() {
         return NO.equals(getApplicant1FullDefenceConfirmAmountPaidSpec());
     }
