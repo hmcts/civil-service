@@ -13,7 +13,6 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CL
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIM_INTENTION_TRANSLATED_DOCUMENT;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
