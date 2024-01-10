@@ -21,7 +21,9 @@ import uk.gov.hmcts.reform.civil.service.search.CaseStateSearchService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -103,6 +105,21 @@ class GenerateCsvAndTransferHandlerTest {
         verify(searchService).getCases();
         verify(mediationCsvServiceFactory, times(0)).getMediationCSVService(any());
         verify(sendGridClient, times(0)).sendEmail(anyString(), any());
+        verify(externalTaskService).complete(externalTask);
+    }
+
+    @Test
+    void should_handle_task_from_external_variable() {
+        String date = (claimToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK))).toString();
+        when(externalTask.getVariable(any())).thenReturn(date);
+        when(searchService.getCases()).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
+        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
+        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
+
+        inMediationCsvHandler.execute(externalTask, externalTaskService);
+        verify(searchService).getCases();
+        verify(sendGridClient).sendEmail(anyString(), any());
+        verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask);
     }
 
