@@ -652,11 +652,11 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_whenApplicantAgreeClaimSettlement() {
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimIssued()
-                    .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
-                    .applicant1PartAdmitConfirmAmountPaidSpec(YES)
-                    .build().toBuilder()
-                    .responseClaimMediationSpecRequired(YES).build();
+                .atStateClaimIssued()
+                .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
+                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
+                .build().toBuilder()
+                .responseClaimMediationSpecRequired(YES).build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -682,6 +682,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
         }
+
     }
 
     @Test
