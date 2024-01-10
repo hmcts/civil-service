@@ -149,7 +149,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData),
-            PARTY_NAME, getLegalOrganizationDef2Name(caseData)
+            PARTY_NAME, caseData.getRespondent2().getPartyName()
         );
     }
 
