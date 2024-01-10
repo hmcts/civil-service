@@ -1461,7 +1461,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input1")
                 .isEqualTo("Each party must upload to the Digital Portal copies of all documents which they wish the"
-                               + " court to consider when reaching its decision not less than 14 days before "
+                               + " court to consider when reaching its decision not less than 21 days before "
                                + "the hearing.");
             assertThat(response.getData()).extracting("smallClaimsDocuments").extracting("input2")
                 .isEqualTo("The court may refuse to consider any document which has not been uploaded to the "
@@ -1476,7 +1476,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("smallClaimsWitnessStatement").extracting("input1")
                 .isEqualTo("Each party must upload to the Digital Portal copies of all witness statements of the"
-                               + " witnesses upon whose evidence they intend to rely at the hearing not less than 14"
+                               + " witnesses upon whose evidence they intend to rely at the hearing not less than 21"
                                + " days before the hearing.");
             assertThat(response.getData()).extracting("smallClaimsWitnessStatement").doesNotHaveToString("input2");
             assertThat(response.getData()).extracting("smallClaimsWitnessStatement").doesNotHaveToString("input3");
@@ -1549,7 +1549,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("smallClaimsRoadTrafficAccident").extracting("input")
                 .isEqualTo("Photographs and/or a place of the accident location shall be prepared and agreed by the "
-                               + "parties and uploaded to the Digital Portal no later than 14 days before the "
+                               + "parties and uploaded to the Digital Portal no later than 21 days before the "
                                + "hearing.");
             assertThat(response.getData()).extracting("disposalHearingHearingTime").extracting("input")
                 .isEqualTo("This claim will be listed for final disposal before a judge on the first available date "
