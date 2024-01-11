@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,13 +32,12 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::notifyClaimReconsiderationUpheld
+            this::notifyClaimReconsiderationUpheldToDefendant
         );
     }
 
@@ -53,7 +51,7 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimReconsiderationUpheld(CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimReconsiderationUpheldToDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         if (caseData.getRespondent1() != null && !caseData.getRespondent1().getPartyName().isEmpty()) {
