@@ -52,7 +52,7 @@ public class SettlementAgreementFormMapper {
                 .claimant(claimant)
                 .defendant(defendant)
                 .claimReferenceNumber(caseData.getLegacyCaseReference())
-                .totalClaimAmount(totalClaimAmount)
+                .totalClaimAmount(getClaimAmount(caseData))
                 .settlementAgreedDate(getSettlementDate(caseData))
                 .settlementSubmittedDate(caseData.getRespondent1ResponseDate())
                 .build();
@@ -98,5 +98,13 @@ public class SettlementAgreementFormMapper {
 
     private static long getNumberOfInstallmentsAfterFirst(BigDecimal totalAmount, BigDecimal paymentAmount) {
         return totalAmount.divide(paymentAmount, 0, RoundingMode.CEILING).longValue() - 1;
+    }
+
+    private String getClaimAmount(CaseData caseData) {
+        BigDecimal claimAmount = caseData.getTotalClaimAmount();
+        if (caseData.isPartAdmitClaimSpec()) {
+            claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
+        }
+        return claimAmount.toString();
     }
 }

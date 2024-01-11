@@ -10,6 +10,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -73,10 +75,12 @@ public class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCall
     }
 
     @Test
-    void shouldNotGenerateForm_whenPartyTypeIsCompanyOROrganisation() {
+    void shouldNotGenerateForm_whenApplicantNotAcceptedRepaymentPlan() {
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(caseDocument);
 
         CaseData caseData = CaseDataBuilder.builder()
+                .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                 .respondent1(PartyBuilder.builder()
                         .soleTrader().build().toBuilder()
                         .type(Party.Type.ORGANISATION)

@@ -37,7 +37,7 @@ public class GenerateSettlementAgreementFormCallbackHandler extends CallbackHand
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> updatedCaseDataBuilder = caseData.toBuilder();
 
-        if (!caseData.getRespondent1().isIndividualORSoleTrader()) {
+        if (caseData.isPayImmediately() || caseData.hasApplicantRejectedRepaymentPlan()) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
