@@ -386,7 +386,7 @@ public class CaseDataBuilder {
     private List<IdValue<Bundle>> caseBundles;
     private RespondToClaim respondToClaim;
     private RespondentResponseTypeSpec respondent1ClaimResponseTypeForSpec;
-    private PaymentType applicant1RepaymentOptionForDefendantSpec;
+
     private YesOrNo defendantSingleResponseToBothClaimants;
     private RespondentResponseTypeSpec respondent2ClaimResponseTypeForSpec;
     private UnemployedComplexTypeLRspec respondToClaimAdmitPartUnemployedLRspec;
@@ -1607,11 +1607,6 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addApplicant2() {
         this.addApplicant2 = YES;
-        return this;
-    }
-
-    public CaseDataBuilder applicant1RepaymentOptionForDefendantSpec(PaymentType applicant1RepaymentOptionForDefendantSpec) {
-        this.applicant1RepaymentOptionForDefendantSpec = applicant1RepaymentOptionForDefendantSpec;
         return this;
     }
 
