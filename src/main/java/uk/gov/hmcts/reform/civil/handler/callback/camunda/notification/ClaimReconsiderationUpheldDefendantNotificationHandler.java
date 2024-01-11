@@ -33,13 +33,12 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final OrganisationService organisationService;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::notifyClaimReconsiderationUpheld
+            this::notifyClaimReconsiderationUpheldToDefendant
         );
     }
 
@@ -53,7 +52,7 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimReconsiderationUpheld(CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimReconsiderationUpheldToDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
         if (caseData.getRespondent1() != null && !caseData.getRespondent1().getPartyName().isEmpty()) {

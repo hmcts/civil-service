@@ -36,7 +36,7 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT),
-            this::notifyClaimReconsiderationUpheld
+            this::notifyClaimReconsiderationUpheldToClaimant
         );
     }
 
@@ -50,14 +50,17 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
         return EVENTS;
     }
 
-    private CallbackResponse notifyClaimReconsiderationUpheld(CallbackParams callbackParams) {
+    private CallbackResponse notifyClaimReconsiderationUpheldToClaimant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        notificationService.sendMail(
-            getApplicantEmail(caseData),
-            getTemplate(),
-            addProperties(caseData),
-            getReferenceTemplate(caseData)
-        );
+        if (caseData.getApplicantSolicitor1UserDetails().getEmail() != null) {
+            notificationService.sendMail(
+                caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                getTemplate(),
+                addProperties(caseData),
+                getReferenceTemplate(caseData)
+            );
+        }
+
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
@@ -79,8 +82,4 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
         return String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
     }
 
-    private String getApplicantEmail(CaseData caseData) {
-        return caseData.getApplicantSolicitor1UserDetails().getEmail() != null
-            ? caseData.getApplicantSolicitor1UserDetails().getEmail() : caseData.getClaimantUserDetails().getEmail();
-    }
 }
