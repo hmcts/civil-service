@@ -679,6 +679,21 @@ public class CaseDataTest {
     }
 
     @Test
+    void shouldReturnTrueWhenBilingual() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+            .build();
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
+
+        //When
+        boolean result = caseData.isBilingual();
+
+        //Then
+        assertTrue(result);
+    }
+
+    @Test
     void shouldReturnTrueWhenRespondentSignSettlementAgreementIsNotNull() {
 
         //Given
@@ -726,6 +741,7 @@ public class CaseDataTest {
         assertThat(caseData.isSettlementAgreementDeadlineExpired()).isTrue();
     }
 
+    @Test
     void shouldReturnClaimFeeInPence_whenClaimFeeExists() {
         //Given
         CaseData caseData = CaseData.builder()
