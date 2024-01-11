@@ -136,7 +136,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             return CaseState.IN_MEDIATION.name();
         } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
             return CaseState.All_FINAL_ORDERS_ISSUED.name();
-        } else if (Objects.nonNull(updatedData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && updatedData.isClaimantIntentionSettlePartAdmit()) {
+        } else if (isCaseSettledAllowed(updatedData)) {
             return CaseState.CASE_SETTLED.name();
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
             return CaseState.CASE_DISMISSED.name();
@@ -147,6 +147,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         }
     }
 
+    private boolean isCaseSettledAllowed(CaseData caseData) {
+        return ((Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
+                && caseData.isClaimantIntentionSettlePartAdmit())
+                || (caseData.isPartAdmitImmediatePaymentClaimSettled()));
+    }
+  
     private void updateCcjRequestPaymentDetails(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
         if (hasCcjRequest(caseData)) {
             CCJPaymentDetails ccjPaymentDetails = judgementService.buildJudgmentAmountSummaryDetails(caseData);
