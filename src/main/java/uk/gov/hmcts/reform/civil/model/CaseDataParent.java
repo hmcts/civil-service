@@ -816,8 +816,15 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isBilingual() {
-        return null != claimantBilingualLanguagePreference
-                && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
+        System.out.println(getClaimantBilingualLanguagePreference());
+        System.out.println(Optional.ofNullable(getClaimantBilingualLanguagePreference())
+                               .map(String::toString)
+                               .filter(Language.BOTH.toString()::equals)
+                               .isPresent());
+        return Optional.ofNullable(getClaimantBilingualLanguagePreference())
+            .map(String::toString)
+            .filter(Language.BOTH.toString()::equals)
+            .isPresent();
     }
 
     @JsonIgnore
