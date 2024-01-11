@@ -61,7 +61,6 @@ public class ClaimReconsiderationUpheldClaimantNotificationHandler extends Callb
             );
         }
 
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
