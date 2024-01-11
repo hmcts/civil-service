@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
@@ -196,6 +197,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(updatedData::caseManagementLocation);
+
+        //This the flowafter request for reconsideration
+        if (featureToggleService.isSdoR2Enabled() && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())) {
+                //updatedData.drawDirectionsOrder(null);
+            log.info("Case is in CASE_PROGRESSION .", caseData.getCcdCaseReference());
+        }
 
         if (V_1.equals(callbackParams.getVersion())) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
