@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -49,6 +50,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Time time;
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
+    private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -76,10 +78,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        LocalDateTime applicant1ResponseDate = LocalDateTime.now();
 
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
-                .applicant1ResponseDate(LocalDateTime.now())
-                .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI));
+            .applicant1ResponseDate(applicant1ResponseDate)
+            .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
+            .respondent1RespondToSettlementAgreementDeadline(getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate));
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
@@ -96,6 +100,11 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         updateClaimEndState(response, updatedData);
 
         return response.build();
+    }
+
+    private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
+        return caseData.hasApplicant1SignedSettlementAgreement()
+            ? deadlinesCalculator.getRespondToSettlementAgreementDeadline(responseDate) : null;
     }
 
     private boolean isProceedsInHeritageSystemAllowed(CaseData caseData) {
@@ -127,7 +136,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             return CaseState.IN_MEDIATION.name();
         } else if (updatedData.hasApplicant1SignedSettlementAgreement() && updatedData.hasApplicantAcceptedRepaymentPlan()) {
             return CaseState.All_FINAL_ORDERS_ISSUED.name();
-        } else if (Objects.nonNull(updatedData.getApplicant1PartAdmitIntentionToSettleClaimSpec()) && updatedData.isClaimantIntentionSettlePartAdmit()) {
+        } else if (isCaseSettledAllowed(updatedData)) {
             return CaseState.CASE_SETTLED.name();
         } else if (updatedData.hasApplicantNotProceededWithClaim()) {
             return CaseState.CASE_DISMISSED.name();
@@ -138,6 +147,12 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         }
     }
 
+    private boolean isCaseSettledAllowed(CaseData caseData) {
+        return ((Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
+                && caseData.isClaimantIntentionSettlePartAdmit())
+                || (caseData.isPartAdmitImmediatePaymentClaimSettled()));
+    }
+  
     private void updateCcjRequestPaymentDetails(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
         if (hasCcjRequest(caseData)) {
             CCJPaymentDetails ccjPaymentDetails = judgementService.buildJudgmentAmountSummaryDetails(caseData);

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -36,6 +39,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
@@ -81,6 +85,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     private LocationHelper locationHelper;
     @MockBean
     private LocationRefDataService locationRefDataService;
+    @MockBean
+    private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private ClaimantResponseCuiCallbackHandler handler;
     private static final String  courtLocation = "Site 1 - Adr 1 - AAA 111";
@@ -127,6 +133,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             given(time.now()).willReturn(submittedDate);
             given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(locationRefData));
+            given(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).willReturn(LocalDateTime.MAX);
         }
 
         @Test
@@ -595,6 +602,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+            CaseData data = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(data.getRespondent1RespondToSettlementAgreementDeadline()).isEqualTo(LocalDateTime.MAX);
         }
 
         @Test
@@ -654,6 +663,26 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
         }
+
+        @Test
+        void shouldChangeCaseState_whenApplicantAcceptedPartAdmitImmediatePayment() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .applicant1AcceptAdmitAmountPaidSpec(YES)
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
+                    .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
+                    .respondent1(Party.builder()
+                            .type(COMPANY)
+                            .companyName("Test Inc")
+                            .build())
+                    .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
+        }
+
     }
 
     @Test
