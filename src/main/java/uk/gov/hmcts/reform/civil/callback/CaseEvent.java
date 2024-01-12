@@ -325,7 +325,6 @@ public enum CaseEvent {
     GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC(CAMUNDA),
     GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC(CAMUNDA);
 
-
     private final UserType userType;
 
     public boolean isCamundaEvent() {
