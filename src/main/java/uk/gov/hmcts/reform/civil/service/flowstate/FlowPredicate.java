@@ -1010,6 +1010,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> isRespondentResponseLangIsBilingual =
         CaseDataParent::isRespondentResponseBilingual;
 
+    public static final Predicate<CaseData> isApplicantLangBilingual =
+        CaseDataParent::isBilingual;
+
     public static final Predicate<CaseData> agreePartAdmitSettle =
         CaseData::isPartAdmitClaimSettled;
 
