@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDateTime;
@@ -58,6 +59,9 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private SpecReferenceNumberRepository specReferenceNumberRepository;
+
+    @MockBean
+    private CaseFlagsInitialiser caseFlagInitialiser;
 
     @MockBean
     private Time time;
