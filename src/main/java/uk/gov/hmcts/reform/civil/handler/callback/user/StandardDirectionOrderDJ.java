@@ -457,8 +457,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                        + "is filed. The bundle will include a case summary and a "
                                                        + "chronology.")
                                                .dateToToggle(dateToShowTrue)
-                                               .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(22)))
-                                               .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(30)))
+                                               .date1(LocalDate.now().plusWeeks(22))
+                                               .date2(LocalDate.now().plusWeeks(30))
                                                .build());
 
         caseDataBuilder.trialOrderMadeWithoutHearingDJ(TrialOrderMadeWithoutHearingDJ.builder()
