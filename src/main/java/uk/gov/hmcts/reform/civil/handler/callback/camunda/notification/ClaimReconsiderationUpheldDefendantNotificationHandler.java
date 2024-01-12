@@ -56,7 +56,7 @@ public class ClaimReconsiderationUpheldDefendantNotificationHandler extends Call
 
         if (caseData.getRespondent1() != null && !caseData.getRespondent1().getPartyName().isEmpty()) {
             notificationService.sendMail(
-                caseData.getRespondent1().getPartyEmail(),
+                caseData.getRespondentSolicitor1EmailAddress(),
                 getTemplate(),
                 addProperties(caseData),
                 getReferenceTemplate(caseData)
