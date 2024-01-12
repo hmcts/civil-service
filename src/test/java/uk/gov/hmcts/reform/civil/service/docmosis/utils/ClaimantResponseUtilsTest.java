@@ -99,7 +99,7 @@ public class ClaimantResponseUtilsTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"IMMEDIATELY,Immediately", "BY_SET_DATE,By a set date", "SUGGESTION_OF_REPAYMENT_PLAN,By installments"})
+    @CsvSource({"IMMEDIATELY,Immediately", "BY_SET_DATE,By a set date", "SUGGESTION_OF_REPAYMENT_PLAN,By instalments"})
     void shouldReturnDefendantRepaymentOption(RespondentResponsePartAdmissionPaymentTimeLRspec input, String expectedOutput) {
         CaseData caseData = CaseData.builder()
             .defenceAdmitPartPaymentTimeRouteRequired(input)
