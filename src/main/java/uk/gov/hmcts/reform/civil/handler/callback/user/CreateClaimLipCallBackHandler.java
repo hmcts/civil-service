@@ -77,9 +77,9 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         if (Optional.ofNullable(callbackParams.getRequest()).map(CallbackRequest::getEventId).isPresent()) {
             caseDataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             caseDataBuilder.businessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));
+            caseDataBuilder.respondent1DetailsForClaimDetailsTab(caseDataBuilder.build().getRespondent1().toBuilder().flags(null).build());
+            caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseDataBuilder);
         }
-
-        caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseDataBuilder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
