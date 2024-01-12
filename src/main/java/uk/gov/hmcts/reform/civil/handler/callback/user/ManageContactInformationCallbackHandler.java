@@ -93,13 +93,13 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicito
 @RequiredArgsConstructor
 public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
-    private static final String INVALID_CASE_STATE_ERROR = "You will be able to run the manage contact information " +
+    private static final String INVALID_CASE_STATE_ERROR = "You will be able run the manage contact information " +
         "event once the claimant has responded.";
     private static final String CHECK_LITIGATION_FRIEND_ERROR_TITLE = "Check the litigation friend's details";
     private static final String CHECK_LITIGATION_FRIEND_ERROR = "After making these changes, please ensure that the "
         + "litigation friend's contact information is also up to date.";
-    private static final String CREATE_ORDER_ERROR_EXPERTS = "Adding a new expert is not permitted in this screen. Please delete any new experts.";
-    private static final String CREATE_ORDER_ERROR_WITNESSES = "Adding a new witness is not permitted in this screen. Please delete any new witnesses.";
+    private static final String CREATE_ORDER_ERROR_EXPERTS = "Please create an order to add more experts.";
+    private static final String CREATE_ORDER_ERROR_WITNESSES = "Please create an order to add more witnesses.";
     private static final List<String> ADMIN_ROLES = List.of(
         "caseworker-civil-admin");
     private static final List<CaseEvent> EVENTS = List.of(

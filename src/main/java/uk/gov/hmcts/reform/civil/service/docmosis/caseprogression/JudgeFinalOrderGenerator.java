@@ -508,8 +508,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     case COST_DRAFTSMAN_FOR_THE_CLAIMANT -> format("Costs draftsman for %s, the claimant.", name);
                     case THE_CLAIMANT_IN_PERSON -> format("%s, the claimant, in person.", name);
                     case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> format("A lay representative for %s, the claimant.", name);
-                    case LEGAL_EXECUTIVE_FOR_THE_CLAIMANT -> format("Legal Executive for %s, the claimant.", name);
-                    case SOLICITORS_AGENT_FOR_THE_CLAIMANT -> format("Solicitor's Agent for %s, the claimant.", name);
                     case CLAIMANT_NOT_ATTENDING -> claimantNotAttendingText(caseData, isClaimant2, name);
                 };
             }
@@ -525,8 +523,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     case COST_DRAFTSMAN_FOR_THE_CLAIMANT -> format("Costs draftsman for %s, the claimant.", name);
                     case THE_CLAIMANT_IN_PERSON -> format("%s, the claimant, in person.", name);
                     case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> format("A lay representative for %s, the claimant.", name);
-                    case LEGAL_EXECUTIVE_FOR_THE_CLAIMANT -> format("Legal Executive for %s, the claimant.", name);
-                    case SOLICITORS_AGENT_FOR_THE_CLAIMANT -> format("Solicitor's Agent for %s, the claimant.", name);
                     case CLAIMANT_NOT_ATTENDING -> claimantNotAttendingText(caseData, isClaimant2, name);
                 };
             }
@@ -549,8 +545,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     case THE_DEFENDANT_IN_PERSON -> format("%s, the defendant, in person.", name);
                     case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> format("A lay representative for %s, the defendant.", name
                     );
-                    case LEGAL_EXECUTIVE_FOR_THE_DEFENDANT -> format("Legal Executive for %s, the defendant.", name);
-                    case SOLICITORS_AGENT_FOR_THE_DEFENDANT -> format("Solicitor's Agent for %s, the defendant.", name);
                     case DEFENDANT_NOT_ATTENDING -> defendantNotAttendingText(caseData, isDefendant2, name);
                 };
             }
@@ -566,8 +560,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     case COST_DRAFTSMAN_FOR_THE_DEFENDANT -> format("Costs draftsman for %s, the defendant.", name);
                     case THE_DEFENDANT_IN_PERSON -> format("%s, the defendant, in person.", name);
                     case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> format("A lay representative for %s, the defendant.", name);
-                    case LEGAL_EXECUTIVE_FOR_THE_DEFENDANT -> format("Legal Executive for %s, the defendant.", name);
-                    case SOLICITORS_AGENT_FOR_THE_DEFENDANT -> format("Solicitor's Agent for %s, the defendant.", name);
                     case DEFENDANT_NOT_ATTENDING -> defendantNotAttendingText(caseData, isDefendant2, name);
                 };
             }

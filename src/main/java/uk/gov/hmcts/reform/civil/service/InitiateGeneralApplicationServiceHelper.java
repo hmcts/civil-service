@@ -83,10 +83,8 @@ public class InitiateGeneralApplicationServiceHelper {
 
         List<CaseAssignedUserRole> applicantSolicitor = userRoles.getCaseAssignedUserRoles()
             .stream().filter(user -> !respondentSolicitors.contains(user)).collect(Collectors.toList());
-        boolean sameDefSol1v2 = applicantSolicitor.size() == 2
-                && applicantSolicitor.get(0).getUserId()
-                .equals(applicantSolicitor.get(1).getUserId());
-        if (!CollectionUtils.isEmpty(applicantSolicitor) && (applicantSolicitor.size() == 1 || sameDefSol1v2)) {
+
+        if (!CollectionUtils.isEmpty(applicantSolicitor) && applicantSolicitor.size() == 1) {
 
             CaseAssignedUserRole applnSol = applicantSolicitor.get(0);
 
