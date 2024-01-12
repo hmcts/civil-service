@@ -93,7 +93,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "sole.trader@email.com",
+                "respondentsolicitor@example.com",
                 TEMPLATE_ID,
                 getNotificationDataMap(caseData),
                 "reconsideration-upheld-applicant-notification-000DC001"
