@@ -9,7 +9,7 @@ def type = "java"
 def product = "civil"
 def component = "service"
 def ccdBranch = "feat/CIV-10909-request-for-reconsideration-notification"
-def camundaBranch = "master"
+def camundaBranch = "feat/CIV-10909-request-for-reconsideration-notification"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 AppPipelineConfig pipelineConf
