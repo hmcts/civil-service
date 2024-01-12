@@ -155,9 +155,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                     .claimDetailsNotificationDate(currentDateTime)
                     .addLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
                     .addLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
-                    .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
-                    .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
-                    .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
+                    .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
+                    .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
+                    .nextDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime).toLocalDate())
                     .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
                             6,
                             notificationDate
@@ -172,7 +172,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             CaseData.CaseDataBuilder builder = caseData.toBuilder()
                     .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
                     .claimDetailsNotificationDate(currentDateTime)
-                    .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
+                    .nextDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime).toLocalDate())
                     .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
                             6,
                             notificationDate
@@ -180,7 +180,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
             if (Objects.nonNull(caseData.getRespondent1())) {
                 builder.respondent1ResponseDeadline(
-                        deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
+                        deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
             }
 
             if (Objects.nonNull(caseData.getRespondent1())
@@ -191,7 +191,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             if (Objects.nonNull(caseData.getRespondent2())
                 && YES.equals(caseData.getAddRespondent2())) {
                 builder.respondent2ResponseDeadline(
-                        deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
+                        deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
             }
 
             if (Objects.nonNull(caseData.getRespondent2())
