@@ -248,7 +248,7 @@ notifications:
   applicantSolicitor1DefaultJudgmentRequested: "cd0486ac-cc6a-4429-865a-7746f64bf4dd"
   interimJudgmentRequestedClaimant: "7c6d0840-3f38-4fc5-a26b-676f27bb8fe2"
   interimJudgmentApprovalClaimant: "fd5a7c12-6ba2-46b8-a423-61ff3f76fb73"
-  standardDirectionOrderDJTemplate: "90667080-6b20-48f2-b9ea-349fa8ec78e4"
+  standardDirectionOrderDJTemplate: "ecf754da-a07e-40b5-bcfd-512d4123c44a"
   interimJudgmentRequestedDefendant: "0a926106-b8cf-4d07-be6b-1b451c7895e9"
   interimJudgmentApprovalDefendant: "eec6d8aa-4771-4f25-afcf-f4ce2c8bc3d2"
   caseworkerDefaultJudgmentRequested: "b20f34f4-39c3-4488-9961-f6d4ae7247f4"
