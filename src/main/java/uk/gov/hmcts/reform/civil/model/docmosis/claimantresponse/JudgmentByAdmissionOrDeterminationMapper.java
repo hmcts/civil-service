@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
@@ -25,6 +27,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final JudgementService judgementService;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
@@ -53,6 +57,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         String totalInterest = judgementService.ccjJudgmentInterest(caseData).toString();
 
         JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
+        LocalDateTime now = LocalDateTime.now();
         return builder
             .formHeader(getFormHeader(caseData))
             .formName(getFormName(caseData))
@@ -72,7 +77,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .ccjAlreadyPaidAmount(judgementService.ccjJudgmentPaidAmount(caseData).toString())
             .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).toString())
             .defendantResponse(caseData.getRespondent1ClaimResponseTypeForSpec())
-            .generationDate(LocalDate.now())
+            .generationDate(now.toLocalDate())
+            .generationDateTime(now.format(formatter))
             .build();
     }
 

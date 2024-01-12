@@ -41,6 +41,7 @@ public class JudgmentByAdmissionOrDetermination implements MappableObject {
     private final String ccjSubtotal;
     private final String ccjAlreadyPaidAmount;
     private final String ccjFinalTotal;
+    private final String generationDateTime;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
     private final LocalDate generationDate;

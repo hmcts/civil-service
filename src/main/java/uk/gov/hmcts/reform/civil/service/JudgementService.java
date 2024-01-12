@@ -29,6 +29,7 @@ public class JudgementService {
             .ccjJudgmentSummarySubtotalAmount(ccjJudgementSubTotal(caseData))
             .ccjJudgmentTotalStillOwed(ccjJudgmentFinalTotal(caseData))
             .ccjJudgmentAmountInterestToDate(ccjJudgmentInterest(caseData))
+            .ccjPaymentPaidSomeAmount(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount())
             .ccjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData))
             .ccjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData))
             .ccjJudgmentFixedCostOption(caseData.getCcjPaymentDetails()
