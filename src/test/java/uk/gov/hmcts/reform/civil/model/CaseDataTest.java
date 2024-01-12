@@ -694,6 +694,54 @@ public class CaseDataTest {
     }
 
     @Test
+    void shouldReturnTrueWhenRespondentSignSettlementAgreementIsNotNull() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+                .caseDataLip(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO).build())
+                .build();
+
+        //When
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentRespondedToSettlementAgreement();
+
+        //Then
+        assertTrue(isRespondentSignSettlementAgreement);
+    }
+
+    @Test
+    void shouldReturnFalseWhenRespondentSignSettlementAgreementIsNull() {
+
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+                .caseDataLip(CaseDataLiP.builder().build())
+                .build();
+
+        //When
+        boolean isRespondentSignSettlementAgreement = caseData.isRespondentRespondedToSettlementAgreement();
+
+        //Then
+        assertFalse(isRespondentSignSettlementAgreement);
+    }
+
+    @Test
+    void isSignSettlementAgreementDeadlineNotExpired_thenFalse() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStatePriorToRespondToSettlementAgreementDeadline().build();
+        //When
+        //Then
+        assertThat(caseData.isSettlementAgreementDeadlineExpired()).isFalse();
+    }
+
+    @Test
+    void isSignSettlementAgreementDeadlineExpired_thenTrue() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder().atStatePastRespondToSettlementAgreementDeadline().build();
+        //When
+        //Then
+        assertThat(caseData.isSettlementAgreementDeadlineExpired()).isTrue();
+    }
+
+    @Test
     void shouldReturnClaimFeeInPence_whenClaimFeeExists() {
         //Given
         CaseData caseData = CaseData.builder()
@@ -771,7 +819,7 @@ public class CaseDataTest {
                     .build();
 
             //When
-            boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
+            boolean isRespondentSignSettlementAgreement = caseData.isRespondentRespondedToSettlementAgreement();
 
             //Then
             assertTrue(isRespondentSignSettlementAgreement);
@@ -813,22 +861,6 @@ public class CaseDataTest {
             //Then
             assertTrue(isJudgementDateNotPermitted);
         }
-    }
-
-    @Test
-    void shouldReturnFalseWhenRespondentSignSettlementAgreementIsNull() {
-
-        //Given
-        CaseData caseData = CaseDataBuilder.builder()
-            .caseDataLip(CaseDataLiP.builder().build())
-            .build();
-
-        //When
-        boolean isRespondentSignSettlementAgreement = caseData.isRespondentSignSettlementAgreement();
-
-        //Then
-        assertFalse(isRespondentSignSettlementAgreement);
-
     }
 }
 
