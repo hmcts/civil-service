@@ -19,7 +19,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getClaimantSuggestedRepaymentType;
+import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getClaimantRepaymentType;
 import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantRepaymentOption;
 
 @Component
@@ -48,7 +48,7 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
         return InterlocutoryJudgementDoc.builder()
             .claimIssueDate(caseData.getIssueDate())
             .claimNumber(caseData.getLegacyCaseReference())
-            .claimantRequestRepaymentBy(getClaimantSuggestedRepaymentType(caseData))
+            .claimantRequestRepaymentBy(getClaimantRepaymentType(caseData))
             .claimantRequestRepaymentLastDateBy(getClaimantRequestRepaymentLastDateBy(caseData))
             .claimantResponseSubmitDateTime(caseData.getApplicant1ResponseDate())
             .claimantResponseToDefendantAdmission(getClaimantResponseToDefendantAdmission(caseData))

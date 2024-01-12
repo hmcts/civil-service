@@ -21,14 +21,13 @@ public class ClaimantResponseUtils {
         //NO-OP
     }
 
-    public static String getClaimantSuggestedRepaymentType(CaseData caseData) {
+    public static String getClaimantRepaymentType(CaseData caseData) {
         PaymentType claimantRepaymentOption = caseData.getApplicant1RepaymentOptionForDefendantSpec();
         if (claimantRepaymentOption == null) {
             return "No payment type selected";
         }
-
         if (claimantRepaymentOption == PaymentType.REPAYMENT_PLAN) {
-            return "By installments";
+            return "By instalments";
         } else {
             return claimantRepaymentOption.getDisplayedValue();
         }
@@ -41,7 +40,7 @@ public class ClaimantResponseUtils {
         }
 
         if (defendantRepaymentOption == RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN) {
-            return "By installments";
+            return "By instalments";
         } else {
             return defendantRepaymentOption.getDisplayedValue();
         }
@@ -51,12 +50,13 @@ public class ClaimantResponseUtils {
         BigDecimal paymentAmount = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
         LocalDate firstRepaymentDate = caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec();
         PaymentFrequencyClaimantResponseLRspec repaymentFrequency = caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec();
+
         BigDecimal claimantTotalAmount = caseData.getTotalClaimAmount();
         if (isNull(firstRepaymentDate) || isNull(paymentAmount) || isNull(repaymentFrequency)) {
             return null;
         }
-
         long numberOfInstallmentsAfterFirst = getNumberOfInstallmentsAfterFirst(claimantTotalAmount, paymentAmount);
+
         return switch (repaymentFrequency) {
             case ONCE_ONE_WEEK -> firstRepaymentDate.plusWeeks(numberOfInstallmentsAfterFirst);
             case ONCE_TWO_WEEKS -> firstRepaymentDate.plusWeeks(2 * numberOfInstallmentsAfterFirst);
