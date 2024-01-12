@@ -58,7 +58,7 @@ public class InterlocutoryJudgementDocMapperTest {
         try (MockedStatic mocked = mockStatic(ClaimantResponseUtils.class)) {
             given(repaymentPlanDecisionCalculator.calculateDisposableIncome(
                 caseData)).willReturn(-100.989999);
-            given(ClaimantResponseUtils.getClaimantSuggestedRepaymentType(caseData)).willReturn("Immediately");
+            given(ClaimantResponseUtils.getClaimantRepaymentType(caseData)).willReturn("Immediately");
             given(ClaimantResponseUtils.getDefendantRepaymentOption(caseData)).willReturn("By a set date");
             given(ClaimantResponseUtils.getClaimantFinalRepaymentDate(caseData)).willReturn(null);
             given(ClaimantResponseUtils.getDefendantFinalRepaymentDate(caseData)).willReturn(LocalDate.of(
