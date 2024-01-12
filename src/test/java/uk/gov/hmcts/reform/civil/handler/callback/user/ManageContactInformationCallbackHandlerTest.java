@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -142,9 +143,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                 .companyName("Test Inc")
                                 .build())
                 .respondent1(Party.builder()
-                                .type(COMPANY)
-                                .companyName("Test Inc")
-                                .build())
+                                 .type(COMPANY)
+                                 .companyName("Test Inc")
+                                 .build())
                 .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
                 .ccdCaseReference(123L)
                 .build();
@@ -211,16 +212,18 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            List<String> expected = List.of("CLAIMANT 1: Mr. John Rambo",
-                                                                "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend",
-                                                                "CLAIMANT 1: Individuals attending for the legal representative",
-                                                                "CLAIMANT 1: Witnesses",
-                                                                "CLAIMANT 1: Experts",
-                                                                "DEFENDANT 1: Test Inc",
-                                                                "DEFENDANT 1: Individuals attending for the organisation",
-                                                                "DEFENDANT 1: Individuals attending for the legal representative",
-                                                                "DEFENDANT 1: Witnesses",
-                                                                "DEFENDANT 1: Experts");
+            List<String> expected = List.of(
+                "CLAIMANT 1: Mr. John Rambo",
+                "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend",
+                "CLAIMANT 1: Individuals attending for the legal representative",
+                "CLAIMANT 1: Witnesses",
+                "CLAIMANT 1: Experts",
+                "DEFENDANT 1: Test Inc",
+                "DEFENDANT 1: Individuals attending for the organisation",
+                "DEFENDANT 1: Individuals attending for the legal representative",
+                "DEFENDANT 1: Witnesses",
+                "DEFENDANT 1: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -231,7 +234,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedList_WhenInvokedFor1v1AsApplicantSolicitor() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("[APPLICANTSOLICITORONE]"));
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of(
+                "[APPLICANTSOLICITORONE]"));
             CaseData caseData = CaseDataBuilder.builder()
                 .addRespondent1LitigationFriend()
                 .addApplicant1LitigationFriend()
@@ -256,7 +260,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend",
                 "CLAIMANT 1: Individuals attending for the legal representative",
                 "CLAIMANT 1: Witnesses",
-                "CLAIMANT 1: Experts");
+                "CLAIMANT 1: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -267,7 +272,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedList_WhenInvokedFor1v1AsRespondentSolicitor() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("[RESPONDENTSOLICITORONE]"));
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of(
+                "[RESPONDENTSOLICITORONE]"));
             CaseData caseData = CaseDataBuilder.builder()
                 .addRespondent1LitigationFriend()
                 .addApplicant1LitigationFriend()
@@ -293,7 +299,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 1: Individuals attending for the organisation",
                 "DEFENDANT 1: Individuals attending for the legal representative",
                 "DEFENDANT 1: Witnesses",
-                "DEFENDANT 1: Experts");
+                "DEFENDANT 1: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -337,7 +344,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 1: Individuals attending for the organisation",
                 "DEFENDANT 1: Individuals attending for the legal representative",
                 "DEFENDANT 1: Witnesses",
-                "DEFENDANT 1: Experts");
+                "DEFENDANT 1: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -348,7 +356,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedList_WhenInvokedFor2v1AsApplicantSolicitor() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("[APPLICANTSOLICITORONE]"));
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of(
+                "[APPLICANTSOLICITORONE]"));
             CaseData caseData = CaseDataBuilder.builder()
                 .addApplicant1LitigationFriend()
                 .addApplicant2LitigationFriend()
@@ -376,7 +385,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "CLAIMANT 2: Litigation Friend: Applicant Two Litigation Friend",
                 "CLAIMANTS: Individuals attending for the legal representative",
                 "CLAIMANTS: Witnesses",
-                "CLAIMANTS: Experts");
+                "CLAIMANTS: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -387,7 +397,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedList_WhenInvokedFor2v1AsRespondentSolicitor() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("[RESPONDENTSOLICITORONE]"));
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of(
+                "[RESPONDENTSOLICITORONE]"));
             CaseData caseData = CaseDataBuilder.builder()
                 .addApplicant1LitigationFriend()
                 .addApplicant2LitigationFriend()
@@ -414,7 +425,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 1: Individuals attending for the organisation",
                 "DEFENDANT 1: Individuals attending for the legal representative",
                 "DEFENDANT 1: Witnesses",
-                "DEFENDANT 1: Experts");
+                "DEFENDANT 1: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -457,7 +469,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 2: Mr. John Rambo",
                 "DEFENDANTS: Individuals attending for the legal representative",
                 "DEFENDANTS: Witnesses",
-                "DEFENDANTS: Experts");
+                "DEFENDANTS: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -468,7 +481,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedList_WhenInvokedFor1v2SameSolicitorAsApplicantSolicitor() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("[APPLICANTSOLICITORONE]"));
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of(
+                "[APPLICANTSOLICITORONE]"));
             CaseData caseData = CaseDataBuilder.builder()
                 .addRespondent1LitigationFriend()
                 .addApplicant1LitigationFriend()
@@ -497,7 +511,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend",
                 "CLAIMANT 1: Individuals attending for the legal representative",
                 "CLAIMANT 1: Witnesses",
-                "CLAIMANT 1: Experts");
+                "CLAIMANT 1: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -508,7 +523,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedList_WhenInvokedFor1v2SameSolicitorAsRespondentSolicitor() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("[RESPONDENTSOLICITORONE]"));
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of(
+                "[RESPONDENTSOLICITORONE]"));
             CaseData caseData = CaseDataBuilder.builder()
                 .addRespondent1LitigationFriend()
                 .addRespondent2LitigationFriend()
@@ -540,7 +556,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 2: Litigation Friend: Litigation Friend",
                 "DEFENDANTS: Individuals attending for the legal representative",
                 "DEFENDANTS: Witnesses",
-                "DEFENDANTS: Experts");
+                "DEFENDANTS: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -591,7 +608,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 2: Litigation Friend: Litigation Friend",
                 "DEFENDANT 2: Individuals attending for the legal representative",
                 "DEFENDANT 2: Witnesses",
-                "DEFENDANT 2: Experts");
+                "DEFENDANT 2: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -602,7 +620,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedList_WhenInvokedFor1v2DifferentSolicitorAsApplicantSolicitor() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("[APPLICANTSOLICITORONE]"));
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of(
+                "[APPLICANTSOLICITORONE]"));
             CaseData caseData = CaseDataBuilder.builder()
                 .addRespondent1LitigationFriend()
                 .addRespondent2LitigationFriend()
@@ -634,7 +653,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "CLAIMANT 1: Litigation Friend: Applicant Litigation Friend",
                 "CLAIMANT 1: Individuals attending for the legal representative",
                 "CLAIMANT 1: Witnesses",
-                "CLAIMANT 1: Experts");
+                "CLAIMANT 1: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -645,7 +665,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedList_WhenInvokedFor1v2DifferentSolicitorAsRespondentSolicitorOne() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("[RESPONDENTSOLICITORONE]"));
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of(
+                "[RESPONDENTSOLICITORONE]"));
             CaseData caseData = CaseDataBuilder.builder()
                 .addRespondent1LitigationFriend()
                 .addRespondent2LitigationFriend()
@@ -677,7 +698,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 1: Individuals attending for the organisation",
                 "DEFENDANT 1: Individuals attending for the legal representative",
                 "DEFENDANT 1: Witnesses",
-                "DEFENDANT 1: Experts");
+                "DEFENDANT 1: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -688,7 +710,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnExpectedList_WhenInvokedFor1v2DifferentSolicitorAsRespondentSolicitorTwo() {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("[RESPONDENTSOLICITORTWO]"));
+            when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of(
+                "[RESPONDENTSOLICITORTWO]"));
             CaseData caseData = CaseDataBuilder.builder()
                 .addRespondent1LitigationFriend()
                 .addRespondent2LitigationFriend()
@@ -720,7 +743,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 "DEFENDANT 2: Litigation Friend: Litigation Friend",
                 "DEFENDANT 2: Individuals attending for the legal representative",
                 "DEFENDANT 2: Witnesses",
-                "DEFENDANT 2: Experts");
+                "DEFENDANT 2: Experts"
+            );
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             List<String> actual = listFromDynamicList(updatedData.getUpdateDetailsForm().getPartyChosen());
@@ -781,6 +805,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .firstName("First")
                 .lastName("Name")
                 .build();
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
         }
 
         @Test
@@ -1391,6 +1423,18 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 String errorMessage = "After making these changes, please ensure that the "
                     + "litigation friend's contact information is also up to date.";
 
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .addApplicant1LitigationFriend()
+                    .addApplicant2LitigationFriend()
+                    .addRespondent1LitigationFriend()
+                    .addRespondent2LitigationFriend()
+                    .buildClaimIssuedPaymentCaseData();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
                 CaseData caseData = CaseDataBuilder.builder()
                     .updateDetailsForm(UpdateDetailsForm.builder()
                                            .partyChosen(DynamicList.builder()
@@ -1426,6 +1470,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .build())
                     .build();
 
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .buildClaimIssuedPaymentCaseData();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
@@ -1436,6 +1488,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @Test
             void shouldReturnPostcodeError() {
                 given(postcodeValidator.validate(any())).willReturn(List.of("Please enter Postcode"));
+
+                CaseData caseDataBefore = CaseDataBuilder.builder()
+                    .applicant1(Party.builder().type(INDIVIDUAL).build())
+                    .applicant2(Party.builder().type(INDIVIDUAL).build())
+                    .respondent1(Party.builder().type(INDIVIDUAL).build())
+                    .respondent2(Party.builder().type(INDIVIDUAL).build())
+                    .buildClaimIssuedPaymentCaseData();
+                given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
