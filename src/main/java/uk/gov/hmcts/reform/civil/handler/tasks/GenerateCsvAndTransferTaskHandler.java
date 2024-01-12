@@ -66,10 +66,8 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
                 emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
             }
         } catch (Exception e) {
-            log.error("Generate CSV and Sending Email to MMT failed - " + e.getMessage(), e);
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
         }
-
     }
 
     private Optional<EmailData> prepareEmail(String generateCsvData) {
