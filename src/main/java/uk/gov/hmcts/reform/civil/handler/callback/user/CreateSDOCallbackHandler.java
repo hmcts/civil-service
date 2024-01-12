@@ -299,7 +299,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         DisposalHearingFinalDisposalHearing tempDisposalHearingFinalDisposalHearing =
             DisposalHearingFinalDisposalHearing.builder()
                 .input("This claim will be listed for final disposal before a judge on the first available date after")
-                .date(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(16)))
+                .date(LocalDate.now().plusWeeks(16))
                 .build();
 
         updatedData.disposalHearingFinalDisposalHearing(tempDisposalHearingFinalDisposalHearing).build();
