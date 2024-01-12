@@ -35,6 +35,9 @@ public abstract class ElasticSearchService {
 
     public List<CaseDetails> getInMediationCases(LocalDate claimMovedDate) {
 
+        if (claimMovedDate == null) {
+            claimMovedDate = LocalDate.now().minusDays(1);
+        }
         SearchResult searchResult = coreCaseDataService.searchCases(queryInMediationCases(START_INDEX, claimMovedDate));
         int pages = calculatePages(searchResult);
         List<CaseDetails> caseDetails = new ArrayList<>(searchResult.getCases());

@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -40,6 +41,17 @@ abstract class ElasticSearchServiceTest {
         assertThat(searchService.getCases()).isEqualTo(searchResult.getCases());
         verify(coreCaseDataService).searchCases(queryCaptor.capture());
         assertThat(queryCaptor.getValue()).usingRecursiveComparison().isEqualTo(buildQuery(0));
+    }
+
+    @Test
+    void shouldCallGetMediationCasesOnce_WhenCasesReturnEqualsTotalCases() {
+        SearchResult searchResult = buildSearchResultWithTotalCases(1);
+
+        when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
+
+        assertThat(searchService.getInMediationCases(any())).isEqualTo(searchResult.getCases());
+        verify(coreCaseDataService).searchCases(queryCaptor.capture());
+        assertThat(queryCaptor.getValue()).usingRecursiveComparison().isEqualTo(buildQueryInMediation(0, LocalDate.now().minusDays(1)));
     }
 
     @Test
@@ -90,4 +102,6 @@ abstract class ElasticSearchServiceTest {
     }
 
     protected abstract Query buildQuery(int fromValue);
+
+    protected abstract Query buildQueryInMediation(int fromValue, LocalDate date);
 }
