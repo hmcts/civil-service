@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.search.CaseStateSearchService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -114,6 +115,7 @@ class GenerateCsvAndTransferHandlerTest {
 
     @Test
     void should_handle_task_from_external_variable() {
+
         String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK))).toString();
         when(externalTask.getVariable(any())).thenReturn(date);
         when(searchService.getInMediationCases(any())).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
