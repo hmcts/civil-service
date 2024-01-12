@@ -121,7 +121,7 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
                 reference.capture()
             );
             //Email to respondent1
-            assertThat(targetEmail.getAllValues().get(0)).isEqualTo("sole.trader@email.com");
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo("respondentsolicitor@example.com");
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo("template-id");
             assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(getNotificationDataMap(caseData));
             assertThat(reference.getAllValues().get(0)).isEqualTo("reconsideration-upheld-applicant-notification-000DC001");
