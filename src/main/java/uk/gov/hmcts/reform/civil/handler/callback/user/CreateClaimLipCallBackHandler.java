@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 
 @Slf4j
 @Service
@@ -80,10 +83,23 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             caseDataBuilder.respondent1DetailsForClaimDetailsTab(caseDataBuilder.build().getRespondent1().toBuilder().flags(null).build());
             caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseDataBuilder);
         }
-
+        addOrginsationPoliciesforClaimantLip(caseDataBuilder);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    private void addOrginsationPoliciesforClaimantLip(CaseData.CaseDataBuilder caseDataBuilder) {
+        CaseData caseData = caseDataBuilder.build();
+        //         LiP are not represented or registered
+        if (caseData.getApplicant1OrganisationPolicy() == null) {
+            caseDataBuilder
+                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
+                                                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
+                                                  .build());
+        }
+
+        OrgPolicyUtils.addMissingOrgPolicies(caseDataBuilder);
     }
 
 }
