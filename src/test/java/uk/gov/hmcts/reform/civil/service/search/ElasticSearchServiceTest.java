@@ -77,6 +77,31 @@ abstract class ElasticSearchServiceTest {
     }
 
     @Test
+    void shouldCallGetInMediationCasesOnce_WhenCasesRetrievedEqualsEsSearchLimit() {
+        SearchResult searchResult = buildSearchResultWithTotalCases(10);
+
+        when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
+
+        assertThat(searchService.getInMediationCases(LocalDate.now().minusDays(1))).hasSize(1);
+        verify(coreCaseDataService).searchCases(queryCaptor.capture());
+        assertThat(queryCaptor.getValue()).usingRecursiveComparison().isEqualTo(buildQueryInMediation(0, LocalDate.now().minusDays(1)));
+    }
+
+    @Test
+    void shouldCallGetInMediationCasesMultipleTimes_WhenCasesReturnedIsMoreThanEsSearchLimit() {
+        SearchResult searchResult = buildSearchResultWithTotalCases(11);
+
+        when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
+
+        assertThat(searchService.getInMediationCases(LocalDate.now().minusDays(1))).hasSize(2);
+        verify(coreCaseDataService, times(2)).searchCases(queryCaptor.capture());
+
+        List<Query> capturedQueries = queryCaptor.getAllValues();
+        assertThat(capturedQueries.get(0)).usingRecursiveComparison().isEqualTo(buildQueryInMediation(0, LocalDate.now().minusDays(1)));
+        assertThat(capturedQueries.get(1)).usingRecursiveComparison().isEqualTo(buildQueryInMediation(10, LocalDate.now().minusDays(1)));
+    }
+    
+    @Test
     void shouldCallGetCasesMultipleTimes_WhenCasesReturnedIsMoreThanEsSearchLimit() {
         SearchResult searchResult = buildSearchResultWithTotalCases(11);
 
