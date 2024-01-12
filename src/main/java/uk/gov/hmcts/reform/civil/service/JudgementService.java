@@ -48,7 +48,7 @@ public class JudgementService {
         return errors;
     }
 
-    public BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
+    private BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
         if (caseData.isPartAdmitClaimSpec()) {
             claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
@@ -56,12 +56,12 @@ public class JudgementService {
         return claimAmount;
     }
 
-    public BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
+    private BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
         return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee() :
             MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
     }
 
-    public BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
+    private BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
         return (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES)
             ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
     }
@@ -70,19 +70,19 @@ public class JudgementService {
         return caseData.getUpFixedCostAmount(ccjJudgmentClaimAmount(caseData));
     }
 
-    public BigDecimal ccjJudgmentInterest(CaseData caseData) {
+    private BigDecimal ccjJudgmentInterest(CaseData caseData) {
         return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
             caseData.getTotalInterest();
     }
 
-    public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
+    private BigDecimal ccjJudgementSubTotal(CaseData caseData) {
         return ccjJudgmentClaimAmount(caseData)
             .add(ccjJudgmentClaimFee(caseData))
             .add(ccjJudgmentInterest(caseData))
             .add(ccjJudgmentFixedCost(caseData));
     }
 
-    public BigDecimal ccjJudgmentFinalTotal(CaseData caseData) {
+    private BigDecimal ccjJudgmentFinalTotal(CaseData caseData) {
         return ccjJudgementSubTotal(caseData)
             .subtract(ccjJudgmentPaidAmount(caseData));
     }
