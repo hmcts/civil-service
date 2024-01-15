@@ -515,7 +515,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @BeforeEach
             void setup() {
                 when(time.now()).thenReturn(notificationDate);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class))).thenReturn(deadline);
+                when(deadlinesCalculator.plus14DaysDeadline(any(LocalDateTime.class))).thenReturn(deadline);
             }
 
             @Test
@@ -591,7 +591,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldSetDetailsNotificationDeadlineTo4pmDeadline_whenNotifyClaimBefore4pm() {
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class)))
+                when(deadlinesCalculator.plus14DaysDeadline(any(LocalDateTime.class)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
@@ -610,7 +610,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldSetDetailsNotificationDeadlineTo4pmDeadline_whenNotifyClaimAfter4pm() {
 
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class)))
+                when(deadlinesCalculator.plus14DaysDeadline(any(LocalDateTime.class)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1()
@@ -633,7 +633,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate cosNotifyDate = LocalDate.of(2021, 4, 2);
 
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
+                when(deadlinesCalculator.plus14DaysDeadline(cosNotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
@@ -664,7 +664,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 LocalDate cosNotifyDate = LocalDate.of(2021, 4, 2);
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
+                when(deadlinesCalculator.plus14DaysDeadline(cosNotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
@@ -697,7 +697,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate cosDef2NotifyDate = LocalDate.of(2021, 5, 2);
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
 
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef1NotifyDate.atTime(15, 05)))
+                when(deadlinesCalculator.plus14DaysDeadline(cosDef1NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
@@ -729,7 +729,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate cosDef2NotifyDate = LocalDate.of(2021, 4, 28);
 
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef2NotifyDate.atTime(15, 05)))
+                when(deadlinesCalculator.plus14DaysDeadline(cosDef2NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
@@ -761,7 +761,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate cosDef2NotifyDate = LocalDate.of(2021, 4, 2);
 
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDef1NotifyDate.atTime(15, 05)))
+                when(deadlinesCalculator.plus14DaysDeadline(cosDef1NotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified1v2RespondentLiP()
@@ -792,7 +792,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 LocalDate cosNotifyDate = LocalDate.of(2021, 4, 26);
                 when(time.now()).thenReturn(LocalDateTime.of(2021, 5, 3, 15, 05));
 
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosNotifyDate.atTime(15, 05)))
+                when(deadlinesCalculator.plus14DaysDeadline(cosNotifyDate.atTime(15, 05)))
                     .thenReturn(claimDetailsNotificationDeadline);
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -825,7 +825,7 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             @BeforeEach
             void setup() {
                 when(time.now()).thenReturn(notificationDate);
-                when(deadlinesCalculator.plus14DaysAt4pmDeadline(any(LocalDateTime.class))).thenReturn(deadline);
+                when(deadlinesCalculator.plus14DaysDeadline(any(LocalDateTime.class))).thenReturn(deadline);
             }
 
             @Test
