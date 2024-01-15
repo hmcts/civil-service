@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlowBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+import uk.gov.hmcts.reform.civil.utils.JudgmentAdmissionUtils;
 import uk.gov.hmcts.reform.civil.utils.JudicialReferralUtils;
 
 import java.util.Map;
@@ -514,6 +515,9 @@ public class StateFlowEngine {
                 .transitionTo(FULL_ADMIT_PROCEED).onlyIf(fullDefenceProceed)
                 .transitionTo(FULL_ADMIT_NOT_PROCEED).onlyIf(fullDefenceNotProceed)
                 .transitionTo(FULL_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
+                })
                 .transitionTo(FULL_ADMIT_REJECT_REPAYMENT).onlyIf(rejectRepaymentPlan)
                 .transitionTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyIf(ccjRequestJudgmentByAdmission.and(isPayImmediately))
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
@@ -530,6 +534,9 @@ public class StateFlowEngine {
                 .transitionTo(PART_ADMIT_PAY_IMMEDIATELY).onlyIf(partAdmitPayImmediately)
                 .transitionTo(PART_ADMIT_AGREE_SETTLE).onlyIf(agreePartAdmitSettle)
                 .transitionTo(PART_ADMIT_AGREE_REPAYMENT).onlyIf(acceptRepaymentPlan)
+                .set((c, flags) -> {
+                    flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), JudgmentAdmissionUtils.getLIPJudgmentAdmission(c));
+                })
                 .transitionTo(PART_ADMIT_REJECT_REPAYMENT).onlyIf(rejectRepaymentPlan)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaff)
                 .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)

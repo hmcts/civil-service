@@ -50,6 +50,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDism
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedAfterDetailNotifiedExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseDismissedPastHearingFeeDue;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.casemanMarksMediationUnsuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.certificateOfServiceEnabled;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDetailsNotifiedTimeExtension;
@@ -1803,7 +1804,7 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenTakenOfflineByStaffMediationUnsuccessful() {
+        void shouldReturnFalse_whenTakenOfflineByStaffAfterMediationUnsuccessful() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
                 .takenOfflineByStaff()
@@ -1813,7 +1814,17 @@ class FlowPredicateTest {
         }
 
         @Test
-        void shouldReturnFalse_whenTakenOfflineByStaffInMediation() {
+        void shouldReturnFalse_whenTakenOfflineByStaffAfterMediationUnsuccessfulCarm() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_ONE)
+                .takenOfflineByStaff()
+                .build();
+
+            assertFalse(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenTakenOfflineByStaffInMediationBeforeMediationUnsuccessful() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
                 .takenOfflineByStaff()
@@ -1822,6 +1833,36 @@ class FlowPredicateTest {
                 .build();
 
             assertTrue(takenOfflineByStaffBeforeMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseworkerMarksMediationUnsuccessful() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
+                .build().toBuilder()
+                .build();
+
+            assertTrue(casemanMarksMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenCaseworkerMarksMediationUnsuccessfulCarm() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationUnsuccessfulCarm(MultiPartyScenario.ONE_V_ONE)
+                .build().toBuilder()
+                .build();
+
+            assertTrue(casemanMarksMediationUnsuccessful.test(caseData));
+        }
+
+        @Test
+        void shouldReturnFalse_whenCaseworkerMarksMediationSuccessful() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateMediationSuccessful(MultiPartyScenario.ONE_V_ONE)
+                .build().toBuilder()
+                .build();
+
+            assertFalse(casemanMarksMediationUnsuccessful.test(caseData));
         }
     }
 

@@ -23,7 +23,7 @@ public class CUIIdamClientService {
         this.cmcPinVerifyConfiguration = cmcPinVerifyConfiguration;
     }
 
-    public int authenticatePinUser(String pin, String state) {
+    public Response authenticatePinUser(String pin, String state) {
 
         final String encodedRedirectUrl = URLEncoder.encode(cmcPinVerifyConfiguration.getRedirectUrl() + "/receiver", StandardCharsets.UTF_8);
         log.info("Redirect URL: " + encodedRedirectUrl);
@@ -33,7 +33,7 @@ public class CUIIdamClientService {
             encodedRedirectUrl,
             state
         )) {
-            return response.status();
+            return response;
         }
     }
 }

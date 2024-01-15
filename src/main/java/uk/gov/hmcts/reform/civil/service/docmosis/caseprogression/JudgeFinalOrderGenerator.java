@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -58,8 +57,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     private final DocumentGeneratorService documentGeneratorService;
     private final IdamClient idamClient;
     private final LocationRefDataService locationRefDataService;
-    private final DocumentHearingLocationHelper locationHelper;
     private final FeatureToggleService featureToggleService;
+    private LocationRefData caseManagementLocationDetails;
 
     private static final String NOTICE_RECIEVED_CAN_PROCEED = "received notice of the trial and determined that it was reasonable to proceed in their absence.";
     private static final String NOTICE_RECIEVED_CANNOT_PROCEED =     "received notice of the trial, the Judge was not satisfied that it was "
@@ -101,7 +100,14 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
 
     private JudgeFinalOrderForm getFreeFormOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-        LocationRefData locationRefData = locationRefDataService.getCcmccLocation(authorisation);
+        List<LocationRefData>  locationRefData = locationRefDataService.getHearingCourtLocations(authorisation);
+        var foundLocations = locationRefData.stream()
+            .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
+        if (!foundLocations.isEmpty()) {
+            caseManagementLocationDetails = foundLocations.get(0);
+        } else {
+            throw new IllegalArgumentException("Base Court Location not found, in location data");
+        }
 
         var freeFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
@@ -128,16 +134,23 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .withoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
             .judgeNameTitle(userDetails.getFullName())
-            .courtName(locationRefData.getVenueName())
+            .courtName(caseManagementLocationDetails.getSiteName())
             .courtLocation(featureToggleService.isHmcEnabled()
                                ? getHearingLocationText(caseData, authorisation)
-                               : LocationRefDataService.getDisplayEntry(locationRefData));
+                               : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails));
         return freeFormOrderBuilder.build();
     }
 
     private JudgeFinalOrderForm getAssistedOrder(CaseData caseData, String authorisation) {
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-        LocationRefData locationRefData = locationRefDataService.getCcmccLocation(authorisation);
+        List<LocationRefData>  locationRefData = locationRefDataService.getHearingCourtLocations(authorisation);
+        var foundLocations = locationRefData.stream()
+            .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
+        if (!foundLocations.isEmpty()) {
+            caseManagementLocationDetails = foundLocations.get(0);
+        } else {
+            throw new IllegalArgumentException("Base Court Location not found, in location data");
+        }
 
         var assistedFormOrderBuilder = JudgeFinalOrderForm.builder()
             .caseNumber(caseData.getCcdCaseReference().toString())
@@ -147,10 +160,12 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
             .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
             .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
-            .courtName(locationRefData.getVenueName())
+            .courtName(caseManagementLocationDetails.getSiteName())
             .finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
             .orderMadeDate(orderMadeDateBuilder(caseData))
-            .courtLocation(LocationRefDataService.getDisplayEntry(locationRefData))
+            .courtLocation(featureToggleService.isHmcEnabled()
+                               ? getHearingLocationText(caseData, authorisation)
+                               : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails))
             .judgeNameTitle(userDetails.getFullName())
             .recordedToggle(nonNull(caseData.getFinalOrderRecitals()))
             .recordedText(nonNull(caseData.getFinalOrderRecitalsRecorded()) ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
@@ -169,7 +184,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .furtherHearingLength(getFurtherHearingLength(caseData))
             .datesToAvoid(getDatesToAvoid(caseData))
             .showFurtherHearingLocationAlt(isDefaultCourt(caseData))
-            .furtherHearingLocationDefault(LocationRefDataService.getDisplayEntry(locationRefData))
+            .furtherHearingLocationDefault(LocationRefDataService.getDisplayEntry(caseManagementLocationDetails))
             .furtherHearingLocationAlt(getFurtherHearingLocationAlt(caseData))
             .furtherHearingMethod(getFurtherHearingMethod(caseData))
             .hearingNotes(getHearingNotes(caseData))
@@ -493,6 +508,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     case COST_DRAFTSMAN_FOR_THE_CLAIMANT -> format("Costs draftsman for %s, the claimant.", name);
                     case THE_CLAIMANT_IN_PERSON -> format("%s, the claimant, in person.", name);
                     case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> format("A lay representative for %s, the claimant.", name);
+                    case LEGAL_EXECUTIVE_FOR_THE_CLAIMANT -> format("Legal Executive for %s, the claimant.", name);
+                    case SOLICITORS_AGENT_FOR_THE_CLAIMANT -> format("Solicitor's Agent for %s, the claimant.", name);
                     case CLAIMANT_NOT_ATTENDING -> claimantNotAttendingText(caseData, isClaimant2, name);
                 };
             }
@@ -508,6 +525,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     case COST_DRAFTSMAN_FOR_THE_CLAIMANT -> format("Costs draftsman for %s, the claimant.", name);
                     case THE_CLAIMANT_IN_PERSON -> format("%s, the claimant, in person.", name);
                     case LAY_REPRESENTATIVE_FOR_THE_CLAIMANT -> format("A lay representative for %s, the claimant.", name);
+                    case LEGAL_EXECUTIVE_FOR_THE_CLAIMANT -> format("Legal Executive for %s, the claimant.", name);
+                    case SOLICITORS_AGENT_FOR_THE_CLAIMANT -> format("Solicitor's Agent for %s, the claimant.", name);
                     case CLAIMANT_NOT_ATTENDING -> claimantNotAttendingText(caseData, isClaimant2, name);
                 };
             }
@@ -530,6 +549,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     case THE_DEFENDANT_IN_PERSON -> format("%s, the defendant, in person.", name);
                     case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> format("A lay representative for %s, the defendant.", name
                     );
+                    case LEGAL_EXECUTIVE_FOR_THE_DEFENDANT -> format("Legal Executive for %s, the defendant.", name);
+                    case SOLICITORS_AGENT_FOR_THE_DEFENDANT -> format("Solicitor's Agent for %s, the defendant.", name);
                     case DEFENDANT_NOT_ATTENDING -> defendantNotAttendingText(caseData, isDefendant2, name);
                 };
             }
@@ -545,6 +566,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                     case COST_DRAFTSMAN_FOR_THE_DEFENDANT -> format("Costs draftsman for %s, the defendant.", name);
                     case THE_DEFENDANT_IN_PERSON -> format("%s, the defendant, in person.", name);
                     case LAY_REPRESENTATIVE_FOR_THE_DEFENDANT -> format("A lay representative for %s, the defendant.", name);
+                    case LEGAL_EXECUTIVE_FOR_THE_DEFENDANT -> format("Legal Executive for %s, the defendant.", name);
+                    case SOLICITORS_AGENT_FOR_THE_DEFENDANT -> format("Solicitor's Agent for %s, the defendant.", name);
                     case DEFENDANT_NOT_ATTENDING -> defendantNotAttendingText(caseData, isDefendant2, name);
                 };
             }

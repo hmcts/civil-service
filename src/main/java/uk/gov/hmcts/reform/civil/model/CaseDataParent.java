@@ -95,6 +95,9 @@ import uk.gov.hmcts.reform.civil.model.finalorders.FinalOrderRepresentation;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetails;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMadeOnDetailsOrderWithoutNotice;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsReferredInStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -157,6 +160,7 @@ import java.util.Set;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Jacksonized
@@ -408,6 +412,7 @@ public class CaseDataParent implements MappableObject {
      */
     private final ResponseOneVOneShowTag showResponseOneVOneFlag;
     private final YesOrNo applicant1AcceptAdmitAmountPaidSpec;
+    private final YesOrNo applicant1FullDefenceConfirmAmountPaidSpec;
     private final YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
     private final YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
     private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
@@ -432,9 +437,14 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
-        return this.applicant1Represented == YesOrNo.NO;
+        return this.applicant1Represented == NO;
     }
 
+    @JsonIgnore
+    public boolean isApplicantRepresented() {
+        return this.applicant1Represented == YES;
+    }
+    
     /**
      * Adding for Certificate of Service.
      */
@@ -719,11 +729,29 @@ public class CaseDataParent implements MappableObject {
     private DynamicList transferCourtLocationList;
     private NotSuitableSdoOptions notSuitableSdoOptions;
     private TocTransferCaseReason tocTransferCaseReason;
+    private String claimantBilingualLanguagePreference;
 
     @JsonUnwrapped
     private final UpdateDetailsForm updateDetailsForm;
 
     private FastTrackAllocation fastTrackAllocation;
+
+    private YesOrNo showCarmFields;
+
+    @JsonUnwrapped
+    private UploadMediationDocumentsForm uploadMediationDocumentsForm;
+
+    private List<Element<MediationNonAttendanceStatement>> app1MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> app1MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> app2MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> app2MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> res1MediationDocumentsReferred;
+
+    private List<Element<MediationNonAttendanceStatement>> res2MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> res2MediationDocumentsReferred;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
@@ -790,4 +818,16 @@ public class CaseDataParent implements MappableObject {
             .map(DynamicListElement::getLabel)
             .orElse(null);
     }
+
+    @JsonIgnore
+    public boolean isBilingual() {
+        return null != claimantBilingualLanguagePreference
+                && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
+    }
+
+    @JsonIgnore
+    public boolean isFullDefenceNotPaid() {
+        return NO.equals(getApplicant1FullDefenceConfirmAmountPaidSpec());
+    }
+
 }

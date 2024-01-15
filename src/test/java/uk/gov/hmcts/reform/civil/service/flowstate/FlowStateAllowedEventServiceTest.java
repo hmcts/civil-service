@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_AFTER_PA
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
@@ -70,6 +71,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESUBMIT_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SERVICE_REQUEST_RECEIVED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.STANDARD_DIRECTION_ORDER_DJ;
@@ -572,7 +574,9 @@ class FlowStateAllowedEventServiceTest {
                         RECORD_JUDGMENT,
                         TRANSFER_ONLINE_CASE,
                         asyncStitchingComplete,
-                        CLAIMANT_RESPONSE_CUI
+                        CLAIMANT_RESPONSE_CUI,
+                        REQUEST_FOR_RECONSIDERATION,
+                        DECISION_ON_RECONSIDERATION_REQUEST
                     }
                 ),
                 of(

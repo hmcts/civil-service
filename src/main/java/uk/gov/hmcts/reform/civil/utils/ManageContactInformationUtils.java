@@ -131,11 +131,11 @@ public class ManageContactInformationUtils {
         }
     }
 
-    public static List<Element<UpdatePartyDetailsForm>> mapExpertsToUpdatePartyDetailsForm(List<Element<Expert>> experts) {
+    public static List<Element<UpdatePartyDetailsForm>> mapExpertsToUpdatePartyDetailsForm(Experts dqExperts) {
         List<Element<UpdatePartyDetailsForm>> newExperts = new ArrayList<>();
 
-        if (experts != null) {
-            for (Element<Expert> party : experts) {
+        if (dqExperts != null && dqExperts.getDetails() != null) {
+            for (Element<Expert> party : dqExperts.getDetails()) {
                 Expert expert = party.getValue();
                 newExperts.addAll(wrapElements(UpdatePartyDetailsForm.builder()
                                                    .firstName(expert.getFirstName())
@@ -150,9 +150,13 @@ public class ManageContactInformationUtils {
         return newExperts;
     }
 
-    public static List<Element<Expert>> mapUpdatePartyDetailsFormToDQExperts(List<Element<Expert>> existingDQExperts, List<Element<UpdatePartyDetailsForm>> formExperts) {
+    public static List<Element<Expert>> mapUpdatePartyDetailsFormToDQExperts(Experts existingDQExperts, List<Element<UpdatePartyDetailsForm>> formExperts) {
         List<Element<Expert>> newExperts = new ArrayList<>();
-        List<Expert> experts = unwrapElements(existingDQExperts);
+        List<Expert> experts = new ArrayList<>();
+
+        if (existingDQExperts != null && existingDQExperts.getDetails() != null) {
+            experts = unwrapElements(existingDQExperts.getDetails());
+        }
 
         if (formExperts != null) {
             for (Element<UpdatePartyDetailsForm> form : formExperts) {
@@ -191,11 +195,11 @@ public class ManageContactInformationUtils {
         return newExperts;
     }
 
-    public static List<Element<UpdatePartyDetailsForm>> mapWitnessesToUpdatePartyDetailsForm(List<Element<Witness>> witnesses) {
+    public static List<Element<UpdatePartyDetailsForm>> mapWitnessesToUpdatePartyDetailsForm(Witnesses dqWitnesses) {
         List<Element<UpdatePartyDetailsForm>> newWitnesses = new ArrayList<>();
 
-        if (witnesses != null) {
-            for (Element<Witness> party : witnesses) {
+        if (dqWitnesses != null && dqWitnesses.getDetails() != null) {
+            for (Element<Witness> party : dqWitnesses.getDetails()) {
                 Witness witness = party.getValue();
                 newWitnesses.addAll(wrapElements(UpdatePartyDetailsForm.builder()
                                                    .firstName(witness.getFirstName())
@@ -209,9 +213,13 @@ public class ManageContactInformationUtils {
         return newWitnesses;
     }
 
-    public static List<Element<Witness>> mapUpdatePartyDetailsFormToDQWitnesses(List<Element<Witness>> existingDQWitnesses, List<Element<UpdatePartyDetailsForm>> formWitnesses) {
+    public static List<Element<Witness>> mapUpdatePartyDetailsFormToDQWitnesses(Witnesses existingDQWitnesses, List<Element<UpdatePartyDetailsForm>> formWitnesses) {
         List<Element<Witness>> newWitnesses = new ArrayList<>();
-        List<Witness> witnesses = unwrapElements(existingDQWitnesses);
+        List<Witness> witnesses = new ArrayList<>();
+
+        if (existingDQWitnesses != null && existingDQWitnesses.getDetails() != null) {
+            witnesses = unwrapElements(existingDQWitnesses.getDetails());
+        }
 
         if (formWitnesses != null) {
             for (Element<UpdatePartyDetailsForm> form : formWitnesses) {
@@ -448,13 +456,13 @@ public class ManageContactInformationUtils {
     }
 
     private static boolean shouldAddExperts(Experts experts) {
-        return YES.equals(experts.getExpertRequired())
+        return experts != null && YES.equals(experts.getExpertRequired())
             && experts.getDetails() != null
             && !experts.getDetails().isEmpty();
     }
 
     private static boolean shouldAddWitnesses(Witnesses witnesses) {
-        return YES.equals(witnesses.getWitnessesToAppear())
+        return witnesses != null && YES.equals(witnesses.getWitnessesToAppear())
             && witnesses.getDetails() != null
             && !witnesses.getDetails().isEmpty();
     }

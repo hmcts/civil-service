@@ -10,11 +10,10 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
-import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
-
+import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
@@ -23,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
@@ -66,7 +66,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private CallbackResponse notifyRespondentForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime claimNotificationDate = time.now();
-
         final CaseData.CaseDataBuilder caseDataBuilder
             = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
 
@@ -90,6 +89,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
             ISSUED_ON, formatLocalDate(caseData.getIssueDate(), DATE),
             RESPOND_URL, pipInPostConfiguration.getRespondToClaimUrl(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_16_DIGIT_NUMBER, caseData.getCcdCaseReference().toString(),
             PIN, caseData.getRespondent1PinToPostLRspec().getAccessCode(),
             RESPONSE_DEADLINE, formatLocalDate(caseData.getRespondent1ResponseDeadline()
                                                    .toLocalDate(), DATE),
@@ -99,9 +99,10 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
 
     private void generatePIPLetter(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        byte[] letter = pipLetterGenerator.downloadLetter(caseData);
+        byte[] letterContent = pipLetterGenerator.downloadLetter(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
+
         List<String> recipients = Arrays.asList(caseData.getRespondent1().getPartyName());
-        bulkPrintService.printLetter(letter, caseData.getLegacyCaseReference(),
+        bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
                                      caseData.getLegacyCaseReference(), FIRST_CONTACT_PACK_LETTER_TYPE, recipients);
     }
 

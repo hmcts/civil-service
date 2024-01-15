@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.utils;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -28,5 +29,15 @@ public class DateUtils {
             }
         }
         return result;
+    }
+
+    public static boolean isAfterFourPM(LocalDateTime localDateTime) {
+        LocalTime localTime = localDateTime.toLocalTime();
+        return localTime.getHour() > 15;
+    }
+
+    public static LocalDate getRequiredDateBeforeFourPm(LocalDateTime localDateTime) {
+        return isAfterFourPM(localDateTime)
+            ? localDateTime.toLocalDate().plusDays(1) : localDateTime.toLocalDate();
     }
 }

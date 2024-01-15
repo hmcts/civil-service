@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.civil.utils.HearingFeeUtils;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
@@ -20,12 +21,11 @@ import uk.gov.hmcts.reform.payments.request.CreditAccountPaymentRequest;
 import uk.gov.hmcts.reform.payments.request.PBAServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.util.UUID;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
 import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.log;
 
@@ -53,40 +53,40 @@ public class PaymentsService {
         FeeDto claimFee = caseData.getClaimFee().toFeeDto();
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         var organisationName = organisationService.findOrganisationById(organisationId)
-                .map(Organisation::getName)
-                .orElseThrow(RuntimeException::new);
+            .map(Organisation::getName)
+            .orElseThrow(RuntimeException::new);
 
         String customerReference = ofNullable(caseData.getClaimIssuedPaymentDetails())
-                .map(PaymentDetails::getCustomerReference)
-                .orElse(caseData.getPaymentReference());
+            .map(PaymentDetails::getCustomerReference)
+            .orElse(caseData.getPaymentReference());
         CreditAccountPaymentRequest creditAccountPaymentRequest = null;
 
-        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory()))  {
+        if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
-                    .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
-                    .amount(claimFee.getCalculatedAmount())
-                    .caseReference(caseData.getLegacyCaseReference())
-                    .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-                    .customerReference(customerReference)
-                    .description("Claim issue payment")
-                    .organisationName(organisationName)
-                    .service(paymentsConfiguration.getService())
-                    .siteId(paymentsConfiguration.getSiteId())
-                    .fees(new FeeDto[]{claimFee})
-                    .build();
+                .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
+                .amount(claimFee.getCalculatedAmount())
+                .caseReference(caseData.getLegacyCaseReference())
+                .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+                .customerReference(customerReference)
+                .description("Claim issue payment")
+                .organisationName(organisationName)
+                .service(paymentsConfiguration.getService())
+                .siteId(paymentsConfiguration.getSiteId())
+                .fees(new FeeDto[]{claimFee})
+                .build();
         } else if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             creditAccountPaymentRequest = CreditAccountPaymentRequest.builder()
-                    .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
-                    .amount(claimFee.getCalculatedAmount())
-                    .caseReference(caseData.getLegacyCaseReference())
-                    .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-                    .customerReference(customerReference)
-                    .description("Claim issue payment")
-                    .organisationName(organisationName)
-                    .service(paymentsConfiguration.getSpecService())
-                    .siteId(paymentsConfiguration.getSpecSiteId())
-                    .fees(new FeeDto[]{claimFee})
-                    .build();
+                .accountNumber(caseData.getApplicantSolicitor1PbaAccounts().getValue().getLabel())
+                .amount(claimFee.getCalculatedAmount())
+                .caseReference(caseData.getLegacyCaseReference())
+                .ccdCaseNumber(caseData.getCcdCaseReference().toString())
+                .customerReference(customerReference)
+                .description("Claim issue payment")
+                .organisationName(organisationName)
+                .service(paymentsConfiguration.getSpecService())
+                .siteId(paymentsConfiguration.getSpecSiteId())
+                .fees(new FeeDto[]{claimFee})
+                .build();
         }
         return creditAccountPaymentRequest;
     }
@@ -104,9 +104,9 @@ public class PaymentsService {
         if (serviceRequestPBADetails == null) {
             error = "Fee details not received.";
         } else if (serviceRequestPBADetails.getFee() == null
-                || serviceRequestPBADetails.getFee().getCalculatedAmountInPence() == null
-                || isBlank(serviceRequestPBADetails.getFee().getVersion())
-                || isBlank(serviceRequestPBADetails.getFee().getCode())) {
+            || serviceRequestPBADetails.getFee().getCalculatedAmountInPence() == null
+            || isBlank(serviceRequestPBADetails.getFee().getVersion())
+            || isBlank(serviceRequestPBADetails.getFee().getCode())) {
             error = "Fees are not set correctly.";
         }
         if (!isBlank(error)) {
@@ -122,8 +122,8 @@ public class PaymentsService {
 
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         var organisationName = organisationService.findOrganisationById(organisationId)
-                .map(Organisation::getName)
-                .orElseThrow(RuntimeException::new);
+            .map(Organisation::getName)
+            .orElseThrow(RuntimeException::new);
         PBAServiceRequestDTO pbaServiceRequestDTO = null;
         if (serviceRequestPBADetails != null) {
             pbaServiceRequestDTO = PBAServiceRequestDTO.builder()
@@ -150,7 +150,11 @@ public class PaymentsService {
         } else {
             serviceReqReference = caseData.getHearingFeePBADetails().getServiceReqReference();
         }
-        return paymentsClient.createPbaPayment(serviceReqReference, authToken, buildPbaPaymentRequestBulkClaim(caseData));
+        return paymentsClient.createPbaPayment(
+            serviceReqReference,
+            authToken,
+            buildPbaPaymentRequestBulkClaim(caseData)
+        );
     }
 
     public PaymentServiceResponse createServiceRequest(CaseData caseData, String authToken) {
@@ -178,7 +182,7 @@ public class PaymentsService {
                 feeResponse = caseData.getHearingFee().toFeeDto();
             } else {
                 feeResponse = HearingFeeUtils.calculateAndApplyFee(
-                    hearingFeesService, caseData, caseData.getAllocatedTrack()).toFeeDto();
+                    hearingFeesService, caseData, caseData.getAllocatedTrack().name()).toFeeDto();
             }
         }
 

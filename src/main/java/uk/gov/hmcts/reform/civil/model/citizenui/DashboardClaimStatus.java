@@ -6,6 +6,12 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    MEDIATION_UNSUCCESSFUL(
+        Claim::isMediationUnsuccessful
+    ),
+    MEDIATION_SUCCESSFUL(
+        Claim::isMediationSuccessful
+    ),
     CLAIMANT_REJECT_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionRejected
     ),
@@ -21,12 +27,6 @@ public enum DashboardClaimStatus {
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
     ),
-    MEDIATION_UNSUCCESSFUL(
-        Claim::isMediationUnsuccessful
-    ),
-    MEDIATION_SUCCESSFUL(
-        Claim::isMediationSuccessful
-    ),
     IN_MEDIATION(
         Claim::isMediationPending
     ),
@@ -41,6 +41,18 @@ public enum DashboardClaimStatus {
     ),
     TRANSFERRED(
         Claim::isSentToCourt
+    ),
+    CLAIMANT_AND_DEFENDANT_SIGNED_SETTLEMENT_AGREEMENT(
+        Claim::hasClaimantAndDefendantSignedSettlementAgreement
+    ),
+    DEFENDANT_REJECTED_SETTLEMENT_AGREEMENT(
+        Claim::hasDefendantRejectedSettlementAgreement
+    ),
+    CLAIMANT_SIGNED_SETTLEMENT_AGREEMENT_DEADLINE_EXPIRED(
+        Claim::hasClaimantSignedSettlementAgreementAndDeadlineExpired
+    ),
+    CLAIMANT_SIGNED_SETTLEMENT_AGREEMENT(
+        Claim::hasClaimantSignedSettlementAgreement
     ),
     SETTLED(
         Claim::isSettled

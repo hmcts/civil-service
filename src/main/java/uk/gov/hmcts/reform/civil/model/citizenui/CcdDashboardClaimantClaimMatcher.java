@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -17,12 +16,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
-@AllArgsConstructor
-public class CcdDashboardClaimantClaimMatcher implements Claim {
+public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
 
     private static final LocalTime FOUR_PM = LocalTime.of(16, 1, 0);
-    private CaseData caseData;
     private FeatureToggleService featureToggleService;
+
+    public CcdDashboardClaimantClaimMatcher(CaseData caseData, FeatureToggleService featureToggleService) {
+        super(caseData);
+        this.featureToggleService = featureToggleService;
+    }
 
     @Override
     public boolean hasResponsePending() {
@@ -84,16 +86,6 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
     @Override
     public boolean claimantConfirmedDefendantPaid() {
         return caseData.getRespondent1CourtOrderPayment() != null && caseData.respondent1PaidInFull();
-    }
-
-    @Override
-    public boolean isSettled() {
-        return !caseData.isRespondentResponseFullDefence()
-            && (caseData.respondent1PaidInFull()
-            || caseData.isResponseAcceptedByClaimant())
-            && Objects.isNull(caseData.getCcjPaymentDetails())
-            && !caseData.hasApplicantRejectedRepaymentPlan()
-            || caseData.isPartAdmitClaimSettled();
     }
 
     @Override
@@ -231,8 +223,10 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
     public boolean isMediationUnsuccessful() {
         return !hasSdoBeenDrawn()
             && Objects.nonNull(caseData.getMediation())
-            && Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
-            && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty();
+            && ((Objects.nonNull(caseData.getMediation().getUnsuccessfulMediationReason())
+                && !caseData.getMediation().getUnsuccessfulMediationReason().isEmpty())
+            || (Objects.nonNull(caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect())
+                && !caseData.getMediation().getMediationUnsuccessfulReasonsMultiSelect().isEmpty()));
     }
 
     @Override
@@ -247,8 +241,9 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
     @Override
     public boolean isCourtReviewing() {
         return (!hasSdoBeenDrawn()
-            && caseData.isRespondentResponseFullDefence()
-            && caseData.getCcdState().equals(CaseState.JUDICIAL_REFERRAL))
+            && (caseData.isRespondentResponseFullDefence()
+            || caseData.isPartAdmitClaimSpec())
+            && CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState()))
             || (caseData.hasApplicantRejectedRepaymentPlan());
     }
 
@@ -278,7 +273,7 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
     @Override
     public boolean isPartialAdmissionRejected() {
         return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
-            && caseData.isPartAdmitClaimSpec();
+            && caseData.isPartAdmitClaimSpec() && YesOrNo.NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec());
     }
 
     @Override
@@ -293,5 +288,4 @@ public class CcdDashboardClaimantClaimMatcher implements Claim {
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
     }
-
 }

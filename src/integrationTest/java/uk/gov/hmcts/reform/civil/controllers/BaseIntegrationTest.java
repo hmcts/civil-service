@@ -63,7 +63,7 @@ public abstract class BaseIntegrationTest {
         .roles(of("caseworker-civil-solicitor"))
         .build();
 
-    private static final String s2sToken = "s2s AuthToken";
+    protected static final String s2sToken = "s2s AuthToken";
     @MockBean
     private ServiceAuthorisationApi serviceAuthorisationApi;
     @MockBean

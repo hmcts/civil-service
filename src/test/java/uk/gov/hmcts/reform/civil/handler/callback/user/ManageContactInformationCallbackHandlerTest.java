@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -161,7 +162,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .handle(params);
 
             List<String> expected =
-                List.of("You will be able run the manage contact information event once the claimant has responded.");
+                List.of("You will be able to run the manage contact information event once the claimant has responded.");
 
             assertEquals(expected, response.getErrors());
         }
@@ -768,6 +769,86 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .firstName("First")
                 .lastName("Name")
                 .build();
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+        }
+
+        @Nested
+        class RetainFlags {
+            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
+            Flags respondent2Flags = Flags.builder().partyName("respondent2name").roleOnCase("respondent2").build();
+            Flags applicant1Flags = Flags.builder().partyName("applicant1name").roleOnCase("applicant1").build();
+            Flags applicant2Flags = Flags.builder().partyName("applicant2name").roleOnCase("applicant2").build();
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1(Party.builder().flags(applicant1Flags).build())
+                .applicant2(Party.builder().flags(applicant2Flags).build())
+                .respondent1(Party.builder().flags(respondent1Flags).build())
+                .respondent2(Party.builder().flags(respondent2Flags).build())
+                .build();
+
+            @BeforeEach
+            void setup() {
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
+            void shouldCopyFlagsForApplicants(String partyChosenId) {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .multiPartyClaimTwoApplicants()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .partyChosenId(partyChosenId)
+                                           .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(responseCaseData.getApplicant1().getFlags()).isEqualTo(applicant1Flags);
+                assertThat(responseCaseData.getApplicant2().getFlags()).isEqualTo(applicant2Flags);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
+            void shouldCopyFlagsForRespondents(String partyChosenId) {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .partyChosenId(partyChosenId)
+                                           .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+                assertThat(responseCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
+            }
         }
 
         @Test
@@ -825,6 +906,33 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
+        void shouldUpdateDefendantOneExperts_WhenNoExpertsExisted() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(DEFENDANT_ONE_EXPERTS_ID)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(DEFENDANT_ONE_EXPERTS_ID)
+                                       .updateExpertsDetailsForm(wrapElements(party))
+                                       .build())
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQExperts(Experts.builder().build())
+                                   .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(unwrapElements(updatedData.getRespondent1DQ().getRespondent1DQExperts().getDetails()).get(0)).isEqualTo(expectedExpert1);
+            assertThat(unwrapElements(updatedData.getRespondent1Experts()).get(0)).isEqualTo(expectedExpertFlags);
+        }
+
+        @Test
         void shouldUpdateDefendantTwoExperts() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -839,6 +947,33 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                        .build())
                 .respondent2DQ(Respondent2DQ.builder()
                                    .respondent2DQExperts(Experts.builder().details(wrapElements(dqExpert)).build())
+                                   .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(unwrapElements(updatedData.getRespondent2DQ().getRespondent2DQExperts().getDetails()).get(0)).isEqualTo(expectedExpert1);
+            assertThat(unwrapElements(updatedData.getRespondent2Experts()).get(0)).isEqualTo(expectedExpertFlags);
+        }
+
+        @Test
+        void shouldUpdateDefendantTwoExperts_WhenNoExpertsExisted() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(DEFENDANT_TWO_EXPERTS_ID)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(DEFENDANT_TWO_EXPERTS_ID)
+                                       .updateExpertsDetailsForm(wrapElements(party))
+                                       .build())
+                .respondent2DQ(Respondent2DQ.builder()
+                                   .respondent2DQExperts(Experts.builder().build())
                                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -920,6 +1055,60 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                        .build())
                 .respondent2DQ(Respondent2DQ.builder()
                                    .respondent2DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
+                                   .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(unwrapElements(updatedData.getRespondent2DQ().getRespondent2DQWitnesses().getDetails()).get(0)).isEqualTo(expectedWitness1);
+            assertThat(unwrapElements(updatedData.getRespondent2Witnesses()).get(0)).isEqualTo(expectedWitnessFlags);
+        }
+
+        @Test
+        void shouldUpdateDefendantOneWitnesses_WhenNoWitnessesExisted() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(DEFENDANT_ONE_WITNESSES_ID)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
+                                       .updateWitnessesDetailsForm(wrapElements(party))
+                                       .build())
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQWitnesses(Witnesses.builder().build())
+                                   .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(unwrapElements(updatedData.getRespondent1DQ().getRespondent1DQWitnesses().getDetails()).get(0)).isEqualTo(expectedWitness1);
+            assertThat(unwrapElements(updatedData.getRespondent1Witnesses()).get(0)).isEqualTo(expectedWitnessFlags);
+        }
+
+        @Test
+        void shouldUpdateDefendantTwoWitnesses_WhenNoWitnessesExisted() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(DEFENDANT_TWO_WITNESSES_ID)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(DEFENDANT_TWO_WITNESSES_ID)
+                                       .updateWitnessesDetailsForm(wrapElements(party))
+                                       .build())
+                .respondent2DQ(Respondent2DQ.builder()
+                                   .respondent2DQWitnesses(Witnesses.builder().build())
                                    .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -1058,6 +1247,18 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             String errorMessage = "After making these changes, please ensure that the "
                 + "litigation friend's contact information is also up to date.";
 
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .addApplicant1LitigationFriend()
+                .addApplicant2LitigationFriend()
+                .addRespondent1LitigationFriend()
+                .addRespondent2LitigationFriend()
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
@@ -1072,6 +1273,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .addRespondent2LitigationFriend()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getWarnings()).contains(errorTitle);
@@ -1079,7 +1281,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID, DEFENDANT_ONE_LITIGATION_FRIEND_ID})
+        @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID,
+            DEFENDANT_ONE_LITIGATION_FRIEND_ID})
         void shouldNotReturnWarning(String partyChosenId) {
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
@@ -1091,7 +1294,16 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                        .build())
                 .build();
 
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getWarnings()).isEmpty();
@@ -1100,6 +1312,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnPostcodeError() {
             given(postcodeValidator.validate(any())).willReturn(List.of("Please enter Postcode"));
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -1118,6 +1338,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1130,6 +1351,17 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
     @Nested
     class MidShowPartyField {
         private static final String PAGE_ID = "show-party-field";
+
+        @BeforeEach
+        void setup() {
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+        }
 
         @Test
         void shouldPopulatePartyChosenId() {
@@ -1156,13 +1388,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
         void shouldPopulatePartyType(String partyChosenId) {
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            CaseData caseDataBefore = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(INDIVIDUAL).build())
-                .applicant2(Party.builder().type(INDIVIDUAL).build())
-                .respondent1(Party.builder().type(INDIVIDUAL).build())
-                .respondent2(Party.builder().type(INDIVIDUAL).build())
-                .buildClaimIssuedPaymentCaseData();
-            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
@@ -1187,13 +1412,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @ValueSource(strings = {CLAIMANT_ONE_LITIGATION_FRIEND_ID, CLAIMANT_TWO_LITIGATION_FRIEND_ID, DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
         void shouldPopulatePartyTypeForLitigationFriend(String partyChosenId) {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            CaseData caseDataBefore = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(INDIVIDUAL).build())
-                .applicant2(Party.builder().type(INDIVIDUAL).build())
-                .respondent1(Party.builder().type(INDIVIDUAL).build())
-                .respondent2(Party.builder().type(INDIVIDUAL).build())
-                .buildClaimIssuedPaymentCaseData();
-            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
@@ -1249,6 +1467,41 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
             assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEqualTo(form);
             assertThat(updatedData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm()).isEmpty();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {CLAIMANT_ONE_EXPERTS_ID, DEFENDANT_ONE_EXPERTS_ID, DEFENDANT_TWO_EXPERTS_ID})
+        void shouldNotPopulateExpertsIfEmpty(String partyChosenId) {
+            when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
+            Expert expert = Expert.builder().firstName("First").lastName("Name").partyID("id").build();
+            UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
+                .partyId("id").build();
+            List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(null)
+                .respondent1DQ(Respondent1DQ.builder()
+                                   .respondent1DQExperts(Experts.builder().build())
+                                   .build())
+                .respondent2DQ(Respondent2DQ.builder()
+                                   .respondent2DQExperts(Experts.builder().build())
+                                   .build())
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(partyChosenId)
+                                                                   .build())
+                                                        .build())
+                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
+            assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
+            assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEmpty();
+            assertThat(updatedData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm()).isEmpty();
 
         }
 
@@ -1286,7 +1539,163 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
             assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEmpty();
             assertThat(updatedData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm()).isEqualTo(form);
+        }
 
+        @ParameterizedTest
+        @ValueSource(strings = {CLAIMANT_ONE_WITNESSES_ID, DEFENDANT_ONE_WITNESSES_ID, DEFENDANT_TWO_WITNESSES_ID})
+        void shouldNotPopulateWitnessesIfEmpty(String partyChosenId) {
+            Witness witness = Witness.builder().firstName("First").lastName("Name").partyID("id").build();
+            UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
+                .partyId("id").build();
+            List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1DQ(Applicant1DQ.builder()
+                                  .applicant1DQWitnesses(Witnesses.builder().build())
+                                  .build())
+                .respondent1DQ(null)
+                .respondent2DQ(null)
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(partyChosenId)
+                                                                   .build())
+                                                        .build())
+                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getUpdateDetailsForm().getPartyChosenId()).isEqualTo(partyChosenId);
+            assertThat(updatedData.getUpdateDetailsForm().getPartyChosenType()).isEqualTo(null);
+            assertThat(updatedData.getUpdateDetailsForm().getUpdateExpertsDetailsForm()).isEmpty();
+            assertThat(updatedData.getUpdateDetailsForm().getUpdateWitnessesDetailsForm()).isEmpty();
+
+        }
+    }
+
+    @Nested
+    class MidValidateExperts {
+        private static final String PAGE_ID = "validate-experts";
+
+        @Test
+        void shouldValidatePartyIdsandReturnError() {
+            when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
+
+            UpdatePartyDetailsForm expert = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId("id").build();
+            UpdatePartyDetailsForm expert2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .updateExpertsDetailsForm(wrapElements(expert, expert2))
+                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            List<String> expected = List.of("Adding a new expert is not permitted in this screen. Please delete any new experts.");
+
+            assertEquals(expected, response.getErrors());
+
+        }
+
+        @Test
+        void shouldValidatePartyIds_NotReturnError() {
+            when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
+
+            UpdatePartyDetailsForm expert = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId("id").build();
+            UpdatePartyDetailsForm expert2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").partyId("id").build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .updateExpertsDetailsForm(wrapElements(expert, expert2))
+                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldValidatePartyIds_NotReturnErrorAsAdmin() {
+            when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
+
+            UpdatePartyDetailsForm expert = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId("id").build();
+            UpdatePartyDetailsForm expert2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .updateExpertsDetailsForm(wrapElements(expert, expert2))
+                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class MidValidateWitnesses {
+        private static final String PAGE_ID = "validate-witnesses";
+
+        @Test
+        void shouldValidatePartyIds_ReturnError() {
+            when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
+
+            UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId("id").build();
+            UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .updateWitnessesDetailsForm(wrapElements(party, party2))
+                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            List<String> expected = List.of("Adding a new witness is not permitted in this screen. Please delete any new witnesses.");
+
+            assertEquals(expected, response.getErrors());
+
+        }
+
+        @Test
+        void shouldValidatePartyIds_NotReturnError() {
+            when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
+
+            UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId("id").build();
+            UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").partyId("id").build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .updateWitnessesDetailsForm(wrapElements(party, party2))
+                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldValidatePartyIds_NotReturnErrorAsAdmin() {
+            when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
+
+            UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").partyId("id").build();
+            UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("Name2").build();
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .updateWitnessesDetailsForm(wrapElements(party, party2))
+                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 }

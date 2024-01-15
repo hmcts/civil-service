@@ -73,13 +73,13 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     }
 
     public HearingForm getTemplateData(CaseData caseData, String authorisation) {
-        List<LocationRefData> locations = (locationRefDataService.getCourtLocationsForDefaultJudgments(authorisation));
+        List<LocationRefData> locations = (locationRefDataService.getHearingCourtLocations(authorisation));
 
         return HearingForm.builder()
             .courtName(courtLocationUtils.findPreferredLocationData(locations, caseData.getHearingLocation()).getSiteName())
             .listingOrRelisting(caseData.getListingOrRelisting().toString())
             .court(caseData.getHearingLocation().getValue().getLabel())
-            .caseNumber(caseData.getLegacyCaseReference())
+            .caseNumber(caseData.getCcdCaseReference().toString())
             .creationDate(getDateFormatted(LocalDate.now()))
             .claimant(caseData.getApplicant1().getPartyName())
             .claimantReference(checkReference(caseData)
