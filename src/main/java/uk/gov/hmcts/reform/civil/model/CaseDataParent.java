@@ -444,7 +444,6 @@ public class CaseDataParent implements MappableObject {
     public boolean isApplicantRepresented() {
         return this.applicant1Represented == YES;
     }
-
     /**
      * Adding for Certificate of Service.
      */
