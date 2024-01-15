@@ -80,13 +80,13 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
             caseDataBuilder.businessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));
         }
 
-        addOrganisationPoliciesforClaimantLip(caseDataBuilder);
+        addOrginsationPoliciesforClaimantLip(caseDataBuilder);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 
-    private void addOrganisationPoliciesforClaimantLip(CaseData.CaseDataBuilder caseDataBuilder) {
+    private void addOrginsationPoliciesforClaimantLip(CaseData.CaseDataBuilder caseDataBuilder) {
         CaseData caseData = caseDataBuilder.build();
         //         LiP are not represented or registered
         if (caseData.getApplicant1OrganisationPolicy() == null) {
