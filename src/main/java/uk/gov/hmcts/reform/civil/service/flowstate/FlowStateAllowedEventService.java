@@ -99,6 +99,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplet
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
@@ -782,6 +783,12 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 asyncStitchingComplete
             )
+        ),
+        entry(
+            CASE_STAYED.fullName(),
+            List.of(
+                INITIATE_GENERAL_APPLICATION
+            )
         )
     );
 
@@ -1443,6 +1450,12 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC
+            )
+        ),
+        entry(
+            CASE_STAYED.fullName(),
+            List.of(
+                INITIATE_GENERAL_APPLICATION
             )
         )
     );
