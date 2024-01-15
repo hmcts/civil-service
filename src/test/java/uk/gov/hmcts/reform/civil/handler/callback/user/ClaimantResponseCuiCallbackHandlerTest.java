@@ -683,6 +683,57 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
         }
 
+        @Test
+        void shouldChangeCaseStateWhenApplicantPlanAcceptedAndSignedSettlement() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1AcceptAdmitAmountPaidSpec(YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+                .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_ORG_NAME").build())
+                .respondent1(Party.builder()
+                            .type(Party.Type.INDIVIDUAL)
+                            .partyName("Test Inc")
+                            .build())
+                .caseDataLip(CaseDataLiP.builder()
+                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)                                                                             .applicant1SignedSettlementAgreement(
+                                                                                 YesOrNo.YES).build())
+                                 .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+
+        @Test
+        void shouldChangeCaseStateWhenApplicantAcceptCourtDecisionAndSignedSettlement() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1AcceptAdmitAmountPaidSpec(YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_ORG_NAME").build())
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName("Test Inc")
+                                 .build())
+                .caseDataLip(CaseDataLiP.builder()
+                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                            .claimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE)
+                                                            .applicant1SignedSettlementAgreement(
+                                                                YesOrNo.YES).build())
+                                 .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+
     }
 
     @Test
