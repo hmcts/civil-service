@@ -440,6 +440,11 @@ public class CaseDataParent implements MappableObject {
         return this.applicant1Represented == NO;
     }
 
+    @JsonIgnore
+    public boolean isApplicantRepresented() {
+        return this.applicant1Represented == YES;
+    }
+    
     /**
      * Adding for Certificate of Service.
      */
@@ -724,6 +729,7 @@ public class CaseDataParent implements MappableObject {
     private DynamicList transferCourtLocationList;
     private NotSuitableSdoOptions notSuitableSdoOptions;
     private TocTransferCaseReason tocTransferCaseReason;
+    private String claimantBilingualLanguagePreference;
 
     @JsonUnwrapped
     private final UpdateDetailsForm updateDetailsForm;
@@ -811,6 +817,12 @@ public class CaseDataParent implements MappableObject {
             .map(DynamicList::getValue)
             .map(DynamicListElement::getLabel)
             .orElse(null);
+    }
+
+    @JsonIgnore
+    public boolean isBilingual() {
+        return null != claimantBilingualLanguagePreference
+                && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
     }
 
     @JsonIgnore
