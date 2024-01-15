@@ -58,10 +58,10 @@ public class DefendantSignSettlementAgreementCallbackHandlerTest extends BaseCal
         @Test
         void shouldUpdateBusinessProcess() {
             CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondentSignSettlementAgreement(YesOrNo.NO)
-                                 .build())
-                .build();
+                    .caseDataLip(CaseDataLiP.builder()
+                            .respondentSignSettlementAgreement(YesOrNo.NO)
+                            .build())
+                    .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
