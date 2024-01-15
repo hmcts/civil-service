@@ -15,9 +15,7 @@ import java.util.Optional;
 public class UpdateClaimStateService {
 
     public String setUpCaseState(CaseData updatedData) {
-        if (updatedData.isBilingual()) {
-            return updatedData.getCcdState().name();
-        } else if (isJudicialReferralAllowed(updatedData)) {
+        if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();
         } else if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
             return CaseState.IN_MEDIATION.name();

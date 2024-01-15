@@ -53,8 +53,9 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.toMap(objectMapper));
-        response.state(updateClaimStateService.setUpCaseState(updatedData));
-
+        if (!updatedData.isBilingual()) {
+            response.state(updateClaimStateService.setUpCaseState(updatedData));
+        }
         return response.build();
     }
 }
