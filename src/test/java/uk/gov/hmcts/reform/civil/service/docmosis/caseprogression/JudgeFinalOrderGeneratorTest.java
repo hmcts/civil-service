@@ -157,7 +157,24 @@ public class JudgeFinalOrderGeneratorTest {
         when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(List.of(
             locationRefData
         ));
+        when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(List.of(locationRefData));
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
+    }
+
+    @Test
+    void shouldThrowException_whenBaseCourtLocationNotFound() {
+        when(featureToggleService.isHmcEnabled()).thenReturn(false);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(FREE_FORM_ORDER_PDF)))
+            .thenReturn(new DocmosisDocument(FREE_FORM_ORDER_PDF.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
+            .thenReturn(FREE_FROM_ORDER);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("00000888").build())
+            .build();
+
+        assertThrows(IllegalArgumentException.class, () -> generator.generate(caseData, BEARER_TOKEN));
     }
 
     @Test
@@ -171,6 +188,7 @@ public class JudgeFinalOrderGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
+            .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
@@ -342,6 +360,7 @@ public class JudgeFinalOrderGeneratorTest {
                  .uploadDocument(BEARER_TOKEN, new PDF(fileFreeForm, bytes, JUDGE_FINAL_ORDER)))
             .thenReturn(FREE_FROM_ORDER);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .caseManagementLocation(caseManagementLocation)
             .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
             .ccdState(CaseState.CASE_PROGRESSION)
             .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("test without notice")
@@ -377,6 +396,7 @@ public class JudgeFinalOrderGeneratorTest {
             .thenReturn(ASSISTED_FROM_ORDER);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .caseManagementLocation(caseManagementLocation)
             .ccdState(CaseState.CASE_PROGRESSION)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             // Order made section
@@ -627,6 +647,7 @@ public class JudgeFinalOrderGeneratorTest {
         List<FinalOrdersJudgePapers> finalOrdersJudgePapersList =
             new ArrayList<>(Arrays.asList(FinalOrdersJudgePapers.CONSIDERED));
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .caseManagementLocation(caseManagementLocation)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             // Order made section
             .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
