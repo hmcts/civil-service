@@ -267,7 +267,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate cosDate = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemedDate = localDateTime.minusDays(2).toLocalDate();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemedDate.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysDeadline(deemedDate.atTime(15, 05)))
                 .thenReturn(newDate.minusDays(2));
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
 
@@ -297,7 +297,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
                 .thenReturn(LocalDate.now().plusDays(2));
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDate.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysDeadline(cosDate.atTime(15, 05)))
                 .thenReturn(newDate.minusDays(2));
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
 
@@ -324,9 +324,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate deemed1Date = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemed2Date = localDateTime.minusDays(3).toLocalDate();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemed1Date.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysDeadline(deemed1Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(2));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(deemed2Date.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysDeadline(deemed2Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(3));
 
             CaseData caseData = CaseDataBuilder.builder()
@@ -351,9 +351,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate deemed1Date = localDateTime.minusDays(2).toLocalDate();
             LocalDate deemed2Date = localDateTime.minusDays(3).toLocalDate();
             when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos1Date.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysDeadline(cos1Date.atTime(15, 05)))
                 .thenReturn(newDate.minusDays(3));
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(cos2Date.atTime(15, 05)))
+            when(deadlinesCalculator.plus14DaysDeadline(cos2Date.atTime(15, 05)))
                 .thenReturn(newDate.minusDays(2));
             when(deadlinesCalculator.plus14DaysDeadline(cos1Date.atTime(15, 05)))
                     .thenReturn(newDate.minusDays(3));
@@ -522,7 +522,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnCoSConfirmation_whenCosNotifyDetailsSuccess() {
             LocalDate past = LocalDate.now().minusDays(1);
             when(time.now()).thenReturn(LocalDateTime.now());
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any()))
+            when(deadlinesCalculator.plus14DaysDeadline(any()))
                 .thenReturn(past.plusDays(14).atTime(16, 0));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -537,7 +537,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnCoSConfirmation_1Lip1Lr_whenCosNotifyDetailsSuccess() {
             LocalDate past = LocalDate.now().minusDays(1);
             when(time.now()).thenReturn(LocalDateTime.now());
-            when(deadlinesCalculator.plus14DaysAt4pmDeadline(any()))
+            when(deadlinesCalculator.plus14DaysDeadline(any()))
                 .thenReturn(past.plusDays(14).atTime(16, 0));
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
