@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.UpdatePartyDetailsForm;
+import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -161,7 +162,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .handle(params);
 
             List<String> expected =
-                List.of("You will be able run the manage contact information event once the claimant has responded.");
+                List.of("You will be able to run the manage contact information event once the claimant has responded.");
 
             assertEquals(expected, response.getErrors());
         }
@@ -768,6 +769,86 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .firstName("First")
                 .lastName("Name")
                 .build();
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+        }
+
+        @Nested
+        class RetainFlags {
+            Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
+            Flags respondent2Flags = Flags.builder().partyName("respondent2name").roleOnCase("respondent2").build();
+            Flags applicant1Flags = Flags.builder().partyName("applicant1name").roleOnCase("applicant1").build();
+            Flags applicant2Flags = Flags.builder().partyName("applicant2name").roleOnCase("applicant2").build();
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1(Party.builder().flags(applicant1Flags).build())
+                .applicant2(Party.builder().flags(applicant2Flags).build())
+                .respondent1(Party.builder().flags(respondent1Flags).build())
+                .respondent2(Party.builder().flags(respondent2Flags).build())
+                .build();
+
+            @BeforeEach
+            void setup() {
+                when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseDataBefore);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
+            void shouldCopyFlagsForApplicants(String partyChosenId) {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .multiPartyClaimTwoApplicants()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .partyChosenId(partyChosenId)
+                                           .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(responseCaseData.getApplicant1().getFlags()).isEqualTo(applicant1Flags);
+                assertThat(responseCaseData.getApplicant2().getFlags()).isEqualTo(applicant2Flags);
+            }
+
+            @ParameterizedTest
+            @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
+            void shouldCopyFlagsForRespondents(String partyChosenId) {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateApplicantRespondToDefenceAndProceed()
+                    .multiPartyClaimTwoDefendantSolicitors()
+                    .updateDetailsForm(UpdateDetailsForm.builder()
+                                           .partyChosen(DynamicList.builder()
+                                                            .value(DynamicListElement.builder()
+                                                                       .code(partyChosenId)
+                                                                       .build())
+                                                            .build())
+                                           .partyChosenId(partyChosenId)
+                                           .build())
+                    .build();
+
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData responseCaseData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(responseCaseData.getRespondent1().getFlags()).isEqualTo(respondent1Flags);
+                assertThat(responseCaseData.getRespondent2().getFlags()).isEqualTo(respondent2Flags);
+            }
         }
 
         @Test
@@ -1166,6 +1247,18 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             String errorMessage = "After making these changes, please ensure that the "
                 + "litigation friend's contact information is also up to date.";
 
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .addApplicant1LitigationFriend()
+                .addApplicant2LitigationFriend()
+                .addRespondent1LitigationFriend()
+                .addRespondent2LitigationFriend()
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
                                        .partyChosen(DynamicList.builder()
@@ -1180,6 +1273,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .addRespondent2LitigationFriend()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getWarnings()).contains(errorTitle);
@@ -1187,7 +1281,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID, DEFENDANT_ONE_LITIGATION_FRIEND_ID})
+        @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID,
+            DEFENDANT_ONE_LITIGATION_FRIEND_ID})
         void shouldNotReturnWarning(String partyChosenId) {
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
@@ -1199,7 +1294,16 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                        .build())
                 .build();
 
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getWarnings()).isEmpty();
@@ -1208,6 +1312,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldReturnPostcodeError() {
             given(postcodeValidator.validate(any())).willReturn(List.of("Please enter Postcode"));
+
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -1226,6 +1338,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                 .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -1238,6 +1351,17 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
     @Nested
     class MidShowPartyField {
         private static final String PAGE_ID = "show-party-field";
+
+        @BeforeEach
+        void setup() {
+            CaseData caseDataBefore = CaseDataBuilder.builder()
+                .applicant1(Party.builder().type(INDIVIDUAL).build())
+                .applicant2(Party.builder().type(INDIVIDUAL).build())
+                .respondent1(Party.builder().type(INDIVIDUAL).build())
+                .respondent2(Party.builder().type(INDIVIDUAL).build())
+                .buildClaimIssuedPaymentCaseData();
+            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
+        }
 
         @Test
         void shouldPopulatePartyChosenId() {
@@ -1264,13 +1388,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID, DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
         void shouldPopulatePartyType(String partyChosenId) {
             when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-            CaseData caseDataBefore = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(INDIVIDUAL).build())
-                .applicant2(Party.builder().type(INDIVIDUAL).build())
-                .respondent1(Party.builder().type(INDIVIDUAL).build())
-                .respondent2(Party.builder().type(INDIVIDUAL).build())
-                .buildClaimIssuedPaymentCaseData();
-            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
@@ -1295,13 +1412,6 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @ValueSource(strings = {CLAIMANT_ONE_LITIGATION_FRIEND_ID, CLAIMANT_TWO_LITIGATION_FRIEND_ID, DEFENDANT_ONE_LITIGATION_FRIEND_ID, DEFENDANT_TWO_LITIGATION_FRIEND_ID})
         void shouldPopulatePartyTypeForLitigationFriend(String partyChosenId) {
             when(userService.getUserInfo(anyString())).thenReturn(LEGAL_REP_USER);
-            CaseData caseDataBefore = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(INDIVIDUAL).build())
-                .applicant2(Party.builder().type(INDIVIDUAL).build())
-                .respondent1(Party.builder().type(INDIVIDUAL).build())
-                .respondent2(Party.builder().type(INDIVIDUAL).build())
-                .buildClaimIssuedPaymentCaseData();
-            given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             CaseData caseData = CaseDataBuilder.builder()
                 .updateDetailsForm(UpdateDetailsForm.builder()
@@ -1484,7 +1594,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            List<String> expected = List.of("Please create an order to add more experts.");
+            List<String> expected = List.of("Adding a new expert is not permitted in this screen. Please delete any new experts.");
 
             assertEquals(expected, response.getErrors());
 
@@ -1546,7 +1656,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            List<String> expected = List.of("Please create an order to add more witnesses.");
+            List<String> expected = List.of("Adding a new witness is not permitted in this screen. Please delete any new witnesses.");
 
             assertEquals(expected, response.getErrors());
 
