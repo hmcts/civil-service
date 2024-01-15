@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
@@ -18,7 +17,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.LitigantInPersonFormGenerator;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimFormGeneratorForSpec;
 import uk.gov.hmcts.reform.civil.service.stitching.CivilDocumentStitchingService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -49,7 +47,6 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
     private final CivilDocumentStitchingService civilDocumentStitchingService;
-    private final LitigantInPersonFormGenerator litigantInPersonFormGenerator;
     private final FeatureToggleService toggleService;
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
@@ -152,25 +149,6 @@ public class GenerateClaimFormForSpecCallbackHandler extends CallbackHandler {
         documentMetaDataList.add(new DocumentMetaData(caseDocument.getDocumentLink(),
                                                       "Sealed Claim form",
                                                       LocalDate.now().toString()));
-
-        //LiP Claim form guidance needs be sent as the 2nd doc to go on the back of the claim form
-        if (stitchEnabled) {
-            if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())
-                || YesOrNo.NO.equals(caseData.getSpecRespondent2Represented())) {
-
-                CaseDocument lipForm = litigantInPersonFormGenerator.generate(
-                    caseDataBuilder.build(),
-                    callbackParams.getParams().get(BEARER_TOKEN).toString()
-                );
-
-                documentMetaDataList.add(new DocumentMetaData(
-                    lipForm.getDocumentLink(),
-                    "Litigant in person claim form",
-                    LocalDate.now().toString()
-                ));
-
-            }
-        }
 
         if (caseData.getSpecClaimTemplateDocumentFiles() != null) {
             documentMetaDataList.add(new DocumentMetaData(
