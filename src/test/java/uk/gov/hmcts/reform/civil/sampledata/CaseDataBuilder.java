@@ -1610,6 +1610,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder applicant1RepaymentOptionForDefendantSpec(PaymentType applicant1RepaymentOptionForDefendantSpec) {
+        this.applicant1RepaymentOptionForDefendantSpec = applicant1RepaymentOptionForDefendantSpec;
+        return this;
+    }
+
     public CaseDataBuilder respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec respondentResponseTypeSpec) {
         this.respondent1ClaimResponseTypeForSpec = respondentResponseTypeSpec;
         return this;
@@ -6455,6 +6460,7 @@ public class CaseDataBuilder {
         this.applicant1RepaymentOptionForDefendantSpec = repaymentOption;
         return this;
     }
+
 
     public CaseDataBuilder applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate repaymentBySetDate) {
         this.applicant1RequestedPaymentDateForDefendantSpec = repaymentBySetDate;
