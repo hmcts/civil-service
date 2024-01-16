@@ -79,7 +79,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .applicant1ResponseDate(applicant1ResponseDate)
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_CUI))
-            .respondent1RespondToSettlementAgreementDeadline(getRespondToSettlementAgreementDeadline(caseData, applicant1ResponseDate));
+            .respondent1RespondToSettlementAgreementDeadline(caseData.isBilingual() ? null : getRespondToSettlementAgreementDeadline(
+                caseData,
+                applicant1ResponseDate
+            ));
 
         updateCaseManagementLocationDetailsService.updateCaseManagementDetails(builder, callbackParams);
 
@@ -110,7 +113,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
 
     private boolean hasCcjRequest(CaseData caseData) {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-                && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
+            && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
     }
 
     private boolean isProceedOrNotSettleClaim(CaseData caseData) {
