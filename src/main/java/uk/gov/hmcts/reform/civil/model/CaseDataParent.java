@@ -438,21 +438,13 @@ public class CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
         return this.applicant1Represented == NO;
-<<<<<<< HEAD
-    }
-
-    @JsonIgnore
-    public boolean isApplicantRepresented() {
-        return this.applicant1Represented == YES;
-=======
->>>>>>> CIV-11603 Fast Track Claimant Intent (#3720)
     }
 
     @JsonIgnore
     public boolean isApplicantRepresented() {
         return this.applicant1Represented == YES;
     }
-    
+
     /**
      * Adding for Certificate of Service.
      */
