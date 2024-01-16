@@ -112,7 +112,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
-    public static LocalDate specificTestDate = LocalDate.of(2024, 1, 20);
+    public static LocalDate specificTestDate = LocalDate.of(2024, 1, 13);
     private final IdamClient idamClient;
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
