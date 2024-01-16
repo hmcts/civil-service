@@ -152,7 +152,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
                 && caseData.isClaimantIntentionSettlePartAdmit())
                 || (caseData.isPartAdmitImmediatePaymentClaimSettled()));
     }
-  
+
     private void updateCcjRequestPaymentDetails(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
         if (hasCcjRequest(caseData)) {
             CCJPaymentDetails ccjPaymentDetails = judgementService.buildJudgmentAmountSummaryDetails(caseData);
