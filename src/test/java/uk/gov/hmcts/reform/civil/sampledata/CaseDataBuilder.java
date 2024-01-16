@@ -6456,12 +6456,6 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder applicant1RepaymentOptionForDefendantSpec(PaymentType repaymentOption) {
-        this.applicant1RepaymentOptionForDefendantSpec = repaymentOption;
-        return this;
-    }
-
-
     public CaseDataBuilder applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate repaymentBySetDate) {
         this.applicant1RequestedPaymentDateForDefendantSpec = repaymentBySetDate;
         return this;
