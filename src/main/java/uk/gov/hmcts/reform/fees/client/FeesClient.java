@@ -61,12 +61,18 @@ public class FeesClient {
                 jurisdiction2 = this.jurisdiction2;
             }
 
-            return FeeLookupResponseDto.builder()
-                .feeAmount(new BigDecimal("14.00")).code("test_fee_code").version(2).build();
+            return this.feesApi.lookupFee(
+                service,
+                jurisdiction1,
+                jurisdiction2,
+                channel,
+                event,
+                keyword,
+                amount
+            );
 
         } else {
-            return FeeLookupResponseDto.builder()
-                .feeAmount(new BigDecimal("14.00")).code("test_fee_code").version(2).build();
+            return this.feesApi.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
         }
     }
 
