@@ -150,7 +150,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     public static final String FEEDBACK_LINK = "<p>%s"
         + " <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>";
 
-    public static LocalDate specificTestDate = LocalDate.of(2024, 1, 20);
+    public static LocalDate specificTestDate = LocalDate.of(2024, 1, 13);
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
