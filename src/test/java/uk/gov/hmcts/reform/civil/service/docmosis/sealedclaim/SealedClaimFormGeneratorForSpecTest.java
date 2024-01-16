@@ -49,7 +49,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_DIFFERENT_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
 
 @ExtendWith(SpringExtension.class)
 public class SealedClaimFormGeneratorForSpecTest {
@@ -287,15 +286,15 @@ public class SealedClaimFormGeneratorForSpecTest {
             .sdtRequestIdFromSdt("1234")
             .build();
 
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_LIP)))
-            .thenReturn(new DocmosisDocument(N2_LIP.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
+            .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
 
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
-        verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2_LIP));
+        verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
     }
 
     @Test
@@ -312,15 +311,15 @@ public class SealedClaimFormGeneratorForSpecTest {
             .build();
 
         when(interestCalculator.calculateBulkInterest(any(CaseData.class))).thenReturn(BigDecimal.valueOf(5));
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_LIP)))
-            .thenReturn(new DocmosisDocument(N2_LIP.getDocumentTitle(), bytes));
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2)))
+            .thenReturn(new DocmosisDocument(N2.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
             .thenReturn(CASE_DOCUMENT);
         CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
 
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
-        verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2_LIP));
+        verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
     }
 
 }
