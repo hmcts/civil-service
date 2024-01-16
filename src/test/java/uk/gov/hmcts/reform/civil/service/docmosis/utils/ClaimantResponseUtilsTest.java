@@ -28,13 +28,13 @@ public class ClaimantResponseUtilsTest {
     @Test
     void shouldReturnFinalPaymentDateForDefendant() {
         CaseData caseData = CaseDataBuilder.builder()
-                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(100))
-                .issueDate(LocalDate.now())
-                .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
-                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
-                .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_TWO_WEEKS)
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .build();
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal.valueOf(100))
+            .issueDate(LocalDate.now())
+            .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
+            .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_TWO_WEEKS)
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .build();
 
         LocalDate finalDate = getClaimantFinalRepaymentDate(caseData);
         assertThat(finalDate).isNotNull();
@@ -44,8 +44,8 @@ public class ClaimantResponseUtilsTest {
     @CsvSource({"IMMEDIATELY,Immediately", "SET_DATE,By a set date", "REPAYMENT_PLAN,By instalments"})
     void shouldReturnClaimantRepaymentOption(PaymentType input, String expectedOutput) {
         CaseData caseData = CaseData.builder()
-                .applicant1RepaymentOptionForDefendantSpec(input)
-                .build();
+            .applicant1RepaymentOptionForDefendantSpec(input)
+            .build();
 
         String actualOutput = getClaimantRepaymentType(caseData);
         Assertions.assertEquals(expectedOutput, actualOutput);
@@ -54,12 +54,12 @@ public class ClaimantResponseUtilsTest {
     @Test
     void shouldNotReturnFinalPaymentDateForDefendant_WhenInstallmentIsNull() {
         CaseData caseData = CaseDataBuilder.builder()
-                .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(null)
-                .issueDate(LocalDate.now())
-                .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
-                .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
-                .totalClaimAmount(BigDecimal.valueOf(1000))
-                .build();
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(null)
+            .issueDate(LocalDate.now())
+            .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
+            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
+            .totalClaimAmount(BigDecimal.valueOf(1000))
+            .build();
 
         LocalDate finalDate = getClaimantFinalRepaymentDate(caseData);
         assertThat(finalDate).isNull();
