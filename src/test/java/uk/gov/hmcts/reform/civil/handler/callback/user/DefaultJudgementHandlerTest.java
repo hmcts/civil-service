@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -59,6 +60,11 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     private DefaultJudgementHandler handler;
     @MockBean
     private LocationRefDataService locationRefDataService;
+
+    // ApplicationContext requirement
+    @SuppressWarnings("unused")
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Nested
     class AboutToStartCallback {
