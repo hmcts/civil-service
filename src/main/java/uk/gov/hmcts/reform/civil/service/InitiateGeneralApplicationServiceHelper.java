@@ -128,7 +128,7 @@ public class InitiateGeneralApplicationServiceHelper {
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
         applicationBuilder
             .generalAppApplnSolicitor(applicantBuilder.build());
-        GAParties applicantPartyData = getApplicantPartyData(userRoles, userDetails, caseData);;
+        GAParties applicantPartyData = GAParties.builder().build();
         /*
          * Set GA respondent solicitors' details
          * */
@@ -183,6 +183,7 @@ public class InitiateGeneralApplicationServiceHelper {
                 }
 
             });
+            applicantPartyData = getApplicantPartyData(userRoles, userDetails, caseData);
             applicationBuilder.applicantPartyName(applicantPartyData.getApplicantPartyName());
             applicationBuilder.litigiousPartyID(applicantPartyData.getLitigiousPartyID());
             applicationBuilder.generalAppRespondentSolicitors(respondentSols);
