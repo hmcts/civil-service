@@ -262,7 +262,7 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffBeforeClaimIssued)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
                 .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLipCase)
-                .set((c, flags) -> {
+                    .set((c, flags) -> {
                         if (featureToggleService.isPinInPostEnabled()) {
                             flags.put(FlowFlag.PIP_ENABLED.name(), true);
                         }
