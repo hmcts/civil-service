@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.docmosis.draft;
+package uk.gov.hmcts.reform.civil.model.docmosis.claimform;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.utils.DateUtils.getRequiredDateBeforeFou
 
 @Component
 @RequiredArgsConstructor
-public class DraftClaimFormMapper {
+public class ClaimFormMapper {
 
     private static final String STANDARD_INTEREST_RATE = "8";
     public static final String EXPLANATION_OF_INTEREST_RATE = "The claimant reserves the right to claim interest under "
@@ -37,7 +37,7 @@ public class DraftClaimFormMapper {
     public static final String INTEREST_START_FROM_CLAIM_ISSUED_DATE = "From the date the claim was issued";
     private final InterestCalculator interestCalculator;
 
-    public DraftClaimForm toDraftClaimForm(CaseData caseData) {
+    public ClaimForm toClaimForm(CaseData caseData) {
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
         Optional<AdditionalLipPartyDetails> applicantDetails =
@@ -54,7 +54,7 @@ public class DraftClaimFormMapper {
         String totalClaimAmount = Optional.ofNullable(caseData.getTotalClaimAmount())
             .map(BigDecimal::toString)
             .orElse("0");
-        return DraftClaimForm.builder()
+        return ClaimForm.builder()
             .totalInterestAmount(interest != null ? interest.toString() : null)
             .howTheInterestWasCalculated(Optional.ofNullable(caseData.getInterestClaimOptions()).map(
                 InterestClaimOptions::getDescription).orElse(null))
@@ -79,7 +79,9 @@ public class DraftClaimFormMapper {
                 getCorrespondenceAddress(defendantDetails),
                 getContactPerson(defendantDetails)
             ))
-            .generationDate(LocalDate.now())
+            .generationDate(LocalDateTime.now())
+            .claimIssuedDate(caseData.getIssueDate())
+            .claimNumber(caseData.getLegacyCaseReference())
             .build();
     }
 
