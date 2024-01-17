@@ -54,7 +54,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_1V2_SAME_SOL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_2V1_LIP;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N2_LIP;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.isAfterFourPM;
 
 @Service
@@ -109,11 +108,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
                 }
             }
         } else {
-            if (YesOrNo.NO.equals(caseData.getSpecRespondent1Represented())) {
-                sealedTemplate = N2_LIP;
-            } else {
-                sealedTemplate = N2;
-            }
+            sealedTemplate = N2;
         }
         return sealedTemplate;
     }
@@ -185,8 +180,7 @@ public class SealedClaimFormGeneratorForSpec implements TemplateDataGenerator<Se
             .descriptionOfClaim(caseData.getDetailsOfClaim())
             .applicantRepresentativeOrganisationName(representativeService.getApplicantRepresentative(caseData)
                                                          .getOrganisationName())
-            .defendantResponseDeadlineDate(YesOrNo.YES.equals(caseData.getRespondent1Represented())
-                                               ? getResponseDeadline(caseData) : "")
+            .defendantResponseDeadlineDate(getResponseDeadline(caseData))
             .build();
     }
 
