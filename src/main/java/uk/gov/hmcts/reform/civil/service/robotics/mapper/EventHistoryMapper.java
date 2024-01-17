@@ -981,6 +981,7 @@ public class EventHistoryMapper {
                                   .build())
                 .build());
     }
+
     private void buildGeneralFormApplicationEventsStrikeOutOrder(EventHistory.EventHistoryBuilder builder,
                                                                  CaseData caseData) {
         if (caseData.getGeneralApplications() != null) {
