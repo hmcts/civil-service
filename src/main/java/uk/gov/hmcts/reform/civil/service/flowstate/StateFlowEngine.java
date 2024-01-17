@@ -167,7 +167,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC_BILINGUAL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SETTLEMENT_AGREEMENT;
@@ -262,18 +261,13 @@ public class StateFlowEngine {
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffBeforeClaimIssued)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC_BILINGUAL).onlyIf(isLipCase.and(claimIssueBilingual))
-                .set(flags -> {
-                    if (featureToggleService.isPinInPostEnabled()) {
-                        flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                    }
-                    flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
-                    flags.put(FlowFlag.LIP_CASE.name(), true);
-                })
-                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLipCase.and(not(claimIssueBilingual)))
-                    .set(flags -> {
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLipCase)
+                .set((c, flags) -> {
                         if (featureToggleService.isPinInPostEnabled()) {
                             flags.put(FlowFlag.PIP_ENABLED.name(), true);
+                        }
+                        if (claimIssueBilingual.test(c)){
+                            flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
                         }
                         flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                         flags.put(FlowFlag.LIP_CASE.name(), true);
@@ -300,16 +294,8 @@ public class StateFlowEngine {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
                 }
             })
-            .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC_BILINGUAL)
-            .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim).and(claimIssueBilingual))
-            .set(flags -> {
-                if (featureToggleService.isPinInPostEnabled()) {
-                    flags.put(FlowFlag.PIP_ENABLED.name(), true);
-                }
-                flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
-            })
             .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC)
-            .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim).and(not(claimIssueBilingual)))
+            .onlyIf(oneVsOneCase.and(respondent1NotRepresented).and(specClaim))
             .set(flags -> {
                 if (featureToggleService.isPinInPostEnabled()) {
                     flags.put(FlowFlag.PIP_ENABLED.name(), true);
@@ -618,7 +604,6 @@ public class StateFlowEngine {
             .state(IN_HEARING_READINESS)
             .state(FULL_ADMIT_JUDGMENT_ADMISSION)
             .state(SIGN_SETTLEMENT_AGREEMENT)
-            .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC_BILINGUAL)
             .build();
     }
 

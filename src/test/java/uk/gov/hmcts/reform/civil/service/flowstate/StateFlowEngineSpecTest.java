@@ -33,7 +33,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC_BILINGUAL;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREGISTERED_DEFENDANT;
@@ -511,28 +510,6 @@ class StateFlowEngineSpecTest {
                 SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
                 PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName(), TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT.fullName()
             );
-    }
-
-    // Specified 1V1  Unrepresented with state transition from  CLAIM_SUBMITTED -> PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC_BILINGUAL
-    @Test()
-    void shouldReturnPendingClaimIssuedUnrepresented1v1Bilingual_whenCaseDataAtStatePaymentSuccessfulAndClaimIssueBilingual() {
-        //Given
-        CaseData caseData = CaseDataBuilderSpec.builder().atStateSpec1v1UnrepresentedPendingClaimIssued().build();
-        caseData.setClaimantBilingualLanguagePreference("BOTH");
-        //When
-        StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
-
-        // Then Claim will go through state CLAIM_ISSUED_PAYMENT_SUCCESSFUL and finish at state PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC_BILINGUAL
-        assertThat(stateFlow.getState())
-            .extracting(State::getName)
-            .isNotNull()
-            .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC_BILINGUAL.fullName());
-        assertThat(stateFlow.getStateHistory())
-            .hasSize(4)
-            .extracting(State::getName)
-            .containsExactly(
-                SPEC_DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
-                PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC_BILINGUAL.fullName());
     }
 }
 
