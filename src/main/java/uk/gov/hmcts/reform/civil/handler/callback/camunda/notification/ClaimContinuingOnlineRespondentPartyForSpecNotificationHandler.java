@@ -67,15 +67,12 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
 
     private CallbackResponse notifyRespondentForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        if (caseData.isBilingual() && featureToggleService.isLipVLipEnabled()) {
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
+        }
         LocalDateTime claimNotificationDate = time.now();
         final CaseData.CaseDataBuilder caseDataBuilder
             = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
-
-        if(caseData.isBilingual() &&  featureToggleService.isLipVLipEnabled()){
-            return AboutToStartOrSubmitCallbackResponse.builder()
-                    .data(caseDataBuilder.build().toMap(objectMapper))
-                    .build();
-        }
 
         if (caseData.getRespondent1() != null && caseData.getRespondent1().getPartyEmail() != null) {
             generatePIPEmail(caseData);

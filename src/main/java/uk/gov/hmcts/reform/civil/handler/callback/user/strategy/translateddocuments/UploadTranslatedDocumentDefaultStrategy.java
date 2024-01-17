@@ -61,9 +61,8 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
     }
 
-    private boolean isClaimStateInPending(CaseData caseData){
+    private boolean isClaimStateInPending(CaseData caseData) {
         return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
                 && caseData.getCcdState().name().equals(CaseState.PENDING_CASE_ISSUED.name());
-
     }
 }
