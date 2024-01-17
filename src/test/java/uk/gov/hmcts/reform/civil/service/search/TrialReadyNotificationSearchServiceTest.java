@@ -33,6 +33,7 @@ class TrialReadyNotificationSearchServiceTest extends ElasticSearchServiceTest {
                           .should(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING")))
                           .should(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
                 .mustNot(matchQuery("data.allocatedTrack", "SMALL_CLAIM"))
+                .mustNot(matchQuery("data.responseClaimTrack", "SMALL_CLAIM"))
                 .mustNot(matchQuery("data.listingOrRelisting", ListingOrRelisting.RELISTING))
                 .mustNot(matchQuery("data.trialReadyNotified", YesOrNo.YES)));
 
