@@ -6532,6 +6532,7 @@ public class CaseDataBuilder {
         ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
         return this;
     }
+
     public CaseData build() {
         return CaseData.builder()
             // Create Claim

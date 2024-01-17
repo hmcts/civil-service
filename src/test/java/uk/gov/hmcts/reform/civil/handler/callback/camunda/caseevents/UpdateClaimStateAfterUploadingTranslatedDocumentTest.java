@@ -12,13 +12,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AFTER_TRANSLATED_DOCUMENT_UPLOADED;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCallbackHandlerTest {
@@ -67,7 +64,7 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
                 .ccdState(CaseState.CASE_ISSUED)
                 .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-       // when
+        // when
         var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
 
         // then
