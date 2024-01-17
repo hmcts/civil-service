@@ -107,7 +107,7 @@ public class TrialReadinessCallbackHandler extends CallbackHandler {
             errors.add(format(TOO_LATE));
         }
 
-        if (SMALL_CLAIM.equals(caseData.getAllocatedTrack())) {
+        if (SMALL_CLAIM.equals(caseData.getAllocatedTrack()) || "SMALL_CLAIM".equals(caseData.getResponseClaimTrack())) {
             errors.add(format(NO_SMALL_CLAIMS));
         }
 
