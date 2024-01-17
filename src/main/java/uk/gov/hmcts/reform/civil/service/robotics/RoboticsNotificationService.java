@@ -202,9 +202,6 @@ public class RoboticsNotificationService {
     }
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
-        if (isSpecClaim) {
-            return roboticsEmailConfiguration.getSpecRecipient();
-        }
         String recipient = isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
 
@@ -258,7 +255,9 @@ public class RoboticsNotificationService {
             eventHistory.getBreathingSpaceLifted(),
             eventHistory.getBreathingSpaceMentalHealthEntered(),
             eventHistory.getBreathingSpaceMentalHealthLifted(),
-            eventHistory.getJudgmentByAdmission()
+            eventHistory.getJudgmentByAdmission(),
+            eventHistory.getGeneralFormOfApplication(),
+            eventHistory.getDefenceStruckOut()
         );
         return eventsList.stream()
             .filter(Objects::nonNull)
@@ -285,7 +284,8 @@ public class RoboticsNotificationService {
         triggerReason = updateTriggerReason(eventHistory.getBreathingSpaceMentalHealthLifted(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getDirectionsQuestionnaireFiled(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getJudgmentByAdmission(), triggerReason);
-
+        triggerReason = updateTriggerReason(eventHistory.getGeneralFormOfApplication(), triggerReason);
+        triggerReason = updateTriggerReason(eventHistory.getDefenceStruckOut(), triggerReason);
         return triggerReason;
     }
 
