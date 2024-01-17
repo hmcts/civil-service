@@ -266,7 +266,7 @@ public class StateFlowEngine {
                         if (featureToggleService.isPinInPostEnabled()) {
                             flags.put(FlowFlag.PIP_ENABLED.name(), true);
                         }
-                        if (claimIssueBilingual.test(c)){
+                        if (claimIssueBilingual.test(c)) {
                             flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
                         }
                         flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
