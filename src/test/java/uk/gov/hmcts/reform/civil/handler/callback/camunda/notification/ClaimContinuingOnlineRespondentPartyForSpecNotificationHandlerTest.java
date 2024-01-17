@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -20,24 +22,18 @@ import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.*;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
-import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -82,7 +78,8 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
     @MockBean
     private Time time;
-
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Autowired
     private ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler handler;
 
@@ -207,6 +204,21 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
+    }
+
+    @Test
+    void  shouldNotNotifyRespondent1_whenBilingualSelectedAndR2Enabled() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder()
+                .build();
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
+        CallbackParams params = getCallbackParams(caseData);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        // When
+        handler.handle(params);
+
+        // Assertions
+        verify(notificationService, never()).sendMail(any(), any(), any(), any());
     }
 
 }
