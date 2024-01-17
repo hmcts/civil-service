@@ -4625,7 +4625,6 @@ class StateFlowEngineTest {
                 .caseAccessCategory(SPEC_CLAIM).build();
             caseData.setClaimantBilingualLanguagePreference("BOTH");
 
-
             // When
             when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
             StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
