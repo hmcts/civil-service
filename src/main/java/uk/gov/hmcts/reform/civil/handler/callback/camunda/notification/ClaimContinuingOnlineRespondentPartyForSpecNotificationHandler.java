@@ -47,7 +47,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private final PiPLetterGenerator pipLetterGenerator;
     private final BulkPrintService bulkPrintService;
     private final FeatureToggleService featureToggleService;
-    
+
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
