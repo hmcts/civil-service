@@ -1351,7 +1351,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                UPLOAD_MEDIATION_DOCUMENTS
             )
         ),
         entry(
