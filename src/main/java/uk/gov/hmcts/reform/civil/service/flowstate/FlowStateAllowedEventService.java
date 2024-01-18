@@ -1239,7 +1239,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                INITIATE_GENERAL_APPLICATION
             )
         ),
         entry(
