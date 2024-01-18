@@ -746,7 +746,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 MEDIATION_SUCCESSFUL,
                 MEDIATION_UNSUCCESSFUL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                INITIATE_GENERAL_APPLICATION
             )
         ),
         entry(

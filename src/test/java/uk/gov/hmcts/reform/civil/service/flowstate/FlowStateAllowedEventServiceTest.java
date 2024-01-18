@@ -733,7 +733,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         MEDIATION_SUCCESSFUL,
                         MEDIATION_UNSUCCESSFUL,
-                        ADD_UNAVAILABLE_DATES
+                        ADD_UNAVAILABLE_DATES,
+                        INITIATE_GENERAL_APPLICATION
                     }
                 ),
                 of(
