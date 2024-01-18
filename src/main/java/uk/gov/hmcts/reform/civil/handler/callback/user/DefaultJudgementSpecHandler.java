@@ -404,10 +404,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
     private CallbackResponse generateClaimForm(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
-
-        if (!caseData.isLRvLipOneVOne()) {
-            caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
-        }
+        caseDataBuilder.businessProcess(BusinessProcess.ready(DEFAULT_JUDGEMENT_SPEC));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
