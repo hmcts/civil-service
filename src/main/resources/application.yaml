@@ -318,7 +318,6 @@ notifications:
 
   notifyLipUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
   notifyUpdateTemplate: "734f9bb6-2e13-4364-8c25-b90a611b91a5"
-  notifyClaimantLipHelpWithFees: "242171a6-98c8-4fe3-b6d2-1748b39d2c9b"
 
   hearingNotificationLipDefendantTemplate: "9239a55e-fd08-4f03-9ba5-7d90ac35af41"
 
@@ -335,7 +334,7 @@ notifications:
 
   notifyApplicantLipRequestJudgementByAdmissionNotificationTemplate: "d6625ee3-f794-4a87-b0a3-bef7dd0663b9"
   notifyRespondentLipRequestJudgementByAdmissionNotificationTemplate: "6ced7f9c-b0fd-4fad-a76c-745873b9a3a2"
-  
+
   notifyClaimantLipHelpWithFees: "242171a6-98c8-4fe3-b6d2-1748b39d2c9b"
 
   notifyApplicantForSignedSettlementAgreement: "65459efd-a351-4a1b-814a-435aabe3beb5"
@@ -577,9 +576,6 @@ feign:
         url: http://fake/engine-rest/
       remoteExternalTaskService:
         url: http://fake/engine-rest/
-
-notifications:
-  govNotifyApiKey: some-gov-uk-notify-api-key
 
 testing:
   support:
