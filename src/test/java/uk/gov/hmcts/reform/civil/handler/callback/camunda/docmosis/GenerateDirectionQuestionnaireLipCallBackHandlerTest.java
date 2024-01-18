@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireLipGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DI
 @SpringBootTest(classes = {
     GenerateDirectionQuestionnaireLipCallBackHandler.class,
     JacksonAutoConfiguration.class,
+    AssignCategoryId.class
 })
 class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -45,6 +47,8 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     private DirectionsQuestionnaireLipGenerator directionsQuestionnaireLipGenerator;
     @MockBean
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
+    @MockBean
+    private AssignCategoryId assignCategoryId;
 
     private static final CaseDocument FORM = CaseDocument.builder()
         .createdBy("John")
