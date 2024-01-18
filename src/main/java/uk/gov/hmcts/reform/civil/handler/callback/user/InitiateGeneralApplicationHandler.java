@@ -99,12 +99,6 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
 
-        if (featureToggleService.isEarlyAdoptersEnabled()
-            && !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                  .getBaseLocation()))) {
-            errors.add(NOT_IN_EA_REGION);
-        }
-
         if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
