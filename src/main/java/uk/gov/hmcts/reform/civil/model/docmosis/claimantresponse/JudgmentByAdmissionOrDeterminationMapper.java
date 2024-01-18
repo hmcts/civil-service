@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
