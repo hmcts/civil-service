@@ -577,6 +577,9 @@ feign:
       remoteExternalTaskService:
         url: http://fake/engine-rest/
 
+notifications:
+  govNotifyApiKey: some-gov-uk-notify-api-key
+
 testing:
   support:
     enabled: true
