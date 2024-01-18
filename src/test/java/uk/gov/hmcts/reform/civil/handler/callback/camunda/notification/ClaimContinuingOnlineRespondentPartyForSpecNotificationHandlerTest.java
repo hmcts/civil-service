@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
@@ -82,7 +83,8 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
     @MockBean
     private Time time;
-
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Autowired
     private ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler handler;
 
@@ -207,6 +209,21 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC);
+    }
+
+    @Test
+    void  shouldNotNotifyRespondent1_whenBilingualSelectedAndR2Enabled() {
+        // Given
+        CaseData caseData = CaseDataBuilder.builder()
+                .build();
+        caseData.setClaimantBilingualLanguagePreference("BOTH");
+        CallbackParams params = getCallbackParams(caseData);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        // When
+        handler.handle(params);
+
+        // Assertions
+        verify(notificationService, never()).sendMail(any(), any(), any(), any());
     }
 
 }
