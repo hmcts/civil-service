@@ -112,12 +112,12 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
-    public static LocalDate specificTestDate4weeks = LocalDate.of(2024, 11, 27);
-    public static LocalDate specificTestDate6weeks = LocalDate.of(2024, 11, 13);
-    public static LocalDate specificTestDate8weeks = LocalDate.of(2024, 10, 30);
-    public static LocalDate specificTestDate10weeks = LocalDate.of(2024, 10, 16);
-    public static LocalDate specificTestDate12weeks = LocalDate.of(2024, 10, 2);
-    public static LocalDate specificTestDate14weeks = LocalDate.of(2024, 9, 18);
+    public static final LocalDate specificTestDate4weeks = LocalDate.of(2024, 11, 27);
+    public static final LocalDate specificTestDate6weeks = LocalDate.of(2024, 11, 13);
+    public static final LocalDate specificTestDate8weeks = LocalDate.of(2024, 10, 30);
+    public static final LocalDate specificTestDate10weeks = LocalDate.of(2024, 10, 16);
+    public static final LocalDate specificTestDate12weeks = LocalDate.of(2024, 10, 2);
+    public static final LocalDate specificTestDate14weeks = LocalDate.of(2024, 9, 18);
 
     private final IdamClient idamClient;
     private final AssignCategoryId assignCategoryId;
