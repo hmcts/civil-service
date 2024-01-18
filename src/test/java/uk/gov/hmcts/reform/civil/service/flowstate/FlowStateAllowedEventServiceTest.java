@@ -127,7 +127,6 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_O
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_UNREPRESENTED_UNREGISTERED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_SDO;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
 
 @SpringBootTest(classes = {
     JacksonAutoConfiguration.class,
@@ -925,9 +924,6 @@ class FlowStateAllowedEventServiceTest {
                         TAKEN_OFFLINE_AFTER_SDO.fullName(),
                         IN_HEARING_READINESS.fullName()
                     }
-                ),
-                of(UPLOAD_TRANSLATED_DOCUMENT,
-                        new String[] {PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName()}
                 )
             );
         }
