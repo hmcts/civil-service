@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
@@ -15,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -25,6 +26,8 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
     private final JudgementService judgementService;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
@@ -47,12 +50,13 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         );
 
         String totalClaimAmount = Optional.ofNullable(caseData.getTotalClaimAmount())
-            .map(BigDecimal::toString)
-            .orElse("0");
+            .map(amount -> amount.setScale(2).toString())
+            .orElse("0.00");
 
-        String totalInterest = judgementService.ccjJudgmentInterest(caseData).toString();
+        String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
 
         JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
+        LocalDateTime now = LocalDateTime.now();
         return builder
             .formHeader(getFormHeader(caseData))
             .formName(getFormName(caseData))
@@ -65,14 +69,15 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .paymentTypeDisplayValue(getPaymentType(caseData).getDisplayedValue())
             .payBy(setPayByDate(caseData))
             .repaymentPlan(addRepaymentPlan(caseData))
-            .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).toString())
+            .ccjJudgmentAmount(judgementService.ccjJudgmentClaimAmount(caseData).setScale(2).toString())
             .ccjInterestToDate(totalInterest)
-            .claimFee(judgementService.ccjJudgmentClaimFee(caseData).toString())
-            .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).toString())
-            .ccjAlreadyPaidAmount(judgementService.ccjJudgmentPaidAmount(caseData).toString())
-            .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).toString())
+            .claimFee(judgementService.ccjJudgmentClaimFee(caseData).setScale(2).toString())
+            .ccjSubtotal(judgementService.ccjJudgementSubTotal(caseData).setScale(2).toString())
+            .ccjAlreadyPaidAmount(judgementService.ccjJudgmentPaidAmount(caseData).setScale(2).toString())
+            .ccjFinalTotal(judgementService.ccjJudgmentFinalTotal(caseData).setScale(2).toString())
             .defendantResponse(caseData.getRespondent1ClaimResponseTypeForSpec())
-            .generationDate(LocalDate.now())
+            .generationDate(now.toLocalDate())
+            .generationDateTime(now.format(formatter))
             .build();
     }
 
@@ -113,7 +118,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.REPAYMENT_PLAN)) {
             return builder
                 .firstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
-                .paymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec())
+                .paymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec().setScale(2))
                 .paymentFrequencyDisplay(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec().getLabel())
                 .build();
         }

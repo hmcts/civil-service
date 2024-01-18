@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -610,6 +611,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String respondent1DocumentURL;
     private final String respondent2DocumentURL;
     private final String respondent2DocumentGeneration;
+    private final String hearingHelpFeesReferenceNumber;
 
     // judge final orders
     private final FinalOrderSelection finalOrderSelection;
@@ -806,6 +808,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isClaimantAcceptedClaimAmount() {
+        return YES.equals(getApplicant1AcceptAdmitAmountPaidSpec());
+    }
+    
+    @JsonIgnore
     public boolean isClaimantRejectsClaimAmount() {
         return NO.equals(getApplicant1AcceptAdmitAmountPaidSpec());
     }
@@ -924,6 +931,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isPartAdmitClaimSpec() {
         return PART_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec());
+    }
+
+    @JsonIgnore
+    public boolean isPartAdmitImmediatePaymentClaimSettled() {
+        return (isPartAdmitClaimSpec()
+                && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
+                && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
+                && PaymentType.IMMEDIATELY.equals(getApplicant1RepaymentOptionForDefendantSpec()));
     }
 
     @JsonIgnore
