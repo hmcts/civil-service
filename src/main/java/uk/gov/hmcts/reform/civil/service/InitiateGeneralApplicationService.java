@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategory;
+import uk.gov.hmcts.reform.civil.model.genapplication.GACaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
@@ -167,6 +169,27 @@ public class InitiateGeneralApplicationService {
                 .generalAppInformOtherParty(GAInformOtherParty.builder().build())
                 .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
         }
+
+        GACaseManagementCategoryElement civil =
+            GACaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
+        List<Element<GACaseManagementCategoryElement>> itemList = new ArrayList<>();
+        itemList.add(element(civil));
+        applicationBuilder.caseManagementCategory(
+            GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
+
+        Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+        //Setting Work Allocation location and location name
+        if (Objects.isNull(caseLocation.getLeft().getSiteName())
+            && Objects.nonNull(caseLocation.getLeft().getBaseLocation())) {
+            LocationRefData  locationDetails = getWorkAllocationLocationDetails(caseLocation.getLeft().getBaseLocation(), authToken);
+            caseLocation.getLeft().setSiteName(locationDetails.getSiteName());
+            caseLocation.getLeft().setAddress(locationDetails.getCourtAddress());
+            caseLocation.getLeft().setPostcode(locationDetails.getPostcode());
+        }
+        applicationBuilder.caseManagementLocation(caseLocation.getLeft());
+        applicationBuilder.isCcmccLocation(caseLocation.getRight() ? YES : NO);
+        applicationBuilder.locationName(hasSDOBeenMade(caseData.getCcdState())
+                                            ? caseData.getLocationName() : caseLocation.getLeft().getSiteName());
 
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
