@@ -168,7 +168,6 @@ public class InitiateGeneralApplicationService {
                 .generalAppStatementOfTruth(GAStatementOfTruth.builder().build());
         }
 
-
         LocalDateTime deadline = deadlinesCalculator
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
