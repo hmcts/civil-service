@@ -62,6 +62,18 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
                           .documentBinaryUrl("binary-url")
                           .build())
         .build();
+    private static final CaseDocument FORM_DEFENDANT = CaseDocument.builder()
+        .createdBy("John")
+        .documentName("defendant_doc")
+        .documentSize(0L)
+        .documentType(DIRECTIONS_QUESTIONNAIRE)
+        .createdDatetime(LocalDateTime.now())
+        .documentLink(Document.builder()
+                          .documentUrl("fake-url")
+                          .documentFileName("file-name")
+                          .documentBinaryUrl("binary-url")
+                          .build())
+        .build();
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     @BeforeEach
@@ -95,5 +107,16 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
             systemGeneratedDocumentService,
             never()
         ).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
+    }
+
+    @Test
+    void shouldNotGenerateForm_whenAboutToSubmitCalledWithFullAdmissionWithDefendantDoc() {
+        // Given
+        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString()))
+            .willReturn(FORM_DEFENDANT);
+        CaseData caseData = CaseData.builder().build();
+
+        handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
     }
 }
