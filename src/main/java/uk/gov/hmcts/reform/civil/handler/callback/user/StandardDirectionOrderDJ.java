@@ -112,7 +112,13 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
-    public static LocalDate specificTestDate = LocalDate.of(2024, 12, 11);
+    public static LocalDate specificTestDate4weeks = LocalDate.of(2024, 11, 27);
+    public static LocalDate specificTestDate6weeks = LocalDate.of(2024, 11, 13);
+    public static LocalDate specificTestDate8weeks = LocalDate.of(2024, 10, 30);
+    public static LocalDate specificTestDate10weeks = LocalDate.of(2024, 10, 16);
+    public static LocalDate specificTestDate12weeks = LocalDate.of(2024, 10, 2);
+    public static LocalDate specificTestDate14weeks = LocalDate.of(2024, 9, 18);
+
     private final IdamClient idamClient;
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
@@ -240,7 +246,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                    + "reliance is to be"
                                                                    + " placed at the disposal hearing "
                                                                    + "by 4pm on")
-                                                        .date(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+                                                        .date(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
                                                         .build());
 
         caseDataBuilder
@@ -250,11 +256,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                             + "the witness statements of all witnesses "
                                                             + "of fact on whose evidence reliance is "
                                                             + "to be placed by 4pm on ")
-                                                .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+                                                .date1(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
                                                 .input2("The provisions of CPR 32.6 apply to such evidence.")
                                                 .input3("Any application by the defendant in relation to CPR 32.7 "
                                                             + "must be made by 4pm on")
-                                                .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(2)))
+                                                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(2)))
                                                 .input4("and must be accompanied by proposed directions for allocation"
                                                             + " and listing for trial on quantum. This is because"
                                                             + " cross-examination will cause the hearing to exceed"
@@ -271,13 +277,13 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                          + " upon any associated correspondence or "
                                                                          + "updating report which is uploaded to the "
                                                                          + "Digital Portal by 4pm on")
-                                                             .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+                                                             .date1(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
 
                                                              .build());
 
         caseDataBuilder.disposalHearingQuestionsToExpertsDJ(DisposalHearingQuestionsToExpertsDJ
                                                                 .builder()
-                                                                .date(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(6)))
+                                                                .date(workingDayIndicator.getNextWorkingDay(specificTestDate6weeks.plusWeeks(6)))
                                                                 .build());
 
         caseDataBuilder.disposalHearingSchedulesOfLossDJ(DisposalHearingSchedulesOfLossDJ
@@ -287,17 +293,17 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                          + " the claimant"
                                                                          + " must send an up to date schedule of "
                                                                          + "loss to the defendant by 4pm on the")
-                                                             .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+                                                             .date1(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
                                                              .input2("If the defendant wants to challenge this claim,"
                                                                          + " they must send an up-to-date "
                                                                          + "counter-schedule of loss to the "
                                                                          + "claimant by 4pm on")
-                                                             .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(12)))
+                                                             .date2(workingDayIndicator.getNextWorkingDay(specificTestDate12weeks.plusWeeks(12)))
                                                              .input3("If the defendant wants to challenge the"
                                                                          + " sums claimed in the schedule of loss they"
                                                                          + " must upload to the Digital Portal an "
                                                                          + "updated counter schedule of loss by 4pm on")
-                                                             .date3(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(12)))
+                                                             .date3(workingDayIndicator.getNextWorkingDay(specificTestDate12weeks.plusWeeks(12)))
                                                              .inputText4("If there is a claim for future pecuniary loss"
                                                                              + " and the parties have not already set out"
                                                                              + " their case on periodical payments, they"
@@ -344,7 +350,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                               + "aside or varied. Any such application must be uploaded "
                                                               + "to the Digital Portal together with payment of any "
                                                               + "appropriate fee, by 4pm on")
-                                                   .date(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(1)))
+                                                   .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)))
                                                    .build());
 
         // copy of disposalHearingNotesDJ field to update order made without hearing field without breaking
@@ -375,18 +381,18 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                      .input1("Standard disclosure shall be provided by "
                                                                  + "the parties by uploading to the digital "
                                                                  + "portal their lists of documents by 4pm on")
-                                                     .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+                                                     .date1(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
                                                      .input2("Any request to inspect a document, or for a copy of a "
                                                                  + "document, shall be made directly to the other"
                                                                  + " party by 4pm on")
-                                                     .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(6)))
+                                                     .date2(workingDayIndicator.getNextWorkingDay(specificTestDate6weeks.plusWeeks(6)))
                                                      .input3("Requests will be complied with within 7 days of the"
                                                                  + " receipt of the request")
                                                      .input4("Each party must upload to the Digital Portal"
                                                                  + " copies of those documents on which they wish to rely"
                                                                  + " at trial")
                                                      .input5("by 4pm on")
-                                                     .date3(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+                                                     .date3(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
                                                      .build());
 
         caseDataBuilder
@@ -404,7 +410,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                          + "using a font size of 12.")
                                              .input8("Witness statements shall be uploaded to the "
                                                          + "Digital Portal by 4pm on")
-                                             .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+                                             .date1(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
                                              .input9("Evidence will not be permitted at trial from a witness whose "
                                                          + "statement has not been uploaded in accordance with this"
                                                          + " Order. Evidence not uploaded, or uploaded late, will not "
@@ -416,11 +422,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                .builder()
                                                .input1("The claimant must upload to the Digital Portal an "
                                                            + "up-to-date schedule of loss to the defendant by 4pm on")
-                                               .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+                                               .date1(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
                                                .input2("If the defendant wants to challenge this claim, "
                                                            + "upload to the Digital Portal counter-schedule"
                                                            + " of loss by 4pm on")
-                                               .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(12)))
+                                               .date2(workingDayIndicator.getNextWorkingDay(specificTestDate12weeks.plusWeeks(12)))
                                                .input3("If there is a claim for future pecuniary loss and the parties"
                                                            + " have not already set out their "
                                                            + "case on periodical payments. "
@@ -431,8 +437,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         caseDataBuilder.trialHearingTrialDJ(TrialHearingTrial
                                                 .builder()
                                                 .input1("The time provisionally allowed for the trial is")
-                                                .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(22)))
-                                                .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(34)))
+                                                .date1(LocalDate.now().plusWeeks(22))
+                                                .date2(LocalDate.now().plusWeeks(34))
                                                 .input2("If either party considers that the time estimates is"
                                                             + " insufficient, they must inform the court within "
                                                             + "7 days of the date of this order.")
@@ -485,7 +491,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                            + "aside or varied."
                                                            + " Any such application must be received by the court "
                                                            + "(together with the appropriate fee) by 4pm on")
-                                                .date(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(1)))
+                                                .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)))
                                                 .build());
 
         caseDataBuilder.trialBuildingDispute(TrialBuildingDispute
@@ -501,11 +507,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                  .input3("The claimant must upload to the Digital Portal the "
                                                              + "Scott Schedule with the relevant "
                                                              + "columns completed by 4pm on")
-                                                 .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+                                                 .date1(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
                                                  .input4("The defendant must upload to the Digital Portal "
                                                              + "an amended version of the Scott Schedule with the relevant"
                                                              + " columns in response completed by 4pm on")
-                                                 .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(12)))
+                                                 .date2(workingDayIndicator.getNextWorkingDay(specificTestDate12weeks.plusWeeks(12)))
                                                  .build());
 
         caseDataBuilder.trialClinicalNegligence(TrialClinicalNegligence
@@ -551,7 +557,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                         + "statement addressing \na) the need to hire a replacement "
                                                         + "vehicle; and \nb) impecuniosity")
                                             .input3("This statement must be uploaded to the Digital Portal by 4pm on")
-                                            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+                                            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
                                             .input4("A failure to comply will result in the claimant being "
                                                         + "debarred from asserting need or relying on impecuniosity "
                                                         + "as the case may be at the final hearing, unless they "
@@ -559,7 +565,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                             .input5("The parties are to liaise and use reasonable endeavours to"
                                                         + " agree the basic hire rate no "
                                                         + "later than 4pm on")
-                                            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+                                            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
                                             .input6("If the parties fail to agree rates subject to liability "
                                                         + "and/or other issues pursuant to the paragraph above, "
                                                         + "each party may rely upon the written evidence by way of"
@@ -569,10 +575,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                         + " location from a mainstream supplier, or a local reputable "
                                                         + "supplier if none is available. The defendant’s evidence is "
                                                         + "to be uploaded to the Digital Portal by 4pm on")
-                                            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(12)))
+                                            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate12weeks.plusWeeks(12)))
                                             .input7("and the claimant’s evidence in reply if "
                                                         + "so advised is to be uploaded by 4pm on")
-                                            .date4(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(14)))
+                                            .date4(workingDayIndicator.getNextWorkingDay(specificTestDate14weeks.plusWeeks(14)))
                                             .input8("This witness statement is limited to 10 pages per party "
                                                         + "(to include any appendices).")
                                             .build());
@@ -585,17 +591,17 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                             + "has permission to rely upon any associated "
                                                             + "correspondence or updating report which is uploaded "
                                                             + "to the Digital Portal by 4pm on")
-                                                .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+                                                .date1(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
                                                 .input2("Any questions which are to be addressed to an expert must "
                                                             + "be sent to the expert directly and"
                                                             + " uploaded to the Digital "
                                                             + "Portal by 4pm on")
-                                                .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+                                                .date2(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
                                                 .input3("The answers to the questions shall be answered "
                                                             + "by the Expert by")
-                                                .date3(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+                                                .date3(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
                                                 .input4("and uploaded to the Digital Portal by")
-                                                .date4(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+                                                .date4(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
                                                 .build());
 
         caseDataBuilder.trialRoadTrafficAccident(TrialRoadTrafficAccident
@@ -604,7 +610,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                                 + "shall be prepared "
                                                                 + "and agreed by the parties and uploaded to the"
                                                                 + " Digital Portal by 4pm on")
-                                                     .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+                                                     .date1(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
                                                      .build());
 
         caseDataBuilder.trialHousingDisrepair(TrialHousingDisrepair.builder()
@@ -617,11 +623,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                   .input3("The claimant must upload to the Digital Portal the "
                                                               + "Scott Schedule with the relevant columns "
                                                               + "completed by 4pm on")
-                                                  .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+                                                  .date1(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
                                                   .input4("The defendant must upload to the Digital Portal "
                                                               + "the amended Scott Schedule with the relevant columns "
                                                               + "in response completed by 4pm on")
-                                                  .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(12)))
+                                                  .date2(workingDayIndicator.getNextWorkingDay(specificTestDate12weeks.plusWeeks(12)))
                                                   .build());
 
         return AboutToStartOrSubmitCallbackResponse.builder()

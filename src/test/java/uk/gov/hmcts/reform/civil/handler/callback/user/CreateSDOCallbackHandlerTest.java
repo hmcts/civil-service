@@ -1301,9 +1301,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("input1")
                 .isEqualTo("The time provisionally allowed for this trial is");
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("date1")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("date2")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(30).toString());
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("input2")
                 .isEqualTo("If either party considers that the time estimate is insufficient, they must inform the"
                                + " court within 7 days of the date stated on this order.");

@@ -150,7 +150,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     public static final String FEEDBACK_LINK = "<p>%s"
         + " <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>";
 
-    public static LocalDate specificTestDate = LocalDate.of(2024, 12, 11);
+    public static LocalDate specificTestDate4weeks = LocalDate.of(2024, 11, 27);
+    public static LocalDate specificTestDate6weeks = LocalDate.of(2024, 11, 13);
+    public static LocalDate specificTestDate8weeks = LocalDate.of(2024, 10, 30);
+    public static LocalDate specificTestDate10weeks = LocalDate.of(2024, 10, 16);
+    public static LocalDate specificTestDate12weeks = LocalDate.of(2024, 10, 2);
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
@@ -243,10 +247,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             DisposalHearingDisclosureOfDocuments.builder()
                 .input1("The parties shall serve on each other copies of the documents upon which reliance is to be"
                             + " placed at the disposal hearing by 4pm on")
-                .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+                .date1(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
                 .input2("The parties must upload to the Digital Portal copies of those documents which they wish the "
                             + "court to consider when deciding the amount of damages, by 4pm on")
-                .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+                .date2(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
                 .build();
 
         updatedData.disposalHearingDisclosureOfDocuments(tempDisposalHearingDisclosureOfDocuments).build();
@@ -254,10 +258,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         DisposalHearingWitnessOfFact tempDisposalHearingWitnessOfFact = DisposalHearingWitnessOfFact.builder()
             .input3("The claimant must upload to the Digital Portal copies of the witness statements of all witnesses"
                         + " of fact on whose evidence reliance is to be placed by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
             .input4("The provisions of CPR 32.6 apply to such evidence.")
             .input5("Any application by the defendant in relation to CPR 32.7 must be made by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(6)))
+            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate6weeks.plusWeeks(6)))
             .input6("and must be accompanied by proposed directions for allocation and listing for trial on quantum. "
                         + "This is because cross-examination will cause the hearing to exceed the 30-minute "
                         + "maximum time estimate for a disposal hearing.")
@@ -270,14 +274,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                        + " Digital Portal with the particulars of claim and in addition has permission to rely upon"
                        + " any associated correspondence or updating report which is uploaded to the Digital Portal"
                        + " by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+            .date(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
             .build();
 
         updatedData.disposalHearingMedicalEvidence(tempDisposalHearingMedicalEvidence).build();
 
         DisposalHearingQuestionsToExperts tempDisposalHearingQuestionsToExperts = DisposalHearingQuestionsToExperts
             .builder()
-            .date(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(6)))
+            .date(workingDayIndicator.getNextWorkingDay(specificTestDate6weeks.plusWeeks(6)))
             .build();
 
         updatedData.disposalHearingQuestionsToExperts(tempDisposalHearingQuestionsToExperts).build();
@@ -285,13 +289,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         DisposalHearingSchedulesOfLoss tempDisposalHearingSchedulesOfLoss = DisposalHearingSchedulesOfLoss.builder()
             .input2("If there is a claim for ongoing or future loss in the original schedule of losses, the claimant"
                         + " must upload to the Digital Portal an up-to-date schedule of loss by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
             .input3("If the defendant wants to challenge this claim, "
                         + "they must send an up-to-date counter-schedule of loss to the claimant by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(12)))
+            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate12weeks.plusWeeks(12)))
             .input4("If the defendant want to challenge the sums claimed in the schedule of loss they must upload"
                         + " to the Digital Portal an updated counter schedule of loss by 4pm on")
-            .date4(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(12)))
+            .date4(workingDayIndicator.getNextWorkingDay(specificTestDate12weeks.plusWeeks(12)))
             .build();
 
         updatedData.disposalHearingSchedulesOfLoss(tempDisposalHearingSchedulesOfLoss).build();
@@ -337,7 +341,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order"
                        + " set aside or varied. Any such application must be uploaded to the Digital Portal"
                        + " together with the appropriate fee, by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(1)))
+            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)))
             .build();
 
         updatedData.disposalHearingNotes(tempDisposalHearingNotes).build();
@@ -351,14 +355,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         FastTrackDisclosureOfDocuments tempFastTrackDisclosureOfDocuments = FastTrackDisclosureOfDocuments.builder()
             .input1("Standard disclosure shall be provided by the parties by uploading to the Digital Portal their "
                         + "list of documents by 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
             .input2("Any request to inspect a document, or for a copy of a document, shall be made directly to "
                         + "the other party by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(6)))
+            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate6weeks.plusWeeks(6)))
             .input3("Requests will be complied with within 7 days of the receipt of the request.")
             .input4("Each party must upload to the Digital Portal copies of those documents on which they wish to"
                         + " rely at trial by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
             .build();
 
         updatedData.fastTrackDisclosureOfDocuments(tempFastTrackDisclosureOfDocuments).build();
@@ -373,7 +377,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input6("10")
             .input7("A4 pages. Statements should be double spaced using a font size of 12.")
             .input8("Witness statements shall be uploaded to the Digital Portal by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+            .date(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
             .input9("Evidence will not be permitted at trial from a witness whose statement has not been uploaded "
                         + "in accordance with this Order. Evidence not uploaded, or uploaded late, will not be "
                         + "permitted except with permission from the Court.")
@@ -384,10 +388,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         FastTrackSchedulesOfLoss tempFastTrackSchedulesOfLoss = FastTrackSchedulesOfLoss.builder()
             .input1("The claimant must upload to the Digital Portal an up-to-date schedule of loss to the "
                         + "defendant by 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
             .input2("If the defendant wants to challenge this claim, upload to the Digital Portal "
                         + "counter-schedule of loss by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(12)))
+            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate12weeks.plusWeeks(12)))
             .input3("If there is a claim for future pecuniary loss and the parties have not already set out "
                         + "their case on periodical payments, they must do so in the respective schedule and "
                         + "counter-schedule.")
@@ -397,8 +401,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         FastTrackTrial tempFastTrackTrial = FastTrackTrial.builder()
             .input1("The time provisionally allowed for this trial is")
-            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(22)))
-            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(30)))
+            .date1(LocalDate.now().plusWeeks(22))
+            .date2(LocalDate.now().plusWeeks(30))
             .input2("If either party considers that the time estimate is insufficient, they must inform the court "
                         + "within 7 days of the date stated on this order.")
             .input3("At least 7 days before the trial, the claimant must upload to the Digital Portal")
@@ -426,7 +430,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input("This Order has been made without a hearing. Each party has the right to apply to have this Order "
                        + "set aside or varied. Any application must be received by the Court, "
                        + "together with the appropriate fee by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(1)))
+            .date(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(1)))
             .build();
 
         updatedData.fastTrackNotes(tempFastTrackNotes).build();
@@ -457,10 +461,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "  •  Reserved for Judge’s use")
             .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant columns"
                         + " completed by 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
             .input4("The defendant must upload to the Digital Portal an amended version of the Scott Schedule "
                         + "with the relevant columns in response completed by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(12)))
+            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate12weeks.plusWeeks(12)))
             .build();
 
         updatedData.fastTrackBuildingDispute(tempFastTrackBuildingDispute).build();
@@ -495,22 +499,22 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
                         + "a) the need to hire a replacement vehicle; and\n"
                         + "b) impecuniosity")
-            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
             .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                         + "save with permission of the Trial Judge.")
             .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
                         + "later than 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(6)))
+            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate6weeks.plusWeeks(6)))
             .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
                         + "one witness to provide evidence of basic hire rates available within the claimant's "
                         + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
                         + "is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
             .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
-            .date4(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+            .date4(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
             .input8("This witness statement is limited to 10 pages per party, including any appendices.")
             .build();
 
@@ -525,10 +529,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "  •  Reserved for Judge’s use")
             .input3("The claimant must upload to the Digital Portal the Scott Schedule with the relevant "
                         + "columns completed by 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
             .input4("The defendant must upload to the Digital Portal the amended Scott Schedule with the "
                         + "relevant columns in response completed by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(12)))
+            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate12weeks.plusWeeks(12)))
             .build();
 
         updatedData.fastTrackHousingDisrepair(tempFastTrackHousingDisrepair).build();
@@ -538,14 +542,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                         + "the Digital Portal with the particulars of claim and in addition has permission to rely upon"
                         + " any associated correspondence or updating report which is uploaded to the Digital Portal by"
                         + " 4pm on")
-            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
             .input2("Any questions which are to be addressed to an expert must be sent to the expert directly "
                         + "and uploaded to the Digital Portal by 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
             .input3("The answers to the questions shall be answered by the Expert by")
-            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
             .input4("and uploaded to the Digital Portal by")
-            .date4(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+            .date4(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
             .build();
 
         updatedData.fastTrackPersonalInjury(tempFastTrackPersonalInjury).build();
@@ -553,7 +557,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         FastTrackRoadTrafficAccident tempFastTrackRoadTrafficAccident = FastTrackRoadTrafficAccident.builder()
             .input("Photographs and/or a place of the accident location shall be prepared and agreed by the "
                        + "parties and uploaded to the Digital Portal by 4pm on")
-            .date(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+            .date(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
             .build();
 
         updatedData.fastTrackRoadTrafficAccident(tempFastTrackRoadTrafficAccident).build();
@@ -637,22 +641,22 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
                         + "a) the need to hire a replacement vehicle; and\n"
                         + "b) impecuniosity")
-            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(4)))
+            .date1(workingDayIndicator.getNextWorkingDay(specificTestDate4weeks.plusWeeks(4)))
             .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
                         + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
                         + "save with permission of the Trial Judge.")
             .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
                         + "later than 4pm on")
-            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(6)))
+            .date2(workingDayIndicator.getNextWorkingDay(specificTestDate6weeks.plusWeeks(6)))
             .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
                         + "paragraph above, each party may rely upon written evidence by way of witness statement of "
                         + "one witness to provide evidence of basic hire rates available within the claimant's "
                         + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
                         + "is available.")
             .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(8)))
+            .date3(workingDayIndicator.getNextWorkingDay(specificTestDate8weeks.plusWeeks(8)))
             .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
-            .date4(workingDayIndicator.getNextWorkingDay(specificTestDate.plusWeeks(10)))
+            .date4(workingDayIndicator.getNextWorkingDay(specificTestDate10weeks.plusWeeks(10)))
             .input11("This witness statement is limited to 10 pages per party, including any appendices.")
             .build();
 

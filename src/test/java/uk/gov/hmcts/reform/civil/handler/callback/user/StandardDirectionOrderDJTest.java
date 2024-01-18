@@ -347,9 +347,9 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialHearingTrialDJ").extracting("input1")
                 .isEqualTo("The time provisionally allowed for the trial is");
             assertThat(response.getData()).extracting("trialHearingTrialDJ").extracting("date1")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
             assertThat(response.getData()).extracting("trialHearingTrialDJ").extracting("date2")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(34).toString());
             assertThat(response.getData()).extracting("trialHearingTrialDJ").extracting("input2")
                 .isEqualTo("If either party considers that the time estimates is"
                                + " insufficient, they must inform the court within "
