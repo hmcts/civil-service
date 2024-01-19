@@ -52,7 +52,7 @@ public class ClaimFormMapper {
             getContactPerson(applicantDetails)
         );
         String totalClaimAmount = Optional.ofNullable(caseData.getTotalClaimAmount())
-            .map(amount-> amount.setScale(2))
+            .map(amount -> amount.setScale(2))
             .map(BigDecimal::toString)
             .orElse("0");
 
