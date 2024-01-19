@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -14,17 +15,25 @@ import java.time.ZoneId;
 public class FeatureToggleService {
 
     private final FeatureToggleApi featureToggleApi;
+    List<String> featureToggleOffInProd = List.of("general_applications_enabled",
+                                                  "bulk_claim_enabled", "hmc", "ahn", "update-contact-details",
+                                                  "cuiReleaseTwoEnabled",
+                                                  "isTransferOnlineCaseEnabled",
+                                                  "cui-case-progression", "isSdoR2Enabled", "carm");
 
     public boolean isFeatureEnabled(String feature) {
+        if (featureToggleOffInProd.contains(feature)) {
+            return false;
+        }
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
     public boolean isGeneralApplicationsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("general_applications_enabled");
+        return false;
     }
 
     public boolean isBulkClaimEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("bulk_claim_enabled");
+        return false;
     }
 
     public boolean isCaseFlagsEnabled() {
@@ -44,7 +53,7 @@ public class FeatureToggleService {
     }
 
     public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
+        return false;
     }
 
     public boolean isCaseFileViewEnabled() {
@@ -52,7 +61,7 @@ public class FeatureToggleService {
     }
 
     public boolean isAutomatedHearingNoticeEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("ahn");
+        return false;
     }
 
     public boolean isFastTrackUpliftsEnabled() {
@@ -60,11 +69,11 @@ public class FeatureToggleService {
     }
 
     public boolean isUpdateContactDetailsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("update-contact-details");
+        return false;
     }
 
     public boolean isLipVLipEnabled() {
-        return featureToggleApi.isFeatureEnabled("cuiReleaseTwoEnabled");
+        return false;
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
@@ -73,11 +82,11 @@ public class FeatureToggleService {
     }
 
     public boolean isTransferOnlineCaseEnabled() {
-        return featureToggleApi.isFeatureEnabled("isTransferOnlineCaseEnabled");
+        return false;
     }
 
     public boolean isCaseProgressionEnabled() {
-        return featureToggleApi.isFeatureEnabled("cui-case-progression");
+        return false;
     }
 
     public boolean isEarlyAdoptersEnabled() {
@@ -85,14 +94,12 @@ public class FeatureToggleService {
     }
 
     public boolean isSdoR2Enabled() {
-        return featureToggleApi.isFeatureEnabled("isSdoR2Enabled");
+        return false;
     }
 
     public boolean isCarmEnabledForCase(LocalDateTime submittedDate) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = submittedDate.atZone(zoneId).toEpochSecond();
-        return featureToggleApi.isFeatureEnabled("carm")
-            && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
-                                                            epoch, false);
+        return false;
     }
 }
