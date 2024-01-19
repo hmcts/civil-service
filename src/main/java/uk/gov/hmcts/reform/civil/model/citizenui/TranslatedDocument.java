@@ -22,7 +22,7 @@ public class TranslatedDocument {
     private TranslatedDocumentType documentType;
 
     @JsonIgnore
-    public DocumentType getCorrespondingDocumentType() {
+    public DocumentType getCorrespondingDocumentType(TranslatedDocumentType documentType) {
         switch (documentType) {
             case DEFENDANT_RESPONSE : return DEFENCE_TRANSLATED_DOCUMENT;
             case CLAIM_ISSUE : return CLAIM_ISSUE_TRANSLATED_DOCUMENT;
