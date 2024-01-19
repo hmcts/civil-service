@@ -59,7 +59,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
         " \n" +
         "To make a bespoke order in this claim, select 'General order' from the dropdown menu on the right of the " +
         "screen on your dashboard.";
-    private static final String upholdingPreviousOrderReason = "Having read the application for reconsideration of " +
+    private static final String UPHOLDING_PREVIOUS_ORDER_REASON = "Having read the application for reconsideration of " +
         "the Legal Advisor's order dated %s and the court file \n 1.The application for reconsideration of the order " +
         "is dismissed.";
 
@@ -95,7 +95,7 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            String reason = String.format(upholdingPreviousOrderReason, formatLocalDateTime(LocalDateTime.now(), DATE));
+            String reason = String.format(UPHOLDING_PREVIOUS_ORDER_REASON, formatLocalDateTime(LocalDateTime.now(), DATE));
             //Then: upholding reason should be set correctly
             assertThat(response.getData()).extracting("upholdingPreviousOrderReason")
                 .extracting("reasonForReconsiderationTxtYes")
