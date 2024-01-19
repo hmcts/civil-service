@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -15,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
-@Slf4j
+
 @Service
 @Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class SystemGeneratedDocumentService {
@@ -32,9 +30,6 @@ public class SystemGeneratedDocumentService {
         List<Element<CaseDocument>> systemGeneratedDocuments = caseData.getSystemGeneratedCaseDocuments();
         if (Objects.nonNull(translatedDocuments)) {
             for (Element<TranslatedDocument> translateDocument : translatedDocuments) {
-                log.info("-------------------getSystemGeneratedDocumentsWithAddedDocument-------------------------");
-                DocumentType docType = translateDocument.getValue().getCorrespondingDocumentType(translateDocument.getValue().getDocumentType());
-                log.info("DocType ----2-----" + docType.toString());
                 CaseDocument caseDocument = CaseDocument.toCaseDocument(translateDocument.getValue().getFile(),
                         translateDocument.getValue().getCorrespondingDocumentType(translateDocument.getValue().getDocumentType()));
                 systemGeneratedDocuments.add(element(caseDocument));
