@@ -73,6 +73,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .atStatePendingClaimIssued()
             .build()
             .builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .caseDataLiP(CaseDataLiP
                              .builder()
                              .translatedDocuments(translatedDocument)
@@ -101,7 +102,9 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         CaseData caseData = CaseDataBuilder
             .builder()
             .atStatePendingClaimIssued()
-            .build();
+            .build()
+            .builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
