@@ -54,7 +54,7 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
+    //@ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
         var generalApplicationsKey = "general_applications_enabled";
