@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ public class TranslatedDocumentUploadedDefendantNotificationHandler extends Call
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final FeatureToggleService featureToggleService;
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_DEFENDANT_TRANSLATED_DOCUMENT_UPLOADED);
     private static final String REFERENCE_TEMPLATE = "translated-document-uploaded-defendant-notification-%s";
     public static final String TASK_ID = "NotifyTranslatedDocumentUploadedToDefendant";
@@ -59,9 +57,7 @@ public class TranslatedDocumentUploadedDefendantNotificationHandler extends Call
 
     private CallbackResponse notifyDefendant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
+
         if (StringUtils.isNotEmpty(caseData.getRespondent1().getPartyEmail())) {
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
