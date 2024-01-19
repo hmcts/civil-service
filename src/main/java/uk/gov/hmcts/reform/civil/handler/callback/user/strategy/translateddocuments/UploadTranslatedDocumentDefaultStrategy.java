@@ -63,6 +63,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
 
     private boolean isClaimStateInPending(CaseData caseData) {
         return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-                && caseData.getCcdState().name().equals(CaseState.PENDING_CASE_ISSUED.name());
+                && caseData.getCcdState().equals(CaseState.PENDING_CASE_ISSUED.name());
     }
 }
