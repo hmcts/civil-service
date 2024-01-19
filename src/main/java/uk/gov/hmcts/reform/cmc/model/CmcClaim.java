@@ -444,7 +444,7 @@ public class CmcClaim implements Claim {
     public boolean isClaimantDefaultJudgement() {
         return false;
     }
-=
+    
     @Override
     public boolean isPartialAdmissionAccepted() {
 
