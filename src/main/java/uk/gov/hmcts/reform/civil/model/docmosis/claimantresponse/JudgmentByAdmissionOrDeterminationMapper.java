@@ -51,7 +51,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
         String totalClaimAmount = Optional.ofNullable(caseData.getTotalClaimAmount())
             .map(amount -> amount.setScale(2).toString())
-            .orElse("0.00");
+            .orElse("0");
 
         String totalInterest = judgementService.ccjJudgmentInterest(caseData).setScale(2).toString();
 
