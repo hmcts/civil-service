@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
+
 @Slf4j
 @Service
 @Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)

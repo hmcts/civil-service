@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CLAIM_ISSUE_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
+
 @Slf4j
 @Data
 @AllArgsConstructor
