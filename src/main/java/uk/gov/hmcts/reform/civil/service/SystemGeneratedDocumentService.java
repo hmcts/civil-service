@@ -33,10 +33,8 @@ public class SystemGeneratedDocumentService {
         if (Objects.nonNull(translatedDocuments)) {
             for (Element<TranslatedDocument> translateDocument : translatedDocuments) {
                 log.info("-------------------getSystemGeneratedDocumentsWithAddedDocument-------------------------");
-                log.info("DocType -----1----",translateDocument.getValue().getDocumentType().name().toString());
                 DocumentType docType = translateDocument.getValue().getCorrespondingDocumentType(translateDocument.getValue().getDocumentType());
-                log.info("DocType ----2-----",docType.toString());
-                System.out.println(docType);
+                log.info("DocType ----2-----" + docType.toString());
                 CaseDocument caseDocument = CaseDocument.toCaseDocument(translateDocument.getValue().getFile(),
                         translateDocument.getValue().getCorrespondingDocumentType(translateDocument.getValue().getDocumentType()));
                 systemGeneratedDocuments.add(element(caseDocument));

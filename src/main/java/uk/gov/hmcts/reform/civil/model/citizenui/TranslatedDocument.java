@@ -26,14 +26,13 @@ public class TranslatedDocument {
     public DocumentType getCorrespondingDocumentType(TranslatedDocumentType documentType) {
         log.info("-------------------getCorrespondingDocumentType-------------------------");
         log.info(documentType.toString());
-        log.info(documentType.name().toString());
         switch (documentType) {
             case DEFENDANT_RESPONSE : {
-                log.info("DEFENDANT_RESPONSE ---------");
+                log.info("------DEFENDANT_RESPONSE ---------");
                 return DEFENCE_TRANSLATED_DOCUMENT;
             }
             case CLAIM_ISSUE : {
-                log.info("CLAIM_ISSUE ---------");
+                log.info("------------CLAIM_ISSUE ---------");
                 return CLAIM_ISSUE_TRANSLATED_DOCUMENT;
             }
             default: throw new DocumentUploadException("No document file type found for Translated document");
