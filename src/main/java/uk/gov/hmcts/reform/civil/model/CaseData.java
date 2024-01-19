@@ -332,6 +332,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private final String defenceRouteRequired;
     private final String responseClaimTrack;
+    // used in elasticsearch
+    private final String responseClaimTrackSearch;
     private final RespondToClaim respondToClaim;
     private final RespondToClaim respondToAdmittedClaim;
     /**

@@ -911,8 +911,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             case SPEC_CLAIM:// spec claims use responseClaimTrack to hold claims track value
                 if (SdoHelper.isSmallClaimsTrack(caseData)) {
                     dataBuilder.responseClaimTrack(SMALL_CLAIM.name());
+                    dataBuilder.responseClaimTrackSearch(SMALL_CLAIM.name());
                 } else if (SdoHelper.isFastTrack(caseData)) {
                     dataBuilder.responseClaimTrack(FAST_CLAIM.name());
+                    dataBuilder.responseClaimTrackSearch(FAST_CLAIM.name());
                 }
                 break;
             default: break;
