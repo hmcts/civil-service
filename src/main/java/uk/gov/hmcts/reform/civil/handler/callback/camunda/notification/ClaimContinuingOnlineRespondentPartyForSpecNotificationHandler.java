@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
@@ -46,7 +45,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private final PinInPostConfiguration pipInPostConfiguration;
     private final PiPLetterGenerator pipLetterGenerator;
     private final BulkPrintService bulkPrintService;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -67,9 +65,6 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
 
     private CallbackResponse notifyRespondentForClaimContinuingOnline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (caseData.isBilingual() && featureToggleService.isLipVLipEnabled()) {
-            return AboutToStartOrSubmitCallbackResponse.builder().build();
-        }
         LocalDateTime claimNotificationDate = time.now();
         final CaseData.CaseDataBuilder caseDataBuilder
             = caseData.toBuilder().claimNotificationDate(claimNotificationDate);
