@@ -1899,7 +1899,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo'");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1915,7 +1915,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
+                .isEqualTo("'John Rambo', 'Jason Rambo' v 'Sole Trader'");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1931,7 +1931,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+                .isEqualTo("'John Rambo' v 'Sole Trader'");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
