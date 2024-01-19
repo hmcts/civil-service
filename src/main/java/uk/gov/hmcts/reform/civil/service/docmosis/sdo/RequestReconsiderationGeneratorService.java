@@ -91,9 +91,8 @@ public class RequestReconsiderationGeneratorService {
             )
             .hasRoadTrafficAccident(
                 SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident")
-            );
-            //.judgeDecisionOnReconRequest();
-            //.upholdingPreviousOrderReason(caseData.getUpholdingPreviousOrderReason());
+            )
+            .upholdingPreviousOrderReason(caseData.getUpholdingPreviousOrderReason());
 
         return DesicionOnReconsiderationDocumentFormBuilder
             .build();

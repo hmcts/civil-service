@@ -48,6 +48,8 @@ public class DesicionOnReconsiderationDocumentForm implements MappableObject {
     private final boolean hasRoadTrafficAccident;
     private final boolean writtenByJudge;
 
-    private final JudgeDecisionOnReconRequest judgeDecisionOnReconRequest;
+    private ReasonForReconsideration reasonForReconsideration;
+    private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
+    private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
 
 }
