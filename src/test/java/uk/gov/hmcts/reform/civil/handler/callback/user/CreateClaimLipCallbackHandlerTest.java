@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -24,6 +26,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
 import java.time.LocalDateTime;
@@ -60,6 +63,9 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     private SpecReferenceNumberRepository specReferenceNumberRepository;
 
     @MockBean
+    private CaseFlagsInitialiser caseFlagInitialiser;
+
+    @MockBean
     private Time time;
 
     @MockBean
@@ -69,6 +75,9 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     private CreateClaimLipCallBackHandler handler;
 
     public static final String REFERENCE_NUMBER = "000MC001";
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Nested
     class AboutToStatCallback {
@@ -91,12 +100,14 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private CallbackParams params;
         private CaseData caseData;
+        private static final String DEFENDANT_EMAIL_ADDRESS = "defendantmail@hmcts.net";
+        private static final String DEFENDANT_PARTY_NAME = "ABC ABC";
 
         private final LocalDateTime submittedDate = LocalDateTime.now();
 
         @BeforeEach
         void setup() {
-            caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData = CaseDataBuilder.builder().atStateClaimDraft().applicant1OrganisationPolicy(null).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             given(time.now()).willReturn(submittedDate);
             given(specReferenceNumberRepository.getSpecReferenceNumber()).willReturn(REFERENCE_NUMBER);
@@ -105,16 +116,40 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldAddCaseReferenceSubmittedDateAndAllocatedTrack_whenInvoked() {
+            caseData = CaseDataBuilder.builder()
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName(DEFENDANT_PARTY_NAME)
+                                 .partyEmail(DEFENDANT_EMAIL_ADDRESS).build())
+                .build();
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                     CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
                 .build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            System.out.println(response.getData());
             assertThat(response.getData())
                 .containsEntry("legacyCaseReference", REFERENCE_NUMBER)
                 .containsEntry("submittedDate", submittedDate.format(DateTimeFormatter.ISO_DATE_TIME));
 
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getPartyName().equals(DEFENDANT_PARTY_NAME));
+            assertThat(updatedData.getRespondent1DetailsForClaimDetailsTab().getType().equals(Party.Type.INDIVIDUAL));
+        }
+
+        @Test
+        void shouldSetOrganisationPolicies_whenInvoked() {
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CREATE_LIP_CLAIM.name()).build())
+                .build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .extracting("respondent1OrganisationPolicy.OrgPolicyCaseAssignedRole")
+                .isEqualTo("[RESPONDENTSOLICITORONE]");
+            assertThat(response.getData())
+                .extracting("applicant1OrganisationPolicy.OrgPolicyCaseAssignedRole")
+                .isEqualTo("[APPLICANTSOLICITORONE]");
         }
     }
 }

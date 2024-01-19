@@ -45,6 +45,18 @@ public enum DashboardClaimStatus {
     TRANSFERRED(
         Claim::isSentToCourt
     ),
+    CLAIMANT_AND_DEFENDANT_SIGNED_SETTLEMENT_AGREEMENT(
+        Claim::hasClaimantAndDefendantSignedSettlementAgreement
+    ),
+    DEFENDANT_REJECTED_SETTLEMENT_AGREEMENT(
+        Claim::hasDefendantRejectedSettlementAgreement
+    ),
+    CLAIMANT_SIGNED_SETTLEMENT_AGREEMENT_DEADLINE_EXPIRED(
+        Claim::hasClaimantSignedSettlementAgreementAndDeadlineExpired
+    ),
+    CLAIMANT_SIGNED_SETTLEMENT_AGREEMENT(
+        Claim::hasClaimantSignedSettlementAgreement
+    ),
     SETTLED(
         Claim::isSettled
     ),
