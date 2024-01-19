@@ -52,8 +52,10 @@ public class ClaimFormMapper {
             getContactPerson(applicantDetails)
         );
         String totalClaimAmount = Optional.ofNullable(caseData.getTotalClaimAmount())
+            .map(amount-> amount.setScale(2))
             .map(BigDecimal::toString)
             .orElse("0");
+
         return ClaimForm.builder()
             .totalInterestAmount(interest != null ? interest.toString() : null)
             .howTheInterestWasCalculated(Optional.ofNullable(caseData.getInterestClaimOptions()).map(
