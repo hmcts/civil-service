@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentDefaultStrategy;
 import uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocuments.UploadTranslatedDocumentStrategyFactory;
@@ -84,6 +85,7 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
                 .build()
                 .builder()
                 .systemGeneratedCaseDocuments(new ArrayList<>())
+                .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
                 .caseDataLiP(CaseDataLiP
                                  .builder()
                                  .translatedDocuments(translatedDocument)
