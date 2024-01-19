@@ -83,7 +83,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
-import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNameInternal;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
@@ -498,7 +498,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
         //casename
-        dataBuilder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
+        dataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
 
         //case management category
         CaseManagementCategoryElement civil =
@@ -526,7 +526,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         //assign category ids to documents uploaded as part of particulars of claim
         assignParticularOfClaimCategoryIds(caseData);
 
-        dataBuilder.caseNamePublic(CaseNameUtils.buildCaseNamePublic(caseData));
+        dataBuilder.caseNamePublic(CaseNameUtils.buildCaseName(caseData));
 
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
 
