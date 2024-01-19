@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user.strategy.translateddocum
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslatedDocumentStrategy {
 
@@ -55,9 +57,16 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData caseData) {
+        log.info("--------------getBusinessProcessEvent------------");
+        log.info("--------------caseData.isLipvLipOneVOne()------------" + caseData.isLipvLipOneVOne());
+        log.info("--------------featureToggleService.isLipVLipEnabled()------------" + featureToggleService.isLipVLipEnabled());
+        log.info("--------------Pending case state----1-------" + caseData.getCcdState().equals(CaseState.PENDING_CASE_ISSUED));
+        log.info("--------------Pending case state----2-------" + caseData.getCcdState().name().equals(CaseState.PENDING_CASE_ISSUED.name()));
         if (isClaimStateInPending(caseData)) {
+            log.info("--------------TDoc 1-----------");
             return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE;
         }
+        log.info("--------------TDoc2-----------");
         return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
     }
 
