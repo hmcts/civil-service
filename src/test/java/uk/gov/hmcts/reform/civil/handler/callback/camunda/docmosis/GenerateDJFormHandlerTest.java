@@ -161,8 +161,6 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void shouldNotGenerateOneForm_whenLRvLiPSpecified() {
             List<CaseDocument> documents = new ArrayList<>();
-            when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
-                                                       eq(GENERATE_DJ_FORM_SPEC.name()))).thenReturn(documents);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .specClaim1v1LrVsLip().build().toBuilder()
                 .addRespondent2(NO)
@@ -176,9 +174,6 @@ public class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             params.getRequest().setEventId(GENERATE_DJ_FORM_SPEC.name());
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            verify(defaultJudgmentFormGenerator).generate(any(CaseData.class), eq("BEARER_TOKEN"),
-                                                          eq(GENERATE_DJ_FORM_SPEC.name()));
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getDefaultJudgmentDocuments().size()).isZero();
