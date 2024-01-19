@@ -651,7 +651,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
     //SDO-R2
     private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
-    private ReasonForReconsideration reasonForReconsideration;
+    private ReasonForReconsideration reasonForReconsiderationApplicant;
+    private ReasonForReconsideration reasonForReconsiderationRespondent1;
+    private ReasonForReconsideration reasonForReconsiderationRespondent2;
+    private String casePartyRequestForReconsideration;
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
 
