@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 
 import java.util.Collections;
@@ -42,6 +43,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private final Time time;
     private final ObjectMapper objectMapper;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -63,7 +65,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
 
     private CallbackResponse lipClaimInitialState(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.caseAccessCategory(SPEC_CLAIM);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -71,15 +73,16 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         caseDataBuilder.submittedDate(time.now());
         // Add back Pip in post to temporary pass the email event
         caseDataBuilder.respondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         if (Optional.ofNullable(callbackParams.getRequest()).map(CallbackRequest::getEventId).isPresent()) {
             caseDataBuilder.legacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
             caseDataBuilder.businessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));
+            caseDataBuilder.respondent1DetailsForClaimDetailsTab(caseDataBuilder.build().getRespondent1().toBuilder().flags(null).build());
+            caseFlagsInitialiser.initialiseCaseFlags(CREATE_LIP_CLAIM, caseDataBuilder);
         }
-
         addOrginsationPoliciesforClaimantLip(caseDataBuilder);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
