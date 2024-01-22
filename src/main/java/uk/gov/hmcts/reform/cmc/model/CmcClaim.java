@@ -458,8 +458,6 @@ public class CmcClaim implements Claim {
         
         return (hasResponse() && (response.isPartAdmit() || response.isFullAdmit())
             && (response.getPaymentIntention().isPayByDate() || response.getPaymentIntention().isPayByInstallments()));
-          //  && (response.getResponseType().isCompany() || response.getRespondent1().isOrganisation())
-          //  && response.hasApplicantRejectedRepaymentPlan());
     }
 
     private boolean isThroughAdmissions(Settlement settlement) {
