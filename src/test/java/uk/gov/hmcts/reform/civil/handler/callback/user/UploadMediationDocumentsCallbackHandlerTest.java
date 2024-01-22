@@ -456,7 +456,6 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertThat(app2actual).hasSize(1);
                 assertThat(app2actual).containsExactly(getExpectedMediationNonattendanceDocOne(APP2_CATEGORY_ID));
 
-
                 // Run event again adding second document
                 UploadMediationDocumentsForm uploadMediationDocumentsForm = buildSecondMediationNonattendanceDoc(
                     CLAIMANTS_ID,
@@ -564,7 +563,6 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 assertThat(actual).containsExactly(getExpectedMediationNonattendanceDocOne(RES1_CATEGORY_ID));
                 assertThat(res2actual).hasSize(1);
                 assertThat(res2actual).containsExactly(getExpectedMediationNonattendanceDocOne(RES2_CATEGORY_ID));
-
 
                 // Run event again adding second document
                 UploadMediationDocumentsForm uploadMediationDocumentsForm = buildSecondMediationNonattendanceDoc(
