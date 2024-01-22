@@ -16,12 +16,14 @@ import uk.gov.hmcts.reform.civil.model.Respondent1CourtOrderDetails;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiP;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccommodationTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormPartyDefence;
+
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -62,6 +64,20 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final List<ReasonMoneyTemplateData> expenseList;
     //repayment details for repayment plan that are common between LR and LiP
     private final ResponseRepaymentDetailsForm commonDetails;
+    private final MediationLiP defendantMediationResponse;
+
+    //CARM defendant Mediation Fields
+    private final String defendant1MediationContactNumber;
+    private final String defendant1MediationEmail;
+    private final String defendant1MediationCompanyName;
+    private final boolean defendant1MediationUnavailableDatesExists;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate defendant1UnavailableDateFromForMediation;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate defendant1UnavailableDateToForMediation;
+    private final boolean checkCarmToggle;
 
     public boolean isCurrentlyWorking() {
         return (employerDetails != null && !employerDetails.isEmpty())

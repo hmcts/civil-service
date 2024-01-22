@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.ExpenseTypeLRspec;
 import uk.gov.hmcts.reform.civil.enums.dq.IncomeTypeLRspec;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -41,8 +43,13 @@ import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.account.AccountSimple;
 import uk.gov.hmcts.reform.civil.model.account.AccountType;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.MediationLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sealedclaim.SealedClaimLipResponseForm;
@@ -50,6 +57,7 @@ import uk.gov.hmcts.reform.civil.model.dq.HomeDetails;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringExpenseLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.RecurringIncomeLRspec;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
@@ -57,6 +65,7 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,8 +75,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENDANT_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFENDANT_RESPONSE_LIP_SPEC;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -86,13 +97,35 @@ class SealedClaimLipResponseFormGeneratorTest {
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
     @Autowired
     private SealedClaimLipResponseFormGenerator generator;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Captor
     ArgumentCaptor<PDF> uploadDocumentArgumentCaptor;
 
+    @BeforeEach
+    void setup() {
+        featureToggleService = mock(FeatureToggleService.class);
+    }
+
     @Test
     void shouldGenerateDocumentSuccessfully() {
+
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
         //Given
         CaseData caseData = commonData().build();
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(company("B"))
+            .respondent2(individual("C"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
+
         String fileName = "someName";
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
@@ -102,9 +135,9 @@ class SealedClaimLipResponseFormGeneratorTest {
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
         SealedClaimLipResponseForm templateData = generator
-            .getTemplateData(caseData);
+            .getTemplateData(builder.build());
         //When
-        CaseDocument result = generator.generate(caseData, AUTHORIZATION);
+        CaseDocument result = generator.generate(builder.build(), AUTHORIZATION);
         //Then
         assertThat(result).isEqualTo(caseDocument);
         verify(documentGeneratorService).generateDocmosisDocument(templateData, DEFENDANT_RESPONSE_LIP_SPEC);
@@ -551,6 +584,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .companyName("company " + suffix)
             .partyPhone("phone " + suffix)
             .partyEmail("email " + suffix)
+            .partyName("company " + suffix)
             .primaryAddress(Address.builder()
                                 .postCode("postCode " + suffix)
                                 .addressLine1("line 1 " + suffix)
@@ -581,6 +615,211 @@ class SealedClaimLipResponseFormGeneratorTest {
                                 .country("country " + suffix)
                                 .build())
             .build();
+    }
+
+    @Test
+    void checkMediationDefaultFields() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(company("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1MediationLiPResponse(MediationLiP.builder()
+                                                                                              .isMediationContactNameCorrect(YesOrNo.YES)
+                                                                                              .isMediationEmailCorrect(YesOrNo.YES)
+                                                                                              .isMediationPhoneCorrect(YesOrNo.YES)
+                                                                                              .hasUnavailabilityNextThreeMonths(YesOrNo.NO)
+                                                                                              .build())
+                                                                          .build()).build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(builder.build());
+        Assertions.assertEquals("company B", templateData.getDefendant1MediationCompanyName());
+        Assertions.assertEquals("email B", templateData.getDefendant1MediationEmail());
+        Assertions.assertEquals("phone B", templateData.getDefendant1MediationContactNumber());
+    }
+
+    @Test
+    void checkMediationAlternativeFields() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(company("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1MediationLiPResponse(MediationLiP.builder()
+                                                                                              .isMediationContactNameCorrect(YesOrNo.NO)
+                                                                                              .alternativeMediationContactPerson("Jake")
+                                                                                              .isMediationEmailCorrect(YesOrNo.NO)
+                                                                                              .alternativeMediationEmail("test@gmail.com")
+                                                                                              .isMediationPhoneCorrect(YesOrNo.NO)
+                                                                                              .alternativeMediationTelephone("23454656")
+                                                                                              .hasUnavailabilityNextThreeMonths(YesOrNo.NO)
+                                                                                              .build())
+                                                         .build()).build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(builder.build());
+        Assertions.assertEquals("Jake", templateData.getDefendant1MediationCompanyName());
+        Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
+        Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
+    }
+
+    @Test
+    void checkMediationUnAvailabilityDateRangeFields() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
+        def1UnavailabilityDates.add(element(UnavailableDate.builder()
+                                                .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                                                 .toDate(LocalDate.now().plusDays(5))
+                                                 .fromDate(LocalDate.now()).build()));
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(company("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1MediationLiPResponse(MediationLiP.builder()
+                                                                                              .isMediationContactNameCorrect(YesOrNo.NO)
+                                                                                              .alternativeMediationContactPerson("Jake")
+                                                                                              .isMediationEmailCorrect(YesOrNo.NO)
+                                                                                              .alternativeMediationEmail("test@gmail.com")
+                                                                                              .isMediationPhoneCorrect(YesOrNo.NO)
+                                                                                              .alternativeMediationTelephone("23454656")
+                                                                                              .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
+                                                                                              .unavailableDatesForMediation(def1UnavailabilityDates)
+                                                                                              .build())
+                                                         .build()).build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(builder.build());
+        Assertions.assertEquals("Jake", templateData.getDefendant1MediationCompanyName());
+        Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
+        Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
+        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDateFromForMediation());
+        Assertions.assertEquals(LocalDate.now().plusDays(5), templateData.getDefendant1UnavailableDateToForMediation());
+    }
+
+    @Test
+    void checkMediationUnAvailabilitySingleDateFields() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
+        def1UnavailabilityDates.add(element(UnavailableDate.builder()
+                                                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                .date(LocalDate.now())
+                                                .fromDate(LocalDate.now()).build()));
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(company("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1MediationLiPResponse(MediationLiP.builder()
+                                                                                              .isMediationContactNameCorrect(YesOrNo.NO)
+                                                                                              .alternativeMediationContactPerson("Jake")
+                                                                                              .isMediationEmailCorrect(YesOrNo.NO)
+                                                                                              .alternativeMediationEmail("test@gmail.com")
+                                                                                              .isMediationPhoneCorrect(YesOrNo.NO)
+                                                                                              .alternativeMediationTelephone("23454656")
+                                                                                              .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
+                                                                                              .unavailableDatesForMediation(def1UnavailabilityDates)
+                                                                                              .build())
+                                                         .build()).build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(builder.build());
+        Assertions.assertEquals("Jake", templateData.getDefendant1MediationCompanyName());
+        Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
+        Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
+        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDateFromForMediation());
+        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDateToForMediation());
+    }
+
+    @Test
+    void checkMediationRespondent1LipResponseFieldsAreNull() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(company("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(builder.build());
+        Assertions.assertEquals("company B", templateData.getDefendant1MediationCompanyName());
+        Assertions.assertEquals("email B", templateData.getDefendant1MediationEmail());
+        Assertions.assertEquals("phone B", templateData.getDefendant1MediationContactNumber());
+    }
+
+    @Test
+    void checkMediationCaseDataLipResponsesAreNull() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(company("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(builder.build());
+        Assertions.assertEquals("company B", templateData.getDefendant1MediationCompanyName());
+        Assertions.assertEquals("email B", templateData.getDefendant1MediationEmail());
+        Assertions.assertEquals("phone B", templateData.getDefendant1MediationContactNumber());
+    }
+
+    @Test
+    void checkMediationNullFieldsOfRespondent1MediationLipResponseFields() {
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(company("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().build())
+                             .build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(builder.build());
+        Assertions.assertEquals("company B", templateData.getDefendant1MediationCompanyName());
+        Assertions.assertEquals("email B", templateData.getDefendant1MediationEmail());
+        Assertions.assertEquals("phone B", templateData.getDefendant1MediationContactNumber());
     }
 
 }
