@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -115,14 +114,4 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
             && caseData.hasApplicant1AcceptedCcj() && caseData.isCcjRequestJudgmentByAdmission());
     }
-
-    private boolean isProceedOrNotSettleClaim(CaseData caseData) {
-        return caseData.isClaimantNotSettlePartAdmitClaim() || caseData.isFullDefence() || caseData.isFullDefenceNotPaid();
-    }
-
-    private boolean isClaimantOrDefendantRejectMediation(CaseData caseData) {
-        return (Objects.nonNull(caseData.getCaseDataLiP()) && caseData.getCaseDataLiP().hasClaimantNotAgreedToFreeMediation())
-            || caseData.hasDefendantNotAgreedToFreeMediation();
-    }
-
 }

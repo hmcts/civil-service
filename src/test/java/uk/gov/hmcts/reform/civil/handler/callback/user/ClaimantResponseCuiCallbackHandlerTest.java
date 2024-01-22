@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -28,7 +29,6 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -77,7 +77,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private ClaimantResponseCuiCallbackHandler handler;
-    private static final String  courtLocation = "Site 1 - Adr 1 - AAA 111";
+    private static final String courtLocation = "Site 1 - Adr 1 - AAA 111";
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -113,14 +113,16 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void before() {
-            LocationRefData locationRefData = LocationRefData.builder().siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
+            LocationRefData locationRefData = LocationRefData.builder().siteName("Site 1").courtAddress("Adr 1").postcode(
+                    "AAA 111")
                 .courtName("Court Name").region("Region").regionId("1").courtVenueId("1")
                 .courtTypeId("10").courtLocationCode("court1")
                 .epimmsId("111").build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
             given(time.now()).willReturn(submittedDate);
-            given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(locationRefData));
+            given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(
+                locationRefData));
             given(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).willReturn(LocalDateTime.MAX);
         }
 
@@ -291,37 +293,37 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateCCJRequestPaymentDetails() {
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                    .ccjPaymentPaidSomeOption(YES)
-                    .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
-                    .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
-                    .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
-                    .build();
+                .ccjPaymentPaidSomeOption(YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
             CaseData caseData = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build())
-                    .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build())
-                    .caseDataLip(
-                            CaseDataLiP.builder()
-                                    .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
-                                            ChooseHowToProceed.REQUEST_A_CCJ).build())
-                                    .build())
-                    .respondent1Represented(NO)
-                    .specRespondent1Represented(NO)
-                    .applicant1Represented(NO)
-                    .totalClaimAmount(BigDecimal.valueOf(1000))
-                    .ccjPaymentDetails(ccjPaymentDetails)
-                    .build();
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build())
+                .caseDataLip(
+                    CaseDataLiP.builder()
+                        .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
+                            ChooseHowToProceed.REQUEST_A_CCJ).build())
+                        .build())
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
+                .applicant1Represented(NO)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CCJPaymentDetails ccjResponseForJudgement =
-                    getCaseData(response).getCcjPaymentDetails();
+                getCaseData(response).getCcjPaymentDetails();
             assertThat(response.getData())
-                    .extracting("businessProcess")
-                    .extracting("camundaEvent")
-                    .isEqualTo(CLAIMANT_RESPONSE_CUI.name());
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(CLAIMANT_RESPONSE_CUI.name());
             assertThat(response.getData())
-                    .extracting("businessProcess")
-                    .extracting("status")
-                    .isEqualTo("READY");
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
             assertThat(ccjPaymentDetails.getCcjPaymentPaidSomeOption()).isEqualTo(ccjResponseForJudgement.getCcjPaymentPaidSomeOption());
             assertThat(caseData.getTotalClaimAmount()).isEqualTo(ccjResponseForJudgement.getCcjJudgmentAmountClaimAmount());
         }
