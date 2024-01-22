@@ -492,7 +492,8 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
-                        CLAIMANT_RESPONSE_CUI
+                        CLAIMANT_RESPONSE_CUI,
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
                     }
                 ),
                 of(
