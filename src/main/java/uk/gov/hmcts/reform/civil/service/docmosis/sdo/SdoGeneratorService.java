@@ -43,12 +43,12 @@ public class SdoGeneratorService {
     private final FeatureToggleService featureToggleService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
-        log.info("generate SDO Doc starting at: "+ DateTime.now());
+        log.info("generate SDO Doc starting at: " + DateTime.now());
         MappableObject templateData;
         DocmosisTemplates docmosisTemplate;
-        log.info("Before calling User Details: "+ DateTime.now());
+        log.info("Before calling User Details: " + DateTime.now());
         UserDetails userDetails = idamClient.getUserDetails(authorisation);
-        log.info("User Details received at : "+ DateTime.now());
+        log.info("User Details received at : " + DateTime.now());
         String judgeName = userDetails.getFullName();
 
         boolean isJudge = false;
@@ -69,15 +69,15 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName, isJudge, authorisation);
         }
-        log.info("Before docmosisDocument : "+ DateTime.now());
+        log.info("Before docmosisDocument : " + DateTime.now());
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
             docmosisTemplate
         );
-        log.info("docmosisDocument done at : "+ DateTime.now());
+        log.info("docmosisDocument done at : " + DateTime.now());
 
-        log.info("Upload starting at : "+ DateTime.now());
+        log.info("Upload starting at : " + DateTime.now());
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
@@ -93,7 +93,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
-        log.info("getTemplateDataDisposal starting at : "+ DateTime.now());
+        log.info("getTemplateDataDisposal starting at : " + DateTime.now());
         var sdoDocumentBuilder = SdoDocumentFormDisposal.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -187,12 +187,12 @@ public class SdoGeneratorService {
                 authorisation
             ))
             .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
-        log.info("getTemplateDataDisposal ending at : "+ DateTime.now());
+        log.info("getTemplateDataDisposal ending at : " + DateTime.now());
         return sdoDocumentBuilder.build();
     }
 
     private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
-        log.info("getTemplateDataFast starting at : "+ DateTime.now());
+        log.info("getTemplateDataFast starting at : " + DateTime.now());
         var sdoDocumentFormBuilder = SdoDocumentFormFast.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -306,12 +306,12 @@ public class SdoGeneratorService {
                 authorisation
             ))
             .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
-        log.info("getTemplateDataFast ending at : "+ DateTime.now());
+        log.info("getTemplateDataFast ending at : " + DateTime.now());
         return sdoDocumentFormBuilder.build();
     }
 
     private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
-        log.info("getTemplateDataSmall starting at : "+ DateTime.now());
+        log.info("getTemplateDataSmall starting at : " + DateTime.now());
         SdoDocumentFormSmall.SdoDocumentFormSmallBuilder sdoDocumentFormBuilder = SdoDocumentFormSmall.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -388,7 +388,7 @@ public class SdoGeneratorService {
                 ))
             .caseManagementLocation(
                 locationHelper.getHearingLocation(null, caseData, authorisation));
-        log.info("getTemplateDataSmall ending at : "+ DateTime.now());
+        log.info("getTemplateDataSmall ending at : " + DateTime.now());
         return sdoDocumentFormBuilder
             .build();
     }

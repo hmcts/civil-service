@@ -753,11 +753,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
-        log.info("Generate SDO Order starting at: "+DateTime.now());
+        log.info("Generate SDO Order starting at: " + DateTime.now());
         CaseData caseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
             : callbackParams.getCaseData();
-        log.info("Case data received at: "+DateTime.now());
+        log.info("Case data received at: " + DateTime.now());
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         List<String> errors = new ArrayList<>();
@@ -800,7 +800,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CaseData mapHearingMethodFields(CaseData caseData) {
-        log.info("Map Hearing Method Fields starting at: "+DateTime.now());
+        log.info("Map Hearing Method Fields starting at: " + DateTime.now());
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         if (caseData.getHearingMethodValuesDisposalHearing() != null
@@ -834,7 +834,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodTelephoneHearing);
             }
         }
-        log.info("Map Hearing Method Fields Ending at: "+DateTime.now());
+        log.info("Map Hearing Method Fields Ending at: " + DateTime.now());
         return updatedData.build();
     }
 
