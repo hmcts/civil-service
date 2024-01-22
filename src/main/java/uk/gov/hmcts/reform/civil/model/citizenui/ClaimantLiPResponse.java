@@ -21,6 +21,7 @@ public class ClaimantLiPResponse {
     private ChooseHowToProceed applicant1ChoosesHowToProceed;
     private RepaymentDecisionType claimantCourtDecision;
     private ClaimantResponseOnCourtDecisionType claimantResponseOnCourtDecision;
+    private String applicant1RejectedRepaymentReason;
 
     @JsonIgnore
     public boolean hasApplicant1SignedSettlementAgreement() {

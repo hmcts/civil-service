@@ -48,7 +48,8 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         " \n" +
         "To make a bespoke order in this claim, select 'General order' from the dropdown menu on the right of the " +
         "screen on your dashboard.";
-    private static final String upholdingPreviousOrderReason = "Having read the application for reconsideration of " +
+    private static final String UPHOLDING_PREVIOUS_ORDER_REASON = "Having read the application for reconsideration of" +
+        " " +
         "the Legal Advisor's order dated %s and the court file \n 1.The application for reconsideration of the order " +
         "is dismissed.";
 
@@ -75,7 +76,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
             String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);
             caseDataBuilder.upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
                                                              .reasonForReconsiderationTxtYes(String.format(
-                                                                 upholdingPreviousOrderReason,
+                                                                 UPHOLDING_PREVIOUS_ORDER_REASON,
                                                                  sdoDate
                                                              )).build());
         }
