@@ -778,21 +778,21 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         if (errors.isEmpty()) {
-            log.info("generate Starting at : "+ DateTime.now());
+            log.info("generate Starting at : " + DateTime.now());
             CaseDocument document = sdoGeneratorService.generate(
                 caseData,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             );
-            log.info("generate and upload done at : "+ DateTime.now());
+            log.info("generate and upload done at : " + DateTime.now());
 
             if (document != null) {
-                log.info("update case data Starting at : "+ DateTime.now());
+                log.info("update case data Starting at : " + DateTime.now());
                 updatedData.sdoOrderDocument(document);
-                log.info("update case data done at : "+ DateTime.now());
+                log.info("update case data done at : " + DateTime.now());
             }
             assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
         }
-        log.info("Generate SDO Order ending at: "+ DateTime.now());
+        log.info("Generate SDO Order ending at: " + DateTime.now());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(updatedData.build().toMap(objectMapper))
