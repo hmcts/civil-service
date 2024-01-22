@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -184,6 +185,34 @@ class PaymentRequestUpdateCallbackServiceTest {
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.CLAIMISSUED.name());
 
         //Then: startUpdate and submitUpdate should be called
+        verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
+        verify(coreCaseDataService, times(1)).startUpdate(any(), any());
+        verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
+    }
+
+    @Test
+    public void shouldStartAndSubmitEventWithCaseDetailsInLipClaim_Hearing() {
+
+        CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
+        caseData = caseData.toBuilder()
+            .ccdState(CASE_PROGRESSION)
+            .businessProcess(BusinessProcess.builder()
+                                 .status(BusinessProcessStatus.READY)
+                                 .camundaEvent(BUSINESS_PROCESS)
+                                 .build())
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+        CaseDetails caseDetails = buildCaseDetails(caseData);
+
+        when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
+        when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
+        when(coreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(caseDetails,
+                                                                                          SERVICE_REQUEST_RECEIVED));
+        when(coreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+
+        paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
+
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
         verify(coreCaseDataService, times(1)).startUpdate(any(), any());
         verify(coreCaseDataService, times(1)).submitUpdate(any(), any());

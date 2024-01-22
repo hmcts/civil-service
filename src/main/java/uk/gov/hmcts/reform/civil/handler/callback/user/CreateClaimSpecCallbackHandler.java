@@ -95,7 +95,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
-import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNameInternal;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 
@@ -477,7 +477,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         dataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
 
         //assign case management category to the case and caseNameHMCTSinternal
-        dataBuilder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
+        dataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
 
         CaseManagementCategoryElement civil =
             CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
