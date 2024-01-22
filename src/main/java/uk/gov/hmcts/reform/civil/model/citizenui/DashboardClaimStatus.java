@@ -33,9 +33,6 @@ public enum DashboardClaimStatus {
     CLAIM_ENDED(
         Claim::hasClaimEnded
     ),
-    RESPONSE_BY_POST(
-        Claim::isPaperResponse
-    ),
     CLAIMANT_REJECTED_PAYMENT_PLAN(
         Claim::isPaymentPlanAccepted
     ),
@@ -92,9 +89,6 @@ public enum DashboardClaimStatus {
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
     ),
-    ELIGIBLE_FOR_CCJ(
-        Claim::isEligibleForCCJ
-    ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
     ),
@@ -135,7 +129,12 @@ public enum DashboardClaimStatus {
     CLAIMANT_ACCEPTED_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionAccepted
     ),
-
+    ELIGIBLE_FOR_CCJ(
+        Claim::isEligibleForCCJ
+    ),
+    RESPONSE_BY_POST(
+        Claim::isPaperResponse
+    ),
     NO_STATUS(c -> false);
 
     @Getter
