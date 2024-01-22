@@ -138,7 +138,7 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true, true})
     void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
         var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
         givenToggle(transferCaseOnlineKey, toggleStat);

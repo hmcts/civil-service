@@ -16,6 +16,9 @@ public class FeatureToggleService {
     private final FeatureToggleApi featureToggleApi;
 
     public boolean isFeatureEnabled(String feature) {
+        if (feature.equals("isTransferOnlineCaseEnabled")) {
+            return true;
+        }
         return this.featureToggleApi.isFeatureEnabled(feature);
     }
 
@@ -73,7 +76,7 @@ public class FeatureToggleService {
     }
 
     public boolean isTransferOnlineCaseEnabled() {
-        return featureToggleApi.isFeatureEnabled("isTransferOnlineCaseEnabled");
+        return true;
     }
 
     public boolean isCaseProgressionEnabled() {
