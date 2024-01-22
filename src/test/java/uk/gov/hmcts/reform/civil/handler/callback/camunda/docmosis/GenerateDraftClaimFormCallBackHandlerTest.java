@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.draft.DraftClaimFormGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 
@@ -27,7 +28,8 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DR
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     GenerateDraftClaimFormCallBackHandler.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    AssignCategoryId.class
 })
 class GenerateDraftClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -35,6 +37,8 @@ class GenerateDraftClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest 
     private DraftClaimFormGenerator draftClaimFormGenerator;
     @MockBean
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
+    @MockBean
+    private AssignCategoryId assignCategoryId;
     @Autowired
     private GenerateDraftClaimFormCallBackHandler handler;
     @Autowired

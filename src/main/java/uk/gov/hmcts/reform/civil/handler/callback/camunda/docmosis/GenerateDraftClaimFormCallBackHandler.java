@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.draft.DraftClaimFormGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ public class GenerateDraftClaimFormCallBackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final DraftClaimFormGenerator draftClaimFormGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -50,6 +52,7 @@ public class GenerateDraftClaimFormCallBackHandler extends CallbackHandler {
                 caseData
             ))
             .build();
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, "detailsOfClaim");
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
