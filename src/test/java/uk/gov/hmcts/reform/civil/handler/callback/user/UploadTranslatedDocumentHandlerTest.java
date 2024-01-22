@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -26,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.D
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 
 import java.util.ArrayList;
@@ -44,6 +46,9 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private UploadTranslatedDocumentHandler handler;
+
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @Autowired
     private UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory;
