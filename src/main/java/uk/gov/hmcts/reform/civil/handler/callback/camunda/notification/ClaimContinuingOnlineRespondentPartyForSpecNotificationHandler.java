@@ -10,10 +10,12 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 
@@ -44,6 +46,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
     private final Time time;
     private final PinInPostConfiguration pipInPostConfiguration;
     private final PiPLetterGenerator pipLetterGenerator;
+    private final FeatureToggleService featureToggleService;
     private final BulkPrintService bulkPrintService;
 
     @Override
@@ -75,10 +78,23 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandler exte
 
         generatePIPLetter(callbackParams);
 
+        String updateCaseState = setClaimState(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
-            .state("AWAITING_RESPONDENT_ACKNOWLEDGEMENT")
+            .state(updateCaseState)
             .build();
+    }
+
+    private String setClaimState(CaseData caseData) {
+        if (!isBilingualForLipvsLip(caseData)) {
+            return CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
+        }
+        return caseData.getCcdState().name();
+    }
+
+    private boolean isBilingualForLipvsLip(CaseData caseData) {
+        return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
+                && caseData.isBilingual();
     }
 
     @Override

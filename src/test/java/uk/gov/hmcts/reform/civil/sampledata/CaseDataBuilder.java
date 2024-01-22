@@ -528,9 +528,11 @@ public class CaseDataBuilder {
 
     private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
+    private ReasonForReconsideration reasonForReconsiderationApplicant;
+    private ReasonForReconsideration reasonForReconsiderationRespondent1;
+    private ReasonForReconsideration reasonForReconsiderationRespondent2;
     private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
-    private ReasonForReconsideration reasonForReconsideration;
-
+  
     private UploadMediationDocumentsForm uploadDocumentsForm;
 
     private YesOrNo responseClaimExpertSpecRequired;
@@ -5363,8 +5365,18 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder reasonForReconsideration(ReasonForReconsideration reasonForReconsideration) {
-        this.reasonForReconsideration = reasonForReconsideration;
+    public CaseDataBuilder reasonForReconsiderationApplicant(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsiderationApplicant = reasonForReconsideration;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForReconsiderationRespondent1(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsiderationRespondent1 = reasonForReconsideration;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForReconsiderationRespondent2(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsiderationRespondent2 = reasonForReconsideration;
         return this;
     }
 
@@ -6527,6 +6539,12 @@ public class CaseDataBuilder {
         return new CaseDataBuilder();
     }
 
+    public CaseDataBuilder atStateRespondent1v1BilingualFlagSet() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
     public CaseData build() {
         return CaseData.builder()
             // Create Claim
@@ -6828,7 +6846,9 @@ public class CaseDataBuilder {
             .applicant1ClaimExpertSpecRequired(applicant1ClaimExpertSpecRequired)
             .applicantMPClaimExpertSpecRequired(applicantMPClaimExpertSpecRequired)
             .isFlightDelayClaim(isFlightDelayClaim)
-            .reasonForReconsideration(reasonForReconsideration)
+            .reasonForReconsiderationApplicant(reasonForReconsiderationApplicant)
+            .reasonForReconsiderationRespondent1(reasonForReconsiderationRespondent1)
+            .reasonForReconsiderationRespondent2(reasonForReconsiderationRespondent2)
             .build();
     }
 }
