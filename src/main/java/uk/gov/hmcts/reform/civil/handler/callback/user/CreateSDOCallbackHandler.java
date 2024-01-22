@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -752,9 +753,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
+        log.info("Generate SDO Order starting at: "+DateTime.now());
         CaseData caseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
             : callbackParams.getCaseData();
+        log.info("Case data received at: "+DateTime.now());
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         List<String> errors = new ArrayList<>();
@@ -775,17 +778,21 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         if (errors.isEmpty()) {
+            log.info("generate Starting at : "+ DateTime.now());
             CaseDocument document = sdoGeneratorService.generate(
                 caseData,
                 callbackParams.getParams().get(BEARER_TOKEN).toString()
             );
+            log.info("generate and upload done at : "+ DateTime.now());
 
             if (document != null) {
+                log.info("update case data Starting at : "+ DateTime.now());
                 updatedData.sdoOrderDocument(document);
+                log.info("update case data done at : "+ DateTime.now());
             }
             assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
         }
-
+        log.info("Generate SDO Order ending at: "+ DateTime.now());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(updatedData.build().toMap(objectMapper))
@@ -793,6 +800,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private CaseData mapHearingMethodFields(CaseData caseData) {
+        log.info("Map Hearing Method Fields starting at: "+DateTime.now());
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
 
         if (caseData.getHearingMethodValuesDisposalHearing() != null
@@ -826,7 +834,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 updatedData.smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodTelephoneHearing);
             }
         }
-
+        log.info("Map Hearing Method Fields Ending at: "+DateTime.now());
         return updatedData.build();
     }
 
