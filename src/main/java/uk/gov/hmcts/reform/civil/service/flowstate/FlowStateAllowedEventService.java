@@ -486,7 +486,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 CREATE_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
             )
         ),
 
