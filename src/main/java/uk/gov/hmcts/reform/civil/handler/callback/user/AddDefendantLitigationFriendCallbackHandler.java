@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
@@ -136,6 +137,9 @@ public class AddDefendantLitigationFriendCallbackHandler extends CallbackHandler
         if (featureToggleService.isHmcEnabled()) {
             populateWithPartyIds(caseDataUpdated);
         }
+
+        caseDataUpdated.caseNameHmctsInternal(CaseNameUtils.buildCaseName(caseDataUpdated.build()));
+        caseDataUpdated.caseNamePublic(CaseNameUtils.buildCaseName(caseDataUpdated.build()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))

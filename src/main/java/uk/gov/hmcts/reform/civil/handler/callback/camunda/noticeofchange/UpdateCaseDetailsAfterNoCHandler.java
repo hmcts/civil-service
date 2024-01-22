@@ -94,6 +94,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         boolean isApplicantSolicitorRole = isApplicantOrRespondent(replacedSolicitorCaseRole);
 
         if (isApplicantSolicitorRole) {
+            unAssignCaseFromClaimantLip(caseDataBuilder);
             updateApplicantSolicitorDetails(caseDataBuilder, addedSolicitorDetails);
         } else {
             unassignCaseFromDefendantLip(caseData);
@@ -130,6 +131,19 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
     private void unassignCaseFromDefendantLip(CaseData caseData) {
         if (caseData.isRespondent1LiP() && caseData.getDefendantUserDetails() != null) {
             coreCaseUserService.unassignCase(caseData.getCcdCaseReference().toString(), caseData.getDefendantUserDetails().getId(), null, CaseRole.DEFENDANT);
+        }
+    }
+
+    private void unAssignCaseFromClaimantLip(CaseData.CaseDataBuilder<?, ?> caseDataBuilder) {
+        CaseData caseData = caseDataBuilder.build();
+        if (caseData.isApplicantLiP() && caseData.getClaimantUserDetails() != null) {
+            coreCaseUserService.unassignCase(
+                caseData.getCcdCaseReference().toString(),
+                caseData.getClaimantUserDetails().getId(),
+                null,
+                CaseRole.CLAIMANT
+            );
+            caseDataBuilder.applicant1Represented(YES);
         }
     }
 
