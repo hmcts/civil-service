@@ -441,8 +441,8 @@ public class CaseDataBuilder {
 
     private String unassignedCaseListDisplayOrganisationReferences;
     private String caseListDisplayDefendantSolicitorReferences;
-    private  CertificateOfService cosNotifyClaimDefendant1;
-    private  CertificateOfService cosNotifyClaimDefendant2;
+    private CertificateOfService cosNotifyClaimDefendant1;
+    private CertificateOfService cosNotifyClaimDefendant2;
     private CertificateOfService cosNotifyClaimDetails1;
     private CertificateOfService cosNotifyClaimDetails2;
 
@@ -532,7 +532,7 @@ public class CaseDataBuilder {
     private ReasonForReconsideration reasonForReconsiderationRespondent1;
     private ReasonForReconsideration reasonForReconsiderationRespondent2;
     private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
-  
+
     private UploadMediationDocumentsForm uploadDocumentsForm;
 
     private YesOrNo responseClaimExpertSpecRequired;

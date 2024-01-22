@@ -7,14 +7,12 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
-import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
@@ -22,8 +20,8 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.ServiceOfDateValidationMessageUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -69,21 +67,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         + " step by 4:00pm on %s.%n%nThis is a new online process - you don't need to file any further documents"
         + " to the court";
 
-    public static final String DOC_SERVED_DATE_IN_FUTURE =
-        "On what day did you serve must be today or in the past";
-
-    public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
-        "On what day did you serve should not be more than 14 days old";
-
-    public static final String DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS =
-        "The date of service must be no greater than 2 working days in the future";
-
-    public static final String DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS =
-        "The date of service must not be more than 14 days old";
-
-    public static final String DATE_OF_SERVICE_DATE_IS_WORKING_DAY =
-        "For the date of service please enter a working day";
-
     public static final String ERROR_PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT = "There is a problem"
         + "\n"
         + "This action cannot currently be performed because it has either already"
@@ -94,9 +77,8 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
     private final DeadlinesCalculator deadlinesCalculator;
-    private final WorkingDayIndicator workingDayIndicator;
+    private final ServiceOfDateValidationMessageUtils serviceOfDateValidationMessageUtils;
     private final Time time;
-    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -156,7 +138,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
         CertificateOfService certificateOfService = caseData.getCosNotifyClaimDefendant1();
-        List<String> dateValidationErrorMessages = getServiceOfDateValidationMessages(certificateOfService);
+        List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfService);
         errors.addAll(dateValidationErrorMessages);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -172,7 +154,7 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CertificateOfService certificateOfServiceDef2 = caseData.getCosNotifyClaimDefendant2();
         ArrayList<String> errors = new ArrayList<>();
-        List<String> dateValidationErrorMessages = getServiceOfDateValidationMessages(certificateOfServiceDef2);
+        List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef2);
         errors.addAll(dateValidationErrorMessages);
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -311,48 +293,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         return Objects.equals("Both", caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel());
     }
 
-    private boolean isCosDefendantNotifyDateFutureDate(LocalDate cosDateOfServiceForDefendant) {
-        return time.now().toLocalDate().isBefore(cosDateOfServiceForDefendant);
-    }
-
-    private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        LocalDateTime notificationDeadline = cosDateOfServiceForDefendant.atTime(END_OF_BUSINESS_DAY).plusDays(14);
-        LocalDateTime currentDateTime = time.now();
-        LocalDateTime today4pm = currentDateTime.toLocalDate().atTime(16, 0);
-
-        boolean isAfter4pmToday = currentDateTime.isAfter(today4pm)
-            && currentDateTime.toLocalDate().equals(notificationDeadline.toLocalDate());
-
-        boolean isAfter14DaysAt4pmDeadline = currentDateTime.isAfter(notificationDeadline);
-
-        return isAfter14DaysAt4pmDeadline || isAfter4pmToday;
-    }
-
-    private boolean isDeemedServedDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        LocalDateTime deemedServedDeadline = cosDateOfServiceForDefendant.atTime(END_OF_BUSINESS_DAY).plusDays(14);
-        LocalDateTime currentDateTime = time.now();
-        LocalDateTime today4pm = currentDateTime.toLocalDate().atTime(16, 0);
-
-        boolean isAfter4pmToday = currentDateTime.isAfter(today4pm)
-            && currentDateTime.toLocalDate().equals(deemedServedDeadline.toLocalDate());
-
-        boolean isAfter14DaysAt4pmDeadline = currentDateTime.isAfter(deemedServedDeadline);
-
-        return isAfter14DaysAt4pmDeadline || isAfter4pmToday;
-    }
-
-    public boolean isDeemedServedWithinMaxWorkingDays(LocalDate cosDateOfServiceForDefendant) {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate maxWorkingDaysDate = deadlinesCalculator.plusWorkingDays(currentDate, 2);
-
-        return cosDateOfServiceForDefendant.isAfter(maxWorkingDaysDate);
-    }
-
-    private boolean isDeemedServedDateIsNotWorkingDay(LocalDate cosDateOfServiceForDefendant) {
-        boolean isOlderThan14Days = isDeemedServedDateOlderThan14Days(cosDateOfServiceForDefendant);
-        return !isOlderThan14Days && !workingDayIndicator.isWorkingDay(cosDateOfServiceForDefendant);
-    }
-
     private boolean isConfirmationForLip(CaseData caseData) {
         return (caseData.getDefendant1LIPAtClaimIssued() != null
             && caseData.getDefendant1LIPAtClaimIssued() == YesOrNo.YES)
@@ -364,32 +304,6 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
     private boolean areAnyRespondentsLitigantInPerson(CaseData caseData) {
         return caseData.getRespondent1Represented() == NO
             || (YES.equals(caseData.getAddRespondent2()) ? (caseData.getRespondent2Represented() == NO) : false);
-    }
-
-    private List<String> getServiceOfDateValidationMessages(CertificateOfService certificateOfService) {
-        List<String> errorMessages = new ArrayList<>();
-        if (Objects.nonNull(certificateOfService)) {
-            if (isCosDefendantNotifyDateFutureDate(certificateOfService.getCosDateOfServiceForDefendant())) {
-                errorMessages.add(DOC_SERVED_DATE_IN_FUTURE);
-            }
-
-            if (isCosDefendantNotifyDateOlderThan14Days(certificateOfService.getCosDateOfServiceForDefendant())) {
-                errorMessages.add(DOC_SERVED_DATE_OLDER_THAN_14DAYS);
-            }
-
-            if (isDeemedServedWithinMaxWorkingDays(certificateOfService.getCosDateDeemedServedForDefendant())) {
-                errorMessages.add(DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS);
-            }
-
-            if (isDeemedServedDateOlderThan14Days(certificateOfService.getCosDateDeemedServedForDefendant())) {
-                errorMessages.add(DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS);
-            }
-
-            if (isDeemedServedDateIsNotWorkingDay(certificateOfService.getCosDateDeemedServedForDefendant())) {
-                errorMessages.add(DATE_OF_SERVICE_DATE_IS_WORKING_DAY);
-            }
-        }
-        return errorMessages;
     }
 
     private LocalDateTime getServiceDate(CaseData caseData) {
