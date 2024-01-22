@@ -35,7 +35,8 @@ public class CaseFlagsInitialiser {
         CaseData caseData = dataBuilder.build();
         switch (caseEvent) {
             case CREATE_CLAIM:
-            case CREATE_CLAIM_SPEC: {
+            case CREATE_CLAIM_SPEC:
+            case CREATE_LIP_CLAIM: {
                 initialiseApplicantAndRespondentFlags(dataBuilder, caseData);
                 break;
             }
