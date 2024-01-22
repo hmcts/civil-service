@@ -92,6 +92,6 @@ public interface Claim {
 
     boolean isPartialAdmissionAccepted();
 
-    boolean isPaymentPlanAccepted();
+    boolean isPaymentPlanRejected();
 
 }

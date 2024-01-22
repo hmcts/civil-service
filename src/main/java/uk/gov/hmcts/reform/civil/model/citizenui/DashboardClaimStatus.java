@@ -34,7 +34,7 @@ public enum DashboardClaimStatus {
         Claim::hasClaimEnded
     ),
     CLAIMANT_REJECTED_PAYMENT_PLAN(
-        Claim::isPaymentPlanAccepted
+        Claim::isPaymentPlanRejected
     ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing

@@ -295,18 +295,17 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isPartialAdmissionAccepted() {
-        return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
+        return CaseState.JUDICIAL_REFERRAL == caseData.getCcdState()
             && caseData.isPartAdmitClaimSpec()
             && caseData.isPartAdmitClaimNotSettled()
             && caseData.isPayImmediately()
-            && YES.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
+            && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();
     }
 
     @Override
-    public boolean isPaymentPlanAccepted() {
+    public boolean isPaymentPlanRejected() {
         return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
-                && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
-                && (caseData.getRespondent1().isCompany() || caseData.getRespondent1().isOrganisation())
-                && caseData.hasApplicantRejectedRepaymentPlan());
+            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+            && caseData.hasApplicantRejectedRepaymentPlan());
     }
 }

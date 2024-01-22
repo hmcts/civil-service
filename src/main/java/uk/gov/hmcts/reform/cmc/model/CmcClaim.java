@@ -444,7 +444,7 @@ public class CmcClaim implements Claim {
     public boolean isClaimantDefaultJudgement() {
         return false;
     }
-    
+
     @Override
     public boolean isPartialAdmissionAccepted() {
 
@@ -454,8 +454,8 @@ public class CmcClaim implements Claim {
     }
 
     @Override
-    public boolean isPaymentPlanAccepted() {
-        
+    public boolean isPaymentPlanRejected() {
+
         return (hasResponse() && (response.isPartAdmit() || response.isFullAdmit())
             && (response.getPaymentIntention().isPayByDate() || response.getPaymentIntention().isPayByInstallments()));
     }

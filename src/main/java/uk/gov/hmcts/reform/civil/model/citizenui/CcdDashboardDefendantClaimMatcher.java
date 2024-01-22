@@ -294,7 +294,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
-    public boolean isPaymentPlanAccepted() {
+    public boolean isPaymentPlanRejected() {
         return false;
     }
 
