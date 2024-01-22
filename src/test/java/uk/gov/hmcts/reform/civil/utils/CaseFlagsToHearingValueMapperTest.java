@@ -276,15 +276,6 @@ public class CaseFlagsToHearingValueMapperTest {
             .flagComment("Local dialect")
             .build();
 
-        FlagDetail flagSecondSignLanguage = FlagDetail.builder()
-            .status("Active")
-            .hearingRelevant(YES)
-            .flagCode("RA0042")
-            .name("Sign Language Interpreter")
-            .subTypeValue("French")
-            .flagComment("Comment - French sign language")
-            .build();
-
         FlagDetail flagSecondLanguage = FlagDetail.builder()
             .status("Active")
             .hearingRelevant(YES)
@@ -293,7 +284,6 @@ public class CaseFlagsToHearingValueMapperTest {
             .name("Language Interpreter")
             .flagComment("Comment - Waterloo accent")
             .build();
-
 
         List<FlagDetail> flagDetails = List.of(
             flagNotRAorSM,

@@ -112,7 +112,7 @@ public class CaseFlagsToHearingValueMapper {
             .collect(Collectors.toList());
     }
 
-    private static boolean isLanguageInterpreterFlag(String flag){
+    private static boolean isLanguageInterpreterFlag(String flag) {
         return flag.equals(LANGUAGE_INTERPRETER_FLAG) || flag.equals(SIGN_LANGUAGE_INTERPRETER_FLAG);
     }
 
