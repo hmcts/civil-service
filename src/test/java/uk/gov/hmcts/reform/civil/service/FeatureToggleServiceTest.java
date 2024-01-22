@@ -141,7 +141,7 @@ class FeatureToggleServiceTest {
     @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
         var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
-        givenToggle(transferCaseOnlineKey, toggleStat);
+        //givenToggle(transferCaseOnlineKey, toggleStat);
 
         assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
     }
