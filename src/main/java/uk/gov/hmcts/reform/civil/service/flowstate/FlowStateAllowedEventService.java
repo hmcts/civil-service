@@ -466,7 +466,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
             )
         ),
 
@@ -1018,7 +1019,8 @@ public class FlowStateAllowedEventService {
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
             )
         ),
 
@@ -1044,7 +1046,8 @@ public class FlowStateAllowedEventService {
                 DEFAULT_JUDGEMENT_SPEC,
                 CHANGE_SOLICITOR_EMAIL,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
             )
         ),
 
