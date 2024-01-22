@@ -35,7 +35,6 @@ public class PaymentRequestUpdateCallbackService {
     public static final String serviceRequestReceived = "ServiceRequestReceived";
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
-    private final FeatureToggleService featureToggleService;
     private final ObjectMapper objectMapper;
     private final Time time;
 
@@ -43,7 +42,8 @@ public class PaymentRequestUpdateCallbackService {
 
     public void processCallback(ServiceRequestUpdateDto serviceRequestUpdateDto, String feeType) {
         log.info("Processing the callback for the caseId {} with status {}", serviceRequestUpdateDto.getCcdCaseNumber(),
-                 serviceRequestUpdateDto.getServiceRequestStatus());
+                 serviceRequestUpdateDto.getServiceRequestStatus()
+        );
 
         if (serviceRequestUpdateDto.getServiceRequestStatus().equalsIgnoreCase(PAID)) {
 
@@ -58,7 +58,7 @@ public class PaymentRequestUpdateCallbackService {
 
         } else {
             log.info("Service request status is not PAID for Case id {}",
-                      serviceRequestUpdateDto.getCcdCaseNumber());
+                     serviceRequestUpdateDto.getCcdCaseNumber());
         }
     }
 
