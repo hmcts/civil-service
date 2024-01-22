@@ -48,7 +48,6 @@ public class SetSettlementAgreementDeadlineCallbackHandlerTest extends BaseCallb
     @Autowired
     private SetSettlementAgreementDeadlineCallbackHandler handler;
 
-
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(SET_SETTLEMENT_AGREEMENT_DEADLINE);
