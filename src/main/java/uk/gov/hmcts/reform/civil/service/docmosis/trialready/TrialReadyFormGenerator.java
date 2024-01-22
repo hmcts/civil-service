@@ -52,6 +52,7 @@ public class TrialReadyFormGenerator {
                 DocumentType.TRIAL_READY_DOCUMENT
             )
         );
+
         switch (userRole) {
             case APPLICANTSOLICITORONE:
             case CLAIMANT:
@@ -63,6 +64,7 @@ public class TrialReadyFormGenerator {
                 break;
             case RESPONDENTSOLICITORTWO:
                 assignCategoryId.assignCategoryIdToCaseDocument(trialReadyDocument, DocCategory.DQ_DEF2.getValue());
+                break;
             default:
         }
 
