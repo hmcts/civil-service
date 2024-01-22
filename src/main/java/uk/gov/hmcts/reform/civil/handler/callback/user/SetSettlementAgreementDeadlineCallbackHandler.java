@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SET_SETTLEMENT_AGREEMENT_DEADLINE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +18,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 
 import java.util.Collections;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 
@@ -57,7 +55,6 @@ public class SetSettlementAgreementDeadlineCallbackHandler extends CallbackHandl
 
         return response.build();
     }
-
 
     private LocalDateTime getRespondToSettlementAgreementDeadline(CaseData caseData, LocalDateTime responseDate) {
         return caseData.hasApplicant1SignedSettlementAgreement()
