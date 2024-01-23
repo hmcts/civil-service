@@ -740,7 +740,9 @@ class FlowStateAllowedEventServiceTest {
                 of(
                     CASE_STAYED,
                     new CaseEvent[]{
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        ADD_UNAVAILABLE_DATES,
+                        CHANGE_SOLICITOR_EMAIL
                     }
                 ),
                 of(

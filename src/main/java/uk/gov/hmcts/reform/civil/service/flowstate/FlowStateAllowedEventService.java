@@ -788,7 +788,9 @@ public class FlowStateAllowedEventService {
         entry(
             CASE_STAYED.fullName(),
             List.of(
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                ADD_UNAVAILABLE_DATES,
+                CHANGE_SOLICITOR_EMAIL
             )
         )
     );
@@ -1457,7 +1459,9 @@ public class FlowStateAllowedEventService {
         entry(
             CASE_STAYED.fullName(),
             List.of(
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                ADD_UNAVAILABLE_DATES,
+                CHANGE_SOLICITOR_EMAIL
             )
         )
     );
