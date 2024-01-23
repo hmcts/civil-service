@@ -2,9 +2,13 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
@@ -18,25 +22,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest(classes = {
+    ServiceOfDateValidationMessageUtils.class,
+
+})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ServiceOfDateValidationMessageUtilsTest {
 
-    @Mock
+    @MockBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @Mock
+    @MockBean
     private WorkingDayIndicator workingDayIndicator;
 
-    @Mock
+    @MockBean
     private Time time;
 
-    @InjectMocks
+    @Autowired
     private ServiceOfDateValidationMessageUtils serviceUtils;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
+    
     @Test
     void shouldThrowError_whenDeemedServedDateIsOlderThan14Days() {
         LocalDate currentDate = LocalDate.now();
