@@ -1269,7 +1269,8 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
-                UPLOAD_MEDIATION_DOCUMENTS
+                UPLOAD_MEDIATION_DOCUMENTS,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
