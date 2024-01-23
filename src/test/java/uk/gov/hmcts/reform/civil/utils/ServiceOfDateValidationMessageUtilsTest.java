@@ -48,7 +48,7 @@ class ServiceOfDateValidationMessageUtilsTest {
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         when(time.now()).thenReturn(currentDateTime);
-        when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(LocalDate.now().plusDays(2));
+        when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(currentDate);
         when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
         List<String> errorMessages = serviceUtils.getServiceOfDateValidationMessages(certificateOfService);
@@ -68,7 +68,7 @@ class ServiceOfDateValidationMessageUtilsTest {
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         when(time.now()).thenReturn(currentDateTime);
-        when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(LocalDate.now().plusDays(2));
+        when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(currentDate);
         when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
         List<String> errorMessages = serviceUtils.getServiceOfDateValidationMessages(certificateOfService);
@@ -89,7 +89,7 @@ class ServiceOfDateValidationMessageUtilsTest {
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         when(time.now()).thenReturn(currentDateTime);
-        when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(LocalDate.now().plusDays(2));
+        when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(currentDate);
         when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
         List<String> errorMessages = serviceUtils.getServiceOfDateValidationMessages(certificateOfService);
@@ -110,7 +110,7 @@ class ServiceOfDateValidationMessageUtilsTest {
         LocalDateTime currentDateTime = LocalDateTime.now();
         when(time.now()).thenReturn(currentDateTime);
         when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
-        when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(LocalDate.now().plusDays(2));
+        when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(currentDate);
 
         List<String> errorMessages = serviceUtils.getServiceOfDateValidationMessages(certificateOfService);
 
@@ -131,7 +131,7 @@ class ServiceOfDateValidationMessageUtilsTest {
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         when(time.now()).thenReturn(currentDateTime);
-        when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(LocalDate.now().plusDays(2));
+        when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(currentDate);
         when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
         // Act
