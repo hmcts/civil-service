@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
@@ -744,6 +745,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.setSmallClaimsFlag(YES).build();
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
+            updatedData.isSdoR2NewScreen(caseData.getFastClaims().contains(
+                FastTrack.fastClaimNoiseInducedHearingLoss) ? "true" :"false");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

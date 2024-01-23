@@ -270,6 +270,7 @@ public class CaseDataParent implements MappableObject {
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
+    private String isSdoR2NewScreen;
     private FastTrackJudgesRecital sdoFastTrackJudgesRecital;
     private SdoR2FastTrackAltDisputeResolution sdoAltDisputeResolution;
     private SdoR2VariationOfDirections sdoVariationOfDirections;
