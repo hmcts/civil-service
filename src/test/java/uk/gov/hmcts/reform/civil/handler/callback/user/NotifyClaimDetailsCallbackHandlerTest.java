@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
+import uk.gov.hmcts.reform.civil.utils.ServiceOfDateValidationMessageUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -75,6 +77,9 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
+
+    @MockBean
+    private ServiceOfDateValidationMessageUtils serviceOfDateValidationMessageUtils;
 
     @MockBean
     private FeatureToggleService featureToggleService;
@@ -626,15 +631,17 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotPassValidateCertificateOfService_1Lr1Lip_whenServiceDateIsPast_OlderThan14Days() {
             LocalDate past = LocalDate.now().minusDays(15);
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
-            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
-                .thenReturn(LocalDate.now().plusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_1Lr_1Lip()
                 .setCoSClaimDetailsWithDate(true, false, past, past, null, null, true, false)
                 .build();
+            CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDetails1();
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef))
+                .thenReturn(List.of(ServiceOfDateValidationMessageUtils.DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS,
+                                    ServiceOfDateValidationMessageUtils.DOC_SERVED_DATE_OLDER_THAN_14DAYS));
+
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -646,15 +653,17 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotPassValidateCertificateOfService_1Lr1Lip_whenServiceDateIsPast_deadlineTodayDate_After16hrs() {
             LocalDate past = LocalDate.now().minusDays(14);
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(17, 05));
-            when(deadlinesCalculator.plusWorkingDays(LocalDate.now(), 2))
-                .thenReturn(LocalDate.now().plusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_1Lr_1Lip()
                 .setCoSClaimDetailsWithDate(true, false, past, past, null, null, true, false)
                 .build();
+            CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDetails1();
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(17, 05));
+            when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef))
+                .thenReturn(List.of(ServiceOfDateValidationMessageUtils.DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS,
+                                    ServiceOfDateValidationMessageUtils.DOC_SERVED_DATE_OLDER_THAN_14DAYS));
+
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -746,15 +755,16 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate.minusDays(15);
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
-            when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
-                .thenReturn(LocalDate.now().plusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
                 .setCoSClaimDetailsWithDate(true, false, currentDate, deemedServedDate, null, null, true, false)
                 .build();
+            CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDetails1();
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef))
+                .thenReturn(List.of(ServiceOfDateValidationMessageUtils.DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS));
+
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -768,15 +778,16 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate;
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
-            when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
-                .thenReturn(LocalDate.now().plusDays(2));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
                 .setCoSClaimDetailsWithDate(true, false, currentDate, deemedServedDate, null, null, true, false)
                 .build();
+            CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDetails1();
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef))
+                .thenReturn(List.of(ServiceOfDateValidationMessageUtils.DATE_OF_SERVICE_DATE_IS_WORKING_DAY));
+
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -790,15 +801,16 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             LocalDate currentDate = LocalDate.now();
             LocalDate deemedServedDate = currentDate.plusDays(5);
 
-            when(time.now()).thenReturn(LocalDate.now().atTime(16, 00));
-            when(deadlinesCalculator.plusWorkingDays(currentDate, 2))
-                .thenReturn(LocalDate.of(2023, 10, 16));
-            when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
-
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
                 .setCoSClaimDetailsWithDate(true, false, currentDate, deemedServedDate, null, null, true, false)
                 .build();
+            CertificateOfService certificateOfServiceDef = caseData.getCosNotifyClaimDetails1();
+
+            when(time.now()).thenReturn(LocalDate.now().atTime(15, 05));
+            when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(certificateOfServiceDef))
+                .thenReturn(List.of(ServiceOfDateValidationMessageUtils.DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS));
+
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

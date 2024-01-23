@@ -28,7 +28,7 @@ public class ServiceOfDateValidationMessageUtils {
         "The date of service must be no greater than 2 working days in the future";
 
     public static final String DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS =
-        "The date of service must not be more than 14 days old";
+        "The date of service should not be more than 14 days old";
 
     public static final String DATE_OF_SERVICE_DATE_IS_WORKING_DAY =
         "For the date of service please enter a working day";
