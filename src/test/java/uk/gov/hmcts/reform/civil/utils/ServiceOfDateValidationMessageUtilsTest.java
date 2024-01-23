@@ -39,7 +39,6 @@ class ServiceOfDateValidationMessageUtilsTest {
 
     @Test
     void shouldThrowError_whenDeemedServedDateIsOlderThan14Days() {
-        // Arrange
         LocalDate currentDate = LocalDate.now();
         LocalDate deemedServedDate = currentDate.minusDays(15);
         CertificateOfService certificateOfService = CertificateOfService.builder()
@@ -47,14 +46,13 @@ class ServiceOfDateValidationMessageUtilsTest {
             .cosDateDeemedServedForDefendant(deemedServedDate)
             .build();
 
-        when(time.now()).thenReturn(LocalDateTime.now());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        when(time.now()).thenReturn(currentDateTime);
         when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(LocalDate.now().plusDays(2));
         when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
-        // Act
         List<String> errorMessages = serviceUtils.getServiceOfDateValidationMessages(certificateOfService);
 
-        // Assert
         assertThat(errorMessages).contains(ServiceOfDateValidationMessageUtils.DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS);
         assertThat(errorMessages).hasSize(1);
     }
@@ -68,7 +66,8 @@ class ServiceOfDateValidationMessageUtilsTest {
             .cosDateDeemedServedForDefendant(currentDate)
             .build();
 
-        when(time.now()).thenReturn(LocalDateTime.now());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        when(time.now()).thenReturn(currentDateTime);
         when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(LocalDate.now().plusDays(2));
         when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
@@ -88,7 +87,8 @@ class ServiceOfDateValidationMessageUtilsTest {
             .cosDateDeemedServedForDefendant(currentDate)
             .build();
 
-        when(time.now()).thenReturn(LocalDateTime.now());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        when(time.now()).thenReturn(currentDateTime);
         when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(LocalDate.now().plusDays(2));
         when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
@@ -107,7 +107,8 @@ class ServiceOfDateValidationMessageUtilsTest {
             .cosDateDeemedServedForDefendant(deemedServedDate)
             .build();
 
-        when(time.now()).thenReturn(LocalDateTime.now());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        when(time.now()).thenReturn(currentDateTime);
         when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(false);
         when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(LocalDate.now().plusDays(2));
 
@@ -128,7 +129,8 @@ class ServiceOfDateValidationMessageUtilsTest {
             .cosDateDeemedServedForDefendant(LocalDate.now().plusDays(3))
             .build();
 
-        when(time.now()).thenReturn(LocalDateTime.now());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        when(time.now()).thenReturn(currentDateTime);
         when(deadlinesCalculator.plusWorkingDays(currentDate, 2)).thenReturn(LocalDate.now().plusDays(2));
         when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
