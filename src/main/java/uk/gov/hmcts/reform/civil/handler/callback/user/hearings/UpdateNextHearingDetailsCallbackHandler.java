@@ -43,7 +43,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
     );
 
     private static final List<String> UPDATE_HEARING_DATE_STATUSES = List.of(LISTED.name(), AWAITING_ACTUALS.name());
-    private static final List<HmcStatus> CLEAR_HEARING_DATE_STATUSES = List.of(COMPLETED, CANCELLED, ADJOURNED);
+    private static final List<String> CLEAR_HEARING_DATE_STATUSES = List.of(COMPLETED.name(), CANCELLED.name(), ADJOURNED.name());
 
     private final HearingsService hearingService;
     private final Time datetime;
@@ -63,7 +63,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         Long caseId = callbackParams.getRequest().getCaseDetails().getId();
-        CaseData.CaseDataBuilder caseDataBuilder = callbackParams.getCaseData().toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         HearingsResponse hearingsResponse = hearingService.getHearings(authToken, caseId, null);
 
