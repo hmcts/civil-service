@@ -79,7 +79,6 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
                     .build();
                 dataBuilder.transferCaseDetails(transferCaseDetails).build();
             } else {
-                dataBuilder.ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).build();
                 dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);
                 tempOtherDetails.setReasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput());
             }
@@ -135,6 +134,9 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         if (isTransferOnlineCase(caseData)) {
+            if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.OTHER_REASONS) {
+                caseData.toBuilder().ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).build();
+            }
             return SubmittedCallbackResponse.builder()
                 .confirmationHeader(getHeaderTOC(caseData))
                 .confirmationBody(getBodyTOC(caseData))
