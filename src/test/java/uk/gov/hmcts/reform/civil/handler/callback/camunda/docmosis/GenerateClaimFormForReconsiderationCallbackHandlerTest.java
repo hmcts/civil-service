@@ -44,7 +44,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM_RECONSIDERATION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -83,6 +82,7 @@ public class GenerateClaimFormForReconsiderationCallbackHandlerTest extends Base
 
     private final LocalDate issueDate = now();
     private CaseData caseData;
+
     @Nested
     class AboutToSubmitCallback {
         @BeforeEach
@@ -106,6 +106,7 @@ public class GenerateClaimFormForReconsiderationCallbackHandlerTest extends Base
                 .build();
             when(time.now()).thenReturn(issueDate.atStartOfDay());
         }
+
         @Test
         public void shouldGenerateForm() {
 
