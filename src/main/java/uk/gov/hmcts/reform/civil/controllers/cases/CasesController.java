@@ -32,7 +32,6 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.ras.model.RoleAssignmentServiceResponse;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.RoleAssignmentsService;
-import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseWorkerSearchCaseParams;
 import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerCaseEventService;
 import uk.gov.hmcts.reform.civil.service.bulkclaims.CaseworkerEventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizen.events.CaseEventService;
@@ -40,13 +39,11 @@ import uk.gov.hmcts.reform.civil.service.citizen.events.EventSubmissionParams;
 import uk.gov.hmcts.reform.civil.service.citizen.repaymentplan.RepaymentPlanDecisionService;
 import uk.gov.hmcts.reform.civil.service.citizenui.DashboardClaimInfoService;
 import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
-import uk.gov.hmcts.reform.civil.service.search.CaseSdtRequestSearchService;
 import uk.gov.hmcts.reform.civil.service.user.UserInformationService;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Collections.emptyList;
 
@@ -64,7 +61,6 @@ public class CasesController {
     private final CoreCaseDataService coreCaseDataService;
     private final DashboardClaimInfoService dashboardClaimInfoService;
     private final CaseEventService caseEventService;
-    private final CaseSdtRequestSearchService caseSdtRequestSearchService;
     private final CaseworkerCaseEventService caseworkerCaseEventService;
     private final DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
     private final PostcodeValidator postcodeValidator;
@@ -225,16 +221,8 @@ public class CasesController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @RequestParam(name = "sdtRequestId") String searchParam
     ) {
-        CaseWorkerSearchCaseParams params = CaseWorkerSearchCaseParams.builder()
-            .authorisation(authorization)
-            .userId(userId)
-            .searchCriteria(Map.of("case.sdtRequestIdFromSdt", searchParam)).build();
-        List<CaseDetails> caseDetails = caseSdtRequestSearchService.searchCaseForSdtRequest(params);
 
-        if (caseDetails.size() < 1 && caseDetails.isEmpty()) {
-            return true;
-        }
-        return false;
+        return true;
     }
 
     @GetMapping(path = "/caseworker/validatePin")
