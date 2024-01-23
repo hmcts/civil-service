@@ -780,7 +780,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                TRANSFER_ONLINE_CASE
             )
         )
     );
