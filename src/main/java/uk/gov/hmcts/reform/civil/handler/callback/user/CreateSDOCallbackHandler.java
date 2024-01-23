@@ -891,6 +891,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
 
+        if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
+            dataBuilder.orderType(DISPOSAL);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
