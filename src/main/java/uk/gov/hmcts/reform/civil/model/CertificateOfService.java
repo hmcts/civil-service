@@ -27,8 +27,6 @@ public class CertificateOfService {
 
     @JsonProperty("cosDateOfServiceForDefendant")
     private LocalDate cosDateOfServiceForDefendant;
-    @JsonProperty("cosDateDeemedServedForDefendant")
-    private LocalDate cosDateDeemedServedForDefendant;
     @JsonProperty("cosServedDocumentFiles")
     private String cosServedDocumentFiles;
     @JsonProperty("cosEvidenceDocument")
