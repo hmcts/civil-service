@@ -79,7 +79,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
                     .build();
                 dataBuilder.transferCaseDetails(transferCaseDetails).build();
             } else {
-                dataBuilder.ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+                dataBuilder.ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM).build();
                 dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);
                 tempOtherDetails.setReasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput());
             }
