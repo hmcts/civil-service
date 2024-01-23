@@ -66,7 +66,6 @@ public enum DocmosisTemplates {
     CLAIMANT_LIP_MANUAL_DETERMINATION_PDF("CV-SPC-CLM-ENG-00001-LIP-MD.docx", "%s_request-org-repayment-amount.pdf"),
     RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF("CV-UNS-RECON-ENG-00001.docx", "Decision_on_reconsideration_request_%s.pdf");
 
-
     private final String template;
     private final String documentTitle;
 
