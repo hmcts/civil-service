@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -78,6 +79,7 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
                     .build();
                 dataBuilder.transferCaseDetails(transferCaseDetails).build();
             } else {
+                dataBuilder.ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
                 dataBuilder.notSuitableSdoOptions(NotSuitableSdoOptions.OTHER_REASONS);
                 tempOtherDetails.setReasonNotSuitableForSDO(callbackParams.getCaseData().getReasonNotSuitableSDO().getInput());
             }
