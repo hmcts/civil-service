@@ -11,12 +11,13 @@ import java.util.Date;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class SdoR2QuestionsClaimantExpert {
+public class SdoR2QuestionsToEntExpert {
 
-    private String sdoDefendantMayAskTxt;
-    private Date sdoDefendantMayAskDate;
+    private String sdoWrittenQuestionsTxt;
+    private Date sdoWrittenQuestionsDate;
+    private String sdoWrittenQuestionsDigPortalTxt;
     private String sdoQuestionsShallBeAnsweredTxt;
     private Date sdoQuestionsShallBeAnsweredDate;
-    private String sdoUploadedToDigitalPortalTxt;
-    private SdoR2ApplicationToRelyOnFurther sdoR2ApplicationToRelyOnFurther;
+    private String sdoShallBeUploadedTxt;
+
 }

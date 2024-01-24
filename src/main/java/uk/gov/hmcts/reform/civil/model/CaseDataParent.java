@@ -270,12 +270,21 @@ public class CaseDataParent implements MappableObject {
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
+    private String isSdoR2NewScreen;
     private FastTrackJudgesRecital sdoFastTrackJudgesRecital;
     private SdoR2FastTrackAltDisputeResolution sdoAltDisputeResolution;
     private SdoR2VariationOfDirections sdoVariationOfDirections;
-    private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
     private SdoR2Settlement sdoR2Settlement;
+    private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
+    private SdoR2ExpertEvidence sdoR2ExpertEvidence;
+    private SdoR2AddendumReport sdoR2AddendumReport;
+    private SdoR2FurtherAudiogram sdoR2FurtherAudiogram;
+    private SdoR2QuestionsClaimantExpert sdoR2QuestionsClaimantExpert;
+    private SdoR2PermissionToRelyOnExpert sdoR2PermissionToRelyOnExpert;
+    private SdoR2EvidenceAcousticEngineer sdoR2EvidenceAcousticEngineer;
+    private SdoR2QuestionsToEntExpert sdoR2QuestionsToEntExpert;
     private SdoR2Trial sdoR2Trial;
+    private SdoR2UploadOfDocuments sdoR2UploadOfDocuments;
 
     private CaseDocument sdoOrderDocument;
 
