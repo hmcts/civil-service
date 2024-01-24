@@ -31,6 +31,7 @@ class TrialReadyCheckSearchServiceTest extends ElasticSearchServiceTest {
                           .should(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING")))
                           .should(boolQuery().must(matchQuery("state", "HEARING_READINESS"))))
                 .mustNot(matchQuery("data.allocatedTrack", "SMALL_CLAIM"))
+                .mustNot(matchQuery("data.responseClaimTrack", "SMALL_CLAIM"))
                 .mustNot(matchQuery("data.trialReadyChecked", "Yes")));
 
         return new Query(query, List.of("reference"), fromValue);
