@@ -1198,21 +1198,24 @@ public class FlowStateAllowedEventService {
             List.of(
                 TAKE_CASE_OFFLINE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
             PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
             PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1255,7 +1258,8 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1354,7 +1358,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 CHANGE_SOLICITOR_EMAIL,
                 EXTEND_RESPONSE_DEADLINE,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE
 
             )
         ),
@@ -1389,7 +1394,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1474,14 +1480,16 @@ public class FlowStateAllowedEventService {
             PART_ADMIT_AGREE_REPAYMENT.fullName(),
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
             FULL_ADMIT_AGREE_REPAYMENT.fullName(),
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                TRANSFER_ONLINE_CASE
             )
         )
     );
