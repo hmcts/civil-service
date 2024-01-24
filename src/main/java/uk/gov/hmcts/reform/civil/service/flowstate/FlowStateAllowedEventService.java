@@ -168,7 +168,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -183,7 +184,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -197,7 +199,8 @@ public class FlowStateAllowedEventService {
                     NotSuitable_SDO,
                     migrateCase,
                     CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                    CREATE_CLAIM_AFTER_PAYMENT
+                    CREATE_CLAIM_AFTER_PAYMENT,
+                    TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -225,7 +228,8 @@ public class FlowStateAllowedEventService {
                 CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT
+                EVIDENCE_UPLOAD_RESPONDENT,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -251,7 +255,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT
+                EVIDENCE_UPLOAD_RESPONDENT,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -321,7 +326,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
-                GENERATE_DIRECTIONS_ORDER
+                GENERATE_DIRECTIONS_ORDER,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -350,7 +356,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
-                GENERATE_DIRECTIONS_ORDER
+                GENERATE_DIRECTIONS_ORDER,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -379,7 +386,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
-                GENERATE_DIRECTIONS_ORDER
+                GENERATE_DIRECTIONS_ORDER,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -402,7 +410,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -425,7 +434,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -448,7 +458,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -467,7 +478,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -486,7 +498,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 CREATE_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -504,7 +517,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -574,7 +588,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -587,7 +602,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 APPLICATION_CLOSED_UPDATE_CLAIM,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -600,7 +616,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
                 APPLICATION_CLOSED_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -628,7 +645,8 @@ public class FlowStateAllowedEventService {
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
                 NotSuitable_SDO,
-                CREATE_SDO
+                CREATE_SDO,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -640,7 +658,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -652,7 +671,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -661,7 +681,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 migrateCase,
                 CREATE_SDO,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -817,7 +838,8 @@ public class FlowStateAllowedEventService {
                     NotSuitable_SDO,
                     migrateCase,
                     CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                    CREATE_CLAIM_AFTER_PAYMENT
+                    CREATE_CLAIM_AFTER_PAYMENT,
+                    TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -835,7 +857,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -881,7 +904,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -921,7 +945,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -944,7 +969,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -968,7 +994,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 migrateCase,
                 CHANGE_SOLICITOR_EMAIL,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -995,7 +1022,8 @@ public class FlowStateAllowedEventService {
                 DEFAULT_JUDGEMENT_SPEC,
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -1021,7 +1049,8 @@ public class FlowStateAllowedEventService {
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -1047,7 +1076,8 @@ public class FlowStateAllowedEventService {
                 DEFAULT_JUDGEMENT_SPEC,
                 CHANGE_SOLICITOR_EMAIL,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -1076,7 +1106,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 migrateCase,
                 CHANGE_SOLICITOR_EMAIL,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -1145,7 +1176,8 @@ public class FlowStateAllowedEventService {
                 REFER_TO_JUDGE,
                 migrateCase,
                 CHANGE_SOLICITOR_EMAIL,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1167,21 +1199,24 @@ public class FlowStateAllowedEventService {
             List.of(
                 TAKE_CASE_OFFLINE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
             PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
             PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1214,7 +1249,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1223,7 +1259,8 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1313,7 +1350,8 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1321,7 +1359,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 CHANGE_SOLICITOR_EMAIL,
                 EXTEND_RESPONSE_DEADLINE,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE
 
             )
         ),
@@ -1356,7 +1395,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1441,14 +1481,16 @@ public class FlowStateAllowedEventService {
             PART_ADMIT_AGREE_REPAYMENT.fullName(),
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
             FULL_ADMIT_AGREE_REPAYMENT.fullName(),
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(

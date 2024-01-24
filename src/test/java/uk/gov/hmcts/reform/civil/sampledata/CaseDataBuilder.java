@@ -441,8 +441,8 @@ public class CaseDataBuilder {
 
     private String unassignedCaseListDisplayOrganisationReferences;
     private String caseListDisplayDefendantSolicitorReferences;
-    private  CertificateOfService cosNotifyClaimDefendant1;
-    private  CertificateOfService cosNotifyClaimDefendant2;
+    private CertificateOfService cosNotifyClaimDefendant1;
+    private CertificateOfService cosNotifyClaimDefendant2;
     private CertificateOfService cosNotifyClaimDetails1;
     private CertificateOfService cosNotifyClaimDetails2;
 
@@ -532,7 +532,7 @@ public class CaseDataBuilder {
     private ReasonForReconsideration reasonForReconsiderationRespondent1;
     private ReasonForReconsideration reasonForReconsiderationRespondent2;
     private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
-  
+
     private UploadMediationDocumentsForm uploadDocumentsForm;
 
     private YesOrNo responseClaimExpertSpecRequired;
@@ -5756,7 +5756,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder setCoSClaimDetailsWithDate(boolean setCos1, boolean setCos2,
-                                                      LocalDate cos1Date, LocalDate cos2Date,
+                                                      LocalDate cos1Date, LocalDate deemed1Date, LocalDate cos2Date, LocalDate deemed2Date,
                                                       boolean file1, boolean file2) {
         List<Element<Document>> files = wrapElements(Document.builder()
                 .documentUrl("fake-url")
@@ -5772,7 +5772,8 @@ public class CaseDataBuilder {
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos1Date);
+                .cosDateOfServiceForDefendant(cos1Date)
+                .cosDateDeemedServedForDefendant(deemed1Date);
             if (file1) {
                 cos1Builder.cosEvidenceDocument(files);
             }
@@ -5780,7 +5781,8 @@ public class CaseDataBuilder {
         }
         if (setCos2) {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos2Date);
+                .cosDateOfServiceForDefendant(cos2Date)
+                .cosDateDeemedServedForDefendant(deemed2Date);
             if (file2) {
                 cos2Builder.cosEvidenceDocument(files2);
             }
