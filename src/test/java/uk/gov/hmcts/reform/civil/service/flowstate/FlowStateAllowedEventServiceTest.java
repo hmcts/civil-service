@@ -91,6 +91,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
@@ -732,7 +733,18 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         MEDIATION_SUCCESSFUL,
                         MEDIATION_UNSUCCESSFUL,
-                        ADD_UNAVAILABLE_DATES
+                        ADD_UNAVAILABLE_DATES,
+                        INITIATE_GENERAL_APPLICATION,
+                        TRANSFER_ONLINE_CASE
+                    }
+                ),
+                of(
+                    CASE_STAYED,
+                    new CaseEvent[]{
+                        INITIATE_GENERAL_APPLICATION,
+                        ADD_UNAVAILABLE_DATES,
+                        CHANGE_SOLICITOR_EMAIL,
+                        TRANSFER_ONLINE_CASE
                     }
                 ),
                 of(
@@ -767,7 +779,8 @@ class FlowStateAllowedEventServiceTest {
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
                         ADD_UNAVAILABLE_DATES,
-                        asyncStitchingComplete
+                        asyncStitchingComplete,
+                        TRANSFER_ONLINE_CASE
                     }
                 )
             );

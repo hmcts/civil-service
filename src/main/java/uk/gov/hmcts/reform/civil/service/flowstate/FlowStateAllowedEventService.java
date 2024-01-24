@@ -99,6 +99,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplet
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
@@ -745,7 +746,9 @@ public class FlowStateAllowedEventService {
             List.of(
                 MEDIATION_SUCCESSFUL,
                 MEDIATION_UNSUCCESSFUL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                INITIATE_GENERAL_APPLICATION,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -780,7 +783,17 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                TRANSFER_ONLINE_CASE
+            )
+        ),
+        entry(
+            CASE_STAYED.fullName(),
+            List.of(
+                INITIATE_GENERAL_APPLICATION,
+                ADD_UNAVAILABLE_DATES,
+                CHANGE_SOLICITOR_EMAIL,
+                TRANSFER_ONLINE_CASE
             )
         )
     );
@@ -1231,7 +1244,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                INITIATE_GENERAL_APPLICATION,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1269,7 +1284,8 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
-                UPLOAD_MEDIATION_DOCUMENTS
+                UPLOAD_MEDIATION_DOCUMENTS,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1359,7 +1375,8 @@ public class FlowStateAllowedEventService {
             PREPARE_FOR_HEARING_CONDUCT_HEARING.fullName(),
             List.of(
                 asyncStitchingComplete,
-                UPLOAD_MEDIATION_DOCUMENTS
+                UPLOAD_MEDIATION_DOCUMENTS,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1444,6 +1461,15 @@ public class FlowStateAllowedEventService {
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC
+            )
+        ),
+        entry(
+            CASE_STAYED.fullName(),
+            List.of(
+                INITIATE_GENERAL_APPLICATION,
+                ADD_UNAVAILABLE_DATES,
+                CHANGE_SOLICITOR_EMAIL,
+                TRANSFER_ONLINE_CASE
             )
         )
     );
