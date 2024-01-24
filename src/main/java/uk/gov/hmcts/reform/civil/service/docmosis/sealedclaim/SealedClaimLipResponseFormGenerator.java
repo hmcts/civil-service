@@ -32,17 +32,22 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
-        SealedClaimLipResponseForm.toTemplate(caseData);
-        SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
-            SealedClaimLipResponseForm.toTemplate(caseData).toBuilder()
-                .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))
-                .defendant1MediationCompanyName(getDefendant1MediationCompanyName(caseData))
-                .defendant1MediationContactNumber(getDefendant1MediationContactNumber(caseData))
-                .defendant1MediationEmail(getDefendant1MediationEmail(caseData))
-                .defendant1MediationUnavailableDatesExists(checkDefendant1MediationHasUnavailabilityDates(caseData))
-                .defendant1UnavailableDateFromForMediation(getDefendant1MediationUnavailableDate(caseData, YesOrNo.YES))
-                .defendant1UnavailableDateToForMediation(getDefendant1MediationUnavailableDate(caseData, YesOrNo.NO));
-        return responseFormBuilder.build();
+        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+            SealedClaimLipResponseForm.toTemplate(caseData);
+            SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
+                SealedClaimLipResponseForm.toTemplate(caseData).toBuilder()
+                    .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))
+                    .defendant1MediationCompanyName(getDefendant1MediationCompanyName(caseData))
+                    .defendant1MediationContactNumber(getDefendant1MediationContactNumber(caseData))
+                    .defendant1MediationEmail(getDefendant1MediationEmail(caseData))
+                    .defendant1MediationUnavailableDatesExists(checkDefendant1MediationHasUnavailabilityDates(caseData))
+                    .defendant1UnavailableDateFromForMediation(getDefendant1MediationUnavailableDate(caseData, YesOrNo.YES))
+                    .defendant1UnavailableDateToForMediation(getDefendant1MediationUnavailableDate(caseData, YesOrNo.NO));
+            return responseFormBuilder.build();
+
+        } else {
+            return  SealedClaimLipResponseForm.toTemplate(caseData);
+        }
     }
 
     private LocalDate getDefendant1MediationUnavailableDate(CaseData caseData, YesOrNo unavailabilityFrom) {

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -103,13 +102,39 @@ class SealedClaimLipResponseFormGeneratorTest {
     @Captor
     ArgumentCaptor<PDF> uploadDocumentArgumentCaptor;
 
-    @BeforeEach
-    void setup() {
-        featureToggleService = mock(FeatureToggleService.class);
+    @Test
+    void shouldGenerateDocumentSuccessfully() {
+
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        //Given
+        CaseData caseData = commonData().build();
+
+        String fileName = "someName";
+        DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
+        byte[] bytes = {};
+        given(docmosisDocument.getBytes()).willReturn(bytes);
+        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
+            docmosisDocument);
+        given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(caseData);
+        //When
+        CaseDocument result = generator.generate(caseData, AUTHORIZATION);
+        //Then
+        assertThat(result).isEqualTo(caseDocument);
+        verify(documentGeneratorService).generateDocmosisDocument(templateData, DEFENDANT_RESPONSE_LIP_SPEC);
+        verify(documentManagementService).uploadDocument(
+            eq(AUTHORIZATION),
+            uploadDocumentArgumentCaptor.capture()
+        );
+        PDF document = uploadDocumentArgumentCaptor.getValue();
+        assertThat(document.getDocumentType()).isEqualTo(DEFENDANT_DEFENCE);
     }
 
     @Test
-    void shouldGenerateDocumentSuccessfully() {
+    void shouldGenerateDocumentSuccessfully_AfterCarmEnabled() {
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
@@ -125,7 +150,6 @@ class SealedClaimLipResponseFormGeneratorTest {
                     .whenWillThisAmountBePaid(whenWillPay)
                     .build()
             );
-
         String fileName = "someName";
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
@@ -237,6 +261,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void shouldNotBuildRepaymentPlan_whenRespondent1RepaymentPlanisNull() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent2(company("C"))
@@ -619,6 +644,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationDefaultFields() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
@@ -648,6 +674,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationAlternativeFields() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
@@ -680,6 +707,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationUnAvailabilityDateRangeFields() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
         def1UnavailabilityDates.add(element(UnavailableDate.builder()
@@ -720,6 +748,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationUnAvailabilitySingleDateFields() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
         def1UnavailabilityDates.add(element(UnavailableDate.builder()
@@ -760,6 +789,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationRespondent1LipResponseFieldsAreNull() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
@@ -782,6 +812,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationCaseDataLipResponsesAreNull() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
@@ -802,6 +833,7 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     @Test
     void checkMediationNullFieldsOfRespondent1MediationLipResponseFields() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
