@@ -88,7 +88,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             "Supporting evidence is required";
 
     public static final String BOTH_CERTIFICATE_SERVED_SAME_DATE =
-        "The date of Service for defendant 1 and defendant 2 must be the same";
+        "The date of service for defendant 1 and defendant 2 must be the same";
 
     public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0, 0);
 
