@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -57,8 +58,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNameInternal;
-import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNamePublic;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
@@ -425,8 +425,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
         if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
             // update case name for hmc if applicant/respondent/litigation friend was updated
-            builder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
-            builder.caseNamePublic(buildCaseNamePublic(caseData));
+            builder.caseNameHmctsInternal(CaseNameUtils.buildCaseName(caseData));
+            builder.caseNamePublic(buildCaseName(caseData));
         }
 
         // last step before clearing update details form

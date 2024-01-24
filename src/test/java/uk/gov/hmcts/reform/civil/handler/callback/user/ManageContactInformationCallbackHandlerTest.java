@@ -942,6 +942,32 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(caseDataBefore.getBusinessProcess(), responseData.getBusinessProcess());
         }
 
+        @Test
+        void shouldUpdateInternalCaseName() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .addApplicant1LitigationFriend()
+                .updateDetailsForm(UpdateDetailsForm.builder()
+                                       .partyChosen(DynamicList.builder()
+                                                        .value(DynamicListElement.builder()
+                                                                   .code(CLAIMANT_ONE_ID)
+                                                                   .build())
+                                                        .build())
+                                       .partyChosenId(CLAIMANT_ONE_ID)
+                                       .updateExpertsDetailsForm(wrapElements(party))
+                                       .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getCaseNameHmctsInternal())
+                .isEqualTo("'John Rambo' represented by 'Applicant Litigation Friend' (litigation friend) " +
+                               "v 'Sole Trader'");
+        }
+
         @Nested
         class RetainFlags {
             Flags respondent1Flags = Flags.builder().partyName("respondent1name").roleOnCase("respondent1").build();
