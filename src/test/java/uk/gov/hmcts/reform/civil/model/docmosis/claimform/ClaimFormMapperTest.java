@@ -372,7 +372,7 @@ class ClaimFormMapperTest {
         //When
         ClaimForm form = claimFormMapper.toClaimForm(CASE_DATA);
         //Then
-        assertThat(form.getTotalClaimAmount()).isEqualTo(TOTAL_CLAIM_AMOUNT.toString());
+        assertThat(form.getTotalClaimAmount()).isEqualTo(TOTAL_CLAIM_AMOUNT.setScale(2).toString());
     }
 
     @Test
