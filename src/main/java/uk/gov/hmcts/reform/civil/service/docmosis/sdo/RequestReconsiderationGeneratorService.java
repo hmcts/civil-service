@@ -66,8 +66,10 @@ public class RequestReconsiderationGeneratorService {
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private DesicionOnReconsiderationDocumentForm getTemplateData(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
-        DesicionOnReconsiderationDocumentForm.DesicionOnReconsiderationDocumentFormBuilder DesicionOnReconsiderationDocumentFormBuilder = DesicionOnReconsiderationDocumentForm.builder()
+    private DesicionOnReconsiderationDocumentForm getTemplateData(CaseData caseData, String judgeName, boolean isJudge,
+                                                                  String authorisation) {
+        DesicionOnReconsiderationDocumentForm.DesicionOnReconsiderationDocumentFormBuilder
+            desicionOnReconsiderationDocumentFormBuilder = DesicionOnReconsiderationDocumentForm.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
@@ -94,7 +96,7 @@ public class RequestReconsiderationGeneratorService {
             )
             .upholdingPreviousOrderReason(caseData.getUpholdingPreviousOrderReason());
 
-        return DesicionOnReconsiderationDocumentFormBuilder
+        return desicionOnReconsiderationDocumentFormBuilder
             .build();
     }
 
