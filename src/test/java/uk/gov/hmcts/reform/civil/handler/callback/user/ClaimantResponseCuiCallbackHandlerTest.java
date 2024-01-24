@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,11 +14,12 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -34,12 +34,10 @@ import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
-import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
@@ -52,10 +50,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
@@ -89,7 +87,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private ClaimantResponseCuiCallbackHandler handler;
-    private static final String  courtLocation = "Site 1 - Adr 1 - AAA 111";
+    private static final String courtLocation = "Site 1 - Adr 1 - AAA 111";
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -125,14 +123,16 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @BeforeEach
         void before() {
-            LocationRefData locationRefData = LocationRefData.builder().siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
+            LocationRefData locationRefData = LocationRefData.builder().siteName("Site 1").courtAddress("Adr 1").postcode(
+                    "AAA 111")
                 .courtName("Court Name").region("Region").regionId("1").courtVenueId("1")
                 .courtTypeId("10").courtLocationCode("court1")
                 .epimmsId("111").build();
             given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                 .willReturn(getSampleCourLocationsRefObject());
             given(time.now()).willReturn(submittedDate);
-            given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(locationRefData));
+            given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(
+                locationRefData));
             given(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).willReturn(LocalDateTime.MAX);
         }
 
@@ -217,9 +217,9 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                              .hasAgreedFreeMediation(MediationDecision.No).build())
                 .build();
             CaseData caseData = CaseDataBuilder.builder()
-                    .caseDataLip(caseDataLiP)
-                    .applicant1AcceptAdmitAmountPaidSpec(NO)
-                    .atStateClaimIssued().build();
+                .caseDataLip(caseDataLiP)
+                .applicant1AcceptAdmitAmountPaidSpec(NO)
+                .atStateClaimIssued().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -389,8 +389,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStateClaimIssued()
                 .applicant1PartAdmitConfirmAmountPaidSpec(NO)
                 .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                    MediationDecision.Yes).build())
-                            .build())
+                        MediationDecision.Yes).build())
+                                 .build())
                 .build().toBuilder()
                 .responseClaimMediationSpecRequired(YES).build();
 
@@ -419,7 +419,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
                 .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                        MediationDecision.No).build()).build())
+                    MediationDecision.No).build()).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
                 .respondent1(Party.builder()
                                  .type(COMPANY)
@@ -610,37 +610,37 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateCCJRequestPaymentDetails() {
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
             CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                    .ccjPaymentPaidSomeOption(YES)
-                    .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
-                    .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
-                    .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
-                    .build();
+                .ccjPaymentPaidSomeOption(YES)
+                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
+                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
+                .build();
             CaseData caseData = CaseDataBuilder.builder()
-                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build())
-                    .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build())
-                    .caseDataLip(
-                            CaseDataLiP.builder()
-                                    .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
-                                            ChooseHowToProceed.REQUEST_A_CCJ).build())
-                                    .build())
-                    .respondent1Represented(NO)
-                    .specRespondent1Represented(NO)
-                    .applicant1Represented(NO)
-                    .totalClaimAmount(BigDecimal.valueOf(1000))
-                    .ccjPaymentDetails(ccjPaymentDetails)
-                    .build();
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build())
+                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build())
+                .caseDataLip(
+                    CaseDataLiP.builder()
+                        .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
+                            ChooseHowToProceed.REQUEST_A_CCJ).build())
+                        .build())
+                .respondent1Represented(NO)
+                .specRespondent1Represented(NO)
+                .applicant1Represented(NO)
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .ccjPaymentDetails(ccjPaymentDetails)
+                .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CCJPaymentDetails ccjResponseForJudgement =
-                    getCaseData(response).getCcjPaymentDetails();
+                getCaseData(response).getCcjPaymentDetails();
             assertThat(response.getData())
-                    .extracting("businessProcess")
-                    .extracting("camundaEvent")
-                    .isEqualTo(CLAIMANT_RESPONSE_CUI.name());
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(CLAIMANT_RESPONSE_CUI.name());
             assertThat(response.getData())
-                    .extracting("businessProcess")
-                    .extracting("status")
-                    .isEqualTo("READY");
+                .extracting("businessProcess")
+                .extracting("status")
+                .isEqualTo("READY");
             assertThat(ccjPaymentDetails.getCcjPaymentPaidSomeOption()).isEqualTo(ccjResponseForJudgement.getCcjPaymentPaidSomeOption());
             assertThat(caseData.getTotalClaimAmount()).isEqualTo(ccjResponseForJudgement.getCcjJudgmentAmountClaimAmount());
         }
@@ -667,20 +667,72 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldChangeCaseState_whenApplicantAcceptedPartAdmitImmediatePayment() {
             CaseData caseData = CaseDataBuilder.builder()
-                    .applicant1AcceptAdmitAmountPaidSpec(YES)
-                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                    .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
-                    .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
-                    .respondent1(Party.builder()
-                            .type(COMPANY)
-                            .companyName("Test Inc")
-                            .build())
-                    .build();
+                .applicant1AcceptAdmitAmountPaidSpec(YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
+                .respondent1(Party.builder()
+                                 .type(COMPANY)
+                                 .companyName("Test Inc")
+                                 .build())
+                .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
+        }
+
+        @Test
+        void shouldChangeCaseStateWhenApplicantPlanAcceptedAndSignedSettlement() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1AcceptAdmitAmountPaidSpec(YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
+                .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_ORG_NAME").build())
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName("Test Inc")
+                                 .build())
+                .caseDataLip(CaseDataLiP.builder()
+                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT).applicant1SignedSettlementAgreement(
+                                         YesOrNo.YES).build())
+                                 .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+
+        @Test
+        void shouldChangeCaseStateWhenApplicantAcceptCourtDecisionAndSignedSettlement() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .applicant1AcceptAdmitAmountPaidSpec(YES)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
+                .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_ORG_NAME").build())
+                .respondent1(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .partyName("Test Inc")
+                                 .build())
+                .caseDataLip(CaseDataLiP.builder()
+                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                            .claimantResponseOnCourtDecision(
+                                                                ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE)
+                                                            .applicant1SignedSettlementAgreement(
+                                                                YesOrNo.YES).build())
+                                 .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
 
     }
