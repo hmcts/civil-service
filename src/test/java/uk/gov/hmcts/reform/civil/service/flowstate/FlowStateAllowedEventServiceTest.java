@@ -743,8 +743,7 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         INITIATE_GENERAL_APPLICATION,
                         ADD_UNAVAILABLE_DATES,
-                        CHANGE_SOLICITOR_EMAIL,
-                        TRANSFER_ONLINE_CASE
+                        CHANGE_SOLICITOR_EMAIL
                     }
                 ),
                 of(
