@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.IndividualDetailsModel;
@@ -772,6 +773,61 @@ public class HearingsPartyMapperTest {
         expected.add(respondent2Expert);
         expected.add(respondent2Witness);
         expected.add(respondent2LitFriend);
+
+        List<PartyDetailsModel> actualPartyDetailsModel = buildPartyObjectForHearingPayload(
+            caseData,
+            organisationService
+        );
+        assertThat(actualPartyDetailsModel).isEqualTo(expected);
+    }
+
+    @Test
+    void shouldBuildIndividualDetails_whenClaimantIsALip() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateApplicantRespondToDefenceAndProceed()
+            .applicant1DQWithUnavailableDate()
+            .build()
+            .toBuilder().applicant1OrganisationPolicy(OrganisationPolicy.builder().build()).build();
+        caseData = rollUpUnavailableDateApplicant(caseData);
+
+        PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
+            "app-1-party-id",
+            "John",
+            "Rambo",
+            "Mr. John Rambo",
+            CLAIMANT_ROLE,
+            "rambo@email.com",
+            "0123456789"
+        );
+
+        applicantPartyDetails.setUnavailabilityRanges(List.of(buildUnavailabilityDateRange(LocalDate.now().plusDays(1), LocalDate.now().plusDays(1))));
+
+        PartyDetailsModel applicantSolicitorParty = buildExpectedOrganisationPartyObject(
+            APPLICANT_LR_ORG_NAME,
+            LEGAL_REP_ROLE,
+            APPLICANT_ORG_ID
+        );
+
+        PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
+            "res-1-party-id",
+            "Sole",
+            "Trader",
+            "Mr. Sole Trader",
+            DEFENDANT_ROLE,
+            "sole.trader@email.com",
+            "0123456789"
+        );
+
+        PartyDetailsModel respondentSolicitorParty = buildExpectedOrganisationPartyObject(
+            RESPONDENT_ONE_LR_ORG_NAME,
+            LEGAL_REP_ROLE,
+            RESPONDENT_ONE_ORG_ID
+        );
+
+        List<PartyDetailsModel> expected = new ArrayList<>();
+        expected.add(applicantPartyDetails);
+        expected.add(respondentPartyDetails);
+        expected.add(respondentSolicitorParty);
 
         List<PartyDetailsModel> actualPartyDetailsModel = buildPartyObjectForHearingPayload(
             caseData,

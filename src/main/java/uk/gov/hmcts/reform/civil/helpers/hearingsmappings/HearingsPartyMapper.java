@@ -172,10 +172,11 @@ public class HearingsPartyMapper {
         // applicant 1
         parties.add(getDetailsForPartyObject(caseData.getApplicant1(), CLAIMANT_ROLE.getPartyRoleValue()));
         // applicant 1 solicitor
-        parties.add(getDetailsForSolicitorOrganisation(
-            caseData.getApplicant1OrganisationPolicy(),
-            organisationService
-        ));
+        if (caseData.getApplicant1OrganisationPolicy().getOrganisation() != null) {
+            parties.add(getDetailsForSolicitorOrganisation(
+                caseData.getApplicant1OrganisationPolicy(),
+                organisationService
+            ));
 
         if (caseData.getApplicant1DQ() != null) {
             // applicant 1 expert
@@ -218,21 +219,25 @@ public class HearingsPartyMapper {
             );
         } else {
             return buildOrganisationPartyObject(party.getPartyID(), party.getPartyName(),
-                                                partyRole, null, party.getUnavailableDates());
+                                                partyRole, null, party.getUnavailableDates()
+            );
         }
     }
 
     private static PartyDetailsModel getDetailsForLitigationFriendObject(LitigationFriend litigationFriend) {
-        return buildIndividualPartyObject(litigationFriend.getPartyID(),
-                                          litigationFriend.getFirstName(),
-                                          litigationFriend.getLastName(),
-                                          String.format(FULL_NAME, litigationFriend.getFirstName(),
-                                                        litigationFriend.getLastName()),
-                                          LITIGATION_FRIEND_ROLE.getPartyRoleValue(),
-                                          litigationFriend.getEmailAddress(),
-                                          litigationFriend.getPhoneNumber(),
-                                          litigationFriend.getFlags(),
-                                          null);
+        return buildIndividualPartyObject(
+            litigationFriend.getPartyID(),
+            litigationFriend.getFirstName(),
+            litigationFriend.getLastName(),
+            String.format(FULL_NAME, litigationFriend.getFirstName(),
+                          litigationFriend.getLastName()
+            ),
+            LITIGATION_FRIEND_ROLE.getPartyRoleValue(),
+            litigationFriend.getEmailAddress(),
+            litigationFriend.getPhoneNumber(),
+            litigationFriend.getFlags(),
+            null
+        );
     }
 
     private static List<PartyDetailsModel> getDetailsFor(PartyRole partyRole, List<Element<PartyFlagStructure>> experts) {
@@ -245,7 +250,8 @@ public class HearingsPartyMapper {
                     partyFlagStructure.getFirstName(),
                     partyFlagStructure.getLastName(),
                     String.format(FULL_NAME, partyFlagStructure.getFirstName(),
-                                  partyFlagStructure.getLastName()),
+                                  partyFlagStructure.getLastName()
+                    ),
                     partyRole.getPartyRoleValue(),
                     partyFlagStructure.getEmail(),
                     partyFlagStructure.getPhone(),
@@ -266,7 +272,8 @@ public class HearingsPartyMapper {
         return buildOrganisationPartyObject(
             organisationID, orgName,
             LEGAL_REP_ROLE.getPartyRoleValue(), organisationID,
-            null);
+            null
+        );
     }
 
     public static PartyDetailsModel buildIndividualPartyObject(String partyId, String firstName, String lastName,
@@ -274,7 +281,7 @@ public class HearingsPartyMapper {
                                                                String email, String phone,
                                                                Flags flags, List<Element<UnavailableDate>> unavailableDates) {
 
-        List<FlagDetail> flagDetails = flags != null &&  flags.getDetails() != null
+        List<FlagDetail> flagDetails = flags != null && flags.getDetails() != null
             ? flags.getDetails().stream().map(Element::getValue).collect(Collectors.toList()) : List.of();
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         List<String> hearingChannelPhone = phone == null ? emptyList() : List.of(phone);
@@ -298,7 +305,8 @@ public class HearingsPartyMapper {
             .partyRole(partyRole)
             .individualDetails(individualDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
+            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(
+                date)).collect(
                 Collectors.toList()) : null)
             .hearingSubChannel(null)
             .build();
@@ -321,7 +329,8 @@ public class HearingsPartyMapper {
             .partyRole(partyRole)
             .organisationDetails(organisationDetails)
             .unavailabilityDOW(null)
-            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).collect(
+            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(
+                date)).collect(
                 Collectors.toList()) : null)
             .hearingSubChannel(null)
             .build();
