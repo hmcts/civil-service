@@ -732,7 +732,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         MEDIATION_SUCCESSFUL,
                         MEDIATION_UNSUCCESSFUL,
-                        ADD_UNAVAILABLE_DATES
+                        ADD_UNAVAILABLE_DATES,
+                        TRANSFER_ONLINE_CASE
                     }
                 ),
                 of(
@@ -767,7 +768,8 @@ class FlowStateAllowedEventServiceTest {
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
                         ADD_UNAVAILABLE_DATES,
-                        asyncStitchingComplete
+                        asyncStitchingComplete,
+                        TRANSFER_ONLINE_CASE
                     }
                 )
             );

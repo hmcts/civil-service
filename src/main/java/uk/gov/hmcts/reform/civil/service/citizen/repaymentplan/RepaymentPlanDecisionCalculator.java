@@ -78,7 +78,7 @@ public class RepaymentPlanDecisionCalculator {
         return RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT;
     }
 
-    private double calculateDisposableIncome(CaseData caseData) {
+    public double calculateDisposableIncome(CaseData caseData) {
         double calculatedIncome = incomeCalculator.calculateTotalMonthlyIncome(
             caseData.getRespondent1DQ().getRespondent1BankAccountList(),
             caseData.getRecurringIncomeForRespondent1(),
