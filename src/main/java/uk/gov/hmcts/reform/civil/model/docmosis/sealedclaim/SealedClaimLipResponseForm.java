@@ -64,7 +64,6 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final List<ReasonMoneyTemplateData> expenseList;
     //repayment details for repayment plan that are common between LR and LiP
     private final ResponseRepaymentDetailsForm commonDetails;
-    private final MediationLiP defendantMediationResponse;
 
     //CARM defendant Mediation Fields
     private final String defendant1MediationContactNumber;
