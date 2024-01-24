@@ -22,9 +22,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
-
-import static java.time.LocalDate.now;
 
 @Component
 @RequiredArgsConstructor
@@ -42,41 +39,35 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
 
     @Override
     public void handleTask(ExternalTask externalTask) {
-        List<CaseDetails> cases = caseSearchService.getCases();
+
         List<CaseData> inMediationCases;
+        LocalDate claimMovedDate;
         if (externalTask.getVariable("claimMovedDate") != null) {
-            LocalDate erroredDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
-            inMediationCases = cases.stream()
-               .map(caseDetailsConverter::toCaseData)
-               .filter(checkErrorCasesWithDate(erroredDate)).toList();
+            claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
         } else {
-            inMediationCases = cases.stream()
-               .map(caseDetailsConverter::toCaseData)
-               .filter(checkMediationMovedDate).toList();
+            claimMovedDate = LocalDate.now().minusDays(1);
         }
+        List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate);
+        inMediationCases = cases.stream()
+            .map(caseDetailsConverter::toCaseData)
+            .toList();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), inMediationCases.size());
         String[] headers = {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
             "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
         StringBuilder csvColContent = new StringBuilder();
-        if (!inMediationCases.isEmpty()) {
-            inMediationCases.forEach(caseData ->
-                csvColContent.append(generateCsvContent(caseData)));
+        try {
+            if (!inMediationCases.isEmpty()) {
+                inMediationCases.forEach(caseData ->
+                                             csvColContent.append(generateCsvContent(caseData)));
 
-            String generateCsvData = generateCSVRow(headers) + csvColContent;
-            Optional<EmailData> emailData = prepareEmail(generateCsvData);
+                String generateCsvData = generateCSVRow(headers) + csvColContent;
+                Optional<EmailData> emailData = prepareEmail(generateCsvData);
 
-            emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+                emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
-    }
-
-    private  Predicate<CaseData> checkMediationMovedDate = caseData ->
-        caseData.getClaimMovedToMediationOn() != null
-            && now().minusDays(1).equals(caseData.getClaimMovedToMediationOn());
-
-    private Predicate<CaseData> checkErrorCasesWithDate(LocalDate errorDate) {
-        return caseData ->
-            caseData.getClaimMovedToMediationOn() != null && errorDate != null
-                && errorDate.equals(caseData.getClaimMovedToMediationOn());
     }
 
     private Optional<EmailData> prepareEmail(String generateCsvData) {
