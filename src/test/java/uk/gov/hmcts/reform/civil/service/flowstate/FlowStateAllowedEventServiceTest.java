@@ -734,7 +734,8 @@ class FlowStateAllowedEventServiceTest {
                         MEDIATION_SUCCESSFUL,
                         MEDIATION_UNSUCCESSFUL,
                         ADD_UNAVAILABLE_DATES,
-                        INITIATE_GENERAL_APPLICATION
+                        INITIATE_GENERAL_APPLICATION,
+                        TRANSFER_ONLINE_CASE
                     }
                 ),
                 of(

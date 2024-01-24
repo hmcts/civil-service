@@ -792,7 +792,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 INITIATE_GENERAL_APPLICATION,
                 ADD_UNAVAILABLE_DATES,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                TRANSFER_ONLINE_CASE
             )
         )
     );
@@ -1466,7 +1467,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 INITIATE_GENERAL_APPLICATION,
                 ADD_UNAVAILABLE_DATES,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                TRANSFER_ONLINE_CASE
             )
         )
     );
