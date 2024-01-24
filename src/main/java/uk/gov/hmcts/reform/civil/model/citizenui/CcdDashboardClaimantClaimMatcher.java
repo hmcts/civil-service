@@ -98,8 +98,10 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
-            && !hasSdoBeenDrawn();
+        return (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
+            && !hasSdoBeenDrawn())
+            || (null != caseData.getCcjPaymentDetails()
+            && null != caseData.getCcjPaymentDetails().getCcjJudgmentStatement());
     }
 
     @Override
@@ -295,8 +297,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isPartialAdmissionAccepted() {
-        return CaseState.JUDICIAL_REFERRAL == caseData.getCcdState()
-            && caseData.isPartAdmitClaimSpec()
+        return  caseData.isPartAdmitClaimSpec()
             && caseData.isPartAdmitClaimNotSettled()
             && caseData.isPayImmediately()
             && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();
