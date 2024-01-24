@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
+
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -48,7 +50,8 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         " \n" +
         "To make a bespoke order in this claim, select 'General order' from the dropdown menu on the right of the " +
         "screen on your dashboard.";
-    private static final String upholdingPreviousOrderReason = "Having read the application for reconsideration of " +
+    private static final String UPHOLDING_PREVIOUS_ORDER_REASON = "Having read the application for reconsideration of" +
+        " " +
         "the Legal Advisor's order dated %s and the court file \n 1.The application for reconsideration of the order " +
         "is dismissed.";
 
@@ -75,7 +78,7 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
             String sdoDate = formatLocalDateTime(sdoDocLatest.get().getValue().getCreatedDatetime(), DATE);
             caseDataBuilder.upholdingPreviousOrderReason(UpholdingPreviousOrderReason.builder()
                                                              .reasonForReconsiderationTxtYes(String.format(
-                                                                 upholdingPreviousOrderReason,
+                                                                 UPHOLDING_PREVIOUS_ORDER_REASON,
                                                                  sdoDate
                                                              )).build());
         }
@@ -89,6 +92,11 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         if (!callbackParams.getCaseData().getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
             caseDataBuilder.upholdingPreviousOrderReason(null);
         }
+
+        if (callbackParams.getCaseData().getDecisionOnRequestReconsiderationOptions().name().equals(DecisionOnRequestReconsiderationOptions.YES.name())) {
+            caseDataBuilder.businessProcess(BusinessProcess.ready(DECISION_ON_RECONSIDERATION_REQUEST));
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

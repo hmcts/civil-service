@@ -27,7 +27,7 @@ public class ServiceHearingsCaseLevelMapper {
 
     public static String getPublicCaseName(CaseData caseData) {
         return caseData.getCaseNamePublic() != null ? caseData.getCaseNamePublic()
-            : CaseNameUtils.buildCaseNamePublic(caseData);
+            : CaseNameUtils.buildCaseName(caseData);
     }
 
     public static String getCaseDeepLink(Long caseId,
