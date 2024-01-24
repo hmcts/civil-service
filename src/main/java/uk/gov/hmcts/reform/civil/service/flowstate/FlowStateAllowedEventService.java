@@ -747,7 +747,8 @@ public class FlowStateAllowedEventService {
                 MEDIATION_SUCCESSFUL,
                 MEDIATION_UNSUCCESSFUL,
                 ADD_UNAVAILABLE_DATES,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -782,7 +783,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1242,7 +1244,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED,
-                INITIATE_GENERAL_APPLICATION
+                INITIATE_GENERAL_APPLICATION,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1280,7 +1283,8 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
-                UPLOAD_MEDIATION_DOCUMENTS
+                UPLOAD_MEDIATION_DOCUMENTS,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1369,7 +1373,8 @@ public class FlowStateAllowedEventService {
             PREPARE_FOR_HEARING_CONDUCT_HEARING.fullName(),
             List.of(
                 asyncStitchingComplete,
-                UPLOAD_MEDIATION_DOCUMENTS
+                UPLOAD_MEDIATION_DOCUMENTS,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(

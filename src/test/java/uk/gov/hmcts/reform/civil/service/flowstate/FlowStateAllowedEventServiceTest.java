@@ -742,7 +742,8 @@ class FlowStateAllowedEventServiceTest {
                     new CaseEvent[]{
                         INITIATE_GENERAL_APPLICATION,
                         ADD_UNAVAILABLE_DATES,
-                        CHANGE_SOLICITOR_EMAIL
+                        CHANGE_SOLICITOR_EMAIL,
+                        TRANSFER_ONLINE_CASE
                     }
                 ),
                 of(
@@ -777,7 +778,8 @@ class FlowStateAllowedEventServiceTest {
                         TRIAL_READINESS,
                         BUNDLE_CREATION_NOTIFICATION,
                         ADD_UNAVAILABLE_DATES,
-                        asyncStitchingComplete
+                        asyncStitchingComplete,
+                        TRANSFER_ONLINE_CASE
                     }
                 )
             );
