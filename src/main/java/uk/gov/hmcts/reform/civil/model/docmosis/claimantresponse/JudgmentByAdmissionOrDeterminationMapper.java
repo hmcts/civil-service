@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -29,7 +30,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
 
-    public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData) {
+    public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData, CaseEvent caseEvent) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
         Optional<AdditionalLipPartyDetails> applicantDetails =
             caseDataLip.map(CaseDataLiP::getApplicant1AdditionalLipPartyDetails);
@@ -58,7 +59,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder builder = new JudgmentByAdmissionOrDetermination.JudgmentByAdmissionOrDeterminationBuilder();
         LocalDateTime now = LocalDateTime.now();
         return builder
-            .formHeader(getFormHeader(caseData))
+            .formHeader(getFormHeader(caseData, caseEvent))
             .formName(getFormName(caseData))
             .claimant(claimant)
             .defendant(defendant)
@@ -125,11 +126,12 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         return null;
     }
 
-    private String getFormHeader(CaseData caseData) {
+    private String getFormHeader(CaseData caseData, CaseEvent caseEvent) {
         String formHeader = "Judgment by %s";
         String formType;
         if (YesOrNo.YES.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec())
-            || YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())) {
+            || YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec())
+            || caseEvent == CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC) {
             formType = "admission";
         } else {
             formType = "determination";

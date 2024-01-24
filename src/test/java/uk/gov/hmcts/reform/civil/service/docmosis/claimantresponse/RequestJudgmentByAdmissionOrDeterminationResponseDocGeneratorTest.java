@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.CCJ_REQUEST_ADMISSION;
@@ -61,7 +62,8 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         ).thenReturn(caseDocument);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .build();
-        when(judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData)).thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+        when(judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData, GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC))
+            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
 
         // When
         CaseDocument actual = generator.generate(GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC, caseData, BEARER_TOKEN);
@@ -87,7 +89,8 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         ).thenReturn(caseDocument);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .build();
-        when(judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData)).thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+        when(judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData, GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC))
+            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
 
         // When
         CaseDocument actual = generator.generate(GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC, caseData, BEARER_TOKEN);
@@ -95,6 +98,33 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGeneratorTest {
         // Then
         verify(documentManagementService)
             .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, CCJ_REQUEST_DETERMINATION));
+        assertThat(actual).isEqualTo(caseDocument);
+    }
+
+    @Test
+    void shouldGenerateDefaultJudgementByAdmissionDocument() {
+        // Given
+        String fileName = String.format(JUDGMENT_BY_ADMISSION_OR_DETERMINATION.getDocumentTitle(), REFERENCE_NUMBER, "admission");
+        CaseDocument caseDocument = CaseDocumentBuilder.builder()
+            .documentName(fileName)
+            .documentType(CCJ_REQUEST_ADMISSION)
+            .build();
+        when(documentGeneratorService.generateDocmosisDocument(any(JudgmentByAdmissionOrDetermination.class), eq(JUDGMENT_BY_ADMISSION_OR_DETERMINATION)))
+            .thenReturn(new DocmosisDocument(JUDGMENT_BY_ADMISSION_OR_DETERMINATION.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(
+            BEARER_TOKEN, new PDF(fileName, bytes, CCJ_REQUEST_ADMISSION))
+        ).thenReturn(caseDocument);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
+            .build();
+        when(judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData, GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC))
+            .thenReturn(JudgmentByAdmissionOrDetermination.builder().build());
+
+        // When
+        CaseDocument actual = generator.generate(GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC, caseData, BEARER_TOKEN);
+
+        // Then
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, CCJ_REQUEST_ADMISSION));
         assertThat(actual).isEqualTo(caseDocument);
     }
 }

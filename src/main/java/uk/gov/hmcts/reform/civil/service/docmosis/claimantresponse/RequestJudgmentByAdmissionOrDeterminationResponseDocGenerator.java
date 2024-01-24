@@ -31,7 +31,7 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
     public CaseDocument generate(CaseEvent caseEvent, CaseData caseData, String authorisation) {
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
-            getTemplateData(caseData),
+            getTemplateData(caseData, caseEvent),
             JUDGMENT_BY_ADMISSION_OR_DETERMINATION
         );
         return documentManagementService.uploadDocument(
@@ -43,8 +43,8 @@ public class RequestJudgmentByAdmissionOrDeterminationResponseDocGenerator imple
         );
     }
 
-    public JudgmentByAdmissionOrDetermination getTemplateData(CaseData caseData) {
-        return judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData);
+    public JudgmentByAdmissionOrDetermination getTemplateData(CaseData caseData, CaseEvent caseEvent) {
+        return judgmentByAdmissionOrDeterminationMapper.toClaimantResponseForm(caseData, caseEvent);
     }
 
     private String getJudgmentType(CaseEvent caseEvent) {
