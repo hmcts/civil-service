@@ -39,4 +39,9 @@ class TrialReadyNotificationSearchServiceTest extends ElasticSearchServiceTest {
 
         return new Query(query, List.of("reference"), fromValue);
     }
+
+    @Override
+    protected Query buildQueryInMediation(int fromValue, LocalDate date) {
+        return null;
+    }
 }
