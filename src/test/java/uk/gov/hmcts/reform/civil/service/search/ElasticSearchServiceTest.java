@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -43,6 +44,17 @@ abstract class ElasticSearchServiceTest {
     }
 
     @Test
+    void shouldCallGetMediationCasesOnce_WhenCasesReturnEqualsTotalCases() {
+        SearchResult searchResult = buildSearchResultWithTotalCases(1);
+
+        when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
+
+        assertThat(searchService.getInMediationCases(LocalDate.now().minusDays(1))).isEqualTo(searchResult.getCases());
+        verify(coreCaseDataService).searchCases(queryCaptor.capture());
+        assertThat(queryCaptor.getValue()).usingRecursiveComparison().isEqualTo(buildQueryInMediation(0, LocalDate.now().minusDays(1)));
+    }
+
+    @Test
     void shouldCallGetCasesOnce_WhenNoCasesReturned() {
         SearchResult searchResult = buildSearchResult(0, emptyList());
 
@@ -64,6 +76,31 @@ abstract class ElasticSearchServiceTest {
         assertThat(queryCaptor.getValue()).usingRecursiveComparison().isEqualTo(buildQuery(0));
     }
 
+    @Test
+    void shouldCallGetInMediationCasesOnce_WhenCasesRetrievedEqualsEsSearchLimit() {
+        SearchResult searchResult = buildSearchResultWithTotalCases(10);
+
+        when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
+
+        assertThat(searchService.getInMediationCases(LocalDate.now().minusDays(1))).hasSize(1);
+        verify(coreCaseDataService).searchCases(queryCaptor.capture());
+        assertThat(queryCaptor.getValue()).usingRecursiveComparison().isEqualTo(buildQueryInMediation(0, LocalDate.now().minusDays(1)));
+    }
+
+    @Test
+    void shouldCallGetInMediationCasesMultipleTimes_WhenCasesReturnedIsMoreThanEsSearchLimit() {
+        SearchResult searchResult = buildSearchResultWithTotalCases(11);
+
+        when(coreCaseDataService.searchCases(any())).thenReturn(searchResult);
+
+        assertThat(searchService.getInMediationCases(LocalDate.now().minusDays(1))).hasSize(2);
+        verify(coreCaseDataService, times(2)).searchCases(queryCaptor.capture());
+
+        List<Query> capturedQueries = queryCaptor.getAllValues();
+        assertThat(capturedQueries.get(0)).usingRecursiveComparison().isEqualTo(buildQueryInMediation(0, LocalDate.now().minusDays(1)));
+        assertThat(capturedQueries.get(1)).usingRecursiveComparison().isEqualTo(buildQueryInMediation(10, LocalDate.now().minusDays(1)));
+    }
+    
     @Test
     void shouldCallGetCasesMultipleTimes_WhenCasesReturnedIsMoreThanEsSearchLimit() {
         SearchResult searchResult = buildSearchResultWithTotalCases(11);
@@ -90,4 +127,6 @@ abstract class ElasticSearchServiceTest {
     }
 
     protected abstract Query buildQuery(int fromValue);
+
+    protected abstract Query buildQueryInMediation(int fromValue, LocalDate date);
 }

@@ -478,6 +478,7 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
 
         //assign case management category to the case and caseNameHMCTSinternal
         dataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
+        dataBuilder.caseNamePublic(buildCaseName(caseData));
 
         CaseManagementCategoryElement civil =
             CaseManagementCategoryElement.builder().code("Civil").label("Civil").build();
