@@ -59,7 +59,7 @@ public class GenerateDJFormHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
-        if (!caseData.isLRvLipOneVOne() && !isSpecHandler(callbackParams)) {
+        if (!(caseData.isLRvLipOneVOne() && isSpecHandler(callbackParams))) {
             if (ofNullable(caseData.getRespondent2()).isPresent()
                 && ((ofNullable(caseData.getDefendantDetails()).isPresent()
                 && caseData.getDefendantDetails().getValue().getLabel().startsWith(
