@@ -117,6 +117,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_SPE
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DIRECTIONS_QUESTIONNAIRE;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
@@ -1508,6 +1509,67 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
             assertThat(response.getState())
                 .isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+        }
+
+        @Test
+        void shouldMoveCaseToIn_MediationWhenClaimantProceeds1v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .applicant1ProceedWithClaim(YES)
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .build();
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getState()).isEqualTo(IN_MEDIATION.toString());
+        }
+
+        @Test
+        void shouldMoveCaseToIn_MediationWhenClaimantProceeds2v1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .applicant1ProceedWithClaimSpec2v1(YES).build();
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getState()).isEqualTo(IN_MEDIATION.toString());
+        }
+
+        @Test
+        void shouldNotMoveCaseToIn_MediationWhenClaimantProceedsFastClaim() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .responseClaimTrack(FAST_CLAIM.name())
+                .applicant1ProceedWithClaimSpec2v1(YES).build();
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getState()).isNotEqualTo(IN_MEDIATION.toString());
+        }
+
+        @Test
+        void shouldNotMoveCaseToIn_MediationWhenClaimantProceedsMultiClaim() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .build().toBuilder()
+                .responseClaimTrack(MULTI_CLAIM.name())
+                .applicant1ProceedWithClaim(YES).build();
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            var params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getState()).isNotEqualTo(IN_MEDIATION.toString());
         }
     }
 
