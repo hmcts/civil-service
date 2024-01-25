@@ -46,6 +46,11 @@ public class TrialReadyNotificationSearchService extends ElasticSearchService {
         );
     }
 
+    @Override
+    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate) {
+        return null;
+    }
+
     private QueryBuilder beState(CaseState caseState) {
         return boolQuery()
             .must(matchQuery("state", caseState.toString()));
