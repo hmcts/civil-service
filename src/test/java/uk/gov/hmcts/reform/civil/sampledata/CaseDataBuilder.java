@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -245,6 +246,7 @@ public class CaseDataBuilder {
     protected ClaimValue claimValue;
     protected YesOrNo uploadParticularsOfClaim;
     protected ClaimType claimType;
+    protected ClaimTypeUnspec claimTypeUnSpec;
     protected String claimTypeOther;
     protected PersonalInjuryType personalInjuryType;
     protected String personalInjuryTypeOther;
@@ -2252,6 +2254,7 @@ public class CaseDataBuilder {
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
             .build();
         claimType = ClaimType.PERSONAL_INJURY;
+        claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
         applicantSolicitor1PbaAccounts = DynamicList.builder()
             .value(DynamicListElement.builder().label("PBA0077597").build())
@@ -6566,6 +6569,7 @@ public class CaseDataBuilder {
             .claimValue(claimValue)
             .uploadParticularsOfClaim(uploadParticularsOfClaim)
             .claimType(claimType)
+            .claimTypeUnSpec(claimTypeUnSpec)
             .claimTypeOther(claimTypeOther)
             .personalInjuryType(personalInjuryType)
             .personalInjuryTypeOther(personalInjuryTypeOther)
