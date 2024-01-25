@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,11 +22,11 @@ import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
@@ -59,6 +60,9 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     private DefaultJudgementHandler handler;
     @MockBean
     private LocationRefDataService locationRefDataService;
+
+    // ApplicationContext requirement
+    @SuppressWarnings("unused")
     @MockBean
     private FeatureToggleService featureToggleService;
 
@@ -73,6 +77,12 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getErrors()).isNotEmpty();
+            Assertions.assertTrue(
+                response.getErrors().stream()
+                    .anyMatch(errorMessage ->
+                                  errorMessage.contains(
+                                      "The Claim is not eligible for Default Judgment until 5:00pm on ")
+                    ));
         }
 
         @Test
