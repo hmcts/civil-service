@@ -72,4 +72,3 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
         assertThat(response.getState()).isEqualTo(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
     }
 }
-

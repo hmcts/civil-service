@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
+
 import java.util.Collections;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 
 import java.util.ArrayList;
@@ -62,11 +66,14 @@ public class ServiceRequestCUICallbackHandler extends CallbackHandler {
             if (isServiceRequestNotRequested(caseData) && !caseData.isHelpWithFees()) {
                 log.info("Calling payment service request (claim fee) for case {}", caseData.getCcdCaseReference());
                 String serviceRequestReference = getServiceRequestReference(caseData, authToken);
-                caseData = caseData.toBuilder().serviceRequestReference(serviceRequestReference).build();
+                caseData = caseData.toBuilder().serviceRequestReference(serviceRequestReference)
+                    .claimIssuedPBADetails(getClaimIssuePbaDetails(serviceRequestReference, caseData.getClaimFee()))
+                    .build();
             }
         } catch (FeignException e) {
             log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",
-                      caseData.getCcdCaseReference(), e.status(), e);
+                      caseData.getCcdCaseReference(), e.status(), e
+            );
             errors.add(ERROR_MESSAGE);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -82,5 +89,12 @@ public class ServiceRequestCUICallbackHandler extends CallbackHandler {
 
     private boolean isServiceRequestNotRequested(CaseData caseData) {
         return isNull(caseData.getServiceRequestReference());
+    }
+
+    private SRPbaDetails getClaimIssuePbaDetails(String serviceReference, Fee claimFee) {
+        return SRPbaDetails.builder()
+            .serviceReqReference(serviceReference)
+            .fee(claimFee)
+            .build();
     }
 }
