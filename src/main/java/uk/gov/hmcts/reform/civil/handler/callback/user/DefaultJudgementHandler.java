@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.UnavailabilityDatesUtils;
 
@@ -48,13 +48,11 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
 
-    public static final String NOT_VALID_DJ = "The Claim  is not eligible for Default Judgment until %s";
+    public static final String NOT_VALID_DJ = "The Claim is not eligible for Default Judgment until %s";
     public static final String JUDGMENT_GRANTED = "<br /><a href=\"%s\" target=\"_blank\">Download  interim judgment</a> "
         + "%n%n Judgment has been entered and your case will be referred to a judge for directions.";
     public static final String JUDGMENT_REFERRED = "Your request will be referred to a judge and we will contact you "
         + "and tell you what happens next.";
-    public static final String DISPOSAL_TEXT = "will be disposal hearing provided text";
-    public static final String TRIAL_TEXT = "will be trial hearing provided text";
     public static final String JUDGMENT_REQUESTED = "# Judgment for damages to be decided requested ";
     public static final String JUDGMENT_GRANTED_HEADER = "# Judgment for damages to be decided Granted ";
     private static final List<CaseEvent> EVENTS = List.of(DEFAULT_JUDGEMENT);
@@ -97,10 +95,10 @@ public class DefaultJudgementHandler extends CallbackHandler {
         if (caseData.getRespondent2() != null
             && !caseData.getDefendantDetails().getValue()
             .getLabel().startsWith("Both")) {
-            return format(JUDGMENT_REQUESTED, caseData.getLegacyCaseReference());
+            return format(JUDGMENT_REQUESTED);
 
         } else {
-            return format(JUDGMENT_GRANTED_HEADER, caseData.getLegacyCaseReference());
+            return format(JUDGMENT_GRANTED_HEADER);
         }
     }
 
@@ -213,12 +211,16 @@ public class DefaultJudgementHandler extends CallbackHandler {
 
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         ArrayList<String> errors = new ArrayList<>();
-        if (nonNull(caseData.getRespondent1ResponseDeadline()) && caseData.getRespondent1ResponseDeadline().isAfter(
-            LocalDateTime.now())) {
-            String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
-            errors.add(format(NOT_VALID_DJ, formattedDeadline));
+        if (nonNull(caseData.getRespondent1ResponseDeadline())) {
+            // CIV-11985 restrict this event until 5 pm
+            LocalDateTime deadlineToUse = caseData.getRespondent1ResponseDeadline()
+                .toLocalDate().atTime(17, 0);
+            if (deadlineToUse.isAfter(LocalDateTime.now())) {
+                String formattedDeadline = formatLocalDateTime(deadlineToUse, DATE_TIME_AT);
+                errors.add(format(NOT_VALID_DJ, formattedDeadline));
+            }
         }
         List<String> listData = new ArrayList<>();
         listData.add(getPartyNameBasedOnType(caseData.getRespondent1()));

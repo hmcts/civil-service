@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.config.MockDatabaseConfiguration;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -1248,7 +1249,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo'");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1261,7 +1262,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
+                .isEqualTo("'John Rambo', 'Jason Rambo' v 'Sole Trader'");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1274,7 +1275,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
 
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+                .isEqualTo("'John Rambo' v 'Sole Trader'");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1285,6 +1286,27 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .containsEntry("CaseAccessCategory", CaseCategory.UNSPEC_CLAIM.toString());
+        }
+
+        @Test
+        void shouldsetClaimTypeFromClaimTypeUnspec_when_sdoR2Enabled() {
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            assertThat(response.getData())
+                .containsEntry("claimType", ClaimType.CLINICAL_NEGLIGENCE.name());
+        }
+
+        @Test
+        void shouldNotsetClaimTypeFromClaimTypeUnspec_when_sdoR2Disabled() {
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(false);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
+                callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+            assertThat(response.getData())
+                .containsEntry("claimType", ClaimType.PERSONAL_INJURY.name());
         }
 
         @Nested

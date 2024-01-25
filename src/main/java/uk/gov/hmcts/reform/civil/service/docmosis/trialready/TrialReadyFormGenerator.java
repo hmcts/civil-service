@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.trialready.TrialReadyForm;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDate;
 
@@ -32,6 +34,7 @@ public class TrialReadyFormGenerator {
 
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
+    private final AssignCategoryId assignCategoryId;
 
     private static final String TASK_ID_APPLICANT = "GenerateTrialReadyFormApplicant";
     private static final String TASK_ID_RESPONDENT1 = "GenerateTrialReadyFormRespondent1";
@@ -49,6 +52,21 @@ public class TrialReadyFormGenerator {
                 DocumentType.TRIAL_READY_DOCUMENT
             )
         );
+
+        switch (userRole) {
+            case APPLICANTSOLICITORONE:
+            case CLAIMANT:
+                assignCategoryId.assignCategoryIdToCaseDocument(trialReadyDocument, DocCategory.DQ_APP1.getValue());
+                break;
+            case RESPONDENTSOLICITORONE:
+            case DEFENDANT:
+                assignCategoryId.assignCategoryIdToCaseDocument(trialReadyDocument, DocCategory.DQ_DEF1.getValue());
+                break;
+            case RESPONDENTSOLICITORTWO:
+                assignCategoryId.assignCategoryIdToCaseDocument(trialReadyDocument, DocCategory.DQ_DEF2.getValue());
+                break;
+            default:
+        }
 
         return trialReadyDocument.toBuilder().ownedBy(userRole).build();
     }

@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimLipResponseFormGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 
@@ -28,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DE
 @SpringBootTest(classes = {
     GenerateCUIResponseSealedFormCallBackHandler.class,
     JacksonAutoConfiguration.class,
+    AssignCategoryId.class
 })
 public class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -40,6 +42,8 @@ public class GenerateCUIResponseSealedFormCallBackHandlerTest extends BaseCallba
 
     @MockBean
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
+    @MockBean
+    private AssignCategoryId assignCategoryId;
 
     private static final CaseDocument FORM = CaseDocument.builder()
         .createdBy("John")
