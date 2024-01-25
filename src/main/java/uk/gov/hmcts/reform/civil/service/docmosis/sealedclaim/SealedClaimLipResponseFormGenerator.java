@@ -107,6 +107,8 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
             && caseData.getCaseDataLiP().getRespondent1LiPResponse() != null
             && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse() != null
             && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse()
+            .getIsMediationContactNameCorrect() != null
+            && caseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1MediationLiPResponse()
             .getIsMediationContactNameCorrect().equals(YesOrNo.NO)) {
             mediationContactName = caseData.getCaseDataLiP().getRespondent1LiPResponse()
                     .getRespondent1MediationLiPResponse().getAlternativeMediationContactPerson();

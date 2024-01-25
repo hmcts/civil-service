@@ -629,6 +629,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .individualLastName("Surname " + suffix)
             .individualDateOfBirth(LocalDate.of(1956, 10, 2))
             .partyPhone("phone " + suffix)
+            .partyName("Name Surname" + suffix)
             .partyEmail("email " + suffix)
             .primaryAddress(Address.builder()
                                 .postCode("postCode " + suffix)
@@ -854,4 +855,42 @@ class SealedClaimLipResponseFormGeneratorTest {
         Assertions.assertEquals("phone B", templateData.getDefendant1MediationContactNumber());
     }
 
+    @Test
+    void checkMediationIndividualNameField() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        LocalDate whenWillPay = LocalDate.now().plusDays(5);
+        List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
+        def1UnavailabilityDates.add(element(UnavailableDate.builder()
+                                                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                .date(LocalDate.now())
+                                                .fromDate(LocalDate.now()).build()));
+        CaseData.CaseDataBuilder<?, ?> builder = commonData()
+            .respondent1(individual("B"))
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .respondent1LiPResponse(RespondentLiPResponse.builder()
+                                                         .respondent1MediationLiPResponse(MediationLiP.builder()
+                                                                                              .isMediationEmailCorrect(YesOrNo.NO)
+                                                                                              .alternativeMediationEmail("test@gmail.com")
+                                                                                              .isMediationPhoneCorrect(YesOrNo.NO)
+                                                                                              .alternativeMediationTelephone("23454656")
+                                                                                              .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
+                                                                                              .unavailableDatesForMediation(def1UnavailabilityDates)
+                                                                                              .build())
+                                                         .build()).build())
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
+            .respondToClaimAdmitPartLRspec(
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            );
+
+        SealedClaimLipResponseForm templateData = generator
+            .getTemplateData(builder.build());
+        Assertions.assertEquals("Name B Surname B", templateData.getDefendant1MediationCompanyName());
+        Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
+        Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
+        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDateFromForMediation());
+        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDateToForMediation());
+    }
 }
