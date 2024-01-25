@@ -29,17 +29,31 @@ import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
+import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.service.CategoryService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -47,6 +61,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -88,6 +103,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_HEADER;
@@ -246,6 +262,78 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(hearingMethodValuesFastTrackActual).containsOnly("In Person");
             assertThat(hearingMethodValuesDisposalHearingActual).containsOnly("In Person");
             assertThat(hearingMethodValuesSmallClaimsActual).containsOnly("In Person");
+        }
+
+        @Test
+        void shouldClearDataIfstateIsCaseProgression() {
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            List<FastTrack> directions = List.of(FastTrack.fastClaimBuildingDispute);
+            List<SmallTrack> smallDirections = List.of(SmallTrack.smallClaimCreditHire);
+            DisposalHearingAddNewDirections disposalHearingAddNewDirections = DisposalHearingAddNewDirections.builder()
+                .directionComment("test")
+                .build();
+            Element<DisposalHearingAddNewDirections> disposalHearingAddNewDirectionsElement =
+                Element.<DisposalHearingAddNewDirections>builder()
+                    .value(disposalHearingAddNewDirections)
+                    .build();
+            SmallClaimsAddNewDirections smallClaimsAddNewDirections = SmallClaimsAddNewDirections.builder()
+                .directionComment("test")
+                .build();
+
+            Element<SmallClaimsAddNewDirections> smallClaimsAddNewDirectionsElement =
+                Element.<SmallClaimsAddNewDirections>builder()
+                    .value(smallClaimsAddNewDirections)
+                    .build();
+
+            FastTrackAddNewDirections fastTrackAddNewDirections = FastTrackAddNewDirections.builder()
+                .directionComment("test")
+                .build();
+
+            Element<FastTrackAddNewDirections> fastTrackAddNewDirectionsElement =
+                Element.<FastTrackAddNewDirections>builder()
+                    .value(fastTrackAddNewDirections)
+                    .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .drawDirectionsOrderRequired(YES)
+                .drawDirectionsOrderSmallClaims(YES)
+                .fastClaims(directions)
+                .smallClaims(smallDirections)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .orderType(OrderType.DECIDE_DAMAGES)
+                .trialAdditionalDirectionsForFastTrack(directions)
+                .drawDirectionsOrderSmallClaimsAdditionalDirections(smallDirections)
+                .fastTrackAllocation(FastTrackAllocation.builder().assignComplexityBand(YES).build())
+                .disposalHearingAddNewDirections(List.of(disposalHearingAddNewDirectionsElement))
+                .smallClaimsAddNewDirections(List.of(smallClaimsAddNewDirectionsElement))
+                .fastTrackAddNewDirections(List.of(fastTrackAddNewDirectionsElement))
+                .sdoHearingNotes(SDOHearingNotes.builder().input("TEST").build())
+                .fastTrackHearingNotes(FastTrackHearingNotes.builder().input("TEST").build())
+                .disposalHearingHearingNotes("TEST")
+                .ccdState(CASE_PROGRESSION)
+                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(responseCaseData.getDrawDirectionsOrderRequired()).isNull();
+            assertThat(responseCaseData.getDrawDirectionsOrderSmallClaims()).isNull();
+            assertThat(responseCaseData.getFastClaims()).isNull();
+            assertThat(responseCaseData.getSmallClaims()).isNull();
+            assertThat(responseCaseData.getClaimsTrack()).isNull();
+            assertThat(responseCaseData.getOrderType()).isNull();
+            assertThat(responseCaseData.getTrialAdditionalDirectionsForFastTrack()).isNull();
+            assertThat(responseCaseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections()).isNull();
+            assertThat(responseCaseData.getFastTrackAllocation()).isNull();
+            assertThat(responseCaseData.getDisposalHearingAddNewDirections()).isNull();
+            assertThat(responseCaseData.getSmallClaimsAddNewDirections()).isNull();
+            assertThat(responseCaseData.getFastTrackAddNewDirections()).isNull();
+            assertThat(responseCaseData.getSdoHearingNotes()).isNull();
+            assertThat(responseCaseData.getFastTrackHearingNotes()).isNull();
+            assertThat(responseCaseData.getDisposalHearingHearingNotes()).isNull();
         }
     }
 

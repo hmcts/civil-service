@@ -37,7 +37,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     private CallbackResponse notifyRespondentForClaimantConfirmsToProceed(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (Objects.nonNull(caseData.getRespondent1().getPartyEmail())) {
+        if (!caseData.isBilingual() && Objects.nonNull(caseData.getRespondent1().getPartyEmail())) {
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
                 notificationsProperties.getRespondent1LipClaimUpdatedTemplate(),
@@ -50,7 +50,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return  callbackMap;
+        return callbackMap;
     }
 
     @Override
