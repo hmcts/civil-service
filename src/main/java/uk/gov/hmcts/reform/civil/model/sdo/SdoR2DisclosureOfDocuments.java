@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -14,9 +15,9 @@ import java.util.Date;
 public class SdoR2DisclosureOfDocuments {
 
     private String standardDisclosureTxt;
-    private Date standardDisclosureDate;
+    private LocalDate standardDisclosureDate;
     private String inspectionTxt;
-    private Date inspectionDate;
+    private LocalDate inspectionDate;
     private String requestsWillBeCompiledLabel;
 
 }

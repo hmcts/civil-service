@@ -275,8 +275,13 @@ public class CaseDataParent implements MappableObject {
     private SdoR2FastTrackAltDisputeResolution sdoAltDisputeResolution;
     private SdoR2VariationOfDirections sdoVariationOfDirections;
     private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
+    private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
     private SdoR2Settlement sdoR2Settlement;
     private SdoR2Trial sdoR2Trial;
+    private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
+    private SdoR2AddNewDirection sdoR2AddNewDirection;
+    private String sdoR2ImportantNotesTxt;
+    private LocalDate sdoR2ImportantNotesDate;
 
     private CaseDocument sdoOrderDocument;
 

@@ -24,6 +24,7 @@ public class SdoR2Trial {
     private HearingLengthFinalOrderList lengthList;
     private SdoR2TrialHearingLengthOther lengthListOther;
     private DynamicList hearingCourtLocationList;
+    private DynamicList altHearingCourtLocationList;
     private FastTrackMethod methodOfHearing;
     private PhysicalTrialBundleOptions physicalBundleOptions;
     private String physicalBundlePartyTxt;

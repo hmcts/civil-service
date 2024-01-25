@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -68,6 +70,15 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
@@ -76,6 +87,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
@@ -691,6 +703,67 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .data(updatedData.build().toMap(objectMapper))
             .build();
     }
+    private void prePopulateNIHLFields(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData){
+
+        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
+        preferredCourt.map(RequestedCourt::getCaseLocation)
+            .ifPresent(updatedData::caseManagementLocation);
+        DynamicList locationsList = getLocationListForNIHL(callbackParams, updatedData, preferredCourt.orElse(null));
+        locationsList.toBuilder().listItems(List.of(DynamicListElement.builder()
+                                                        .code("OTHER_LOCATION")
+                                                        .label("Other location")
+                                                        .build()));
+        updatedData.sdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
+                                                  .input(SdoR2UiConstantFastTrack.JUDGE_RECITAL).build());
+        updatedData.sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
+                                                   .standardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE)
+                                                   .standardDisclosureDate(LocalDate.now().plusDays(28))
+                                                   .inspectionTxt(SdoR2UiConstantFastTrack.INSPECTION)
+                                                   .inspectionDate(LocalDate.now().plusDays(42))
+                                                   .requestsWillBeCompiledLabel(SdoR2UiConstantFastTrack.REQUEST_COMPILED_WITH)
+                                                   .build());
+        updatedData.sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder()
+                                           .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
+                                           .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
+                                                                     .restrictNoOfWitnessDetails(
+                                                                         SdoR2RestrictNoOfWitnessDetails
+                                                                             .builder()
+                                                                             .partyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
+                                                                             .build())
+                                                                     .build())
+                                           .sdoRestrictPages(SdoR2RestrictPages.builder()
+                                                                 .restrictNoOfPagesDetails(
+                                                                     SdoR2RestrictNoOfPagesDetails.builder()
+                                                                         .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
+                                                                         .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
+                                                                         .build()).build())
+                                           .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
+                                           .sdoWitnessDeadlineDate(LocalDate.now().plusDays(70))
+                                           .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
+                                           .build());
+        updatedData.sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder().sdoR2ScheduleOfLossClaimantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT)
+                                            .sdoR2ScheduleOfLossClaimantDate(LocalDate.now().plusDays(364))
+                                            .sdoR2ScheduleOfLossDefendantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_DEFENDANT)
+                                            .sdoR2ScheduleOfLossDefendantDate(LocalDate.now().plusDays(378))
+                                            .sdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS)
+                                            .build());
+        updatedData.sdoR2Trial(SdoR2Trial.builder()
+                                   .sdoR2TrialFirstOpenDateAfter(
+                                       SdoR2TrialFirstOpenDateAfter.builder()
+                                                                     .listFrom(LocalDate.now().plusDays(434)).build())
+                                   .sdoR2TrialWindow(SdoR2TrialWindow.builder()
+                                                         .listFrom(LocalDate.now().plusDays(434))
+                                                         .dateTo(LocalDate.now().plusDays(455))
+                                                         .build())
+                                   .hearingCourtLocationList(locationsList)
+                                   .altHearingCourtLocationList(locationsList)
+                                   .physicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE)
+                                   .build());
+
+        updatedData.sdoR2ImportantNotesTxt(SdoR2UiConstantFastTrack.IMPORTANT_NOTES);
+        updatedData.sdoR2ImportantNotesDate(LocalDate.now().plusDays(7));
+
+    }
 
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
         Optional.ofNullable(caseData.getDrawDirectionsOrder())
@@ -753,6 +826,28 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return locationsList;
     }
 
+    private DynamicList getLocationListForNIHL(CallbackParams callbackParams,
+                                        CaseData.CaseDataBuilder<?, ?> updatedData,
+                                        RequestedCourt preferredCourt) {
+
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+        Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
+            .flatMap(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                updatedData,
+                requestedCourt,
+                () -> locations
+            ));
+
+        List<DynamicListElement> dynamicListOptions = new ArrayList<>();
+        locations.stream().forEach(loc -> dynamicListOptions.add(
+            dynamicElementFromCode(loc.getEpimmsId(),LocationRefDataService.getDisplayEntry(loc))));
+        dynamicListOptions.add(dynamicElementFromCode("OTHER_LOCATION","Other location"));
+
+        return DynamicList.fromDynamicListElementList(dynamicListOptions);
+    }
+
     private String getLocationEpimms(LocationRefData location) {
         return location.getEpimmsId();
     }
@@ -772,6 +867,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.setFastTrackFlag(YES).build();
           updatedData.isSdoR2NewScreen(caseData.getFastClaims().contains(
                 FastTrack.fastClaimNoiseInducedHearingLoss) ? "true" :"false");
+            prePopulateNIHLFields(callbackParams, caseData, updatedData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
