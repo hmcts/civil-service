@@ -22,6 +22,8 @@ import uk.gov.hmcts.reform.civil.service.search.CaseStateSearchService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -85,12 +87,12 @@ class GenerateCsvAndTransferHandlerTest {
 
     @Test
     void shouldGenerateCsvAndSendEmailSuccessfully() {
-        when(searchService.getCases()).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
+        when(searchService.getInMediationCases(claimToBeProcessed)).thenReturn(List.of(caseDetailsWithInMediationState));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
 
         inMediationCsvHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getCases();
+        verify(searchService).getInMediationCases(claimToBeProcessed);
         verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask);
@@ -98,11 +100,14 @@ class GenerateCsvAndTransferHandlerTest {
 
     @Test
     void shouldNotGenerateCsvAndSendEmail() {
-        when(searchService.getCases()).thenReturn(List.of(caseDetailsWithInMediationStateNotToProcess));
+        List<CaseDetails> cases = new ArrayList<>();
+        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK))).toString();
+        when(externalTask.getVariable(any())).thenReturn(date);
+        when(searchService.getInMediationCases(any())).thenReturn(cases);
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
 
         inMediationCsvHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getCases();
+        verify(searchService).getInMediationCases(claimNotToBeProcessed);
         verify(mediationCsvServiceFactory, times(0)).getMediationCSVService(any());
         verify(sendGridClient, times(0)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask);
@@ -110,14 +115,15 @@ class GenerateCsvAndTransferHandlerTest {
 
     @Test
     void should_handle_task_from_external_variable() {
-        String date = (claimToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK))).toString();
+
+        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK))).toString();
         when(externalTask.getVariable(any())).thenReturn(date);
-        when(searchService.getCases()).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
+        when(searchService.getInMediationCases(any())).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
 
         inMediationCsvHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getCases();
+        verify(searchService).getInMediationCases(claimNotToBeProcessed);
         verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask);

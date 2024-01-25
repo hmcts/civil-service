@@ -11,9 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim.SealedClaimLipResponseFormGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +33,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
     private final ObjectMapper objectMapper;
     private final SealedClaimLipResponseFormGenerator formGenerator;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
+    private final AssignCategoryId assignCategoryId;
 
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(CallbackType.ABOUT_TO_SUBMIT), this::prepareSealedForm
@@ -59,6 +62,7 @@ public class GenerateCUIResponseSealedFormCallBackHandler extends CallbackHandle
                 caseData
             ))
             .build();
+        assignCategoryId.assignCategoryIdToCaseDocument(sealedForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
