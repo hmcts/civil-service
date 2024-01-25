@@ -71,7 +71,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
 
     private  Predicate<CaseData> checkMediationMovedDate = caseData ->
         caseData.getClaimMovedToMediationOn() != null
-            && now().minusDays(1).equals(caseData.getClaimMovedToMediationOn());
+            && now().minusDays(0).equals(caseData.getClaimMovedToMediationOn());
 
     private Predicate<CaseData> checkErrorCasesWithDate(LocalDate errorDate) {
         return caseData ->
@@ -83,7 +83,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
         InputStreamSource inputSource = new ByteArrayResource(generateCsvData.getBytes(StandardCharsets.UTF_8));
 
         return Optional.of(EmailData.builder()
-                               .to(mediationCSVEmailConfiguration.getRecipient())
+                               .to("hestermctester90@gmail.com")
                                .subject(subject)
                                .attachments(List.of(new EmailAttachment(inputSource, "text/csv", filename)))
                                .build());
