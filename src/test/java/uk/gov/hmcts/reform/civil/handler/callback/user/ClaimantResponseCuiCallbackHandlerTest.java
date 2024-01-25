@@ -58,6 +58,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
@@ -134,6 +135,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(
                 locationRefData));
             given(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).willReturn(LocalDateTime.MAX);
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         }
 
         @Test
@@ -242,6 +244,48 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
 
+        }
+
+        @Test
+        void shouldUpdateCaseStateToInMediation_WhenSmallClaimCarmEnabled1v1() {
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                             .hasAgreedFreeMediation(MediationDecision.No).build())
+                .build();
+            CaseData caseData =
+                CaseDataBuilder.builder().caseDataLip(caseDataLiP)
+                    .applicant1ProceedWithClaim(YES)
+                    .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                    .atStateClaimIssued()
+                    .build().toBuilder()
+                    .responseClaimTrack(SMALL_CLAIM.name())
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertEquals(CaseState.IN_MEDIATION.name(), response.getState());
+        }
+
+        @Test
+        void shouldUpdateCaseStateToJudicialReferral_WhenSmallClaimCarmNotEnabled() {
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                             .hasAgreedFreeMediation(MediationDecision.No).build())
+                .build();
+            CaseData caseData =
+                CaseDataBuilder.builder().caseDataLip(caseDataLiP)
+                    .applicant1ProceedWithClaim(YES)
+                    .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                    .atStateClaimIssued()
+                    .build().toBuilder()
+                    .responseClaimTrack(SMALL_CLAIM.name())
+                    .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
         }
 
         @Test

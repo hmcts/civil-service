@@ -35,6 +35,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
+import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
 
 @Slf4j
 @Service
@@ -133,7 +134,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     }
 
     private String setUpCaseState(AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response, CaseData updatedData) {
-        if (isJudicialReferralAllowed(updatedData)) {
+        if (shouldMoveToInMediationState(updatedData,
+                                         featureToggleService.isCarmEnabledForCase(updatedData.getSubmittedDate()))) {
+            return CaseState.IN_MEDIATION.name();
+        } else if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();
         } else if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
             return CaseState.IN_MEDIATION.name();

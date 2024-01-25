@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartySc
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.buildPartiesReferences;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -97,7 +99,9 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         switch (caseEvent) {
             case NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE:
-                recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
+                YesOrNo applicant1Represented = caseData.getApplicant1Represented();
+                recipient = NO.equals(applicant1Represented) ? caseData.getApplicant1().getPartyEmail()
+                    : caseData.getApplicantSolicitor1UserDetails().getEmail();
                 break;
             case NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE_CC:
                 recipient = caseData.getRespondentSolicitor1EmailAddress();
@@ -283,7 +287,11 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
     private String getLegalOrganisationName(CaseData caseData,  CaseEvent caseEvent) {
         String organisationID;
         if (caseEvent.equals(NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE)) {
-            organisationID = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
+            YesOrNo applicant1Represented = caseData.getApplicant1Represented();
+            if (NO.equals(applicant1Represented)) {
+                return caseData.getApplicant1().getPartyName();
+            }
+            organisationID = caseData.getApplicant1().getPartyName();
         } else if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC)) {
             organisationID = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
         } else {
