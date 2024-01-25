@@ -745,7 +745,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 MEDIATION_SUCCESSFUL,
                 MEDIATION_UNSUCCESSFUL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -780,7 +781,8 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                TRANSFER_ONLINE_CASE
             )
         )
     );
@@ -1231,7 +1233,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1269,7 +1272,8 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
-                UPLOAD_MEDIATION_DOCUMENTS
+                UPLOAD_MEDIATION_DOCUMENTS,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1358,7 +1362,8 @@ public class FlowStateAllowedEventService {
             PREPARE_FOR_HEARING_CONDUCT_HEARING.fullName(),
             List.of(
                 asyncStitchingComplete,
-                UPLOAD_MEDIATION_DOCUMENTS
+                UPLOAD_MEDIATION_DOCUMENTS,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
