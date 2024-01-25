@@ -6553,12 +6553,6 @@ public class CaseDataBuilder {
         return new CaseDataBuilder();
     }
 
-    public CaseDataBuilder atStateRespondent1v1BilingualFlagSet() {
-        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
-        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
-        return this;
-    }
-
     public CaseData build() {
         return CaseData.builder()
             // Create Claim
