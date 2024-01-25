@@ -55,4 +55,20 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
         assertThat(handler.handledEvents()).contains(UPDATE_CLAIM_STATE_AFTER_TRANSLATED_DOCUMENT_UPLOADED);
 
     }
+
+    @Test
+    void shouldUpdateClaimState_WhenClaimStateIsClaimIssued() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+                .build().toBuilder()
+                .ccdState(CaseState.CASE_ISSUED)
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isEqualTo(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
+    }
 }
