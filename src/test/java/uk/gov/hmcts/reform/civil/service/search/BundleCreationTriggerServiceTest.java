@@ -30,4 +30,9 @@ class BundleCreationTriggerServiceTest extends ElasticSearchServiceTest {
                         .must(boolQuery().must(matchQuery("state", "PREPARE_FOR_HEARING_CONDUCT_HEARING"))));
         return new Query(query, List.of("reference"), fromValue);
     }
+
+    @Override
+    protected Query buildQueryInMediation(int fromValue, LocalDate date) {
+        return null;
+    }
 }

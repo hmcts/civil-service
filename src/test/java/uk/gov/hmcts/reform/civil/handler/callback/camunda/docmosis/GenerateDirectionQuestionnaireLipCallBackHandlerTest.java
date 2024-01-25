@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionsQuestionnaireLipGenerator;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +33,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DI
 @SpringBootTest(classes = {
     GenerateDirectionQuestionnaireLipCallBackHandler.class,
     JacksonAutoConfiguration.class,
+    AssignCategoryId.class
 })
 class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -45,10 +47,24 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
     private DirectionsQuestionnaireLipGenerator directionsQuestionnaireLipGenerator;
     @MockBean
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
+    @MockBean
+    private AssignCategoryId assignCategoryId;
 
     private static final CaseDocument FORM = CaseDocument.builder()
         .createdBy("John")
         .documentName("document name")
+        .documentSize(0L)
+        .documentType(DIRECTIONS_QUESTIONNAIRE)
+        .createdDatetime(LocalDateTime.now())
+        .documentLink(Document.builder()
+                          .documentUrl("fake-url")
+                          .documentFileName("file-name")
+                          .documentBinaryUrl("binary-url")
+                          .build())
+        .build();
+    private static final CaseDocument FORM_DEFENDANT = CaseDocument.builder()
+        .createdBy("John")
+        .documentName("defendant_doc")
         .documentSize(0L)
         .documentType(DIRECTIONS_QUESTIONNAIRE)
         .createdDatetime(LocalDateTime.now())
@@ -91,5 +107,16 @@ class GenerateDirectionQuestionnaireLipCallBackHandlerTest extends BaseCallbackH
             systemGeneratedDocumentService,
             never()
         ).getSystemGeneratedDocumentsWithAddedDocument(any(CaseDocument.class), any(CaseData.class));
+    }
+
+    @Test
+    void shouldNotGenerateForm_whenAboutToSubmitCalledWithFullAdmissionWithDefendantDoc() {
+        // Given
+        given(directionsQuestionnaireLipGenerator.generate(any(CaseData.class), anyString()))
+            .willReturn(FORM_DEFENDANT);
+        CaseData caseData = CaseData.builder().build();
+
+        handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));
+        verify(directionsQuestionnaireLipGenerator).generate(caseData, BEARER_TOKEN);
     }
 }
