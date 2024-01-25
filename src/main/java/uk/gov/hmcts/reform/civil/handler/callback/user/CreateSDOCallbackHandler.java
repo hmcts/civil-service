@@ -37,7 +37,6 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -70,6 +69,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
@@ -87,7 +87,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
@@ -123,6 +122,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
@@ -703,7 +703,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .data(updatedData.build().toMap(objectMapper))
             .build();
     }
-    private void prePopulateNIHLFields(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData){
+
+    private void prePopulateNihlFields(CallbackParams callbackParams, CaseData caseData,
+                                       CaseData.CaseDataBuilder<?, ?> updatedData) {
 
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
         preferredCourt.map(RequestedCourt::getCaseLocation)
@@ -842,8 +844,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         List<DynamicListElement> dynamicListOptions = new ArrayList<>();
         locations.stream().forEach(loc -> dynamicListOptions.add(
-            dynamicElementFromCode(loc.getEpimmsId(),LocationRefDataService.getDisplayEntry(loc))));
-        dynamicListOptions.add(dynamicElementFromCode("OTHER_LOCATION","Other location"));
+            dynamicElementFromCode(loc.getEpimmsId(), LocationRefDataService.getDisplayEntry(loc))));
+        dynamicListOptions.add(dynamicElementFromCode("OTHER_LOCATION", "Other location"));
 
         return DynamicList.fromDynamicListElementList(dynamicListOptions);
     }
@@ -865,9 +867,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.setSmallClaimsFlag(YES).build();
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
-          updatedData.isSdoR2NewScreen(caseData.getFastClaims().contains(
-                FastTrack.fastClaimNoiseInducedHearingLoss) ? "true" :"false");
-            prePopulateNIHLFields(callbackParams, caseData, updatedData);
+            updatedData.isSdoR2NewScreen(caseData.getFastClaims().contains(
+                FastTrack.fastClaimNoiseInducedHearingLoss) ? "true" : "false");
+            prePopulateNihlFields(callbackParams, caseData, updatedData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

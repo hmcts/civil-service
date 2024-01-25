@@ -10,8 +10,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 
-import java.util.Date;
-
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
