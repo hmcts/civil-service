@@ -131,6 +131,8 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 @RequiredArgsConstructor
 public class CreateSDOCallbackHandler extends CallbackHandler {
 
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SDO);
     private static final String HEARING_CHANNEL = "HearingChannel";
     private static final String SPEC_SERVICE_ID = "AAA6";
@@ -688,15 +690,21 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.smallClaims(null);
             updatedData.claimsTrack(null);
             updatedData.orderType(null);
-            updatedData.trialAdditionalDirectionsForFastTrack(null);
-            updatedData.drawDirectionsOrderSmallClaimsAdditionalDirections(null);
-            updatedData.fastTrackAllocation(FastTrackAllocation.builder().assignComplexityBand(null).build());
-            updatedData.disposalHearingAddNewDirections(null);
-            updatedData.smallClaimsAddNewDirections(null);
-            updatedData.fastTrackAddNewDirections(null);
-            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
-            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
-            updatedData.disposalHearingHearingNotes(null);
+
+            if (caseData.getIsSdoR2NewScreen().equals(TRUE)) {
+                updatedData.sdoR2AddNewDirection(null);
+                updatedData.sdoR2Trial(SdoR2Trial.builder().hearingNotesTxt("").build());
+            } else {
+                updatedData.trialAdditionalDirectionsForFastTrack(null);
+                updatedData.drawDirectionsOrderSmallClaimsAdditionalDirections(null);
+                updatedData.fastTrackAllocation(FastTrackAllocation.builder().assignComplexityBand(null).build());
+                updatedData.disposalHearingAddNewDirections(null);
+                updatedData.smallClaimsAddNewDirections(null);
+                updatedData.fastTrackAddNewDirections(null);
+                updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
+                updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
+                updatedData.disposalHearingHearingNotes(null);
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -710,11 +718,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(updatedData::caseManagementLocation);
-        DynamicList locationsList = getLocationListForNIHL(callbackParams, updatedData, preferredCourt.orElse(null));
-        locationsList.toBuilder().listItems(List.of(DynamicListElement.builder()
-                                                        .code("OTHER_LOCATION")
-                                                        .label("Other location")
-                                                        .build()));
         updatedData.sdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
                                                   .input(SdoR2UiConstantFastTrack.JUDGE_RECITAL).build());
         updatedData.sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
@@ -757,8 +760,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                          .listFrom(LocalDate.now().plusDays(434))
                                                          .dateTo(LocalDate.now().plusDays(455))
                                                          .build())
-                                   .hearingCourtLocationList(locationsList)
-                                   .altHearingCourtLocationList(locationsList)
+                                   .hearingCourtLocationList(getCourtLocationForNihl(callbackParams, updatedData,
+                                                                                     preferredCourt.orElse(null)))
+                                   .altHearingCourtLocationList(getAlternativeCourtLocationsForNihl(callbackParams))
                                    .physicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE)
                                    .build());
 
@@ -828,10 +832,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return locationsList;
     }
 
-    private DynamicList getLocationListForNIHL(CallbackParams callbackParams,
-                                        CaseData.CaseDataBuilder<?, ?> updatedData,
-                                        RequestedCourt preferredCourt) {
-
+    private DynamicList getCourtLocationForNihl(CallbackParams callbackParams,
+                                                          CaseData.CaseDataBuilder<?, ?> updatedData,
+                                                          RequestedCourt preferredCourt) {
         List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
@@ -841,12 +844,24 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 requestedCourt,
                 () -> locations
             ));
+        List<DynamicListElement> dynamicListOptions = new ArrayList<>();
+        if (matchingLocation.isPresent()) {
+            dynamicListOptions.add(dynamicElementFromCode(matchingLocation.get().getEpimmsId(),
+                                                          LocationRefDataService.getDisplayEntry(matchingLocation.get())));
+        }
+        dynamicListOptions.add(dynamicElementFromCode("OTHER_LOCATION", "Other location"));
+        return DynamicList.fromDynamicListElementList(dynamicListOptions);
+    }
+
+    private DynamicList getAlternativeCourtLocationsForNihl(CallbackParams callbackParams) {
 
         List<DynamicListElement> dynamicListOptions = new ArrayList<>();
-        locations.stream().forEach(loc -> dynamicListOptions.add(
-            dynamicElementFromCode(loc.getEpimmsId(), LocationRefDataService.getDisplayEntry(loc))));
-        dynamicListOptions.add(dynamicElementFromCode("OTHER_LOCATION", "Other location"));
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
 
+        locations.stream().forEach(loc -> dynamicListOptions.add(
+                dynamicElementFromCode(loc.getEpimmsId(), LocationRefDataService.getDisplayEntry(loc))));
         return DynamicList.fromDynamicListElementList(dynamicListOptions);
     }
 
@@ -867,9 +882,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.setSmallClaimsFlag(YES).build();
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
-            updatedData.isSdoR2NewScreen(caseData.getFastClaims().contains(
-                FastTrack.fastClaimNoiseInducedHearingLoss) ? "true" : "false");
-            prePopulateNihlFields(callbackParams, caseData, updatedData);
+            if (featureToggleService.isSdoR2Enabled()) {
+                String isSdoR2NewScreen = caseData.getFastClaims().contains(
+                    FastTrack.fastClaimNoiseInducedHearingLoss) ? TRUE : FALSE;
+                updatedData.isSdoR2NewScreen(isSdoR2NewScreen);
+                if (isSdoR2NewScreen.equals(TRUE)) {
+                    prePopulateNihlFields(callbackParams, caseData, updatedData);
+                }
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -1061,8 +1081,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
             return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
         }
-        if (SdoHelper.isFastTrack(caseData)) {
-            return caseData.getFastTrackMethodInPerson().getValue().getCode();
+        if (featureToggleService.isSdoR2Enabled()) {
+            if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(FALSE)) {
+                return caseData.getFastTrackMethodInPerson().getValue().getCode();
+            }
+            if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(TRUE)) {
+                return caseData.getSdoR2Trial().getHearingCourtLocationList().getValue() != null
+                    ? caseData.getSdoR2Trial().getHearingCourtLocationList().getValue().getCode()
+                    : caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue().getCode();
+            }
+        } else {
+            if (SdoHelper.isFastTrack(caseData)) {
+                return caseData.getFastTrackMethodInPerson().getValue().getCode();
+            }
         }
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
