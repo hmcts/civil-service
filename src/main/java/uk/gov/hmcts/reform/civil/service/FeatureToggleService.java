@@ -44,7 +44,8 @@ public class FeatureToggleService {
     }
 
     public boolean isHmcEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("hmc");
+        //return this.featureToggleApi.isFeatureEnabled("hmc");
+        return false;
     }
 
     public boolean isCaseFileViewEnabled() {

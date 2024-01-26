@@ -1816,6 +1816,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .toBuilder()
                 .drawDirectionsOrderRequired(YesOrNo.NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
+                .fastClaims(List.of(FastTrack.fastClaimBuildingDispute))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1835,6 +1836,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .drawDirectionsOrderRequired(YesOrNo.YES)
                 .drawDirectionsOrderSmallClaims(YesOrNo.NO)
                 .orderType(OrderType.DECIDE_DAMAGES)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .fastClaims(List.of(FastTrack.fastClaimBuildingDispute))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
