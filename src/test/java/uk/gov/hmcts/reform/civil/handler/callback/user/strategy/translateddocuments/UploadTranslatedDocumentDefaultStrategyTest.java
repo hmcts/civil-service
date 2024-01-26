@@ -9,13 +9,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 
 import java.util.List;
@@ -23,6 +27,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocumentType.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -41,6 +46,8 @@ class UploadTranslatedDocumentDefaultStrategyTest {
 
     @MockBean
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
+    @MockBean
+    private  FeatureToggleService featureToggleService;
 
     @Test
     void shouldReturnDocumentListWithTranslatedDocument() {
@@ -66,6 +73,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             .atStatePendingClaimIssued()
             .build()
             .builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             .caseDataLiP(CaseDataLiP
                              .builder()
                              .translatedDocuments(translatedDocument)
@@ -94,7 +102,9 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         CaseData caseData = CaseDataBuilder
             .builder()
             .atStatePendingClaimIssued()
-            .build();
+            .build()
+            .builder()
+            .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT).build();
         CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
@@ -102,5 +112,30 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         //Then
         assertThat(response.getData()).extracting("systemGeneratedCaseDocuments")
             .isNotNull();
+    }
+
+    @Test
+    void shouldUpdateBusinessProcess_WhenLipVsLipAndCcdState_In_Pending_Case_Issued_R2FlagEnabled() {
+        //Given
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .ccdState(CaseState.PENDING_CASE_ISSUED)
+                .ccdCaseReference(123L)
+                .build();
+
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
+                callbackParams);
+        //Then
+        assertThat(response.getData())
+                .extracting("businessProcess")
+                .extracting("camundaEvent")
+                .isEqualTo(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE.name());
     }
 }
