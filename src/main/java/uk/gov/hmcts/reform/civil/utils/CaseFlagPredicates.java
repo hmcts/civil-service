@@ -13,10 +13,12 @@ public class CaseFlagPredicates {
         //NO-OP
     }
 
+    public static final String LANGUAGE_INTERPRETER_FLAG = "PF0015";
+    public static final String SIGN_LANGUAGE_INTERPRETER_FLAG = "RA0042";
     private static final List<String> VULNERABLE_FLAGS = List.of("PF0002", "RA0033", "RA0026");
     private static final List<String> ADDITIONAL_SECURITY_FLAGS = List.of("PF0007");
-    private static final List<String> LANGUAGE_INTERPRETER_FLAGS = List.of("PF0015");
-    private static final List<String> SIGN_LANGUAGE_INTERPRETER_FLAGS = List.of("RA0042");
+    private static final List<String> LANGUAGE_INTERPRETER_FLAGS = List.of(LANGUAGE_INTERPRETER_FLAG);
+    private static final List<String> SIGN_LANGUAGE_INTERPRETER_FLAGS = List.of(SIGN_LANGUAGE_INTERPRETER_FLAG);
     private static final List<String> DETAINED_INDIVIDUAL_FLAGS = List.of("PF0019");
     private static final List<String> REASONABLE_ADJUSTMENT_FLAGS = List.of("RA", "SM");
 
