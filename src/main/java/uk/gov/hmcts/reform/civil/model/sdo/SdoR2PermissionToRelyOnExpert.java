@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @Builder(toBuilder = true)
@@ -14,9 +14,9 @@ import java.util.Date;
 public class SdoR2PermissionToRelyOnExpert {
 
     private String sdoPermissionToRelyOnExpertTxt;
-    private Date sdoPermissionToRelyOnExpertDate;
+    private LocalDate sdoPermissionToRelyOnExpertDate;
     private String sdoJointMeetingOfExpertsTxt;
-    private Date sdoJointMeetingOfExpertsDate;
+    private LocalDate sdoJointMeetingOfExpertsDate;
     private String sdoUploadedToDigitalPortalTxt;
 
 }

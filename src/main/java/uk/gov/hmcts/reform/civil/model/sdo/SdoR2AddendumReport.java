@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @Builder(toBuilder = true)
@@ -14,6 +14,6 @@ import java.util.Date;
 public class SdoR2AddendumReport {
 
     private String sdoAddendumReportTxt;
-    private Date sdoAddendumReportDate;
+    private LocalDate sdoAddendumReportDate;
 
 }

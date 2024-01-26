@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @Builder(toBuilder = true)
@@ -15,16 +15,16 @@ public class SdoR2EvidenceAcousticEngineer {
 
     private String sdoEvidenceAcousticEngineerTxt;
     private String sdoInstructionOfTheExpertTxt;
-    private Date sdoInstructionOfTheExpertDate;
+    private LocalDate sdoInstructionOfTheExpertDate;
     private String sdoInstructionOfTheExpertTxtArea;
     private String sdoExpertReportTxt;
-    private Date sdoExpertReportDate;
+    private LocalDate sdoExpertReportDate;
     private String sdoExpertReportDigitalPortalTxt;
     private String sdoWrittenQuestionsTxt;
-    private Date sdoWrittenQuestionsDate;
+    private LocalDate sdoWrittenQuestionsDate;
     private String sdoWrittenQuestionsDigitalPortalTxt;
     private String sdoRepliesTxt;
-    private Date sdoRepliesDate;
+    private LocalDate sdoRepliesDate;
     private String sdoRepliesDigitalPortalTxt;
     private String sdoServiceOfOrderTxt;
 

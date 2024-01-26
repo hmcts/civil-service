@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @Builder(toBuilder = true)
@@ -14,9 +14,9 @@ import java.util.Date;
 public class SdoR2QuestionsClaimantExpert {
 
     private String sdoDefendantMayAskTxt;
-    private Date sdoDefendantMayAskDate;
+    private LocalDate sdoDefendantMayAskDate;
     private String sdoQuestionsShallBeAnsweredTxt;
-    private Date sdoQuestionsShallBeAnsweredDate;
+    private LocalDate sdoQuestionsShallBeAnsweredDate;
     private String sdoUploadedToDigitalPortalTxt;
-    private SdoR2ApplicationToRelyOnFurther sdoR2ApplicationToRelyOnFurther;
+    private SdoR2ApplicationToRelyOnFurther sdoApplicationToRelyOnFurther;
 }

@@ -12,7 +12,7 @@ public final class SdoR2UiConstantFastTrack {
     public static final String ADDENDUM_REPORT = "The Claimant may upload to the Digital Portal an addendum report " +
         "from their expert ENT surgeon by 4pm on";
     public static final String CLAIMANT_SHALL_UNDERGO = "The Claimant shall undergo a single further audiogram at the" +
-        "written request of any Defendant. Such request to be made no later than 4pm on";
+        " written request of any Defendant. Such request to be made no later than 4pm on";
     public static final String SERVICE_REPORT = "The further audiogram shall be arranged and paid for by the " +
         "Defendant requesting it. The Defendant shall serve a copy of the further audiogram on the Claimant and " +
         "upload to the Digital Portal by 4pm on";
