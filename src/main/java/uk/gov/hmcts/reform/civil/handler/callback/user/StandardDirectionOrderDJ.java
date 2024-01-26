@@ -112,6 +112,8 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
     public static final String ORDER_1_DEF = "%n%n ## Defendant 1 %n%n %s";
     public static final String ORDER_2_DEF = "%n%n ## Defendant 2 %n%n %s";
     public static final String ORDER_ISSUED = "# Your order has been issued %n%n ## Claim number %n%n # %s";
+
+    public static final LocalDate specificTestDate2weeks = LocalDate.of(2024, 12, 11);
     public static final LocalDate specificTestDate4weeks = LocalDate.of(2024, 11, 27);
     public static final LocalDate specificTestDate6weeks = LocalDate.of(2024, 11, 13);
     public static final LocalDate specificTestDate8weeks = LocalDate.of(2024, 10, 30);
@@ -260,7 +262,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                                                 .input2("The provisions of CPR 32.6 apply to such evidence.")
                                                 .input3("Any application by the defendant in relation to CPR 32.7 "
                                                             + "must be made by 4pm on")
-                                                .date2(workingDayIndicator.getNextWorkingDay(LocalDate.now().plusWeeks(2)))
+                                                .date2(workingDayIndicator.getNextWorkingDay(specificTestDate2weeks.plusWeeks(2)))
                                                 .input4("and must be accompanied by proposed directions for allocation"
                                                             + " and listing for trial on quantum. This is because"
                                                             + " cross-examination will cause the hearing to exceed"
