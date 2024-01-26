@@ -65,7 +65,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
     private static final String ERROR_MESSAGE_DEADLINE_EXPIRED
         = "You can no longer request a reconsideration because the deadline has expired";
 
-    private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND = "This event is not available for claim amount greater than 1000 pounds";
+    private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND = "You can only request a reconsideration for claims of £1,000 or less.";
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
