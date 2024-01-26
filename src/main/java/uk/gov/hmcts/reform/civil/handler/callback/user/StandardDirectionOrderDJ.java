@@ -76,6 +76,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
@@ -686,9 +687,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private String getEpimmsId(CaseData caseData) {
         if (caseData.getTrialHearingMethodInPersonDJ() != null) {
-            return caseData.getTrialHearingMethodInPersonDJ().getValue().getCode();
+            return Optional.ofNullable(caseData.getTrialHearingMethodInPersonDJ().getValue())
+                .map(DynamicListElement::getCode).orElse(null);
         } else if (caseData.getDisposalHearingMethodInPersonDJ() != null) {
-            return caseData.getDisposalHearingMethodInPersonDJ().getValue().getCode();
+            return Optional.ofNullable(caseData.getDisposalHearingMethodInPersonDJ().getValue())
+                .map(DynamicListElement::getCode).orElse(null);
         }
         throw new IllegalArgumentException("Epimms Id is not provided");
     }
