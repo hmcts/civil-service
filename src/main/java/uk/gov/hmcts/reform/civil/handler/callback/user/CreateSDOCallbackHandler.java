@@ -709,66 +709,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.disposalHearingHearingNotes(null);
         }
 
-        // SDO R2 NIHL populate default text on page load
-        updatedData.sdoR2ExpertEvidence(SdoR2ExpertEvidence.builder()
-                                            .sdoClaimantPermissionToRelyTxt(SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY).build());
-        updatedData.sdoR2AddendumReport(SdoR2AddendumReport.builder()
-                                            .sdoAddendumReportTxt(SdoR2UiConstantFastTrack.ADDENDUM_REPORT)
-                                            .sdoAddendumReportDate(LocalDate.now().plusDays(56)).build());
-        updatedData.sdoR2FurtherAudiogram(SdoR2FurtherAudiogram.builder()
-                                              .sdoClaimantShallUndergoTxt(SdoR2UiConstantFastTrack.CLAIMANT_SHALL_UNDERGO)
-                                              .sdoServiceReportTxt(SdoR2UiConstantFastTrack.SERVICE_REPORT)
-                                              .sdoClaimantShallUndergoDate(LocalDate.now().plusDays(42))
-                                              .sdoServiceReportDate(LocalDate.now().plusDays(98)).build());
-        updatedData.sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder().build().builder()
-                                                     .sdoDefendantMayAskTxt(SdoR2UiConstantFastTrack.DEFENDANT_MAY_ASK)
-                                                     .sdoDefendantMayAskDate(LocalDate.now().plusDays(126))
-                                                     .sdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.QUESTIONS_SHALL_BE_ANSWERED)
-                                                     .sdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(147))
-                                                     .sdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL)
-                                                     .sdoApplicationToRelyOnFurther(
-                                                         SdoR2ApplicationToRelyOnFurther.builder()
-                                                             .doRequireApplicationToRely(YesOrNo.NO)
-                                                             .applicationToRelyOnFurtherDetails(
-                                                             SdoR2ApplicationToRelyOnFurtherDetails.builder()
-                                                                 .applicationToRelyDetailsTxt(SdoR2UiConstantFastTrack.APPLICATION_TO_RELY_DETAILS)
-                                                                 .applicationToRelyDetailsDate(LocalDate.now().plusDays(161)).build()).build())
-                                                     .build());
-        updatedData.sdoR2PermissionToRelyOnExpert(SdoR2PermissionToRelyOnExpert.builder()
-                                                      .sdoPermissionToRelyOnExpertTxt(SdoR2UiConstantFastTrack.PERMISSION_TO_RELY_ON_EXPERT)
-                                                      .sdoPermissionToRelyOnExpertDate(LocalDate.now().plusDays(119))
-                                                      .sdoJointMeetingOfExpertsTxt(SdoR2UiConstantFastTrack.JOINT_MEETING_OF_EXPERTS)
-                                                      .sdoJointMeetingOfExpertsDate(LocalDate.now().plusDays(147))
-                                                      .sdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL_7_DAYS)
-                                                      .build());
-        updatedData.sdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder()
-                                                      .sdoEvidenceAcousticEngineerTxt(SdoR2UiConstantFastTrack.EVIDENCE_ACOUSTIC_ENGINEER)
-                                                      .sdoInstructionOfTheExpertTxt(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT)
-                                                      .sdoInstructionOfTheExpertDate(LocalDate.now().plusDays(42))
-                                                      .sdoInstructionOfTheExpertTxtArea(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT_TA)
-                                                      .sdoExpertReportTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT)
-                                                      .sdoExpertReportDate(LocalDate.now().plusDays(280))
-                                                      .sdoExpertReportDigitalPortalTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT_DIGITAL_PORTAL)
-                                                      .sdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS)
-                                                      .sdoWrittenQuestionsDate(LocalDate.now().plusDays(294))
-                                                      .sdoWrittenQuestionsDigitalPortalTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS_DIGITAL_PORTAL)
-                                                      .sdoRepliesTxt(SdoR2UiConstantFastTrack.REPLIES)
-                                                      .sdoRepliesDate(LocalDate.now().plusDays(315))
-                                                      .sdoRepliesDigitalPortalTxt(SdoR2UiConstantFastTrack.REPLIES_DIGITAL_PORTAL)
-                                                      .sdoServiceOfOrderTxt(SdoR2UiConstantFastTrack.SERVICE_OF_ORDER)
-                                                      .build());
-        updatedData.sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder()
-                                                  .sdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS)
-                                                  .sdoWrittenQuestionsDate(LocalDate.now().plusDays(336))
-                                                  .sdoWrittenQuestionsDigPortalTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS_DIG_PORTAL)
-                                                  .sdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.ENT_QUESTIONS_SHALL_BE_ANSWERED)
-                                                  .sdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(350))
-                                                  .sdoShallBeUploadedTxt(SdoR2UiConstantFastTrack.ENT_SHALL_BE_UPLOADED)
-                                                  .build());
-        updatedData.sdoR2UploadOfDocuments(SdoR2UploadOfDocuments.builder()
-                                               .sdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS)
-                                               .build());
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
@@ -834,6 +774,65 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.sdoR2ImportantNotesTxt(SdoR2UiConstantFastTrack.IMPORTANT_NOTES);
         updatedData.sdoR2ImportantNotesDate(LocalDate.now().plusDays(7));
+
+        updatedData.sdoR2ExpertEvidence(SdoR2ExpertEvidence.builder()
+                                            .sdoClaimantPermissionToRelyTxt(SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY).build());
+        updatedData.sdoR2AddendumReport(SdoR2AddendumReport.builder()
+                                            .sdoAddendumReportTxt(SdoR2UiConstantFastTrack.ADDENDUM_REPORT)
+                                            .sdoAddendumReportDate(LocalDate.now().plusDays(56)).build());
+        updatedData.sdoR2FurtherAudiogram(SdoR2FurtherAudiogram.builder()
+                                              .sdoClaimantShallUndergoTxt(SdoR2UiConstantFastTrack.CLAIMANT_SHALL_UNDERGO)
+                                              .sdoServiceReportTxt(SdoR2UiConstantFastTrack.SERVICE_REPORT)
+                                              .sdoClaimantShallUndergoDate(LocalDate.now().plusDays(42))
+                                              .sdoServiceReportDate(LocalDate.now().plusDays(98)).build());
+        updatedData.sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder().build().builder()
+                                                     .sdoDefendantMayAskTxt(SdoR2UiConstantFastTrack.DEFENDANT_MAY_ASK)
+                                                     .sdoDefendantMayAskDate(LocalDate.now().plusDays(126))
+                                                     .sdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.QUESTIONS_SHALL_BE_ANSWERED)
+                                                     .sdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(147))
+                                                     .sdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL)
+                                                     .sdoApplicationToRelyOnFurther(
+                                                         SdoR2ApplicationToRelyOnFurther.builder()
+                                                             .doRequireApplicationToRely(YesOrNo.NO)
+                                                             .applicationToRelyOnFurtherDetails(
+                                                                 SdoR2ApplicationToRelyOnFurtherDetails.builder()
+                                                                     .applicationToRelyDetailsTxt(SdoR2UiConstantFastTrack.APPLICATION_TO_RELY_DETAILS)
+                                                                     .applicationToRelyDetailsDate(LocalDate.now().plusDays(161)).build()).build())
+                                                     .build());
+        updatedData.sdoR2PermissionToRelyOnExpert(SdoR2PermissionToRelyOnExpert.builder()
+                                                      .sdoPermissionToRelyOnExpertTxt(SdoR2UiConstantFastTrack.PERMISSION_TO_RELY_ON_EXPERT)
+                                                      .sdoPermissionToRelyOnExpertDate(LocalDate.now().plusDays(119))
+                                                      .sdoJointMeetingOfExpertsTxt(SdoR2UiConstantFastTrack.JOINT_MEETING_OF_EXPERTS)
+                                                      .sdoJointMeetingOfExpertsDate(LocalDate.now().plusDays(147))
+                                                      .sdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL_7_DAYS)
+                                                      .build());
+        updatedData.sdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder()
+                                                      .sdoEvidenceAcousticEngineerTxt(SdoR2UiConstantFastTrack.EVIDENCE_ACOUSTIC_ENGINEER)
+                                                      .sdoInstructionOfTheExpertTxt(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT)
+                                                      .sdoInstructionOfTheExpertDate(LocalDate.now().plusDays(42))
+                                                      .sdoInstructionOfTheExpertTxtArea(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT_TA)
+                                                      .sdoExpertReportTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT)
+                                                      .sdoExpertReportDate(LocalDate.now().plusDays(280))
+                                                      .sdoExpertReportDigitalPortalTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT_DIGITAL_PORTAL)
+                                                      .sdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS)
+                                                      .sdoWrittenQuestionsDate(LocalDate.now().plusDays(294))
+                                                      .sdoWrittenQuestionsDigitalPortalTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS_DIGITAL_PORTAL)
+                                                      .sdoRepliesTxt(SdoR2UiConstantFastTrack.REPLIES)
+                                                      .sdoRepliesDate(LocalDate.now().plusDays(315))
+                                                      .sdoRepliesDigitalPortalTxt(SdoR2UiConstantFastTrack.REPLIES_DIGITAL_PORTAL)
+                                                      .sdoServiceOfOrderTxt(SdoR2UiConstantFastTrack.SERVICE_OF_ORDER)
+                                                      .build());
+        updatedData.sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder()
+                                                  .sdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS)
+                                                  .sdoWrittenQuestionsDate(LocalDate.now().plusDays(336))
+                                                  .sdoWrittenQuestionsDigPortalTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS_DIG_PORTAL)
+                                                  .sdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.ENT_QUESTIONS_SHALL_BE_ANSWERED)
+                                                  .sdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(350))
+                                                  .sdoShallBeUploadedTxt(SdoR2UiConstantFastTrack.ENT_SHALL_BE_UPLOADED)
+                                                  .build());
+        updatedData.sdoR2UploadOfDocuments(SdoR2UploadOfDocuments.builder()
+                                               .sdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS)
+                                               .build());
 
     }
 
