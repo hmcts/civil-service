@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 class CaseStateUtilsTest {
@@ -34,6 +35,31 @@ class CaseStateUtilsTest {
         boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
 
         assertThat(actual).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalse_whenCarmEnabledSmallClaim1v1ApplicantNotProceed() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .multiPartyClaimTwoApplicants()
+            .applicant1ProceedWithClaim(NO)
+            .build();
+
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenCarmEnabledSmallClaim2v1ApplicantNotProceed() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .multiPartyClaimTwoApplicants()
+            .applicant1ProceedWithClaimSpec2v1(NO)
+            .build();
+
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+
+        assertThat(actual).isFalse();
     }
 
     @Test
