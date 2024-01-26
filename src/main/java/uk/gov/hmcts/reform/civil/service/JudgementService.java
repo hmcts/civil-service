@@ -29,6 +29,7 @@ public class JudgementService {
             .ccjJudgmentSummarySubtotalAmount(ccjJudgementSubTotal(caseData))
             .ccjJudgmentTotalStillOwed(ccjJudgmentFinalTotal(caseData))
             .ccjJudgmentAmountInterestToDate(ccjJudgmentInterest(caseData))
+            .ccjPaymentPaidSomeAmount(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount())
             .ccjPaymentPaidSomeAmountInPounds(ccjJudgmentPaidAmount(caseData))
             .ccjJudgmentFixedCostAmount(ccjJudgmentFixedCost(caseData))
             .ccjJudgmentFixedCostOption(caseData.getCcjPaymentDetails()
@@ -47,7 +48,7 @@ public class JudgementService {
         return errors;
     }
 
-    private BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
+    public BigDecimal ccjJudgmentClaimAmount(CaseData caseData) {
         BigDecimal claimAmount = caseData.getTotalClaimAmount();
         if (caseData.isPartAdmitClaimSpec()) {
             claimAmount = caseData.getRespondToAdmittedClaimOwingAmountPounds();
@@ -55,12 +56,12 @@ public class JudgementService {
         return claimAmount;
     }
 
-    private BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
+    public BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
         return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee() :
             MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
     }
 
-    private BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
+    public BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
         return (caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeOption() == YesOrNo.YES)
             ? MonetaryConversions.penniesToPounds(caseData.getCcjPaymentDetails().getCcjPaymentPaidSomeAmount()) : ZERO;
     }
@@ -69,19 +70,19 @@ public class JudgementService {
         return caseData.getUpFixedCostAmount(ccjJudgmentClaimAmount(caseData));
     }
 
-    private BigDecimal ccjJudgmentInterest(CaseData caseData) {
+    public BigDecimal ccjJudgmentInterest(CaseData caseData) {
         return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
             caseData.getTotalInterest();
     }
 
-    private BigDecimal ccjJudgementSubTotal(CaseData caseData) {
+    public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
         return ccjJudgmentClaimAmount(caseData)
             .add(ccjJudgmentClaimFee(caseData))
             .add(ccjJudgmentInterest(caseData))
             .add(ccjJudgmentFixedCost(caseData));
     }
 
-    private BigDecimal ccjJudgmentFinalTotal(CaseData caseData) {
+    public BigDecimal ccjJudgmentFinalTotal(CaseData caseData) {
         return ccjJudgementSubTotal(caseData)
             .subtract(ccjJudgmentPaidAmount(caseData));
     }
