@@ -291,7 +291,7 @@ public class DefendantResponseApplicantNotificationHandler extends CallbackHandl
             if (NO.equals(applicant1Represented)) {
                 return caseData.getApplicant1().getPartyName();
             }
-            organisationID = caseData.getApplicant1().getPartyName();
+            organisationID = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         } else if (caseEvent.equals(NOTIFY_RESPONDENT_SOLICITOR2_FOR_DEFENDANT_RESPONSE_CC)) {
             organisationID = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
         } else {
