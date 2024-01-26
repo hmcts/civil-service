@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getAdditionalSecurity;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getCustodyStatus;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getInterpreterLanguage;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getOtherReasonableAdjustmentDetails;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getReasonableAdjustments;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getVulnerabilityDetails;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
@@ -220,6 +221,85 @@ public class CaseFlagsToHearingValueMapperTest {
             assertEquals("sign-sse", getInterpreterLanguage(flagDetails));
         }
 
+    }
+
+    @Test
+    public void shouldReturnCorrectFlagsForOtherReasonableAdjustmentDetails() {
+        FlagDetail flagNotRAorSM = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("PF0002")
+            .build();
+
+        FlagDetail flagWithDetailsAndComments = FlagDetail.builder()
+            .status("Active")
+            .name("Flight risk")
+            .flagComment("comment")
+            .flagCode("SM001")
+            .hearingRelevant(YES)
+            .status("Active")
+            .build();
+
+        FlagDetail flagDetailsOnly = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RA0019")
+            .name("Step free / wheelchair access")
+            .subTypeKey("whe")
+            .subTypeValue("WHEELCHAIR_ACCESS_FLAG")
+            .build();
+
+        FlagDetail flagCommentsOnly = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RA0026")
+            .flagComment("Support comment")
+            .subTypeKey("sup")
+            .subTypeValue("SUPPORT_WORKER_FLAG")
+            .build();
+
+        FlagDetail flagLanguageManualEntry = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("PF0015")
+            .subTypeValue("Hokkien")
+            .name("Language Interpreter")
+            .flagComment("Local dialect")
+            .build();
+
+        FlagDetail flagSignLanguageManualEntry = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("RA0042")
+            .name("Sign Language Interpreter")
+            .subTypeValue("Hokkien")
+            .flagComment("Local dialect")
+            .build();
+
+        FlagDetail flagSecondLanguage = FlagDetail.builder()
+            .status("Active")
+            .hearingRelevant(YES)
+            .flagCode("PF0015")
+            .subTypeValue("French")
+            .name("Language Interpreter")
+            .flagComment("Comment - Waterloo accent")
+            .build();
+
+        List<FlagDetail> flagDetails = List.of(
+            flagNotRAorSM,
+            flagWithDetailsAndComments,
+            flagDetailsOnly,
+            flagCommentsOnly,
+            flagLanguageManualEntry,
+            flagSignLanguageManualEntry,
+            flagSecondLanguage
+        );
+
+        assertEquals("SM001: Flight risk: comment, RA0019: Step free / wheelchair access, "
+                         + "RA0026: Support comment, RA0042: Sign Language Interpreter: Local dialect: Hokkien, "
+                         + "PF0015: Language Interpreter: Local dialect: Hokkien, "
+                         + "PF0015: Language Interpreter: Comment - Waterloo accent: French",
+                     getOtherReasonableAdjustmentDetails(flagDetails));
     }
 
     @Test

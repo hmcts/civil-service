@@ -1842,6 +1842,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldPopulateCasenamePublic_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("caseNamePublic").isEqualTo("'John Rambo' v 'Sole Trader'");
+        }
+
+        @Test
         void shouldNotAddPartyIdsToPartyFields_whenInvokedWithHMCToggleOff() {
             when(toggleService.isHmcEnabled()).thenReturn(false);
 
