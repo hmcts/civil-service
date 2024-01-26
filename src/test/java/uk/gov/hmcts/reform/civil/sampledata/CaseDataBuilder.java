@@ -6,28 +6,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
-import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
-import uk.gov.hmcts.reform.civil.enums.MediationDecision;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
-import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
@@ -42,51 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
-import uk.gov.hmcts.reform.civil.model.Address;
-import uk.gov.hmcts.reform.civil.model.Bundle;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.CaseNote;
-import uk.gov.hmcts.reform.civil.model.CertificateOfService;
-import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
-import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
-import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCasemanLR;
-import uk.gov.hmcts.reform.civil.model.ClaimValue;
-import uk.gov.hmcts.reform.civil.model.CloseClaim;
-import uk.gov.hmcts.reform.civil.model.CorrectEmail;
-import uk.gov.hmcts.reform.civil.model.CourtLocation;
-import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
-import uk.gov.hmcts.reform.civil.model.HearingDates;
-import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
-import uk.gov.hmcts.reform.civil.model.IdValue;
-import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
-import uk.gov.hmcts.reform.civil.model.LitigationFriend;
-import uk.gov.hmcts.reform.civil.model.Mediation;
-import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
-import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
-import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
-import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
-import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
-import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
-import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
-import uk.gov.hmcts.reform.civil.model.ResponseDocument;
-import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
-import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
-import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
-import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
-import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
-import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
-import uk.gov.hmcts.reform.civil.model.UnavailableDate;
-import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
-import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
+import uk.gov.hmcts.reform.civil.model.*;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
@@ -544,6 +479,8 @@ public class CaseDataBuilder {
     private YesOrNo responseClaimExpertSpecRequired2;
     private YesOrNo applicantMPClaimExpertSpecRequired;
     private YesOrNo applicant1ClaimExpertSpecRequired;
+    private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
+    private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
 
     public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
         this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
@@ -4528,6 +4465,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atReconsiderationUpheld() {
+        decisionOnRequestReconsiderationOptions =  DecisionOnRequestReconsiderationOptions.YES;
+        upholdingPreviousOrderReason = new UpholdingPreviousOrderReason("Reason to upheld ");
+        return this;
+    }
+
     public CaseDataBuilder atStateDisposalHearingOrderMadeWithoutHearing() {
         disposalHearingOrderMadeWithoutHearingDJ =
             DisposalHearingOrderMadeWithoutHearingDJ.builder().input("test").build();
@@ -6858,6 +6801,8 @@ public class CaseDataBuilder {
             .reasonForReconsiderationApplicant(reasonForReconsiderationApplicant)
             .reasonForReconsiderationRespondent1(reasonForReconsiderationRespondent1)
             .reasonForReconsiderationRespondent2(reasonForReconsiderationRespondent2)
+            .upholdingPreviousOrderReason(upholdingPreviousOrderReason)
+            .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)
             .build();
     }
 }
