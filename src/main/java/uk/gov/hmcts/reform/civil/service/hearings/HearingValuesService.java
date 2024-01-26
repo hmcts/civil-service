@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_MISSING_FIELDS;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsMapper.getCaseFlags;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.hasCaseInterpreterRequiredFlag;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.HearingDetailsMapper.getDuration;
@@ -133,7 +134,9 @@ public class HearingValuesService {
 
     private void isEarlyAdopter(CaseData caseData) throws NotEarlyAdopterCourtException {
         if (featureToggleService.isEarlyAdoptersEnabled()) {
-            if (!featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
+            if ((caseData.getEaCourtLocation() != null && caseData.getEaCourtLocation().equals(NO))
+                || !featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
+                                                                                     .getBaseLocation())) {
                 throw new NotEarlyAdopterCourtException();
             }
         }

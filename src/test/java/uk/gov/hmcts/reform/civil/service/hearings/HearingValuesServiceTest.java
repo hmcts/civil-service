@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.config.ManageCaseBaseUrlConfiguration;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.hearing.CategoryType;
 import uk.gov.hmcts.reform.civil.exceptions.CaseNotFoundException;
@@ -471,33 +472,13 @@ public class HearingValuesServiceTest {
 
     @Nested
     class EarlyAdopter {
-        Long caseId = 1L;
-        CaseData caseData;
+        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
+            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
 
         @BeforeEach
         void setup() {
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-                WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-                WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
-            caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .caseAccessCategory(UNSPEC_CLAIM)
-                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
-                                            .region(WELSH_REGION_ID).build())
-                .applicant1DQ(applicant1DQ)
-                .respondent1DQ(respondent1DQ)
-                .build();
-            caseData = caseData.toBuilder()
-                .applicant1(caseData.getApplicant1().toBuilder()
-                                .flags(Flags.builder().partyName("party name").build())
-                                .build()).build();
-
-            CaseDetails caseDetails = CaseDetails.builder()
-                .data(caseData.toMap(mapper))
-                .id(caseId).build();
-            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
-            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
             when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
                 .thenReturn(Optional.of(Organisation.builder()
                                             .name(APPLICANT_LR_ORG_NAME)
@@ -515,55 +496,31 @@ public class HearingValuesServiceTest {
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
                 Optional.of(categorySearchResult));
-
-            List<CaseCategoryModel> expectedCaseCategories = getExpectedCaseCategories();
-
-            List<HearingLocationModel> expectedHearingLocation = List.of(HearingLocationModel.builder()
-                                                                             .locationId(BASE_LOCATION_ID)
-                                                                             .locationType(COURT)
-                                                                             .build());
-
-            JudiciaryModel expectedJudiciary = JudiciaryModel.builder().build();
-
-            ServiceHearingValuesModel expected = ServiceHearingValuesModel.builder()
-                .hmctsServiceID("AAA7")
-                .hmctsInternalCaseName("Mr. John Rambo v Mr. Sole Trader")
-                .publicCaseName("'John Rambo' v 'Sole Trader'")
-                .caseAdditionalSecurityFlag(false)
-                .caseCategories(expectedCaseCategories)
-                .caseDeepLink("http://localhost:3333/cases/case-details/1")
-                .caseRestrictedFlag(false)
-                .externalCaseReference(null)
-                .caseManagementLocationCode(BASE_LOCATION_ID)
-                .caseSLAStartDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-                .autoListFlag(false)
-                .hearingType(null)
-                .hearingWindow(null)
-                .duration(0)
-                .hearingPriorityType("Standard")
-                .numberOfPhysicalAttendees(0)
-                .hearingInWelshFlag(true)
-                .hearingLocations(expectedHearingLocation)
-                .facilitiesRequired(null)
-                .listingComments(null)
-                .hearingRequester("")
-                .privateHearingRequiredFlag(false)
-                .caseInterpreterRequiredFlag(false)
-                .panelRequirements(null)
-                .leadJudgeContractType("")
-                .judiciary(expectedJudiciary)
-                .hearingIsLinkedFlag(false)
-                .parties(getExpectedPartyModel())
-                .screenFlow(getScreenFlow())
-                .vocabulary(List.of(VocabularyModel.builder().build()))
-                .hearingChannels(null)
-                .caseFlags(getCaseFlags(caseData))
-                .build();
         }
 
         @SneakyThrows
         @Test
         void shouldThrowErrorIfLocationIsNotWhiteListed() {
+            Long caseId = 1L;
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                            .region(WELSH_REGION_ID).build())
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
+                .build();
+            caseData = caseData.toBuilder()
+                .applicant1(caseData.getApplicant1().toBuilder()
+                                .flags(Flags.builder().partyName("party name").build())
+                                .build()).build();
+
+            CaseDetails caseDetails = CaseDetails.builder()
+                .data(caseData.toMap(mapper))
+                .id(caseId).build();
+            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+
             when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(false);
             assertThrows(NotEarlyAdopterCourtException.class, () -> {
                 hearingValuesService.getValues(caseId, "8AB87C89", "auth");
@@ -572,10 +529,86 @@ public class HearingValuesServiceTest {
 
         @Test
         void shouldThrowNotThrowErrorIfLocationIsWhiteListed() {
+            Long caseId = 1L;
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                            .region(WELSH_REGION_ID).build())
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
+                .build();
+            caseData = caseData.toBuilder()
+                .applicant1(caseData.getApplicant1().toBuilder()
+                                .flags(Flags.builder().partyName("party name").build())
+                                .build()).build();
+
+            CaseDetails caseDetails = CaseDetails.builder()
+                .data(caseData.toMap(mapper))
+                .id(caseId).build();
+            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+
             when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "8AB87C89", "auth"));
         }
 
+        @SneakyThrows
+        @Test
+        void shouldThrowErrorIfEACourtIsNo() {
+            Long caseId = 1L;
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                            .region(WELSH_REGION_ID).build())
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
+                .eaCourtLocation(YesOrNo.NO)
+                .build();
+            caseData = caseData.toBuilder()
+                .applicant1(caseData.getApplicant1().toBuilder()
+                                .flags(Flags.builder().partyName("party name").build())
+                                .build()).build();
+
+            CaseDetails caseDetails = CaseDetails.builder()
+                .data(caseData.toMap(mapper))
+                .id(caseId).build();
+            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+
+            when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(false);
+            assertThrows(NotEarlyAdopterCourtException.class, () -> {
+                hearingValuesService.getValues(caseId, "8AB87C89", "auth");
+            });
+        }
+
+        @Test
+        void shouldThrowNotThrowErrorIfEaCourtIsYes() {
+            Long caseId = 1L;
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder().baseLocation(BASE_LOCATION_ID)
+                                            .region(WELSH_REGION_ID).build())
+                .eaCourtLocation(YesOrNo.YES)
+                .applicant1DQ(applicant1DQ)
+                .respondent1DQ(respondent1DQ)
+                .build();
+            caseData = caseData.toBuilder()
+                .applicant1(caseData.getApplicant1().toBuilder()
+                                .flags(Flags.builder().partyName("party name").build())
+                                .build()).build();
+
+            CaseDetails caseDetails = CaseDetails.builder()
+                .data(caseData.toMap(mapper))
+                .id(caseId).build();
+            when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
+            when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
+
+            when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(false);
+            assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "8AB87C89", "auth"));
+        }
     }
 
     private List<PartyDetailsModel> getExpectedPartyModel() {
