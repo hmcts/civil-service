@@ -12,11 +12,14 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -29,20 +32,16 @@ import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
-import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
-import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
-import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
-import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
-import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -59,6 +58,7 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.IdValue;
@@ -66,23 +66,27 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Mediation;
+import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
+import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
-import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
+import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
@@ -128,12 +132,12 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsReferredInStatement;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
@@ -242,6 +246,7 @@ public class CaseDataBuilder {
     protected ClaimValue claimValue;
     protected YesOrNo uploadParticularsOfClaim;
     protected ClaimType claimType;
+    protected ClaimTypeUnspec claimTypeUnSpec;
     protected String claimTypeOther;
     protected PersonalInjuryType personalInjuryType;
     protected String personalInjuryTypeOther;
@@ -441,8 +446,8 @@ public class CaseDataBuilder {
 
     private String unassignedCaseListDisplayOrganisationReferences;
     private String caseListDisplayDefendantSolicitorReferences;
-    private  CertificateOfService cosNotifyClaimDefendant1;
-    private  CertificateOfService cosNotifyClaimDefendant2;
+    private CertificateOfService cosNotifyClaimDefendant1;
+    private CertificateOfService cosNotifyClaimDefendant2;
     private CertificateOfService cosNotifyClaimDetails1;
     private CertificateOfService cosNotifyClaimDetails2;
 
@@ -528,8 +533,10 @@ public class CaseDataBuilder {
 
     private YesOrNo isFlightDelayClaim;
     private FlightDelayDetails flightDelayDetails;
+    private ReasonForReconsideration reasonForReconsiderationApplicant;
+    private ReasonForReconsideration reasonForReconsiderationRespondent1;
+    private ReasonForReconsideration reasonForReconsiderationRespondent2;
     private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
-    private ReasonForReconsideration reasonForReconsideration;
 
     private UploadMediationDocumentsForm uploadDocumentsForm;
 
@@ -2246,6 +2253,7 @@ public class CaseDataBuilder {
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
             .build();
         claimType = ClaimType.PERSONAL_INJURY;
+        claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
         applicantSolicitor1PbaAccounts = DynamicList.builder()
             .value(DynamicListElement.builder().label("PBA0077597").build())
@@ -5363,8 +5371,18 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder reasonForReconsideration(ReasonForReconsideration reasonForReconsideration) {
-        this.reasonForReconsideration = reasonForReconsideration;
+    public CaseDataBuilder reasonForReconsiderationApplicant(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsiderationApplicant = reasonForReconsideration;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForReconsiderationRespondent1(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsiderationRespondent1 = reasonForReconsideration;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForReconsiderationRespondent2(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsiderationRespondent2 = reasonForReconsideration;
         return this;
     }
 
@@ -5744,7 +5762,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder setCoSClaimDetailsWithDate(boolean setCos1, boolean setCos2,
-                                                      LocalDate cos1Date, LocalDate cos2Date,
+                                                      LocalDate cos1Date, LocalDate deemed1Date, LocalDate cos2Date, LocalDate deemed2Date,
                                                       boolean file1, boolean file2) {
         List<Element<Document>> files = wrapElements(Document.builder()
                 .documentUrl("fake-url")
@@ -5760,7 +5778,8 @@ public class CaseDataBuilder {
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos1Date);
+                .cosDateOfServiceForDefendant(cos1Date)
+                .cosDateDeemedServedForDefendant(deemed1Date);
             if (file1) {
                 cos1Builder.cosEvidenceDocument(files);
             }
@@ -5768,7 +5787,8 @@ public class CaseDataBuilder {
         }
         if (setCos2) {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos2Date);
+                .cosDateOfServiceForDefendant(cos2Date)
+                .cosDateDeemedServedForDefendant(deemed2Date);
             if (file2) {
                 cos2Builder.cosEvidenceDocument(files2);
             }
@@ -6523,6 +6543,12 @@ public class CaseDataBuilder {
                                 .build());
     }
 
+    public CaseDataBuilder atStateRespondent1v1BilingualFlagSet() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -6542,6 +6568,7 @@ public class CaseDataBuilder {
             .claimValue(claimValue)
             .uploadParticularsOfClaim(uploadParticularsOfClaim)
             .claimType(claimType)
+            .claimTypeUnSpec(claimTypeUnSpec)
             .claimTypeOther(claimTypeOther)
             .personalInjuryType(personalInjuryType)
             .personalInjuryTypeOther(personalInjuryTypeOther)
@@ -6828,7 +6855,9 @@ public class CaseDataBuilder {
             .applicant1ClaimExpertSpecRequired(applicant1ClaimExpertSpecRequired)
             .applicantMPClaimExpertSpecRequired(applicantMPClaimExpertSpecRequired)
             .isFlightDelayClaim(isFlightDelayClaim)
-            .reasonForReconsideration(reasonForReconsideration)
+            .reasonForReconsiderationApplicant(reasonForReconsiderationApplicant)
+            .reasonForReconsiderationRespondent1(reasonForReconsiderationRespondent1)
+            .reasonForReconsiderationRespondent2(reasonForReconsiderationRespondent2)
             .build();
     }
 }

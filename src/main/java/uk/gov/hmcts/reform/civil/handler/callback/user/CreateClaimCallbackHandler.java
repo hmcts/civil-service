@@ -19,7 +19,9 @@ import uk.gov.hmcts.reform.civil.config.ClaimUrlsConfiguration;
 import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.helpers.ClaimTypeHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -81,7 +83,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllDefendantSolicitorReferences;
 import static uk.gov.hmcts.reform.civil.utils.CaseListSolicitorReferenceUtils.getAllOrganisationPolicyReferences;
-import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNameInternal;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
@@ -496,7 +498,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
         //assign casemanagementcategory to the case and assign casenamehmctsinternal
         //casename
-        dataBuilder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
+        dataBuilder.caseNameHmctsInternal(buildCaseName(caseData));
 
         //case management category
         CaseManagementCategoryElement civil =
@@ -524,7 +526,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         //assign category ids to documents uploaded as part of particulars of claim
         assignParticularOfClaimCategoryIds(caseData);
 
-        dataBuilder.caseNamePublic(CaseNameUtils.buildCaseNamePublic(caseData));
+        dataBuilder.caseNamePublic(CaseNameUtils.buildCaseName(caseData));
 
         caseFlagInitialiser.initialiseCaseFlags(CREATE_CLAIM, dataBuilder);
 
@@ -562,7 +564,15 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         dataBuilder.legacyCaseReference(referenceNumberRepository.getReferenceNumber());
-        dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType(), caseData.getPersonalInjuryType()));
+
+        //Copy Unspec Claim Type into Spec claim Type if SDO R" feature toggle is on
+        if (toggleService.isSdoR2Enabled()) {
+            ClaimType claimType = ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(caseData.getClaimTypeUnSpec());
+            dataBuilder.claimType(claimType);
+            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType(), caseData.getPersonalInjuryType()));
+        } else {
+            dataBuilder.allocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType(), caseData.getPersonalInjuryType()));
+        }
         dataBuilder.submittedDate(time.now());
 
         //set check email field to null for GDPR

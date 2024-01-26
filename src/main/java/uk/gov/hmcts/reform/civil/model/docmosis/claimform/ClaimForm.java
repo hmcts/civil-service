@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.docmosis.draft;
+package uk.gov.hmcts.reform.civil.model.docmosis.claimform;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -14,13 +14,15 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.Timeline;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormParty;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
 @Getter
 @EqualsAndHashCode
-public class DraftClaimForm implements MappableObject {
+public class ClaimForm implements MappableObject {
 
+    private final String claimNumber;
     private final LipFormParty claimant;
     private final LipFormParty defendant;
     private final Address claimantCorrespondenceAddress;
@@ -46,9 +48,8 @@ public class DraftClaimForm implements MappableObject {
     private final String interestAmount;
     private final String claimFee;
     private final String totalAmountOfClaim;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate generationDate;
-
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy 'at' HH:mm a")
+    private final LocalDateTime generationDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd MMM yyyy")
+    private final LocalDate claimIssuedDate;
 }

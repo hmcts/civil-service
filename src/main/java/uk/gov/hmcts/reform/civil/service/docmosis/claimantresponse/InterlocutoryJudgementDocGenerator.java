@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.draft;
+package uk.gov.hmcts.reform.civil.service.docmosis.claimantresponse;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -9,38 +9,40 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.model.docmosis.draft.DraftClaimForm;
-import uk.gov.hmcts.reform.civil.model.docmosis.draft.DraftClaimFormMapper;
+import uk.gov.hmcts.reform.civil.model.docmosis.InterlocutoryJudgementDoc;
+import uk.gov.hmcts.reform.civil.model.docmosis.InterlocutoryJudgementDocMapper;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DRAFT_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.INTERLOCUTORY_JUDGEMENT_DOCUMENT;
 
 @Service
 @Getter
 @RequiredArgsConstructor
-public class DraftClaimFormGenerator implements TemplateDataGenerator<DraftClaimForm> {
+public class InterlocutoryJudgementDocGenerator implements TemplateDataGenerator<InterlocutoryJudgementDoc> {
 
-    private final DraftClaimFormMapper draftClaimFormMapper;
+    private final InterlocutoryJudgementDocMapper mapper;
     private final DocumentManagementService documentManagementService;
     private final DocumentGeneratorService documentGeneratorService;
 
-    public CaseDocument generate(CaseData caseData, String authorisation) {
+    public CaseDocument generateInterlocutoryJudgementDoc(CaseData caseData, String authorisation) {
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             getTemplateData(caseData),
-            DRAFT_CLAIM_FORM
+            INTERLOCUTORY_JUDGEMENT_DOCUMENT
         );
+
         return documentManagementService.uploadDocument(
             authorisation,
-            new PDF(String.format(DRAFT_CLAIM_FORM.getDocumentTitle(), caseData.getLegacyCaseReference()),
-                    docmosisDocument.getBytes(),
-                    DocumentType.DRAFT_CLAIM_FORM
+            new PDF(
+                String.format(INTERLOCUTORY_JUDGEMENT_DOCUMENT.getDocumentTitle(), caseData.getLegacyCaseReference()),
+                docmosisDocument.getBytes(),
+                DocumentType.INTERLOCUTORY_JUDGEMENT
             )
         );
     }
 
     @Override
-    public DraftClaimForm getTemplateData(CaseData caseData) {
-        return draftClaimFormMapper.toDraftClaimForm(caseData);
+    public InterlocutoryJudgementDoc getTemplateData(CaseData caseData) {
+        return mapper.toInterlocutoryJudgementDoc(caseData);
     }
 }
