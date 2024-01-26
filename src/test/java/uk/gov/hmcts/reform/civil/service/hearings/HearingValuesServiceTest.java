@@ -564,7 +564,7 @@ public class HearingValuesServiceTest {
         @SneakyThrows
         @Test
         void shouldThrowErrorIfLocationIsNotWhiteListed() {
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(null);
+            when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(false);
             assertThrows(NotEarlyAdopterCourtException.class, () -> {
                 hearingValuesService.getValues(caseId, "8AB87C89", "auth");
             });
