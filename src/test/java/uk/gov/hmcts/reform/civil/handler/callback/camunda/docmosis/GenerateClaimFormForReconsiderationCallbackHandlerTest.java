@@ -53,7 +53,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     CaseDetailsConverter.class,
     AssignCategoryId.class
 })
-public class GenerateClaimFormForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTest {
+class GenerateClaimFormForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
@@ -108,7 +108,7 @@ public class GenerateClaimFormForReconsiderationCallbackHandlerTest extends Base
         }
 
         @Test
-        public void shouldGenerateForm() {
+        void shouldGenerateForm() {
 
             when(requestReconsiderationGeneratorService.generate(any(CaseData.class), anyString())).thenReturn(document);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

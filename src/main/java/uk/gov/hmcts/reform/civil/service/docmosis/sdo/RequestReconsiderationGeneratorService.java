@@ -11,10 +11,8 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.DesicionOnReconsiderationDocumentForm;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -27,8 +25,6 @@ public class RequestReconsiderationGeneratorService {
     private final DocumentGeneratorService documentGeneratorService;
     private final DocumentManagementService documentManagementService;
     private final IdamClient idamClient;
-    private final DocumentHearingLocationHelper locationHelper;
-    private final FeatureToggleService featureToggleService;
 
     public CaseDocument generate(CaseData caseData, String authorisation) {
         MappableObject templateData;
@@ -45,7 +41,7 @@ public class RequestReconsiderationGeneratorService {
         }
 
         docmosisTemplate = DocmosisTemplates.RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF;
-        templateData = getTemplateData(caseData, judgeName, isJudge, authorisation);
+        templateData = getTemplateData(caseData, judgeName, isJudge);
 
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData,
@@ -66,8 +62,7 @@ public class RequestReconsiderationGeneratorService {
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
     }
 
-    private DesicionOnReconsiderationDocumentForm getTemplateData(CaseData caseData, String judgeName, boolean isJudge,
-                                                                  String authorisation) {
+    private DesicionOnReconsiderationDocumentForm getTemplateData(CaseData caseData, String judgeName, boolean isJudge) {
         DesicionOnReconsiderationDocumentForm.DesicionOnReconsiderationDocumentFormBuilder
             desicionOnReconsiderationDocumentFormBuilder = DesicionOnReconsiderationDocumentForm.builder()
             .writtenByJudge(isJudge)

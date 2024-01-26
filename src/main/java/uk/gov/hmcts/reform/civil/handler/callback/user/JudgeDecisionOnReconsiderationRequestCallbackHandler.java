@@ -61,38 +61,12 @@ public class JudgeDecisionOnReconsiderationRequestCallbackHandler extends Callba
         "the Legal Advisor's order dated %s and the court file \n 1.The application for reconsideration of the order " +
         "is dismissed.";
 
-    @Autowired
-    private final RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
-
     @Override
     protected Map<String, Callback> callbacks() {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::getUpholdingPreviousOrderReason)
             .put(callbackKey(ABOUT_TO_SUBMIT), this::saveRequestForReconsiderationReason)
             .put(callbackKey(SUBMITTED), this::buildConfirmation)
-            .build();
-    }
-
-    private CallbackResponse generateReconsiderationOrder(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-
-        List<String> errors = new ArrayList<>();
-
-        if (errors.isEmpty()) {
-            CaseDocument document = requestReconsiderationGeneratorService.generate(
-                caseData,
-                callbackParams.getParams().get(BEARER_TOKEN).toString()
-            );
-
-            if (document != null) {
-                updatedData.sdoOrderDocument(document);
-            }
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
-            .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 
