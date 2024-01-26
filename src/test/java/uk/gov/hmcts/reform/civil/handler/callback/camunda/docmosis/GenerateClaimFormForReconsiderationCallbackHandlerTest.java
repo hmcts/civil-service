@@ -118,7 +118,8 @@ class GenerateClaimFormForReconsiderationCallbackHandlerTest extends BaseCallbac
 
             verify(requestReconsiderationGeneratorService).generate(any(CaseData.class), eq("BEARER_TOKEN"));
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isEqualTo(1);
+            assertThat(updatedData.getSystemGeneratedCaseDocuments().size()).isOne();
+
         }
     }
 
