@@ -743,8 +743,8 @@ class SealedClaimLipResponseFormGeneratorTest {
         Assertions.assertEquals("Jake", templateData.getDefendant1MediationCompanyName());
         Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
-        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDateFromForMediation());
-        Assertions.assertEquals(LocalDate.now().plusDays(5), templateData.getDefendant1UnavailableDateToForMediation());
+        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDatesList().get(0).getValue().getFromDate());
+        Assertions.assertEquals(LocalDate.now().plusDays(5), templateData.getDefendant1UnavailableDatesList().get(0).getValue().getToDate());
     }
 
     @Test
@@ -784,8 +784,8 @@ class SealedClaimLipResponseFormGeneratorTest {
         Assertions.assertEquals("Jake", templateData.getDefendant1MediationCompanyName());
         Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
-        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDateFromForMediation());
-        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDateToForMediation());
+        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDatesList().get(0).getValue().getFromDate());
+        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDatesList().get(0).getValue().getDate());
     }
 
     @Test
@@ -864,6 +864,11 @@ class SealedClaimLipResponseFormGeneratorTest {
                                                 .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                                                 .date(LocalDate.now())
                                                 .fromDate(LocalDate.now()).build()));
+        def1UnavailabilityDates.add(element(UnavailableDate.builder()
+                                                .unavailableDateType(UnavailableDateType.DATE_RANGE)
+                                                .toDate(LocalDate.now().plusDays(5))
+                                                .date(LocalDate.now())
+                                                .fromDate(LocalDate.now()).build()));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -890,7 +895,6 @@ class SealedClaimLipResponseFormGeneratorTest {
         Assertions.assertEquals("Name B Surname B", templateData.getDefendant1MediationCompanyName());
         Assertions.assertEquals("test@gmail.com", templateData.getDefendant1MediationEmail());
         Assertions.assertEquals("23454656", templateData.getDefendant1MediationContactNumber());
-        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDateFromForMediation());
-        Assertions.assertEquals(LocalDate.now(), templateData.getDefendant1UnavailableDateToForMediation());
+        Assertions.assertEquals(2, templateData.getDefendant1UnavailableDatesList().size());
     }
 }
