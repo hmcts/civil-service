@@ -6864,6 +6864,7 @@ public class CaseDataBuilder {
             .isFlightDelayClaim(isFlightDelayClaim)
             .reasonForReconsiderationApplicant(reasonForReconsiderationApplicant)
             .reasonForReconsiderationRespondent1(reasonForReconsiderationRespondent1)
+            .reasonForReconsiderationRespondent2(reasonForReconsiderationRespondent2)
             .eaCourtLocation(eaCourtLocation)
             .build();
     }
