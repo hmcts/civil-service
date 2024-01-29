@@ -302,7 +302,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .disposalHearingHearingNotes("TEST")
                 .ccdState(CASE_PROGRESSION)
                 .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
-                .isSdoR2NewScreen("false")
+                .isSdoR2NewScreen(NO)
                 .build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
@@ -1866,7 +1866,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("isSdoR2NewScreen").isEqualTo("true");
+            assertThat(response.getData()).extracting("isSdoR2NewScreen").isEqualTo("Yes");
         }
 
         @Test

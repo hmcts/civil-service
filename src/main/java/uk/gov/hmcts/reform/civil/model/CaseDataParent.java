@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
@@ -323,16 +324,20 @@ public class CaseDataParent implements MappableObject {
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
-    private String isSdoR2NewScreen;
+    private YesOrNo isSdoR2NewScreen;
     private FastTrackJudgesRecital sdoFastTrackJudgesRecital;
     private SdoR2FastTrackAltDisputeResolution sdoAltDisputeResolution;
     private SdoR2VariationOfDirections sdoVariationOfDirections;
-    private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
-    private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
     private SdoR2Settlement sdoR2Settlement;
-    private SdoR2Trial sdoR2Trial;
+    private IncludeInOrderToggle sdoR2DisclosureOfDocumentsToggle;
+    private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
+    private IncludeInOrderToggle sdoR2SeparatorWitnessesOfFactToggle;
+    private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
+    private IncludeInOrderToggle sdoR2ScheduleOfLossToggle;
     private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
     private SdoR2AddNewDirection sdoR2AddNewDirection;
+    private IncludeInOrderToggle  sdoR2TrialToggle;
+    private SdoR2Trial sdoR2Trial;
     private String sdoR2ImportantNotesTxt;
     private LocalDate sdoR2ImportantNotesDate;
 

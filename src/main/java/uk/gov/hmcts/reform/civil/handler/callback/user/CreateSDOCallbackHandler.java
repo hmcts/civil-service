@@ -118,6 +118,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
@@ -691,7 +692,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.claimsTrack(null);
             updatedData.orderType(null);
 
-            if (caseData.getIsSdoR2NewScreen().equals(TRUE)) {
+            if (caseData.getIsSdoR2NewScreen().equals(YES)) {
                 updatedData.sdoR2AddNewDirection(null);
                 updatedData.sdoR2Trial(SdoR2Trial.builder().hearingNotesTxt("").build());
             } else {
@@ -730,6 +731,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder()
                                            .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
                                            .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
+                                                                     .isRestrictWitness(NO)
                                                                      .restrictNoOfWitnessDetails(
                                                                          SdoR2RestrictNoOfWitnessDetails
                                                                              .builder()
@@ -737,6 +739,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                                              .build())
                                                                      .build())
                                            .sdoRestrictPages(SdoR2RestrictPages.builder()
+                                                                 .isRestrictPages(NO)
                                                                  .restrictNoOfPagesDetails(
                                                                      SdoR2RestrictNoOfPagesDetails.builder()
                                                                          .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
@@ -747,6 +750,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                            .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
                                            .build());
         updatedData.sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder().sdoR2ScheduleOfLossClaimantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT)
+                                            .isClaimForPecuniaryLoss(NO)
                                             .sdoR2ScheduleOfLossClaimantDate(LocalDate.now().plusDays(364))
                                             .sdoR2ScheduleOfLossDefendantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_DEFENDANT)
                                             .sdoR2ScheduleOfLossDefendantDate(LocalDate.now().plusDays(378))
@@ -883,10 +887,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
             if (featureToggleService.isSdoR2Enabled()) {
-                String isSdoR2NewScreen = caseData.getFastClaims().contains(
-                    FastTrack.fastClaimNoiseInducedHearingLoss) ? TRUE : FALSE;
+                YesOrNo isSdoR2NewScreen = caseData.getFastClaims().contains(
+                    FastTrack.fastClaimNoiseInducedHearingLoss) ? YES : NO;
                 updatedData.isSdoR2NewScreen(isSdoR2NewScreen);
-                if (isSdoR2NewScreen.equals(TRUE)) {
+                if (isSdoR2NewScreen.equals(YES)) {
                     prePopulateNihlFields(callbackParams, caseData, updatedData);
                 }
             }
@@ -1082,10 +1086,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
         }
         if (featureToggleService.isSdoR2Enabled()) {
-            if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(FALSE)) {
+            if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(NO)) {
                 return caseData.getFastTrackMethodInPerson().getValue().getCode();
             }
-            if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(TRUE)) {
+            if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(YES)) {
                 return caseData.getSdoR2Trial().getHearingCourtLocationList().getValue() != null
                     ? caseData.getSdoR2Trial().getHearingCourtLocationList().getValue().getCode()
                     : caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue().getCode();
