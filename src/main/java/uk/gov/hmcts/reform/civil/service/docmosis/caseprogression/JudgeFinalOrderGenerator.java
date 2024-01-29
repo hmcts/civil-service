@@ -137,7 +137,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .courtName(caseManagementLocationDetails.getSiteName())
             .courtLocation(featureToggleService.isHmcEnabled()
                                ? getHearingLocationText(caseData, authorisation)
-                               : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails));
+                               : getCourtLocationAddress(caseManagementLocationDetails, caseData));
         return freeFormOrderBuilder.build();
     }
 
@@ -165,7 +165,7 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .orderMadeDate(orderMadeDateBuilder(caseData))
             .courtLocation(featureToggleService.isHmcEnabled()
                                ? getHearingLocationText(caseData, authorisation)
-                               : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails))
+                               : getCourtLocationAddress(caseManagementLocationDetails, caseData))
             .judgeNameTitle(userDetails.getFullName())
             .recordedToggle(nonNull(caseData.getFinalOrderRecitals()))
             .recordedText(nonNull(caseData.getFinalOrderRecitalsRecorded()) ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
@@ -210,6 +210,35 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .reasonsText(getReasonsText(caseData));
 
         return assistedFormOrderBuilder.build();
+    }
+
+    // Used to populate first paragraph text with court locations address
+    // If hearing location was selected during SDO we use that, otherwise use case management location
+    public String getCourtLocationAddress(LocationRefData venueNameCML, CaseData caseData) {
+        if (nonNull(caseData.getCaseManagementOrderSelection())) {
+            // Court locations from DJ SDO
+            if (nonNull(caseData.getDisposalHearingMethodInPersonDJ())) {
+                return caseData.getDisposalHearingMethodInPersonDJ().getValue().getLabel();
+            }
+            if (nonNull(caseData.getTrialHearingMethodInPersonDJ())) {
+                return caseData.getTrialHearingMethodInPersonDJ().getValue().getLabel();
+            } else {
+                return LocationRefDataService.getDisplayEntry(venueNameCML);
+            }
+        } else {
+            // Court locations from CREATE_SDO
+            if (nonNull(caseData.getSmallClaimsMethodInPerson())) {
+                return caseData.getSmallClaimsMethodInPerson().getValue().getLabel();
+            }
+            if (nonNull(caseData.getFastTrackMethodInPerson())) {
+                return caseData.getFastTrackMethodInPerson().getValue().getLabel();
+            }
+            if (nonNull(caseData.getDisposalHearingMethodInPerson())){
+                return caseData.getDisposalHearingMethodInPerson().getValue().getLabel();
+            }else {
+                return LocationRefDataService.getDisplayEntry(venueNameCML);
+            }
+        }
     }
 
     private String getOtherRepresentedText(CaseData caseData) {

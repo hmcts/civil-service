@@ -1483,4 +1483,61 @@ public class JudgeFinalOrderGeneratorTest {
         assertNull(responseWhenNone);
     }
 
+    @ParameterizedTest
+    @MethodSource("validCourtLocationAddresses")
+    void testGetCourtLocationAddress(CaseData caseData, String expectedResponse) {
+        String response = generator.getCourtLocationAddress(locationRefData, caseData);
+        assertEquals(expectedResponse, response);
+    }
+
+    static Stream<Arguments> validCourtLocationAddresses() {
+        return Stream.of(
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                    .caseManagementOrderSelection("exists")
+                    .disposalHearingMethodInPersonDJ(DynamicList.builder().value(DynamicListElement.builder().label("A real Hearing Court").build())
+                                                         .build()).build(), "A real Hearing Court"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                    .caseManagementOrderSelection("exists")
+                    .trialHearingMethodInPersonDJ(DynamicList.builder().value(DynamicListElement.builder().label("A real Hearing Court").build())
+                                                         .build()).build(), "A real Hearing Court"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                    .caseManagementOrderSelection("exists").build(), "SiteName - 1 - 1"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                    .caseManagementOrderSelection(null)
+                    .smallClaimsMethodInPerson(DynamicList.builder().value(DynamicListElement.builder().label("A real Hearing Court").build())
+                                                   .build()).build(), "A real Hearing Court"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                    .caseManagementOrderSelection(null)
+                    .fastTrackMethodInPerson(DynamicList.builder().value(DynamicListElement.builder().label("A real Hearing Court").build())
+                                                   .build()).build(), "A real Hearing Court"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                    .caseManagementOrderSelection(null)
+                    .disposalHearingMethodInPerson(DynamicList.builder().value(DynamicListElement.builder().label("A real Hearing Court").build())
+                                                 .build()).build(), "A real Hearing Court"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                    .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                    .caseManagementOrderSelection(null).build(), "SiteName - 1 - 1"
+            )
+        );
+    }
+
 }
