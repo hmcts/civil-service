@@ -21,11 +21,12 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.*;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.RECONSIDERATION_UPHELD_DECISION_OUTPUT_PDF;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
