@@ -42,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.IND;
 import static uk.gov.hmcts.reform.civil.enums.hearing.PartyType.ORG;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.hearing.UnavailabilityType.ALL_DAY;
+import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getOtherReasonableAdjustmentDetails;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getReasonableAdjustments;
 import static uk.gov.hmcts.reform.civil.helpers.hearingsmappings.CaseFlagsToHearingValueMapper.getVulnerabilityDetails;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
@@ -289,6 +290,7 @@ public class HearingsPartyMapper {
             .hearingChannelPhone(hearingChannelPhone)
             .relatedParties(emptyList())
             .custodyStatus(getCustodyStatus(flagDetails))
+            .otherReasonableAdjustmentDetails(getOtherReasonableAdjustmentDetails(flagDetails))
             .build();
 
         return PartyDetailsModel.builder()
