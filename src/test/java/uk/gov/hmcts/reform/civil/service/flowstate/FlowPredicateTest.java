@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
@@ -29,6 +28,7 @@ import java.util.function.Predicate;
 import static java.util.function.Predicate.not;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.COUNTER_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_ADMISSION;
@@ -100,6 +100,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.responde
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specSmallClaimCarm;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterNotSuitableForSdo;
@@ -1646,6 +1647,32 @@ class FlowPredicateTest {
                 .build();
             assertTrue(fullDefenceNotProceed.test(caseData));
         }
+
+        @Test
+        void shouldReturnTrue_whenApplicantProceedsSpecSmallClaimCarmEnabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .setClaimTypeToSpecClaim()
+                .applicant1ProceedWithClaim(YES)
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .build().toBuilder()
+                .submittedDate(LocalDateTime.of(2024, 6, 1, 1, 1))
+                .build();
+            assertTrue(specSmallClaimCarm.test(caseData));
+        }
+
+        @Test
+        void shouldReturnTrue_whenApplicantProceedsSpecSmallClaimCarmNotEnabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateApplicantRespondToDefenceAndProceed()
+                .setClaimTypeToSpecClaim()
+                .applicant1ProceedWithClaim(YES)
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .build().toBuilder()
+                .submittedDate(LocalDateTime.of(2022, 6, 1, 1, 1))
+                .build();
+            assertFalse(specSmallClaimCarm.test(caseData));
+        }
     }
 
     @Nested
@@ -2738,7 +2765,7 @@ class FlowPredicateTest {
         public void when1v1() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimTrack(SMALL_CLAIM.name())
                 .build();
 
             Map<YesOrNo[], Boolean> defClaim = Map.of(
@@ -2765,7 +2792,7 @@ class FlowPredicateTest {
         public void when1v2ss() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimTrack(SMALL_CLAIM.name())
                 .respondent2(Party.builder().build())
                 .respondent2SameLegalRepresentative(YES)
                 .build();
@@ -2794,7 +2821,7 @@ class FlowPredicateTest {
         public void when1v2ds() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimTrack(SMALL_CLAIM.name())
                 .respondent2(Party.builder().build())
                 .respondent2SameLegalRepresentative(NO)
                 .build();
@@ -2828,7 +2855,7 @@ class FlowPredicateTest {
         public void when2v1() {
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimTrack(SMALL_CLAIM.name())
                 .build();
 
             Map<YesOrNo[], Boolean> defClaim = Map.of(
@@ -2863,7 +2890,7 @@ class FlowPredicateTest {
             //Given
             CaseData caseData = CaseData.builder()
                 .caseAccessCategory(SPEC_CLAIM)
-                .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
+                .responseClaimTrack(SMALL_CLAIM.name())
                 .caseDataLiP(CaseDataLiP.builder()
                                  .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
                                                                               .hasAgreedFreeMediation(MediationDecision.Yes)
