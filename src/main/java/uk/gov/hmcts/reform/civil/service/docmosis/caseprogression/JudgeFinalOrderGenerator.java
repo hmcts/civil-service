@@ -222,8 +222,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             }
             if (nonNull(caseData.getTrialHearingMethodInPersonDJ())) {
                 return caseData.getTrialHearingMethodInPersonDJ().getValue().getLabel();
-            } else {
-                return LocationRefDataService.getDisplayEntry(venueNameCML);
             }
         } else {
             // Court locations from CREATE_SDO
@@ -233,12 +231,12 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             if (nonNull(caseData.getFastTrackMethodInPerson())) {
                 return caseData.getFastTrackMethodInPerson().getValue().getLabel();
             }
-            if (nonNull(caseData.getDisposalHearingMethodInPerson())){
+            if (nonNull(caseData.getDisposalHearingMethodInPerson())) {
                 return caseData.getDisposalHearingMethodInPerson().getValue().getLabel();
-            }else {
-                return LocationRefDataService.getDisplayEntry(venueNameCML);
             }
         }
+        // defaulted CML location, if no hearing location selected
+        return LocationRefDataService.getDisplayEntry(venueNameCML);
     }
 
     private String getOtherRepresentedText(CaseData caseData) {
