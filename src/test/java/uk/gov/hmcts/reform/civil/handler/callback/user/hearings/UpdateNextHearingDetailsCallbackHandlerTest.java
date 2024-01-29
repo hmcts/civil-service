@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.hearings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-<<<<<<< HEAD
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,13 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-=======
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
->>>>>>> feat/CIV-11838-nhd-hmc-scheduler-handler
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -25,7 +17,6 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.NextHearingDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-<<<<<<< HEAD
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
@@ -45,13 +36,6 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
-=======
-
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
->>>>>>> feat/CIV-11838-nhd-hmc-scheduler-handler
 
 @SpringBootTest(classes = {
     UpdateNextHearingDetailsCallbackHandler.class,
@@ -60,14 +44,11 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 })
 class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-<<<<<<< HEAD
     @MockBean
     HearingsService hearingService;
     @MockBean
     Time datetime;
 
-=======
->>>>>>> feat/CIV-11838-nhd-hmc-scheduler-handler
     @Autowired
     private UpdateNextHearingDetailsCallbackHandler handler;
 
@@ -76,7 +57,6 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Nested
     class AboutToSubmit {
-<<<<<<< HEAD
         private static final LocalDateTime TODAY = LocalDateTime.of(2024, 1, 22, 0, 0, 0);
 
         @BeforeEach
@@ -109,14 +89,6 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
-=======
-
-        @Nested
-        class UpdateNextHearingDetails {
-            @Test
-            void shouldSetNextHearingDetails() {
-                CaseData caseData = CaseDataBuilder.builder().build();
->>>>>>> feat/CIV-11838-nhd-hmc-scheduler-handler
                 CallbackParams params = callbackParamsOf(
                     caseData,
                     CaseEvent.UPDATE_NEXT_HEARING_DETAILS,
@@ -129,7 +101,6 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
                 NextHearingDetails expected = NextHearingDetails.builder()
-<<<<<<< HEAD
                     .hearingID(hearingId.toString())
                     .hearingDateTime(hearingStartTime).build();
 
@@ -293,17 +264,10 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 assertNull(updatedData.getNextHearingDetails());
             }
-=======
-                    .hearingID("HER12345")
-                    .hearingDateTime(LocalDateTime.of(2025, 1, 1, 0, 0, 0)).build();
-                assertEquals(expected, updatedData.getNextHearingDetails());
-            }
->>>>>>> feat/CIV-11838-nhd-hmc-scheduler-handler
         }
 
         @Nested
         class UpdateNextHearingInfo {
-<<<<<<< HEAD
             @ParameterizedTest(name = "and HMCStatus is {0}")
             @EnumSource(
                 value = HmcStatus.class,
@@ -326,11 +290,6 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
-=======
-            @Test
-            void shouldSetNextHearingDetails() {
-                CaseData caseData = CaseDataBuilder.builder().build();
->>>>>>> feat/CIV-11838-nhd-hmc-scheduler-handler
                 CallbackParams params = callbackParamsOf(
                     caseData,
                     CaseEvent.UpdateNextHearingInfo,
@@ -343,7 +302,6 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
                 NextHearingDetails expected = NextHearingDetails.builder()
-<<<<<<< HEAD
                     .hearingID(hearingId.toString())
                     .hearingDateTime(hearingStartTime).build();
 
@@ -521,12 +479,4 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
             .build();
     }
 
-=======
-                    .hearingID("HER12345")
-                    .hearingDateTime(LocalDateTime.of(2025, 1, 1, 0, 0, 0)).build();
-                assertEquals(expected, updatedData.getNextHearingDetails());
-            }
-        }
-    }
->>>>>>> feat/CIV-11838-nhd-hmc-scheduler-handler
 }
