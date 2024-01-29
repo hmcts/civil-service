@@ -606,7 +606,7 @@ public class HearingValuesServiceTest {
             when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
             when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
 
-            when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(false);
+            when(featureToggleService.isLocationWhiteListedForCaseProgression(anyString())).thenReturn(true);
             assertDoesNotThrow(() -> hearingValuesService.getValues(caseId, "8AB87C89", "auth"));
         }
     }
