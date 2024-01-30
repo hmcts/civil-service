@@ -887,7 +887,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
             if (featureToggleService.isSdoR2Enabled()) {
-                YesOrNo isSdoR2NewScreen = caseData.getFastClaims().contains(
+                YesOrNo isSdoR2NewScreen = caseData.getFastClaims() != null && caseData.getFastClaims().contains(
                     FastTrack.fastClaimNoiseInducedHearingLoss) ? YES : NO;
                 updatedData.isSdoR2NewScreen(isSdoR2NewScreen);
                 if (isSdoR2NewScreen.equals(YES)) {
