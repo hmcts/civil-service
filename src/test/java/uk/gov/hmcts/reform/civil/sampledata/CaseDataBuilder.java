@@ -4530,7 +4530,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atReconsiderationUpheld() {
         decisionOnRequestReconsiderationOptions =  DecisionOnRequestReconsiderationOptions.YES;
-        upholdingPreviousOrderReason = new UpholdingPreviousOrderReason("Reason to upheld ");
+        upholdingPreviousOrderReason = new UpholdingPreviousOrderReason("Reason to upheld");
         return this;
     }
 
