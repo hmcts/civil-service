@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.JudgementService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
 import uk.gov.hmcts.reform.civil.service.citizenui.ResponseOneVOneShowTagService;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
 
 @Slf4j
 @Service
@@ -52,6 +54,7 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
     private final Time time;
     private final UpdateCaseManagementDetailsService updateCaseManagementLocationDetailsService;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final CaseFlagsInitialiser caseFlagsInitialiser;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -95,6 +98,10 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
         updateCcjRequestPaymentDetails(builder, caseData);
+        if (featureToggleService.isHmcEnabled()) {
+            populateDQPartyIds(builder);
+        }
+        caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_CUI, builder);
 
         CaseData updatedData = builder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
