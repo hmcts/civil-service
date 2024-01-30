@@ -84,20 +84,12 @@ public class SdoHelper {
 
     public static SmallTrack getSmallClaimsAdditionalDirectionEnum(String additionalDirection) {
         switch (additionalDirection) {
-            case "smallClaimBuildingDispute":
-                return SmallTrack.smallClaimBuildingDispute;
             case "smallClaimCreditHire":
                 return SmallTrack.smallClaimCreditHire;
-            case "smallClaimHousingDisrepair":
-                return SmallTrack.smallClaimHousingDisrepair;
             case "smallClaimRoadTrafficAccident":
                 return SmallTrack.smallClaimRoadTrafficAccident;
             case "smallClaimDisputeResolutionHearing":
                 return SmallTrack.smallClaimDisputeResolutionHearing;
-            case "smallClaimPPI":
-                return SmallTrack.smallClaimPPI;
-            case "smallClaimFlightDelay":
-                return SmallTrack.smallClaimFlightDelay;
             default:
                 return null;
         }
