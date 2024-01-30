@@ -723,11 +723,14 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
             List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
             systemGeneratedCaseDocuments.add(element(document));
+
+            log.info("TEST 1    " + caseData.getDisposalHearingMethodInPersonDJ());
             caseDataBuilder.orderSDODocumentDJCollection(systemGeneratedCaseDocuments);
             caseDataBuilder.disposalHearingMethodInPersonDJ(deleteLocationList(
                 caseData.getDisposalHearingMethodInPersonDJ()));
             caseDataBuilder.trialHearingMethodInPersonDJ(deleteLocationList(
                 caseData.getTrialHearingMethodInPersonDJ()));
+            log.info("TEST 2    " + caseData.getDisposalHearingMethodInPersonDJ());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -796,8 +799,10 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private DynamicList deleteLocationList(DynamicList list) {
         if (isNull(list)) {
+            log.info("TEST if null    " + list);
             return null;
         }
+        log.info("TEST if not null    " + list);
         return DynamicList.builder().value(list.getValue()).build();
     }
 
