@@ -50,7 +50,6 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
                 } catch (Exception e) {
                     throw e;
                 }
-                
                 log.info("Retrigger cases Finished for event: {}", caseEvent);
             });
         } else {
