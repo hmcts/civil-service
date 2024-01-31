@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.citizenui.dashboard;
+package uk.gov.hmcts.reform.dashboard.model.dashboard;
 
 import lombok.EqualsAndHashCode;
 
@@ -8,14 +8,14 @@ import java.util.Date;
 
 @Entity
 @EqualsAndHashCode
-@Table(name = "task_List")
-public class TaskList {
+@Table(name = "notifications")
+public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String taskListTemplateId;
+    private String templateId;
     private String caseReference;
     private String role;
     private String enHTML;
@@ -26,10 +26,10 @@ public class TaskList {
     private String modifiedBy;
     private Date modifiedAt;
 
-    public TaskList() {}
+    public Notification() {}
 
-    public TaskList(String taskListTemplateId, String caseReference, String role, String enHTML, String cyHTML, String reference, String createdBy, Date createdAt, String modifiedBy, Date modifiedAt) {
-        this.taskListTemplateId = taskListTemplateId;
+    public Notification(String templateId,String caseReference,String role, String enHTML,String cyHTML, String reference, String createdBy, Date createdAt, String modifiedBy, Date modifiedAt) {
+        this.templateId = templateId;
         this.caseReference = caseReference;
         this.role = role;
         this.enHTML = enHTML;
@@ -41,12 +41,12 @@ public class TaskList {
         this.modifiedAt= modifiedAt;
 
     }
-    public String getTaskListTemplateId() {
-        return taskListTemplateId;
+    public String getTemplateId() {
+        return templateId;
     }
 
-    public void setTaskListTemplateId(String taskListTemplateId) {
-        this.taskListTemplateId = taskListTemplateId;
+    public void setTemplateId(String templateId) {
+        this.templateId = templateId;
     }
 
     public String getCaseReference() {
