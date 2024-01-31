@@ -166,6 +166,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final AssignCategoryId assignCategoryId;
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     public List<CaseEvent> handledEvents() {
@@ -1119,6 +1120,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondent1ClaimResponseTestForSpec(caseData.getRespondent1ClaimResponseTypeForSpec())
             .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
             .showConditionFlags(initialShowTags);
+        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+            updatedCaseData.showCarmFields(YES);
+        } else {
+            updatedCaseData.showCarmFields(NO);
+        }
 
         updatedCaseData.respondent1DetailsForClaimDetailsTab(caseData.getRespondent1().toBuilder().flags(null).build());
 
