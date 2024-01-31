@@ -927,9 +927,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
         boolean hasDoneSettlementAgreementInTime = (nonNull(hasDoneSettlementAgreement) && hasDoneSettlementAgreement == YesOrNo.YES)
                                                     ||  (isNull(hasDoneSettlementAgreement) && isDateAfterToday(respondentSettlementAgreementDeadline));
 
-        return (isNull(whenWillThisAmountBePaid) || isDateAfterToday(whenWillThisAmountBePaid))
-            && hasDoneSettlementAgreementInTime
-            && (isNull(firstRepaymentDate) || isDateAfterToday(firstRepaymentDate));
+        return (isNull(whenWillThisAmountBePaid) && isNull(firstRepaymentDate))
+            || (isDateAfterToday(whenWillThisAmountBePaid) && hasDoneSettlementAgreementInTime)
+            || (isDateAfterToday(firstRepaymentDate) && hasDoneSettlementAgreementInTime)
+            || (isDateAfterToday(whenWillThisAmountBePaid) && isFullAdmitPayImmediatelyClaimSpec());
+
     }
 
     @JsonIgnore
@@ -956,6 +958,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isFullAdmitClaimSpec() {
         return FULL_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec());
+    }
+
+    @JsonIgnore
+    public boolean isFullAdmitPayImmediatelyClaimSpec() {
+        return isFullAdmitClaimSpec() && isPayImmediately();
     }
 
     @JsonIgnore
