@@ -9,7 +9,7 @@ import java.util.Date;
 @Entity
 @EqualsAndHashCode
 @Table(name = "task_List")
-public class taskList {
+public class TaskList {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +26,9 @@ public class taskList {
     private String modifiedBy;
     private Date modifiedAt;
 
-    public taskList() {}
+    public TaskList() {}
 
-    public taskList(String taskListTemplateId, String caseReference, String role, String enHTML, String cyHTML, String reference, String createdBy, Date createdAt, String modifiedBy, Date modifiedAt) {
+    public TaskList(String taskListTemplateId, String caseReference, String role, String enHTML, String cyHTML, String reference, String createdBy, Date createdAt, String modifiedBy, Date modifiedAt) {
         this.taskListTemplateId = taskListTemplateId;
         this.caseReference = caseReference;
         this.role = role;
