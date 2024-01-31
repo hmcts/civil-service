@@ -60,9 +60,6 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
 
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
     @Autowired
     private ObjectMapper objectMapper;
     private static final String FILE_NAME_1 = "Some file 1";
