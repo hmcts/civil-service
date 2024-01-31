@@ -9,11 +9,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION;
@@ -30,13 +32,11 @@ public class ClaimSubmissionLipClaimantNotificationHandler extends CallbackHandl
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
+    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::notifyLipClaimantForClaimSubmission);
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT),
-            this::notifyLipClaimantForClaimSubmission
-        );
+        return callbackMap;
     }
 
     @Override
@@ -52,13 +52,19 @@ public class ClaimSubmissionLipClaimantNotificationHandler extends CallbackHandl
     private CallbackResponse notifyLipClaimantForClaimSubmission(
         CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        notificationService.sendMail(
-            caseData.getApplicant1().getPartyEmail(),
-            notificationsProperties.getNotifyClaimantLipForClaimSubmissionTemplate(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-        );
+        String applicant1Email = Optional.ofNullable(caseData)
+            .map(CaseData::getApplicant1)
+            .map(Party::getPartyEmail)
+            .orElse(null);
 
+        if(applicant1Email != null) {
+            notificationService.sendMail(
+                applicant1Email,
+                notificationsProperties.getNotifyClaimantLipForClaimSubmissionTemplate(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 

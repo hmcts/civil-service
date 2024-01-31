@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -29,6 +31,26 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 @ExtendWith(MockitoExtension.class)
 class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
+    private static final String CLAIMANT_EMAIL_ADDRESS = "individual.claimant@email.com";
+    private static final String REFERENCE = "claim-submission-lip-claimant-notification-000DC001";
+    private static final String TEMPLATE_ID = "template-id";
+    private static final CaseData caseData = CaseData.builder()
+        .applicant1(Party.builder()
+                        .individualTitle("Mr.")
+                        .individualFirstName("Claimant")
+                        .individualLastName("Guy")
+                        .type(Party.Type.INDIVIDUAL)
+                        .partyEmail(CLAIMANT_EMAIL_ADDRESS)
+                        .build())
+        .respondent1(Party.builder()
+                         .individualTitle("Mr.")
+                         .individualFirstName("Defendant")
+                         .individualLastName("Guy")
+                         .type(Party.Type.INDIVIDUAL)
+                         .build())
+        .legacyCaseReference(LEGACY_CASE_REFERENCE)
+        .build();
+
     @Mock
     private NotificationService notificationService;
     @Mock
@@ -37,49 +59,48 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
     private ClaimSubmissionLipClaimantNotificationHandler handler;
 
     @Test
-    void shouldNotifyLipRespondent_whenInvoked() {
+    void shouldNotifyLipClaimantWhenInvoked() {
         when(notificationsProperties.getNotifyClaimantLipForClaimSubmissionTemplate()).thenReturn(
-            "template-id");
-
-        CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .individualTitle("Mr.")
-                            .individualFirstName("Claimant")
-                            .individualLastName("Guy")
-                            .type(Party.Type.INDIVIDUAL)
-                            .partyEmail("individual.claimant@email.com")
-                            .build())
-            .respondent1(Party.builder()
-                             .individualTitle("Mr.")
-                             .individualFirstName("Defendant")
-                             .individualLastName("Guy")
-                             .type(Party.Type.INDIVIDUAL)
-                             .build())
-            .legacyCaseReference(LEGACY_CASE_REFERENCE)
-            .build();
-
+            TEMPLATE_ID);
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-            CallbackRequest.builder().eventId("NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION")
+            CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION.toString())
                 .build()).build();
 
         handler.handle(params);
 
         verify(notificationService).sendMail(
-            "individual.claimant@email.com",
-            "template-id",
-            getNotificationDataMap(caseData),
-            "claim-submission-lip-claimant-notification-000DC001"
+            CLAIMANT_EMAIL_ADDRESS,
+            TEMPLATE_ID,
+            getNotificationDataMap(),
+            REFERENCE
+        );
+    }
+
+    @Test
+    void shouldNotifyLipClaimantWhenEmailAddressIsNotPresent() {
+        caseData.getApplicant1().setPartyEmail(null);
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+            CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION.toString())
+                .build()).build();
+
+        handler.handle(params);
+
+        verify(notificationService, times(0)).sendMail(
+            CLAIMANT_EMAIL_ADDRESS,
+            TEMPLATE_ID,
+            getNotificationDataMap(),
+            REFERENCE
         );
     }
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-            "NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION").build()).build())).isEqualTo(TASK_ID);
+            CaseEvent.NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION.toString()).build()).build())).isEqualTo(TASK_ID);
     }
 
     @NotNull
-    private Map<String, String> getNotificationDataMap(CaseData caseData) {
+    private Map<String, String> getNotificationDataMap() {
         return Map.of(
             RESPONDENT_NAME, "Mr. Defendant Guy",
             CLAIMANT_NAME, "Mr. Claimant Guy"
