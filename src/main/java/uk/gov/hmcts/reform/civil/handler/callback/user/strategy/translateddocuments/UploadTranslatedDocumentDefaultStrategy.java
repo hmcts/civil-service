@@ -37,7 +37,6 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
         if (Objects.nonNull(caseDataLip)) {
             caseDataLip.setTranslatedDocuments(null);
         }
-
         CaseData caseData = callbackParams.getCaseData();
         CaseData updatedCaseData = caseData.toBuilder().systemGeneratedCaseDocuments(
                 updatedDocumentList)

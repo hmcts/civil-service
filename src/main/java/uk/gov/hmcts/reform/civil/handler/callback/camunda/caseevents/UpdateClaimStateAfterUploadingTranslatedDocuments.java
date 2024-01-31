@@ -46,9 +46,11 @@ public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackH
     }
 
     private String setClaimState(CaseData caseData) {
-        if (caseData.getCcdState() == CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT) {
+        if (CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT == caseData.getCcdState()) {
             return CaseState.AWAITING_APPLICANT_INTENTION.name();
-        } else if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
+        } else if (CaseState.CASE_ISSUED == caseData.getCcdState()) {
+            return CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
+        } else if (CaseState.AWAITING_APPLICANT_INTENTION == caseData.getCcdState()) {
             return updateClaimStateService.setUpCaseState(caseData);
         }
         return caseData.getCcdState().name();

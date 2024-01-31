@@ -91,6 +91,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRANSFER_ONLINE_CASE;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
@@ -412,10 +413,19 @@ class FlowStateAllowedEventServiceTest {
                         STANDARD_DIRECTION_ORDER_DJ,
                         migrateCase,
                         TAKE_CASE_OFFLINE,
-                        EVIDENCE_UPLOAD_JUDGE,
-                        HEARING_SCHEDULED,
+                        TRANSFER_ONLINE_CASE,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRANSFER_ONLINE_CASE
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        TRIAL_READINESS,
+                        HEARING_SCHEDULED,
+                        TRIAL_READY_CHECK,
+                        TRIAL_READY_NOTIFICATION,
+                        MOVE_TO_DECISION_OUTCOME,
+                        HEARING_FEE_UNPAID,
+                        HEARING_FEE_PAID,
+                        BUNDLE_CREATION_NOTIFICATION
                     }
                 ),
                 of(
@@ -754,7 +764,16 @@ class FlowStateAllowedEventServiceTest {
                         MEDIATION_SUCCESSFUL,
                         MEDIATION_UNSUCCESSFUL,
                         ADD_UNAVAILABLE_DATES,
+                        INITIATE_GENERAL_APPLICATION,
                         TRANSFER_ONLINE_CASE
+                    }
+                ),
+                of(
+                    CASE_STAYED,
+                    new CaseEvent[]{
+                        INITIATE_GENERAL_APPLICATION,
+                        ADD_UNAVAILABLE_DATES,
+                        CHANGE_SOLICITOR_EMAIL
                     }
                 ),
                 of(
