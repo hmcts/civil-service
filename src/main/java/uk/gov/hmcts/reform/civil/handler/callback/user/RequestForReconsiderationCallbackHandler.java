@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +47,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
     protected final ObjectMapper objectMapper;
     private static final String ERROR_MESSAGE_DEADLINE_EXPIRED
         = "You can no longer request a reconsideration because the deadline has expired";
+    private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND = "You can only request a reconsideration for claims of £1,000 or less.";
     private final UserService userService;
     private final CoreCaseUserService coreCaseUserService;
     private static final String CONFIRMATION_HEADER = "# Your request has been submitted";
@@ -64,15 +66,21 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateRequestEligibilityAndGetPartyDetails(CallbackParams callbackParams) {
         List<String> errors = new ArrayList<>();
-        Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments()
-            .stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                .equals(DocumentType.SDO_ORDER))
-            .sorted(Comparator.comparing(caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
-            Comparator.reverseOrder())).findFirst();
-        if (sdoDocLatest.isPresent()) {
-            LocalDateTime sdoDocLatestDate = sdoDocLatest.get().getValue().getCreatedDatetime();
-            if (LocalDateTime.now().isAfter(sdoDocLatestDate.plusDays(7))) {
-                errors.add(ERROR_MESSAGE_DEADLINE_EXPIRED);
+        if (callbackParams.getCaseData().getTotalClaimAmount().compareTo(BigDecimal.valueOf(1000)) > 0) {
+            errors.add(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND);
+        } else {
+            Optional<Element<CaseDocument>> sdoDocLatest = callbackParams.getCaseData().getSystemGeneratedCaseDocuments()
+                .stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
+                    .equals(DocumentType.SDO_ORDER))
+                .sorted(Comparator.comparing(
+                    caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
+                    Comparator.reverseOrder()
+                )).findFirst();
+            if (sdoDocLatest.isPresent()) {
+                LocalDateTime sdoDocLatestDate = sdoDocLatest.get().getValue().getCreatedDatetime();
+                if (LocalDateTime.now().isAfter(sdoDocLatestDate.plusDays(7))) {
+                    errors.add(ERROR_MESSAGE_DEADLINE_EXPIRED);
+                }
             }
         }
         if (errors.isEmpty()) {
