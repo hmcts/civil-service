@@ -60,14 +60,17 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
 
     @Test
     void shouldNotifyLipClaimantWhenInvoked() {
-        when(notificationsProperties.getNotifyClaimantLipForClaimSubmissionTemplate()).thenReturn(
-            TEMPLATE_ID);
+        // Given
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION.toString())
                 .build()).build();
+        when(notificationsProperties.getNotifyClaimantLipForClaimSubmissionTemplate()).thenReturn(
+            TEMPLATE_ID);
 
+        // When
         handler.handle(params);
 
+        // Then
         verify(notificationService).sendMail(
             CLAIMANT_EMAIL_ADDRESS,
             TEMPLATE_ID,
@@ -78,13 +81,16 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
 
     @Test
     void shouldNotifyLipClaimantWhenEmailAddressIsNotPresent() {
+
+        // Given
         caseData.getApplicant1().setPartyEmail(null);
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION.toString())
                 .build()).build();
-
+        // When
         handler.handle(params);
 
+        // Then
         verify(notificationService, times(0)).sendMail(
             CLAIMANT_EMAIL_ADDRESS,
             TEMPLATE_ID,
