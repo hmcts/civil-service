@@ -72,6 +72,24 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             );
         }
 
+        @Test
+        void shouldNotifyLipRespondent_whenTranslatedDocUploaded() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setClaimantBilingualLanguagePreference("BOTH");
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                RESPONDENT_EMAIL_ID,
+                RESPONDENT_EMAIL_TEMPLATE,
+                getNotificationDataMap(caseData),
+                REFERENCE_NUMBER
+            );
+        }
+
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
