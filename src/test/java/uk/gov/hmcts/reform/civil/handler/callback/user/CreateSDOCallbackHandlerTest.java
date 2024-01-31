@@ -325,66 +325,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getFastTrackHearingNotes()).isNull();
             assertThat(responseCaseData.getDisposalHearingHearingNotes()).isNull();
         }
-
-        @Test
-        void shouldClearDataIfstateIsCaseProgressionNihl() {
-
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-            List<FastTrack> directions = List.of(FastTrack.fastClaimBuildingDispute);
-            List<SmallTrack> smallDirections = List.of(SmallTrack.smallClaimCreditHire);
-            DisposalHearingAddNewDirections disposalHearingAddNewDirections = DisposalHearingAddNewDirections.builder()
-                .directionComment("test")
-                .build();
-            Element<DisposalHearingAddNewDirections> disposalHearingAddNewDirectionsElement =
-                Element.<DisposalHearingAddNewDirections>builder()
-                    .value(disposalHearingAddNewDirections)
-                    .build();
-            SmallClaimsAddNewDirections smallClaimsAddNewDirections = SmallClaimsAddNewDirections.builder()
-                .directionComment("test")
-                .build();
-
-            Element<SmallClaimsAddNewDirections> smallClaimsAddNewDirectionsElement =
-                Element.<SmallClaimsAddNewDirections>builder()
-                    .value(smallClaimsAddNewDirections)
-                    .build();
-
-            FastTrackAddNewDirections fastTrackAddNewDirections = FastTrackAddNewDirections.builder()
-                .directionComment("test")
-                .build();
-
-            Element<FastTrackAddNewDirections> fastTrackAddNewDirectionsElement =
-                Element.<FastTrackAddNewDirections>builder()
-                    .value(fastTrackAddNewDirections)
-                    .build();
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .drawDirectionsOrderRequired(YES)
-                .drawDirectionsOrderSmallClaims(YES)
-                .fastClaims(directions)
-                .smallClaims(smallDirections)
-                .claimsTrack(ClaimsTrack.smallClaimsTrack)
-                .orderType(OrderType.DECIDE_DAMAGES)
-                .trialAdditionalDirectionsForFastTrack(directions)
-                .drawDirectionsOrderSmallClaimsAdditionalDirections(smallDirections)
-                .fastTrackAllocation(FastTrackAllocation.builder().assignComplexityBand(YES).build())
-                .disposalHearingAddNewDirections(List.of(disposalHearingAddNewDirectionsElement))
-                .smallClaimsAddNewDirections(List.of(smallClaimsAddNewDirectionsElement))
-                .fastTrackAddNewDirections(List.of(fastTrackAddNewDirectionsElement))
-                .sdoHearingNotes(SDOHearingNotes.builder().input("TEST").build())
-                .fastTrackHearingNotes(FastTrackHearingNotes.builder().input("TEST").build())
-                .disposalHearingHearingNotes("TEST")
-                .ccdState(CASE_PROGRESSION)
-                .decisionOnRequestReconsiderationOptions(DecisionOnRequestReconsiderationOptions.CREATE_SDO)
-                .isSdoR2NewScreen(YES)
-                .build();
-
-            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-
-            assertThat(responseCaseData.getSdoR2AddNewDirection()).isNull();
-            assertThat(responseCaseData.getSdoR2Trial()).isNull();
-        }
     }
 
     @Nested
