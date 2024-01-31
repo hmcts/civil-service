@@ -1088,8 +1088,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (featureToggleService.isSdoR2Enabled()) {
             if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(NO)) {
                 return caseData.getFastTrackMethodInPerson().getValue().getCode();
-            }
-            if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(YES)) {
+            } else if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(YES)) {
                 return caseData.getSdoR2Trial().getHearingCourtLocationList().getValue() != null
                     ? caseData.getSdoR2Trial().getHearingCourtLocationList().getValue().getCode()
                     : caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue().getCode();
