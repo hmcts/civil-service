@@ -68,7 +68,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
 
     private CallbackResponse notifyClaimant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String email = addEmail(caseData);
+        String email = getEmail(caseData);
         if (Objects.nonNull(email)) {
             notificationService.sendMail(
                 email,
@@ -90,7 +90,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
         return notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded();
     }
 
-    private String addEmail(CaseData caseData) {
+    private String getEmail(CaseData caseData) {
         return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
             ? caseData.getApplicant1Email()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();

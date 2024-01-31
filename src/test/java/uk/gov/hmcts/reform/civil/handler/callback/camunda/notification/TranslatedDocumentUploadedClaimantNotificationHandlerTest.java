@@ -48,12 +48,12 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
     private OrganisationService organisationService;
     @MockBean
     private FeatureToggleService featureToggleService;
-    private final String emailTemplate1 = "template-id";
-    private final String emailTemplate2 = "template-id-Bilingual";
-    private final String emailTemplate3 = "template-id-English";
-    private final String claimantLREmail = "applicantsolicitor@example.com";
-    private final String claimantLiPEmail = "rambo@email.com";
-    private final String legacyCaseReference = "translated-document-uploaded-claimant-notification-000DC001";
+    private static final String emailTemplate1 = "template-id";
+    private static final String emailTemplate2 = "template-id-Bilingual";
+    private static final String emailTemplate3 = "template-id-English";
+    private static final String claimantLREmail = "applicantsolicitor@example.com";
+    private static final String claimantLiPEmail = "rambo@email.com";
+    private static final String legacyCaseReference = "translated-document-uploaded-claimant-notification-000DC001";
 
     @Nested
     class AboutToSubmitCallback {

@@ -345,7 +345,6 @@ notifications:
 
   notifyRespondentLipForClaimantRepresentedTemplate: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
   notifyClaimantLipForNoLongerAccessTemplate: "8bf1b6c6-2ee7-442d-8b72-550d2aca9bdf"
-
   notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual: "e880dc43-dc4e-440d-8c34-d0feec70e196"
   notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish: "f372a4df-4577-402a-a2cd-142fd8ff9028"
 
