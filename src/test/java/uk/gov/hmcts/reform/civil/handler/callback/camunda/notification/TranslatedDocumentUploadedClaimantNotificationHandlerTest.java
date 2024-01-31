@@ -26,10 +26,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 
@@ -49,8 +48,11 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
     private OrganisationService organisationService;
     @MockBean
     private FeatureToggleService featureToggleService;
-    private final String emailTemplate = "template-id";
-    private final String claimantEmail = "applicantsolicitor@example.com";
+    private final String emailTemplate1 = "template-id";
+    private final String emailTemplate2 = "template-id-Bilingual";
+    private final String emailTemplate3 = "template-id-English";
+    private final String claimantLREmail = "applicantsolicitor@example.com";
+    private final String claimantLiPEmail = "rambo@email.com";
     private final String legacyCaseReference = "translated-document-uploaded-claimant-notification-000DC001";
 
     @Nested
@@ -58,7 +60,9 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded()).thenReturn(emailTemplate);
+            when(notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded()).thenReturn(emailTemplate1);
+            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual()).thenReturn(emailTemplate2);
+            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish()).thenReturn(emailTemplate3);
         }
 
         @Test
@@ -74,19 +78,81 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
-                claimantEmail,
-                emailTemplate,
-                getNotificationDataMapSpec(caseData),
+                claimantLREmail,
+                emailTemplate1,
+                getNotificationDataMapSpecClaimantLR(caseData),
                 legacyCaseReference
             );
 
         }
 
+        @Test
+        void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenR2EnabledAndClaimIssuedInBilingual() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStatePendingClaimIssued()
+                    .build().toBuilder()
+                    .respondent1Represented(YesOrNo.NO)
+                    .specRespondent1Represented(YesOrNo.NO)
+                    .applicant1Represented(YesOrNo.NO)
+                    .claimantBilingualLanguagePreference("BOTH")
+                    .build();
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                    CallbackRequest.builder().eventId(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED.name())
+                            .build()).build();
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService).sendMail(
+                claimantLiPEmail,
+                emailTemplate2,
+                getNotificationDataMapSpecClaimantLIP(caseData),
+                legacyCaseReference
+            );
+        }
+
+        @Test
+        void  shouldNotifyLipClaimantForClaimIssueTranslatedDoc_whenR2EnabledAndClaimIssuedInEnglish() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .build();
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED.name())
+                    .build()).build();
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService).sendMail(
+                claimantLiPEmail,
+                emailTemplate3,
+                getNotificationDataMapSpecClaimantLIP(caseData),
+                legacyCaseReference
+            );
+        }
+
+
         @NotNull
-        public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
+        public Map<String, String> getNotificationDataMapSpecClaimantLR(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData)
+            );
+        }
+
+        @NotNull
+        public Map<String, String> getNotificationDataMapSpecClaimantLIP(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
             );
         }
 
@@ -96,26 +162,5 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
             return organisation.isPresent() ? organisation.get().getName() :
                 caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
         }
-    }
-
-    @Test
-    void  shouldNotNotifyLipClaimantForClaimIssueTranslatedDoc_whenR2Enabled() {
-        // Given
-        CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued()
-                .build().toBuilder()
-                .respondent1Represented(YesOrNo.NO)
-                .specRespondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED.name())
-                        .build()).build();
-        // When
-        handler.handle(params);
-
-        // Assertions
-        verify(notificationService, never()).sendMail(any(), any(), any(), any());
     }
 }
