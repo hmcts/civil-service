@@ -413,10 +413,19 @@ class FlowStateAllowedEventServiceTest {
                         STANDARD_DIRECTION_ORDER_DJ,
                         migrateCase,
                         TAKE_CASE_OFFLINE,
-                        EVIDENCE_UPLOAD_JUDGE,
-                        HEARING_SCHEDULED,
+                        TRANSFER_ONLINE_CASE,
                         GENERATE_DIRECTIONS_ORDER,
-                        TRANSFER_ONLINE_CASE
+                        EVIDENCE_UPLOAD_APPLICANT,
+                        EVIDENCE_UPLOAD_RESPONDENT,
+                        EVIDENCE_UPLOAD_JUDGE,
+                        TRIAL_READINESS,
+                        HEARING_SCHEDULED,
+                        TRIAL_READY_CHECK,
+                        TRIAL_READY_NOTIFICATION,
+                        MOVE_TO_DECISION_OUTCOME,
+                        HEARING_FEE_UNPAID,
+                        HEARING_FEE_PAID,
+                        BUNDLE_CREATION_NOTIFICATION
                     }
                 ),
                 of(
