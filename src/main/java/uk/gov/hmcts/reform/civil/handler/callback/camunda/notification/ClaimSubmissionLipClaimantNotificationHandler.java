@@ -9,13 +9,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION;
@@ -55,10 +53,7 @@ public class ClaimSubmissionLipClaimantNotificationHandler extends CallbackHandl
     private CallbackResponse notifyLipClaimantForClaimSubmission(
         CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String applicant1Email = Optional.ofNullable(caseData)
-            .map(CaseData::getApplicant1)
-            .map(Party::getPartyEmail)
-            .orElse(null);
+        String applicant1Email = caseData.getApplicant1Email();
 
         if (applicant1Email != null) {
             notificationService.sendMail(
@@ -73,13 +68,10 @@ public class ClaimSubmissionLipClaimantNotificationHandler extends CallbackHandl
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if(caseData != null) {
-            return Map.of(
-                RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
-            );
-        }
-        return Map.of();
+        return Map.of(
+            RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+        );
     }
 
 }

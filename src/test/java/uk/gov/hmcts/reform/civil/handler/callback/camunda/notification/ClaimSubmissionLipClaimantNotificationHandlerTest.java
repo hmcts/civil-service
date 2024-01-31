@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -34,7 +35,7 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
     private static final String CLAIMANT_EMAIL_ADDRESS = "individual.claimant@email.com";
     private static final String REFERENCE = "claim-submission-lip-claimant-notification-000DC001";
     private static final String TEMPLATE_ID = "template-id";
-    private static final CaseData caseData = CaseData.builder()
+    private CaseData caseData = CaseData.builder()
         .applicant1(Party.builder()
                         .individualTitle("Mr.")
                         .individualFirstName("Claimant")
@@ -84,6 +85,10 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
 
         // Given
         caseData.getApplicant1().setPartyEmail(null);
+        caseData = caseData.toBuilder()
+            .claimantUserDetails(IdamUserDetails.builder()
+                                     .build())
+            .build();
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION.toString())
                 .build()).build();
