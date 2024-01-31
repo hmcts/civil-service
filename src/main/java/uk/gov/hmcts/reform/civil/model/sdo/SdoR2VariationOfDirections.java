@@ -12,6 +12,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 @AllArgsConstructor
 public class SdoR2VariationOfDirections {
 
-    private IncludeInOrderToggle sdoVariationOfDirections;
+    private IncludeInOrderToggle includeInOrderToggle;
 
 }
