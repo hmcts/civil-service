@@ -501,7 +501,6 @@ public class FlowStateAllowedEventService {
                 CLAIMANT_RESPONSE_CUI,
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 TRANSFER_ONLINE_CASE
-
             )
         ),
 
