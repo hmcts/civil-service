@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
@@ -21,9 +22,11 @@ import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.BulkPrintService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.docmosis.pip.PiPLetterGenerator;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
@@ -44,6 +47,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT1_FOR_CLAIM_CONTINUING_ONLINE_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_16_DIGIT_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.FRONTEND_URL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.ISSUED_ON;
@@ -76,7 +80,10 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
     private BulkPrintService bulkPrintService;
     @MockBean
     private PiPLetterGenerator pipLetterGenerator;
-
+    @MockBean
+    private FeatureToggleService featureToggleService;
+    @MockBean
+    private SystemGeneratedDocumentService systemGeneratedDocumentService;
     @MockBean
     private Time time;
 
@@ -109,7 +116,8 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
             CallbackParams params = getCallbackParams(caseData);
 
             // When
-            handler.handle(params);
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
 
             // Then
             verify(notificationService).sendMail(
@@ -118,6 +126,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 getNotificationDataMap(caseData),
                 "claim-continuing-online-notification-000DC001"
             );
+            assertThat(response.getState()).isEqualTo("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
         }
 
         @Test
@@ -136,7 +145,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
         @Test
         void shouldGenerateAndPrintLetterSuccessfully() {
             // Given
-            given(pipLetterGenerator.downloadLetter(any())).willReturn(LETTER_CONTENT);
+            given(pipLetterGenerator.downloadLetter(any(), any())).willReturn(LETTER_CONTENT);
             CaseData caseData = getCaseData("testorg@email.com");
             CallbackParams params = getCallbackParams(caseData);
 
@@ -161,6 +170,7 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 ISSUED_ON, formatLocalDate(LocalDate.now(), DATE),
                 RESPOND_URL, "dummy_respond_to_claim_url",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_16_DIGIT_NUMBER, CASE_ID.toString(),
                 PIN, "TEST1234",
                 RESPONSE_DEADLINE, formatLocalDate(
                     caseData.getRespondent1ResponseDeadline()
@@ -168,6 +178,29 @@ public class ClaimContinuingOnlineRespondentPartyForSpecNotificationHandlerTest 
                 FRONTEND_URL, "dummy_cui_front_end_url"
             );
         }
+
+        @Test
+        void  shouldNotUpdateCaseSTate_whenBilingualSelectedAndR2EnabledForLipvsLip() {
+            // Given
+            CaseData caseData = getCaseData("testorg@email.com");
+            CaseData.CaseDataBuilder<?, ?> updatedCaseData = caseData.toBuilder();
+            updatedCaseData.claimantBilingualLanguagePreference("BOTH")
+                    .respondent1Represented(YesOrNo.NO)
+                    .specRespondent1Represented(YesOrNo.NO)
+                    .applicant1Represented(YesOrNo.NO)
+                    .ccdCaseReference(123L).build();
+            CaseData updatedData = updatedCaseData.build();
+            CallbackParams params = getCallbackParams(updatedData);
+            when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+            // Assertions
+            assertThat(response.getState()).isEqualTo(caseData.getCcdState().name());
+        }
+
     }
 
     @Test

@@ -1055,6 +1055,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
     private AllocatedTrack getAllocatedTrack(CaseData caseData) {
         return AllocatedTrack.getAllocatedTrack(
             caseData.getTotalClaimAmount(),
+            null,
             null
         );
     }
@@ -1471,6 +1472,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
         }
 
         if (caseData.getRespondent1DQ() != null
+            && YES.equals(caseData.getResponseClaimExpertSpecRequired())
             && caseData.getRespondent1DQ().getSmallClaimExperts() != null) {
             Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent1DQ().getSmallClaimExperts());
             updatedData.respondent1DQ(
@@ -1480,9 +1482,18 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                                               .details(wrapElements(expert))
                                               .build())
                     .build());
+        } else if (caseData.getRespondent1DQ() != null
+            && NO.equals(caseData.getResponseClaimExpertSpecRequired())) {
+            updatedData.respondent1DQ(
+                updatedData.build().getRespondent1DQ().toBuilder()
+                    .respondent1DQExperts(Experts.builder()
+                                              .expertRequired(caseData.getResponseClaimExpertSpecRequired())
+                                              .build())
+                    .build());
         }
 
         if (caseData.getRespondent2DQ() != null
+            && YES.equals(caseData.getResponseClaimExpertSpecRequired2())
             && caseData.getRespondent2DQ().getSmallClaimExperts() != null) {
             Expert expert = fromSmallClaimExpertDetails(caseData.getRespondent2DQ().getSmallClaimExperts());
             updatedData.respondent2DQ(
@@ -1490,6 +1501,14 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                     .respondent2DQExperts(Experts.builder()
                                               .expertRequired(caseData.getResponseClaimExpertSpecRequired2())
                                               .details(wrapElements(expert))
+                                              .build())
+                    .build());
+        } else if (caseData.getRespondent2DQ() != null
+            && NO.equals(caseData.getResponseClaimExpertSpecRequired2())) {
+            updatedData.respondent2DQ(
+                updatedData.build().getRespondent2DQ().toBuilder()
+                    .respondent2DQExperts(Experts.builder()
+                                              .expertRequired(caseData.getResponseClaimExpertSpecRequired())
                                               .build())
                     .build());
         }

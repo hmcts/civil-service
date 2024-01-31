@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.BundleFileNameList;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.EvidenceUploadFiles;
@@ -92,6 +93,7 @@ public class BundleRequestMapper {
                     bundleConfigFileName)
                     .trialDocuments(mapTrialDocuments(caseData))
                     .statementsOfCaseDocuments(mapStatementOfcaseDocs(caseData))
+                    .directionsQuestionnaires(mapDq(caseData))
                     .ordersDocuments(mapOrdersDocument(caseData))
                     .claimant1WitnessStatements(mapWitnessStatements(caseData, PartyType.CLAIMANT1))
                     .claimant2WitnessStatements(mapWitnessStatements(caseData, PartyType.CLAIMANT2))
@@ -537,6 +539,32 @@ public class BundleRequestMapper {
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
+    private List<Element<BundlingRequestDocument>> mapDq(CaseData caseData) {
+        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+        bundlingRequestDocuments.addAll(getDqByCategory(caseData,
+                DocCategory.APP1_DQ.getValue(), PartyType.CLAIMANT1));
+        bundlingRequestDocuments.addAll(getDqByCategory(caseData,
+                DocCategory.DEF1_DEFENSE_DQ.getValue(), PartyType.DEFENDANT1));
+        bundlingRequestDocuments.addAll(getDqByCategory(caseData,
+                DocCategory.DEF2_DEFENSE_DQ.getValue(), PartyType.DEFENDANT2));
+        return ElementUtils.wrapElements(bundlingRequestDocuments);
+    }
+
+    List<BundlingRequestDocument> getDqByCategory(CaseData caseData, String category, PartyType partyType) {
+        List<Element<CaseDocument>> docs = caseData.getSystemGeneratedCaseDocuments().stream()
+                .filter(caseDocumentElement -> (caseDocumentElement.getValue().getDocumentType()
+                        .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                        && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals(category)))
+                .sorted(Comparator.comparing(caseDocumentElement -> caseDocumentElement
+                        .getValue().getCreatedDatetime())).collect(Collectors.toList());
+        return docs.stream().map(caseDocumentElement -> {
+            String docName = generateDocName(BundleFileNameList.DIRECTIONS_QUESTIONNAIRE.getDisplayName(),
+                    partyType.getDisplayName(), null,
+                    caseDocumentElement.getValue().getCreatedDatetime().toLocalDate());
+            return buildBundlingRequestDoc(docName, caseDocumentElement.getValue().getDocumentLink(), DocumentType.DIRECTIONS_QUESTIONNAIRE.name());
+        }).collect(Collectors.toList());
+    }
+
     private List<Element<BundlingRequestDocument>> mapStatementOfcaseDocs(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
         bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
@@ -570,11 +598,6 @@ public class BundleRequestMapper {
                 partyType
             ));
         });
-        bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
-                                                                           .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                                                                               .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)).collect(
-                                                                               Collectors.toList()),
-                                                                       BundleFileNameList.DIRECTIONS_QUESTIONNAIRE.getDisplayName()));
         Arrays.stream(PartyType.values()).toList().forEach(partyType -> {
             bundlingRequestDocuments.addAll(covertEvidenceUploadTypeToBundleRequestDocs(
                 getDocumentaryEvidenceByType(getEvidenceUploadDocsByPartyAndDocType(partyType, EvidenceUploadFiles.DOCUMENTARY, caseData),
@@ -691,9 +714,8 @@ public class BundleRequestMapper {
                                                  isWitnessSelf ? party.getDisplayName() :
                                                      uploadEvidenceWitnessElement.getValue().getWitnessOptionName(),
                                                  null,
-                                                 documentType.equals(EvidenceUploadFiles.WITNESS_STATEMENT.name())
-                                                     ? uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate() : uploadEvidenceWitnessElement
-                                                     .getValue().getCreatedDatetime().toLocalDate());
+                                                 uploadEvidenceWitnessElement.getValue().getWitnessOptionUploadDate()
+                );
                 bundlingRequestDocuments.add(buildBundlingRequestDoc(docName, uploadEvidenceWitnessElement.getValue().getWitnessOptionDocument(), documentType));
             });
         }

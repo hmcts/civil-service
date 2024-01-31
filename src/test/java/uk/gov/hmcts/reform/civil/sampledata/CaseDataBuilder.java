@@ -12,11 +12,14 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
@@ -25,19 +28,20 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
-import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
+import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
 import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
+import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialHearingTimeEstimateDJ;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
-import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
-import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.Bundle;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -54,6 +58,7 @@ import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.IdValue;
@@ -61,23 +66,27 @@ import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.LengthOfUnemploymentComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Mediation;
+import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
+import uk.gov.hmcts.reform.civil.model.MediationSuccessful;
 import uk.gov.hmcts.reform.civil.model.PartnerAndDependentsLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.ResponseDocument;
-import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
+import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
+import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
@@ -123,12 +132,16 @@ import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.SameRateInterestSelection;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
+import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentFrequency;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
-import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsReferredInStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
+import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -137,6 +150,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
@@ -145,6 +159,9 @@ import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -184,6 +201,8 @@ import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.MORE_THAN_DAY;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 import static uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration.MINUTES_120;
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
+import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
+import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.REFERRED_DOCUMENTS;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -214,6 +233,7 @@ public class CaseDataBuilder {
     protected Party applicant2;
     protected YesOrNo applicant1Represented;
     protected YesOrNo applicant1LitigationFriendRequired;
+    protected YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
     protected YesOrNo applicant2LitigationFriendRequired;
     protected Party respondent1;
     protected Party respondent2;
@@ -226,6 +246,7 @@ public class CaseDataBuilder {
     protected ClaimValue claimValue;
     protected YesOrNo uploadParticularsOfClaim;
     protected ClaimType claimType;
+    protected ClaimTypeUnspec claimTypeUnSpec;
     protected String claimTypeOther;
     protected PersonalInjuryType personalInjuryType;
     protected String personalInjuryTypeOther;
@@ -277,6 +298,11 @@ public class CaseDataBuilder {
     protected ResponseDocument applicant1DefenceResponseDocument;
     protected ResponseDocument applicant2DefenceResponseDocument;
     protected BusinessProcess businessProcess;
+    protected PaymentType applicant1RepaymentOptionForDefendantSpec;
+    protected PaymentBySetDate applicant1RequestedPaymentDateForDefendantSpec;
+    protected BigDecimal applicant1SuggestInstalmentsPaymentAmountForDefendantSpec;
+    protected PaymentFrequencyClaimantResponseLRspec applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec;
+    protected LocalDate applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec;
 
     //Case proceeds in caseman
     protected ClaimProceedsInCaseman claimProceedsInCaseman;
@@ -420,8 +446,8 @@ public class CaseDataBuilder {
 
     private String unassignedCaseListDisplayOrganisationReferences;
     private String caseListDisplayDefendantSolicitorReferences;
-    private  CertificateOfService cosNotifyClaimDefendant1;
-    private  CertificateOfService cosNotifyClaimDefendant2;
+    private CertificateOfService cosNotifyClaimDefendant1;
+    private CertificateOfService cosNotifyClaimDefendant2;
     private CertificateOfService cosNotifyClaimDetails1;
     private CertificateOfService cosNotifyClaimDetails2;
 
@@ -505,8 +531,47 @@ public class CaseDataBuilder {
     private DynamicList transferCourtLocationList;
     private String reasonForTransfer;
 
+    private YesOrNo isFlightDelayClaim;
+    private FlightDelayDetails flightDelayDetails;
+    private ReasonForReconsideration reasonForReconsiderationApplicant;
+    private ReasonForReconsideration reasonForReconsiderationRespondent1;
+    private ReasonForReconsideration reasonForReconsiderationRespondent2;
+    private LocalDateTime respondent1RespondToSettlementAgreementDeadline;
+
+    private UploadMediationDocumentsForm uploadDocumentsForm;
+
+    private YesOrNo responseClaimExpertSpecRequired;
+    private YesOrNo responseClaimExpertSpecRequired2;
+    private YesOrNo applicantMPClaimExpertSpecRequired;
+    private YesOrNo applicant1ClaimExpertSpecRequired;
+
+    public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
+        this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
+        return this;
+    }
+
     public CaseDataBuilder sameRateInterestSelection(SameRateInterestSelection sameRateInterestSelection) {
         this.sameRateInterestSelection = sameRateInterestSelection;
+        return this;
+    }
+
+    public CaseDataBuilder responseClaimExpertSpecRequired(YesOrNo responseClaimExpertSpecRequired) {
+        this.responseClaimExpertSpecRequired = responseClaimExpertSpecRequired;
+        return this;
+    }
+
+    public CaseDataBuilder responseClaimExpertSpecRequired2(YesOrNo responseClaimExpertSpecRequired2) {
+        this.responseClaimExpertSpecRequired2 = responseClaimExpertSpecRequired2;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1ClaimExpertSpecRequired(YesOrNo applicant1ClaimExpertSpecRequired) {
+        this.applicant1ClaimExpertSpecRequired = applicant1ClaimExpertSpecRequired;
+        return this;
+    }
+
+    public CaseDataBuilder applicantMPClaimExpertSpecRequired(YesOrNo applicantMPClaimExpertSpecRequired) {
+        this.applicantMPClaimExpertSpecRequired = applicantMPClaimExpertSpecRequired;
         return this;
     }
 
@@ -1115,37 +1180,95 @@ public class CaseDataBuilder {
         return this;
     }
 
-    public CaseDataBuilder applicant1DQSmallCalimExperts() {
+    public CaseDataBuilder respondent1DQSmallClaimExperts(ExpertDetails experts, YesOrNo expertsRequired) {
+        var respondent1DQBuilder = this.respondent1DQ != null
+            ? this.respondent1DQ.toBuilder() : respondent1DQ().build().getRespondent1DQ().toBuilder();
+        ExpertDetails expertDetails = experts != null
+            ? experts
+            : (ExpertDetails.builder()
+                .expertName("Mr Expert Defendant")
+                .firstName("Expert")
+                .lastName("Defendant")
+                .phoneNumber("07123456789")
+                .emailAddress("test@email.com")
+                .fieldofExpertise("Roofing")
+                .estimatedCost(new BigDecimal(434))
+                .build());
+
+        respondent1DQBuilder.respondToClaimExperts(expertDetails).build();
+        respondent1DQ = respondent1DQBuilder.build();
+
+        this.responseClaimExpertSpecRequired(expertsRequired != null ? expertsRequired : YES);
+        return this;
+    }
+
+    public CaseDataBuilder respondent2DQSmallClaimExperts(ExpertDetails experts, YesOrNo expertsRequired) {
+        var respondent2DQBuilder = this.respondent2DQ != null
+            ? this.respondent2DQ.toBuilder() : respondent2DQ().build().getRespondent2DQ().toBuilder();
+        ExpertDetails expertDetails = experts != null
+            ? experts
+            : (ExpertDetails.builder()
+                .expertName("Mr Expert Defendant")
+                .firstName("Expert")
+                .lastName("Defendant")
+                .phoneNumber("07123456789")
+                .emailAddress("test@email.com")
+                .fieldofExpertise("Roofing")
+                .estimatedCost(new BigDecimal(434))
+                .build());
+
+        respondent2DQBuilder.respondToClaimExperts2(expertDetails).build();
+        respondent2DQ = respondent2DQBuilder.build();
+
+        this.responseClaimExpertSpecRequired2(expertsRequired != null ? expertsRequired : YES);
+        return this;
+    }
+
+    public CaseDataBuilder applicant1DQSmallClaimExperts(ExpertDetails experts, YesOrNo expertsRequired) {
         var applicant1DQBuilder = applicant1DQ != null
             ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
 
-        applicant1DQBuilder.applicant1RespondToClaimExperts(ExpertDetails.builder()
-                                                    .expertName("Mr Expert Defendant")
-                                                    .firstName("Expert")
-                                                    .lastName("Defendant")
-                                                    .phoneNumber("07123456789")
-                                                    .emailAddress("test@email.com")
-                                                    .fieldofExpertise("Roofing")
-                                                    .estimatedCost(new BigDecimal(434))
-                                                    .build()).build();
+        ExpertDetails expertDetails = experts != null
+            ? experts
+            : (ExpertDetails.builder()
+            .expertName("Mr Expert Defendant")
+            .firstName("Expert")
+            .lastName("Defendant")
+            .phoneNumber("07123456789")
+            .emailAddress("test@email.com")
+            .fieldofExpertise("Roofing")
+            .estimatedCost(new BigDecimal(434))
+            .build());
+
+        applicant1DQBuilder.applicant1RespondToClaimExperts(expertDetails).build();
+        this.applicant1ClaimExpertSpecRequired(expertsRequired != null ? expertsRequired : YES);
 
         applicant1DQ = applicant1DQBuilder.build();
         return this;
     }
 
     public CaseDataBuilder applicant2DQSmallClaimExperts() {
+        return applicant2DQSmallClaimExperts(null, null);
+    }
+
+    public CaseDataBuilder applicant2DQSmallClaimExperts(ExpertDetails experts, YesOrNo expertsRequired) {
         var applicant2DQBuilder = applicant2DQ != null
             ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
 
-        applicant2DQBuilder.applicant2RespondToClaimExperts(ExpertDetails.builder()
-                                                                .expertName("Mr Expert Defendant")
-                                                                .firstName("Expert")
-                                                                .lastName("Defendant")
-                                                                .phoneNumber("07123456789")
-                                                                .emailAddress("test@email.com")
-                                                                .fieldofExpertise("Roofing")
-                                                                .estimatedCost(new BigDecimal(434))
-                                                                .build()).build();
+        ExpertDetails expertDetails = experts != null
+            ? experts
+            : (ExpertDetails.builder()
+            .expertName("Mr Expert Defendant")
+            .firstName("Expert")
+            .lastName("Defendant")
+            .phoneNumber("07123456789")
+            .emailAddress("test@email.com")
+            .fieldofExpertise("Roofing")
+            .estimatedCost(new BigDecimal(434))
+            .build());
+
+        applicant2DQBuilder.applicant2RespondToClaimExperts(expertDetails).build();
+        this.applicantMPClaimExpertSpecRequired(expertsRequired != null ? expertsRequired : YES);
 
         applicant2DQ = applicant2DQBuilder.build();
         return this;
@@ -1490,6 +1613,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder addApplicant2() {
         this.addApplicant2 = YES;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1RepaymentOptionForDefendantSpec(PaymentType applicant1RepaymentOptionForDefendantSpec) {
+        this.applicant1RepaymentOptionForDefendantSpec = applicant1RepaymentOptionForDefendantSpec;
         return this;
     }
 
@@ -2125,6 +2253,7 @@ public class CaseDataBuilder {
             .statementOfValueInPennies(BigDecimal.valueOf(10000000))
             .build();
         claimType = ClaimType.PERSONAL_INJURY;
+        claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
         applicantSolicitor1PbaAccounts = DynamicList.builder()
             .value(DynamicListElement.builder().label("PBA0077597").build())
@@ -4123,6 +4252,7 @@ public class CaseDataBuilder {
         atStateHearingFeeDuePaid().setClaimTypeToSpecClaim();
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         if (!hasEmailAddress) {
+            applicant1 = applicant1.toBuilder().partyEmail(null).build();
             respondent1 = respondent1.toBuilder().partyEmail("").build();
             respondent2 = respondent2.toBuilder().partyEmail("").build();
         }
@@ -4766,6 +4896,42 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateMediationUnsuccessfulCarm(MultiPartyScenario mpScenario) {
+        atStateApplicantProceedAllMediation(mpScenario);
+        applicantsProceedIntention = YES;
+        caseDataLiP = CaseDataLiP.builder()
+            .applicant1ClaimMediationSpecRequiredLip(
+                ClaimantMediationLip.builder()
+                    .hasAgreedFreeMediation(MediationDecision.Yes)
+                    .build()).build();
+
+        mediation = Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(
+            List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE)).build();
+
+        return this;
+    }
+
+    public CaseDataBuilder atStateMediationSuccessful(MultiPartyScenario mpScenario) {
+        atStateApplicantProceedAllMediation(mpScenario);
+        applicantsProceedIntention = YES;
+        caseDataLiP = CaseDataLiP.builder()
+            .applicant1ClaimMediationSpecRequiredLip(
+                ClaimantMediationLip.builder()
+                    .hasAgreedFreeMediation(MediationDecision.Yes)
+                    .build()).build();
+
+        mediation = Mediation.builder()
+            .mediationSuccessful(MediationSuccessful.builder()
+                                     .mediationSettlementAgreedAt(now())
+                                     .mediationAgreement(MediationAgreementDocument.builder()
+                                                             .name("mediation")
+                                                             .build())
+                                     .build())
+            .build();
+
+        return this;
+    }
+
     public CaseDataBuilder businessProcess(BusinessProcess businessProcess) {
         this.businessProcess = businessProcess;
         return this;
@@ -4869,6 +5035,11 @@ public class CaseDataBuilder {
         this.respondent2Represented = YES;
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
+        this.solicitorReferences = SolicitorReferences.builder()
+            .applicantSolicitor1Reference("12345")
+            .respondentSolicitor1Reference("6789")
+            .respondentSolicitor2Reference("01234")
+            .build();
         return this;
     }
 
@@ -5190,6 +5361,31 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder flightDelay(FlightDelayDetails flightDelayDetails) {
+        this.flightDelayDetails = flightDelayDetails;
+        return this;
+    }
+
+    public CaseDataBuilder isFlightDelayClaim(YesOrNo isFlightDelayClaim) {
+        this.isFlightDelayClaim = isFlightDelayClaim;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForReconsiderationApplicant(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsiderationApplicant = reasonForReconsideration;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForReconsiderationRespondent1(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsiderationRespondent1 = reasonForReconsideration;
+        return this;
+    }
+
+    public CaseDataBuilder reasonForReconsiderationRespondent2(ReasonForReconsideration reasonForReconsideration) {
+        this.reasonForReconsiderationRespondent2 = reasonForReconsideration;
+        return this;
+    }
+
     public CaseData buildMakePaymentsCaseData() {
         Organisation orgId = Organisation.builder()
             .organisationID("OrgId").build();
@@ -5207,6 +5403,13 @@ public class CaseDataBuilder {
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .build();
+    }
+
+    public CaseData buildCuiCaseDataWithFee() {
+        return build().toBuilder()
+            .ccdCaseReference(1644495739087775L)
+            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100)).code("CODE").build())
             .build();
     }
 
@@ -5559,7 +5762,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder setCoSClaimDetailsWithDate(boolean setCos1, boolean setCos2,
-                                                      LocalDate cos1Date, LocalDate cos2Date,
+                                                      LocalDate cos1Date, LocalDate deemed1Date, LocalDate cos2Date, LocalDate deemed2Date,
                                                       boolean file1, boolean file2) {
         List<Element<Document>> files = wrapElements(Document.builder()
                 .documentUrl("fake-url")
@@ -5575,7 +5778,8 @@ public class CaseDataBuilder {
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
             CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos1Date);
+                .cosDateOfServiceForDefendant(cos1Date)
+                .cosDateDeemedServedForDefendant(deemed1Date);
             if (file1) {
                 cos1Builder.cosEvidenceDocument(files);
             }
@@ -5583,7 +5787,8 @@ public class CaseDataBuilder {
         }
         if (setCos2) {
             CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos2Date);
+                .cosDateOfServiceForDefendant(cos2Date)
+                .cosDateDeemedServedForDefendant(deemed2Date);
             if (file2) {
                 cos2Builder.cosEvidenceDocument(files2);
             }
@@ -6141,6 +6346,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStatePriorToRespondToSettlementAgreementDeadline() {
+        this.respondent1RespondToSettlementAgreementDeadline = LocalDateTime.now().plusDays(1);
+        return this;
+    }
+
+    public CaseDataBuilder atStatePastRespondToSettlementAgreementDeadline() {
+        this.respondent1RespondToSettlementAgreementDeadline = LocalDateTime.now().minusDays(1);
+        return this;
+    }
+
     public CaseDataBuilder addApplicantLRIndividual(String firstName, String lastName) {
         List<Element<PartyFlagStructure>> individual =
             wrapElements(PartyFlagStructure.builder()
@@ -6260,6 +6475,80 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate repaymentBySetDate) {
+        this.applicant1RequestedPaymentDateForDefendantSpec = repaymentBySetDate;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal suggestedInstallmentPayment) {
+        this.applicant1SuggestInstalmentsPaymentAmountForDefendantSpec = suggestedInstallmentPayment;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec repaymentFrequency) {
+        this.applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec = repaymentFrequency;
+        return this;
+    }
+
+    public CaseDataBuilder applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate firstRepaymentDate) {
+        this.applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec = firstRepaymentDate;
+        return this;
+    }
+
+    public CaseDataBuilder uploadMediationDocumentsChooseOptions(String partyChosen, List<MediationDocumentsType> documentTypes) {
+        List<Element<MediationNonAttendanceStatement>> mediationNonAttendanceStatement;
+        List<Element<MediationDocumentsReferredInStatement>> documentsReferred;
+        if (documentTypes.contains(NON_ATTENDANCE_STATEMENT)) {
+            mediationNonAttendanceStatement = buildMediationNonAttendanceStatement();
+        } else {
+            mediationNonAttendanceStatement = null;
+        }
+        if (documentTypes.contains(REFERRED_DOCUMENTS)) {
+            documentsReferred = buildMediationDocumentsReferred();
+        } else {
+            documentsReferred = null;
+        }
+        this.uploadDocumentsForm = UploadMediationDocumentsForm.builder()
+            .uploadMediationDocumentsPartyChosen(DynamicList.builder()
+                                                     .value(DynamicListElement.builder()
+                                                                .code(partyChosen)
+                                                                .build())
+                                                     .build())
+            .mediationDocumentsType(documentTypes)
+            .documentsReferredForm(documentsReferred)
+            .nonAttendanceStatementForm(mediationNonAttendanceStatement)
+            .build();
+        return this;
+    }
+
+    private List<Element<MediationNonAttendanceStatement>> buildMediationNonAttendanceStatement() {
+        return wrapElements(MediationNonAttendanceStatement.builder()
+                                .yourName("My name")
+                                .document(Document.builder()
+                                              .documentFileName("Mediation non attendance")
+                                              .build())
+                                .documentDate(LocalDate.of(2023, 4, 2))
+                                .documentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1))
+                                .build());
+    }
+
+    private List<Element<MediationDocumentsReferredInStatement>> buildMediationDocumentsReferred() {
+        return wrapElements(MediationDocumentsReferredInStatement.builder()
+                                .documentType("type")
+                                .document(Document.builder()
+                                              .documentFileName("Referred documents")
+                                              .build())
+                                .documentDate(LocalDate.of(2023, 4, 2))
+                                .documentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1))
+                                .build());
+    }
+
+    public CaseDataBuilder atStateRespondent1v1BilingualFlagSet() {
+        respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.FULL_ADMISSION;
+        ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
+        return this;
+    }
+
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
     }
@@ -6279,6 +6568,7 @@ public class CaseDataBuilder {
             .claimValue(claimValue)
             .uploadParticularsOfClaim(uploadParticularsOfClaim)
             .claimType(claimType)
+            .claimTypeUnSpec(claimTypeUnSpec)
             .claimTypeOther(claimTypeOther)
             .personalInjuryType(personalInjuryType)
             .personalInjuryTypeOther(personalInjuryTypeOther)
@@ -6333,7 +6623,11 @@ public class CaseDataBuilder {
             .applicant1DefenceResponseDocument(applicant1DefenceResponseDocument)
             .claimantDefenceResDocToDefendant2(applicant2DefenceResponseDocument)
             .defendantDetails(defendantDetails)
-
+            .applicant1RepaymentOptionForDefendantSpec(applicant1RepaymentOptionForDefendantSpec)
+            .applicant1RequestedPaymentDateForDefendantSpec(applicant1RequestedPaymentDateForDefendantSpec)
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(applicant1SuggestInstalmentsPaymentAmountForDefendantSpec)
+            .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec)
+            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec)
             //Case procceds in Caseman
             .claimProceedsInCaseman(claimProceedsInCaseman)
             .claimProceedsInCasemanLR(claimProceedsInCasemanLR)
@@ -6359,6 +6653,7 @@ public class CaseDataBuilder {
             .respondent1LitigationFriend(respondent1LitigationFriend)
             .applicant1LitigationFriend(applicant1LitigationFriend)
             .applicant1LitigationFriendRequired(applicant1LitigationFriendRequired)
+            .applicant1AcceptFullAdmitPaymentPlanSpec(applicant1AcceptFullAdmitPaymentPlanSpec)
             .applicant2LitigationFriend(applicant2LitigationFriend)
             .applicant2LitigationFriendRequired(applicant2LitigationFriendRequired)
             .respondent1LitigationFriendDate(respondent1LitigationFriendDate)
@@ -6545,6 +6840,7 @@ public class CaseDataBuilder {
             .drawDirectionsOrderRequired(drawDirectionsOrderRequired)
             .transferCourtLocationList(transferCourtLocationList)
             .reasonForTransfer(reasonForTransfer)
+            .respondent1RespondToSettlementAgreementDeadline(respondent1RespondToSettlementAgreementDeadline)
             .applicant1LRIndividuals(applicant1LRIndividuals)
             .respondent1LRIndividuals(respondent1LRIndividuals)
             .respondent2LRIndividuals(respondent2LRIndividuals)
@@ -6552,6 +6848,16 @@ public class CaseDataBuilder {
             .applicant2OrgIndividuals(applicant2OrgIndividuals)
             .respondent1OrgIndividuals(respondent1OrgIndividuals)
             .respondent2OrgIndividuals(respondent2OrgIndividuals)
+            .flightDelayDetails(flightDelayDetails)
+            .uploadMediationDocumentsForm(uploadDocumentsForm)
+            .responseClaimExpertSpecRequired(responseClaimExpertSpecRequired)
+            .responseClaimExpertSpecRequired2(responseClaimExpertSpecRequired2)
+            .applicant1ClaimExpertSpecRequired(applicant1ClaimExpertSpecRequired)
+            .applicantMPClaimExpertSpecRequired(applicantMPClaimExpertSpecRequired)
+            .isFlightDelayClaim(isFlightDelayClaim)
+            .reasonForReconsiderationApplicant(reasonForReconsiderationApplicant)
+            .reasonForReconsiderationRespondent1(reasonForReconsiderationRespondent1)
+            .reasonForReconsiderationRespondent2(reasonForReconsiderationRespondent2)
             .build();
     }
 }

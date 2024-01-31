@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -46,10 +49,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
@@ -99,6 +104,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
@@ -560,7 +567,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         SmallClaimsDocuments tempSmallClaimsDocuments = SmallClaimsDocuments.builder()
             .input1("Each party must upload to the Digital Portal copies of all documents which they wish the court to"
-                        + " consider when reaching its decision not less than 14 days before the hearing.")
+                        + " consider when reaching its decision not less than 21 days before the hearing.")
             .input2("The court may refuse to consider any document which has not been uploaded to the "
                         + "Digital Portal by the above date.")
             .build();
@@ -570,7 +577,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         SmallClaimsWitnessStatement tempSmallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
             .smallClaimsNumberOfWitnessesToggle(checkList)
             .input1("Each party must upload to the Digital Portal copies of all witness statements of the witnesses"
-                        + " upon whose evidence they intend to rely at the hearing not less than 14 days before"
+                        + " upon whose evidence they intend to rely at the hearing not less than 21 days before"
                         + " the hearing.")
             .input2("2")
             .input3("2")
@@ -654,10 +661,30 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         SmallClaimsRoadTrafficAccident tempSmallClaimsRoadTrafficAccident = SmallClaimsRoadTrafficAccident.builder()
             .input("Photographs and/or a place of the accident location shall be prepared and agreed by the parties"
-                       + " and uploaded to the Digital Portal no later than 14 days before the hearing.")
+                       + " and uploaded to the Digital Portal no later than 21 days before the hearing.")
             .build();
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
+
+        //This the flowafter request for reconsideration
+        if (featureToggleService.isSdoR2Enabled() && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
+            updatedData.drawDirectionsOrderRequired(null);
+            updatedData.drawDirectionsOrderSmallClaims(null);
+            updatedData.fastClaims(null);
+            updatedData.smallClaims(null);
+            updatedData.claimsTrack(null);
+            updatedData.orderType(null);
+            updatedData.trialAdditionalDirectionsForFastTrack(null);
+            updatedData.drawDirectionsOrderSmallClaimsAdditionalDirections(null);
+            updatedData.fastTrackAllocation(FastTrackAllocation.builder().assignComplexityBand(null).build());
+            updatedData.disposalHearingAddNewDirections(null);
+            updatedData.smallClaimsAddNewDirections(null);
+            updatedData.fastTrackAddNewDirections(null);
+            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
+            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
+            updatedData.disposalHearingHearingNotes(null);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
@@ -703,7 +730,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private DynamicList getLocationList(CallbackParams callbackParams,
                                         CaseData.CaseDataBuilder<?, ?> updatedData,
                                         RequestedCourt preferredCourt) {
-        List<LocationRefData> locations = locationRefDataService.getCourtLocationsForDefaultJudgments(
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
         Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
@@ -864,8 +891,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.hearingNotes(getHearingNotes(caseData));
 
         if (featureToggleService.isEarlyAdoptersEnabled()) {
-            if (featureToggleService.isLocationWhiteListedForCaseProgression(
-                getEpimmsId(caseData))) {
+            // LiP check ensures any LiP cases will always trigger takeCaseOffline task as CUI R1 does not account for LiPs
+            // ToDo: remove LiP check for CUI R2
+            if (!caseContainsLiP(caseData)
+                // If both SDO court AND case managment location is a EA approved court.
+                // check epimm from judge selected court in SDO journey
+                && featureToggleService.isLocationWhiteListedForCaseProgression(getEpimmsId(caseData))
+                // check epimm from case management location
+                && featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation().getBaseLocation())) {
                 log.info("Case {} is whitelisted for case progression.", caseData.getCcdCaseReference());
                 dataBuilder.eaCourtLocation(YES);
             } else {
@@ -881,11 +914,38 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
             caseData.getSmallClaimsMethodInPerson()));
 
-        System.out.println("before about to submit");
+        setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
+    }
+
+    // During SDO the claim track can change based on judges selection. In this case we want to update claims track
+    // to this decision, or maintain it, if it was not changed.
+    private void setClaimsTrackBasedOnJudgeSelection(CaseData.CaseDataBuilder<?, ?> dataBuilder, CaseData caseData) {
+        CaseCategory caseAccessCategory = caseData.getCaseAccessCategory();
+        switch (caseAccessCategory) {
+            case UNSPEC_CLAIM:// unspec use allocatedTrack to hold claims track value
+                if (SdoHelper.isSmallClaimsTrack(caseData)) {
+                    dataBuilder.allocatedTrack(SMALL_CLAIM);
+                } else if (SdoHelper.isFastTrack(caseData)) {
+                    dataBuilder.allocatedTrack(FAST_CLAIM);
+                }
+                break;
+            case SPEC_CLAIM:// spec claims use responseClaimTrack to hold claims track value
+                if (SdoHelper.isSmallClaimsTrack(caseData)) {
+                    dataBuilder.responseClaimTrack(SMALL_CLAIM.name());
+                } else if (SdoHelper.isFastTrack(caseData)) {
+                    dataBuilder.responseClaimTrack(FAST_CLAIM.name());
+                }
+                break;
+            default: break;
+        }
+    }
+
+    private boolean caseContainsLiP(CaseData caseData) {
+        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
     }
 
     private DynamicList deleteLocationList(DynamicList list) {

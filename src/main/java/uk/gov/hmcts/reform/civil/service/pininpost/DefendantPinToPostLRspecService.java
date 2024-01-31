@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.service.pininpost;
 
 import feign.FeignException;
+import feign.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
@@ -26,10 +28,11 @@ public class DefendantPinToPostLRspecService {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
-
+    private final CUIIdamClientService cuiIdamClientService;
     private static final int EXPIRY_PERIOD = 180;
 
     public void validatePin(CaseDetails caseDetails, String pin) {
+        log.info("Validate Pin called..");
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
         if (pinInPostData == null || pinInPostData.getAccessCode() == null
@@ -73,5 +76,19 @@ public class DefendantPinToPostLRspecService {
             .citizenCaseRole(pinInPostData.getCitizenCaseRole())
             .respondentCaseRole(pinInPostData.getRespondentCaseRole())
             .accessCode(pinInPostData.getAccessCode()).build();
+    }
+
+    public String validateOcmcPin(String pin, String caseReference) {
+        log.info("Validate ocmc Pin called..");
+        Response response = cuiIdamClientService.authenticatePinUser(pin, caseReference);
+        log.info("valid Pin : " + response.status());
+        if (response.status() == HttpStatus.FOUND.value()) {
+            log.info("It's a valid ocmc claim..");
+            return response.headers().get("Location").stream().findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Missing 'Location' header"));
+        } else {
+            log.error("Pin does not match or expired for {}", caseReference);
+            throw new PinNotMatchException();
+        }
     }
 }

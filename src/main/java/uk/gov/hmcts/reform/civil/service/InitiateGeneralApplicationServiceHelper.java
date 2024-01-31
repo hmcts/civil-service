@@ -40,7 +40,6 @@ public class InitiateGeneralApplicationServiceHelper {
     private final AuthTokenGenerator authTokenGenerator;
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
-    public CaseAssignedUserRolesResource userRoles;
 
     public boolean isGAApplicantSameAsPCClaimant(CaseData caseData, String organisationIdentifier) {
 
@@ -63,7 +62,7 @@ public class InitiateGeneralApplicationServiceHelper {
         String applicant1OrgCaseRole = caseData.getApplicant1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
         String respondent1OrgCaseRole = caseData.getRespondent1OrganisationPolicy().getOrgPolicyCaseAssignedRole();
 
-        userRoles = getUserRoles(parentCaseId);
+        CaseAssignedUserRolesResource userRoles = getUserRoles(parentCaseId);
 
         /*Filter the case users to collect solicitors whose ID doesn't match with GA Applicant Solicitor's ID*/
         List<CaseAssignedUserRole> respondentSolicitors = userRoles.getCaseAssignedUserRoles().stream()
@@ -84,8 +83,10 @@ public class InitiateGeneralApplicationServiceHelper {
 
         List<CaseAssignedUserRole> applicantSolicitor = userRoles.getCaseAssignedUserRoles()
             .stream().filter(user -> !respondentSolicitors.contains(user)).collect(Collectors.toList());
-
-        if (!CollectionUtils.isEmpty(applicantSolicitor) && applicantSolicitor.size() == 1) {
+        boolean sameDefSol1v2 = applicantSolicitor.size() == 2
+                && applicantSolicitor.get(0).getUserId()
+                .equals(applicantSolicitor.get(1).getUserId());
+        if (!CollectionUtils.isEmpty(applicantSolicitor) && (applicantSolicitor.size() == 1 || sameDefSol1v2)) {
 
             CaseAssignedUserRole applnSol = applicantSolicitor.get(0);
 
@@ -260,10 +261,8 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     public CaseAssignedUserRolesResource getUserRoles(String parentCaseId) {
-        if (Objects.isNull(userRoles)) {
-            userRoles = caseAccessDataStoreApi.getUserRoles(
+        CaseAssignedUserRolesResource userRoles = caseAccessDataStoreApi.getUserRoles(
                 getCaaAccessToken(), authTokenGenerator.generate(), List.of(parentCaseId));
-        }
         log.info("UserRoles from API :" + userRoles);
         return userRoles;
     }

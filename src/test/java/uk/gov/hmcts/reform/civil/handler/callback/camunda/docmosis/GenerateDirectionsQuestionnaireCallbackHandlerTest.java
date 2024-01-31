@@ -411,6 +411,26 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     }
 
     @Test
+    void shouldAssignClaimantCategoryId_whenInvokedAnd1v2DiffSolicitorUnspecified() {
+        // Given
+        when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
+        CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
+                .systemGeneratedCaseDocuments(wrapElements(DOCUMENT))
+                .respondent2DocumentGeneration("userRespondent2")
+                .build();
+        when(directionsQuestionnaireGenerator.generate(any(CaseData.class), anyString())).thenReturn(getDoc("claimant"));
+        // When
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+        // Then
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(1).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "directionsQuestionnaire");
+        assertThat(updatedData.getSystemGeneratedCaseDocuments().get(2).getValue().getDocumentLink().getCategoryID()).isEqualTo(
+                "DQApplicant");
+    }
+
+    @Test
     void shouldAssignClaimantCategoryId_whenFlagNotUserRespondent2Unspecified() {
         // Given
         when(featureToggleService.isCaseFileViewEnabled()).thenReturn(true);
@@ -508,6 +528,21 @@ class GenerateDirectionsQuestionnaireCallbackHandlerTest extends BaseCallbackHan
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).containsOnly(GENERATE_DIRECTIONS_QUESTIONNAIRE);
+    }
+
+    private CaseDocument getDoc(String prefix) {
+        return  CaseDocument.builder()
+                .createdBy("John")
+                .documentName(prefix + "document name")
+                .documentSize(0L)
+                .documentType(DIRECTIONS_QUESTIONNAIRE)
+                .createdDatetime(LocalDateTime.now())
+                .documentLink(Document.builder()
+                        .documentUrl("fake-url")
+                        .documentFileName("file-name")
+                        .documentBinaryUrl("binary-url")
+                        .build())
+                .build();
     }
 
 }

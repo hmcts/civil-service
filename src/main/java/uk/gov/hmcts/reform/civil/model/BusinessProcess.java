@@ -12,7 +12,7 @@ import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class BusinessProcess {
 
     private String processInstanceId;

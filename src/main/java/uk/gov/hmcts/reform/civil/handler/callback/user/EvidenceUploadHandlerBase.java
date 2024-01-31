@@ -54,7 +54,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.getAllocatedTrack;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 
@@ -117,21 +118,17 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
     protected static final String RESPONDENT_ONE_DISCLOSURE_LIST = "RespondentOneDisclosureList";
     protected static final String RESPONDENT_ONE_PRE_TRIAL_SUMMARY = "RespondentOnePreTrialSummary";
     protected static final String RESPONDENT_ONE_TRIAL_SKELETON = "RespondentOneTrialSkeleton";
-    protected static final String RESPONDENT_ONE_PRECEDENT_H = "RespondentOneUploadedPrecedentH";
     protected static final String RESPONDENT_TWO_DISCLOSURE_LIST = "RespondentTwoDisclosureList";
     protected static final String RESPONDENT_TWO_PRE_TRIAL_SUMMARY = "RespondentTwoPreTrialSummary";
     protected static final String RESPONDENT_TWO_TRIAL_SKELETON = "RespondentTwoTrialSkeleton";
-    protected static final String RESPONDENT_TWO_PRECEDENT_H = "RespondentTwoUploadedPrecedentH";
     protected static final String RESPONDENT_ONE_SCHEDULE_OF_COSTS = "RespondentSchedulesOfCost";
     protected static final String RESPONDENT_TWO_SCHEDULE_OF_COSTS = "RespondentTwoSchedulesOfCost";
     protected static final String APPLICANT_DISCLOSURE_LIST = "ApplicantDisclosureList";
     protected static final String APPLICANT_PRE_TRIAL_SUMMARY = "ApplicantPreTrialSummary";
     protected static final String APPLICANT_TRIAL_SKELETON = "ApplicantTrialSkeleton";
-    protected static final String APPLICANT_PRECEDENT_H = "ApplicantUploadedPrecedentH";
     protected static final String APPLICANT_TWO_DISCLOSURE_LIST = "ApplicantTwoDisclosureList";
     protected static final String APPLICANT_TWO_PRE_TRIAL_SUMMARY = "ApplicantTwoPreTrialSummary";
     protected static final String APPLICANT_TWO_TRIAL_SKELETON = "ApplicantTwoTrialSkeleton";
-    protected static final String APPLICANT_TWO_PRECEDENT_H = "ApplicantTwoUploadedPrecedentH";
     protected static final String APPLICANT_SCHEDULE_OF_COSTS = "ApplicantSchedulesOfCost";
     protected static final String APPLICANT_TWO_SCHEDULE_OF_COSTS = "ApplicantTwoSchedulesOfCost";
     // Notification Strings used for email
@@ -218,11 +215,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
             }
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        //determine claim path, and assign to CCD object for show hide functionality
-        if (caseData.getClaimType() == null) {
-            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getTotalClaimAmount(), null).name());
-        } else {
-            caseDataBuilder.caseProgAllocatedTrack(getAllocatedTrack(caseData.getClaimValue().toPounds(), caseData.getClaimType()).name());
+        //Evidence upload will have different screen for Fast claims and Small claims.
+        // We use show hide in CCD to do this, using utility field caseProgAllocatedTrack to hold the value of the claim track
+        // for either spec claims (ResponseClaimTrack) or unspec claims (AllocatedTrack)
+        if (caseData.getCaseAccessCategory().equals(UNSPEC_CLAIM)) {
+            caseDataBuilder.caseProgAllocatedTrack(caseData.getAllocatedTrack().name());
+        } else if (caseData.getCaseAccessCategory().equals(SPEC_CLAIM)) {
+            caseDataBuilder.caseProgAllocatedTrack(caseData.getResponseClaimTrack());
         }
         caseDataBuilder.evidenceUploadOptions(DynamicList.fromList(dynamicListOptions));
         // was unable to null value properly in EvidenceUploadNotificationEventHandler after emails are sent,
@@ -352,6 +351,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
 
     CallbackResponse validateValuesParty(List<Element<UploadEvidenceDocumentType>> uploadEvidenceDocumentType,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness1,
+                                         List<Element<UploadEvidenceWitness>> uploadEvidenceWitness2,
                                          List<Element<UploadEvidenceWitness>> uploadEvidenceWitness3,
                                          List<Element<UploadEvidenceDocumentType>> witnessDocumentReferred,
                                          List<Element<UploadEvidenceExpert>> uploadEvidenceExpert1,
@@ -370,37 +370,43 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                  .getWitnessOptionUploadDate(),
                              "Invalid date: \"witness statement\" "
                                  + "date entered must not be in the future (2).");
+
+        checkDateCorrectness(time, errors, uploadEvidenceWitness2, date -> date.getValue()
+                                 .getWitnessOptionUploadDate(),
+                             "Invalid date: \"witness summary\" "
+                                 + "date entered must not be in the future (3).");
+
         checkDateCorrectness(time, errors, uploadEvidenceWitness3, date -> date.getValue()
                                  .getWitnessOptionUploadDate(),
                              "Invalid date: \"Notice of the intention to rely on hearsay evidence\" "
-                                 + "date entered must not be in the future (3).");
+                                 + "date entered must not be in the future (4).");
 
         checkDateCorrectness(time, errors, witnessDocumentReferred, date -> date.getValue()
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Documents referred to in the statement\" "
-                                 + "date entered must not be in the future (4).");
+                                 + "date entered must not be in the future (5).");
 
         checkDateCorrectness(time, errors, uploadEvidenceExpert1, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Expert's report\""
-                                 + " date entered must not be in the future (5).");
+                                 + " date entered must not be in the future (6).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert2, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Joint statement of experts\" "
-                                 + "date entered must not be in the future (6).");
+                                 + "date entered must not be in the future (7).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert3, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Questions for other party's expert or joint experts\" "
-                                 + "expert statement date entered must not be in the future (7).");
+                                 + "expert statement date entered must not be in the future (8).");
         checkDateCorrectness(time, errors, uploadEvidenceExpert4, date -> date.getValue()
                                  .getExpertOptionUploadDate(),
                              "Invalid date: \"Answers to questions asked by the other party\" "
-                                 + "date entered must not be in the future (8).");
+                                 + "date entered must not be in the future (9).");
 
         checkDateCorrectness(time, errors, trialDocumentEvidence, date -> date.getValue()
                                  .getDocumentIssuedDate(),
                              "Invalid date: \"Documentary evidence for trial\" "
-                                 + "date entered must not be in the future (9).");
+                                 + "date entered must not be in the future (10).");
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
@@ -503,7 +509,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                     RESPONDENT_ONE_WITNESS_SUMMARY,
                     RESPONDENT_TWO_WITNESS_SUMMARY:
                 prefix = "Witness Summary of";
-                renameUploadEvidenceWitness(documentUpload, prefix, false);
+                renameUploadEvidenceWitness(documentUpload, prefix, true);
                 break;
             case APPLICANT_WITNESS_HEARSAY,
                     APPLICANT_TWO_WITNESS_HEARSAY,
@@ -647,7 +653,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       PRE_TRIAL_SUMMARY_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgumentRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_TRIAL_SKELETON,
                                       TRIAL_SKELETON_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
-            setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_PRECEDENT_H,
+            setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_TRIAL_SKELETON,
                                       TRIAL_AUTHORITIES_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes(), document -> document.getValue().getDocumentUpload(), RESPONDENT_ONE_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
@@ -683,7 +689,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       PRE_TRIAL_SUMMARY_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgumentRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_TRIAL_SKELETON,
                                       TRIAL_SKELETON_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
-            setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_PRECEDENT_H,
+            setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_TRIAL_SKELETON,
                                       TRIAL_AUTHORITIES_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentCostsRes2(), document -> document.getValue().getDocumentUpload(), RESPONDENT_TWO_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), defendantString);
@@ -720,7 +726,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       PRE_TRIAL_SUMMARY_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgument(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_SKELETON,
                                       TRIAL_SKELETON_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
-            setCategoryIdAndRenameDoc(caseData.getDocumentAuthorities(), document -> document.getValue().getDocumentUpload(), APPLICANT_PRECEDENT_H,
+            setCategoryIdAndRenameDoc(caseData.getDocumentAuthorities(), document -> document.getValue().getDocumentUpload(), APPLICANT_TRIAL_SKELETON,
                                       TRIAL_AUTHORITIES_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentCosts(), document -> document.getValue().getDocumentUpload(), APPLICANT_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
@@ -757,7 +763,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
                                       PRE_TRIAL_SUMMARY_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentSkeletonArgumentApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_SKELETON,
                                       TRIAL_SKELETON_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
-            setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_PRECEDENT_H,
+            setCategoryIdAndRenameDoc(caseData.getDocumentAuthoritiesApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_TRIAL_SKELETON,
                                       TRIAL_AUTHORITIES_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
             setCategoryIdAndRenameDoc(caseData.getDocumentCostsApp2(), document -> document.getValue().getDocumentUpload(), APPLICANT_TWO_SCHEDULE_OF_COSTS,
                                       TRIAL_COSTS_TEXT, documentDateTime -> documentDateTime.getValue().getCreatedDatetime(), claimantString);
@@ -880,7 +886,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentAuthoritiesRes(),
                 caseData.getDocumentAuthoritiesRes(),
                 caseData.getDocumentAuthoritiesRes2());
-        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, RESPONDENT_TWO_PRECEDENT_H);
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, RESPONDENT_TWO_TRIAL_SKELETON);
         builder.documentAuthoritiesRes2(evidenceDocToAdd);
 
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentCostsRes(),
@@ -992,7 +998,7 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentAuthorities(),
                 caseData.getDocumentAuthorities(),
                 caseData.getDocumentAuthoritiesApp2());
-        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, APPLICANT_TWO_PRECEDENT_H);
+        evidenceDocToAdd = deepCopyUploadEvidenceDocumentType(evidenceDocToCopy, APPLICANT_TWO_TRIAL_SKELETON);
         builder.documentAuthoritiesApp2(evidenceDocToAdd);
 
         evidenceDocToCopy = compareAndCopy(caseDataBefore.getDocumentCosts(),

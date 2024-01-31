@@ -76,6 +76,9 @@ public class UpdateCaseManagementDetailsService {
     }
 
     private RequestedCourt correctCaseLocation(RequestedCourt requestedCourt, List<LocationRefData> locations) {
+        if (requestedCourt.getCaseLocation() == null || requestedCourt.getCaseLocation().getBaseLocation() == null) {
+            return requestedCourt;
+        }
         String locationLabel = requestedCourt.getCaseLocation().getBaseLocation();
         LocationRefData preferredLocation = locations.stream()
             .filter(locationRefData -> courtLocationUtils.checkLocation(locationRefData, locationLabel))

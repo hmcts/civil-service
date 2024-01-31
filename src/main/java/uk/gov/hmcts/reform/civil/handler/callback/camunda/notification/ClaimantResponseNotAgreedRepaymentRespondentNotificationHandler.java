@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
 
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     private static final String REFERENCE_TEMPLATE = "claimant-reject-repayment-respondent-notification-%s";
     public static final String TASK_ID_CLAIMANT = "ClaimantDisAgreeRepaymentPlanNotifyApplicant";
     private final OrganisationDetailsService organisationDetailsService;
+    private final FeatureToggleService featureToggleService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -46,7 +49,7 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
         CaseData caseData = callbackParams.getCaseData();
 
         notificationService.sendMail(
-            addEmail(caseData),
+            getEmail(caseData),
             addTemplate(caseData),
             addProperties(caseData),
             String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
@@ -55,7 +58,10 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
     }
 
     private String addTemplate(CaseData caseData) {
-        return notificationsProperties.getNotifyClaimantLrTemplate();
+        return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
+            ? notificationsProperties.getNotifyClaimantLipTemplateManualDetermination()
+            : notificationsProperties.getNotifyClaimantLrTemplate();
+
     }
 
     @Override
@@ -65,13 +71,20 @@ public class ClaimantResponseNotAgreedRepaymentRespondentNotificationHandler ext
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        return new HashMap<>(Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganizationName(caseData)
-        ));
+        return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
+            ? new HashMap<>(Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            ))
+            : new HashMap<>(Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganizationName(caseData)
+            ));
     }
 
-    private String addEmail(CaseData caseData) {
-        return caseData.getApplicantSolicitor1UserDetails().getEmail();
+    private String getEmail(CaseData caseData) {
+        return (caseData.isApplicant1NotRepresented() && featureToggleService.isLipVLipEnabled())
+            ? caseData.getApplicant1Email()
+            : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 }

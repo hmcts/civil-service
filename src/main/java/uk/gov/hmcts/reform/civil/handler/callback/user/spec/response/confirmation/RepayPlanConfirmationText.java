@@ -63,9 +63,17 @@ public class RepayPlanConfirmationText implements RespondToClaimConfirmationText
         }
         sb.append(" legal representative if you need details on how to pay")
             .append("<br><br>")
-            .append("If you do not pay immediately, ").append(applicantName)
-            .append(" can request a county court judgment against you.")
-
+            .append("If you do not pay immediately, ").append(applicantName);
+        if (caseData.getRespondent2() != null || caseData.getApplicant2() != null) {
+            sb.append(" can either:")
+                .append("<ul>")
+                .append("<li>ask you to sign a settlement agreement to formalise the repayment plan</li>");
+        } else {
+            sb.append(" can:")
+                .append("<ul>");
+        }
+        sb.append("<li>request a county court judgment against you</li>")
+            .append("</ul>")
             .append("<h3 class=\"govuk-heading-m\">If ")
             .append(applicantName);
         if (caseData.getApplicant2() != null) {

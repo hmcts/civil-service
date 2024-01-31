@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackException;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.hearing.HearingNoticeList;
+import uk.gov.hmcts.reform.civil.enums.hearing.ListingOrRelisting;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -76,9 +78,9 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     private CallbackResponse notifyClaimantHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         boolean isApplicantLip = isApplicantLip(caseData);
-        String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
 
         if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING_HMC)) {
+            String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
             sendEmailHMC(caseData, recipient);
         } else if (isEvent(callbackParams, NOTIFY_CLAIMANT_HEARING)) {
             sendEmail(caseData, getRecipient(caseData, isApplicantLip), getReferenceTemplate(caseData, isApplicantLip), isApplicantLip);
@@ -142,7 +144,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     }
 
     private String getRecipient(CaseData caseData, boolean isApplicantLip) {
-        return isApplicantLip ? caseData.getApplicant1().getPartyEmail()
+        return isApplicantLip ? caseData.getClaimantUserDetails().getEmail()
             : caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
@@ -155,8 +157,12 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
         if (isApplicantLip) {
             return notificationsProperties.getHearingNotificationLipDefendantTemplate();
         }
+        // If fee already paid do not renotify upon hearing being relisted
+        // If hearing type is OTHER no fee is due
         if (caseData.getHearingFeePaymentDetails() != null
-            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) {
+            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())
+            || caseData.getHearingNoticeList().equals(HearingNoticeList.OTHER)
+            || caseData.getListingOrRelisting().equals(ListingOrRelisting.RELISTING)) {
             return notificationsProperties.getHearingListedNoFeeClaimantLrTemplate();
         } else {
             return notificationsProperties.getHearingListedFeeClaimantLrTemplate();
@@ -164,7 +170,7 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
     }
 
     public Map<String, String> addPropertiesHMC(final CaseData caseData) {
-        Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack());
+        Fee fee = calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack().name());
         LocalDateTime hearingStartDateTime = camundaService
             .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingStartDateTime();
 

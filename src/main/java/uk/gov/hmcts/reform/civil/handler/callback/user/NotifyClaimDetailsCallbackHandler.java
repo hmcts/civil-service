@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -10,9 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.model.common.Element;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
@@ -20,16 +20,19 @@ import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
+import uk.gov.hmcts.reform.civil.utils.ServiceOfDateValidationMessageUtils;
 import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidator;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implements ParticularsOfClaimValidator {
@@ -80,22 +84,19 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     public static final String WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR =
             "Your claim will progress offline if you only notify one Defendant of the claim details.";
 
-    public static final String DOC_SERVED_DATE_IN_FUTURE =
-            "Date you served the documents must be today or in the past";
-
-    public static final String DOC_SERVED_DATE_OLDER_THAN_14DAYS =
-        "Date of Service should not be more than 14 days old";
-
     public static final String DOC_SERVED_MANDATORY =
             "Supporting evidence is required";
 
     public static final String BOTH_CERTIFICATE_SERVED_SAME_DATE =
-        "Date of Service for both certificate must be the same";
+        "The date of service for defendant 1 and defendant 2 must be the same";
+
+    public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0, 0);
 
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
     private final Time time;
     private final DeadlinesCalculator deadlinesCalculator;
+    private final ServiceOfDateValidationMessageUtils serviceOfDateValidationMessageUtils;
     private final FeatureToggleService featureToggleService;
     private final AssignCategoryId assignCategoryId;
 
@@ -137,9 +138,11 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             updatedCaseData = caseData.toBuilder()
                     .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
                     .claimDetailsNotificationDate(currentDateTime)
-                    .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
-                    .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime))
-                    .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
+                    .addLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
+                    .addLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
+                    .respondent1ResponseDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
+                    .respondent2ResponseDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime))
+                    .nextDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime).toLocalDate())
                     .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
                             6,
                             notificationDate
@@ -154,7 +157,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             CaseData.CaseDataBuilder builder = caseData.toBuilder()
                     .businessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS))
                     .claimDetailsNotificationDate(currentDateTime)
-                    .nextDeadline(deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime).toLocalDate())
+                    .nextDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime).toLocalDate())
                     .claimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
                             6,
                             notificationDate
@@ -162,14 +165,27 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
             if (Objects.nonNull(caseData.getRespondent1())) {
                 builder.respondent1ResponseDeadline(
-                        deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
+                        deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
             }
+
+            if (Objects.nonNull(caseData.getRespondent1())
+                && NO.equals(caseData.getRespondent1Represented())) {
+                builder.addLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
+            }
+
             if (Objects.nonNull(caseData.getRespondent2())
                 && YES.equals(caseData.getAddRespondent2())) {
                 builder.respondent2ResponseDeadline(
-                        deadlinesCalculator.plus14DaysAt4pmDeadline(notificationDateTime));
+                        deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
             }
-            if (areAnyRespondentsLitigantInPerson(caseData)) {
+
+            if (Objects.nonNull(caseData.getRespondent2())
+                   && YES.equals(caseData.getAddRespondent2())
+                && NO.equals(caseData.getRespondent2Represented())) {
+                builder.addLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
+            }
+
+            if (areAnyRespondentsLitigantInPerson(caseData))  {
                 if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
                     builder
                         .cosNotifyClaimDetails1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails1()))
@@ -193,24 +209,31 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private LocalDateTime getEarliestDateOfService(CaseData caseData) {
         LocalDateTime date = time.now();
+        LocalDateTime deemedDate1 = null;
+        LocalDateTime deemedDate2 = null;
 
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
-            && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant())) {
-            LocalDateTime cosDate1 = caseData.getCosNotifyClaimDetails1()
-                    .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
-            if (cosDate1.isBefore(date)) {
-                date = cosDate1;
-            }
+            && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant())) {
+            deemedDate1 = caseData.getCosNotifyClaimDetails1()
+                .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
         }
+
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
-            && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
-            LocalDateTime cosDate2 = caseData.getCosNotifyClaimDetails2()
-                    .getCosDateOfServiceForDefendant().atTime(time.now().toLocalTime());
-            if (cosDate2.isBefore(date)) {
-                date = cosDate2;
-            }
+            && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant())) {
+            deemedDate2 = caseData.getCosNotifyClaimDetails2()
+                .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
         }
-        return date;
+
+        if (deemedDate1 != null && deemedDate2 != null) {
+            return deemedDate1.isBefore(deemedDate2) ? deemedDate1 : deemedDate2;
+        } else if (deemedDate1 != null) {
+            return deemedDate1;
+        } else if (deemedDate2 != null) {
+            return deemedDate2;
+        } else {
+            // If both deemedDate1 and deemedDate2 are null, use the current date and time
+            return date;
+        }
     }
 
     private CaseData saveCoSDetailsDoc(CaseData caseData, int lipNumber) {
@@ -354,12 +377,10 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             caseData.getCosNotifyClaimDetails1().setCosDocSaved(NO);
         }
 
-        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(
-            caseData.getCosNotifyClaimDetails1());
+        List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils
+            .getServiceOfDateValidationMessages(caseData.getCosNotifyClaimDetails1());
+        errors.addAll(dateValidationErrorMessages);
 
-        if (!dateValidationErrorMessage.isEmpty()) {
-            errors.add(dateValidationErrorMessage);
-        }
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
                 && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails1())) {
             errors.add(DOC_SERVED_MANDATORY);
@@ -381,12 +402,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
             caseData.getCosNotifyClaimDetails2().setCosDocSaved(NO);
         }
-        final String dateValidationErrorMessage = getServiceOfDateValidationMessage(
-            caseData.getCosNotifyClaimDetails2());
-
-        if (!dateValidationErrorMessage.isEmpty()) {
-            errors.add(dateValidationErrorMessage);
-        }
+        List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(caseData.getCosNotifyClaimDetails2());
+        errors.addAll(dateValidationErrorMessages);
 
         if (isBothDefendantLip(caseData) && !isBothDefendantWithSameDateOfService(caseData)) {
             errors.add(BOTH_CERTIFICATE_SERVED_SAME_DATE);
@@ -411,28 +428,6 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         return Objects.isNull(certificateOfService.getCosEvidenceDocument());
     }
 
-    private String getServiceOfDateValidationMessage(CertificateOfService certificateOfService) {
-        final String errorMessage = "";
-        if (Objects.nonNull(certificateOfService)) {
-            if (isCosDefendantNotifyDateFutureDate(certificateOfService.getCosDateOfServiceForDefendant())) {
-                return DOC_SERVED_DATE_IN_FUTURE;
-            } else if (isCosDefendantNotifyDateOlderThan14Days(certificateOfService.getCosDateOfServiceForDefendant())) {
-                return DOC_SERVED_DATE_OLDER_THAN_14DAYS;
-            }
-        }
-        return errorMessage;
-    }
-
-    private boolean isCosDefendantNotifyDateFutureDate(LocalDate cosDateOfServiceForDefendant) {
-        return time.now().toLocalDate().isBefore(cosDateOfServiceForDefendant);
-    }
-
-    private boolean isCosDefendantNotifyDateOlderThan14Days(LocalDate cosDateOfServiceForDefendant) {
-        return time.now().isAfter(deadlinesCalculator.plus14DaysAt4pmDeadline(cosDateOfServiceForDefendant
-                                                                                  .atTime(time.now().toLocalTime())));
-
-    }
-
     private boolean isBothDefendantLip(CaseData caseData) {
         return (caseData.getDefendant1LIPAtClaimIssued() != null
             && caseData.getDefendant1LIPAtClaimIssued() == YES)
@@ -443,8 +438,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private boolean isBothDefendantWithSameDateOfService(CaseData caseData) {
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
             && Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
-            if (caseData.getCosNotifyClaimDetails1().getCosDateOfServiceForDefendant()
-                .equals(caseData.getCosNotifyClaimDetails2().getCosDateOfServiceForDefendant())) {
+            if (caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant()
+                .equals(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant())) {
                 return true;
             }
         }

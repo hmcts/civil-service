@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.TypeOfDocDocumentaryEvidenceOfTrial;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -92,8 +94,16 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(6).getValue().getDocumentFileName());
         assertEquals("DF 2 reply to part 18 request 12/01/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(7).getValue().getDocumentFileName());
-        assertEquals("Directions Questionnaire 10/02/2023",
-                     bundleCreateRequest.getCaseDetails().getCaseData().getStatementsOfCaseDocuments().get(8).getValue().getDocumentFileName());
+        assertEquals("CL 1 Directions Questionnaire 10/02/2023",
+                     bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(0).getValue().getDocumentFileName());
+        assertEquals("DF 1 Directions Questionnaire 10/02/2023",
+                bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(1).getValue().getDocumentFileName());
+        assertEquals("DF 2 Directions Questionnaire 10/02/2023",
+                bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(2).getValue().getDocumentFileName());
+        assertEquals("DF 2 Directions Questionnaire 11/02/2023",
+                bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(3).getValue().getDocumentFileName());
+        assertEquals("DF 2 Directions Questionnaire 10/03/2023",
+                bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().get(4).getValue().getDocumentFileName());
         assertEquals("Directions Order 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getOrdersDocuments().get(0).getValue().getDocumentFileName());
         assertEquals("Order 10/02/2023",
@@ -116,7 +126,7 @@ class BundleRequestMapperTest {
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(3).getValue().getDocumentFileName());
         assertEquals("Witness Statement df1Fname 1 11/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(4).getValue().getDocumentFileName());
-        assertEquals("Witness Summary cl1Fname 12/12/2023",
+        assertEquals("Witness Summary cl1Fname 10/02/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(5).getValue().getDocumentFileName());
         assertEquals("Email referred to in the statement of witness 12/12/2022",
                      bundleCreateRequest.getCaseDetails().getCaseData().getClaimant1WitnessStatements().get(10).getValue().getDocumentFileName());
@@ -380,13 +390,50 @@ class BundleRequestMapperTest {
                 TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("detailsOfClaim").build()).createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
                  2, 2)).build();
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
-        CaseDocument caseDocumentDQ =
+        CaseDocument caseDocumentDQDef1 =
+                CaseDocument.builder()
+                        .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                        .documentLink(Document.builder().documentUrl(TEST_URL)
+                                .categoryID(DocCategory.DEF1_DEFENSE_DQ.getValue())
+                                .documentFileName(TEST_FILE_NAME).build())
+                        .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                2, 2)).build();
+        CaseDocument caseDocumentDQApp1 =
             CaseDocument.builder()
                 .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
+                .documentLink(Document.builder().documentUrl(TEST_URL).categoryID(DocCategory.APP1_DQ.getValue())
+                        .documentFileName(TEST_FILE_NAME).build())
                 .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
                                                   2, 2)).build();
-        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQ));
+        CaseDocument caseDocumentDQDef22 =
+                CaseDocument.builder()
+                        .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                        .documentLink(Document.builder().documentUrl(TEST_URL)
+                                .categoryID(DocCategory.DEF2_DEFENSE_DQ.getValue())
+                                .documentFileName(TEST_FILE_NAME).build())
+                        .createdDatetime(LocalDateTime.of(2023, 2, 11, 2,
+                                2, 2)).build();
+        CaseDocument caseDocumentDQDef21 =
+                CaseDocument.builder()
+                        .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                        .documentLink(Document.builder().documentUrl(TEST_URL)
+                                .categoryID(DocCategory.DEF2_DEFENSE_DQ.getValue())
+                                .documentFileName(TEST_FILE_NAME).build())
+                        .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                2, 2)).build();
+        CaseDocument caseDocumentDQDef23 =
+                CaseDocument.builder()
+                        .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                        .documentLink(Document.builder().documentUrl(TEST_URL)
+                                .categoryID(DocCategory.DEF2_DEFENSE_DQ.getValue())
+                                .documentFileName(TEST_FILE_NAME).build())
+                        .createdDatetime(LocalDateTime.of(2023, 3, 10, 2,
+                                2, 2)).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef1));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQApp1));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef22));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef21));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef23));
         CaseDocument caseDocumentDJ =
             CaseDocument.builder()
                 .documentType(DocumentType.DEFAULT_JUDGMENT_SDO_ORDER)

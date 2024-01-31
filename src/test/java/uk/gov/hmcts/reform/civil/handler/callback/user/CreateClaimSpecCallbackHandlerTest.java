@@ -29,6 +29,13 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.AirlineEpimsId;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsDataLoader;
+import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
+import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.sampledata.LocationRefSampleDataBuilder;
+import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -206,6 +213,15 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private ToggleConfiguration toggleConfiguration;
+
+    @MockBean
+    protected LocationRefDataService locationRefDataService;
+
+    @MockBean
+    private AirlineEpimsDataLoader airlineEpimsDataLoader;
+
+    @MockBean
+    private AirlineEpimsService airlineEpimsService;
 
     @Nested
     class AboutToStartCallback {
@@ -1623,28 +1639,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
-    class IsFlightDelayClaimMidCallback {
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Enabled(Boolean toggleStat) {
-            // Given
-            YesOrNo yesOrNo = toggleStat ? YES : NO;
-            CaseData caseData = CaseData.builder().isFlightDelayClaim(yesOrNo)
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, "is-flight-delay-claim");
-            // When
-            when(toggleService.isSdoR2Enabled()).thenReturn(true);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            // Then
-            assertThat(response.getData()).containsEntry("isFlightDelayClaim", toggleStat ? "Yes" : "No");
-            if (toggleStat) {
-                assertThat(response.getData()).containsEntry("claimType", "FLIGHT_DELAY");
-            } else {
-                assertThat(response.getData()).doesNotHaveToString("claimType");
-            }
-        }
+    class FlightDelayDetailsMidCallbacks {
 
         @Test
         void shouldSetIsFlightDelayClaim_whenPopulatedAndSdoR2Disabled() {
@@ -1652,7 +1647,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseData.builder().isFlightDelayClaim(YES)
                 .build();
 
-            CallbackParams params = callbackParamsOf(caseData, MID, "is-flight-delay-claim");
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
             // When
             when(toggleService.isSdoR2Enabled()).thenReturn(false);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1660,6 +1655,66 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Then
             assertThat(response.getData()).doesNotHaveToString("isFlightDelayClaim");
             assertThat(response.getData()).doesNotHaveToString("claimType");
+        }
+
+        @Test
+        void shouldGetAirlineList_whenRequired() {
+            // Given
+            List<AirlineEpimsId> airlineEpimsIDList = new ArrayList<>();
+            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("BA/Cityflyer").epimsID("111000").build());
+            airlineEpimsIDList.add(AirlineEpimsId.builder().airline("OTHER").epimsID("111111").build());
+
+            given(airlineEpimsDataLoader.getAirlineEpimsIDList())
+                .willReturn(airlineEpimsIDList);
+
+            CaseData caseData = CaseData.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "get-airline-list");
+
+            // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")
+                .extracting("list_items").asList().extracting("label")
+                .contains("BA/Cityflyer");
+
+            assertThat(response.getData()).extracting("flightDelayDetails").extracting("airlineList")
+                .extracting("list_items").asList().extracting("label")
+                .contains("OTHER");
+        }
+
+        @Test
+        void shouldReturnErrorWhenDateOfFlightIsInTheFuture() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .isFlightDelayClaim(YES)
+                .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().plusDays(1)).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
+            // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).contains("Scheduled date of flight must be today or in the past");
+        }
+
+        @ParameterizedTest
+        @ValueSource(ints = {0, 1})
+        void shouldNotReturnErrorWhenDateOfFlightIsTodayOrInThePast(Integer days) {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .isFlightDelayClaim(YES)
+                .flightDelayDetails(FlightDelayDetails.builder().scheduledDate(now().minusDays(days)).build()).build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateFlightDelayDate");
+            // When
+            when(toggleService.isSdoR2Enabled()).thenReturn(true);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            // Then
+            assertThat(response.getErrors()).isEmpty();
         }
     }
 
@@ -1712,7 +1767,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
             given(feesService.getFeeDataByTotalClaimAmount(any())).willReturn(feeData);
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1729,7 +1784,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1757,7 +1812,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .sdtRequestIdFromSdt("sdtRequestIdFromSdt")
                 .totalClaimAmount(BigDecimal.valueOf(1999))
                 .build();
-            when(interestCalculator.calculateInterest(caseData)).thenReturn(new BigDecimal(0));
+            when(interestCalculator.calculateBulkInterest(caseData)).thenReturn(new BigDecimal(0));
             given(organisationService.findOrganisation(any())).willReturn(Optional.of(bulkOrganisation));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -1767,8 +1822,6 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().contains("12345");
             assertThat(response.getData()).extracting("applicantSolicitor1PbaAccounts").asString().doesNotContain("98765");
         }
-
-        //TODO implement tests for bulk claims that have interest added.
 
         @Test
         void shouldSetCaseCategoryToSpec_whenInvoked() {
@@ -1786,6 +1839,12 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("applicant1").hasFieldOrProperty("partyID");
             assertThat(response.getData()).extracting("respondent1").hasFieldOrProperty("partyID");
+        }
+
+        @Test
+        void shouldPopulateCasenamePublic_whenInvoked() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("caseNamePublic").isEqualTo("'John Rambo' v 'Sole Trader'");
         }
 
         @Test
@@ -1846,7 +1905,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+                .isEqualTo("'John Rambo' v 'Sole Trader', 'John Rambo'");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1862,7 +1921,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
+                .isEqualTo("'John Rambo', 'Jason Rambo' v 'Sole Trader'");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -1878,7 +1937,7 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             // Then
             assertThat(response.getData().get("caseNameHmctsInternal"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+                .isEqualTo("'John Rambo' v 'Sole Trader'");
             assertThat(response.getData().get("caseManagementCategory")).extracting("value")
                 .extracting("code").isEqualTo("Civil");
         }
@@ -2097,6 +2156,65 @@ class CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .extracting("uiStatementOfTruth")
                     .doesNotHaveToString("name")
                     .doesNotHaveToString("role");
+            }
+        }
+
+        @Nested
+        class GetAirlineCourtLocation extends LocationRefSampleDataBuilder {
+
+            @BeforeEach
+            void mockAirlineEpimsData() {
+                given(airlineEpimsService.getEpimsIdForAirline("GULF_AIR"))
+                    .willReturn("36791");
+
+                List<LocationRefData> locations = new ArrayList<>();
+                locations.add(LocationRefData.builder().regionId("Site Name").epimmsId("36791")
+                                  .build());
+                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .willReturn(locations);
+
+                when(toggleService.isSdoR2Enabled()).thenReturn(true);
+            }
+
+            @Test
+            void shouldReturnExpectedCourtLocation_whenAirlineExists() {
+                // Given
+
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .isFlightDelayClaim(YES)
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(
+                                         DynamicList.builder()
+                                             .value(DynamicListElement.builder().code("GULF_AIR").label("Gulf Air")
+                                                        .build()).build()).build()).build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                // When
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                // Then
+                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").extracting("region").isEqualTo("Site Name");
+            }
+
+            @Test
+            void shouldReturnExpectedCourtLocation_whenOtherAirlineSelected() {
+                // Given
+                CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                    .flightDelay(FlightDelayDetails.builder()
+                                     .airlineList(
+                                         DynamicList.builder()
+                                             .value(DynamicListElement.builder().code("OTHER").label("OTHER")
+                                                        .build()).build()).build()).build();
+                CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+                given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                    .willReturn(getSampleCourLocationsRefObject());
+
+                // When
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+                // Then
+                assertThat(response.getData()).extracting("flightDelayDetails").extracting("flightCourtLocation").isNull();
             }
         }
     }
