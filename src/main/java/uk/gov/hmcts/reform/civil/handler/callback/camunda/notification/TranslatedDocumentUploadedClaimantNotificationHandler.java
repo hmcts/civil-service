@@ -54,8 +54,7 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
 
-        if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
-        {
+        if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
                 CLAIMANT_NAME, caseData.getApplicant1().getPartyName()

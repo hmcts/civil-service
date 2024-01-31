@@ -139,7 +139,6 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
             );
         }
 
-
         @NotNull
         public Map<String, String> getNotificationDataMapSpecClaimantLR(CaseData caseData) {
             return Map.of(
