@@ -73,10 +73,13 @@ public class ClaimSubmissionLipClaimantNotificationHandler extends CallbackHandl
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        return Map.of(
-            RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
-        );
+        if(caseData != null) {
+            return Map.of(
+                RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
+                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
+            );
+        }
+        return Map.of();
     }
 
 }
