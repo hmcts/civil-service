@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,11 +50,11 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
                             .partyEmail("individual.claimant@email.com")
                             .build())
             .respondent1(Party.builder()
-                            .individualTitle("Mr.")
-                            .individualFirstName("Defendant")
-                            .individualLastName("Guy")
-                            .type(Party.Type.INDIVIDUAL)
-                            .build())
+                             .individualTitle("Mr.")
+                             .individualFirstName("Defendant")
+                             .individualLastName("Guy")
+                             .type(Party.Type.INDIVIDUAL)
+                             .build())
             .legacyCaseReference(LEGACY_CASE_REFERENCE)
             .build();
 
