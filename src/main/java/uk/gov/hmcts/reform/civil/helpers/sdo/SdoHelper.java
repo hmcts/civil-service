@@ -221,7 +221,8 @@ public class SdoHelper {
             case "smallClaimsHearingToggle":
                 return caseData.getSmallClaimsHearingToggle() != null;
             case "smallClaimsMethodToggle":
-                return caseData.getSmallClaimsMethodToggle() != null;
+                // SNI-5142
+                return true;
             case "smallClaimsDocumentsToggle":
                 return caseData.getSmallClaimsDocumentsToggle() != null;
             case "smallClaimsWitnessStatementToggle":
@@ -291,7 +292,8 @@ public class SdoHelper {
             case "fastTrackTrialToggle":
                 return caseData.getFastTrackTrialToggle() != null;
             case "fastTrackMethodToggle":
-                return caseData.getFastTrackMethodToggle() != null;
+                // SNI-5142
+                return true;
             case "fastTrackAddNewDirections":
                 return caseData.getFastTrackAddNewDirections() != null;
             case "fastTrackTrialDateToToggle":

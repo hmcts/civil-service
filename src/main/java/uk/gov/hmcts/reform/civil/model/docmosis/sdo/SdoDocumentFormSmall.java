@@ -76,8 +76,17 @@ public class SdoDocumentFormSmall implements MappableObject {
 
     private final SmallClaimsNotes smallClaimsNotes;
     private final boolean smallClaimsHearingToggle;
+    /**
+     * SNI-5142 made mandatory
+     */
     private final boolean smallClaimsMethodToggle;
     private final boolean smallClaimsDocumentsToggle;
     private final boolean smallClaimsWitnessStatementToggle;
     private final boolean smallClaimsNumberOfWitnessesToggle;
+
+    @SuppressWarnings("unused")
+    public boolean getSmallClaimsMethodToggle(){
+        // SNI-5142
+        return true;
+    }
 }

@@ -70,8 +70,8 @@ public class FeatureToggleService {
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
         return
             // because default value is true
-            locationEpimms == null
-                || featureToggleApi
+            locationEpimms != null
+                && featureToggleApi
                 .isFeatureEnabledForLocation(
                     "case-progression-location-whitelist",
                     locationEpimms,
