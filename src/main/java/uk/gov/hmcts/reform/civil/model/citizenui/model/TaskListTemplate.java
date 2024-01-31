@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @EqualsAndHashCode
-@Table(name = "taskListsTemplates")
+@Table(name = "task_Lists_Templates")
 public class TaskListTemplate {
 
     @Id
