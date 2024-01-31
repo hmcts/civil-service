@@ -411,8 +411,7 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void givenClaimStatusInProcessHeritageSystem_WhenGetStatus_thenReturnResponseByPost() {
-        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+    void givenClaimStatusInProcessHeritageSystem_WhenGetStatus_thenReturnDefendantPartAdmit() {
 
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
@@ -424,6 +423,6 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
 
-        assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFENDANT_PART_ADMIT);
     }
 }
