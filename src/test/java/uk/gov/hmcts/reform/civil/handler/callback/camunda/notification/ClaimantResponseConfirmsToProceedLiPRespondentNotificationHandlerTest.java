@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler.TASK_ID;
@@ -88,6 +89,19 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
                 getNotificationDataMap(caseData),
                 REFERENCE_NUMBER
             );
+        }
+
+        @Test
+        void shouldNotNotifyLipRespondent_ifBilingual() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.setClaimantBilingualLanguagePreference("BOTH");
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
         }
 
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
