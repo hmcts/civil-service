@@ -10,6 +10,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormGenerator;
@@ -60,15 +62,13 @@ public class GenerateDJFormHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         if (!(caseData.isLRvLipOneVOne() && isSpecHandler(callbackParams))) {
-            if (ofNullable(caseData.getRespondent2()).isPresent()
-                && ((ofNullable(caseData.getDefendantDetails()).isPresent()
-                && caseData.getDefendantDetails().getValue().getLabel().startsWith(
-                "Both")) || (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
-                && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
-                "Both")))) {
-
+            if (caseData.getRespondent2() == null) {
                 buildDocument(callbackParams, caseDataBuilder);
-            } else if (ofNullable(caseData.getRespondent2()).isEmpty()) {
+            } else if (ofNullable(caseData.getDefendantDetails())
+                .map(defendantDetails -> defendantDetails.getValue().getLabel()).orElse("")
+                .startsWith("Both") || ofNullable(caseData.getDefendantDetailsSpec())
+                .map(defendantDetails -> defendantDetails.getValue().getLabel()).orElse("")
+                .startsWith("Both")) {
                 buildDocument(callbackParams, caseDataBuilder);
             }
         }
