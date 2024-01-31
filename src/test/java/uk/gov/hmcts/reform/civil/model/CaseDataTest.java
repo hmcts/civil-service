@@ -5,10 +5,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.MediationDecision;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.ResponseOneVOneShowTag;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
@@ -829,6 +826,8 @@ public class CaseDataTest {
         void shouldReturnTrueWhenWillThisAmountBePaidIsAfterCurrentDate() {
             //Given
             CaseData caseData = CaseData.builder()
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
+                .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
                 .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                    .whenWillThisAmountBePaid(LocalDate.now().plusDays(1)).build())
                 .build();
@@ -841,7 +840,11 @@ public class CaseDataTest {
         @Test
         void shouldReturnTrueWhenFirstRepaymentDateIsAfterCurrentDate() {
             //Given
+            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+                .respondentSignSettlementAgreement(YesOrNo.YES).build();
+
             CaseData caseData = CaseData.builder()
+                .caseDataLiP(caseDataLiP)
                 .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
                                               .firstRepaymentDate(LocalDate.now().plusDays(1)).build())
                 .build();
