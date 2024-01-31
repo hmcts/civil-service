@@ -98,6 +98,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.OtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TransferCaseDetails;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import javax.validation.Valid;
@@ -117,6 +118,7 @@ import java.util.stream.Stream;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
+import static jdk.dynalink.linker.support.Guards.isNotNull;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.FINISHED;
@@ -818,7 +820,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isClaimantAcceptedClaimAmount() {
         return YES.equals(getApplicant1AcceptAdmitAmountPaidSpec());
     }
-    
+
     @JsonIgnore
     public boolean isClaimantRejectsClaimAmount() {
         return NO.equals(getApplicant1AcceptAdmitAmountPaidSpec());
@@ -921,10 +923,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
                 null);
         LocalDate firstRepaymentDate = Optional.ofNullable(getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(
             null);
+        LocalDate respondentSettlementAgreementDeadline = Optional.ofNullable(getRespondent1RespondToSettlementAgreementDeadline()).map(LocalDateTime::toLocalDate).orElse(null);
+        Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(getCaseDataLiP());
+        YesOrNo hasDoneSettlementAgreement = optionalCaseDataLiP.map(CaseDataLiP::getRespondentSignSettlementAgreement).orElse(null);
+        boolean hasDoneSettlementAgreementInTime = (nonNull(hasDoneSettlementAgreement) && hasDoneSettlementAgreement == YesOrNo.YES) ||  (isNull(hasDoneSettlementAgreement) && isDateAfterToday(respondentSettlementAgreementDeadline));
 
-        return (isNull(whenWillThisAmountBePaid) && isNull(firstRepaymentDate))
-            || isPaymentDateAfterToday(whenWillThisAmountBePaid)
-            || isPaymentDateAfterToday(firstRepaymentDate);
+        return (isNull(whenWillThisAmountBePaid) || isDateAfterToday(whenWillThisAmountBePaid))
+            && hasDoneSettlementAgreementInTime
+            && (isNull(firstRepaymentDate) || isDateAfterToday(firstRepaymentDate));
     }
 
     @JsonIgnore
@@ -1212,8 +1218,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    private boolean isPaymentDateAfterToday(LocalDate paymentDate) {
-        return nonNull(paymentDate)
-            && paymentDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+    private boolean isDateAfterToday(LocalDate date) {
+        return nonNull(date)
+            && date.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
 }
