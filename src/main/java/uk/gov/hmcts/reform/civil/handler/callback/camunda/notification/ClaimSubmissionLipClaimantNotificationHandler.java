@@ -32,7 +32,10 @@ public class ClaimSubmissionLipClaimantNotificationHandler extends CallbackHandl
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::notifyLipClaimantForClaimSubmission);
+    private final Map<String, Callback> callbackMap = Map.of(
+        callbackKey(ABOUT_TO_SUBMIT),
+        this::notifyLipClaimantForClaimSubmission
+    );
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -57,7 +60,7 @@ public class ClaimSubmissionLipClaimantNotificationHandler extends CallbackHandl
             .map(Party::getPartyEmail)
             .orElse(null);
 
-        if(applicant1Email != null) {
+        if (applicant1Email != null) {
             notificationService.sendMail(
                 applicant1Email,
                 notificationsProperties.getNotifyClaimantLipForClaimSubmissionTemplate(),
