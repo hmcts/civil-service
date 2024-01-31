@@ -95,6 +95,7 @@ public class GenerateHearingNoticeHmcHandler extends CallbackHandler {
                 .requestVersion(hearing.getRequestDetails().getVersionNumber())
                 .caseState(caseData.getCcdState().name())
                 .responseDateTime(hearing.getHearingResponse().getReceivedDateTime())
+                .hearingType(hearing.getHearingDetails().getHearingType())
                 .build()
         );
 
