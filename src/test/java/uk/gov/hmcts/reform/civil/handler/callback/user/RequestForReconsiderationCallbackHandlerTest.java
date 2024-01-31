@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -64,6 +65,8 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
     private static final String ERROR_MESSAGE_DEADLINE_EXPIRED
         = "You can no longer request a reconsideration because the deadline has expired";
 
+    private static final String ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND = "You can only request a reconsideration for claims of £1,000 or less.";
+
     @Test
     void handleEventsReturnsTheExpectedCallbackEvents() {
         assertThat(handler.handledEvents()).containsOnly(REQUEST_FOR_RECONSIDERATION);
@@ -75,6 +78,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         void shouldAllowRequestIfLessThan7DaysElapsed() {
             //Given : Casedata containing an SDO order created 6 days ago
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .totalClaimAmount(BigDecimal.valueOf(800))
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
                                                   .element(CaseDocument.builder()
                                                                .documentType(DocumentType.SDO_ORDER)
@@ -95,6 +99,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         void shouldAllowRequestIfLessThan7DaysElapsedForLatestSDO() {
             //Given : Casedata containing two SDO order and latest created 6 days ago
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .totalClaimAmount(BigDecimal.valueOf(800))
                 .systemGeneratedCaseDocuments(Arrays.asList(
                     ElementUtils.element(CaseDocument.builder()
                                              .documentType(DocumentType.SDO_ORDER)
@@ -119,6 +124,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         void shouldSendErrorMessageIf7DaysElapsedForLatestSDO() {
             //Given : Casedata containing two SDO order and latest created 7 days ago
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .totalClaimAmount(BigDecimal.valueOf(800))
                 .systemGeneratedCaseDocuments(Arrays.asList(
                     ElementUtils.element(CaseDocument.builder()
                                              .documentType(DocumentType.SDO_ORDER)
@@ -144,6 +150,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         void shouldSendErrorMessageIf7DaysElapsed() {
             //Given : Casedata containing an SDO order created 7 days ago
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .totalClaimAmount(BigDecimal.valueOf(800))
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
                                                           .element(CaseDocument.builder()
                                                                        .documentType(DocumentType.SDO_ORDER)
@@ -166,6 +173,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         void shouldGetSelectedUserRole(String userRole) {
             //Given : Casedata and return applicant solicitor role
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .totalClaimAmount(BigDecimal.valueOf(800))
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
                                                           .element(CaseDocument.builder()
                                                                        .documentType(DocumentType.SDO_ORDER)
@@ -189,6 +197,43 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 assertThat(response.getData()).extracting("casePartyRequestForReconsideration")
                     .isEqualTo("Respondent2");
             }
+        }
+
+        @Test
+        void shouldAllowEventForCaseWithClaimAmountLessThan1000() {
+            //Given : Casedata with small claim
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
+                .systemGeneratedCaseDocuments(List.of(ElementUtils
+                                                          .element(CaseDocument.builder()
+                                                                       .documentType(DocumentType.SDO_ORDER)
+                                                                       .createdDatetime(LocalDateTime.now().minusDays(5))
+                                                                       .build()))).build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
+
+            //When: handler is called with ABOUT_TO_START event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: No errors should be displayed
+            assertThat(response.getErrors()).isNull();
+        }
+
+        @Test
+        void shouldNotAllowEventForCaseWithClaimAmountGreaterThan1000() {
+            //Given : Casedata with claim amount greater than 1000
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
+                .totalClaimAmount(new BigDecimal(1200))
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
+
+            //When: handler is called with ABOUT_TO_START event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then: No errors should be displayed
+            assertThat(response.getErrors().contains(ERROR_MESSAGE_SPEC_AMOUNT_GREATER_THAN_THOUSAND));
         }
     }
 
