@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -20,6 +21,8 @@ import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
@@ -56,6 +59,9 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private Time time;
+
+    @MockBean
+    private HearingNoticeCamundaService camundaService;
 
     @Autowired
     private ServiceRequestAPIHandler handler;
@@ -273,11 +279,16 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         @BeforeEach
         void setup() {
             when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build());
+            when(camundaService.getProcessVariables(any()))
+                .thenReturn(HearingNoticeVariables.builder()
+                                .hearingType("AAA7-TRI")
+                                .build());
         }
 
         @Test
         void shouldCalculateFee_whenPaymentStatusIsNull() {
-            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus()
+                .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -297,8 +308,26 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotCalculateFee_whenHearingTypeIsDisposal() {
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentSuccess()
+                .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();;
+
+            when(camundaService.getProcessVariables(any()))
+                .thenReturn(HearingNoticeVariables.builder()
+                                .hearingType("AAA7-DIS")
+                                .build());
+
+            params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            verifyNoInteractions(hearingFeesService);
+            verifyNoInteractions(paymentsService);
+        }
+
+        @Test
         void shouldNotCalculateFee_whenPaymentStatusIsSuccess() {
-            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentSuccess();
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentSuccess()
+                .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();;
 
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
 
@@ -309,7 +338,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotCalculateFee_whenPaymentStatusIsFailed() {
-            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentFailed();
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsPaymentFailed()
+                .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();;
 
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API_HMC, ABOUT_TO_SUBMIT);
 
@@ -320,7 +350,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldHandleException_whenPaymentRequestFails() {
-            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
+            caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus()
+                .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();;
 
             when(paymentsService.createServiceRequest(any(), any()))
                 .thenThrow(FeignException.class);
