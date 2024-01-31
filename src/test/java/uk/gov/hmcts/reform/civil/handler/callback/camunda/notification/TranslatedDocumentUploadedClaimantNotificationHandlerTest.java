@@ -48,21 +48,21 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
     private OrganisationService organisationService;
     @MockBean
     private FeatureToggleService featureToggleService;
-    private static final String emailTemplate1 = "template-id";
-    private static final String emailTemplate2 = "template-id-Bilingual";
-    private static final String emailTemplate3 = "template-id-English";
-    private static final String claimantLREmail = "applicantsolicitor@example.com";
-    private static final String claimantLiPEmail = "rambo@email.com";
-    private static final String legacyCaseReference = "translated-document-uploaded-claimant-notification-000DC001";
+    private static final String CLAIMANT_LR_EMAIL_TEMPLATE = "template-id";
+    private static final String CLAIMANT_LIP_EMAIL_TEMPLATE_BILINGUAL = "template-id-Bilingual";
+    private static final String CLAIMANT_LIP_EMAIL_TEMPLATE_ENGLISH = "template-id-English";
+    private static final String CLAIMANT_LR_EMAIL = "applicantsolicitor@example.com";
+    private static final String CLAIMANT_LIP_EMAIL = "rambo@email.com";
+    private static final String LEGACY_CASE_REF = "translated-document-uploaded-claimant-notification-000DC001";
 
     @Nested
     class AboutToSubmitCallback {
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded()).thenReturn(emailTemplate1);
-            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual()).thenReturn(emailTemplate2);
-            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish()).thenReturn(emailTemplate3);
+            when(notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded()).thenReturn(CLAIMANT_LR_EMAIL_TEMPLATE);
+            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual()).thenReturn(CLAIMANT_LIP_EMAIL_TEMPLATE_BILINGUAL);
+            when(notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish()).thenReturn(CLAIMANT_LIP_EMAIL_TEMPLATE_ENGLISH);
         }
 
         @Test
@@ -78,10 +78,10 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
-                claimantLREmail,
-                emailTemplate1,
+                CLAIMANT_LR_EMAIL,
+                CLAIMANT_LR_EMAIL_TEMPLATE,
                 getNotificationDataMapSpecClaimantLR(caseData),
-                legacyCaseReference
+                LEGACY_CASE_REF
             );
 
         }
@@ -106,10 +106,10 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
 
             // Then
             verify(notificationService).sendMail(
-                claimantLiPEmail,
-                emailTemplate2,
+                CLAIMANT_LIP_EMAIL,
+                CLAIMANT_LIP_EMAIL_TEMPLATE_BILINGUAL,
                 getNotificationDataMapSpecClaimantLIP(caseData),
-                legacyCaseReference
+                LEGACY_CASE_REF
             );
         }
 
@@ -132,10 +132,10 @@ public class TranslatedDocumentUploadedClaimantNotificationHandlerTest extends B
 
             // Then
             verify(notificationService).sendMail(
-                claimantLiPEmail,
-                emailTemplate3,
+                CLAIMANT_LIP_EMAIL,
+                CLAIMANT_LIP_EMAIL_TEMPLATE_ENGLISH,
                 getNotificationDataMapSpecClaimantLIP(caseData),
-                legacyCaseReference
+                LEGACY_CASE_REF
             );
         }
 
