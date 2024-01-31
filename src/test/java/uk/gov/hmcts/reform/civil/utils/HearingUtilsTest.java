@@ -181,4 +181,15 @@ public class HearingUtilsTest {
         // Then
         assertThat(claimantVDefendant).isEqualTo("Doe v Company");
     }
+
+    @ParameterizedTest
+    @CsvSource({
+        "AAA7-DIS,true",
+        "AAA7-TRI,false"
+    })
+    void shouldReturnCorrectValue_whenHearingTypeIsDisposalOrTrial(String hearingType, boolean expected) {
+        boolean isDisposalHearing = HearingUtils.isDisposalHearing(hearingType);
+
+        assertThat(isDisposalHearing).isEqualTo(expected);
+    }
 }
