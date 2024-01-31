@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.citizenui.model;
+package uk.gov.hmcts.reform.civil.model.citizenui.dashboard;
 
 import lombok.EqualsAndHashCode;
 

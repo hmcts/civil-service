@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.model.citizenui.model;
+package uk.gov.hmcts.reform.civil.model.citizenui.dashboard;
 
 import lombok.EqualsAndHashCode;
 
@@ -8,32 +8,55 @@ import java.util.Date;
 
 @Entity
 @EqualsAndHashCode
-@Table(name = "notifications_Templates")
-public class NotificationTemplate {
+@Table(name = "task_List")
+public class TaskList {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String taskListTemplateId;
+    private String caseReference;
     private String role;
     private String enHTML;
     private String cyHTML;
     private String reference;
+    private String createdBy;
     private Date createdAt;
+    private String modifiedBy;
     private Date modifiedAt;
 
-    public NotificationTemplate() {}
+    public TaskList() {}
 
-    public NotificationTemplate(String role, String enHTML, String cyHTML, String reference, Date createdAt, Date modifiedAt) {
-
+    public TaskList(String taskListTemplateId, String caseReference, String role, String enHTML, String cyHTML, String reference, String createdBy, Date createdAt, String modifiedBy, Date modifiedAt) {
+        this.taskListTemplateId = taskListTemplateId;
+        this.caseReference = caseReference;
         this.role = role;
         this.enHTML = enHTML;
         this.cyHTML = cyHTML;
         this.reference = reference;
+        this.createdBy = createdBy;
         this.createdAt = createdAt;
+        this.modifiedBy= modifiedBy;
         this.modifiedAt= modifiedAt;
 
     }
+    public String getTaskListTemplateId() {
+        return taskListTemplateId;
+    }
+
+    public void setTaskListTemplateId(String taskListTemplateId) {
+        this.taskListTemplateId = taskListTemplateId;
+    }
+
+    public String getCaseReference() {
+        return caseReference;
+    }
+
+    public void setCaseReference(String caseReference) {
+        this.caseReference = caseReference;
+    }
+
     public String getRole() {
         return role;
     }
@@ -66,6 +89,14 @@ public class NotificationTemplate {
         this.reference = reference;
     }
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
     public Date getCreatedAt() {
         return createdAt;
     }
@@ -80,6 +111,14 @@ public class NotificationTemplate {
 
     public void setModifiedAt(Date modifiedAt) {
         this.modifiedAt = modifiedAt;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
     }
 
     public Long getId() {
