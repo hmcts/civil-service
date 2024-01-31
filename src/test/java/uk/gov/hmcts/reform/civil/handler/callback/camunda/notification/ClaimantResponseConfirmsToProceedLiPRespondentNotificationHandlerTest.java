@@ -104,6 +104,19 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
             verifyNoInteractions(notificationService);
         }
 
+        @Test
+        void shouldNotNotifyLipRespondent_ifNoPartyEmail() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            caseData.getRespondent1().setPartyEmail(null);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED.name())
+                    .build()).build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
+
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
