@@ -50,7 +50,8 @@ public class CaseFlagsInitialiser {
                 break;
             }
             case CLAIMANT_RESPONSE:
-            case CLAIMANT_RESPONSE_SPEC: {
+            case CLAIMANT_RESPONSE_SPEC:
+            case CLAIMANT_RESPONSE_CUI: {
                 addApplicantExpertAndWitnessFlagsStructure(dataBuilder, caseData);
                 break;
             }
