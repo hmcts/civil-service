@@ -53,7 +53,6 @@ public class RoboticsNotificationService {
         log.info(String.format("Start notifyRobotics and case data is not null %s", caseData.getLegacyCaseReference()));
         Optional<EmailData> emailData = prepareEmailData(RoboticsEmailParams.builder().caseData(caseData).authToken(
             authToken).isMultiParty(isMultiParty).build());
-       log.info(String.format("triggerEvent %s", getRoboticsEmailRecipient));
 
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
@@ -82,13 +81,12 @@ public class RoboticsNotificationService {
             if (SPEC_CLAIM.equals(params.getCaseData().getCaseAccessCategory())) {
                 triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseDataDTO.getEvents());
                 log.info(String.format("Spec claim triggerEvent %s", triggerEvent));
-                log.info(String.format("Spec claim events %s", roboticsCaseDataDTO.getEvents());
+                log.info(String.format("Spec claim events %s", roboticsCaseDataDTO.getEvents()));
             } else {
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseDataDTO.getEvents());
                 log.info(String.format("Unspec triggerEvent %s", triggerEvent));
-                log.info(String.format("UnSpec claim events %s", roboticsCaseDataDTO.getEvents());
+                log.info(String.format("UnSpec claim events %s", roboticsCaseDataDTO.getEvents()));
             }
-            log.info(String.format("Email Recipient  %s", getRoboticsEmailRecipient());
             return Optional.of(EmailData.builder()
                                    .message(getMessage(params.getCaseData(), params.isMultiParty()))
                                    .subject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
@@ -209,11 +207,12 @@ public class RoboticsNotificationService {
 
     private String getRoboticsEmailRecipient(boolean isMultiParty, boolean isSpecClaim) {
         if (isSpecClaim) {
+            log.info(String.format("Recipient is %s", roboticsEmailConfiguration.getSpecRecipient()));
             return roboticsEmailConfiguration.getSpecRecipient();
         }
         String recipient = isMultiParty ? roboticsEmailConfiguration
             .getMultipartyrecipient() : roboticsEmailConfiguration.getRecipient();
-
+        log.info(String.format("Recipient is %s", recipient));
         return recipient;
     }
 
