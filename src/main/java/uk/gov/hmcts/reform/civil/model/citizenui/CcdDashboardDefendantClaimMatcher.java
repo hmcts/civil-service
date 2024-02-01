@@ -288,4 +288,14 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
             && caseData.getPaymentTypeSelection() != null;
     }
 
+    @Override
+    public boolean isPartialAdmissionAccepted() {
+        return false;
+    }
+
+    @Override
+    public boolean isPaymentPlanRejected() {
+        return false;
+    }
+
 }
