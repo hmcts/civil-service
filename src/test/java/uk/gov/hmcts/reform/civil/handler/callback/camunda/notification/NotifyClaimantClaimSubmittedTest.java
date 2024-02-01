@@ -188,7 +188,7 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSendEmail_whenHFWReferanceNumberNotPresentAndBilingual() {
+        void shouldSendEmail_whenHWFReferanceNumberNotPresentAndBilingual() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
                 .applicant1(PartyBuilder.builder().individual().build().toBuilder()
@@ -216,7 +216,7 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSendEmail_whenHFWReferenceNumberPresentAndBilingual() {
+        void shouldSendEmail_whenHWFReferenceNumberPresentAndBilingual() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
                 .applicant1(PartyBuilder.builder().individual().build().toBuilder()
