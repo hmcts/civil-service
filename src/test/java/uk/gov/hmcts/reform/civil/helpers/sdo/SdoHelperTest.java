@@ -130,6 +130,8 @@ public class SdoHelperTest {
                 .isEqualTo(SmallTrack.smallClaimCreditHire);
             assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimRoadTrafficAccident"))
                 .isEqualTo(SmallTrack.smallClaimRoadTrafficAccident);
+            assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimDisputeResolutionHearing"))
+                .isEqualTo(SmallTrack.smallClaimDisputeResolutionHearing);
         }
 
         @Test
@@ -169,6 +171,22 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident"))
+                .isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_ifHasDisputeResolutionHearing() {
+            List<SmallTrack> directions = List.of(SmallTrack.smallClaimDisputeResolutionHearing);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(NO)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .smallClaims(directions)
+                .build();
+
+            assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimDisputeResolutionHearing"))
                 .isTrue();
         }
 

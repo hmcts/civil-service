@@ -88,6 +88,8 @@ public class SdoHelper {
                 return SmallTrack.smallClaimCreditHire;
             case "smallClaimRoadTrafficAccident":
                 return SmallTrack.smallClaimRoadTrafficAccident;
+            case "smallClaimDisputeResolutionHearing":
+                return SmallTrack.smallClaimDisputeResolutionHearing;
             default:
                 return null;
         }
