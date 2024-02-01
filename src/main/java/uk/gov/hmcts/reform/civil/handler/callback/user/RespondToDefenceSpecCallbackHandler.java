@@ -415,7 +415,23 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 response.state(CaseState.CASE_SETTLED.name());
             }
         }
+
+        // must always move to in mediation for small claims when claimant proceeds
+        if (shouldMoveToInMediationState(caseData)) {
+            response.state(CaseState.IN_MEDIATION.name());
+        }
+
         return response.build();
+    }
+
+    private boolean shouldMoveToInMediationState(CaseData caseData) {
+        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+            if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+                return YES.equals(caseData.getApplicant1ProceedWithClaim())
+                    || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
+            }
+        }
+        return false;
     }
 
     private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
