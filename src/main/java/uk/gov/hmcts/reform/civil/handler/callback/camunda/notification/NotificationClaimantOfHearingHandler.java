@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
+import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_CLAIMANT_HEARI
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateAndApplyFee;
 import static uk.gov.hmcts.reform.civil.utils.HearingFeeUtils.calculateHearingDueDate;
+import static uk.gov.hmcts.reform.civil.utils.HearingUtils.isDisposalHearing;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Service
@@ -96,14 +98,15 @@ public class NotificationClaimantOfHearingHandler extends CallbackHandler implem
 
     private void sendEmailHMC(CaseData caseData, String recipient) {
         String emailTemplate;
-        if (caseData.getHearingFeePaymentDetails() != null
-            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus())) {
+        HearingNoticeVariables camundaVars = camundaService.getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId());
+        boolean isDisposalHearing = isDisposalHearing(camundaVars.getHearingType());
+        if (isDisposalHearing || (caseData.getHearingFeePaymentDetails() != null
+            && SUCCESS.equals(caseData.getHearingFeePaymentDetails().getStatus()))) {
             emailTemplate = notificationsProperties.getHearingListedNoFeeClaimantLrTemplateHMC();
         } else {
             emailTemplate = notificationsProperties.getHearingListedFeeClaimantLrTemplateHMC();
         }
-        String hearingId = camundaService
-            .getProcessVariables(caseData.getBusinessProcess().getProcessInstanceId()).getHearingId();
+        String hearingId = camundaVars.getHearingId();
         notificationService.sendMail(recipient, emailTemplate, addPropertiesHMC(caseData),
                                      String.format(REFERENCE_TEMPLATE_HEARING, hearingId)
         );

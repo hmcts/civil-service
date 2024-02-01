@@ -15,6 +15,9 @@ import java.time.LocalTime;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+
 @Slf4j
 public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher implements Claim {
 
@@ -95,8 +98,10 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean claimantRequestedCountyCourtJudgement() {
-        return caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
-            && !hasSdoBeenDrawn();
+        return (caseData.getApplicant1DQ() != null && caseData.getApplicant1DQ().getApplicant1DQRequestedCourt() != null
+            && !hasSdoBeenDrawn())
+            || (null != caseData.getCcjPaymentDetails()
+            && null != caseData.getCcjPaymentDetails().getCcjJudgmentStatement());
     }
 
     @Override
@@ -273,7 +278,8 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     @Override
     public boolean isPartialAdmissionRejected() {
         return CaseState.JUDICIAL_REFERRAL.equals(caseData.getCcdState())
-            && caseData.isPartAdmitClaimSpec() && YesOrNo.NO.equals(caseData.getApplicant1PartAdmitConfirmAmountPaidSpec());
+            && caseData.isPartAdmitClaimSpec()
+            && NO.equals(caseData.getApplicant1AcceptAdmitAmountPaidSpec());
     }
 
     @Override
@@ -287,5 +293,20 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
+    }
+
+    @Override
+    public boolean isPartialAdmissionAccepted() {
+        return  caseData.isPartAdmitClaimSpec()
+            && caseData.isPartAdmitClaimNotSettled()
+            && caseData.isPayImmediately()
+            && YES == caseData.getApplicant1AcceptAdmitAmountPaidSpec();
+    }
+
+    @Override
+    public boolean isPaymentPlanRejected() {
+        return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
+            && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
+            && caseData.hasApplicantRejectedRepaymentPlan());
     }
 }
