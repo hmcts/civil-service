@@ -18,27 +18,30 @@ import java.time.Instant;
 @Data
 public class TaskList implements Serializable {
     Long id;
-    @NotNull
+
     TaskListTemplate taskListTemplate;
-    @Size(max = 256)
+
     String role;
-    @Size(max = 256)
+
     String currentStatus;
-    @Size(max = 256)
+
     String nextStatus;
-    @Size(max = 256)
+
     String taskItemEn;
-    @Size(max = 256)
+
     String taskItemCy;
-    @Size(max = 20)
+
     String caseReference;
-    @NotNull
+
     Instant createdAt;
+
     Instant modifiedAt;
-    @Size(max = 256)
+
     String createdBy;
-    @Size(max = 256)
+
     String modifiedBy;
+
     Long orderBy;
+
     JsonNode data;
 }
