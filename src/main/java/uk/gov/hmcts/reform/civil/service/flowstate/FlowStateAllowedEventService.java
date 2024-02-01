@@ -112,6 +112,10 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_AGREE_REPAYMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PAY_IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_REJECT_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
@@ -123,7 +127,13 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFIC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_REPAYMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_SETTLE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_JUDGMENT_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PAY_IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_REJECT_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
@@ -486,6 +496,7 @@ public class FlowStateAllowedEventService {
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
                 CLAIMANT_RESPONSE_CUI,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 TRANSFER_ONLINE_CASE
             )
         ),
@@ -506,6 +517,7 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 TRANSFER_ONLINE_CASE
             )
         ),
@@ -1078,6 +1090,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
                 CLAIMANT_RESPONSE_CUI,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 TRANSFER_ONLINE_CASE
             )
         ),
@@ -1105,6 +1118,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
                 LIP_CLAIM_SETTLED,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 TRANSFER_ONLINE_CASE
             )
         ),
@@ -1138,7 +1152,24 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE
             )
         ),
-
+        entry(PART_ADMIT_REJECT_REPAYMENT.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(PART_ADMIT_PROCEED.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(PART_ADMIT_NOT_PROCEED.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(PART_ADMIT_PAY_IMMEDIATELY.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(PART_ADMIT_AGREE_SETTLE.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(FULL_ADMIT_PAY_IMMEDIATELY.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(FULL_ADMIT_PROCEED.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(FULL_ADMIT_NOT_PROCEED.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(FULL_ADMIT_JUDGMENT_ADMISSION.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
         entry(
             FULL_DEFENCE_PROCEED.fullName(),
             List.of(
@@ -1380,6 +1411,7 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
                 CLAIMANT_RESPONSE_CUI,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 TRANSFER_ONLINE_CASE
             )
         ),
@@ -1513,6 +1545,12 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
                 TRANSFER_ONLINE_CASE
+            )
+        ),
+        entry(
+            FULL_ADMIT_REJECT_REPAYMENT.fullName(),
+            List.of(
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
             )
         ),
         entry(

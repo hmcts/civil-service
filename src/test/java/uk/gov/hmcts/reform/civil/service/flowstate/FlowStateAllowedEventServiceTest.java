@@ -51,6 +51,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
@@ -513,6 +514,7 @@ class FlowStateAllowedEventServiceTest {
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
                         CLAIMANT_RESPONSE_CUI,
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
@@ -532,6 +534,7 @@ class FlowStateAllowedEventServiceTest {
                         NotSuitable_SDO,
                         APPLICATION_OFFLINE_UPDATE_CLAIM,
                         migrateCase,
+                        DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
                         TRANSFER_ONLINE_CASE
                     }
                 ),
