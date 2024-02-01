@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ChildrenByAgeGroupLRspec;
 import uk.gov.hmcts.reform.civil.model.EmployerDetailsLRspec;
@@ -16,12 +17,15 @@ import uk.gov.hmcts.reform.civil.model.Respondent1CourtOrderDetails;
 import uk.gov.hmcts.reform.civil.model.Respondent1DebtLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1EmployerDetailsLRspec;
 import uk.gov.hmcts.reform.civil.model.Respondent1SelfEmploymentLRspec;
+import uk.gov.hmcts.reform.civil.model.UnavailableDate;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccommodationTemplate;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.AccountSimpleTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.DebtTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.ReasonMoneyTemplateData;
 import uk.gov.hmcts.reform.civil.model.docmosis.lip.LipFormPartyDefence;
+
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
@@ -62,6 +66,14 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private final List<ReasonMoneyTemplateData> expenseList;
     //repayment details for repayment plan that are common between LR and LiP
     private final ResponseRepaymentDetailsForm commonDetails;
+
+    //CARM defendant Mediation Fields
+    private final String defendant1MediationContactNumber;
+    private final String defendant1MediationEmail;
+    private final String defendant1MediationCompanyName;
+    private final boolean defendant1MediationUnavailableDatesExists;
+    private final List<Element<UnavailableDate>> defendant1UnavailableDatesList;
+    private final boolean checkCarmToggle;
 
     public boolean isCurrentlyWorking() {
         return (employerDetails != null && !employerDetails.isEmpty())
