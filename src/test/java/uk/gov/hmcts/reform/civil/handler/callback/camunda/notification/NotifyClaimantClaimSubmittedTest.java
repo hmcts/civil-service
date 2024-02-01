@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -53,6 +54,8 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
 
         private static final String EMAIL_TEMPLATE_HWF = "test-notification-id";
         private static final String EMAIL_TEMPLATE_NO_HWF = "test-notification-no-hwf-id";
+        private static final String EMAIL_TEMPLATE_NO_HWF_BILINGUAL = "test-notification-no-hwf-bilingual-id";
+        private static final String EMAIL_TEMPLATE_HWF_BILINGUAL = "test-notification-bilingual-id";
         private static final String CLAIMANT_EMAIL_ID = "testorg@email.com";
         private static final String CLAIMANT_EMAIL_ID_INDIVIDUAL = "rambo@email.com";
         private static final String REFERENCE_NUMBER = "claim-submitted-notification-000DC001";
@@ -66,6 +69,10 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
                 EMAIL_TEMPLATE_NO_HWF);
             when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate()).thenReturn(
                 EMAIL_TEMPLATE_HWF);
+            when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate()).thenReturn(
+                EMAIL_TEMPLATE_NO_HWF_BILINGUAL);
+            when(notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate()).thenReturn(
+                EMAIL_TEMPLATE_HWF_BILINGUAL);
             when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("dummy_cui_front_end_url");
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
@@ -175,6 +182,65 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
             verify(notificationService, times(1)).sendMail(
                 CLAIMANT_EMAIL_ID_INDIVIDUAL,
                 EMAIL_TEMPLATE_NO_HWF,
+                getNotificationDataMap(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldSendEmail_whenHWFReferanceNumberNotPresentAndBilingual() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
+                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
+                                .build())
+                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
+                                 .build())
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.WELSH.name())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                CLAIMANT_EMAIL_ID_INDIVIDUAL,
+                EMAIL_TEMPLATE_NO_HWF_BILINGUAL,
+                getNotificationDataMap(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldSendEmail_whenHWFReferenceNumberPresentAndBilingual() {
+            //Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
+                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
+                                .build())
+                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
+                                 .build())
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .helpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("1111").build())
+                                 .build())
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.WELSH.name())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                CLAIMANT_EMAIL_ID_INDIVIDUAL,
+                EMAIL_TEMPLATE_HWF_BILINGUAL,
                 getNotificationDataMap(),
                 REFERENCE_NUMBER
             );
