@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.Date;
 
+@lombok.Getter
 @Entity
 @EqualsAndHashCode
 @Table(name = "notifications")
@@ -39,92 +40,37 @@ public class Notification {
         this.createdAt = createdAt;
         this.modifiedBy= modifiedBy;
         this.modifiedAt= modifiedAt;
-
     }
-    public String getTemplateId() {
-        return templateId;
-    }
-
     public void setTemplateId(String templateId) {
         this.templateId = templateId;
     }
-
-    public String getCaseReference() {
-        return caseReference;
-    }
-
     public void setCaseReference(String caseReference) {
         this.caseReference = caseReference;
     }
-
-    public String getRole() {
-        return role;
-    }
-
     public void setRole(String role) {
         this.role = role;
     }
-
-    public String getEnHTML() {
-        return enHTML;
-    }
-
     public void setEnHTML(String enHTML) {
         this.enHTML = enHTML;
     }
-
-    public String getCyHTML() {
-        return cyHTML;
-    }
-
     public void setCyHTML(String cyHTML) {
         this.cyHTML = cyHTML;
     }
-
-    public String getReference() {
-        return reference;
-    }
-
     public void setReference(String reference) {
         this.reference = reference;
     }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
-
-    public Date getModifiedAt() {
-        return modifiedAt;
-    }
-
     public void setModifiedAt(Date modifiedAt) {
         this.modifiedAt = modifiedAt;
     }
-
-    public String getModifiedBy() {
-        return modifiedBy;
-    }
-
     public void setModifiedBy(String modifiedBy) {
         this.modifiedBy = modifiedBy;
     }
-
-    public Long getId() {
-        return id;
-    }
-
     public void setId(Long id) {
         this.id = id;
     }
