@@ -4,6 +4,8 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.Date;
 
 @lombok.Getter
@@ -13,7 +15,6 @@ import java.util.Date;
 public class TaskList {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String taskListTemplateId;
@@ -49,14 +50,11 @@ public class TaskList {
     public void setCaseReference(String caseReference) {
         this.caseReference = caseReference;
     }
-
     public void setRole(String role) {
-        this.role = role;
-
-        public void setEnHTML(String enHTML) {
+        this.role = role;}
+    public void setEnHTML(String enHTML) {
         this.enHTML = enHTML;
     }
-
     public void setCyHTML(String cyHTML) {
         this.cyHTML = cyHTML;
     }
@@ -78,5 +76,4 @@ public class TaskList {
     public void setId(Long id) {
         this.id = id;
     }
-
 }
