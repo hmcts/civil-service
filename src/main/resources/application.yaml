@@ -300,6 +300,7 @@ notifications:
   respondent1LipClaimUpdatedTemplate: "9c44f3fb-a340-49e5-bf64-32a3187d7dcd"
   claimantLipClaimUpdatedTemplate: "0abdcb29-edd3-418a-aeab-a102da4ad441"
   applicantLiPDefaultJudgmentRequested: "668d4703-e97f-4e2f-8d07-1a697aac6d0b"
+  applicantLiPDefaultJudgmentRequestedBilingualTemplate: "cad66be4-ee96-4114-b2a7-489690cd6ebf"
 
   hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
 
