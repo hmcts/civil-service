@@ -22,4 +22,5 @@ public class HearingNoticeVariables implements MappableObject {
     public String caseState;
     public List<HearingDay> days;
     public Long requestVersion;
+    public String hearingType;
 }
