@@ -1,79 +1,44 @@
-package uk.gov.hmcts.reform.dashboard.model.dashboard;
+package uk.gov.hmcts.reform.dashboard.model;
 
-import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.*;
+import uk.gov.hmcts.reform.dashboard.model.TaskListTemplate;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import java.util.Date;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.time.Instant;
 
-@lombok.Getter
-@Entity
-@EqualsAndHashCode
-@Table(name = "task_List")
-public class TaskList {
-
-    @Id
-    private Long id;
-
-    private String taskListTemplateId;
-    private String caseReference;
-    private String role;
-    private String enHTML;
-    private String cyHTML;
-    private String reference;
-    private String createdBy;
-    private Date createdAt;
-    private String modifiedBy;
-    private Date modifiedAt;
-
-    public TaskList() {}
-
-    public TaskList(String taskListTemplateId, String caseReference, String role, String enHTML, String cyHTML, String reference, String createdBy, Date createdAt, String modifiedBy, Date modifiedAt) {
-        this.taskListTemplateId = taskListTemplateId;
-        this.caseReference = caseReference;
-        this.role = role;
-        this.enHTML = enHTML;
-        this.cyHTML = cyHTML;
-        this.reference = reference;
-        this.createdBy = createdBy;
-        this.createdAt = createdAt;
-        this.modifiedBy= modifiedBy;
-        this.modifiedAt= modifiedAt;
-
-    }
-
-    public void setTaskListTemplateId(String taskListTemplateId) {
-        this.taskListTemplateId = taskListTemplateId;
-    }
-    public void setCaseReference(String caseReference) {
-        this.caseReference = caseReference;
-    }
-    public void setRole(String role) {
-        this.role = role;}
-    public void setEnHTML(String enHTML) {
-        this.enHTML = enHTML;
-    }
-    public void setCyHTML(String cyHTML) {
-        this.cyHTML = cyHTML;
-    }
-    public void setReference(String reference) {
-        this.reference = reference;
-    }
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-    public void setModifiedAt(Date modifiedAt) {
-        this.modifiedAt = modifiedAt;
-    }
-    public void setModifiedBy(String modifiedBy) {
-        this.modifiedBy = modifiedBy;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
+@JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class TaskList implements Serializable {
+    Long id;
+    @NotNull
+    TaskListTemplate taskListTemplate;
+    @Size(max = 256)
+    String role;
+    @Size(max = 256)
+    String currentStatus;
+    @Size(max = 256)
+    String nextStatus;
+    @Size(max = 256)
+    String taskItemEn;
+    @Size(max = 256)
+    String taskItemCy;
+    @Size(max = 20)
+    String caseReference;
+    @NotNull
+    Instant createdAt;
+    Instant modifiedAt;
+    @Size(max = 256)
+    String createdBy;
+    @Size(max = 256)
+    String modifiedBy;
+    Long orderBy;
+    JsonNode data;
 }

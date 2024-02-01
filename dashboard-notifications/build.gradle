@@ -1,32 +1,11 @@
-plugins {
-  id 'java'
-  id 'org.springframework.boot' version '3.2.2'
-  id 'io.spring.dependency-management' version '1.1.4'
-}
-
-group = 'uk.gov.hmcts.reform.dashboard'
-version = '0.0.1-SNAPSHOT'
-
-java {
-  sourceCompatibility = '17'
-}
-
-configurations {
-  compileOnly {
-    extendsFrom annotationProcessor
-  }
-}
-
-repositories {
-  mavenCentral()
-}
 
 dependencies {
-  implementation 'org.springframework.boot:spring-boot-starter'
-  implementation 'javax.persistence:persistence-api:1.0.2'
-  implementation 'org.hibernate:hibernate-core:5.4.32.Final'
-  implementation 'org.hibernate:hibernate-validator:6.2.4.Final'
-  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation "org.hibernate:hibernate-core:5.6.10.Final"
+  implementation group: 'javax.persistence', name: 'javax.persistence-api'
+  implementation 'jakarta.inject:jakarta.inject-api:1.0.5'
+  implementation 'javax.validation:validation-api:2.0.0.Final'
+  implementation group: 'org.springframework.data', name: 'spring-data-commons'
   runtimeOnly 'org.postgresql:postgresql'
   compileOnly 'org.projectlombok:lombok'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -34,18 +13,7 @@ dependencies {
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-tasks.named('test') {
-  useJUnitPlatform()
+repositories {
+  mavenCentral()
 }
-bootJar {
-  getArchiveFileName().set(provider {
-    'civil-service.jar'
-  })
 
-  manifest {
-    attributes('Implementation-Version': project.version.toString())
-  }
-}
-wrapper {
-  distributionType = Wrapper.DistributionType.ALL
-}

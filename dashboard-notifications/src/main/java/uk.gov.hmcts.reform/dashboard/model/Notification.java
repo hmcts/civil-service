@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dashboard.model.dashboard;
+package uk.gov.hmcts.reform.dashboard.model;
 
 import lombok.EqualsAndHashCode;
 
@@ -16,7 +16,6 @@ public class Notification {
 
     @Id
     private Long id;
-
     private String templateId;
     private String caseReference;
     private String role;
