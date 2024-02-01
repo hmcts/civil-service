@@ -692,7 +692,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
 
-        //This the flowafter request for reconsideration
+        //This the flow after request for reconsideration
         if (featureToggleService.isSdoR2Enabled() && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
             updatedData.drawDirectionsOrderRequired(null);
@@ -701,21 +701,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.smallClaims(null);
             updatedData.claimsTrack(null);
             updatedData.orderType(null);
-
-            if (caseData.getIsSdoR2NewScreen().equals(YES)) {
-                updatedData.sdoR2AddNewDirection(null);
-                updatedData.sdoR2Trial(SdoR2Trial.builder().hearingNotesTxt("").build());
-            } else {
-                updatedData.trialAdditionalDirectionsForFastTrack(null);
-                updatedData.drawDirectionsOrderSmallClaimsAdditionalDirections(null);
-                updatedData.fastTrackAllocation(FastTrackAllocation.builder().assignComplexityBand(null).build());
-                updatedData.disposalHearingAddNewDirections(null);
-                updatedData.smallClaimsAddNewDirections(null);
-                updatedData.fastTrackAddNewDirections(null);
-                updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
-                updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
-                updatedData.disposalHearingHearingNotes(null);
-            }
+            updatedData.trialAdditionalDirectionsForFastTrack(null);
+            updatedData.drawDirectionsOrderSmallClaimsAdditionalDirections(null);
+            updatedData.fastTrackAllocation(FastTrackAllocation.builder().assignComplexityBand(null).build());
+            updatedData.disposalHearingAddNewDirections(null);
+            updatedData.smallClaimsAddNewDirections(null);
+            updatedData.fastTrackAddNewDirections(null);
+            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
+            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
+            updatedData.disposalHearingHearingNotes(null);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -1157,8 +1151,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (featureToggleService.isSdoR2Enabled()) {
             if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(NO)) {
                 return caseData.getFastTrackMethodInPerson().getValue().getCode();
-            }
-            if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(YES)) {
+            } else if (SdoHelper.isFastTrack(caseData) &&  caseData.getIsSdoR2NewScreen().equals(YES)) {
                 return caseData.getSdoR2Trial().getHearingCourtLocationList().getValue() != null
                     ? caseData.getSdoR2Trial().getHearingCourtLocationList().getValue().getCode()
                     : caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue().getCode();
