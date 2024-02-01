@@ -2265,6 +2265,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
             when(courtLocationUtils.getLocationsFromList(locations))
                 .thenReturn(locationValues);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
             // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -2279,6 +2280,43 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("list_items").asList()
                 .extracting("label")
                 .containsExactly(locationValues.getListItems().get(0).getLabel());
+            assertThat(response.getData().get("showCarmFields")).isEqualTo("Yes");
+        }
+
+        @Test
+        void shouldCheckToggleNotToShowCarmFieldsBeforePopulateCourtLocations() {
+            // Given
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder()
+                                 .partyName("name")
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .build())
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            List<LocationRefData> locations = List.of(LocationRefData.builder()
+                                                          .build());
+            when(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
+                .thenReturn(locations);
+            DynamicList locationValues = DynamicList.fromList(List.of("Value 1"));
+            when(courtLocationUtils.getLocationsFromList(locations))
+                .thenReturn(locationValues);
+            when(toggleService.isCarmEnabledForCase(any())).thenReturn(false);
+
+            // When
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            System.out.println(response.getData());
+
+            // Then
+            assertThat(response.getData())
+                .extracting("respondToCourtLocation")
+                .extracting("responseCourtLocations")
+                .extracting("list_items").asList()
+                .extracting("label")
+                .containsExactly(locationValues.getListItems().get(0).getLabel());
+            assertThat(response.getData().get("showCarmFields")).isEqualTo("No");
         }
     }
 
