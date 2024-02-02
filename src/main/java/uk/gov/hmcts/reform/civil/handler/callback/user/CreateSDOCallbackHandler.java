@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
@@ -70,14 +71,17 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
@@ -767,6 +771,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                    .physicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE)
                                    .build());
 
+        setInclude(updatedData);
         updatedData.sdoR2ImportantNotesTxt(SdoR2UiConstantFastTrack.IMPORTANT_NOTES);
         updatedData.sdoR2ImportantNotesDate(LocalDate.now().plusDays(7));
     }
@@ -877,18 +882,25 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.setSmallClaimsFlag(YesOrNo.NO).build();
         updatedData.setFastTrackFlag(YesOrNo.NO).build();
+        updatedData.isSdoR2NewScreen(YesOrNo.NO).build();
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             updatedData.setSmallClaimsFlag(YES).build();
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
             if (featureToggleService.isSdoR2Enabled()) {
-                YesOrNo isSdoR2NewScreen = caseData.getFastClaims() != null && caseData.getFastClaims().contains(
-                    FastTrack.fastClaimNoiseInducedHearingLoss) ? YES : NO;
-                updatedData.isSdoR2NewScreen(isSdoR2NewScreen).build();
+                if (caseData.getDrawDirectionsOrderRequired() == NO
+                    && caseData.getFastClaims() != null
+                    && caseData.getFastClaims().contains(
+                    FastTrack.fastClaimNoiseInducedHearingLoss)) {
+                    updatedData.isSdoR2NewScreen(YES).build();
+                } else if (caseData.getDrawDirectionsOrderRequired() == YES
+                    && caseData.getTrialAdditionalDirectionsForFastTrack() != null
+                    && caseData.getTrialAdditionalDirectionsForFastTrack().contains(FastTrack.fastClaimNoiseInducedHearingLoss)) {
+                    updatedData.isSdoR2NewScreen(YES).build();
+                }
             }
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
@@ -1200,6 +1212,21 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
+    }
+
+    private void setInclude(
+        CaseData.CaseDataBuilder<?, ?> updatedData
+    ) {
+        updatedData.sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder()
+                                                .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build());
+        updatedData.sdoR2DisclosureOfDocumentsToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        updatedData.sdoR2SeparatorWitnessesOfFactToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        updatedData.sdoR2ScheduleOfLossToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        updatedData.sdoR2TrialToggle(List.of(IncludeInOrderToggle.INCLUDE));
+        updatedData.sdoVariationOfDirections(SdoR2VariationOfDirections.builder()
+                                                .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build());
+        updatedData.sdoR2Settlement(SdoR2Settlement.builder()
+                                                 .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build());
     }
 
 }
