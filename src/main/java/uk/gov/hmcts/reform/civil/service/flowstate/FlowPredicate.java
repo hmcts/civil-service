@@ -12,11 +12,13 @@ import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
@@ -184,6 +186,9 @@ public class FlowPredicate {
 
     public static final Predicate<CaseData> claimIssued = caseData ->
         caseData.getClaimNotificationDeadline() != null;
+
+    public static final Predicate<CaseData> claimIssueBilingual = caseData ->
+        caseData.isBilingual();
 
     public static final Predicate<CaseData> claimDetailsNotifiedTimeExtension = caseData ->
         caseData.getRespondent1TimeExtensionDate() != null
@@ -380,6 +385,11 @@ public class FlowPredicate {
             && StringUtils.isNotBlank(caseData.getReasonNotSuitableSDO().getInput())
             && caseData.getTakenOfflineDate() != null
             && caseData.getTakenOfflineByStaffDate() == null;
+
+    public static final Predicate<CaseData> specSmallClaimCarm = caseData ->
+        SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            && caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 5, 1));
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension =
         FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt;
@@ -978,7 +988,7 @@ public class FlowPredicate {
     public static final Predicate<CaseData> allAgreedToLrMediationSpec = caseData -> {
         boolean result = false;
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && AllocatedTrack.SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
             && caseData.getResponseClaimMediationSpecRequired() == YesOrNo.YES) {
             if (caseData.getRespondent2() != null
                 && caseData.getRespondent2SameLegalRepresentative().equals(NO)

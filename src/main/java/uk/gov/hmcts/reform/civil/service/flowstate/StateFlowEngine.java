@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDet
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissalOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssueBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothUnregisteredSolicitors;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
@@ -93,6 +94,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.responde
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondent2OrgNotRegistered;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specSmallClaimCarm;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimDetailsNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterClaimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterNotSuitableForSdo;
@@ -261,9 +263,12 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffBeforeClaimIssued)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
                 .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLipCase)
-                    .set(flags -> {
+                    .set((c, flags) -> {
                         if (featureToggleService.isPinInPostEnabled()) {
                             flags.put(FlowFlag.PIP_ENABLED.name(), true);
+                        }
+                        if (claimIssueBilingual.test(c)) {
+                            flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
                         }
                         flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                         flags.put(FlowFlag.LIP_CASE.name(), true);
@@ -555,6 +560,7 @@ public class StateFlowEngine {
                                                                  .or(takenOfflineAfterNotSuitableForSdo))
                 .transitionTo(TAKEN_OFFLINE_AFTER_SDO).onlyIf(takenOfflineAfterSDO)
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawn)
+                .transitionTo(IN_MEDIATION).onlyIf(specSmallClaimCarm)
             .state(FULL_DEFENCE_NOT_PROCEED)
             .state(TAKEN_OFFLINE_BY_STAFF)
             .state(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT)
@@ -600,6 +606,7 @@ public class StateFlowEngine {
             .state(IN_HEARING_READINESS)
             .state(FULL_ADMIT_JUDGMENT_ADMISSION)
             .state(SIGN_SETTLEMENT_AGREEMENT)
+                .transitionTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyIf(ccjRequestJudgmentByAdmission)
             .build();
     }
 

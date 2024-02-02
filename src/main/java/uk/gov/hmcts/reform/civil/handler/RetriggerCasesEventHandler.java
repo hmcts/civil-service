@@ -43,7 +43,6 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
                     log.info("Retrigger CaseId: {} started", caseId);
                     coreCaseDataService.triggerEvent(Long.parseLong(caseId), caseEvent);
                     log.info("Retrigger CaseId: {} finished", caseId);
-
                 } catch (FeignException e) {
                     log.error("ERROR Retrigger CaseId: {}", caseId);
                     log.error(String.format("Retrigger case failed: %s", e.contentUTF8()));
@@ -51,6 +50,7 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
                 } catch (Exception e) {
                     throw e;
                 }
+                
                 log.info("Retrigger cases Finished for event: {}", caseEvent);
             });
         } else {

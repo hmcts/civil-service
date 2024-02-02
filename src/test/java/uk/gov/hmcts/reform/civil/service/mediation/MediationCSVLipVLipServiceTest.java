@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.service.mediation;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.Party;
 
 import java.math.BigDecimal;
@@ -45,7 +45,7 @@ public class MediationCSVLipVLipServiceTest {
     @Test
     void shouldReturn_properDataForFile_ForIndividual() {
         //Given
-        CaseData caseData = getCaseData(Party.Type.INDIVIDUAL, Language.BOTH.toString());
+        CaseData caseData = getCaseData(Party.Type.INDIVIDUAL, Language.WELSH.toString());
         //When
         String result = service.generateCSVContent(caseData, true);
         //Then
@@ -125,7 +125,7 @@ public class MediationCSVLipVLipServiceTest {
     @Test
     void shouldReturn_properDataForFile_ForBilingualFlag() {
         //Given
-        CaseData caseData = getCaseData(Party.Type.SOLE_TRADER, Language.BOTH.toString());
+        CaseData caseData = getCaseData(Party.Type.SOLE_TRADER, Language.WELSH.toString());
         //When
         String result = service.generateCSVContent(caseData, true);
         //Then

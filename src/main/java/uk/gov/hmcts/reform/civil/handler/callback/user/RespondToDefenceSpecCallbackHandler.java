@@ -90,6 +90,8 @@ import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDeta
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistPartyAddress;
 import static uk.gov.hmcts.reform.civil.utils.WitnessUtils.addEventAndDateAddedToApplicantWitnesses;
 
 @Service
@@ -266,10 +268,15 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        checkPartyAddress(caseData, callbackParams);
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+
+        caseData = persistPartyAddress(oldCaseData, caseData);
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
+
+        // persist party flags (ccd issue)
+        persistFlagsForParties(oldCaseData, caseData, builder);
 
         // null/delete the document used for preview, otherwise it will show as duplicate within case file view
         if (featureToggleService.isCaseFileViewEnabled()) {
@@ -408,7 +415,23 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 response.state(CaseState.CASE_SETTLED.name());
             }
         }
+
+        // must always move to in mediation for small claims when claimant proceeds
+        if (shouldMoveToInMediationState(caseData)) {
+            response.state(CaseState.IN_MEDIATION.name());
+        }
+
         return response.build();
+    }
+
+    private boolean shouldMoveToInMediationState(CaseData caseData) {
+        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+            if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
+                return YES.equals(caseData.getApplicant1ProceedWithClaim())
+                    || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
+            }
+        }
+        return false;
     }
 
     private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
@@ -495,6 +518,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
             updatedCaseData.responseClaimTrack(AllocatedTrack.getAllocatedTrack(
                 caseData.getTotalClaimAmount(),
+                null,
                 null
             ).name());
         }
@@ -713,36 +737,6 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .build();
     }
 
-    private void checkPartyAddress(CaseData caseData, CallbackParams callbackParams) {
-        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
-
-        if (null != caseData.getApplicant1()
-            && null == caseData.getApplicant1().getPrimaryAddress()
-            && null != oldCaseData && null != oldCaseData.getApplicant1()
-            && null != oldCaseData.getApplicant1().getPrimaryAddress()) {
-            caseData.getApplicant1().setPrimaryAddress(oldCaseData.getApplicant1().getPrimaryAddress());
-        }
-        if (null != caseData.getRespondent1()
-            && null == caseData.getRespondent1().getPrimaryAddress()
-            && null != oldCaseData && null != oldCaseData.getRespondent1()
-            && null != oldCaseData.getRespondent1().getPrimaryAddress()) {
-            caseData.getRespondent1().setPrimaryAddress(oldCaseData.getRespondent1().getPrimaryAddress());
-        }
-        if (null != caseData.getApplicant2()
-            && null == caseData.getApplicant2().getPrimaryAddress()
-            && null != oldCaseData && null != oldCaseData.getApplicant2()
-            && null != oldCaseData.getApplicant2().getPrimaryAddress()) {
-            caseData.getApplicant2().setPrimaryAddress(oldCaseData.getApplicant2().getPrimaryAddress());
-        }
-        if (null != caseData.getRespondent2()
-            && null == caseData.getRespondent2().getPrimaryAddress()
-            && null != oldCaseData && null != oldCaseData.getRespondent2()
-            && null != oldCaseData.getRespondent2().getPrimaryAddress()) {
-            caseData.getRespondent2().setPrimaryAddress(oldCaseData.getRespondent2().getPrimaryAddress());
-        }
-
-    }
-        
     private boolean isFlightDelayAndSmallClaim(CaseData caseData) {
         return (featureToggleService.isSdoR2Enabled() && caseData.getIsFlightDelayClaim() != null
             && caseData.getIsFlightDelayClaim().equals(YES)

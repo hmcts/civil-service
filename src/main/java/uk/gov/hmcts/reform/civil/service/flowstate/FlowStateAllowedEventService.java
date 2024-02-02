@@ -14,6 +14,10 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGEMENT_OF_SERVICE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ADD_CASE_NOTE;
@@ -36,12 +40,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFAULT_JUDGEMENT_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_SPEC;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ENTER_BREATHING_SPACE_LIP;
@@ -58,7 +62,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MANAGE_CONTACT_INFORMATION;
@@ -87,13 +90,12 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_MEDIATION_DOCUMENTS;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CLAIM_DISMISSED_HEARING_FEE_DUE_DEADLINE;
@@ -110,6 +112,11 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DIVERGE
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_AGREE_REPAYMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PAY_IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_NOT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_REJECT_REPAYMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_DEFENCE_PROCEED;
@@ -120,7 +127,13 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFIC
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_REPAYMENT;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_AGREE_SETTLE;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.FULL_ADMIT_JUDGMENT_ADMISSION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_PROCEED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_NOT_SETTLED_NO_MEDIATION;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PAY_IMMEDIATELY;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_PROCEED;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PART_ADMIT_REJECT_REPAYMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CLAIM_DISMISSED_DEADLINE_AWAITING_CAMUNDA;
@@ -128,6 +141,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PAST_CL
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.SPEC_DRAFT;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED;
@@ -162,7 +176,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -177,7 +192,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -191,7 +207,8 @@ public class FlowStateAllowedEventService {
                     NotSuitable_SDO,
                     migrateCase,
                     CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                    CREATE_CLAIM_AFTER_PAYMENT
+                    CREATE_CLAIM_AFTER_PAYMENT,
+                    TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -219,7 +236,8 @@ public class FlowStateAllowedEventService {
                 CREATE_CLAIM_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT
+                EVIDENCE_UPLOAD_RESPONDENT,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -245,7 +263,8 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_JUDGE,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
-                EVIDENCE_UPLOAD_RESPONDENT
+                EVIDENCE_UPLOAD_RESPONDENT,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -315,7 +334,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
-                GENERATE_DIRECTIONS_ORDER
+                GENERATE_DIRECTIONS_ORDER,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -344,7 +364,8 @@ public class FlowStateAllowedEventService {
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
                 HEARING_SCHEDULED,
-                GENERATE_DIRECTIONS_ORDER
+                GENERATE_DIRECTIONS_ORDER,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -371,9 +392,19 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 migrateCase,
                 TAKE_CASE_OFFLINE,
+                TRANSFER_ONLINE_CASE,
+                GENERATE_DIRECTIONS_ORDER,
+                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD_RESPONDENT,
                 EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS,
                 HEARING_SCHEDULED,
-                GENERATE_DIRECTIONS_ORDER
+                TRIAL_READY_CHECK,
+                TRIAL_READY_NOTIFICATION,
+                MOVE_TO_DECISION_OUTCOME,
+                HEARING_FEE_UNPAID,
+                HEARING_FEE_PAID,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
 
@@ -396,7 +427,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -419,7 +451,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -442,7 +475,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -461,7 +495,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -480,7 +516,9 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 CREATE_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -498,7 +536,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -549,7 +588,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 CLAIMANT_RESPONSE_CUI,
                 asyncStitchingComplete,
-                REQUEST_FOR_RECONSIDERATION
+                REQUEST_FOR_RECONSIDERATION,
+                DECISION_ON_RECONSIDERATION_REQUEST
             )
         ),
 
@@ -567,7 +607,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -580,7 +621,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 APPLICATION_CLOSED_UPDATE_CLAIM,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -593,7 +635,8 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
                 APPLICATION_CLOSED_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -621,7 +664,8 @@ public class FlowStateAllowedEventService {
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
                 migrateCase,
                 NotSuitable_SDO,
-                CREATE_SDO
+                CREATE_SDO,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -633,7 +677,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -645,7 +690,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 REFER_TO_JUDGE,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -654,7 +700,8 @@ public class FlowStateAllowedEventService {
                 DISMISS_CLAIM,
                 migrateCase,
                 CREATE_SDO,
-                NotSuitable_SDO
+                NotSuitable_SDO,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -739,7 +786,9 @@ public class FlowStateAllowedEventService {
             List.of(
                 MEDIATION_SUCCESSFUL,
                 MEDIATION_UNSUCCESSFUL,
-                ADD_UNAVAILABLE_DATES
+                ADD_UNAVAILABLE_DATES,
+                INITIATE_GENERAL_APPLICATION,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -774,7 +823,16 @@ public class FlowStateAllowedEventService {
                 TRIAL_READINESS,
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                TRANSFER_ONLINE_CASE
+            )
+        ),
+        entry(
+            CASE_STAYED.fullName(),
+            List.of(
+                INITIATE_GENERAL_APPLICATION,
+                ADD_UNAVAILABLE_DATES,
+                CHANGE_SOLICITOR_EMAIL
             )
         )
     );
@@ -808,7 +866,8 @@ public class FlowStateAllowedEventService {
                     NotSuitable_SDO,
                     migrateCase,
                     CREATE_CLAIM_SPEC_AFTER_PAYMENT,
-                    CREATE_CLAIM_AFTER_PAYMENT
+                    CREATE_CLAIM_AFTER_PAYMENT,
+                    TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -826,7 +885,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -872,7 +932,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -912,7 +973,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -935,7 +997,8 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 migrateCase,
-                CHANGE_SOLICITOR_EMAIL
+                CHANGE_SOLICITOR_EMAIL,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -959,7 +1022,20 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 migrateCase,
                 CHANGE_SOLICITOR_EMAIL,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE,
+                GENERATE_DIRECTIONS_ORDER,
+                EVIDENCE_UPLOAD_APPLICANT,
+                EVIDENCE_UPLOAD_RESPONDENT,
+                EVIDENCE_UPLOAD_JUDGE,
+                TRIAL_READINESS,
+                HEARING_SCHEDULED,
+                TRIAL_READY_CHECK,
+                TRIAL_READY_NOTIFICATION,
+                MOVE_TO_DECISION_OUTCOME,
+                HEARING_FEE_UNPAID,
+                HEARING_FEE_PAID,
+                BUNDLE_CREATION_NOTIFICATION
             )
         ),
 
@@ -986,7 +1062,8 @@ public class FlowStateAllowedEventService {
                 DEFAULT_JUDGEMENT_SPEC,
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -1012,7 +1089,9 @@ public class FlowStateAllowedEventService {
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -1038,7 +1117,9 @@ public class FlowStateAllowedEventService {
                 DEFAULT_JUDGEMENT_SPEC,
                 CHANGE_SOLICITOR_EMAIL,
                 REQUEST_JUDGEMENT_ADMISSION_SPEC,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -1067,10 +1148,28 @@ public class FlowStateAllowedEventService {
                 NotSuitable_SDO,
                 migrateCase,
                 CHANGE_SOLICITOR_EMAIL,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE
             )
         ),
-
+        entry(PART_ADMIT_REJECT_REPAYMENT.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(PART_ADMIT_PROCEED.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(PART_ADMIT_NOT_PROCEED.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(PART_ADMIT_PAY_IMMEDIATELY.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(PART_ADMIT_AGREE_SETTLE.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(FULL_ADMIT_PAY_IMMEDIATELY.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(FULL_ADMIT_PROCEED.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(FULL_ADMIT_NOT_PROCEED.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+        entry(FULL_ADMIT_JUDGMENT_ADMISSION.fullName(),
+              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
         entry(
             FULL_DEFENCE_PROCEED.fullName(),
             List.of(
@@ -1113,7 +1212,8 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete,
                 CLAIMANT_RESPONSE_CUI,
                 UPLOAD_MEDIATION_DOCUMENTS,
-                REQUEST_FOR_RECONSIDERATION
+                REQUEST_FOR_RECONSIDERATION,
+                DECISION_ON_RECONSIDERATION_REQUEST
             )
         ),
 
@@ -1135,7 +1235,8 @@ public class FlowStateAllowedEventService {
                 REFER_TO_JUDGE,
                 migrateCase,
                 CHANGE_SOLICITOR_EMAIL,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1157,21 +1258,24 @@ public class FlowStateAllowedEventService {
             List.of(
                 TAKE_CASE_OFFLINE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
             PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
             PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName(),
             List.of(
                 DISMISS_CLAIM,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1204,7 +1308,8 @@ public class FlowStateAllowedEventService {
                 INITIATE_GENERAL_APPLICATION,
                 CREATE_SDO,
                 NotSuitable_SDO,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1213,7 +1318,8 @@ public class FlowStateAllowedEventService {
                 DEFENDANT_RESPONSE_SPEC,
                 DEFENDANT_RESPONSE_CUI,
                 RESET_PIN,
-                migrateCase
+                migrateCase,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1224,7 +1330,9 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                INITIATE_GENERAL_APPLICATION,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1262,7 +1370,8 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
-                UPLOAD_MEDIATION_DOCUMENTS
+                UPLOAD_MEDIATION_DOCUMENTS,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1301,7 +1410,9 @@ public class FlowStateAllowedEventService {
                 ADD_UNAVAILABLE_DATES,
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
-                CLAIMANT_RESPONSE_CUI
+                CLAIMANT_RESPONSE_CUI,
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1309,7 +1420,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 CHANGE_SOLICITOR_EMAIL,
                 EXTEND_RESPONSE_DEADLINE,
-                LIP_CLAIM_SETTLED
+                LIP_CLAIM_SETTLED,
+                TRANSFER_ONLINE_CASE
 
             )
         ),
@@ -1344,14 +1456,17 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 CHANGE_SOLICITOR_EMAIL,
                 ADD_UNAVAILABLE_DATES,
-                asyncStitchingComplete
+                asyncStitchingComplete,
+                UPLOAD_MEDIATION_DOCUMENTS,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
             PREPARE_FOR_HEARING_CONDUCT_HEARING.fullName(),
             List.of(
                 asyncStitchingComplete,
-                UPLOAD_MEDIATION_DOCUMENTS
+                UPLOAD_MEDIATION_DOCUMENTS,
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1428,13 +1543,41 @@ public class FlowStateAllowedEventService {
             PART_ADMIT_AGREE_REPAYMENT.fullName(),
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
-                REQUEST_JUDGEMENT_ADMISSION_SPEC
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                TRANSFER_ONLINE_CASE
+            )
+        ),
+        entry(
+            FULL_ADMIT_REJECT_REPAYMENT.fullName(),
+            List.of(
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
             )
         ),
         entry(
             FULL_ADMIT_AGREE_REPAYMENT.fullName(),
             List.of(
                 DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC,
+                TRANSFER_ONLINE_CASE
+            )
+        ),
+        entry(
+            PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName(),
+            List.of(
+                UPLOAD_TRANSLATED_DOCUMENT
+            )
+        ),
+        entry(
+            CASE_STAYED.fullName(),
+            List.of(
+                INITIATE_GENERAL_APPLICATION,
+                ADD_UNAVAILABLE_DATES,
+                CHANGE_SOLICITOR_EMAIL
+            )
+        ),
+        entry(
+            SIGN_SETTLEMENT_AGREEMENT.fullName(),
+            List.of(
                 REQUEST_JUDGEMENT_ADMISSION_SPEC
             )
         )

@@ -19,11 +19,10 @@ import uk.gov.hmcts.reform.civil.service.mediation.MediationCsvServiceFactory;
 import uk.gov.hmcts.reform.civil.service.search.CaseStateSearchService;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
-
-import static java.time.LocalDate.now;
 
 @Component
 @RequiredArgsConstructor
@@ -37,32 +36,40 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
     private static final String subject = "OCMC Mediation Data";
     private static final String filename = "ocmc_mediation_data.csv";
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private final FeatureToggleService toggleService;
 
     @Override
     public void handleTask(ExternalTask externalTask) {
 
-        List<CaseDetails> cases = caseSearchService.getCases();
-        List<CaseData> inMediationCases = cases.stream()
+        List<CaseData> inMediationCases;
+        LocalDate claimMovedDate;
+        if (externalTask.getVariable("claimMovedDate") != null) {
+            claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
+        } else {
+            claimMovedDate = LocalDate.now().minusDays(1);
+        }
+        List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate);
+        inMediationCases = cases.stream()
             .map(caseDetailsConverter::toCaseData)
-            .filter(checkMediationMovedDate).toList();
+            .toList();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), inMediationCases.size());
         String[] headers = getCSVHeaders();
         StringBuilder csvColContent = new StringBuilder();
-        if (!inMediationCases.isEmpty()) {
-            inMediationCases.forEach(caseData ->
-                csvColContent.append(generateCsvContent(caseData)));
+        try {
+            if (!inMediationCases.isEmpty()) {
+                inMediationCases.forEach(caseData ->
+                                             csvColContent.append(generateCsvContent(caseData)));
 
-            String generateCsvData = generateCSVRow(headers) + csvColContent;
-            Optional<EmailData> emailData = prepareEmail(generateCsvData);
+                String generateCsvData = generateCSVRow(headers) + csvColContent;
+                Optional<EmailData> emailData = prepareEmail(generateCsvData);
 
-            emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+                emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
         }
     }
-
-    private  Predicate<CaseData> checkMediationMovedDate = caseData ->
-        caseData.getClaimMovedToMediationOn() != null
-            && now().minusDays(1).equals(caseData.getClaimMovedToMediationOn());
 
     private Optional<EmailData> prepareEmail(String generateCsvData) {
         InputStreamSource inputSource = new ByteArrayResource(generateCsvData.getBytes(StandardCharsets.UTF_8));
