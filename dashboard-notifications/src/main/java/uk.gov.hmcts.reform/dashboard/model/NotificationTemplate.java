@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.dashboard.model;
 
 import lombok.EqualsAndHashCode;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;
 import java.util.Date;
+import java.util.UUID;
 
 @lombok.Getter
 @lombok.Setter
@@ -16,7 +16,7 @@ import java.util.Date;
 public class NotificationTemplate {
 
     @Id
-    private Long id;
+    private UUID id;
     private String role;
     private String name;
     private String enHTML;

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.dashboard.model;
 
 import java.util.Date;
+import java.util.UUID;
 import javax.persistence.*;
-
 import lombok.EqualsAndHashCode;
 
 @lombok.Getter
@@ -12,11 +12,11 @@ import lombok.EqualsAndHashCode;
 @Table(name = "dashboard_notifications")
 public class Notification {
     @Id
-    private Long id;
+    private UUID id;
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "notifications_Templates_id", referencedColumnName = "id")
     private NotificationTemplate notificationTemplate;
-    private String caseReference;
+    private String reference;
     private String name;
     private String enHTML;
     private String cyHTML;
@@ -31,9 +31,9 @@ public class Notification {
 
     }
 
-    public Notification(NotificationTemplate notificationTemplate, String caseReference, String name, String enHTML,String cyHTML, String params, String createdBy, Date createdAt, String updatedBy, Date updatedOn) {
+    public Notification(NotificationTemplate notificationTemplate, String reference, String name, String enHTML,String cyHTML, String params, String createdBy, Date createdAt, String updatedBy, Date updatedOn) {
         this.notificationTemplate = notificationTemplate;
-        this.caseReference = caseReference;
+        this.reference = reference;
         this.name = name;
         this.enHTML = enHTML;
         this.cyHTML = cyHTML;
