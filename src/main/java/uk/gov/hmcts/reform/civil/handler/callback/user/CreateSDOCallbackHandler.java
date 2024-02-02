@@ -682,6 +682,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
 
+        updatedData.isSdoR2NewScreen(NO).build();
+        prePopulateNihlFields(callbackParams, caseData, updatedData);
+
         //This the flow after request for reconsideration
         if (featureToggleService.isSdoR2Enabled() && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
@@ -882,10 +885,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             if (featureToggleService.isSdoR2Enabled()) {
                 YesOrNo isSdoR2NewScreen = caseData.getFastClaims() != null && caseData.getFastClaims().contains(
                     FastTrack.fastClaimNoiseInducedHearingLoss) ? YES : NO;
-                updatedData.isSdoR2NewScreen(isSdoR2NewScreen);
-                if (isSdoR2NewScreen.equals(YES)) {
-                    prePopulateNihlFields(callbackParams, caseData, updatedData);
-                }
+                updatedData.isSdoR2NewScreen(isSdoR2NewScreen).build();
             }
         }
 
