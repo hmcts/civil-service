@@ -1,44 +1,46 @@
 package uk.gov.hmcts.reform.dashboard.model;
 
+import java.util.Date;
+import javax.persistence.*;
+
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Id;
-import java.util.Date;
 @lombok.Getter
 @lombok.Setter
 @Entity
 @EqualsAndHashCode
-@Table(name = "notifications")
+@Table(name = "dashboard_notifications")
 public class Notification {
     @Id
     private Long id;
-    private String templateId;
+    @ManyToOne
+    @JoinColumn(name = "id")
+    private NotificationTemplate notificationTemplate;
     private String caseReference;
-    private String role;
+    private String name;
     private String enHTML;
     private String cyHTML;
-    private String reference;
+    @Column(name = "message_param")
+    private String params;
     private String createdBy;
     private Date createdAt;
-    private String modifiedBy;
-    private Date modifiedAt;
+    private String updatedBy;
+    private Date updatedOn;
 
     public Notification() {
 
     }
 
-    public Notification(String templateId,String caseReference,String role, String enHTML,String cyHTML, String reference, String createdBy, Date createdAt, String modifiedBy, Date modifiedAt) {
-        this.templateId = templateId;
+    public Notification(NotificationTemplate notificationTemplate, String caseReference, String name, String enHTML,String cyHTML, String params, String createdBy, Date createdAt, String updatedBy, Date updatedOn) {
+        this.notificationTemplate = notificationTemplate;
         this.caseReference = caseReference;
-        this.role = role;
+        this.name = name;
         this.enHTML = enHTML;
         this.cyHTML = cyHTML;
-        this.reference = reference;
+        this.params = params;
         this.createdBy = createdBy;
         this.createdAt = createdAt;
-        this.modifiedBy= modifiedBy;
-        this.modifiedAt= modifiedAt;
+        this.updatedBy = updatedBy;
+        this.updatedOn = updatedOn;
     }
 }
