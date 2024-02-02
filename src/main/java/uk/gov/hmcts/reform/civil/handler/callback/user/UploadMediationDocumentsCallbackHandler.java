@@ -94,8 +94,10 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
             userInfo.getUid()
         );
 
-        log.info("email " + userInfo.getRoles().toString());
+        log.info("roles " + userInfo.getRoles().toString());
         log.info("name " + userInfo.getName());
+        log.info("family name " + userInfo.getFamilyName());
+        log.info("given name " + userInfo.getGivenName());
 
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
@@ -103,15 +105,19 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         List<DynamicListElement> dynamicListOptions = new ArrayList<>();
 
         if (isApplicantSolicitor(roles)) {
+            log.info("applicant 1 options");
             addApplicantOptions(dynamicListOptions, caseData);
         } else if (isRespondentSolicitorOne(roles) && !isRespondentSolicitorTwo(roles)) {
             // 1v1 or 1v2DS respondent 1 solicitor
+            log.info("defendant 1 options");
             addDefendant1Option(dynamicListOptions, caseData);
         } else if (!isRespondentSolicitorOne(roles) && isRespondentSolicitorTwo(roles)) {
+            log.info("defendant 2 options");
             // 1v2 DS respondent 2 solicitor
             addDefendant2Option(dynamicListOptions, caseData);
         } else {
             // 1v2 SS
+            log.info("both defendant options");
             addSameSolicitorDefendantOptions(dynamicListOptions, caseData);
         }
 

@@ -116,6 +116,9 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             void setUp() {
                 when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid")
                                                                           .name("name")
+                                                                          .familyName("fname")
+                                                                          .givenName("gname")
+                                                                          .name("name")
                                                                           .roles(List.of("role"))
                                                                           .build());
             }
