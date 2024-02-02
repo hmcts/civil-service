@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.dashboard.model.TaskListTemplate;
+
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
@@ -23,19 +25,20 @@ import java.time.Instant;
 @NoArgsConstructor
 @Data
 public class TaskList implements Serializable {
-    Long id;
 
-    TaskListTemplate taskListTemplate;
-    String role;
-    String currentStatus;
-    String nextStatus;
-    String taskItemEn;
-    String taskItemCy;
-    String caseReference;
-    Instant createdAt;
-    Instant modifiedAt;
-    String createdBy;
-    String modifiedBy;
-    Long orderBy;
-    JsonNode data;
+    @Id
+    private Long id;
+    private TaskListTemplate taskListTemplate;
+    private String role;
+    private String currentStatus;
+    private String nextStatus;
+    private String taskItemEn;
+    private String taskItemCy;
+    private String caseReference;
+    private Instant createdAt;
+    private Instant modifiedAt;
+    private String createdBy;
+    private String modifiedBy;
+    private Long orderBy;
+    private JsonNode data;
 }

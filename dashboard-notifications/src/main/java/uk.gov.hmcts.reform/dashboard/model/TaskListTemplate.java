@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.persistence.Id;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -18,16 +20,17 @@ import java.time.Instant;
 @Data
 public class TaskListTemplate implements Serializable {
 
-    Long id;
-    String titleEn;
-    String contentEn;
-    String titleCy;
-    String contentCy;
-    String reference;
-    String taskStatusSequence;
-    String role;
-    Long orderBy;
-    String categoryEn;
-    String categoryCy;
-    Instant createdDate;
+    @Id
+    private Long id;
+    private String titleEn;
+    private String contentEn;
+    private String titleCy;
+    private String contentCy;
+    private String reference;
+    private String taskStatusSequence;
+    private String role;
+    private Long orderBy;
+    private String categoryEn;
+    private String categoryCy;
+    private Instant createdDate;
 }
