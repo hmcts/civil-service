@@ -40,7 +40,7 @@ class RetriggerCasesEventHandlerTest {
     @Test
     void testHandleTask_RetriggerClaimantResponse() {
         ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getVariable("eventForRetrigger")).thenReturn(CaseEvent.RETRIGGER_CLAIMANT_RESPONSE);
+        when(externalTask.getVariable("eventForRetrigger")).thenReturn("RETRIGGER_CLAIMANT_RESPONSE");
         CoreCaseDataService coreCaseDataServiceMock = mock(CoreCaseDataService.class);
 
         RetriggerCasesEventHandler handler = new RetriggerCasesEventHandler(coreCaseDataServiceMock);
@@ -53,7 +53,7 @@ class RetriggerCasesEventHandlerTest {
     @Test
     void testHandleTask_RetriggerClaimantResponseSpecific() {
         ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getVariable("eventForRetrigger")).thenReturn(CaseEvent.RETRIGGER_CLAIMANT_RESPONSE_SPEC);
+        when(externalTask.getVariable("eventForRetrigger")).thenReturn("RETRIGGER_CLAIMANT_RESPONSE_SPEC");
         CoreCaseDataService coreCaseDataServiceMock = mock(CoreCaseDataService.class);
 
         RetriggerCasesEventHandler handler = new RetriggerCasesEventHandler(coreCaseDataServiceMock);
@@ -67,7 +67,7 @@ class RetriggerCasesEventHandlerTest {
     void testHandleTask_RetriggerCases() {
         // Given
         ExternalTask externalTask = mock(ExternalTask.class);
-        when(externalTask.getVariable("eventForRetrigger")).thenReturn(CaseEvent.RETRIGGER_CASES);
+        when(externalTask.getVariable("eventForRetrigger")).thenReturn("RETRIGGER_CASES");
         CoreCaseDataService coreCaseDataServiceMock = mock(CoreCaseDataService.class);
 
         RetriggerCasesEventHandler handler = new RetriggerCasesEventHandler(coreCaseDataServiceMock);
