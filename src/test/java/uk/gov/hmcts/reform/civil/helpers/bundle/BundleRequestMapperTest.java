@@ -29,7 +29,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 class BundleRequestMapperTest {
@@ -415,7 +417,6 @@ class BundleRequestMapperTest {
         });
         return witnessEvidenceDocs;
     }
-
 
     private List<Element<CaseDocument>> setupSystemGeneratedCaseDocsNoId() {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
