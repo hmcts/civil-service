@@ -114,7 +114,10 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
         class PopulatePartyOptions {
             @BeforeEach
             void setUp() {
-                when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+                when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid")
+                                                                          .name("name")
+                                                                          .roles(List.of("role"))
+                                                                          .build());
             }
 
             @Nested
