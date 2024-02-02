@@ -545,6 +545,8 @@ public class CaseDataBuilder {
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
 
+    private YesOrNo eaCourtLocation;
+
     public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
         this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
         return this;
@@ -6486,6 +6488,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder eaCourtLocation(YesOrNo eaCourtLocation) {
+        this.eaCourtLocation = eaCourtLocation;
+        return this;
+    }
+
     public CaseDataBuilder applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal suggestedInstallmentPayment) {
         this.applicant1SuggestInstalmentsPaymentAmountForDefendantSpec = suggestedInstallmentPayment;
         return this;
@@ -6864,6 +6871,7 @@ public class CaseDataBuilder {
             .reasonForReconsiderationApplicant(reasonForReconsiderationApplicant)
             .reasonForReconsiderationRespondent1(reasonForReconsiderationRespondent1)
             .reasonForReconsiderationRespondent2(reasonForReconsiderationRespondent2)
+            .eaCourtLocation(eaCourtLocation)
             .upholdingPreviousOrderReason(upholdingPreviousOrderReason)
             .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)
             .build();
