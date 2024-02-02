@@ -207,9 +207,9 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         boolean isInFavourOfClaimant = applicant1Response != null
             && applicant1Response.hasCourtDecisionInFavourOfClaimant();
 
-        return (caseData.hasApplicantRejectedRepaymentPlan()
+        return ((caseData.hasApplicantRejectedRepaymentPlan()
             && (isCourtDecisionAccepted || isInFavourOfClaimant))
-            || caseData.hasApplicantAcceptedRepaymentPlan()
+            || caseData.hasApplicantAcceptedRepaymentPlan())
             && caseData.hasApplicant1SignedSettlementAgreement();
     }
 }
