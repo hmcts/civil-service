@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dashboard.model.dashboard;
+package uk.gov.hmcts.reform.dashboard.model;
 
 import lombok.EqualsAndHashCode;
 
