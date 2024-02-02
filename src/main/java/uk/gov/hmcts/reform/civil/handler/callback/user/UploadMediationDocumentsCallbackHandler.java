@@ -89,12 +89,7 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
     private CallbackResponse populatePartyOptions(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         UserInfo userInfo = userService.getUserInfo(authToken);
-        List<String> roles = coreCaseUserService.getUserCaseRoles(
-            callbackParams.getCaseData().getCcdCaseReference().toString(),
-            userInfo.getUid()
-        );
 
-        log.info("roles " + userInfo.getRoles().toString());
         log.info("name " + userInfo.getName());
         log.info("family name " + userInfo.getFamilyName());
         log.info("given name " + userInfo.getGivenName());
@@ -104,6 +99,11 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
 
         List<DynamicListElement> dynamicListOptions = new ArrayList<>();
 
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
+            callbackParams.getCaseData().getCcdCaseReference().toString(),
+            userInfo.getUid()
+        );
+        log.info("roles " + userInfo.getRoles().toString());
         if (isApplicantSolicitor(roles)) {
             log.info("applicant 1 options");
             addApplicantOptions(dynamicListOptions, caseData);
