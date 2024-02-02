@@ -31,6 +31,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 class BundleRequestMapperTest {
@@ -163,6 +164,40 @@ class BundleRequestMapperTest {
         assertEquals("testFileName 12/12/2023",
                      bundleCreateRequest.getCaseDetails().getCaseData().getDefendant2CostsBudgets().get(0).getValue().getDocumentFileName());
 
+    }
+
+    @Test
+    void testBundleRequestMapperWhenDirectionsHaveNoCategoryId() {
+        // Case file view was add on 16th nov 2023, cases before that will not have categoryId, and cannot be sorted into bundles
+        // Given
+        CaseData caseData = getCaseDataWithNoId();
+        // When
+        BundleCreateRequest bundleCreateRequest = bundleRequestMapper.mapCaseDataToBundleCreateRequest(caseData, "sample" +
+            ".yaml", "test", "test", 1L
+        );
+        // Then
+        assertNotNull(bundleCreateRequest);
+        assertTrue(bundleCreateRequest.getCaseDetails().getCaseData().getDirectionsQuestionnaires().isEmpty());
+
+    }
+
+    private CaseData getCaseDataWithNoId() {
+        return CaseData.builder().ccdCaseReference(1L)
+            .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocsNoId())
+            .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
+                "applicant1").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(Party.builder().individualLastName("lastname").individualFirstName("df1Fname").partyName(
+                "respondent1").type(Party.Type.INDIVIDUAL).build())
+            .addApplicant2(YesOrNo.YES)
+            .addRespondent2(YesOrNo.YES)
+            .applicant2(Party.builder().individualLastName("lastname").individualFirstName("cl2Fname").partyName(
+                "applicant2").type(Party.Type.INDIVIDUAL).build())
+            .respondent2(Party.builder().individualLastName("lastname").individualFirstName("df2Fname").partyName(
+                "respondent2").type(Party.Type.INDIVIDUAL).build())
+            .hearingDate(LocalDate.now())
+            .submittedDate(LocalDateTime.of(2023, 2, 10, 2,
+                                            2, 2))
+            .build();
     }
 
     private CaseData getCaseData() {
@@ -381,6 +416,51 @@ class BundleRequestMapperTest {
                                                              .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build()));
         });
         return witnessEvidenceDocs;
+    }
+
+    private List<Element<CaseDocument>> setupSystemGeneratedCaseDocsNoId() {
+        List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
+        CaseDocument caseDocumentDQDef1 =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL)
+                                  .documentFileName(TEST_FILE_NAME).build())
+                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2)).build();
+        CaseDocument caseDocumentDQApp1 =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL)
+                                  .documentFileName(TEST_FILE_NAME).build())
+                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2)).build();
+        CaseDocument caseDocumentDQDef22 =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL)
+                                  .documentFileName(TEST_FILE_NAME).build())
+                .createdDatetime(LocalDateTime.of(2023, 2, 11, 2,
+                                                  2, 2)).build();
+        CaseDocument caseDocumentDQDef21 =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL)
+                                  .documentFileName(TEST_FILE_NAME).build())
+                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2)).build();
+        CaseDocument caseDocumentDQDef23 =
+            CaseDocument.builder()
+                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .documentLink(Document.builder().documentUrl(TEST_URL)
+                                  .documentFileName(TEST_FILE_NAME).build())
+                .createdDatetime(LocalDateTime.of(2023, 3, 10, 2,
+                                                  2, 2)).build();
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef1));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQApp1));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef22));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef21));
+        systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef23));
+        return systemGeneratedCaseDocuments;
     }
 
     private List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
