@@ -336,10 +336,10 @@ public class CaseDataParent implements MappableObject {
     private FastTrackJudgesRecital sdoFastTrackJudgesRecital;
     private SdoR2FastTrackAltDisputeResolution sdoAltDisputeResolution;
     private SdoR2VariationOfDirections sdoVariationOfDirections;
-    private IncludeInOrderToggle sdoR2SeparatorWitnessesOfFactToggle;
+    private List<IncludeInOrderToggle> sdoR2SeparatorWitnessesOfFactToggle;
     private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
     private SdoR2Settlement sdoR2Settlement;
-    private IncludeInOrderToggle sdoR2DisclosureOfDocumentsToggle;
+    private List<IncludeInOrderToggle> sdoR2DisclosureOfDocumentsToggle;
     private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
     private SdoR2ExpertEvidence sdoR2ExpertEvidence;
     private SdoR2AddendumReport sdoR2AddendumReport;
@@ -348,9 +348,9 @@ public class CaseDataParent implements MappableObject {
     private SdoR2PermissionToRelyOnExpert sdoR2PermissionToRelyOnExpert;
     private SdoR2EvidenceAcousticEngineer sdoR2EvidenceAcousticEngineer;
     private SdoR2QuestionsToEntExpert sdoR2QuestionsToEntExpert;
-    private IncludeInOrderToggle  sdoR2TrialToggle;
+    private List<IncludeInOrderToggle>  sdoR2TrialToggle;
     private SdoR2Trial sdoR2Trial;
-    private IncludeInOrderToggle sdoR2ScheduleOfLossToggle;
+    private List<IncludeInOrderToggle> sdoR2ScheduleOfLossToggle;
     private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
     private SdoR2AddNewDirection sdoR2AddNewDirection;
     private String sdoR2ImportantNotesTxt;
