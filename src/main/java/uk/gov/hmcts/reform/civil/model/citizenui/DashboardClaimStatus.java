@@ -33,8 +33,8 @@ public enum DashboardClaimStatus {
     CLAIM_ENDED(
         Claim::hasClaimEnded
     ),
-    RESPONSE_BY_POST(
-        Claim::isPaperResponse
+    CLAIMANT_REJECTED_PAYMENT_PLAN(
+        Claim::isPaymentPlanRejected
     ),
     WAITING_COURT_REVIEW(
         Claim::isCourtReviewing
@@ -57,6 +57,9 @@ public enum DashboardClaimStatus {
     SETTLED(
         Claim::isSettled
     ),
+    REQUESTED_COUNTRY_COURT_JUDGEMENT(
+        Claim::claimantRequestedCountyCourtJudgement
+    ),
     DEFENDANT_PART_ADMIT_PAID(
         Claim::hasDefendantStatedTheyPaid
     ),
@@ -76,9 +79,7 @@ public enum DashboardClaimStatus {
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
-    REQUESTED_COUNTRY_COURT_JUDGEMENT(
-        Claim::claimantRequestedCountyCourtJudgement
-    ),
+
     DEFAULT_JUDGEMENT(
         Claim::isClaimantDefaultJudgement
     ),
@@ -87,9 +88,6 @@ public enum DashboardClaimStatus {
     ),
     RESPONSE_DUE_NOW(
         Claim::hasResponseDueToday
-    ),
-    ELIGIBLE_FOR_CCJ(
-        Claim::isEligibleForCCJ
     ),
     ADMIT_PAY_IMMEDIATELY(
         Claim::defendantRespondedWithFullAdmitAndPayImmediately
@@ -128,6 +126,15 @@ public enum DashboardClaimStatus {
         Claim::isPassedToCountyCourtBusinessCentre
     ),
 
+    CLAIMANT_ACCEPTED_PARTIAL_ADMISSION(
+        Claim::isPartialAdmissionAccepted
+    ),
+    ELIGIBLE_FOR_CCJ(
+        Claim::isEligibleForCCJ
+    ),
+    RESPONSE_BY_POST(
+        Claim::isPaperResponse
+    ),
     NO_STATUS(c -> false);
 
     @Getter
