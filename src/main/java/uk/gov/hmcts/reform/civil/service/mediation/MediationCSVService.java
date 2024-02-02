@@ -42,7 +42,7 @@ public abstract class MediationCSVService {
 
         if (isR2FlagEnabled) {
             return generateCSVRow(claimantData, isWelshFlag(data.isBilingual()), isR2FlagEnabled)
-                    + generateCSVRow(respondentData, isWelshFlag(data.isRespondentResponseBilingual()), isR2FlagEnabled);
+                    + generateCSVRow(respondentData, null, isR2FlagEnabled);
         }
 
         return generateCSVRow(claimantData, null, false)

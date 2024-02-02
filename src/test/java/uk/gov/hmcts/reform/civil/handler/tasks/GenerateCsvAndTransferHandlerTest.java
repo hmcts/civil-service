@@ -140,12 +140,12 @@ class GenerateCsvAndTransferHandlerTest {
     void shouldGenerateCsvAndSendEmailSuccessfully_R2LipVLipFlagEnabled() {
         when(toggleService.isLipVLipEnabled()).thenReturn(true);
         when(mediationCsvServiceFactory.getMediationCSVService(any())).thenReturn(mediationCSVLipvLipService);
-        when(searchService.getCases()).thenReturn(List.of(caseDetailsWithInMediationState, caseDetailsWithInMediationStateNotToProcess));
+        when(searchService.getInMediationCases(claimToBeProcessed)).thenReturn(List.of(caseDetailsWithInMediationState));
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationState)).thenReturn(caseDataInMediation);
         when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
 
         inMediationCsvHandler.execute(externalTask, externalTaskService);
-        verify(searchService).getCases();
+        verify(searchService).getInMediationCases(claimToBeProcessed);
         verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask);
