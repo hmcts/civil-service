@@ -93,6 +93,7 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         log.info("name " + userInfo.getName());
         log.info("family name " + userInfo.getFamilyName());
         log.info("given name " + userInfo.getGivenName());
+        log.info("uid " + userInfo.getUid());
 
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
