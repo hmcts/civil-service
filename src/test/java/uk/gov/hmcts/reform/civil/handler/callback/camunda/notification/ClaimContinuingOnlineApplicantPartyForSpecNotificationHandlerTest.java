@@ -62,7 +62,6 @@ public class ClaimContinuingOnlineApplicantPartyForSpecNotificationHandlerTest e
     private ClaimContinuingOnlineApplicantPartyForSpecNotificationHandler handler;
 
     private static final String CLAIMANT_EMAIL_ADDRESS = "testorg@email.com";
-
     private static final String TASK_ID_Applicant1 = "CreateClaimContinuingOnlineNotifyApplicant1ForSpec";
     private static final String TEMPLATE_ID = "template-id";
     private static final String BILINGUAL_TEMPLATE_ID = "bilingual-template-id";
