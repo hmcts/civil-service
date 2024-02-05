@@ -124,9 +124,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     public static final String REFERENCE_NUMBER = "000DC001";
     private static final DynamicList options = DynamicList.builder()
         .listItems(List.of(
-                       DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
-                       DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
-                       DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build())).build();
+                    DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                    DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                    DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build())).build();
 
     @MockBean
     private Time time;
@@ -1779,7 +1779,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                              + "Each party has the right to apply to have this Order set aside or varied. "
                                              + "Any such application must be received by the Court (together with the "
                                              + "appropriate fee) by 4pm on %s.",
-                    date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
+                                         date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))
                 ));
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("helpText1")
                 .isEqualTo("If either party considers that the time estimate is insufficient, "
