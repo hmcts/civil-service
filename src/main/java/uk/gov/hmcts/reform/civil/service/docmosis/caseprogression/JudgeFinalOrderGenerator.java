@@ -216,7 +216,6 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
     // If hearing location was selected during SDO we use that, otherwise use case management location
     public String getCourtLocationAddress(LocationRefData venueNameCML, CaseData caseData) {
         if (nonNull(caseData.getCaseManagementOrderSelection())) {
-            log.info("getCaseManagementOrderSelection()   NULL");
             // Court locations from DJ SDO
             if (nonNull(caseData.getDisposalHearingMethodInPersonDJ())) {
                 return caseData.getDisposalHearingMethodInPersonDJ().getValue().getLabel();
@@ -225,23 +224,18 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
                 return caseData.getTrialHearingMethodInPersonDJ().getValue().getLabel();
             }
         } else {
-            log.info("getCaseManagementOrderSelection()   NOT NULL");
             // Court locations from CREATE_SDO
             if (nonNull(caseData.getSmallClaimsMethodInPerson())) {
-                log.info("SDO SMALL_CLAIMS");
                 return caseData.getSmallClaimsMethodInPerson().getValue().getLabel();
             }
             if (nonNull(caseData.getFastTrackMethodInPerson())) {
-                log.info("SDO FAST_TRACK");
                 return caseData.getFastTrackMethodInPerson().getValue().getLabel();
             }
             if (nonNull(caseData.getDisposalHearingMethodInPerson())) {
-                log.info("SDO DISPOSAL");
                 return caseData.getDisposalHearingMethodInPerson().getValue().getLabel();
             }
         }
         // defaulted CML location, if no hearing location selected
-        log.info("DEFAULTED");
         return LocationRefDataService.getDisplayEntry(venueNameCML);
     }
 
