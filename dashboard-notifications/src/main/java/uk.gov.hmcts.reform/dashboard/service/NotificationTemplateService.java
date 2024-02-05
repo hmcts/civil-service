@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.dashboard.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.dashboard.model.NotificationTemplate;
+import uk.gov.hmcts.reform.dashboard.data.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.repository.NotificationTemplateRepository;
 import java.util.List;
 
@@ -11,28 +11,28 @@ public class NotificationTemplateService {
     @Autowired
     private NotificationTemplateRepository repository;
 
-    public List<NotificationTemplate> getAll() {
-        return (List<NotificationTemplate>) repository.findAll();
+    public List<NotificationTemplateEntity> getAll() {
+        return (List<NotificationTemplateEntity>) repository.findAll();
     }
 
-    public NotificationTemplate getById(Long id) {
+    public NotificationTemplateEntity getById(Long id) {
         return repository.findById(id).orElse(null);
     }
 
-    public NotificationTemplate create(NotificationTemplate notificationTemplate) {
-        return repository.save(notificationTemplate);
+    public NotificationTemplateEntity create(NotificationTemplateEntity notificationTemplateEntity) {
+        return repository.save(notificationTemplateEntity);
     }
 
-    public NotificationTemplate update(Long id, NotificationTemplate notificationTemplate) {
-        NotificationTemplate existingNotification = repository.findById(id).orElse(null);
+    public NotificationTemplateEntity update(Long id, NotificationTemplateEntity notificationTemplateEntity) {
+        NotificationTemplateEntity existingNotification = repository.findById(id).orElse(null);
 
         if (existingNotification != null) {
-            existingNotification.setRole(notificationTemplate.getRole());
-            existingNotification.setName(notificationTemplate.getName());
-            existingNotification.setEnHTML(notificationTemplate.getEnHTML());
-            existingNotification.setCyHTML(notificationTemplate.getCyHTML());
-            existingNotification.setCreatedAt(notificationTemplate.getCreatedAt());
-            existingNotification.setTimeToLive(notificationTemplate.getTimeToLive());
+            existingNotification.setRole(notificationTemplateEntity.getRole());
+            existingNotification.setName(notificationTemplateEntity.getName());
+            existingNotification.setEnHTML(notificationTemplateEntity.getEnHTML());
+            existingNotification.setCyHTML(notificationTemplateEntity.getCyHTML());
+            existingNotification.setCreatedAt(notificationTemplateEntity.getCreatedAt());
+            existingNotification.setTimeToLive(notificationTemplateEntity.getTimeToLive());
 
 
             return repository.save(existingNotification);

@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.dashboard.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.dashboard.model.Notification;
+import uk.gov.hmcts.reform.dashboard.data.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.repository.NotificationRepository;
 
 import java.util.List;
@@ -13,23 +13,23 @@ public class NotificationService {
     @Autowired
     private NotificationRepository repository;
 
-    public List<Notification> getAll() {
-        return (List<Notification>) repository.findAll();
+    public List<NotificationEntity> getAll() {
+        return (List<NotificationEntity>) repository.findAll();
     }
 
-    public Notification getById(UUID id) {
+    public NotificationEntity getById(UUID id) {
         return repository.findById(id).orElse(null);
     }
 
-    public Notification create(Notification notification) {
+    public NotificationEntity create(NotificationEntity notification) {
         return repository.save(notification);
     }
 
-    public Notification update(UUID id, Notification notification) {
-        Notification existingNotification = repository.findById(id).orElse(null);
+    public NotificationEntity update(UUID id, NotificationEntity notification) {
+        NotificationEntity existingNotification = repository.findById(id).orElse(null);
 
         if (existingNotification != null) {
-            existingNotification.setNotificationTemplate(notification.getNotificationTemplate());
+            existingNotification.setNotificationTemplateEntity(notification.getNotificationTemplateEntity());
             existingNotification.setReference(notification.getReference());
             existingNotification.setEnHTML(notification.getEnHTML());
             existingNotification.setCyHTML(notification.getCyHTML());

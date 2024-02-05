@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dashboard.model;
+package uk.gov.hmcts.reform.dashboard.data;
 
 import lombok.EqualsAndHashCode;
 import javax.persistence.Column;
@@ -12,7 +12,7 @@ import java.util.Date;
 @Entity
 @EqualsAndHashCode
 @Table(name = "dashboard_notifications_Templates")
-public class NotificationTemplate {
+public class NotificationTemplateEntity {
 
     @Id
     private Long id;
@@ -25,11 +25,11 @@ public class NotificationTemplate {
     private Date createdAt;
     private String timeToLive;
 
-    public NotificationTemplate() {
+    public NotificationTemplateEntity() {
 
     }
 
-    public NotificationTemplate(String role, String enHTML, String cyHTML, String name, Date createdAt, String timeToLive) {
+    public NotificationTemplateEntity(String role, String enHTML, String cyHTML, String name, Date createdAt, String timeToLive) {
 
         this.role = role;
         this.enHTML = enHTML;

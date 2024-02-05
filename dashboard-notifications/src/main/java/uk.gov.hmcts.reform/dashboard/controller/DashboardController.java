@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
+import uk.gov.hmcts.reform.dashboard.data.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.data.TaskItemTemplateEntity;
-import uk.gov.hmcts.reform.dashboard.data.TaskListEntity;
-import uk.gov.hmcts.reform.dashboard.model.Notification;
+
 import uk.gov.hmcts.reform.dashboard.service.NotificationService;
 import uk.gov.hmcts.reform.dashboard.service.TaskListService;
 
@@ -64,7 +64,7 @@ public class DashboardController {
     @GetMapping(path = {
         "notifications/{caseId}",
     })
-    public ResponseEntity<List<Notification>> getCaseId(
+    public ResponseEntity<List<NotificationEntity>> getCaseId(
         @PathVariable("uuId") UUID uuId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {

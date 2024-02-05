@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dashboard.data.TaskItemTemplateEntity;
-import uk.gov.hmcts.reform.dashboard.data.TaskListRepository;
+import uk.gov.hmcts.reform.dashboard.repository.TaskListRepository;
 import java.util.List;
 
 @Service

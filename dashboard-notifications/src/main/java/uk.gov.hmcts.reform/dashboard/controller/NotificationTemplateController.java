@@ -2,11 +2,10 @@ package uk.gov.hmcts.reform.dashboard.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.reform.dashboard.model.NotificationTemplate;
+import uk.gov.hmcts.reform.dashboard.data.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.repository.NotificationTemplateRepository;
 
 import java.util.List;
-import java.util.UUID;
 @RestController
 @RequestMapping("/dashboard_notification_template")
 public class NotificationTemplateController {
@@ -14,23 +13,23 @@ public class NotificationTemplateController {
     private NotificationTemplateRepository repository;
 
     @GetMapping("/")
-    public List<NotificationTemplate> getAll() {
-        return repository.findAll();
+    public List<NotificationTemplateEntity> getAll() {
+        return (List<NotificationTemplateEntity>) repository.findAll();
     }
 
     @GetMapping("/{id}")
-    public NotificationTemplate getById(@PathVariable UUID id) {
+    public NotificationTemplateEntity getById(@PathVariable Long id) {
         return repository.findById(id).orElse(null);
     }
 
     @PostMapping("/")
-    public NotificationTemplate create(@RequestBody NotificationTemplate template) {
+    public NotificationTemplateEntity create(@RequestBody NotificationTemplateEntity template) {
         return repository.save(template);
     }
 
     @PutMapping("/{id}")
-    public NotificationTemplate update(@PathVariable UUID id, @RequestBody NotificationTemplate template) {
-        NotificationTemplate existingTemplate = repository.findById(id).orElse(null);
+    public NotificationTemplateEntity update(@PathVariable Long id, @RequestBody NotificationTemplateEntity template) {
+        NotificationTemplateEntity existingTemplate = repository.findById(id).orElse(null);
 
         if (existingTemplate != null) {
             existingTemplate.setName(template.getName());
@@ -47,7 +46,7 @@ public class NotificationTemplateController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable UUID id) {
+    public void delete(@PathVariable Long id) {
         repository.deleteById(id);
     }
 }

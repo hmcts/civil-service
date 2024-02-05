@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dashboard.model;
+package uk.gov.hmcts.reform.dashboard.data;
 
 import java.util.Date;
 import java.util.UUID;
@@ -12,13 +12,13 @@ import lombok.EqualsAndHashCode;
 @Entity
 @EqualsAndHashCode
 @Table(name = "dashboard_notifications")
-public class Notification {
+public class NotificationEntity {
     @Id
     @NotNull
     private UUID id;
     @ManyToOne
     @JoinColumn(name = "notifications_Templates_id", referencedColumnName = "id")
-    private NotificationTemplate notificationTemplate;
+    private NotificationTemplateEntity notificationTemplateEntity;
     private String reference;
     @Column(name = "notification_name")
     private String name;
@@ -31,12 +31,12 @@ public class Notification {
     private String updatedBy;
     private Date updatedOn;
 
-    public Notification() {
+    public NotificationEntity() {
 
     }
 
-    public Notification(NotificationTemplate notificationTemplate, String reference, String name, String enHTML,String cyHTML, String params, String createdBy, Date createdAt, String updatedBy, Date updatedOn) {
-        this.notificationTemplate = notificationTemplate;
+    public NotificationEntity(NotificationTemplateEntity notificationTemplateEntity, String reference, String name, String enHTML, String cyHTML, String params, String createdBy, Date createdAt, String updatedBy, Date updatedOn) {
+        this.notificationTemplateEntity = notificationTemplateEntity;
         this.reference = reference;
         this.name = name;
         this.enHTML = enHTML;
