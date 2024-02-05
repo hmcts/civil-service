@@ -8,8 +8,11 @@ import java.util.List;
 
 @Service
 public class NotificationTemplateService {
-    @Autowired
-    private NotificationTemplateRepository repository;
+    private final NotificationTemplateRepository repository;
+
+    public NotificationTemplateService(NotificationTemplateRepository repository) {
+        this.repository = repository;
+    }
 
     public List<NotificationTemplateEntity> getAll() {
         return (List<NotificationTemplateEntity>) repository.findAll();

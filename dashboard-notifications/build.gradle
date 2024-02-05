@@ -4,7 +4,7 @@ dependencies {
   implementation group: 'javax.persistence', name: 'javax.persistence-api'
   implementation 'jakarta.inject:jakarta.inject-api:1.0.5'
   implementation 'javax.validation:validation-api:2.0.0.Final'
-  implementation group: 'org.springframework.data', name: 'spring-data-commons'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   runtimeOnly 'org.postgresql:postgresql'
   compileOnly 'org.projectlombok:lombok'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'

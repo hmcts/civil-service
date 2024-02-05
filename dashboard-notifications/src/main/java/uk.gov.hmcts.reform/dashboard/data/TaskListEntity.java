@@ -2,13 +2,19 @@ package uk.gov.hmcts.reform.dashboard.data;
 
 import lombok.Getter;
 import lombok.Setter;
+import uk.gov.hmcts.reform.dashboard.utils.JsonDataConverter;
 
+
+import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -17,12 +23,16 @@ import java.util.UUID;
 @Entity
 public class TaskListEntity {
     @Id
-    @NotNull
     private UUID id;
 
-    private Integer currentStatus;
+    @NotNull
+    @ManyToOne(fetch = javax.persistence.FetchType.LAZY, optional = false)
+    @JoinColumn(name = "task_item_template_id", nullable = false)
+    private TaskItemTemplateEntity taskItemTemplate;
 
-    private Integer nextStatus;
+    private Short currentStatus;
+
+    private Short nextStatus;
 
     @Size(max = 512)
     private String taskItemEn;
@@ -30,18 +40,16 @@ public class TaskListEntity {
     @Size(max = 512)
     private String taskItemCy;
 
-    @Size(max = 256)
-    private String messageParm;
-
     @NotNull
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
-    private Instant modifiedAt;
-
-    @Size(max = 256)
-    private String createdBy;
+    private LocalDateTime updatedAt;
 
     @Size(max = 256)
-    private String modifiedBy;
+    private String updatedBy;
+
+    @Column(name = "message_parm", columnDefinition = "jsonb(0, 0)")
+    @Convert(converter = JsonDataConverter.class)
+    private Object messageParm;
 
 }

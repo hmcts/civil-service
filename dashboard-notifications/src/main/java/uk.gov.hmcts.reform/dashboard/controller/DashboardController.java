@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.dashboard.data.NotificationEntity;
-import uk.gov.hmcts.reform.dashboard.data.TaskItemTemplateEntity;
 
-import uk.gov.hmcts.reform.dashboard.service.NotificationService;
+import uk.gov.hmcts.reform.dashboard.data.TaskListEntity;
+//import uk.gov.hmcts.reform.dashboard.service.NotificationService;
+import uk.gov.hmcts.reform.dashboard.service.NotificationTemplateService;
 import uk.gov.hmcts.reform.dashboard.service.TaskListService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -29,37 +31,31 @@ import java.util.UUID;
 public class DashboardController {
 
     private final TaskListService taskListService;
+    private final NotificationTemplateService notificationTemplateService;
 
     @Autowired
-    public TaskListController(TaskListService taskListService) {
+    public DashboardController(TaskListService taskListService, NotificationTemplateService notificationTemplateService) {
         this.taskListService = taskListService;
-    }
-
-    public DashboardController() {
+        this.notificationTemplateService = notificationTemplateService;
     }
 
     @GetMapping(path = {
-        "taskList/{caseId}",
+        "taskList/{uuid}",
     })
-    public ResponseEntity<List<TaskItemTemplateEntity>> getCaseId(
-        @PathVariable("caseId") Long caseId,
+    public ResponseEntity<Optional<TaskListEntity>> getTaskListByUuid(
+        @PathVariable("uuid") UUID uuid,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
         log.info(
-            "Received CaseId: {}",
-            caseId
+            "Received UUID: {}",
+            uuid
         );
 
-        var taskListResponse = taskListService.getTaskList(caseId);
+        var taskListResponse = taskListService.getTaskList(uuid);
 
         return new ResponseEntity<>(taskListResponse, HttpStatus.OK);
     }
 
-    private final NotificationService notificationService;
-    @Autowired
-    public NotificationController(NotificationService notificationService) {
-        this.notificationService = notificationService;
-    }
 
     @GetMapping(path = {
         "notifications/{caseId}",
@@ -73,9 +69,10 @@ public class DashboardController {
             uuId
         );
 
-        var notificationResponse = notificationService.getById(uuId);
+        //var notificationResponse = notificationTemplateService.getById(uuId);
 
-        return new ResponseEntity<>(notificationResponse, HttpStatus.OK);
+        //return new ResponseEntity<>(notificationResponse, HttpStatus.OK);
+        return null;
     }
 
 

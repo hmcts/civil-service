@@ -3,9 +3,10 @@ package uk.gov.hmcts.reform.dashboard.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.dashboard.data.TaskItemTemplateEntity;
+import uk.gov.hmcts.reform.dashboard.data.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repository.TaskListRepository;
-import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -19,10 +20,7 @@ public class TaskListService {
     }
 
 
-    public List<TaskItemTemplateEntity> getTaskList(Long caseId) {
-
-        return null;
-
-
+    public Optional<TaskListEntity> getTaskList(UUID uuid) {
+        return taskListRepository.findById(uuid);
     }
 }
