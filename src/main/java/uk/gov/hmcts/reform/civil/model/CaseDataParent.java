@@ -336,11 +336,18 @@ public class CaseDataParent implements MappableObject {
     private FastTrackJudgesRecital sdoFastTrackJudgesRecital;
     private SdoR2FastTrackAltDisputeResolution sdoAltDisputeResolution;
     private SdoR2VariationOfDirections sdoVariationOfDirections;
-    private List<IncludeInOrderToggle> sdoR2SeparatorWitnessesOfFactToggle;
-    private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
     private SdoR2Settlement sdoR2Settlement;
     private List<IncludeInOrderToggle> sdoR2DisclosureOfDocumentsToggle;
     private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
+    private List<IncludeInOrderToggle> sdoR2SeparatorWitnessesOfFactToggle;
+    private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
+    private List<IncludeInOrderToggle> sdoR2ScheduleOfLossToggle;
+    private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
+    private SdoR2AddNewDirection sdoR2AddNewDirection;
+    private List<IncludeInOrderToggle>  sdoR2TrialToggle;
+    private SdoR2Trial sdoR2Trial;
+    private String sdoR2ImportantNotesTxt;
+    private LocalDate sdoR2ImportantNotesDate;
     private SdoR2ExpertEvidence sdoR2ExpertEvidence;
     private SdoR2AddendumReport sdoR2AddendumReport;
     private SdoR2FurtherAudiogram sdoR2FurtherAudiogram;
@@ -348,13 +355,6 @@ public class CaseDataParent implements MappableObject {
     private SdoR2PermissionToRelyOnExpert sdoR2PermissionToRelyOnExpert;
     private SdoR2EvidenceAcousticEngineer sdoR2EvidenceAcousticEngineer;
     private SdoR2QuestionsToEntExpert sdoR2QuestionsToEntExpert;
-    private List<IncludeInOrderToggle>  sdoR2TrialToggle;
-    private SdoR2Trial sdoR2Trial;
-    private List<IncludeInOrderToggle> sdoR2ScheduleOfLossToggle;
-    private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
-    private SdoR2AddNewDirection sdoR2AddNewDirection;
-    private String sdoR2ImportantNotesTxt;
-    private LocalDate sdoR2ImportantNotesDate;
     private SdoR2UploadOfDocuments sdoR2UploadOfDocuments;
     private CaseDocument sdoOrderDocument;
 

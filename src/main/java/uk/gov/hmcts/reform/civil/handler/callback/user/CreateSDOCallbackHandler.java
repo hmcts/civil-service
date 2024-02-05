@@ -781,7 +781,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                    .physicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE)
                                    .build());
 
-        setInclude(updatedData);
         updatedData.sdoR2ImportantNotesTxt(SdoR2UiConstantFastTrack.IMPORTANT_NOTES);
         updatedData.sdoR2ImportantNotesDate(LocalDate.now().plusDays(7));
 
@@ -959,21 +958,27 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
             if (featureToggleService.isSdoR2Enabled()) {
-                if (caseData.getDrawDirectionsOrderRequired() == NO
-                    && caseData.getFastClaims() != null
-                    && caseData.getFastClaims().contains(
-                    FastTrack.fastClaimNoiseInducedHearingLoss)) {
+                if (isSDOR2Screen(caseData)) {
                     updatedData.isSdoR2NewScreen(YES).build();
-                } else if (caseData.getDrawDirectionsOrderRequired() == YES
-                    && caseData.getTrialAdditionalDirectionsForFastTrack() != null
-                    && caseData.getTrialAdditionalDirectionsForFastTrack().contains(FastTrack.fastClaimNoiseInducedHearingLoss)) {
-                    updatedData.isSdoR2NewScreen(YES).build();
+                    prePopulateNihlFields(callbackParams, caseData, updatedData);
                 }
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private static boolean isSDOR2Screen(CaseData caseData) {
+
+        return  ((caseData.getDrawDirectionsOrderRequired() == NO
+            && caseData.getFastClaims() != null
+            && caseData.getFastClaims().contains(
+            FastTrack.fastClaimNoiseInducedHearingLoss))
+            || (caseData.getDrawDirectionsOrderRequired() == YES
+            && caseData.getTrialAdditionalDirectionsForFastTrack() != null
+            && caseData.getTrialAdditionalDirectionsForFastTrack()
+            .contains(FastTrack.fastClaimNoiseInducedHearingLoss)));
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
@@ -1283,21 +1288,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
-    }
-
-    private void setInclude(
-        CaseData.CaseDataBuilder<?, ?> updatedData
-    ) {
-        updatedData.sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder()
-                                                .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build());
-        updatedData.sdoR2DisclosureOfDocumentsToggle(List.of(IncludeInOrderToggle.INCLUDE));
-        updatedData.sdoR2SeparatorWitnessesOfFactToggle(List.of(IncludeInOrderToggle.INCLUDE));
-        updatedData.sdoR2ScheduleOfLossToggle(List.of(IncludeInOrderToggle.INCLUDE));
-        updatedData.sdoR2TrialToggle(List.of(IncludeInOrderToggle.INCLUDE));
-        updatedData.sdoVariationOfDirections(SdoR2VariationOfDirections.builder()
-                                                .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build());
-        updatedData.sdoR2Settlement(SdoR2Settlement.builder()
-                                                 .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build());
     }
 
 }
