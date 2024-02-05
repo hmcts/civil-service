@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.service.search.CaseStateSearchService;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -100,11 +101,13 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
     }
 
     private String[] getCSVHeaders() {
+        String[] csvHeaders = new String[] {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
+                "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
         if (toggleService.isLipVLipEnabled()) {
-            return new String[] {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME", "CONTACT_NAME",
-                "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT", "WELSH_FLAG"};
+            String[] newCsvHeaders = Arrays.copyOf(csvHeaders, csvHeaders.length + 1);
+            newCsvHeaders[csvHeaders.length] = "WELSH_FLAG";
+            return newCsvHeaders;
         }
-        return new String[] {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
-            "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
+        return csvHeaders;
     }
 }

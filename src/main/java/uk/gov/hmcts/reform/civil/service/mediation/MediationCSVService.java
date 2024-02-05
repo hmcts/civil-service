@@ -41,7 +41,7 @@ public abstract class MediationCSVService {
         };
 
         if (isR2FlagEnabled) {
-            return generateCSVRow(claimantData, isWelshFlag(data.isBilingual()), isR2FlagEnabled)
+            return generateCSVRow(claimantData, getWelshFlag(data.isBilingual()), isR2FlagEnabled)
                     + generateCSVRow(respondentData, null, isR2FlagEnabled);
         }
 
@@ -77,7 +77,7 @@ public abstract class MediationCSVService {
         return (party.isCompany() || party.isOrganisation()) ? party.getPartyName() : null;
     }
 
-    private String isWelshFlag(boolean isBilingualFlag) {
+    private String getWelshFlag(boolean isBilingualFlag) {
         return isBilingualFlag ? "Yes" : "No";
     }
 }
