@@ -889,14 +889,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             }
         }
 
-        log.info("TEST before    " + caseData.getFastTrackMethodInPerson());
         dataBuilder.disposalHearingMethodInPerson(deleteLocationList(
             caseData.getDisposalHearingMethodInPerson()));
         dataBuilder.fastTrackMethodInPerson(deleteLocationList(
             caseData.getFastTrackMethodInPerson()));
         dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
             caseData.getSmallClaimsMethodInPerson()));
-        log.info("TEST before    " + caseData.getFastTrackMethodInPerson());
 
         setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
 
@@ -934,10 +932,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private DynamicList deleteLocationList(DynamicList list) {
         if (isNull(list)) {
-            log.info("TEST if null    " + list);
             return null;
         }
-        log.info("TEST if Not null    " + list);
         return DynamicList.builder().value(list.getValue()).build();
     }
 
