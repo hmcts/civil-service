@@ -48,6 +48,9 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private UploadTranslatedDocumentHandler handler;
 
+    @MockBean
+    private FeatureToggleService featureToggleService;
+
     @Autowired
     private UploadTranslatedDocumentStrategyFactory uploadTranslatedDocumentStrategyFactory;
 
@@ -56,9 +59,6 @@ class UploadTranslatedDocumentHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
-
-    @MockBean
-    private FeatureToggleService featureToggleService;
 
     @Autowired
     private ObjectMapper objectMapper;
