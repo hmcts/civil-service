@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS dashboard_notifications (
- id UUID DEFAULT uuid_generate_v4() PRIMARY KEY DEFAULT,
+ id UUID NOT NULL PRIMARY KEY,
  dashboard_notifications_Templates_id INTEGER REFERENCES dashboard_notifications_Templates(id),
  reference VARCHAR(256),
  notification_name VARCHAR(256),

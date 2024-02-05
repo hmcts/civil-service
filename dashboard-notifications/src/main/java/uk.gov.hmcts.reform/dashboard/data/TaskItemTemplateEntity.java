@@ -51,9 +51,6 @@ public class TaskItemTemplateEntity {
     @javax.persistence.Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "taskItemTemplate")
-    private Set<TaskListEntity> taskLists = new LinkedHashSet<>();
-
-    private Object taskStatusSequence;
+    //private Object taskStatusSequence;
 
 }
