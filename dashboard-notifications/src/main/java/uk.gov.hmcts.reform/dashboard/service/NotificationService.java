@@ -14,7 +14,7 @@ public class NotificationService {
     private NotificationRepository repository;
 
     public List<Notification> getAll() {
-        return repository.findAll();
+        return (List<Notification>) repository.findAll();
     }
 
     public Notification getById(UUID id) {
