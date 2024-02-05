@@ -880,11 +880,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.setSmallClaimsFlag(YES).build();
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
-            if (featureToggleService.isSdoR2Enabled()) {
-                if (isSDOR2Screen(caseData)) {
-                    updatedData.isSdoR2NewScreen(YES).build();
-                    prePopulateNihlFields(callbackParams, caseData, updatedData);
-                }
+            if (featureToggleService.isSdoR2Enabled() && isSDOR2Screen(caseData)) {
+                updatedData.isSdoR2NewScreen(YES).build();
+                prePopulateNihlFields(callbackParams, caseData, updatedData);
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
