@@ -1,4 +1,4 @@
-CREATE TABLE public.task_item_template (
+CREATE TABLE IF NOT EXISTS public.task_item_template (
                                          id bigint NOT NULL,
                                          title_en character varying(256),
                                          content_en character varying(512),
@@ -14,7 +14,7 @@ CREATE TABLE public.task_item_template (
                                          CONSTRAINT task_list_template_pkey PRIMARY KEY (id)
 );
 
-CREATE TABLE public.task_item_identifier (
+CREATE TABLE IF NOT EXISTS public.task_item_identifier (
                                            id uuid NOT NULL,
                                            task_item_template_id bigint NOT NULL,
                                            case_reference character varying(20) NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE public.task_item_identifier (
 
 
 
-CREATE TABLE public.task_list (
+CREATE TABLE IF NOT EXISTS public.task_list (
                                 id uuid NOT NULL,
                                 current_status integer,
                                 next_status integer,
