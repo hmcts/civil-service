@@ -51,7 +51,7 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
         String recipientEmail = isRespondentNotification(callbackParams) ? getRecipientEmailForRespondent(caseData) :
             caseData.getApplicant1Email();
         String templateId = getTemplateID(
-            isRespondentNotification(callbackParams), caseData
+            isRespondentNotification(callbackParams), caseData.isBilingual()
         );
         if (isNotEmpty(recipientEmail) && templateId != null) {
             notificationService.sendMail(
@@ -92,11 +92,11 @@ public class NotificationForClaimantRepresented extends CallbackHandler implemen
             .orElse("");
     }
 
-    private String getTemplateID(boolean isDefendantEvent, CaseData caseData) {
+    private String getTemplateID(boolean isDefendantEvent, boolean isBilingual) {
         if (isDefendantEvent) {
             return notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate();
         }
-        if (caseData.isBilingual()) {
+        if (isBilingual) {
             return notificationsProperties.getNotifyClaimantLipForNoLongerAccessWelshTemplate();
         }
         return notificationsProperties.getNotifyClaimantLipForNoLongerAccessTemplate();
