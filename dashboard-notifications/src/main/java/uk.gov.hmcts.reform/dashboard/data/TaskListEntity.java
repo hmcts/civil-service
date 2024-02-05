@@ -1,36 +1,47 @@
 package uk.gov.hmcts.reform.dashboard.data;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
-import uk.gov.hmcts.reform.dashboard.utils.JsonDataConverter;
-import javax.persistence.*;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.Instant;
+import java.util.UUID;
+
 @Getter
 @Setter
-@Entity
 @Table(name = "task_list", schema = "public")
+@Entity
 public class TaskListEntity {
     @Id
-    private Long id;
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "task_list_template_id", nullable = false)
-    private TaskListTemplateEntity taskListTemplate;
-    private String role;
-    private String currentStatus;
-    private String nextStatus;
-    private String taskItemEn;
-    private String taskItemCy;
-    private String caseReference;
-    private Instant createdAt;
-    private Instant modifiedAt;
-    private String createdBy;
-    private String modifiedBy;
-    private Long orderBy;
+    private UUID id;
 
-    @Column(name = "messageparams", nullable = false)
-    @Convert(converter = JsonDataConverter.class)
-    private JsonNode data;
+    private Integer currentStatus;
+
+    private Integer nextStatus;
+
+    @Size(max = 512)
+    private String taskItemEn;
+
+    @Size(max = 512)
+    private String taskItemCy;
+
+    @Size(max = 256)
+    private String messageParm;
+
+    @NotNull
+    private Instant createdAt;
+
+    private Instant modifiedAt;
+
+    @Size(max = 256)
+    private String createdBy;
+
+    @Size(max = 256)
+    private String modifiedBy;
+
 }

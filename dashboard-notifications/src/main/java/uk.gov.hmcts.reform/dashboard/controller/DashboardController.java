@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
-import uk.gov.hmcts.reform.dashboard.data.TaskListEntity;
+import uk.gov.hmcts.reform.dashboard.data.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.service.TaskListService;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class DashboardController {
     @GetMapping(path = {
         "taskList/{caseId}",
     })
-    public ResponseEntity<List<TaskListEntity>> getCaseId(
+    public ResponseEntity<List<TaskItemTemplateEntity>> getCaseId(
         @PathVariable("caseId") Long caseId,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
