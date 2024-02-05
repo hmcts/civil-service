@@ -146,7 +146,6 @@ class GenerateCsvAndTransferHandlerTest {
 
         inMediationCsvHandler.execute(externalTask, externalTaskService);
         verify(searchService).getInMediationCases(claimToBeProcessed);
-        verify(sendGridClient).sendEmail(anyString(), any());
         verify(sendGridClient, times(1)).sendEmail(anyString(), any());
         verify(externalTaskService).complete(externalTask);
     }
