@@ -7,7 +7,7 @@ CREATE OR REPLACE TABLE dashboard_notifications (
  cy_HTML VARCHAR(256),
  message_param VARCHAR(256),
  created_By VARCHAR(256),
- created_At DATE,
+ created_At timestamp without time zone DEFAULT now() NOT NULL,
  updated_By VARCHAR(256),
- updated_On DATE,
+ updated_On timestamp without time zone DEFAULT now() NOT NULL
 );

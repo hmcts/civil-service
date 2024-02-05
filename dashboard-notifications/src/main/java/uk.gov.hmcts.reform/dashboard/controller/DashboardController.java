@@ -12,9 +12,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.dashboard.data.TaskItemTemplateEntity;
+import uk.gov.hmcts.reform.dashboard.data.TaskListEntity;
+import uk.gov.hmcts.reform.dashboard.model.Notification;
+import uk.gov.hmcts.reform.dashboard.service.NotificationService;
 import uk.gov.hmcts.reform.dashboard.service.TaskListService;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -27,8 +31,11 @@ public class DashboardController {
     private final TaskListService taskListService;
 
     @Autowired
-    public DashboardController(TaskListService taskListService) {
+    public TaskListController(TaskListService taskListService) {
         this.taskListService = taskListService;
+    }
+
+    public DashboardController() {
     }
 
     @GetMapping(path = {
@@ -47,5 +54,29 @@ public class DashboardController {
 
         return new ResponseEntity<>(taskListResponse, HttpStatus.OK);
     }
+
+    private final NotificationService notificationService;
+    @Autowired
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
+    @GetMapping(path = {
+        "notifications/{caseId}",
+    })
+    public ResponseEntity<List<Notification>> getCaseId(
+        @PathVariable("uuId") UUID uuId,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info(
+            "Received CaseId: {}",
+            uuId
+        );
+
+        var notificationResponse = notificationService.getById(uuId);
+
+        return new ResponseEntity<>(notificationResponse, HttpStatus.OK);
+    }
+
 
 }

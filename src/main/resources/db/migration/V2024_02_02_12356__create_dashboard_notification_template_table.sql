@@ -7,5 +7,5 @@ CREATE OR REPLACE  TABLE dashboard_notifications_Templates (
  cy_HTML VARCHAR(256),
  notification_role VARCHAR(256),
  time_to_live VARCHAR(256),
- created_At DATE
+ created_At timestamp without time zone DEFAULT now() NOT NULL
 );

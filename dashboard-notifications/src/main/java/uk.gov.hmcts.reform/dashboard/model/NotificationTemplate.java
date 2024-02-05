@@ -20,13 +20,9 @@ public class NotificationTemplate {
     private String role;
     @Column(name = "template_name")
     private String name;
-    @Column(name = "en_HTML")
     private String enHTML;
-    @Column(name = "cy_HTML")
     private String cyHTML;
-    @Column(name = "created_At")
     private Date createdAt;
-    @Column(name = "time_to_live")
     private String timeToLive;
 
     public NotificationTemplate() {

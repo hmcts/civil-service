@@ -22,19 +22,13 @@ public class Notification {
     private String reference;
     @Column(name = "notification_name")
     private String name;
-    @Column(name = "en_HTML")
     private String enHTML;
-    @Column(name = "cy_HTML")
     private String cyHTML;
     @Column(name = "message_param")
     private String params;
-    @Column(name = "created_By")
     private String createdBy;
-    @Column(name = "created_At")
     private Date createdAt;
-    @Column(name = "updated_By")
     private String updatedBy;
-    @Column(name = "updated_On")
     private Date updatedOn;
 
     public Notification() {
