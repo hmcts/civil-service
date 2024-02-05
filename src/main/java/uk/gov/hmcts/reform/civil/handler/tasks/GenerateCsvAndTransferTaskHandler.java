@@ -101,7 +101,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
 
     private String[] getCSVHeaders() {
         String[] csvHeaders = new String[] {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
-                "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
+            "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
         if (toggleService.isLipVLipEnabled()) {
             String[] additionalCsvHeaders = Arrays.copyOf(csvHeaders, csvHeaders.length + 1);
             additionalCsvHeaders[csvHeaders.length] = "WELSH_FLAG";
