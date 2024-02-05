@@ -89,36 +89,26 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
     private CallbackResponse populatePartyOptions(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         UserInfo userInfo = userService.getUserInfo(authToken);
-
-        log.info("name " + userInfo.getName());
-        log.info("family name " + userInfo.getFamilyName());
-        log.info("given name " + userInfo.getGivenName());
-        log.info("uid " + userInfo.getUid());
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
+            callbackParams.getCaseData().getCcdCaseReference().toString(),
+            userInfo.getUid()
+        );
 
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         List<DynamicListElement> dynamicListOptions = new ArrayList<>();
 
-        List<String> roles = coreCaseUserService.getUserCaseRoles(
-            callbackParams.getCaseData().getCcdCaseReference().toString(),
-            userInfo.getUid()
-        );
-        log.info("roles " + userInfo.getRoles().toString());
         if (isApplicantSolicitor(roles)) {
-            log.info("applicant 1 options");
             addApplicantOptions(dynamicListOptions, caseData);
         } else if (isRespondentSolicitorOne(roles) && !isRespondentSolicitorTwo(roles)) {
             // 1v1 or 1v2DS respondent 1 solicitor
-            log.info("defendant 1 options");
             addDefendant1Option(dynamicListOptions, caseData);
         } else if (!isRespondentSolicitorOne(roles) && isRespondentSolicitorTwo(roles)) {
-            log.info("defendant 2 options");
             // 1v2 DS respondent 2 solicitor
             addDefendant2Option(dynamicListOptions, caseData);
         } else {
             // 1v2 SS
-            log.info("both defendant options");
             addSameSolicitorDefendantOptions(dynamicListOptions, caseData);
         }
 
