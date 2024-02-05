@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
 import uk.gov.hmcts.reform.civil.enums.RepaymentFrequencyDJ;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimProceedsInCaseman;
@@ -1808,14 +1809,14 @@ public class EventHistoryMapper {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP: {
                 List<Event> events = new ArrayList<>();
-                if (defendant1AckExists.test(caseData)) {
+                if (defendant1AckExists.test(caseData) && caseData.getRespondent1ClaimResponseIntentionType() != null) {
                     events.add(buildAcknowledgementOfServiceEvent(builder, caseData, true, format(
                         "Defendant: %s has acknowledged: %s",
                         caseData.getRespondent1().getPartyName(),
                         caseData.getRespondent1ClaimResponseIntentionType().getLabel()
                     )));
                 }
-                if (defendant2AckExists.test(caseData)) {
+                if (defendant2AckExists.test(caseData) && caseData.getRespondent2ClaimResponseIntentionType() != null) {
                     events.add(buildAcknowledgementOfServiceEvent(builder, caseData, false, format(
                         "Defendant: %s has acknowledged: %s",
                         caseData.getRespondent2().getPartyName(),
@@ -1829,26 +1830,36 @@ public class EventHistoryMapper {
             case ONE_V_TWO_ONE_LEGAL_REP: {
                 String currentTime = time.now().toLocalDate().toString();
 
-                builder
-                    .acknowledgementOfServiceReceived(
-                        List.of(
-                            buildAcknowledgementOfServiceEvent(
-                                builder, caseData, true, format(
-                                    "[1 of 2 - %s] Defendant: %s has acknowledged: %s",
-                                    currentTime,
-                                    caseData.getRespondent1().getPartyName(),
-                                    caseData.getRespondent1ClaimResponseIntentionType().getLabel()
+                if (caseData.getRespondent1ClaimResponseIntentionType() != null || caseData.getRespondent2ClaimResponseIntentionType().getLabel() != null) {
+                    var respondent1IntentionType = Optional.ofNullable(caseData.getRespondent1ClaimResponseIntentionType())
+                        .orElse(caseData.getRespondent2ClaimResponseIntentionType())
+                        .getLabel();
+
+                    var respondent2IntentionType = Optional.ofNullable(caseData.getRespondent2ClaimResponseIntentionType())
+                        .orElse(caseData.getRespondent1ClaimResponseIntentionType())
+                        .getLabel();
+
+                    builder
+                        .acknowledgementOfServiceReceived(
+                            List.of(
+                                buildAcknowledgementOfServiceEvent(
+                                    builder, caseData, true, format(
+                                        "[1 of 2 - %s] Defendant: %s has acknowledged: %s",
+                                        currentTime,
+                                        caseData.getRespondent1().getPartyName(),
+                                        respondent1IntentionType
+                                    )
+                                ),
+                                buildAcknowledgementOfServiceEvent(
+                                    builder, caseData, false, format(
+                                        "[2 of 2 - %s] Defendant: %s has acknowledged: %s",
+                                        currentTime,
+                                        caseData.getRespondent2().getPartyName(),
+                                        respondent2IntentionType
+                                    )
                                 )
-                            ),
-                            buildAcknowledgementOfServiceEvent(
-                                builder, caseData, false, format(
-                                    "[2 of 2 - %s] Defendant: %s has acknowledged: %s",
-                                    currentTime,
-                                    caseData.getRespondent2().getPartyName(),
-                                    caseData.getRespondent2ClaimResponseIntentionType().getLabel()
-                                )
-                            )
-                        ));
+                            ));
+                }
                 break;
             }
             default: {
@@ -1858,7 +1869,7 @@ public class EventHistoryMapper {
                 }
 
                 LocalDateTime dateAcknowledge = caseData.getRespondent1AcknowledgeNotificationDate();
-                if (dateAcknowledge == null) {
+                if (dateAcknowledge == null || caseData.getRespondent1ClaimResponseIntentionType() == null) {
                     return;
                 }
 
