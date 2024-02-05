@@ -346,6 +346,8 @@ notifications:
   notifyRespondentLipForClaimantRepresentedTemplate: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
   notifyClaimantLipForNoLongerAccessTemplate: "8bf1b6c6-2ee7-442d-8b72-550d2aca9bdf"
   notifyClaimantLipForNoLongerAccessWelshTemplate: "4186a193-3135-41dc-b4d3-a0f31911e46f"
+  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual: "e880dc43-dc4e-440d-8c34-d0feec70e196"
+  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish: "f372a4df-4577-402a-a2cd-142fd8ff9028"
   notifyClaimantLipForClaimSubmissionTemplate: "16bb1a39-96f8-4091-8d11-8375a2cc5905"
   notifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate: "f2080ac4-2585-47fd-ac18-5f94148adc07"
   notifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate: "1f6006bb-6726-48c4-ac5f-a456d043f1b7"

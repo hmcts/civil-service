@@ -55,15 +55,13 @@ public class UploadTranslatedDocumentDefaultStrategy implements UploadTranslated
     }
 
     private CaseEvent getBusinessProcessEvent(CaseData caseData) {
-        if (isClaimStateInPending(caseData)) {
-            return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE;
+        if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
+            if (caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED) {
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIM_ISSUE;
+            } else if (caseData.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION) {
+                return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_CLAIMANT_INTENTION;
+            }
         }
         return CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
-    }
-
-    private boolean isClaimStateInPending(CaseData caseData) {
-        return caseData.isLipvLipOneVOne()
-                && featureToggleService.isLipVLipEnabled()
-                && CaseState.PENDING_CASE_ISSUED == caseData.getCcdState();
     }
 }
