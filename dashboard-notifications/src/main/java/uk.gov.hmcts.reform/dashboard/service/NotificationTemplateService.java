@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dashboard.model.NotificationTemplate;
 import uk.gov.hmcts.reform.dashboard.repository.NotificationTemplateRepository;
-
-
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class NotificationTemplateService {
@@ -15,10 +12,10 @@ public class NotificationTemplateService {
     private NotificationTemplateRepository repository;
 
     public List<NotificationTemplate> getAll() {
-        return repository.findAll();
+        return (List<NotificationTemplate>) repository.findAll();
     }
 
-    public NotificationTemplate getById(UUID id) {
+    public NotificationTemplate getById(Long id) {
         return repository.findById(id).orElse(null);
     }
 
@@ -26,7 +23,7 @@ public class NotificationTemplateService {
         return repository.save(notificationTemplate);
     }
 
-    public NotificationTemplate update(UUID id, NotificationTemplate notificationTemplate) {
+    public NotificationTemplate update(Long id, NotificationTemplate notificationTemplate) {
         NotificationTemplate existingNotification = repository.findById(id).orElse(null);
 
         if (existingNotification != null) {
@@ -44,7 +41,7 @@ public class NotificationTemplateService {
         }
     }
 
-    public void delete(UUID id) {
+    public void delete(Long id) {
         repository.deleteById(id);
     }
 }

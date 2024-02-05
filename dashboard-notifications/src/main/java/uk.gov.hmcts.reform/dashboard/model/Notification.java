@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.dashboard.model;
 import java.util.Date;
 import java.util.UUID;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+
 import lombok.EqualsAndHashCode;
 
 @lombok.Getter
@@ -12,6 +14,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "dashboard_notifications")
 public class Notification {
     @Id
+    @NotNull
     private UUID id;
     @ManyToOne
     @JoinColumn(name = "notifications_Templates_id", referencedColumnName = "id")
