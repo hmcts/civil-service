@@ -29,7 +29,7 @@ public class NotificationService {
         Notification existingNotification = repository.findById(id).orElse(null);
 
         if (existingNotification != null) {
-            existingNotification.setNotificationTemplate((notification.getNotificationTemplate());
+            existingNotification.setNotificationTemplate(notification.getNotificationTemplate());
             existingNotification.setReference(notification.getReference());
             existingNotification.setEnHTML(notification.getEnHTML());
             existingNotification.setCyHTML(notification.getCyHTML());
