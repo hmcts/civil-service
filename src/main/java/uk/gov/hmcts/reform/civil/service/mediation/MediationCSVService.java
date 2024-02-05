@@ -62,8 +62,8 @@ public abstract class MediationCSVService {
     private String generateCSVRow(String[] row, String bilingualFlag, boolean isR2FlagEnabled) {
         StringBuilder builder = new StringBuilder();
 
-        for (String s : row) {
-            builder.append(s).append(",");
+        for (String rowValue : row) {
+            builder.append(rowValue).append(",");
         }
         if (isR2FlagEnabled) {
             builder.append(bilingualFlag).append(",");

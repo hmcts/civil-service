@@ -86,7 +86,6 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
         boolean isR2FlagEnabled = toggleService.isLipVLipEnabled();
         MediationCSVService mediationCSVService = mediationCsvServiceFactory.getMediationCSVService(caseData);
         return mediationCSVService.generateCSVContent(caseData, isR2FlagEnabled);
-
     }
 
     private String generateCSVRow(String[] row) {
@@ -104,9 +103,9 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
         String[] csvHeaders = new String[] {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
                 "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
         if (toggleService.isLipVLipEnabled()) {
-            String[] newCsvHeaders = Arrays.copyOf(csvHeaders, csvHeaders.length + 1);
-            newCsvHeaders[csvHeaders.length] = "WELSH_FLAG";
-            return newCsvHeaders;
+            String[] additionalCsvHeaders = Arrays.copyOf(csvHeaders, csvHeaders.length + 1);
+            additionalCsvHeaders[csvHeaders.length] = "WELSH_FLAG";
+            return additionalCsvHeaders;
         }
         return csvHeaders;
     }
