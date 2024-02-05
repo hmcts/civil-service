@@ -52,8 +52,8 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
             .map(caseDetailsConverter::toCaseData)
             .toList();
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), inMediationCases.size());
-        String[] headers = {"SITE_ID", "CASE_NUMBER", "CASE_TYPE", "AMOUNT", "PARTY_TYPE", "COMPANY_NAME",
-            "CONTACT_NAME", "CONTACT_NUMBER", "CHECK_LIST", "PARTY_STATUS", "CONTACT_EMAIL", "PILOT"};
+        String[] headers = {"SITE_ID", "CASE_TYPE", "CHECK_LIST", "PARTY_STATUS", "CASE_NUMBER", "AMOUNT", "PARTY_TYPE",
+            "COMPANY_NAME", "CONTACT_NAME", "CONTACT_NUMBER", "CONTACT_EMAIL", "PILOT"};
         StringBuilder csvColContent = new StringBuilder();
         try {
             if (!inMediationCases.isEmpty()) {
