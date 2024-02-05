@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
@@ -26,8 +23,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ChooseHowToProceed;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
-import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
-import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.Applicant1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Expert;
@@ -38,10 +33,10 @@ import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizen.UpdateCaseManagementDetailsService;
@@ -50,24 +45,19 @@ import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT_RESPONSE_CUI;
-import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
-import static uk.gov.hmcts.reform.civil.model.Party.Type.ORGANISATION;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(SpringExtension.class)
@@ -217,107 +207,9 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .extracting("status")
                 .isEqualTo("READY");
 
-            assertThat(response.getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
             CaseData data = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(data.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()).isEqualTo("court1");
             assertThat(data.getCaseNameHmctsInternal()).isEqualTo(data.getApplicant1().getPartyName() + " v " + data.getRespondent1().getPartyName());
-        }
-
-        @Test
-        void shouldUpdateCaseStateToJudicialReferral_WhenPartAdmitNoSettle_NoMediation() {
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                             .hasAgreedFreeMediation(MediationDecision.No).build())
-                .build();
-            CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(caseDataLiP)
-                .applicant1AcceptAdmitAmountPaidSpec(NO)
-                .atStateClaimIssued().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
-
-        }
-
-        @Test
-        void shouldUpdateCaseStateToJudicialReferral_WhenNotReceivedPayment_NoMediation_ForPartAdmit() {
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                             .hasAgreedFreeMediation(MediationDecision.No).build())
-                .build();
-            CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(caseDataLiP)
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .atStateClaimIssued().build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
-
-        }
-
-        @Test
-        void shouldUpdateCaseStateToJudicialReferral_WhenFullDefence_NotPaid_NoMediation() {
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                             .hasAgreedFreeMediation(MediationDecision.No).build())
-                .build();
-            CaseData caseData =
-                CaseDataBuilder.builder().caseDataLip(caseDataLiP).applicant1PartAdmitIntentionToSettleClaimSpec(NO)
-                    .atStateClaimIssued()
-                    .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
-
-        }
-
-        @Test
-        void shouldUpdateCaseStateToJudicialReferral_WhenFullDefence_NotPaid_FastTrack() {
-
-            CaseData caseData =
-                CaseDataBuilder.builder().applicant1PartAdmitIntentionToSettleClaimSpec(NO)
-                    .responseClaimTrack(FAST_CLAIM.name())
-                    .atStateClaimIssued()
-                    .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
-
-        }
-
-        @Test
-        void shouldUpdateCaseStateToJudicialReferral_WhenFullDefence() {
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
-                                                             .hasAgreedFreeMediation(MediationDecision.No).build())
-                .build();
-            CaseData caseData =
-                CaseDataBuilder.builder().caseDataLip(caseDataLiP).applicant1ProceedWithClaim(YES)
-                    .atStateClaimIssued()
-                    .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertEquals(CaseState.JUDICIAL_REFERRAL.name(), response.getState());
-        }
-
-        @Test
-        void shouldUpdateCaseStateToCaseDismissed_WhenFullDefence_FastTrack() {
-
-            CaseData caseData =
-                CaseDataBuilder.builder().applicant1ProceedWithClaim(NO)
-                    .responseClaimTrack(FAST_CLAIM.name())
-                    .atStateClaimIssued()
-                    .build();
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertEquals(CaseState.CASE_DISMISSED.name(), response.getState());
-
         }
 
         @Test
@@ -396,23 +288,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()).isNull();
         }
 
-        @Test
-        void shouldChangeCaseState_whenApplicantRejectClaimSettlementAndAgreeToMediation() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .applicant1PartAdmitConfirmAmountPaidSpec(NO)
-                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                        MediationDecision.Yes).build())
-                                 .build())
-                .build().toBuilder()
-                .responseClaimMediationSpecRequired(YES).build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("claimMovedToMediationOn").isNotNull();
-            assertThat(response.getState()).isEqualTo(CaseState.IN_MEDIATION.name());
-        }
-
         protected List<LocationRefData> getSampleCourLocationsRefObject() {
             return new ArrayList<>(List.of(
                 LocationRefData.builder()
@@ -425,198 +300,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
                     .courtLocationCode("court3").build()
             ));
-        }
-
-        @Test
-        void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsCompany_toAllFinalOrdersIssued() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
-                .caseDataLip(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder().hasAgreedFreeMediation(
-                    MediationDecision.No).build()).build())
-                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-        }
-
-        @Test
-        void shouldChangeCaseState_whenApplicantRejectRepaymentPlanAndIsOrganisation_toAllFinalOrdersIssued() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
-                .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
-                .respondent1(Party.builder()
-                                 .type(ORGANISATION)
-                                 .companyName("Test Inc")
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-        }
-
-        @Test
-        void shouldChangeCaseState_whenApplicantAcceptedRepaymentPlanAndRequestCCJ_ForFullAdmit() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
-                .caseDataLip(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                             .applicant1ChoosesHowToProceed(
-                                                                                 ChooseHowToProceed.REQUEST_A_CCJ
-                                                                             ).build()).build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-        }
-
-        @Test
-        void shouldChangeCaseState_whenApplicantAcceptedRepaymentPlanAndRequestCCJ_ForPartAmit() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
-                .caseDataLip(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                             .applicant1ChoosesHowToProceed(
-                                                                                 ChooseHowToProceed.REQUEST_A_CCJ
-                                                                             ).build()).build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-        }
-
-        @Test
-        void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_AcceptManualDetermination_ForPartAmit_ForPayBySetDate() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .claimantResponseOnCourtDecision(
-                                                                ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE
-                                                            )
-                                                            .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                            .build()).build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-        }
-
-        @Test
-        void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_AcceptManualDetermination_ForPartAmit_ForPayByInstalments() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .claimantResponseOnCourtDecision(
-                                                                ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_PLAN
-                                                            )
-                                                            .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                            .build()).build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-        }
-
-        @Test
-        void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_RejectedManualDetermination_ForPartAmit_PayBySetDate() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .claimantResponseOnCourtDecision(
-                                                                ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE
-                                                            )
-                                                            .build()).build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-        }
-
-        @Test
-        void shouldChangeCaseState_whenApplicantRejectedRepaymentPlanAndRequestCCJ_CourtAcceptsClaimantDecision_ForPartAmit() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                                                            .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                            .build()).build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.name());
-        }
-
-        @Test
-        void shouldChangeCaseState_whenApplicantAcceptRepaymentPlanAndChooseSettlementAgreement() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
-                .caseDataLip(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                             .applicant1SignedSettlementAgreement(
-                                                                                 YesOrNo.YES).build())
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
-            CaseData data = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(data.getRespondent1RespondToSettlementAgreementDeadline()).isEqualTo(LocalDateTime.MAX);
         }
 
         @Test
@@ -660,92 +343,6 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
             return mapper.convertValue(response.getData(), CaseData.class);
-        }
-
-        @Test
-        void shouldChangeCaseState_whenApplicantAgreeClaimSettlement() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .applicant1PartAdmitIntentionToSettleClaimSpec(YES)
-                .applicant1PartAdmitConfirmAmountPaidSpec(YES)
-                .build().toBuilder()
-                .responseClaimMediationSpecRequired(YES).build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
-        }
-
-        @Test
-        void shouldChangeCaseState_whenApplicantAcceptedPartAdmitImmediatePayment() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1AcceptAdmitAmountPaidSpec(YES)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
-                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName("CLAIMANT_ORG_NAME").build())
-                .respondent1(Party.builder()
-                                 .type(COMPANY)
-                                 .companyName("Test Inc")
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.CASE_SETTLED.name());
-        }
-
-        @Test
-        void shouldChangeCaseStateWhenApplicantPlanAcceptedAndSignedSettlement() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1AcceptAdmitAmountPaidSpec(YES)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-                .applicant1AcceptPartAdmitPaymentPlanSpec(NO)
-                .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_ORG_NAME").build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test Inc")
-                                 .build())
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT).applicant1SignedSettlementAgreement(
-                                         YesOrNo.YES).build())
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
-        }
-
-        @Test
-        void shouldChangeCaseStateWhenApplicantAcceptCourtDecisionAndSignedSettlement() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .applicant1AcceptAdmitAmountPaidSpec(YES)
-                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-                .applicant1AcceptFullAdmitPaymentPlanSpec(NO)
-                .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_ORG_NAME").build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test Inc")
-                                 .build())
-                .caseDataLip(CaseDataLiP.builder()
-                                 .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                            .claimantResponseOnCourtDecision(
-                                                                ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE)
-                                                            .applicant1SignedSettlementAgreement(
-                                                                YesOrNo.YES).build())
-                                 .build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
 
         @Test
