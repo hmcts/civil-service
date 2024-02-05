@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
@@ -71,17 +70,14 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
@@ -686,9 +682,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
 
-        updatedData.isSdoR2NewScreen(NO).build();
-        prePopulateNihlFields(callbackParams, caseData, updatedData);
-
         //This the flow after request for reconsideration
         if (featureToggleService.isSdoR2Enabled() && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
@@ -771,7 +764,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                    .physicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE)
                                    .build());
 
-        setInclude(updatedData);
         updatedData.sdoR2ImportantNotesTxt(SdoR2UiConstantFastTrack.IMPORTANT_NOTES);
         updatedData.sdoR2ImportantNotesDate(LocalDate.now().plusDays(7));
     }
@@ -889,21 +881,27 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
             if (featureToggleService.isSdoR2Enabled()) {
-                if (caseData.getDrawDirectionsOrderRequired() == NO
-                    && caseData.getFastClaims() != null
-                    && caseData.getFastClaims().contains(
-                    FastTrack.fastClaimNoiseInducedHearingLoss)) {
+                if (isSDOR2Screen(caseData)) {
                     updatedData.isSdoR2NewScreen(YES).build();
-                } else if (caseData.getDrawDirectionsOrderRequired() == YES
-                    && caseData.getTrialAdditionalDirectionsForFastTrack() != null
-                    && caseData.getTrialAdditionalDirectionsForFastTrack().contains(FastTrack.fastClaimNoiseInducedHearingLoss)) {
-                    updatedData.isSdoR2NewScreen(YES).build();
+                    prePopulateNihlFields(callbackParams, caseData, updatedData);
                 }
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private static boolean isSDOR2Screen(CaseData caseData) {
+
+        return  ((caseData.getDrawDirectionsOrderRequired() == NO
+            && caseData.getFastClaims() != null
+            && caseData.getFastClaims().contains(
+            FastTrack.fastClaimNoiseInducedHearingLoss))
+            || (caseData.getDrawDirectionsOrderRequired() == YES
+            && caseData.getTrialAdditionalDirectionsForFastTrack() != null
+            && caseData.getTrialAdditionalDirectionsForFastTrack()
+            .contains(FastTrack.fastClaimNoiseInducedHearingLoss)));
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
@@ -1213,21 +1211,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
-    }
-
-    private void setInclude(
-        CaseData.CaseDataBuilder<?, ?> updatedData
-    ) {
-        updatedData.sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder()
-                                                .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build());
-        updatedData.sdoR2DisclosureOfDocumentsToggle(List.of(IncludeInOrderToggle.INCLUDE));
-        updatedData.sdoR2SeparatorWitnessesOfFactToggle(List.of(IncludeInOrderToggle.INCLUDE));
-        updatedData.sdoR2ScheduleOfLossToggle(List.of(IncludeInOrderToggle.INCLUDE));
-        updatedData.sdoR2TrialToggle(List.of(IncludeInOrderToggle.INCLUDE));
-        updatedData.sdoVariationOfDirections(SdoR2VariationOfDirections.builder()
-                                                .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build());
-        updatedData.sdoR2Settlement(SdoR2Settlement.builder()
-                                                 .includeInOrderToggle(List.of(IncludeInOrderToggle.INCLUDE)).build());
     }
 
 }
