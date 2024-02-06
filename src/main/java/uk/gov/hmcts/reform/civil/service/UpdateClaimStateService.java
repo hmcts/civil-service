@@ -18,7 +18,9 @@ public class UpdateClaimStateService {
     private final ToggleConfiguration toggleConfiguration;
 
     public String setUpCaseState(CaseData updatedData) {
+
         updatedData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
+
         if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();
         } else if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
