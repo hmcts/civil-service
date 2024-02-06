@@ -142,8 +142,6 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 @RequiredArgsConstructor
 public class CreateSDOCallbackHandler extends CallbackHandler {
 
-    public static final String TRUE = "true";
-    public static final String FALSE = "false";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SDO);
     private static final String HEARING_CHANNEL = "HearingChannel";
     private static final String SPEC_SERVICE_ID = "AAA6";
@@ -950,11 +948,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.setSmallClaimsFlag(YES).build();
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
-            if (featureToggleService.isSdoR2Enabled()) {
-                if (isSDOR2Screen(caseData)) {
-                    updatedData.isSdoR2NewScreen(YES).build();
-                    prePopulateNihlFields(callbackParams, caseData, updatedData);
-                }
+            if (featureToggleService.isSdoR2Enabled() && isSDOR2Screen(caseData)) {
+                updatedData.isSdoR2NewScreen(YES).build();
+                prePopulateNihlFields(callbackParams, caseData, updatedData);
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -1053,24 +1049,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return updatedData.build();
     }
 
-    private String getHearingInPersonSmall(CaseData caseData) {
-        if (caseData.getSmallClaimsMethod() == SmallClaimsMethod.smallClaimsMethodInPerson
-            && Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            return caseData.getSmallClaimsMethodInPerson().getValue().getLabel();
-        }
-        return null;
-    }
-
-    private String getHearingInPersonFast(CaseData caseData) {
-        if (caseData.getFastTrackMethod() == FastTrackMethod.fastTrackMethodInPerson
-            && Optional.ofNullable(caseData.getFastTrackMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            return caseData.getFastTrackMethodInPerson().getValue().getLabel();
-        }
-        return null;
-    }
-
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
@@ -1155,27 +1133,25 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private String getEpimmsId(CaseData caseData) {
 
-        if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
-            return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
-        }
-        if (featureToggleService.isSdoR2Enabled()) {
-            boolean isFastTrack = SdoHelper.isFastTrack(caseData);
-            if (isFastTrack && caseData.getIsSdoR2NewScreen().equals(NO)) {
-                return caseData.getFastTrackMethodInPerson().getValue().getCode();
-            } else if (isFastTrack && caseData.getIsSdoR2NewScreen().equals(YES)) {
-                return caseData.getSdoR2Trial().getHearingCourtLocationList() != null
-                    ? caseData.getSdoR2Trial().getHearingCourtLocationList().getValue().getCode()
-                    : caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue().getCode();
-            }
+        Optional<DynamicList> toUseList;
+        if (DISPOSAL.equals(caseData.getOrderType())) {
+            toUseList = Optional.ofNullable(caseData.getDisposalHearingMethodInPerson());
+        } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
+            && caseData.getIsSdoR2NewScreen().equals(NO)) {
+            toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
+        } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
+            && caseData.getIsSdoR2NewScreen().equals(YES)) {
+            toUseList = caseData.getSdoR2Trial().getHearingCourtLocationList() != null
+                ? Optional.ofNullable(caseData.getSdoR2Trial().getHearingCourtLocationList())
+                : Optional.ofNullable(caseData.getSdoR2Trial().getAltHearingCourtLocationList());
+        } else if (SdoHelper.isFastTrack(caseData)) {
+            toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
+        } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            toUseList = Optional.ofNullable(caseData.getSmallClaimsMethodInPerson());
         } else {
-            if (SdoHelper.isFastTrack(caseData)) {
-                return caseData.getFastTrackMethodInPerson().getValue().getCode();
-            }
+            throw new IllegalArgumentException("Could not determine claim track");
         }
-        if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
-        }
-        throw new IllegalArgumentException("Could not determine claim track");
+        return toUseList.map(DynamicList::getValue).map(DynamicListElement::getCode).orElse(null);
     }
 
     private boolean nonNull(Object object) {
