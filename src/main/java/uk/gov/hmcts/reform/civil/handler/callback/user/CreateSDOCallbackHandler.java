@@ -132,8 +132,6 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 @RequiredArgsConstructor
 public class CreateSDOCallbackHandler extends CallbackHandler {
 
-    public static final String TRUE = "true";
-    public static final String FALSE = "false";
     private static final List<CaseEvent> EVENTS = Collections.singletonList(CREATE_SDO);
     private static final String HEARING_CHANNEL = "HearingChannel";
     private static final String SPEC_SERVICE_ID = "AAA6";
