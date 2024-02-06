@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -54,12 +53,6 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
 
-        if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
-            return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
-            );
-        }
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData)
@@ -68,32 +61,16 @@ public class TranslatedDocumentUploadedClaimantNotificationHandler extends Callb
 
     private CallbackResponse notifyClaimant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String email = getEmail(caseData);
-        if (Objects.nonNull(email)) {
-            notificationService.sendMail(
-                email,
-                addTemplate(caseData),
-                addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-            );
-        }
-        return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    private String addTemplate(CaseData caseData) {
         if (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()) {
-            if (caseData.isBilingual()) {
-                return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual();
-            }
-            return notificationsProperties.getNotifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish();
+            return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
-        return notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded();
-    }
-
-    private String getEmail(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled())
-            ? caseData.getApplicant1Email()
-            : caseData.getApplicantSolicitor1UserDetails().getEmail();
+        notificationService.sendMail(
+            caseData.getApplicantSolicitor1UserDetails().getEmail(),
+            notificationsProperties.getNotifyClaimantTranslatedDocumentUploaded(),
+            addProperties(caseData),
+            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+        );
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     public String getApplicantLegalOrganizationName(CaseData caseData) {

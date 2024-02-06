@@ -148,8 +148,7 @@ public class SdoGeneratorService {
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingFinalDisposalHearingToggle")
             )
             .disposalHearingMethodToggle(
-                // SNI-5142
-                true
+                SdoHelper.hasDisposalVariable(caseData, "disposalHearingMethodToggle")
             )
             .disposalHearingBundleToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingBundleToggle")
@@ -277,8 +276,9 @@ public class SdoGeneratorService {
             .fastTrackTrialToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")
             )
-            // SNI-5142
-            .fastTrackMethodToggle(true)
+            .fastTrackMethodToggle(
+                SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")
+            )
             .fastTrackAllocation(getFastTrackAllocation(caseData, featureToggleService.isFastTrackUpliftsEnabled()));
 
         sdoDocumentFormBuilder
@@ -353,8 +353,9 @@ public class SdoGeneratorService {
             .smallClaimsHearingToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")
             )
-            // SNI-5142
-            .smallClaimsMethodToggle(true)
+            .smallClaimsMethodToggle(
+                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsMethodToggle")
+            )
             .smallClaimsDocumentsToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")
             )

@@ -49,10 +49,6 @@ public class EventHistory {
     private List<Event> statesPaid;
     @Singular("judgmentByAdmission")
     private List<Event> judgmentByAdmission;
-    @Singular("generalFormOfApplication")
-    private List<Event> generalFormOfApplication;
-    @Singular("defenceStruckOut")
-    private List<Event> defenceStruckOut;
 
     @JsonIgnore
     public List<Event> flatEvents() {
@@ -73,9 +69,7 @@ public class EventHistory {
             interlocutoryJudgment,
             defaultJudgment,
             statesPaid,
-            judgmentByAdmission,
-            generalFormOfApplication,
-            defenceStruckOut
+            judgmentByAdmission
         );
         return eventsList.stream()
             .filter(Objects::nonNull)

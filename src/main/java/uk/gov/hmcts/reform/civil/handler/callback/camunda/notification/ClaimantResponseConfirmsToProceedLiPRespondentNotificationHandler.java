@@ -18,7 +18,6 @@ import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -26,10 +25,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler extends CallbackHandler
     implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(
-        NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED,
-        NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC
-    );
+    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED);
     public static final String TASK_ID = "NotifyLiPRespondentClaimantConfirmToProceed";
     private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-respondent-notification-%s";
     private final NotificationService notificationService;
@@ -41,7 +37,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     private CallbackResponse notifyRespondentForClaimantConfirmsToProceed(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (shouldSendNotification(caseData, callbackParams.getRequest().getEventId())) {
+        if (!caseData.isBilingual() && Objects.nonNull(caseData.getRespondent1().getPartyEmail())) {
             notificationService.sendMail(
                 caseData.getRespondent1().getPartyEmail(),
                 notificationsProperties.getRespondent1LipClaimUpdatedTemplate(),
@@ -50,12 +46,6 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    private boolean shouldSendNotification(CaseData caseData, String eventId) {
-        return Objects.nonNull(caseData.getRespondent1().getPartyEmail())
-            && (!caseData.isBilingual()
-            || NOTIFY_LIP_RESPONDENT_CLAIMANT_CONFIRM_TO_PROCEED_TRANSLATED_DOC.name().equals(eventId));
     }
 
     @Override
