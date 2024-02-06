@@ -31,7 +31,6 @@ public class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseC
     @Mock
     private ToggleConfiguration toggleConfiguration;
 
-
     @Test
     void shouldReturnCorrectActivityId_whenRequested() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
