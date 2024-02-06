@@ -31,20 +31,4 @@ public class NotificationEntity {
     private String updatedBy;
     private Date updatedOn;
 
-    public NotificationEntity() {
-
-    }
-
-    public NotificationEntity(NotificationTemplateEntity notificationTemplateEntity, String reference, String name, String enHTML, String cyHTML, String params, String createdBy, Date createdAt, String updatedBy, Date updatedOn) {
-        this.notificationTemplateEntity = notificationTemplateEntity;
-        this.reference = reference;
-        this.name = name;
-        this.enHTML = enHTML;
-        this.cyHTML = cyHTML;
-        this.params = params;
-        this.createdBy = createdBy;
-        this.createdAt = createdAt;
-        this.updatedBy = updatedBy;
-        this.updatedOn = updatedOn;
-    }
 }

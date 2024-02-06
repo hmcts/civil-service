@@ -1,16 +1,15 @@
 package uk.gov.hmcts.reform.dashboard.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dashboard.data.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.repository.NotificationTemplateRepository;
 import java.util.List;
 
 @Service
-public class NotificationTemplateService {
+public class DashboardNotificationTemplateService {
     private final NotificationTemplateRepository repository;
 
-    public NotificationTemplateService(NotificationTemplateRepository repository) {
+    public DashboardNotificationTemplateService(NotificationTemplateRepository repository) {
         this.repository = repository;
     }
 

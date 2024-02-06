@@ -12,13 +12,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.dashboard.data.NotificationEntity;
-
 import uk.gov.hmcts.reform.dashboard.data.TaskListEntity;
-//import uk.gov.hmcts.reform.dashboard.service.NotificationService;
-import uk.gov.hmcts.reform.dashboard.service.NotificationTemplateService;
+import uk.gov.hmcts.reform.dashboard.service.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.service.TaskListService;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,12 +28,12 @@ import java.util.UUID;
 public class DashboardController {
 
     private final TaskListService taskListService;
-    private final NotificationTemplateService notificationTemplateService;
+    private final DashboardNotificationService dashboardNotificationService;
 
     @Autowired
-    public DashboardController(TaskListService taskListService, NotificationTemplateService notificationTemplateService) {
+    public DashboardController(TaskListService taskListService, DashboardNotificationService dashboardNotificationService) {
         this.taskListService = taskListService;
-        this.notificationTemplateService = notificationTemplateService;
+        this.dashboardNotificationService = dashboardNotificationService;
     }
 
     @GetMapping(path = {
@@ -58,22 +55,20 @@ public class DashboardController {
 
 
     @GetMapping(path = {
-        "notifications/{caseId}",
+        "notifications/{uuid}",
     })
-    public ResponseEntity<List<NotificationEntity>> getCaseId(
-        @PathVariable("uuId") UUID uuId,
+    public ResponseEntity<Optional<NotificationEntity>> getDashboardNotificationByUuid(
+        @PathVariable("uuId") UUID uuid,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
         log.info(
-            "Received CaseId: {}",
-            uuId
+            "Received UUID: {}",
+            uuid
         );
 
-        //var notificationResponse = notificationTemplateService.getById(uuId);
+        var notificationResponse = dashboardNotificationService.getNotification(uuid);
 
-        //return new ResponseEntity<>(notificationResponse, HttpStatus.OK);
-        return null;
+        return new ResponseEntity<>(notificationResponse, HttpStatus.OK);
     }
-
 
 }
