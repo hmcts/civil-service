@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
@@ -22,6 +25,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -32,6 +36,14 @@ class UpdateClaimStateServiceTest {
 
     @InjectMocks
     private UpdateClaimStateService service;
+
+    @Mock
+    private ToggleConfiguration toggleConfiguration;
+
+    @BeforeEach
+    void setup() {
+        given(toggleConfiguration.getFeatureToggle()).willReturn("WA 3.5");
+    }
 
     @Test
     void shouldUpdateCaseStateToJudicialReferral_WhenPartAdmitNoSettle_NoMediation() {
