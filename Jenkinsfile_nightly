@@ -82,6 +82,7 @@ withNightlyPipeline(type, product, component) {
     """
     yarnBuilder.yarn('yarn-update')
     yarnBuilder.yarn('install-dependencies')
+    yarnBuilder.yarn('playwright install')
   }
 
   afterAlways('fullFunctionalTest') {
