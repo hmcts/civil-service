@@ -1,6 +1,6 @@
-CREATE TABLE IF NOT EXISTS dashboard.dashboard_notifications (
+CREATE TABLE IF NOT EXISTS public.dashboard_notifications (
  id UUID NOT NULL PRIMARY KEY,
- dashboard_notifications_Templates_id INTEGER REFERENCES dashboard.dashboard_notifications_Templates(id),
+ dashboard_notifications_Templates_id INTEGER REFERENCES public.dashboard_notifications_Templates(id),
  reference VARCHAR(256),
  notification_name VARCHAR(256),
  en_HTML VARCHAR(256),

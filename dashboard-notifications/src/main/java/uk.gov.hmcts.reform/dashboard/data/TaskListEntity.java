@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.data;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
 import uk.gov.hmcts.reform.dashboard.utils.JsonDataConverter;
@@ -30,6 +31,9 @@ public class TaskListEntity {
     @JoinColumn(name = "task_item_template_id", nullable = false)
     private TaskItemTemplateEntity taskItemTemplate;
 
+    @Size(max = 256)
+    private String reference;
+
     private Short currentStatus;
 
     private Short nextStatus;
@@ -50,6 +54,6 @@ public class TaskListEntity {
 
     @Column(name = "message_parm", columnDefinition = "jsonb(0, 0)")
     @Convert(converter = JsonDataConverter.class)
-    private Object messageParm;
+    private JsonNode messageParm;
 
 }

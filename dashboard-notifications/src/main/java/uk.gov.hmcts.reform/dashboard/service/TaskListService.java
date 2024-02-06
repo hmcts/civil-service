@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dashboard.data.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repository.TaskListRepository;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,7 +22,7 @@ public class TaskListService {
     }
 
 
-    public Optional<TaskListEntity> getTaskList(UUID uuid) {
-        return taskListRepository.findById(uuid);
+    public Optional<List<TaskListEntity>> getTaskList(String ccdCaseIdentifier, String roleType) {
+        return taskListRepository.findByReferenceAndTaskItemTemplateRole(ccdCaseIdentifier, roleType);
     }
 }

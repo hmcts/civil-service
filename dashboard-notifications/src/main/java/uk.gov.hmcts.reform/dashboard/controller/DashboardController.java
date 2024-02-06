@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.dashboard.data.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.service.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.service.TaskListService;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,7 +24,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping(
     path = "/dashboard",
-    produces = MediaType.APPLICATION_JSON_VALUE
+    produces = MediaType.APPLICATION_JSON_VALUE,
+    consumes = MediaType.APPLICATION_JSON_VALUE
 )
 public class DashboardController {
 
@@ -37,18 +39,19 @@ public class DashboardController {
     }
 
     @GetMapping(path = {
-        "taskList/{uuid}",
+        "taskList/{ccd-case-identifier}/role/{role-type}",
     })
-    public ResponseEntity<Optional<TaskListEntity>> getTaskListByUuid(
-        @PathVariable("uuid") UUID uuid,
+    public ResponseEntity<Optional<List<TaskListEntity>>> getTaskListByCaseIdentifierAndRole(
+        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
+        @PathVariable("role-type") String roleType,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
         log.info(
-            "Received UUID: {}",
-            uuid
+            "Received ccd-case-identifier: {}, role-type : {}",
+            ccdCaseIdentifier, roleType
         );
 
-        var taskListResponse = taskListService.getTaskList(uuid);
+        var taskListResponse = taskListService.getTaskList(ccdCaseIdentifier, roleType);
 
         return new ResponseEntity<>(taskListResponse, HttpStatus.OK);
     }
