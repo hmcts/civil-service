@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -15,11 +14,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UpdateClaimStateService {
 
-    private final ToggleConfiguration toggleConfiguration;
-
     public String setUpCaseState(CaseData updatedData) {
-
-        updatedData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
 
         if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();

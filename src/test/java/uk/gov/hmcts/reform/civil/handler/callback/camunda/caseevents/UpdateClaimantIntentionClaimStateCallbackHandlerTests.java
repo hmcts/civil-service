@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -8,12 +9,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,6 +30,13 @@ public class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseC
 
     @Mock
     private ObjectMapper objectMapper;
+    @Mock
+    private ToggleConfiguration toggleConfiguration;
+
+    @BeforeEach
+    void setup() {
+        given(toggleConfiguration.getFeatureToggle()).willReturn("WA 3.5");
+    }
 
     @Test
     void shouldReturnCorrectActivityId_whenRequested() {
