@@ -855,24 +855,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return updatedData.build();
     }
 
-    private String getHearingInPersonSmall(CaseData caseData) {
-        if (caseData.getSmallClaimsMethod() == SmallClaimsMethod.smallClaimsMethodInPerson
-            && Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            return caseData.getSmallClaimsMethodInPerson().getValue().getLabel();
-        }
-        return null;
-    }
-
-    private String getHearingInPersonFast(CaseData caseData) {
-        if (caseData.getFastTrackMethod() == FastTrackMethod.fastTrackMethodInPerson
-            && Optional.ofNullable(caseData.getFastTrackMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            return caseData.getFastTrackMethodInPerson().getValue().getLabel();
-        }
-        return null;
-    }
-
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
@@ -957,16 +939,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private String getEpimmsId(CaseData caseData) {
 
-        if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
-            return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
+        Optional<DynamicList> toUseList;
+        if (DISPOSAL.equals(caseData.getOrderType())) {
+            toUseList = Optional.ofNullable(caseData.getDisposalHearingMethodInPerson());
+        } else if (SdoHelper.isFastTrack(caseData)) {
+            toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
+        } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            toUseList = Optional.ofNullable(caseData.getSmallClaimsMethodInPerson());
+        } else {
+            throw new IllegalArgumentException("Could not determine claim track");
         }
-        if (SdoHelper.isFastTrack(caseData)) {
-            return caseData.getFastTrackMethodInPerson().getValue().getCode();
-        }
-        if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
-        }
-        throw new IllegalArgumentException("Could not determine claim track");
+        return toUseList.map(DynamicList::getValue).map(DynamicListElement::getCode).orElse(null);
     }
 
     private boolean nonNull(Object object) {
