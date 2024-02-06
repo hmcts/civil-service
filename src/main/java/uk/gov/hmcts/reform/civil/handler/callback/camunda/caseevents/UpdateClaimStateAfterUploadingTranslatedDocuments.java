@@ -19,13 +19,13 @@ import java.util.Map;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AFTER_TRANSLATED_DOCUMENT_UPLOADED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AFTER_DOC_UPLOADED;
 
 @Service
 @RequiredArgsConstructor
 public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(UPDATE_CLAIM_STATE_AFTER_TRANSLATED_DOCUMENT_UPLOADED);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(UPDATE_CLAIM_STATE_AFTER_DOC_UPLOADED);
     private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateClaimState);
     private static final String TASK_ID = "updateClaimStateAfterTranslateDocumentUploadedID";
     private final ObjectMapper objectMapper;
