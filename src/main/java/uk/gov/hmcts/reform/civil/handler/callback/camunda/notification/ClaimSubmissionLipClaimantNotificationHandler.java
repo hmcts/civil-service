@@ -14,29 +14,25 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.List;
 import java.util.Map;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION;
 
 @Service
 @RequiredArgsConstructor
-public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler extends CallbackHandler
-    implements NotificationData {
+public class ClaimSubmissionLipClaimantNotificationHandler extends CallbackHandler implements NotificationData {
 
-    private static final List<CaseEvent> EVENTS = List.of(NOTIFY_LIP_APPLICANT_CLAIMANT_CONFIRM_TO_PROCEED);
-
-    public static final String TASK_ID = "NotifyLiPApplicantClaimantConfirmToProceed";
-    private static final String REFERENCE_TEMPLATE = "claimant-confirms-to-proceed-applicant-notification-%s";
+    private static final List<CaseEvent> EVENTS = List.of(
+        NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION);
+    public static final String TASK_ID = "ClaimSubmissionLipClaimantNotification";
+    private static final String REFERENCE_TEMPLATE =
+        "claim-submission-lip-claimant-notification-%s";
 
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final FeatureToggleService featureToggleService;
-
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
-        this::notifyApplicantForClaimantConfirmsToProceed
+        this::notifyLipClaimantForClaimSubmission
     );
 
     @Override
@@ -54,38 +50,28 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
         return EVENTS;
     }
 
-    private CallbackResponse notifyApplicantForClaimantConfirmsToProceed(CallbackParams callbackParams) {
+    private CallbackResponse notifyLipClaimantForClaimSubmission(
+        CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        String applicant1Email = caseData.getApplicant1Email();
 
-        if (caseData.getApplicant1Email() != null) {
+        if (applicant1Email != null) {
             notificationService.sendMail(
-                caseData.getApplicant1Email(),
-                getEmailTemplate(caseData),
+                applicant1Email,
+                notificationsProperties.getNotifyClaimantLipForClaimSubmissionTemplate(),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-    }
-
-    private String getEmailTemplate(CaseData caseData) {
-        if (isBilingualForLipvsLip(caseData)) {
-            return notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate();
-        }
-        return notificationsProperties.getClaimantLipClaimUpdatedTemplate();
-    }
-
-    private boolean isBilingualForLipvsLip(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
-            && caseData.isBilingual();
     }
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            RESPONDENT_NAME, caseData.getRespondent1().getPartyName(),
+            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         );
     }
+
 }
