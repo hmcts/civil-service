@@ -101,19 +101,20 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
             && callbackParams.getCaseData().getCcdState() == CaseState.CASE_PROGRESSION) {
             errors.add(
                 "Unable to process this request. To transfer the case to another court you need to issue a General Order.");
-        } else {
-            if (isTransferOnlineCase(callbackParams.getCaseData())) {
-                reason = callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt();
-            } else {
-                reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
-            }
-
-            if (reason.length() > lengthAllowed) {
-                errors.add("Character Limit Reached: "
-                               + "Reason for not drawing Standard Directions order cannot exceed "
-                               + lengthAllowed + " characters.");
-            }
         }
+
+        if (isTransferOnlineCase(callbackParams.getCaseData())) {
+            reason = callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt();
+        } else {
+            reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
+        }
+
+        if (reason.length() > lengthAllowed) {
+            errors.add("Character Limit Reached: "
+                           + "Reason for not drawing Standard Directions order cannot exceed "
+                           + lengthAllowed + " characters.");
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();
