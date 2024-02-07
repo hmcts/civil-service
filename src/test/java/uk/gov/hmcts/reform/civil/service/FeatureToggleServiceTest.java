@@ -188,12 +188,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isCarmEnabledForCase(LocalDateTime.now())).isEqualTo(toggleStat);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldLipVLipEnabledReturnTrue() {
-        assertThat(featureToggleService.isLipVLipEnabled()).isTrue();
-    }
-
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(eq(feature)))
             .thenReturn(state);
