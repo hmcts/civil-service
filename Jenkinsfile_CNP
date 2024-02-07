@@ -46,7 +46,8 @@ def secrets = [
     secret('postgres-password', 'POSTGRES_PASSWORD'),
     secret('default-password','DEFAULT_PASSWORD'),
     secret('judge-default-password','JUDGE_DEFAULT_PASSWORD'),
-    secret('iac-default-password','IAC_DEFAULT_PASSWORD')
+    secret('iac-default-password','IAC_DEFAULT_PASSWORD'),
+    secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS')
   ]
 ]
 
