@@ -1,8 +1,8 @@
---CREATE SCHEMA IF NOT EXISTS dbs;
+CREATE SCHEMA IF NOT EXISTS dbs;
 
-CREATE SEQUENCE IF NOT EXISTS public.dashboard_notifications_Templates_id_seq START 1 NO MAXVALUE NO MINVALUE INCREMENT BY 1 CACHE 1;
+CREATE SEQUENCE IF NOT EXISTS dbs.dashboard_notifications_Templates_id_seq START 1 NO MAXVALUE NO MINVALUE INCREMENT BY 1 CACHE 1;
 
-CREATE TABLE IF NOT EXISTS public.dashboard_notifications_Templates (
+CREATE TABLE IF NOT EXISTS dbs.dashboard_notifications_Templates (
  id BIGINT PRIMARY KEY DEFAULT nextval('dashboard_notifications_Templates_id_seq'),
  template_name VARCHAR(256),
  en_HTML VARCHAR(256),

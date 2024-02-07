@@ -11,7 +11,7 @@ import java.util.Date;
 @lombok.Setter
 @Entity
 @EqualsAndHashCode
-@Table(name = "dashboard_notifications_Templates")
+@Table(name = "dashboard_notifications_Templates", schema = "dbs")
 public class NotificationTemplateEntity {
 
     @Id
