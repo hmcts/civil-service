@@ -6,7 +6,7 @@ CREATE SEQUENCE IF NOT EXISTS dbs.task_item_template_id_seq
   CACHE 1;
 
 CREATE TABLE IF NOT EXISTS dbs.task_item_template (
-                                                       id bigint NOT NULL,
+                                                       id BIGINT PRIMARY KEY DEFAULT nextval('dbs.task_item_template_id_seq'),
                                                        title_en character varying(256),
                                                        content_en character varying(512),
                                                        category_en character varying(256),
@@ -17,8 +17,7 @@ CREATE TABLE IF NOT EXISTS dbs.task_item_template (
                                                        task_status_sequence int[],
                                                        role character varying(256),
                                                        task_order int,
-                                                       created_at timestamp without time zone DEFAULT now() NOT NULL,
-                                                       CONSTRAINT task_list_template_pkey PRIMARY KEY (id)
+                                                       created_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
