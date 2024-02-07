@@ -26,7 +26,7 @@ data "azurerm_key_vault_secret" "slackmonitoringaddress" {
 module "civil-fail-action-group-slack" {
   source                     = "git@github.com:hmcts/cnp-module-action-group"
   location                   = "global"
-  environment                = "${var.env}"
+  env                =  var.env
 
   resourcegroup_name     = azurerm_resource_group.rg.name
   action_group_name      = "Civil Fail Slack Alert - ${var.env}"
