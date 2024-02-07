@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS dbs.task_item_template (
 
 
 CREATE TABLE IF NOT EXISTS dbs.task_list (
-                                              id uuid NOT NULL,
+                                              id uuid NOT NULL PRIMARY KEY,
                                               task_item_template_id bigint NOT NULL,
                                               reference character varying(256),
                                               current_status int,
@@ -34,7 +34,6 @@ CREATE TABLE IF NOT EXISTS dbs.task_list (
                                               created_at timestamp without time zone DEFAULT now() NOT NULL,
                                               updated_at timestamp without time zone,
                                               updated_by character varying(256),
-                                              CONSTRAINT task_list_pkey PRIMARY KEY (id),
                                               CONSTRAINT fk_task_list_task_item_template FOREIGN KEY (task_item_template_id) REFERENCES dbs.task_item_template(id)
 );
 
