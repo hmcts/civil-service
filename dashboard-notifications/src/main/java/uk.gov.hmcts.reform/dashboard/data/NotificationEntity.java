@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @lombok.Setter
 @Entity
 @EqualsAndHashCode
-@Table(name = "dashboard_notifications")
+@Table(name = "dashboard_notifications", schema = "dbs")
 public class NotificationEntity {
     @Id
     @NotNull

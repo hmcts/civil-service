@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dashboard.data;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Table(name = "task_item_template", schema = "public")
+@Table(name = "task_item_template", schema = "dbs")
 @Entity
 public class TaskItemTemplateEntity {
     @Id
@@ -42,14 +43,12 @@ public class TaskItemTemplateEntity {
     @Size(max = 256)
     private String role;
 
-    private Short taskOrder;
+    private int taskOrder;
 
     @NotNull
     @javax.persistence.Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-//    @ElementCollection(fetch = FetchType.LAZY)
-//    @CollectionTable(name = "task_item_template", joinColumns = @JoinColumn(name = "id"))
-//    private Short[] taskStatusSequence;
-
+    @Type(type = "com.vladmihalcea.hibernate.type.array.IntArrayType")
+    private int[] taskStatusSequence ;
 }

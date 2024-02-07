@@ -109,4 +109,10 @@ public class SdoDocumentFormFast implements MappableObject {
     private final boolean fastTrackMethodToggle;
 
     private final String fastTrackAllocation;
+
+    @SuppressWarnings("unused")
+    public boolean getFastTrackMethodToggle() {
+        // made mandatory in SNI-5142
+        return true;
+    }
 }

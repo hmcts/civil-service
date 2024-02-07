@@ -20,7 +20,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@Table(name = "task_list", schema = "public")
+@Table(name = "task_list", schema = "dbs")
 @Entity
 public class TaskListEntity {
     @Id
@@ -34,9 +34,9 @@ public class TaskListEntity {
     @Size(max = 256)
     private String reference;
 
-    private Short currentStatus;
+    private int currentStatus;
 
-    private Short nextStatus;
+    private int nextStatus;
 
     @Size(max = 512)
     private String taskItemEn;

@@ -50,13 +50,13 @@ import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingWitnessOfFact
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
+import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -686,9 +686,11 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
 
     private String getEpimmsId(CaseData caseData) {
         if (caseData.getTrialHearingMethodInPersonDJ() != null) {
-            return caseData.getTrialHearingMethodInPersonDJ().getValue().getCode();
+            return Optional.ofNullable(caseData.getTrialHearingMethodInPersonDJ().getValue())
+                .map(DynamicListElement::getCode).orElse(null);
         } else if (caseData.getDisposalHearingMethodInPersonDJ() != null) {
-            return caseData.getDisposalHearingMethodInPersonDJ().getValue().getCode();
+            return Optional.ofNullable(caseData.getDisposalHearingMethodInPersonDJ().getValue())
+                .map(DynamicListElement::getCode).orElse(null);
         }
         throw new IllegalArgumentException("Epimms Id is not provided");
     }
