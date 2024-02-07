@@ -46,11 +46,14 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
 
     private CallbackResponse notifyDefendantMediationAgreement(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        notificationService.sendMail(
-            addEmail(caseData),
-            addTemplate(caseData),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference()));
+        if (caseData.getRespondent1().getPartyEmail() != null || caseData.getRespondentSolicitor1EmailAddress() != null) {
+            notificationService.sendMail(
+                addEmail(caseData),
+                addTemplate(caseData),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
 

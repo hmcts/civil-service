@@ -136,4 +136,8 @@ public class HearingUtils {
             default -> party.getOrganisationName();
         };
     }
+
+    public static boolean isDisposalHearing(String hearingType) {
+        return hearingType.contains("DIS");
+    }
 }
