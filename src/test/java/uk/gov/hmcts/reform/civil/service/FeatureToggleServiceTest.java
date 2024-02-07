@@ -191,8 +191,7 @@ class FeatureToggleServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldLipVLipEnabledReturnTrue() {
-
-        assertThat(featureToggleService.isLipVLipEnabled()).isEqualTo(true);
+        assertThat(featureToggleService.isLipVLipEnabled()).isTrue();
     }
 
     private void givenToggle(String feature, boolean state) {
