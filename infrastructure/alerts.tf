@@ -18,6 +18,11 @@ module "camunda-process-stuck-alert" {
   count                      = var.custom_alerts_enabled
 }
 
+data "azurerm_key_vault_secret" "slackmonitoringaddress" {
+  name         = "slackmonitoringaddress"
+  key_vault_id = data.azurerm_key_vault.civil_key_vault.id
+}
+
 module "civil-fail-action-group-slack" {
   source                     = "git@github.com:hmcts/cnp-module-action-group"
   location                   = "global"
@@ -27,6 +32,6 @@ module "civil-fail-action-group-slack" {
   action_group_name      = "Civil Fail Slack Alert - ${var.env}"
   short_name             = "Civil_slack"
   email_receiver_name    = "Civil Alerts"
-  email_receiver_address = data.azurerm_key_vault.civil_key_vault.slackmonitoringaddress.value
+  email_receiver_address = data.azurerm_key_vault_secret.slackmonitoringaddress.value
 
 }
