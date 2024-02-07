@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -11,20 +12,23 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationDetailsService;
-import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NOT_ASSIGNED;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.PARTY_WITHDRAWS;
+import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class NotificationMediationUnsuccessfulDefendantLRHandler extends CallbackHandler implements NotificationData {
 
-    private final OrganisationDetailsService organisationDetailsService;
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private static final List<CaseEvent> EVENTS = List.of(
@@ -37,7 +41,8 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantLRForMediationUnsuccessful
     );
-    private final OrganisationService organisationService;
+    private final FeatureToggleService featureToggleService;
+    private final OrganisationDetailsService organisationDetailsService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -45,7 +50,11 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
     }
 
     private CallbackResponse notifyDefendantLRForMediationUnsuccessful(CallbackParams callbackParams) {
-        sendEmail(callbackParams);
+        if (featureToggleService.isCarmEnabledForCase(callbackParams.getCaseData().getSubmittedDate())) {
+            sendEmail(callbackParams);
+        } else {
+            log.info("Defendant LR is not notified because it is not a CARM case.");
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
@@ -64,59 +73,53 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
 
     public Map<String, String> addProperties(final CaseData caseData) {
         return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, false),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
+            PARTY_NAME, caseData.getApplicant1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 
     public Map<String, String> addPropertiesForDefendant2(final CaseData caseData) {
         return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganisationName(caseData, true),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent2LegalOrganisationName(caseData),
+            PARTY_NAME, caseData.getApplicant1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
         );
     }
 
     private void sendEmail(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String recipient = caseData.getApplicantSolicitor1UserDetails().getEmail();
 
-        //TODO: this template has to change nameNotificationMediationUnsuccessfulDefendant1LRHandler
-        String emailTemplate = notificationsProperties.getMediationUnsuccessfulClaimantLRTemplate();
-        System.out.println(recipient);
-        System.out.println(emailTemplate);
-
-        if (isRespondentSolicitor1Notification(callbackParams)) {
-            notificationService.sendMail(
-                "sherlyn.khaw1@hmcts.net",
-                emailTemplate,
-                addProperties(caseData),
-                String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR, caseData.getLegacyCaseReference())
-            );
-        } else {
-            notificationService.sendMail(
-                "sherlyn.khaw1@hmcts.net",
-                emailTemplate,
-                addPropertiesForDefendant2(caseData),
-                String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR, caseData.getLegacyCaseReference())
-            );
+        if (findMediationUnsuccessfulReason(caseData,
+                List.of(PARTY_WITHDRAWS, APPOINTMENT_NO_AGREEMENT, APPOINTMENT_NOT_ASSIGNED))) {
+            if (isRespondentSolicitor1Notification(callbackParams)) {
+                sendMailToDefendant1Solicitor(caseData);
+            } else {
+                sendMailToDefendant2Solicitor(caseData);
+            }
         }
+    }
 
+    private void sendMailToDefendant1Solicitor(CaseData caseData) {
+        notificationService.sendMail(
+            caseData.getRespondentSolicitor1EmailAddress(),
+            notificationsProperties.getMediationUnsuccessfulLRTemplate(),
+            addProperties(caseData),
+            String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR, caseData.getLegacyCaseReference())
+        );
+    }
+
+    private void sendMailToDefendant2Solicitor(CaseData caseData) {
+        notificationService.sendMail(
+            caseData.getRespondentSolicitor2EmailAddress(),
+            notificationsProperties.getMediationUnsuccessfulLRTemplate(),
+            addPropertiesForDefendant2(caseData),
+            String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR, caseData.getLegacyCaseReference())
+        );
     }
 
     private boolean isRespondentSolicitor1Notification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
             .equals(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name());
-    }
-
-    //finding legal org name
-    private String getLegalOrganisationName(CaseData caseData, boolean isDefendant1) {
-        String organisationID = isDefendant1
-            ? caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID()
-            : caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
-        Optional<Organisation> organisation = organisationService.findOrganisationById(organisationID);
-        return organisation.isPresent() ? organisation.get().getName() :
-            caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
 }
