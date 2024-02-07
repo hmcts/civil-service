@@ -42,6 +42,14 @@ public interface Claim {
 
     boolean hasClaimantAskedToSignSettlementAgreement();
 
+    boolean hasClaimantAndDefendantSignedSettlementAgreement();
+
+    boolean hasDefendantRejectedSettlementAgreement();
+
+    boolean hasClaimantSignedSettlementAgreement();
+
+    boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired();
+
     boolean hasClaimantAcceptedPartialAdmissionAmount();
 
     boolean haveBothPartiesSignedSettlementAgreement();
@@ -81,5 +89,9 @@ public interface Claim {
     boolean isSDOOrderCreated();
 
     boolean isClaimantDefaultJudgement();
+
+    boolean isPartialAdmissionAccepted();
+
+    boolean isPaymentPlanRejected();
 
 }

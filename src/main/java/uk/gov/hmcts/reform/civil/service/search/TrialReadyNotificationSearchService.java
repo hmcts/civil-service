@@ -38,11 +38,17 @@ public class TrialReadyNotificationSearchService extends ElasticSearchService {
                                       .should(beState(PREPARE_FOR_HEARING_CONDUCT_HEARING))
                                       .should(beState(HEARING_READINESS)))
                             .mustNot(matchQuery("data.allocatedTrack", "SMALL_CLAIM"))
+                            .mustNot(matchQuery("data.responseClaimTrack", "SMALL_CLAIM"))
                             .mustNot(matchQuery("data.listingOrRelisting", ListingOrRelisting.RELISTING))
                             .mustNot(matchQuery("data.trialReadyNotified", YesOrNo.YES))),
             List.of("reference"),
             startIndex
         );
+    }
+
+    @Override
+    Query queryInMediationCases(int startIndex, LocalDate claimMovedDate) {
+        return null;
     }
 
     private QueryBuilder beState(CaseState caseState) {

@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -46,10 +49,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
@@ -661,6 +666,26 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
 
+        //This the flowafter request for reconsideration
+        if (featureToggleService.isSdoR2Enabled() && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
+            && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
+            updatedData.drawDirectionsOrderRequired(null);
+            updatedData.drawDirectionsOrderSmallClaims(null);
+            updatedData.fastClaims(null);
+            updatedData.smallClaims(null);
+            updatedData.claimsTrack(null);
+            updatedData.orderType(null);
+            updatedData.trialAdditionalDirectionsForFastTrack(null);
+            updatedData.drawDirectionsOrderSmallClaimsAdditionalDirections(null);
+            updatedData.fastTrackAllocation(FastTrackAllocation.builder().assignComplexityBand(null).build());
+            updatedData.disposalHearingAddNewDirections(null);
+            updatedData.smallClaimsAddNewDirections(null);
+            updatedData.fastTrackAddNewDirections(null);
+            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
+            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
+            updatedData.disposalHearingHearingNotes(null);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
@@ -830,24 +855,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return updatedData.build();
     }
 
-    private String getHearingInPersonSmall(CaseData caseData) {
-        if (caseData.getSmallClaimsMethod() == SmallClaimsMethod.smallClaimsMethodInPerson
-            && Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            return caseData.getSmallClaimsMethodInPerson().getValue().getLabel();
-        }
-        return null;
-    }
-
-    private String getHearingInPersonFast(CaseData caseData) {
-        if (caseData.getFastTrackMethod() == FastTrackMethod.fastTrackMethodInPerson
-            && Optional.ofNullable(caseData.getFastTrackMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            return caseData.getFastTrackMethodInPerson().getValue().getLabel();
-        }
-        return null;
-    }
-
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
         CaseData.CaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
 
@@ -932,16 +939,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private String getEpimmsId(CaseData caseData) {
 
-        if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
-            return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
+        Optional<DynamicList> toUseList;
+        if (DISPOSAL.equals(caseData.getOrderType())) {
+            toUseList = Optional.ofNullable(caseData.getDisposalHearingMethodInPerson());
+        } else if (SdoHelper.isFastTrack(caseData)) {
+            toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
+        } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            toUseList = Optional.ofNullable(caseData.getSmallClaimsMethodInPerson());
+        } else {
+            throw new IllegalArgumentException("Could not determine claim track");
         }
-        if (SdoHelper.isFastTrack(caseData)) {
-            return caseData.getFastTrackMethodInPerson().getValue().getCode();
-        }
-        if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
-        }
-        throw new IllegalArgumentException("Could not determine claim track");
+        return toUseList.map(DynamicList::getValue).map(DynamicListElement::getCode).orElse(null);
     }
 
     private boolean nonNull(Object object) {

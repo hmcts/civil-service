@@ -160,6 +160,7 @@ import java.util.Set;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Optional.ofNullable;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @Jacksonized
@@ -296,6 +297,9 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> fastTrackSchedulesOfLossToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackCostsToggle;
     private List<OrderDetailsPagesSectionsToggle> fastTrackTrialToggle;
+    /**
+     * made mandatory in SNI-5142.
+     */
     private List<OrderDetailsPagesSectionsToggle> fastTrackMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingDisclosureOfDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingWitnessOfFactToggle;
@@ -303,11 +307,17 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> disposalHearingQuestionsToExpertsToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingSchedulesOfLossToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingFinalDisposalHearingToggle;
+    /**
+     * SNI-5142 made mandatory SHOW.
+     */
     private List<OrderDetailsPagesSectionsToggle> disposalHearingMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingBundleToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingClaimSettlingToggle;
     private List<OrderDetailsPagesSectionsToggle> disposalHearingCostsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsHearingToggle;
+    /**
+     * SNI-5142 made mandatory SHOW.
+     */
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
@@ -411,6 +421,7 @@ public class CaseDataParent implements MappableObject {
      */
     private final ResponseOneVOneShowTag showResponseOneVOneFlag;
     private final YesOrNo applicant1AcceptAdmitAmountPaidSpec;
+    private final YesOrNo applicant1FullDefenceConfirmAmountPaidSpec;
     private final YesOrNo applicant1PartAdmitConfirmAmountPaidSpec;
     private final YesOrNo applicant1PartAdmitIntentionToSettleClaimSpec;
     private final YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec;
@@ -435,7 +446,12 @@ public class CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isApplicantNotRepresented() {
-        return this.applicant1Represented == YesOrNo.NO;
+        return this.applicant1Represented == NO;
+    }
+
+    @JsonIgnore
+    public boolean isApplicantRepresented() {
+        return this.applicant1Represented == YES;
     }
 
     /**
@@ -722,6 +738,7 @@ public class CaseDataParent implements MappableObject {
     private DynamicList transferCourtLocationList;
     private NotSuitableSdoOptions notSuitableSdoOptions;
     private TocTransferCaseReason tocTransferCaseReason;
+    private String claimantBilingualLanguagePreference;
 
     @JsonUnwrapped
     private final UpdateDetailsForm updateDetailsForm;
@@ -810,4 +827,16 @@ public class CaseDataParent implements MappableObject {
             .map(DynamicListElement::getLabel)
             .orElse(null);
     }
+
+    @JsonIgnore
+    public boolean isBilingual() {
+        return null != claimantBilingualLanguagePreference
+                && !claimantBilingualLanguagePreference.equalsIgnoreCase(Language.ENGLISH.toString());
+    }
+
+    @JsonIgnore
+    public boolean isFullDefenceNotPaid() {
+        return NO.equals(getApplicant1FullDefenceConfirmAmountPaidSpec());
+    }
+
 }
