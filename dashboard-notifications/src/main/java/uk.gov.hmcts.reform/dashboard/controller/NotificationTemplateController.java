@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.dashboard.data.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.repository.NotificationTemplateRepository;
 
 import java.util.List;
+
 @RestController
 @RequestMapping("/dashboard_notification_template")
 public class NotificationTemplateController {

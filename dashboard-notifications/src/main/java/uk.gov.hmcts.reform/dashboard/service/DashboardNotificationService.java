@@ -17,6 +17,7 @@ public class DashboardNotificationService {
     public DashboardNotificationService(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
     }
+
     public List<NotificationEntity> getAll() {
         return (List<NotificationEntity>) notificationRepository.findAll();
     }

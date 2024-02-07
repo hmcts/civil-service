@@ -7,6 +7,7 @@ import java.util.List;
 
 @Service
 public class DashboardNotificationTemplateService {
+
     private final NotificationTemplateRepository repository;
 
     public DashboardNotificationTemplateService(NotificationTemplateRepository repository) {
