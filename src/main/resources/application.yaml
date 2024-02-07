@@ -299,6 +299,7 @@ notifications:
   respondent1DefaultJudgmentRequestedTemplate: "d4cf381f-a2b3-4a81-a442-eb2aa5deb210"
   respondent1LipClaimUpdatedTemplate: "9c44f3fb-a340-49e5-bf64-32a3187d7dcd"
   claimantLipClaimUpdatedTemplate: "0abdcb29-edd3-418a-aeab-a102da4ad441"
+  claimantLipClaimUpdatedBilingualTemplate: "e880dc43-dc4e-440d-8c34-d0feec70e196"
   applicantLiPDefaultJudgmentRequested: "668d4703-e97f-4e2f-8d07-1a697aac6d0b"
 
   hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
@@ -345,6 +346,12 @@ notifications:
 
   notifyRespondentLipForClaimantRepresentedTemplate: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
   notifyClaimantLipForNoLongerAccessTemplate: "8bf1b6c6-2ee7-442d-8b72-550d2aca9bdf"
+  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual: "e880dc43-dc4e-440d-8c34-d0feec70e196"
+  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish: "f372a4df-4577-402a-a2cd-142fd8ff9028"
+  notifyClaimantLipForClaimSubmissionTemplate: "16bb1a39-96f8-4091-8d11-8375a2cc5905"
+  notifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate: "f2080ac4-2585-47fd-ac18-5f94148adc07"
+  notifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate: "1f6006bb-6726-48c4-ac5f-a456d043f1b7"
+  bilingualClaimantClaimContinuingOnlineForSpec: "461b4ce6-3783-409d-be47-ea1230170833"
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
