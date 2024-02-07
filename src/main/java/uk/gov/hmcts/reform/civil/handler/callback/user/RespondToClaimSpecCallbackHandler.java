@@ -240,21 +240,21 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             for (Element<UnavailableDate> dateRange : datesUnavailableList) {
                 LocalDate dateFrom = dateRange.getValue().getFromDate();
                 LocalDate dateTo = dateRange.getValue().getToDate();
-                if (dateRange.getValue().getUnavailableDateType().equals(UnavailableDateType.SINGLE_DATE)
-                    && dateRange.getValue().getDate().isBefore(LocalDate.now())) {
-                    errors.add(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
-                } else if (dateRange.getValue().getUnavailableDateType().equals(UnavailableDateType.SINGLE_DATE)
-                    && dateRange.getValue().getDate().isAfter(LocalDate.now().plusYears(1))) {
-                    errors.add(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR);
-                } else if (dateRange.getValue().getUnavailableDateType().equals(UnavailableDateType.DATE_RANGE)
-                    && dateTo != null && dateTo.isBefore(dateFrom)) {
-                    errors.add(INVALID_UNAVAILABILITY_RANGE);
-                } else if (dateRange.getValue().getUnavailableDateType().equals(UnavailableDateType.DATE_RANGE)
-                    && dateFrom.isBefore(LocalDate.now())) {
-                    errors.add(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
-                } else if (dateRange.getValue().getUnavailableDateType().equals(UnavailableDateType.DATE_RANGE)
-                    && dateTo.isAfter(LocalDate.now().plusYears(1))) {
-                    errors.add(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR);
+                if (dateRange.getValue().getUnavailableDateType().equals(UnavailableDateType.SINGLE_DATE)) {
+                    if (dateRange.getValue().getDate().isBefore(LocalDate.now())) {
+                        errors.add(INVALID_UNAVAILABLE_DATE_BEFORE_TODAY);
+                    } else if (dateRange.getValue().getDate().isAfter(LocalDate.now().plusYears(1))) {
+                        errors.add(INVALID_UNAVAILABLE_DATE_WHEN_MORE_THAN_YEAR);
+                    }
+                }
+                if (dateRange.getValue().getUnavailableDateType().equals(UnavailableDateType.DATE_RANGE)) {
+                    if (dateTo != null && dateTo.isBefore(dateFrom)) {
+                        errors.add(INVALID_UNAVAILABILITY_RANGE);
+                    } else if (dateFrom != null && dateFrom.isBefore(LocalDate.now())) {
+                        errors.add(INVALID_UNAVAILABLE_DATE_FROM_BEFORE_TODAY);
+                    } else if (dateTo != null && dateTo.isAfter(LocalDate.now().plusYears(1))) {
+                        errors.add(INVALID_UNAVAILABLE_DATE_TO_WHEN_MORE_THAN_YEAR);
+                    }
                 }
             }
         }
