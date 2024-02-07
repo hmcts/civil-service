@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @Table(name = "task_item_template", schema = "dbs")
 @Entity
 public class TaskItemTemplateEntity {
+
     @Id
     private Long id;
 
@@ -50,5 +51,6 @@ public class TaskItemTemplateEntity {
     private LocalDateTime createdAt;
 
     @Type(type = "com.vladmihalcea.hibernate.type.array.IntArrayType")
-    private int[] taskStatusSequence ;
+    private int[] taskStatusSequence;
+
 }

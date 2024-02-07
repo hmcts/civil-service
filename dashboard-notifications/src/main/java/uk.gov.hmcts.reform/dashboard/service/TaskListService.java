@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.dashboard.repository.TaskListRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -20,7 +19,6 @@ public class TaskListService {
     public TaskListService(TaskListRepository taskListRepository) {
         this.taskListRepository = taskListRepository;
     }
-
 
     public Optional<List<TaskListEntity>> getTaskList(String ccdCaseIdentifier, String roleType) {
         return taskListRepository.findByReferenceAndTaskItemTemplateRole(ccdCaseIdentifier, roleType);

@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import uk.gov.hmcts.reform.dashboard.utils.JsonDataConverter;
 
-
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -23,6 +22,7 @@ import java.util.UUID;
 @Table(name = "task_list", schema = "dbs")
 @Entity
 public class TaskListEntity {
+
     @Id
     private UUID id;
 

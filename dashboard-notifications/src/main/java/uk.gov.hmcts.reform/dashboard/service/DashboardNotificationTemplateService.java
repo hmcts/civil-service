@@ -36,7 +36,6 @@ public class DashboardNotificationTemplateService {
             existingNotification.setCreatedAt(notificationTemplateEntity.getCreatedAt());
             existingNotification.setTimeToLive(notificationTemplateEntity.getTimeToLive());
 
-
             return repository.save(existingNotification);
         } else {
             return null;
