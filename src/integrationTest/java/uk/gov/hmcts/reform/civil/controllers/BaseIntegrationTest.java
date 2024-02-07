@@ -144,6 +144,15 @@ public abstract class BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON));
     }
 
+    @SneakyThrows
+    protected <T> ResultActions doDelete(String auth, T content, String urlTemplate, Object... uriVars) {
+        return mockMvc.perform(
+            MockMvcRequestBuilders.post(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, auth)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(content)));
+    }
+
     protected String toJson(Object input) {
         try {
             return objectMapper.writeValueAsString(input);
