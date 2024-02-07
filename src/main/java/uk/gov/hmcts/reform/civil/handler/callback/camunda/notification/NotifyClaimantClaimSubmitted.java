@@ -72,9 +72,18 @@ public class NotifyClaimantClaimSubmitted extends CallbackHandler implements Not
     }
 
     private String addTemplate(CaseData caseData) {
-        return Objects.isNull(caseData.getHelpWithFeesReferenceNumber())
-            ? notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate()
-            : notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate();
+        boolean isWithHearingFee = caseData.getHelpWithFeesReferenceNumber() != null;
+        if (caseData.isBilingual() && isWithHearingFee) {
+            return notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate();
+        }
+        if (caseData.isBilingual()) {
+            return notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate();
+        }
+        if (isWithHearingFee) {
+            return notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndHelpWithFeeTemplate();
+        }
+        return notificationsProperties.getNotifyLiPClaimantClaimSubmittedAndPayClaimFeeTemplate();
+
     }
 
     private void generateEmail(CaseData caseData) {
