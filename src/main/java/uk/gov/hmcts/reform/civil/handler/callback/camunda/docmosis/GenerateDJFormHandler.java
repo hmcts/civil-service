@@ -60,13 +60,15 @@ public class GenerateDJFormHandler extends CallbackHandler {
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
 
         if (!(caseData.isLRvLipOneVOne() && isSpecHandler(callbackParams))) {
-            if (caseData.getRespondent2() == null) {
+            if (ofNullable(caseData.getRespondent2()).isPresent()
+                && ((ofNullable(caseData.getDefendantDetails()).isPresent()
+                && caseData.getDefendantDetails().getValue().getLabel().startsWith(
+                "Both")) || (ofNullable(caseData.getDefendantDetailsSpec()).isPresent()
+                && caseData.getDefendantDetailsSpec().getValue().getLabel().startsWith(
+                "Both")))) {
+
                 buildDocument(callbackParams, caseDataBuilder);
-            } else if (ofNullable(caseData.getDefendantDetails())
-                .map(defendantDetails -> defendantDetails.getValue().getLabel()).orElse("")
-                .startsWith("Both") || ofNullable(caseData.getDefendantDetailsSpec())
-                .map(defendantDetails -> defendantDetails.getValue().getLabel()).orElse("")
-                .startsWith("Both")) {
+            } else if (ofNullable(caseData.getRespondent2()).isEmpty()) {
                 buildDocument(callbackParams, caseDataBuilder);
             }
         }
