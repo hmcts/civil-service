@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
 import uk.gov.hmcts.reform.civil.utils.HearingUtils;
 
 import java.time.LocalDate;
@@ -50,7 +49,7 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
     private final AssignCategoryId assignCategoryId;
     private final FeatureToggleService featureToggleService;
     private final LocationRefDataService locationRefDataService;
-    private final CourtLocationUtils courtLocationUtils;
+    private LocationRefData caseManagementLocationDetails;
 
     public List<CaseDocument> generate(CaseData caseData, String authorisation) {
 
@@ -74,9 +73,16 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
 
     public HearingForm getTemplateData(CaseData caseData, String authorisation) {
         List<LocationRefData> locations = (locationRefDataService.getHearingCourtLocations(authorisation));
+        var foundLocations = locations.stream()
+            .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
+        if (!foundLocations.isEmpty()) {
+            caseManagementLocationDetails = foundLocations.get(0);
+        } else {
+            throw new IllegalArgumentException("Base Court Location not found, in location data");
+        }
 
         return HearingForm.builder()
-            .courtName(courtLocationUtils.findPreferredLocationData(locations, caseData.getHearingLocation()).getSiteName())
+            .courtName(caseManagementLocationDetails.getVenueName())
             .listingOrRelisting(caseData.getListingOrRelisting().toString())
             .court(caseData.getHearingLocation().getValue().getLabel())
             .caseNumber(caseData.getCcdCaseReference().toString())
