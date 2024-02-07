@@ -47,7 +47,6 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getExpertDocsByPartyAndDocType;
@@ -555,7 +554,6 @@ public class BundleRequestMapper {
         List<Element<CaseDocument>> docs = caseData.getSystemGeneratedCaseDocuments().stream()
                 .filter(caseDocumentElement -> (caseDocumentElement.getValue().getDocumentType()
                         .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                        && nonNull(caseDocumentElement.getValue().getDocumentLink().getCategoryID())
                         && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals(category)))
                 .sorted(Comparator.comparing(caseDocumentElement -> caseDocumentElement
                         .getValue().getCreatedDatetime())).collect(Collectors.toList());

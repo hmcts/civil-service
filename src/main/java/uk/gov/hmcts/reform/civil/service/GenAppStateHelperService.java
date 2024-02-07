@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static java.lang.Long.parseLong;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -64,9 +63,6 @@ public class GenAppStateHelperService {
     }
 
     public boolean triggerEvent(CaseData caseData, CaseEvent event) {
-        if (Objects.isNull(caseData.getGeneralApplications())) {
-            return false;
-        }
         caseData.getGeneralApplications()
                 .forEach(application ->
                         triggerEvent(

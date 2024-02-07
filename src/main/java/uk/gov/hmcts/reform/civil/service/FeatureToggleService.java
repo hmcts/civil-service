@@ -68,15 +68,8 @@ public class FeatureToggleService {
     }
 
     public boolean isLocationWhiteListedForCaseProgression(String locationEpimms) {
-        return
-            // because default value is true
-            locationEpimms != null
-                && featureToggleApi
-                .isFeatureEnabledForLocation(
-                    "case-progression-location-whitelist",
-                    locationEpimms,
-                    true
-                );
+        return featureToggleApi.isFeatureEnabledForLocation("case-progression-location-whitelist", locationEpimms,
+                                                            true);
     }
 
     public boolean isTransferOnlineCaseEnabled() {
@@ -100,7 +93,6 @@ public class FeatureToggleService {
         long epoch = submittedDate.atZone(zoneId).toEpochSecond();
         return featureToggleApi.isFeatureEnabled("carm")
             && featureToggleApi.isFeatureEnabledForDate("cam-enabled-for-case",
-                                                        epoch, false
-        );
+                                                            epoch, false);
     }
 }

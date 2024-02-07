@@ -1109,28 +1109,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             Arguments.of(
                 CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                     .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("SMALL_CLAIM")
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .build(),
-                "FAST_CLAIM"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
                     .responseClaimTrack("FAST_CLAIM")
                     .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(NO)
-                    .orderType(OrderType.DISPOSAL)
-                    .build(),
-                "FAST_CLAIM"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("FAST_CLAIM")
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
                     .orderType(OrderType.DISPOSAL)
@@ -1152,16 +1132,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .caseAccessCategory(SPEC_CLAIM)
                     .responseClaimTrack("FAST_CLAIM")
                     .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
-                    .drawDirectionsOrderRequired(YES)
-                    .drawDirectionsOrderSmallClaims(YES)
-                    .orderType(OrderType.DECIDE_DAMAGES)
-                    .build(),
-                "SMALL_CLAIM"
-            ),
-            Arguments.of(
-                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
-                    .caseAccessCategory(SPEC_CLAIM)
-                    .responseClaimTrack("FAST_CLAIM")
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(YES)
                     .orderType(OrderType.DECIDE_DAMAGES)
