@@ -2,7 +2,12 @@ package uk.gov.hmcts.reform.dashboard.data;
 
 import java.util.Date;
 import java.util.UUID;
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import lombok.EqualsAndHashCode;
@@ -13,6 +18,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 @Table(name = "dashboard_notifications", schema = "dbs")
 public class NotificationEntity {
+
     @Id
     @NotNull
     private UUID id;
