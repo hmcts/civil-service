@@ -445,6 +445,21 @@ public class CmcClaim implements Claim {
         return false;
     }
 
+    @Override
+    public boolean isPartialAdmissionAccepted() {
+
+        return hasResponse() && response.isPartAdmitPayImmediately()
+            && !response.getPaymentIntention().hasAlreadyPaid()
+            && claimantAcceptedDefendantResponse();
+    }
+
+    @Override
+    public boolean isPaymentPlanRejected() {
+
+        return (hasResponse() && (response.isPartAdmit() || response.isFullAdmit())
+            && (response.getPaymentIntention().isPayByDate() || response.getPaymentIntention().isPayByInstallments()));
+    }
+
     private boolean isThroughAdmissions(Settlement settlement) {
         List<PartyStatement> partyStatements = new ArrayList<>(settlement.getPartyStatements());
         if (CollectionUtils.isEmpty(partyStatements) || !settlement.hasOffer()) {
