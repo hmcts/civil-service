@@ -56,7 +56,6 @@ public class DashboardController {
         return new ResponseEntity<>(taskListResponse, HttpStatus.OK);
     }
 
-
     @GetMapping(path = {
         "notifications/{uuid}",
     })

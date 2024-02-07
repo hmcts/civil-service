@@ -9,6 +9,7 @@ import java.io.IOException;
 
 @Converter(autoApply = true)
 public class JsonDataConverter implements AttributeConverter<JsonNode, String> {
+
     private static ObjectMapper mapper = new ObjectMapper();
 
     static {

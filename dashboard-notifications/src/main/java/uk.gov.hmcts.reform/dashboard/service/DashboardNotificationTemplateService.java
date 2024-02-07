@@ -7,6 +7,7 @@ import java.util.List;
 
 @Service
 public class DashboardNotificationTemplateService {
+
     private final NotificationTemplateRepository repository;
 
     public DashboardNotificationTemplateService(NotificationTemplateRepository repository) {
@@ -35,7 +36,6 @@ public class DashboardNotificationTemplateService {
             existingNotification.setCyHTML(notificationTemplateEntity.getCyHTML());
             existingNotification.setCreatedAt(notificationTemplateEntity.getCreatedAt());
             existingNotification.setTimeToLive(notificationTemplateEntity.getTimeToLive());
-
 
             return repository.save(existingNotification);
         } else {
