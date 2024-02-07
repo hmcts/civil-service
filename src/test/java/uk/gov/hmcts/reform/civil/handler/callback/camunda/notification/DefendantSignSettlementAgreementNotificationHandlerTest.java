@@ -158,7 +158,6 @@ public class DefendantSignSettlementAgreementNotificationHandlerTest {
                         .build())
                         .claimantBilingualLanguagePreference(Language.WELSH.toString()).build();
 
-
         CallbackParams params = createCallbackParams(
                 CaseEvent.NOTIFY_LIP_APPLICANT_FOR_SIGN_SETTLEMENT_AGREEMENT,
                 caseDataInstance
