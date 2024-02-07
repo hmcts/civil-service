@@ -95,20 +95,24 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         final int lengthAllowed = 150;
         List<String> errors = new ArrayList<>();
         String reason;
-        if (isTransferOnlineCase(callbackParams.getCaseData())) {
-            reason = callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt();
+
+        if (toggleService.isSdoR2Enabled()
+            && callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION
+            && callbackParams.getCaseData().getCcdState() == CaseState.CASE_PROGRESSION) {
+            errors.add(
+                "Unable to process this request. To transfer the case to another court you need to issue a General Order.");
         } else {
-            reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
-        }
-        if (reason.length() > lengthAllowed) {
-            errors.add("Character Limit Reached: "
-                + "Reason for not drawing Standard Directions order cannot exceed "
-                + lengthAllowed + " characters.");
-        }
-        if (callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION
-            && (callbackParams.getCaseData().getCcdState() == CaseState.CASE_PROGRESSION
-            || callbackParams.getCaseData().getCcdState() == CaseState.JUDICIAL_REFERRAL)) {
-            errors.add("Unable to process this request. To transfer the case to another court you need to issue a General Order.");
+            if (isTransferOnlineCase(callbackParams.getCaseData())) {
+                reason = callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt();
+            } else {
+                reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
+            }
+
+            if (reason.length() > lengthAllowed) {
+                errors.add("Character Limit Reached: "
+                               + "Reason for not drawing Standard Directions order cannot exceed "
+                               + lengthAllowed + " characters.");
+            }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
