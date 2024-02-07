@@ -555,6 +555,8 @@ public class CaseDataBuilder {
 
     private YesOrNo eaCourtLocation;
 
+    private List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs;
+    private List<Element<MediationDocumentsReferredInStatement>> res1MediationDocumentsReferred;
     public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
         this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
         return this;
@@ -6552,6 +6554,15 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder uploadMediationByDocumentTypes(List<MediationDocumentsType> documentTypes) {
+        if (documentTypes.contains(NON_ATTENDANCE_STATEMENT)) {
+            this.res1MediationNonAttendanceDocs = buildMediationNonAttendanceStatement();
+        } else if (documentTypes.contains(REFERRED_DOCUMENTS)) {
+            this.res1MediationDocumentsReferred = buildMediationDocumentsReferred();
+        }
+        return this;
+    }
+
     public CaseDataBuilder uploadMediationDocumentsChooseOptions(String partyChosen, List<MediationDocumentsType> documentTypes) {
         List<Element<MediationNonAttendanceStatement>> mediationNonAttendanceStatement;
         List<Element<MediationDocumentsReferredInStatement>> documentsReferred;
@@ -6605,6 +6616,7 @@ public class CaseDataBuilder {
         ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
         return this;
     }
+
 
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();
@@ -6920,6 +6932,8 @@ public class CaseDataBuilder {
             .eaCourtLocation(eaCourtLocation)
             .upholdingPreviousOrderReason(upholdingPreviousOrderReason)
             .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)
+            .res1MediationNonAttendanceDocs(res1MediationNonAttendanceDocs)
+            .res1MediationDocumentsReferred(res1MediationDocumentsReferred)
             .build();
     }
 }
