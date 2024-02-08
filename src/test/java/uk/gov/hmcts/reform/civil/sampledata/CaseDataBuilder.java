@@ -6,32 +6,33 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
-import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.ClaimType;
-import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
-import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
-import uk.gov.hmcts.reform.civil.enums.MediationDecision;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
-import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
-import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.ClaimType;
+import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.ReasonForProceedingOnPaper;
+import uk.gov.hmcts.reform.civil.enums.MediationDecision;
+import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
 import uk.gov.hmcts.reform.civil.enums.ResponseIntention;
-import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
+import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
+import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.ExpertReportsSent;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingBundleType;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
+import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration;
@@ -87,6 +88,7 @@ import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.UnavailableDate;
 import uk.gov.hmcts.reform.civil.model.UnemployedComplexTypeLRspec;
 import uk.gov.hmcts.reform.civil.model.UpdateDetailsForm;
+import uk.gov.hmcts.reform.civil.model.UpholdingPreviousOrderReason;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
@@ -125,8 +127,11 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import uk.gov.hmcts.reform.civil.model.dq.WelshLanguageRequirements;
 import uk.gov.hmcts.reform.civil.model.dq.Witness;
 import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimOptions;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
@@ -159,15 +164,13 @@ import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
-import uk.gov.hmcts.reform.civil.model.PaymentBySetDate;
-import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.time.LocalDate.now;
@@ -197,6 +200,7 @@ import static uk.gov.hmcts.reform.civil.enums.PersonalInjuryType.ROAD_ACCIDENT;
 import static uk.gov.hmcts.reform.civil.enums.ResponseIntention.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.MORE_THAN_DAY;
 import static uk.gov.hmcts.reform.civil.enums.dq.HearingLength.ONE_DAY;
 import static uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration.MINUTES_120;
@@ -460,6 +464,8 @@ public class CaseDataBuilder {
 
     private TrialHearingTimeDJ trialHearingTimeDJ;
     private TrialOrderMadeWithoutHearingDJ trialOrderMadeWithoutHearingDJ;
+    private List<Element<GeneralApplication>> generalApplications;
+    private List<Element<GeneralApplicationsDetails>> generalApplicationsDetails;
 
     private BigDecimal totalInterest;
     private YesOrNo applicant1AcceptAdmitAmountPaidSpec;
@@ -544,6 +550,10 @@ public class CaseDataBuilder {
     private YesOrNo responseClaimExpertSpecRequired2;
     private YesOrNo applicantMPClaimExpertSpecRequired;
     private YesOrNo applicant1ClaimExpertSpecRequired;
+    private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
+    private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
+
+    private YesOrNo eaCourtLocation;
 
     public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
         this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
@@ -4528,6 +4538,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atReconsiderationUpheld() {
+        decisionOnRequestReconsiderationOptions =  DecisionOnRequestReconsiderationOptions.YES;
+        upholdingPreviousOrderReason = new UpholdingPreviousOrderReason("Reason to upheld ");
+        return this;
+    }
+
     public CaseDataBuilder atStateDisposalHearingOrderMadeWithoutHearing() {
         disposalHearingOrderMadeWithoutHearingDJ =
             DisposalHearingOrderMadeWithoutHearingDJ.builder().input("test").build();
@@ -5026,6 +5042,42 @@ public class CaseDataBuilder {
         this.respondent2LitigationFriend = LitigationFriend.builder()
             .fullName("Mr Litigation Friend 2")
             .build();
+        return this;
+    }
+
+    public CaseDataBuilder getGeneralApplicationWithStrikeOut(final String litigiousPartyID) {
+        List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
+        List<Element<GeneralApplication>> generalApplicationValues = wrapElements(
+                GeneralApplication.builder()
+                        .applicantPartyName("partyName")
+                        .litigiousPartyID(litigiousPartyID)
+                        .generalAppDateDeadline(DEADLINE)
+                        .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
+                        .generalAppType(GAApplicationType.builder()
+                                .types(types)
+                                .build())
+
+                        .caseLink(CaseLink.builder().caseReference("12345678").build())
+                        .businessProcess(BusinessProcess.builder()
+                                .camundaEvent("NotifyRoboticsOnCaseHandedOffline")
+                                .build())
+                        .build());
+
+        this.generalApplications = generalApplicationValues;
+        return this;
+    }
+
+    public CaseDataBuilder getGeneralStrikeOutApplicationsDetailsWithCaseState(final String caseState) {
+        List<Element<GeneralApplicationsDetails>> generalApplicationsDetails = wrapElements(
+                GeneralApplicationsDetails.builder()
+                        .generalApplicationType(STRIKE_OUT.getDisplayedValue())
+                        .caseState(caseState)
+                        .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
+                        .caseLink(CaseLink.builder().caseReference("12345678").build())
+                        .build()
+        );
+
+        this.generalApplicationsDetails = generalApplicationsDetails;
         return this;
     }
 
@@ -6480,6 +6532,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder eaCourtLocation(YesOrNo eaCourtLocation) {
+        this.eaCourtLocation = eaCourtLocation;
+        return this;
+    }
+
     public CaseDataBuilder applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(BigDecimal suggestedInstallmentPayment) {
         this.applicant1SuggestInstalmentsPaymentAmountForDefendantSpec = suggestedInstallmentPayment;
         return this;
@@ -6761,6 +6818,8 @@ public class CaseDataBuilder {
             .defendantSingleResponseToBothClaimants(defendantSingleResponseToBothClaimants)
             .breathing(breathing)
             .caseManagementOrderSelection(caseManagementOrderSelection)
+            .generalApplications(generalApplications)
+            .gaDetailsMasterCollection(generalApplicationsDetails)
             .respondent1PinToPostLRspec(respondent1PinToPostLRspec)
             .trialHearingMethodDJ(trialHearingMethodDJ)
             .hearingMethodValuesDisposalHearingDJ(hearingMethodValuesDisposalHearingDJ)
@@ -6858,6 +6917,9 @@ public class CaseDataBuilder {
             .reasonForReconsiderationApplicant(reasonForReconsiderationApplicant)
             .reasonForReconsiderationRespondent1(reasonForReconsiderationRespondent1)
             .reasonForReconsiderationRespondent2(reasonForReconsiderationRespondent2)
+            .eaCourtLocation(eaCourtLocation)
+            .upholdingPreviousOrderReason(upholdingPreviousOrderReason)
+            .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)
             .build();
     }
 }

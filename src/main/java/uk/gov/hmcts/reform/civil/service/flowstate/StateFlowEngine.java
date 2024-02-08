@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDet
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissalOutOfTime;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimDismissedByCamunda;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssued;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssueBilingual;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimNotified;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedBothUnregisteredSolicitors;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimSubmittedOneRespondentRepresentative;
@@ -262,9 +263,12 @@ public class StateFlowEngine {
                 .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffBeforeClaimIssued)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_FAILED).onlyIf(paymentFailed)
                 .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLipCase)
-                    .set(flags -> {
+                    .set((c, flags) -> {
                         if (featureToggleService.isPinInPostEnabled()) {
                             flags.put(FlowFlag.PIP_ENABLED.name(), true);
+                        }
+                        if (claimIssueBilingual.test(c)) {
+                            flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
                         }
                         flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                         flags.put(FlowFlag.LIP_CASE.name(), true);
@@ -602,6 +606,7 @@ public class StateFlowEngine {
             .state(IN_HEARING_READINESS)
             .state(FULL_ADMIT_JUDGMENT_ADMISSION)
             .state(SIGN_SETTLEMENT_AGREEMENT)
+                .transitionTo(FULL_ADMIT_JUDGMENT_ADMISSION).onlyIf(ccjRequestJudgmentByAdmission)
             .build();
     }
 
