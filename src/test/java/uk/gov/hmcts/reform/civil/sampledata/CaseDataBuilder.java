@@ -557,6 +557,7 @@ public class CaseDataBuilder {
 
     private List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs;
     private List<Element<MediationDocumentsReferredInStatement>> res1MediationDocumentsReferred;
+
     public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
         this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
         return this;
@@ -6616,7 +6617,6 @@ public class CaseDataBuilder {
         ccdState = AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
         return this;
     }
-
 
     public static CaseDataBuilder builder() {
         return new CaseDataBuilder();

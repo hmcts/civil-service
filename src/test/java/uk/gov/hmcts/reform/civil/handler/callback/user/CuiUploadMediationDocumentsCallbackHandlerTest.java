@@ -20,17 +20,14 @@ import uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType;
 import uk.gov.hmcts.reform.civil.model.mediation.MediationNonAttendanceStatement;
 import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
-
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.REFERRED_DOCUMENTS;
 
@@ -38,7 +35,6 @@ import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.R
 @SpringBootTest(classes = {
     CuiUploadMediationDocumentsCallbackHandler.class,
     JacksonAutoConfiguration.class,
-    AssignCategoryId.class,
 })
 class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -47,12 +43,6 @@ class CuiUploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandler
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @MockBean
-    private CoreCaseUserService coreCaseUserService;
-
-    @MockBean
-    private Time time;
 
     @MockBean
     private FeatureToggleService featureToggleService;
