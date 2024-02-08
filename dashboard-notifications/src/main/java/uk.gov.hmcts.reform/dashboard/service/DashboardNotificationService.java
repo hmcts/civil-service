@@ -12,12 +12,10 @@ import java.util.UUID;
 public class DashboardNotificationService {
 
     private final NotificationRepository notificationRepository;
-
     @Autowired
     public DashboardNotificationService(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
     }
-
     public List<NotificationEntity> getAll() {
         return (List<NotificationEntity>) notificationRepository.findAll();
     }
