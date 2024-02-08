@@ -25,9 +25,12 @@ import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingLengthFinalOrderList;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
@@ -70,14 +73,18 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialHearingLengthOther;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
@@ -712,6 +719,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         if (featureToggleService.isSdoR2Enabled()) {
             prePopulateNihlFields(callbackParams, caseData, updatedData);
+            List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
+            setCheckListNihl(updatedData, includeInOrderToggle);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -1263,4 +1272,38 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsWitnessStatementToggle(checkList);
     }
 
+    private void setCheckListNihl(
+        CaseData.CaseDataBuilder<?, ?> updatedData,
+        List<IncludeInOrderToggle> includeInOrderToggle
+    ) {
+        updatedData.sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder().includeInOrderToggle(includeInOrderToggle).build());
+        updatedData.sdoVariationOfDirections(SdoR2VariationOfDirections.builder().includeInOrderToggle(includeInOrderToggle).build());
+        updatedData.sdoR2Settlement(SdoR2Settlement.builder().includeInOrderToggle(includeInOrderToggle).build());
+        updatedData.sdoR2DisclosureOfDocumentsToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorWitnessesOfFactToggle(includeInOrderToggle).build();
+        updatedData.sdoR2WitnessesOfFact(
+            SdoR2WitnessOfFact.builder()
+                .sdoR2RestrictWitness(SdoR2RestrictWitness.builder().isRestrictWitness(NO).build())
+                .sdoRestrictPages(SdoR2RestrictPages.builder().isRestrictPages(NO).build()).build());
+        updatedData.sdoR2SeparatorExpertEvidenceToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorAddendumReportToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorFurtherAudiogramToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorQuestionsClaimantExpertToggle(includeInOrderToggle).build();
+        updatedData.sdoR2QuestionsClaimantExpert(
+            SdoR2QuestionsClaimantExpert.builder()
+                .sdoApplicationToRelyOnFurther(SdoR2ApplicationToRelyOnFurther.builder().doRequireApplicationToRely(NO).build()).build());
+        updatedData.sdoR2SeparatorPermissionToRelyOnExpertToggle(includeInOrderToggle);
+        updatedData.sdoR2SeparatorEvidenceAcousticEngineerToggle(includeInOrderToggle);
+        updatedData.sdoR2SeparatorQuestionsToEntExpertToggle(includeInOrderToggle);
+        updatedData.sdoR2ScheduleOfLossToggle(includeInOrderToggle);
+        updatedData.sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder().isClaimForPecuniaryLoss(NO).build());
+        updatedData.sdoR2SeparatorUploadOfDocumentsToggle(includeInOrderToggle);
+        updatedData.sdoR2TrialToggle(includeInOrderToggle);
+        updatedData.sdoR2Trial(SdoR2Trial.builder()
+                                   .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
+                                   .sdoR2TrialFirstOpenDateAfter(SdoR2TrialFirstOpenDateAfter.builder()
+                                                                     ///
+                                                                     .build())
+                                   .build());
+    }
 }
