@@ -706,8 +706,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.smallClaimsAddNewDirections(null);
             updatedData.fastTrackAddNewDirections(null);
             updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
-            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
+            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build()); // TODO ask Azam!
             updatedData.disposalHearingHearingNotes(null);
+        }
+
+        if (featureToggleService.isSdoR2Enabled()) {
+            prePopulateNihlFields(callbackParams, caseData, updatedData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -950,7 +954,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.setFastTrackFlag(YES).build();
             if (featureToggleService.isSdoR2Enabled() && isSDOR2Screen(caseData)) {
                 updatedData.isSdoR2NewScreen(YES).build();
-                prePopulateNihlFields(callbackParams, caseData, updatedData);
+//                prePopulateNihlFields(callbackParams, caseData, updatedData);
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
