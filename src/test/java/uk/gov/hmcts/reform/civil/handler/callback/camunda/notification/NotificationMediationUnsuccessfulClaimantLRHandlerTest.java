@@ -130,7 +130,6 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
 
-
             //When
             notificationHandler.handle(params);
             //Then
