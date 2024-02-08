@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
@@ -147,7 +148,11 @@ import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.TocTransferCaseReason;
-
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -315,13 +320,27 @@ public class CaseDataParent implements MappableObject {
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
+    //SDOR2
+    private YesOrNo isSdoR2NewScreen;
+    private SdoR2SmallClaimsJudgesRecital sdoR2SmallClaimsJudgesRecital;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsPPIToggle;
+    private SdoR2SmallClaimsPPI sdoR2SmallClaimsPPI;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsWitnessStatementsToggle;
+    private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsUploadDocToggle;
+    private SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
+    private List<IncludeInOrderToggle> sdoR2SmallClaimsHearingToggle;
+    private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
+    private String sdoR2SmallClaimsImpNotesTxt;
+    private LocalDate sdoR2SmallClaimsImpNotesDate;
+
     private CaseDocument sdoOrderDocument;
 
     private final YesOrNo eaCourtLocation;
 
     // sdo ui flags
-    private final YesOrNo setSmallClaimsFlag;
-    private final YesOrNo setFastTrackFlag;
+    private  YesOrNo setSmallClaimsFlag;
+    private  YesOrNo setFastTrackFlag;
     private final String eventDescriptionRTJ;
     private final String additionalInformationRTJ;
 

@@ -35,19 +35,8 @@ public class DesicionOnReconsiderationDocumentForm implements MappableObject {
     private final Party respondent2;
     private final boolean hasApplicant2;
     private final Party applicant2;
-
     private final String judgeName;
-
-    private final boolean hasCreditHire;
-    private final boolean hasRoadTrafficAccident;
     private final boolean writtenByJudge;
-
-    private final YesOrNo drawDirectionsOrderRequired;
-    private final JudgementSum drawDirectionsOrder;
-    private final ClaimsTrack claimsTrack;
-
-    private final List<SmallTrack> smallClaims;
-
     private ReasonForReconsideration reasonForReconsideration;
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
