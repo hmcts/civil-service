@@ -135,11 +135,19 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddNewDirection;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
@@ -349,7 +357,14 @@ public class CaseDataParent implements MappableObject {
     private SdoR2Trial sdoR2Trial;
     private String sdoR2ImportantNotesTxt;
     private LocalDate sdoR2ImportantNotesDate;
-
+    private SdoR2ExpertEvidence sdoR2ExpertEvidence;
+    private SdoR2AddendumReport sdoR2AddendumReport;
+    private SdoR2FurtherAudiogram sdoR2FurtherAudiogram;
+    private SdoR2QuestionsClaimantExpert sdoR2QuestionsClaimantExpert;
+    private SdoR2PermissionToRelyOnExpert sdoR2PermissionToRelyOnExpert;
+    private SdoR2EvidenceAcousticEngineer sdoR2EvidenceAcousticEngineer;
+    private SdoR2QuestionsToEntExpert sdoR2QuestionsToEntExpert;
+    private SdoR2UploadOfDocuments sdoR2UploadOfDocuments;
     private CaseDocument sdoOrderDocument;
 
     private final YesOrNo eaCourtLocation;
