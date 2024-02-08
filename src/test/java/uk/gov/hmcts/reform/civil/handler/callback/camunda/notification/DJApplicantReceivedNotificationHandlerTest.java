@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -70,6 +71,8 @@ public class DJApplicantReceivedNotificationHandlerTest {
                 .thenReturn("test-template-requested-id");
             when(notificationsProperties.getApplicantLiPDefaultJudgmentRequested())
                 .thenReturn("test-template-requested-lip-id");
+            when(notificationsProperties.getApplicantLiPDefaultJudgmentRequestedBilingualTemplate())
+                .thenReturn("test-template-requested-lip-id-bilingual");
             when(organisationService.findOrganisationById(anyString()))
                 .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
             when(featureToggleService.isLipVLipEnabled())
@@ -166,6 +169,33 @@ public class DJApplicantReceivedNotificationHandlerTest {
                 "test-template-requested-lip-id",
                 getLipvLiPData(caseData),
                 "default-judgment-applicant-received-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantLip_whenInvokedAndLiPvsLiPEnabledAndBilingual() {
+            when(featureToggleService.isLipVLipEnabled())
+                    .thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                    .applicant1(PartyBuilder.builder().individual().build().toBuilder()
+                            .build())
+                    .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
+                            .build())
+                    .respondent1Represented(YesOrNo.NO)
+                    .specRespondent1Represented(YesOrNo.NO)
+                    .applicant1Represented(YesOrNo.NO)
+                    .claimantBilingualLanguagePreference(Language.WELSH.name())
+                    .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                    "rambo@email.com",
+                    "test-template-requested-lip-id-bilingual",
+                    getLipvLiPData(caseData),
+                    "default-judgment-applicant-received-notification-000DC001"
             );
         }
 
