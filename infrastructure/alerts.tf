@@ -43,7 +43,7 @@ module "slack-alerts-storage-account" {
   account_kind = "StorageV2"
   account_replication_type = "LRS"
   resource_group_name = azurerm_resource_group.rg.name
-  storage_account_name = "civilslackalertstorage-${var.env}"
+  storage_account_name = "civilslackalertstorage${var.env}"
   common_tags = var.common_tags
 }
 
