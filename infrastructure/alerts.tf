@@ -53,15 +53,15 @@ resource "azurerm_storage_container" "azure-function" {
   container_access_type = "blob"
   depends_on = [module.slack-alerts-storage-account]
 }
-
-resource "azurerm_storage_blob" "slack-alerts-zip" {
-  name                   = "slack-alerts.zip"
-  storage_account_name   = module.slack-alerts-storage-account.storage_account_name
-  storage_container_name = azurerm_storage_container.azure-function.name
-  type                   = "Block"
-  source                 = "slack-alerts.zip"
-  depends_on = [azurerm_storage_container.azure-function]
-}
+#
+#resource "azurerm_storage_blob" "slack-alerts-zip" {
+#  name                   = "slack-alerts.zip"
+#  storage_account_name   = module.slack-alerts-storage-account.storage_account_name
+#  storage_container_name = azurerm_storage_container.azure-function.name
+#  type                   = "Block"
+#  source                 = "slack-alerts.zip"
+#  depends_on = [azurerm_storage_container.azure-function]
+#}
 
 
 
