@@ -36,33 +36,16 @@ module "civil-fail-action-group-slack" {
 
 }
 
-resource "azurerm_storage_account" "slack-alerts-storage-account" {
+module "slack-alerts-storage-account" {
+  source           = "git@github.com:hmcts/cnp-module-storage-account?ref=master"
   env      = var.env
   location = var.appinsights_location
   account_kind = "StorageV2"
   account_replication_type = "LRS"
-  name = azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg.name
   storage_account_name = "civilslackalertstorage-${var.env}"
   common_tags = var.common_tags
-  account_tier = "Hot"
 }
-
-resource "azurerm_storage_container" "azure-function" {
-  name                  = "azure-function"
-  storage_account_name  = azurerm_storage_account.slack-alerts-storage-account.name
-  container_access_type = "blob"
-  depends_on = [azurerm_storage_account.slack-alerts-storage-account]
-}
-#
-#resource "azurerm_storage_blob" "slack-alerts-zip" {
-#  name                   = "slack-alerts.zip"
-#  storage_account_name   = module.slack-alerts-storage-account.storage_account_name
-#  storage_container_name = azurerm_storage_container.azure-function.name
-#  type                   = "Block"
-#  source                 = "slack-alerts.zip"
-#  depends_on = [azurerm_storage_container.azure-function]
-#}
-
 
 
 #module "civil-camunda-stuck-alert-function-app" {
