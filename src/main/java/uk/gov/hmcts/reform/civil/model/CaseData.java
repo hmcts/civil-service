@@ -542,7 +542,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
 
-    private YesOrNo setDJFlag;
+    private YesOrNo setRequestDJDamagesFlagForWA;
     private String featureToggleWA;
 
     private String caseManagementOrderSelection;
