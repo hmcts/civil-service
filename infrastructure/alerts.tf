@@ -49,7 +49,7 @@ module "slack-alerts-storage-account" {
 
 data "archive_file" "function_app_data" {
   type       = "zip"
-  source_dir  = "../bin/slack-alerts-data"
+  source_dir  = "${path.module}/slack-alerts-data"
   output_path = "${path.module}/function-app.zip"
 }
 
