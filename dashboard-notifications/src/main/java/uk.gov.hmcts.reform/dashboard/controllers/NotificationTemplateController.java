@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dashboard.controller;
+package uk.gov.hmcts.reform.dashboard.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.dashboard.data.NotificationTemplateEntity;
-import uk.gov.hmcts.reform.dashboard.repository.NotificationTemplateRepository;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
 
 import java.util.List;
 

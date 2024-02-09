@@ -1,8 +1,8 @@
-package uk.gov.hmcts.reform.dashboard.repository;
+package uk.gov.hmcts.reform.dashboard.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import uk.gov.hmcts.reform.dashboard.data.TaskListEntity;
+import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;

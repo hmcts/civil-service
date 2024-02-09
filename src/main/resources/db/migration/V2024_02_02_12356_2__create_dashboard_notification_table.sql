@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS dbs.dashboard_notifications (
  dashboard_notifications_Templates_id INTEGER REFERENCES dbs.dashboard_notifications_Templates(id),
  reference VARCHAR(256),
  notification_name VARCHAR(256),
+ citizen_Role VARCHAR(256),
  en_HTML VARCHAR(256),
  cy_HTML VARCHAR(256),
  message_param VARCHAR(256),

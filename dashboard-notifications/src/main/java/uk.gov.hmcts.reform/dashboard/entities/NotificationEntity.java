@@ -1,5 +1,7 @@
-package uk.gov.hmcts.reform.dashboard.data;
+package uk.gov.hmcts.reform.dashboard.entities;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -10,14 +12,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import lombok.EqualsAndHashCode;
-
-@lombok.Getter
-@lombok.Setter
+@lombok.Data
+@lombok.Builder
+@lombok.NoArgsConstructor
 @Entity
-@EqualsAndHashCode
 @Table(name = "dashboard_notifications", schema = "dbs")
-public class NotificationEntity {
+public class NotificationEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -649190928299762655L;
 
     @Id
     @NotNull
@@ -28,6 +31,7 @@ public class NotificationEntity {
     private String reference;
     @Column(name = "notification_name")
     private String name;
+    private String citizenRole;
     private String enHTML;
     private String cyHTML;
     @Column(name = "message_param")
@@ -36,5 +40,4 @@ public class NotificationEntity {
     private Date createdAt;
     private String updatedBy;
     private Date updatedOn;
-
 }

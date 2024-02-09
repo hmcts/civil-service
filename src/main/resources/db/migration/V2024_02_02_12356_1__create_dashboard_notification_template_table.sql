@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS dbs.dashboard_notifications_Templates (
  en_HTML VARCHAR(256),
  cy_HTML VARCHAR(256),
  notification_role VARCHAR(256),
+ notifications_To_Be_Deleted VARCHAR(256)[],
  time_to_live VARCHAR(256),
  created_At timestamp without time zone DEFAULT now() NOT NULL
 );

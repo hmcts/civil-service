@@ -1,8 +1,8 @@
-package uk.gov.hmcts.reform.dashboard.service;
+package uk.gov.hmcts.reform.dashboard.services;
 
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.dashboard.data.NotificationTemplateEntity;
-import uk.gov.hmcts.reform.dashboard.repository.NotificationTemplateRepository;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
 import java.util.List;
 
 @Service
