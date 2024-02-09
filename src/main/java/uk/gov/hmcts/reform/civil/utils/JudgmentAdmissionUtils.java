@@ -9,8 +9,8 @@ public class JudgmentAdmissionUtils {
     }
 
     public static boolean getLIPJudgmentAdmission(CaseData caseData) {
-        return (caseData.isLipvLipOneVOne() &&
-            ((!caseData.isPayImmediately()
+        return (caseData.isLipvLipOneVOne()
+            && ((!caseData.isPayImmediately()
             && caseData.hasApplicantAcceptedRepaymentPlan()
             && caseData.isCcjRequestJudgmentByAdmission()) || (hasClaimantRequestedCcjAfterCourtDecision(caseData))));
     }
