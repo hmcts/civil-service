@@ -47,6 +47,12 @@ module "slack-alerts-storage-account" {
   common_tags = var.common_tags
 }
 
+data "archive_file" "function_app_data" {
+  type       = "zip"
+  source_dir  = "../bin/slack-alerts-data"
+  output_path = "${path.module}/function-app.zip"
+}
+
 
 #module "civil-camunda-stuck-alert-function-app" {
 #  source           = "git@github.com:hmcts/cpp-module-terraform-azurerm-functionapp.git"
