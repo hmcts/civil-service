@@ -95,11 +95,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
 
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
-
+        CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isEarlyAdoptersEnabled()
             && !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
                                                                                   .getBaseLocation()))) {
@@ -112,6 +110,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         if (caseContainsLiP(caseData)) {
             errors.add(LR_VS_LIP);
         }
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder
                 .generalAppHearingDetails(
                     GAHearingDetails
