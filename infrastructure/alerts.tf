@@ -23,11 +23,6 @@ data "azurerm_key_vault_secret" "slackmonitoringaddress" {
   key_vault_id = data.azurerm_key_vault.civil_key_vault.id
 }
 
-data "azurerm_key_vault_secret" "storageaccountaccesskey" {
-  name         = "storageaccountaccesskey"
-  key_vault_id = data.azurerm_key_vault.civil_key_vault.id
-}
-
 module "civil-fail-action-group-slack" {
   source                     = "git@github.com:hmcts/cnp-module-action-group"
   location                   = "global"
@@ -42,11 +37,12 @@ module "civil-fail-action-group-slack" {
 }
 
 module "slack-alerts-storage-account" {
-  source           = "git@github.com:hmcts/cpp-module-terraform-azurerm-storage-account.git"
-  environment      = var.env
-  public_network_access_enabled = true
+  source           = "git@github.com:hmcts/cnp-module-storage-account.git"
+  env      = var.env
+  location = var.appinsights_location
+  account_kind = "StorageV2"
+  account_replication_type = "LRS"
   resource_group_name = azurerm_resource_group.rg.name
-  subnet_sa = []
   storage_account_name = "civilslackalertstorage-${var.env}"
 }
 
@@ -58,7 +54,7 @@ module "slack-alerts-storage-account" {
 #  asp_os_type      = "Linux"
 #  function_app_name = "civil-camunda-stuck-alert-${var.env}"
 #  resource_group_name = azurerm_resource_group.rg.name
-#  storage_account_access_key = data.azurerm_key_vault_secret.storageaccountaccesskey.value
+#  storage_account_access_key = module.slack-alerts-storage-account.storage_account_access_key
 #  storage_account_name = module.slack-alerts-storage-account.storage_account_name
 #  key_vault_id = data.azurerm_key_vault.civil_key_vault.id
 #  tags = var.common_tags + {
