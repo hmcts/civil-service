@@ -5,6 +5,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @lombok.Getter
@@ -15,27 +17,29 @@ import java.util.Date;
 public class NotificationTemplateEntity {
 
     @Id
+    @Column(name = "id", nullable = false)
     private Long id;
-    @Column(name = "notification_role")
-    private String role;
-    @Column(name = "template_name")
-    private String name;
-    private String enHTML;
-    private String cyHTML;
-    private Date createdAt;
+
+    @Size(max = 256)
+    @Column(name = "template_name", length = 256)
+    private String templateName;
+
+    @Size(max = 256)
+    @Column(name = "en_html", length = 256)
+    private String enHtml;
+
+    @Size(max = 256)
+    @Column(name = "cy_html", length = 256)
+    private String cyHtml;
+
+    @Size(max = 256)
+    @Column(name = "notification_role", length = 256)
+    private String notificationRole;
+
+    @Size(max = 256)
+    @Column(name = "time_to_live", length = 256)
     private String timeToLive;
 
-    public NotificationTemplateEntity() {
-
-    }
-
-    public NotificationTemplateEntity(String role, String enHTML, String cyHTML, String name, Date createdAt, String timeToLive) {
-
-        this.role = role;
-        this.enHTML = enHTML;
-        this.cyHTML = cyHTML;
-        this.name = name;
-        this.createdAt = createdAt;
-        this.timeToLive = timeToLive;
-    }
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 }

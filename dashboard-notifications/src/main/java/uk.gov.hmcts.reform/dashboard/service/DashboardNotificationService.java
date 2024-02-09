@@ -32,11 +32,11 @@ public class DashboardNotificationService {
         NotificationEntity existingNotification = notificationRepository.findById(id).orElse(null);
 
         if (existingNotification != null) {
-            existingNotification.setNotificationTemplateEntity(notification.getNotificationTemplateEntity());
+            existingNotification.setDashboardNotificationsTemplates(notification.getDashboardNotificationsTemplates());
             existingNotification.setReference(notification.getReference());
-            existingNotification.setEnHTML(notification.getEnHTML());
-            existingNotification.setCyHTML(notification.getCyHTML());
-            existingNotification.setParams(notification.getParams());
+            existingNotification.setEnHtml(notification.getEnHtml());
+            existingNotification.setCyHtml(notification.getCyHtml());
+            existingNotification.setMessageParam(notification.getMessageParam());
             existingNotification.setCreatedBy(notification.getCreatedBy());
             existingNotification.setCreatedAt(notification.getCreatedAt());
             existingNotification.setUpdatedBy(notification.getUpdatedBy());

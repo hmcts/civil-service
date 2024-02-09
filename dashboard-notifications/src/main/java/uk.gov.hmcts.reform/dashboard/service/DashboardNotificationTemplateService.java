@@ -30,10 +30,10 @@ public class DashboardNotificationTemplateService {
         NotificationTemplateEntity existingNotification = repository.findById(id).orElse(null);
 
         if (existingNotification != null) {
-            existingNotification.setRole(notificationTemplateEntity.getRole());
-            existingNotification.setName(notificationTemplateEntity.getName());
-            existingNotification.setEnHTML(notificationTemplateEntity.getEnHTML());
-            existingNotification.setCyHTML(notificationTemplateEntity.getCyHTML());
+            existingNotification.setNotificationRole(notificationTemplateEntity.getNotificationRole());
+            existingNotification.setTemplateName(notificationTemplateEntity.getTemplateName());
+            existingNotification.setEnHtml(notificationTemplateEntity.getEnHtml());
+            existingNotification.setCyHtml(notificationTemplateEntity.getCyHtml());
             existingNotification.setCreatedAt(notificationTemplateEntity.getCreatedAt());
             existingNotification.setTimeToLive(notificationTemplateEntity.getTimeToLive());
 

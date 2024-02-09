@@ -66,13 +66,12 @@ public class FeesClient {
                 jurisdiction1,
                 jurisdiction2,
                 channel,
-                event,
                 keyword,
                 amount
             );
 
         } else {
-            return this.feesApi.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
+            return null;
         }
     }
 

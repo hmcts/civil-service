@@ -41,10 +41,10 @@ public class NotificationTemplateController {
         NotificationTemplateEntity existingTemplate = repository.findById(id).orElse(null);
 
         if (existingTemplate != null) {
-            existingTemplate.setName(template.getName());
-            existingTemplate.setEnHTML(template.getEnHTML());
-            existingTemplate.setCyHTML(template.getCyHTML());
-            existingTemplate.setRole(template.getRole());
+            existingTemplate.setTemplateName(template.getTemplateName());
+            existingTemplate.setEnHtml(template.getEnHtml());
+            existingTemplate.setCyHtml(template.getCyHtml());
+            existingTemplate.setNotificationRole(template.getNotificationRole());
             existingTemplate.setTimeToLive(template.getTimeToLive());
             existingTemplate.setCreatedAt(template.getCreatedAt());
 
