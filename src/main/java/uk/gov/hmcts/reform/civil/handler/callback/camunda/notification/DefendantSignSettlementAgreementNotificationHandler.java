@@ -102,11 +102,17 @@ public class DefendantSignSettlementAgreementNotificationHandler extends Callbac
         if (isNotAgreed && isDefendantEvent) {
             return notificationsProperties.getNotifyRespondentForNotAgreedSignSettlement();
         }
-        if (isAgreed) {
+        if (isAgreed && !caseData.isBilingual()) {
             return notificationsProperties.getNotifyApplicantForSignedSettlementAgreement();
         }
-        if (isNotAgreed) {
+        if (isNotAgreed && !caseData.isBilingual()) {
             return notificationsProperties.getNotifyApplicantForNotAgreedSignSettlement();
+        }
+        if (isAgreed && caseData.isBilingual()) {
+            return notificationsProperties.getNotifyApplicantLipForSignedSettlementAgreementInBilingual();
+        }
+        if (isNotAgreed && caseData.isBilingual()) {
+            return notificationsProperties.getNotifyApplicantLipForNotAgreedSignSettlementInBilingual();
         }
         return null;
     }
