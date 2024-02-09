@@ -1,34 +1,3 @@
-spring:
-  datasource:
-    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgresql:11.4://localhost/cmc?TC_INITSCRIPT=initDb.sql
-    jdbcUrl: jdbc:tc:postgresql:11.4://localhost/cmc?TC_INITSCRIPT=initDb.sql
-    hikari:
-      minimum-idle: 1
-      connectionTimeout: 10000
-      idleTimeout: 30000
-      maxLifetime: 60000
-
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      naming:
-        physical-strategy: com.vladmihalcea.hibernate.type.util.CamelCaseToSnakeCaseNamingStrategy
-    properties:
-      hibernate:
-        default_schema: cft_task_db
-        dialect: "uk.gov.hmcts.reform.wataskmanagementapi.config.CustomPostgreSQL94Dialect"
-  #        show_sql: true
-  #        format_sql: true
-  flyway:
-    enabled: true
-    baselineOnMigrate: true
-    defaultSchema: cft_task_db
-    schemas: cft_task_db
-    placeholders:
-      dbPrimaryUserName: wa_user
-      dbReplicaUserName: repl_user
-
 idam:
   test:
     username: ${TEST_WA_LAW_FIRM_USERNAME:some_user@hmcts.net}

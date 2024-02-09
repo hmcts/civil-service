@@ -1,9 +1,9 @@
-package uk.gov.hmcts.reform.dashboard.controllers;
+package uk.gov.hmcts.reform.civil.controllers.dashboard;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
+import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
 import java.util.UUID;
@@ -18,13 +18,11 @@ public class DashboardControllerTest extends BaseIntegrationTest {
 
     private final String endPointUrl = "/dashboard/notifications/{uuid}";
 
-
-
     @Test
     @SneakyThrows
     void shouldReturnOkWhenDeletingEntity() {
 
-        doGet(BEARER_TOKEN, null, endPointUrl, "1122")
+        doGet(BEARER_TOKEN, endPointUrl, "1122")
             .andExpect(status().isOk());
     }
 

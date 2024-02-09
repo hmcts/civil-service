@@ -1,27 +1,9 @@
-sourceSets {
-  integrationTest {
-    java {
-      compileClasspath += main.output
-      runtimeClasspath += main.output
-      srcDir file('src/integrationTest/java')
-    }
-    resources.srcDir file('src/integrationTest/resources')
-  }
-}
-
-task integration(type: Test) {
-  description = "Runs integration tests"
-  group = "Verification"
-  testClassesDirs = sourceSets.integrationTest.output.classesDirs
-  classpath = sourceSets.integrationTest.runtimeClasspath
-  failFast = true
-  testLogging.showStandardStreams = false
-}
 
 def versions = [
   junit              : '5.10.0',
   junitPlatform      : '1.10.0',
-  testcontainers: '1.17.6'
+  testcontainers: '1.17.6',
+  lombok             : '1.18.26'
 ]
 
 ext.libraries = [
@@ -50,12 +32,6 @@ dependencies {
   testImplementation libraries.junit5
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-  testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
-  testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
-  testImplementation group: 'com.h2database', name: 'h2', version: '2.1.214'
-
-  integrationTestImplementation sourceSets.main.runtimeClasspath
-  integrationTestImplementation sourceSets.test.runtimeClasspath
 }
 bootJar.enabled = false
 group = 'uk.gov.hmcts.reform.dashboard'
