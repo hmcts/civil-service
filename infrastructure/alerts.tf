@@ -49,9 +49,9 @@ module "slack-alerts-storage-account" {
 
 resource "azurerm_storage_container" "azure-function" {
   name                  = "azure-function"
-  storage_account_name  = module.slack-alerts-storage-account.storage_account_name
+  storage_account_name  = azurerm_storage_account.slack-alerts-storage-account.name
   container_access_type = "blob"
-  depends_on = [module.slack-alerts-storage-account]
+  depends_on = [azurerm_storage_account.slack-alerts-storage-account.name]
 }
 #
 #resource "azurerm_storage_blob" "slack-alerts-zip" {
