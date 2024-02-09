@@ -44,6 +44,23 @@ module "slack-alerts-storage-account" {
   account_replication_type = "LRS"
   resource_group_name = azurerm_resource_group.rg.name
   storage_account_name = "civilslackalertstorage-${var.env}"
+  common_tags = var.common_tags
+}
+
+resource "azurerm_storage_container" "azure-function" {
+  name                  = "azure-function"
+  storage_account_name  = module.slack-alerts-storage-account.storage_account_name
+  container_access_type = "blob"
+  depends_on = [module.slack-alerts-storage-account]
+}
+
+resource "azurerm_storage_blob" "slack-alerts-zip" {
+  name                   = "slack-alerts.zip"
+  storage_account_name   = module.slack-alerts-storage-account.storage_account_name
+  storage_container_name = azurerm_storage_container.azure-function.name
+  type                   = "Block"
+  source                 = "slack-alerts.zip"
+  depends_on = [azurerm_storage_container.azure-function]
 }
 
 
