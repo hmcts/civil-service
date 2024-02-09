@@ -54,18 +54,19 @@ data "archive_file" "function_app_data" {
 }
 
 
-#module "civil-camunda-stuck-alert-function-app" {
-#  source           = "git@github.com:hmcts/cpp-module-terraform-azurerm-functionapp.git"
-#  environment      = var.env
-#  location         = var.appinsights_location
-#  asp_os_type      = "Linux"
-#  function_app_name = "civil-camunda-stuck-alert-${var.env}"
-#  resource_group_name = azurerm_resource_group.rg.name
-#  storage_account_access_key = module.slack-alerts-storage-account.storage_account_access_key
-#  storage_account_name = module.slack-alerts-storage-account.storage_account_name
-#  key_vault_id = data.azurerm_key_vault.civil_key_vault.id
-#  tags = var.common_tags + {
-#    expiresAfter = "3000-01-01"
-#  }
-#
-#}
+module "civil-camunda-stuck-alert-function-app" {
+  source           = "git@github.com:hmcts/cpp-module-terraform-azurerm-functionapp.git"
+  environment      = var.env
+  location         = var.appinsights_location
+  asp_os_type      = "Linux"
+  function_app_name = "civilcamundastuckalert${var.env}"
+  resource_group_name = azurerm_resource_group.rg.name
+  storage_account_access_key = module.slack-alerts-storage-account.storage_account_access_key
+  storage_account_name = module.slack-alerts-storage-account.storage_account_name
+  key_vault_id = data.azurerm_key_vault.civil_key_vault.id
+  tags = var.common_tags + {
+    expiresAfter = "3000-01-01"
+  }
+  functionapp_package = data.archive_file.function_app_data.output_path
+
+}
