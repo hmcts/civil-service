@@ -5,10 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
 import uk.gov.hmcts.reform.hmc.model.hearing.CaseDetailsHearing;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
@@ -18,7 +16,6 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
-import uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponse;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses;
@@ -39,8 +36,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.HmcDataUtils.includesVideoHearing;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.INTER;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
-import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
-import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.CANCELLED;
 
 class HmcDataUtilsTest {
 
@@ -1207,6 +1202,7 @@ class HmcDataUtilsTest {
     @Nested
     class GetLatestHearing {
         private static final LocalDateTime TODAY = LocalDateTime.of(2024, 1, 22, 0, 0, 0);
+
         @Test
         void shouldGetLatestHearing() {
             LocalDateTime hearingStartTime = TODAY.plusHours(10);
