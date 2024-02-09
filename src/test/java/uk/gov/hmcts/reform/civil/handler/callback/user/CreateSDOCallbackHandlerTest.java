@@ -972,7 +972,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
     }
 
-
     @Nested
     class MidEventDisposalHearingLocationRefDataCallback extends LocationRefSampleDataBuilder {
 
