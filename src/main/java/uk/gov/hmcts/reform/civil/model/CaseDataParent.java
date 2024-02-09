@@ -153,6 +153,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -340,16 +341,16 @@ public class CaseDataParent implements MappableObject {
     private SdoR2SmallClaimsUploadDoc sdoR2SmallClaimsUploadDoc;
     private List<IncludeInOrderToggle> sdoR2SmallClaimsHearingToggle;
     private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
-    private String sdoR2SmallClaimsImpNotesTxt;
-    private LocalDate sdoR2SmallClaimsImpNotesDate;
+    private SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
+
 
     private CaseDocument sdoOrderDocument;
 
     private final YesOrNo eaCourtLocation;
 
     // sdo ui flags
-    private  YesOrNo setSmallClaimsFlag;
-    private  YesOrNo setFastTrackFlag;
+    private final YesOrNo setSmallClaimsFlag;
+    private final YesOrNo setFastTrackFlag;
     private final String eventDescriptionRTJ;
     private final String additionalInformationRTJ;
 

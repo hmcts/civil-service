@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -843,6 +844,134 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         assertThat(responseCaseData.getEaCourtLocation()).isNull();
     }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldSetEarlyAdoptersFlag_whenSmallClaimsDRH(Boolean isLocationWhiteListed) {
+        DynamicList options = DynamicList.builder()
+            .listItems(List.of(
+                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                       )
+            )
+            .build();
+
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .smallClaimsMethodInPerson(options)
+            .isSdoR2NewScreen(YES)
+            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .setSmallClaimsFlag(YES)
+            .drawDirectionsOrderRequired(NO)
+            .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().hearingCourtLocationList(options.toBuilder().value(selectedCourt).build()).build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
+            isLocationWhiteListed);
+        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
+            Optional.of(LocationRefData.builder()
+                            .regionId("region id")
+                            .epimmsId("epimms id")
+                            .siteName("location name")
+                            .build()));
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldSetEarlyAdoptersFlag_whenSmallClaimsAndNotDRH(Boolean isLocationWhiteListed) {
+        DynamicList options = DynamicList.builder()
+            .listItems(List.of(
+                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                       )
+            )
+            .build();
+
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
+            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .setSmallClaimsFlag(YES)
+            .isSdoR2NewScreen(NO)
+            .drawDirectionsOrderRequired(NO)
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression((selectedCourt.getCode()))).thenReturn(
+            isLocationWhiteListed);
+        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
+            Optional.of(LocationRefData.builder()
+                            .regionId("region id")
+                            .epimmsId("epimms id")
+                            .siteName("location name")
+                            .build()));
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true", "false"})
+    void shouldSetEarlyAdoptersFlag_whenSmallClaimDRHAltLocation(Boolean isLocationWhiteListed) {
+        DynamicList options = DynamicList.builder()
+            .listItems(List.of(
+                           DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                           DynamicListElement.builder().code("00002").label("court 2 - 2 address - Y02 7RB").build(),
+                           DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                       )
+            )
+            .build();
+
+        DynamicListElement selectedCourt = DynamicListElement.builder()
+            .code("00002").label("court 2 - 2 address - Y02 7RB").build();
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .smallClaimsMethodInPerson(options)
+            .isSdoR2NewScreen(YES)
+            .disposalHearingMethodInPerson(options)
+            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .setFastTrackFlag(YES)
+            .drawDirectionsOrderRequired(NO)
+            .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().altHearingCourtLocationList(options.toBuilder().value(selectedCourt).build()).build())
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(eq(selectedCourt.getCode()))).thenReturn(
+            isLocationWhiteListed);
+        when(locationRefDataService.getLocationMatchingLabel("label 1", params.getParams().get(
+            CallbackParams.Params.BEARER_TOKEN).toString())).thenReturn(
+            Optional.of(LocationRefData.builder()
+                            .regionId("region id")
+                            .epimmsId("epimms id")
+                            .siteName("location name")
+                            .build()));
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+        assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+    }
+
 
     @Nested
     class MidEventDisposalHearingLocationRefDataCallback extends LocationRefSampleDataBuilder {
@@ -1740,11 +1869,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness()
                            .getPartyIsCountedAsWitnessTxt()).isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT);
             assertThat(data.getSdoR2SmallClaimsWitnessStatements()
-                           .getSdoR2SmallClaimsRestrictPages().getFontDetails()).isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1);
+                           .getSdoR2SmallClaimsRestrictPages().getFontDetails()).isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2);
             assertThat(data.getSdoR2SmallClaimsWitnessStatements()
-                           .getSdoR2SmallClaimsRestrictPages().getWitnessShouldNotMoreThanTxt()).isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2);
+                           .getSdoR2SmallClaimsRestrictPages().getWitnessShouldNotMoreThanTxt()).isEqualTo(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1);
             assertThat(data.getSdoR2SmallClaimsHearing().getTrialOnOptions()).isEqualTo(TrialOnRadioOptions.OPEN_DATE);
-            assertThat(data.getSdoR2SmallClaimsHearing().getMethodOfHearing()).isEqualTo(SmallClaimsSdoR2HearingMethod.smallClaimsMethodTelephoneHearing);
+            assertThat(data.getSdoR2SmallClaimsHearing().getMethodOfHearing()).isEqualTo(SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING);
             assertThat(data.getSdoR2SmallClaimsHearing().getLengthList()).isEqualTo(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES);
             assertThat(data.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions()).isEqualTo(SmallClaimsSdoR2PhysicalTrialBundleOptions.NONE);
             assertThat(data.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingFirstOpenDateAfter().getListFrom()).isEqualTo(LocalDate.now().plusDays(56));
@@ -1753,11 +1882,46 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList()).isEqualTo(expected);
             assertThat(data.getSdoR2SmallClaimsHearing().getHearingCourtLocationList().getValue().getCode()).isEqualTo(preSelectedCourt);
             assertThat(data.getSdoR2SmallClaimsHearing().getPhysicalBundlePartyTxt()).isEqualTo(SdoR2UiConstantSmallClaim.BUNDLE_TEXT);
-            assertThat(data.getSdoR2SmallClaimsImpNotesTxt()).isEqualTo(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT);
-            assertThat(data.getSdoR2SmallClaimsImpNotesDate()).isEqualTo(LocalDate.now().plusDays(7));
+            assertThat(data.getSdoR2SmallClaimsImpNotes().getText()).isEqualTo(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT);
+            assertThat(data.getSdoR2SmallClaimsImpNotes().getDate()).isEqualTo(LocalDate.now().plusDays(7));
+        }
+
+        @Test
+        void shouldPrePopulateToggleDRHFields() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing().build();
+            String preSelectedCourt = "214320";
+            List<LocationRefData> locations = List.of(
+                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
+                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
+                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
+                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
+                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
+                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+            );
+            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            DynamicList expected = DynamicList.builder()
+                .listItems(List.of(
+                               DynamicListElement.builder().code("00001").label("court 1 - 1 address - Y01 7RB").build(),
+                               DynamicListElement.builder().code(preSelectedCourt).label("court 2 - 2 address - Y02 7RB").build(),
+                               DynamicListElement.builder().code("00003").label("court 3 - 3 address - Y03 7RB").build()
+                           )
+                )
+                .build();
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(data.getSdoR2SmallClaimsUploadDocToggle()).isEqualTo(Collections.singletonList(IncludeInOrderToggle.INCLUDE));
             assertThat(data.getSdoR2SmallClaimsHearingToggle()).isEqualTo(Collections.singletonList(IncludeInOrderToggle.INCLUDE));
             assertThat(data.getSdoR2SmallClaimsWitnessStatementsToggle()).isEqualTo(Collections.singletonList(IncludeInOrderToggle.INCLUDE));
+            assertThat(data.getSdoR2SmallClaimsPPIToggle()).isNull();
         }
 
         @Test

@@ -90,6 +90,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingFirstOpenDateAfter;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
@@ -729,13 +730,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                                                                .partyIsCountedAsWitnessTxt(SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT)
                                                                                                .build())
                                                           .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
-                                                                                             .fontDetails(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1)
-                                                                                             .witnessShouldNotMoreThanTxt(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2)
+                                                                                             .fontDetails(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2)
+                                                                                             .witnessShouldNotMoreThanTxt(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1)
                                                                                              .build())
                                                           .text(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT).build());
         updatedData.sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder()
                                                 .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
-                                                .methodOfHearing(SmallClaimsSdoR2HearingMethod.smallClaimsMethodTelephoneHearing)
+                                                .methodOfHearing(SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING)
                                                 .lengthList(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES)
                                                 .physicalBundleOptions(SmallClaimsSdoR2PhysicalTrialBundleOptions.NONE)
                                                 .sdoR2SmallClaimsHearingFirstOpenDateAfter(SdoR2SmallClaimsHearingFirstOpenDateAfter.builder()
@@ -747,8 +748,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                                                              updatedData,
                                                                                              preferredCourt.orElse(null), true))
                                                 .physicalBundlePartyTxt(SdoR2UiConstantSmallClaim.BUNDLE_TEXT).build());
-        updatedData.sdoR2SmallClaimsImpNotesTxt(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT);
-        updatedData.sdoR2SmallClaimsImpNotesDate(LocalDate.now().plusDays(7));
+        updatedData.sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder()
+                                                 .text(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT)
+                                                 .date(LocalDate.now().plusDays(7)).build());
         updatedData.sdoR2SmallClaimsUploadDocToggle(includeInOrderToggle);
         updatedData.sdoR2SmallClaimsHearingToggle(includeInOrderToggle);
         updatedData.sdoR2SmallClaimsWitnessStatementsToggle(includeInOrderToggle);
@@ -988,7 +990,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 dataBuilder.eaCourtLocation(YES);
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(YesOrNo.NO);
+                dataBuilder.eaCourtLocation(NO);
             }
         }
 
@@ -1048,7 +1050,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (SdoHelper.isFastTrack(caseData)) {
             toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            toUseList = Optional.ofNullable(caseData.getSmallClaimsMethodInPerson());
+            if (featureToggleService.isSdoR2Enabled() && caseData.getIsSdoR2NewScreen().equals(YES)) {
+                toUseList = caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList() != null
+                    ? Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList())
+                    : Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList());
+            } else {
+                toUseList = Optional.ofNullable(caseData.getSmallClaimsMethodInPerson());
+            }
         } else {
             throw new IllegalArgumentException("Could not determine claim track");
         }
