@@ -3,27 +3,27 @@ package uk.gov.hmcts.reform.civil.helpers.sdo;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
-import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 
 import java.util.List;
 import java.util.Locale;
@@ -223,7 +223,8 @@ public class SdoHelper {
             case "smallClaimsHearingToggle":
                 return caseData.getSmallClaimsHearingToggle() != null;
             case "smallClaimsMethodToggle":
-                return caseData.getSmallClaimsMethodToggle() != null;
+                // SNI-5142
+                return true;
             case "smallClaimsDocumentsToggle":
                 return caseData.getSmallClaimsDocumentsToggle() != null;
             case "smallClaimsWitnessStatementToggle":
@@ -293,7 +294,8 @@ public class SdoHelper {
             case "fastTrackTrialToggle":
                 return caseData.getFastTrackTrialToggle() != null;
             case "fastTrackMethodToggle":
-                return caseData.getFastTrackMethodToggle() != null;
+                // SNI-5142
+                return true;
             case "fastTrackAddNewDirections":
                 return caseData.getFastTrackAddNewDirections() != null;
             case "fastTrackTrialDateToToggle":
@@ -450,7 +452,8 @@ public class SdoHelper {
             case "disposalHearingFinalDisposalHearingToggle":
                 return caseData.getDisposalHearingFinalDisposalHearingToggle() != null;
             case "disposalHearingMethodToggle":
-                return caseData.getDisposalHearingMethodToggle() != null;
+                // SNI-5142
+                return true;
             case "disposalHearingBundleToggle":
                 return caseData.getDisposalHearingBundleToggle() != null;
             case "disposalHearingClaimSettlingToggle":

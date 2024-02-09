@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.config.PinInPostConfiguration;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -147,9 +148,60 @@ public class DefendantSignSettlementAgreementNotificationHandlerTest {
         );
     }
 
+    @Test
+    public void notifyApplicantForSignedSettlement_InBilingual() {
+        Mockito.when(notificationsProperties.getNotifyApplicantLipForSignedSettlementAgreementInBilingual())
+                .thenReturn(templateId);
+        CaseData.CaseDataBuilder caseData = createCaseData();
+        CaseData caseDataInstance =
+                (CaseData) caseData.caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES)
+                        .build())
+                        .claimantBilingualLanguagePreference(Language.WELSH.toString()).build();
+
+        CallbackParams params = createCallbackParams(
+                CaseEvent.NOTIFY_LIP_APPLICANT_FOR_SIGN_SETTLEMENT_AGREEMENT,
+                caseDataInstance
+        );
+
+        handler.handle(params);
+
+        Mockito.verify(notificationService).sendMail(
+                eq("applicant1@gmail.com"),
+                eq(templateId),
+                eq(createExpectedTemplateProperties()),
+                eq("notify-signed-settlement-legacy ref")
+        );
+    }
+
+    @Test
+    public void notifyApplicantForRejectedSignedSettlement_InBilingual() {
+        Mockito.when(notificationsProperties.getNotifyApplicantLipForNotAgreedSignSettlementInBilingual())
+                .thenReturn(templateId);
+        CaseData.CaseDataBuilder caseData = createCaseData();
+        CaseData caseDataInstance =
+                (CaseData) caseData.caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.NO)
+                        .build())
+                        .claimantBilingualLanguagePreference(Language.WELSH.toString()).build();
+
+        CallbackParams params = createCallbackParams(
+                CaseEvent.NOTIFY_LIP_APPLICANT_FOR_SIGN_SETTLEMENT_AGREEMENT,
+                caseDataInstance
+        );
+
+        handler.handle(params);
+
+        Mockito.verify(notificationService).sendMail(
+                eq("applicant1@gmail.com"),
+                eq(templateId),
+                eq(createExpectedTemplateProperties()),
+                eq("notify-signed-settlement-legacy ref")
+        );
+    }
+
     private CaseData.CaseDataBuilder createCaseData() {
         return CaseData.builder()
             .legacyCaseReference("legacy ref")
+            .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
             .applicant1(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .individualTitle("mr")
