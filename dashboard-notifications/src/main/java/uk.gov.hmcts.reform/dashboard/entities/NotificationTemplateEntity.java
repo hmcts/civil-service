@@ -5,18 +5,15 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 @lombok.Data
-@lombok.Builder
 @lombok.NoArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications_Templates", schema = "dbs")
 public class NotificationTemplateEntity implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = -7113029898212912034L;
 
     @Id

@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import java.io.Serial;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
@@ -12,14 +16,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-@lombok.Data
-@lombok.Builder
-@lombok.NoArgsConstructor
+@Data
+@NoArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications", schema = "dbs")
+@AllArgsConstructor
 public class NotificationEntity implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = -649190928299762655L;
 
     @Id

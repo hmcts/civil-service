@@ -1,3 +1,39 @@
+sourceSets {
+  integrationTest {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      srcDir file('src/integrationTest/java')
+    }
+    resources.srcDir file('src/integrationTest/resources')
+  }
+}
+
+task integration(type: Test) {
+  description = "Runs integration tests"
+  group = "Verification"
+  testClassesDirs = sourceSets.integrationTest.output.classesDirs
+  classpath = sourceSets.integrationTest.runtimeClasspath
+  failFast = true
+  testLogging.showStandardStreams = false
+}
+
+def versions = [
+  junit              : '5.10.0',
+  junitPlatform      : '1.10.0',
+  testcontainers: '1.17.6'
+]
+
+ext.libraries = [
+  junit5: [
+    "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
+    "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",
+    "org.junit.jupiter:junit-jupiter-params:${versions.junit}",
+    "org.junit.platform:junit-platform-commons:${versions.junitPlatform}",
+    "org.junit.platform:junit-platform-engine:${versions.junitPlatform}"
+  ]
+]
+
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation "org.hibernate:hibernate-core:5.6.10.Final"
@@ -10,7 +46,16 @@ dependencies {
   compileOnly 'org.projectlombok:lombok'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   annotationProcessor 'org.projectlombok:lombok'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
+  testImplementation libraries.junit5
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+  testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+  testImplementation group: 'com.h2database', name: 'h2', version: '2.1.214'
+
+  integrationTestImplementation sourceSets.main.runtimeClasspath
+  integrationTestImplementation sourceSets.test.runtimeClasspath
 }
 bootJar.enabled = false
 group = 'uk.gov.hmcts.reform.dashboard'
