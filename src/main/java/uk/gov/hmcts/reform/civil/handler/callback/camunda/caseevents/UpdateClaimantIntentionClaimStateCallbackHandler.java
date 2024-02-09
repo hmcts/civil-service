@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIMANT_INTENTION_CLAIM_STATE;
 
 @Service
@@ -53,19 +55,10 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
                 .data(updatedData.toMap(objectMapper));
-        if (shouldUpdateClaimState(updatedData)) {
+        if (!updatedData.isBilingual()) {
             response.state(updateClaimStateService.setUpCaseState(updatedData));
         }
+
         return response.build();
-    }
-
-    private boolean shouldUpdateClaimState(CaseData caseData) {
-        return !caseData.isBilingual()
-            && !hasClaimantRequestedCcjAfterCourtDecision(caseData);
-    }
-
-    private boolean hasClaimantRequestedCcjAfterCourtDecision(CaseData caseData) {
-        return caseData.hasApplicant1AcceptedCcj()
-            && (caseData.hasApplicant1AcceptedCourtDecision() || caseData.hasApplicant1CourtDecisionInFavourOfClaimant());
     }
 }
