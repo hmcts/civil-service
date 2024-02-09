@@ -1913,6 +1913,48 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("setSmallClaimsFlag").isEqualTo("No");
             assertThat(response.getData()).extracting("setFastTrackFlag").isEqualTo("Yes");
         }
+
+        @Test
+        void smallClaimsSdoR2FlagSetToYesPathOne() {
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("setSmallClaimsFlag").isEqualTo("Yes");
+            assertThat(response.getData()).extracting("setFastTrackFlag").isEqualTo("No");
+            assertThat(response.getData()).extracting("isSdoR2NewScreen").isEqualTo("Yes");
+        }
+
+        @Test
+        void smallClaimsSdoR2FlagSetToYesPathTwo() {
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.YES)
+                .drawDirectionsOrderSmallClaims(YesOrNo.YES)
+                .drawDirectionsOrderSmallClaimsAdditionalDirections(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("setSmallClaimsFlag").isEqualTo("Yes");
+            assertThat(response.getData()).extracting("setFastTrackFlag").isEqualTo("No");
+            assertThat(response.getData()).extracting("isSdoR2NewScreen").isEqualTo("Yes");
+        }
     }
 
     @Nested

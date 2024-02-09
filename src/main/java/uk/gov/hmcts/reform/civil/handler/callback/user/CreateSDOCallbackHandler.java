@@ -745,8 +745,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                 .hearingCourtLocationList(courtList)
                                                 .altHearingCourtLocationList(getLocationList(callbackParams,
                                                                                              updatedData,
-                                                                                             preferredCourt.orElse(null)
-                                                    , true))
+                                                                                             preferredCourt.orElse(null), true))
                                                 .physicalBundlePartyTxt(SdoR2UiConstantSmallClaim.BUNDLE_TEXT).build());
         updatedData.sdoR2SmallClaimsImpNotesTxt(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT);
         updatedData.sdoR2SmallClaimsImpNotesDate(LocalDate.now().plusDays(7));
@@ -854,7 +853,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.setSmallClaimsFlag(NO).build();
         updatedData.setFastTrackFlag(NO).build();
-
+        updatedData.isSdoR2NewScreen(NO).build();
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             updatedData.setSmallClaimsFlag(YES).build();
             if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)) {
@@ -875,7 +874,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             && caseData.getSmallClaims().contains(
             SmallTrack.smallClaimDisputeResolutionHearing))
             || (caseData.getDrawDirectionsOrderRequired() == YES
-            && caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections()!= null
+            && caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections() != null
             && caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections()
             .contains(SmallTrack.smallClaimDisputeResolutionHearing)));
     }

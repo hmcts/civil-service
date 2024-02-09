@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SdoR2SmallClaimsWitnessStatements {
+
     private String sdoStatementOfWitness;
     private SdoR2SmallClaimsRestrictWitness sdoR2SmallClaimsRestrictWitness;
     private SdoR2SmallClaimsRestrictPages sdoR2SmallClaimsRestrictPages;

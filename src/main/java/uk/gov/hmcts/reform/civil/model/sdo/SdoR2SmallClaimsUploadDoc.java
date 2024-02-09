@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SdoR2SmallClaimsUploadDoc {
+
     private String sdoUploadOfDocumentsTxt;
 }
