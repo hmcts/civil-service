@@ -342,8 +342,7 @@ public class CaseDataParent implements MappableObject {
     private List<IncludeInOrderToggle> sdoR2SmallClaimsHearingToggle;
     private SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing;
     private SdoR2SmallClaimsImpNotes sdoR2SmallClaimsImpNotes;
-
-
+    
     private CaseDocument sdoOrderDocument;
 
     private final YesOrNo eaCourtLocation;
