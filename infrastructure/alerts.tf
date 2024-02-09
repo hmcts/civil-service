@@ -37,7 +37,7 @@ module "civil-fail-action-group-slack" {
 }
 
 module "slack-alerts-storage-account" {
-  source           = "git@github.com:hmcts/cnp-module-storage-account.git"
+  source           = "git@github.com:hmcts/cnp-module-storage-account?ref=master"
   env      = var.env
   location = var.appinsights_location
   account_kind = "StorageV2"
@@ -45,6 +45,7 @@ module "slack-alerts-storage-account" {
   resource_group_name = azurerm_resource_group.rg.name
   storage_account_name = "civilslackalertstorage-${var.env}"
 }
+
 
 
 #module "civil-camunda-stuck-alert-function-app" {
