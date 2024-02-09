@@ -36,22 +36,22 @@ module "civil-fail-action-group-slack" {
 
 }
 
-module "slack-alerts-storage-account" {
-  source           = "git@github.com:hmcts/cnp-module-storage-account?ref=master"
+resource "azurerm_storage_account" "slack-alerts-storage-account" {
   env      = var.env
   location = var.appinsights_location
   account_kind = "StorageV2"
   account_replication_type = "LRS"
-  resource_group_name = azurerm_resource_group.rg.name
+  name = azurerm_resource_group.rg.name
   storage_account_name = "civilslackalertstorage-${var.env}"
   common_tags = var.common_tags
+  account_tier = "Hot"
 }
 
 resource "azurerm_storage_container" "azure-function" {
   name                  = "azure-function"
-  storage_account_name  = module.slack-alerts-storage-account.name
+  storage_account_name  = azurerm_storage_account.slack-alerts-storage-account.name
   container_access_type = "blob"
-  depends_on = [module.slack-alerts-storage-account]
+  depends_on = [azurerm_storage_account.slack-alerts-storage-account]
 }
 #
 #resource "azurerm_storage_blob" "slack-alerts-zip" {
