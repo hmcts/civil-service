@@ -1,21 +1,18 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard;
 
 import lombok.SneakyThrows;
-import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
-import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -54,7 +51,7 @@ public class DashboardControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
-    void shouldReturnErrorWhenNotUUIDFormat() {
+    void shouldReturnErrorWhenNotUuidFormat() {
 
         doGet(BEARER_TOKEN, endPointUrl,  "1234")
             .andExpect(status().isBadRequest());
