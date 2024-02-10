@@ -64,7 +64,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceExpert;
 import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -442,6 +442,8 @@ public class CaseDataParent implements MappableObject {
 
     @JsonUnwrapped
     private final CaseDataLiP caseDataLiP;
+    @JsonUnwrapped
+    private final HelpWithFeesDetails hwFeesDetails;
     private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
 

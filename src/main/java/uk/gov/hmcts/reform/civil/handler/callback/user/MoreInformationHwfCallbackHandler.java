@@ -18,7 +18,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.*;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
 @Slf4j
 @Service
@@ -32,7 +35,7 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
         return new ImmutableMap.Builder<String, Callback>()
             .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
             .put(callbackKey(MID, "more-information-hwf"), this::validationMoreInformation)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitMoreInformationHwf)
             .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
             .build();
     }
@@ -53,6 +56,11 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
+            .build();
+    }
+
+    private CallbackResponse submitMoreInformationHwf(CallbackParams callbackParams) {
+        return AboutToStartOrSubmitCallbackResponse.builder()
             .build();
     }
 }
