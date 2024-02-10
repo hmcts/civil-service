@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
