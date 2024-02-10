@@ -22,7 +22,7 @@ public class DashboardControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnOkWhenDeletingEntity() {
 
-        doGet(BEARER_TOKEN, endPointUrl, "1122")
+        doGet(BEARER_TOKEN, endPointUrl, UUID.randomUUID().toString())
             .andExpect(status().isOk());
     }
 
