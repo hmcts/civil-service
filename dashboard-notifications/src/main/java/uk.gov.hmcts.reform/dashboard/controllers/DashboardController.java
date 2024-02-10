@@ -60,7 +60,7 @@ public class DashboardController {
         "notifications/{uuid}",
     })
     public ResponseEntity<Optional<NotificationEntity>> getDashboardNotificationByUuid(
-        @PathVariable("uuId") UUID uuid,
+        @PathVariable("uuid") UUID uuid,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
         log.info(
