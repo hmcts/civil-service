@@ -13,4 +13,6 @@ public interface NotificationRepository extends CrudRepository<NotificationEntit
 
     @Override
     Optional<NotificationEntity> findById(UUID uuid);
+
+    int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String role);
 }

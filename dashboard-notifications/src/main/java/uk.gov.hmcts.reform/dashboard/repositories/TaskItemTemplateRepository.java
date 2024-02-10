@@ -5,9 +5,12 @@ import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Transactional
 @Repository
 public interface TaskItemTemplateRepository extends CrudRepository<TaskItemTemplateEntity, Long> {
 
+    List<TaskItemTemplateEntity> findByName(String name);
+    List<TaskItemTemplateEntity> findByNameAndRole(String name, String role);
 }

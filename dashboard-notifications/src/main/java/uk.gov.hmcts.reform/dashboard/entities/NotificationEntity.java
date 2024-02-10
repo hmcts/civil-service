@@ -1,7 +1,13 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
+import com.vladmihalcea.hibernate.type.array.LocalDateTimeArrayType;
+import lombok.AllArgsConstructor;
+import org.hibernate.annotations.Type;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -14,6 +20,7 @@ import javax.validation.constraints.NotNull;
 
 @lombok.Data
 @lombok.Builder
+@AllArgsConstructor
 @lombok.NoArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications", schema = "dbs")
@@ -34,10 +41,11 @@ public class NotificationEntity implements Serializable {
     private String citizenRole;
     private String enHTML;
     private String cyHTML;
+    @Type(type = "jsonb")
     @Column(name = "message_param")
     private String params;
     private String createdBy;
-    private Date createdAt;
+    private OffsetDateTime createdAt;
     private String updatedBy;
-    private Date updatedOn;
+    private OffsetDateTime updatedOn;
 }

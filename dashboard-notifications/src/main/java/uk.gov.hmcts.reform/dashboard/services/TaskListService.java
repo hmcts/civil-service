@@ -23,4 +23,16 @@ public class TaskListService {
     public Optional<List<TaskListEntity>> getTaskList(String ccdCaseIdentifier, String roleType) {
         return taskListRepository.findByReferenceAndTaskItemTemplateRole(ccdCaseIdentifier, roleType);
     }
+
+    public TaskListEntity saveOrUpdate(TaskListEntity taskListEntity, String templateId) {
+        Optional<TaskListEntity> existingEntity = taskListRepository.findByReferenceAndRoleAndTaskItemTemplateAndId(
+            taskListEntity.getReference(), taskListEntity.getRole(), templateId);
+
+        TaskListEntity beingUpdated = taskListEntity;
+        if (existingEntity.isPresent()) {
+            beingUpdated = taskListEntity.toBuilder().id(existingEntity.get().getId()).build();
+        }
+
+        return taskListRepository.save(beingUpdated);
+    }
 }

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.dashboard.utils.JsonDataConverter;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -14,10 +15,12 @@ import javax.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @lombok.Data
-@lombok.Builder
+@lombok.Builder(toBuilder = true)
+@AllArgsConstructor
 @lombok.NoArgsConstructor
 @Entity
 @Table(name = "task_list", schema = "dbs")
@@ -40,9 +43,10 @@ public class TaskListEntity implements Serializable {
     private String taskItemEn;
     @Size(max = 512)
     private String taskItemCy;
+    private String role;
     @NotNull
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
     @Size(max = 256)
     private String updatedBy;
     @Column(name = "message_parm", columnDefinition = "jsonb(0, 0)")
