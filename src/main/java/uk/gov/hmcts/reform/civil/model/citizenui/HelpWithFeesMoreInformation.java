@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HelpWithFeesMoreInformation {
+
     private List<HwFMoreInfoRequiredDocuments> hwFMoreInfoRequiredDocuments;
     private String hwFMoreInfoDetails;
     private LocalDate hwFMoreInfoDocumentDate;
