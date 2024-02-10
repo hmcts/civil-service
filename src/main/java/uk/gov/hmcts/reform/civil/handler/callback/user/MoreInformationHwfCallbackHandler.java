@@ -47,7 +47,7 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
     private CallbackResponse validationMoreInformation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        LocalDate hwFMoreInfoDocumentDate = caseData.getHelpWithFeesMoreInformation().getHwFMoreInfoDocumentDate();
+        LocalDate hwFMoreInfoDocumentDate = caseData.getHwFeesDetails().getHelpWithFeesMoreInformation().getHwFMoreInfoDocumentDate();
         if (!hwFMoreInfoDocumentDate.isAfter(LocalDate.now())) {
             errors.add(ERROR_MESSAGE_DOCUMENT_DATE_MUST_BE_AFTER_TODAY);
         }
