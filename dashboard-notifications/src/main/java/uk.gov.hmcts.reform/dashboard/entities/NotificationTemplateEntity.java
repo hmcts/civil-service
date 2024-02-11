@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @lombok.Data
-@lombok.Builder
+@lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
