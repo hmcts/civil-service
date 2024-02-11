@@ -10,6 +10,9 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -47,17 +50,21 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
         var claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
         var hearingFeeAmount = caseData.getHearingFeeAmount();
         var feeType = caseData.getHwfFeeType();
-
+        HelpWithFeesDetails helpWithFeesDetails = caseData.getHwFeesDetails();
         if (FeeType.CLAIMISSUED == feeType && claimFeeAmount != null) {
             var claimFee = caseData.getClaimFee();
-
             claimFee.setCalculatedAmountInPence(BigDecimal.ZERO);
+            helpWithFeesDetails.setRemissionAmount(claimFeeAmount);
+
             updatedData.claimFee(claimFee);
+            updatedData.hwFeesDetails(helpWithFeesDetails);
         } else if (FeeType.HEARING == feeType && hearingFeeAmount != null) {
             var hearingFee = caseData.getHearingFee();
-
             hearingFee.setCalculatedAmountInPence(BigDecimal.ZERO);
+            helpWithFeesDetails.setRemissionAmount(hearingFeeAmount);
+
             updatedData.hearingFee(hearingFee);
+            updatedData.hwFeesDetails(helpWithFeesDetails);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
