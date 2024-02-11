@@ -50,19 +50,18 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateRemissionAmount(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-      //  caseData.toBuilder().hwFeesDetails(HelpWithFeesDetails.builder().hwfFeeType(FeeType.CLAIMISSUED).remissionAmount(new BigDecimal(2000)).build());
         var remissionAmount = caseData.getHwFeesDetails().getRemissionAmount();
+        var claimFeeAmount = getClaimFeeAmount(caseData);
+        var hearingFeeAmount = getHearingFeeAmount(caseData);
+        var feeType = getHwfFeeType(caseData);
         List<String> errors = new ArrayList<>();
-        if (FeeType.CLAIMISSUED == getHwfFeeType(caseData)) {
-            var claimFeeAmount = getClaimFeeAmount(caseData);
-            if (remissionAmount.compareTo(claimFeeAmount) > 0) {
-                errors.add("Remission amount should be less than or equal to hearing fee");
-            }
-        } else if (FeeType.HEARING == getHwfFeeType(caseData)) {
-            var hearingFeeAmount = getHearingFeeAmount(caseData);
-            if (remissionAmount.compareTo(hearingFeeAmount) > 0) {
-                errors.add("Remission amount should be less than or equal to hearing fee");
-            }
+
+        if (FeeType.CLAIMISSUED == feeType && remissionAmount.compareTo(claimFeeAmount) > 0) {
+            errors.add("Remission amount should be less than or equal to hearing fee");
+        } else if (FeeType.HEARING == feeType && remissionAmount.compareTo(hearingFeeAmount) > 0) {
+            errors.add("Remission amount should be less than or equal to hearing fee");
+        } else {
+            errors.add("Fee Type is not configured properly.");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -72,17 +71,19 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse partRemissionHWF(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+        var updatedData = caseData.toBuilder();
         var remissionAmount = caseData.getHwFeesDetails().getRemissionAmount();
         var claimFeeAmount = getClaimFeeAmount(caseData);
         var hearingFeeAmount = getHearingFeeAmount(caseData);
-        if (FeeType.CLAIMISSUED == getHwfFeeType(caseData) && claimFeeAmount != null) {
+        var feeType = getHwfFeeType(caseData);
+
+        if (FeeType.CLAIMISSUED == feeType && claimFeeAmount != null) {
             var updatedClaimFeeAmount = claimFeeAmount.subtract(remissionAmount);
             var claimFee = caseData.getClaimFee();
 
             claimFee.setCalculatedAmountInPence(updatedClaimFeeAmount);
             updatedData.claimFee(claimFee);
-        } else if (FeeType.HEARING == getHwfFeeType(caseData) && hearingFeeAmount != null) {
+        } else if (FeeType.HEARING == feeType && hearingFeeAmount != null) {
             var updatedHearingFeeAmount = hearingFeeAmount.subtract(remissionAmount);
             var hearingFee = caseData.getHearingFee();
 
@@ -90,10 +91,8 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
             updatedData.hearingFee(hearingFee);
         }
 
-        var abc = updatedData.build();
-        System.out.println(abc);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(abc.toMap(objectMapper))
+            .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 
