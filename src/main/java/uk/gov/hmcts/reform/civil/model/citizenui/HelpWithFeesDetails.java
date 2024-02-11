@@ -16,5 +16,4 @@ public class HelpWithFeesDetails {
     private String noRemissionDetails;
     private HWFFeeDetailsSummary noRemissionDetailsSummary;
     private FeeType hwfFeeType;
-
 }

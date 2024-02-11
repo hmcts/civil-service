@@ -37,16 +37,19 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldUpdateNoRemissionData() {
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder().noRemissionDetails("no remission")
+                .noRemissionDetailsSummary(HWFFeeDetailsSummary.FEES_REQUIREMENT_NOT_MET).hwfFeeType(
+                    FeeType.CLAIMISSUED).build();
             CaseData caseData = CaseData.builder()
-                .hwFeesDetails(HelpWithFeesDetails.builder().noRemissionDetails("no remission")
-                                   .noRemissionDetailsSummary(HWFFeeDetailsSummary.FEES_REQUIREMENT_NOT_MET).hwfFeeType(
-                        FeeType.CLAIMISSUED).build())
+                .hwFeesDetails(hwfeeDetails)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            assertThat(response.getData()).extracting("hwFeesDetails").isNotNull();
+            ObjectMapper objectMapper = new ObjectMapper();
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getHwFeesDetails()).isEqualTo(hwfeeDetails);
         }
     }
 }
