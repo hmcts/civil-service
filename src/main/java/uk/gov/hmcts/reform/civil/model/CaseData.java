@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
@@ -1209,6 +1210,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return Optional.ofNullable(getClaimFee())
             .map(Fee::getCalculatedAmountInPence)
             .orElse(BigDecimal.ZERO);
+    }
+
+    @JsonIgnore
+    public BigDecimal getHearingFeeAmount() {
+        return Optional.ofNullable(getHearingFee())
+            .map(Fee::getCalculatedAmountInPence)
+            .orElse(null);
+    }
+
+    @JsonIgnore
+    public FeeType getHwfFeeType() {
+        return Optional.ofNullable(getHwFeesDetails())
+            .map(HelpWithFeesDetails::getHwfFeeType)
+            .orElse(null);
     }
 
     public boolean hasApplicant1SignedSettlementAgreement() {
