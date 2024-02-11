@@ -49,7 +49,7 @@ public class DashboardNotificationTemplateService {
         }
     }
 
-    public void delete(Long id) {
+    public void deleteById(Long id) {
         notificationTemplateRepository.deleteById(id);
     }
 }

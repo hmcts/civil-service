@@ -53,7 +53,7 @@ public class DashboardNotificationService {
         }
     }
 
-    public void delete(UUID id) {
+    public void deleteById(UUID id) {
         notificationRepository.deleteById(id);
     }
 }
