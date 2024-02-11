@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 @lombok.Data
 @lombok.Builder
 @lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications", schema = "dbs")
 public class NotificationEntity implements Serializable {

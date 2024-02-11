@@ -19,6 +19,7 @@ import java.util.UUID;
 @lombok.Data
 @lombok.Builder
 @lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 @Entity
 @Table(name = "task_list", schema = "dbs")
 public class TaskListEntity implements Serializable {

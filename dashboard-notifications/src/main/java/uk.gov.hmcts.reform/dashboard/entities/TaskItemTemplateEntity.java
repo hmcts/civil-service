@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @lombok.Data
 @lombok.Builder
 @lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 @Entity
 @Table(name = "task_item_template", schema = "dbs")
 public class TaskItemTemplateEntity implements Serializable {
