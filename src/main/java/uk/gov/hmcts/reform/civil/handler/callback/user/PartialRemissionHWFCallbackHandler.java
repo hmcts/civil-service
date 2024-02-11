@@ -55,13 +55,14 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
         var hearingFeeAmount = getHearingFeeAmount(caseData);
         var feeType = getHwfFeeType(caseData);
         List<String> errors = new ArrayList<>();
+        if (feeType == null) {
+            errors.add("Fee Type is not configured properly.");
+        }
 
         if (FeeType.CLAIMISSUED == feeType && remissionAmount.compareTo(claimFeeAmount) > 0) {
-            errors.add("Remission amount should be less than or equal to hearing fee");
+            errors.add("Remission amount should be less than or equal to claim fee");
         } else if (FeeType.HEARING == feeType && remissionAmount.compareTo(hearingFeeAmount) > 0) {
             errors.add("Remission amount should be less than or equal to hearing fee");
-        } else {
-            errors.add("Fee Type is not configured properly.");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
