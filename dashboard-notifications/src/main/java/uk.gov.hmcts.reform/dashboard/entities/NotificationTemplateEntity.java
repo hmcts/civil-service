@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
+import lombok.AllArgsConstructor;
 import org.hibernate.annotations.Type;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import java.util.Date;
 
 @lombok.Data
 @lombok.Builder
+@AllArgsConstructor
 @lombok.NoArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications_Templates", schema = "dbs")

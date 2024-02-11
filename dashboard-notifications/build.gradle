@@ -22,3 +22,14 @@ repositories {
   mavenCentral()
 }
 
+tasks.withType(Test) {
+  useJUnitPlatform()
+
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
+
+test {
+  failFast = true
+}

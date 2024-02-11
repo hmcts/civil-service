@@ -26,15 +26,18 @@ public class DashboardScenariosService {
     private final NotificationRepository notificationRepository;
     private final TaskListService taskListService;
     private final TaskItemTemplateRepository taskItemTemplateRepository;
+    private final TaskItemContentBuilder taskItemContentBuilder;
 
     public DashboardScenariosService(NotificationTemplateRepository notificationTemplateRepository,
                                      NotificationRepository notificationRepository,
                                      TaskListService taskListService,
-                                     TaskItemTemplateRepository taskItemTemplateRepository) {
+                                     TaskItemTemplateRepository taskItemTemplateRepository,
+                                     TaskItemContentBuilder taskItemContentBuilder) {
         this.notificationTemplateRepository = notificationTemplateRepository;
         this.notificationRepository = notificationRepository;
         this.taskListService = taskListService;
         this.taskItemTemplateRepository = taskItemTemplateRepository;
+        this.taskItemContentBuilder = taskItemContentBuilder;
     }
 
     public void recordScenarios(String authorisation, String scenarioReference,
@@ -80,13 +83,13 @@ public class DashboardScenariosService {
                     .role(citizenRole)
                     .currentStatus(taskItem.getTaskStatusSequence()[0])
                     .nextStatus(taskItem.getTaskStatusSequence()[1])
-                    .taskItemCy(buildTaskItemContent(
+                    .taskItemCy(taskItemContentBuilder.buildTaskItemContent(
                         stringSubstitutor,
                         taskItem.getCategoryCy(),
                         taskItem.getContentCy(),
                         taskItem.getTitleCy()
                     ))
-                    .taskItemEn(buildTaskItemContent(
+                    .taskItemEn(taskItemContentBuilder.buildTaskItemContent(
                         stringSubstitutor,
                         taskItem.getCategoryEn(),
                         taskItem.getContentEn(),
@@ -118,12 +121,4 @@ public class DashboardScenariosService {
         });
     }
 
-    private String buildTaskItemContent(StringSubstitutor stringSubstitutor,
-                                        String category, String content, String title) {
-        Optional<String> updatedContent = Optional.ofNullable(content).map(stringSubstitutor::replace);
-        StringBuilder taskItem = new StringBuilder(category);
-        taskItem.append(title);
-        updatedContent.ifPresent(taskItem::append);
-        return taskItem.toString();
-    }
 }
