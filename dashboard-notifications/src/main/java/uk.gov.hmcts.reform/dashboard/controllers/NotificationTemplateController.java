@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
-import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationTemplateService;
-import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 
