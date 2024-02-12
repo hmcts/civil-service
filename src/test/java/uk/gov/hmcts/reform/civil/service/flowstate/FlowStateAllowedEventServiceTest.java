@@ -207,8 +207,7 @@ class FlowStateAllowedEventServiceTest {
                         CREATE_SDO,
                         NotSuitable_SDO,
                         migrateCase,
-                        TRANSFER_ONLINE_CASE,
-                        INVALID_HWF_REFERENCE
+                        TRANSFER_ONLINE_CASE
                     }
                 ),
                 of(
@@ -266,7 +265,8 @@ class FlowStateAllowedEventServiceTest {
                         EVIDENCE_UPLOAD_APPLICANT,
                         migrateCase,
                         EVIDENCE_UPLOAD_RESPONDENT,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        INVALID_HWF_REFERENCE
                     }
                 ),
                 of(
