@@ -111,6 +111,8 @@ public class DashboardScenariosService {
             List<String> notificationsToBeDeleted = Arrays.asList(template.getNotificationsToBeDeleted());
 
             notificationsToBeDeleted.forEach(removableTemplate -> {
+                log.info("Removing notifications for the template {}", removableTemplate);
+
                 Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
                     .findByName(removableTemplate);
 
@@ -120,7 +122,7 @@ public class DashboardScenariosService {
                         uniqueCaseIdentifier,
                         t.getRole()
                     );
-                    log.info("{} notifications removed for the template {}", noOfRowsRemoved, t.getName());
+                    log.info("{} notifications removed for the template {}", noOfRowsRemoved, removableTemplate);
                 });
             });
         });
