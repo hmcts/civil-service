@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HelpWithFeesDetails {
+    
     private String hwfReferenceNumber;
     private FeeType hwfFeeType;
 }
