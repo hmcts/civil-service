@@ -8,29 +8,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.PartialRemissionHWFCallbackHandler.ERR_MSG_FEE_TYPE_NOT_CONFIGURED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.PartialRemissionHWFCallbackHandler.ERR_MSG_REMISSION_AMOUNT_LESS_THAN_CLAIM_FEE;
@@ -78,7 +70,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
 
         @Test
         void shouldUpdatePartialRemissionHwfHearingFeeWhenHwfFeeTypeIsHearing() {
-           //Given
+            //Given
             CaseData caseData = CaseData.builder()
                 .hearingReferenceNumber("000HN001")
                 .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
@@ -121,7 +113,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
 
     @ParameterizedTest
     @MethodSource("provideFeeTypes")
-    void shouldPopulateErrorWhenRemissionAmountIsNotValidForDifferentFeeTypes(FeeType feeType, String errMsg ) {
+    void shouldPopulateErrorWhenRemissionAmountIsNotValidForDifferentFeeTypes(FeeType feeType, String errMsg) {
         //Given
         CaseData caseData = CaseData.builder()
             .hearingReferenceNumber("000HN001")
@@ -145,7 +137,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
             Arguments.of(FeeType.CLAIMISSUED, ERR_MSG_REMISSION_AMOUNT_LESS_THAN_CLAIM_FEE),
             Arguments.of(FeeType.HEARING, ERR_MSG_REMISSION_AMOUNT_LESS_THAN_HEARING_FEE),
             Arguments.of(null, ERR_MSG_FEE_TYPE_NOT_CONFIGURED)
-            );
+        );
     }
 
 }
