@@ -29,23 +29,33 @@ public class TaskListEntity implements Serializable {
 
     @Id
     private UUID id;
+
     @NotNull
     @ManyToOne(fetch = javax.persistence.FetchType.LAZY, optional = false)
     @JoinColumn(name = "task_item_template_id", nullable = false)
     private TaskItemTemplateEntity taskItemTemplate;
+
     @Size(max = 256)
     private String reference;
+
     private int currentStatus;
+
     private int nextStatus;
-    @Size(max = 512)
-    private String taskItemEn;
-    @Size(max = 512)
-    private String taskItemCy;
+
+    @Size(max = 256)
+    private String categoryEn;
+
+    @Size(max = 256)
+    private String categoryCy;
+
     @NotNull
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
+
     @Size(max = 256)
     private String updatedBy;
+
     @Column(name = "message_parm", columnDefinition = "jsonb(0, 0)")
     @Convert(converter = JsonDataConverter.class)
     private JsonNode messageParm;
