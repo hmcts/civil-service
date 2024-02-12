@@ -31,6 +31,46 @@
         "readOnly": false,
         "attributes": { "caseType": "CIVIL", "jurisdiction": "CIVIL" },
         "authorisations": []
+      },
+      {
+        "roleType": "CASE",
+        "roleName": "[RESPONDENTSOLICITORTWO]",
+        "grantType": "SPECIFIC",
+        "roleCategory": "PROFESSIONAL",
+        "classification": "RESTRICTED",
+        "readOnly": false,
+        "attributes": { "caseType": "CIVIL", "jurisdiction": "CIVIL" },
+        "authorisations": []
+      },
+      {
+        "roleType": "CASE",
+        "roleName": "[CREATOR]",
+        "grantType": "SPECIFIC",
+        "roleCategory": "PROFESSIONAL",
+        "classification": "RESTRICTED",
+        "readOnly": false,
+        "attributes": { "caseType": "CIVIL", "jurisdiction": "CIVIL" },
+        "authorisations": []
+      },
+      {
+        "roleType": "CASE",
+        "roleName": "[CLAIMANT]",
+        "grantType": "SPECIFIC",
+        "roleCategory": "PROFESSIONAL",
+        "classification": "RESTRICTED",
+        "readOnly": false,
+        "attributes": { "caseType": "CIVIL", "jurisdiction": "CIVIL" },
+        "authorisations": []
+      },
+      {
+        "roleType": "CASE",
+        "roleName": "[DEFENDANT]",
+        "grantType": "SPECIFIC",
+        "roleCategory": "PROFESSIONAL",
+        "classification": "RESTRICTED",
+        "readOnly": false,
+        "attributes": { "caseType": "CIVIL", "jurisdiction": "CIVIL" },
+        "authorisations": []
       }
     ]
   },

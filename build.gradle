@@ -1,3 +1,5 @@
+import uk.gov.hmcts.rse.AuthMode
+
 plugins {
   id 'application'
   id 'checkstyle'
@@ -510,6 +512,27 @@ bootJar {
 
 wrapper {
   distributionType = Wrapper.DistributionType.ALL
+}
+
+task buildCCDXlsx(type: Exec) {
+  group 'ccd tasks'
+  commandLine './bin/build-civil-xlxs-definitions.sh'
+}
+
+bootWithCCD {
+  dependsOn(buildCCDXlsx)
+
+  doFirst() {
+    project.file('./.aat-env').readLines().each() {
+      def index = it.indexOf("=")
+      def key = it.substring(0, index)
+      def value = it.substring(index + 1)
+      environment(key, value)
+    }
+  }
+
+  //AAT or Local (IDAM and S2S Simulators)
+  authMode = AuthMode.AAT
 }
 
 task runAndPublishConsumerPactTests(type: Test){
