@@ -70,12 +70,6 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
     }
 
     private void clearHwFReferenceNumber(CaseData caseData) {
-        if (ofNullable(caseData.getHwFeesDetails()).isPresent()
-                && ofNullable(caseData.getHwFeesDetails().getHwfReferenceNumber()).isPresent()) {
-            HelpWithFeesDetails hwFeesDetails = caseData.getHwFeesDetails();
-            hwFeesDetails.setHwfReferenceNumber(null);
-            caseData.toBuilder().hwFeesDetails(hwFeesDetails);
-        }
         if (ofNullable(caseData.getHwFeesDetails())
                 .map(HelpWithFeesDetails::getHwfReferenceNumber).isPresent()) {
             HelpWithFeesDetails hwFeesDetails = caseData.getHwFeesDetails();
