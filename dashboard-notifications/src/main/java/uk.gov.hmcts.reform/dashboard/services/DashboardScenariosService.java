@@ -64,6 +64,13 @@ public class DashboardScenariosService {
                 .cyHTML(stringSubstitutor.replace(template.getCyHTML()))
                 .createdAt(OffsetDateTime.now())
                 .build();
+
+            log.info("Task Notification details for scenario {}, id = {}, enHTML = {}, cyHTML = {}",
+                     scenarioReference,
+                     notification.getId(),
+                     notification.getEnHTML(),
+                     notification.getCyHTML()
+            );
             // insert new record in notifications table
             notificationRepository.save(notification);
 
@@ -96,6 +103,12 @@ public class DashboardScenariosService {
                         taskItem.getTitleEn()
                     ))
                     .build();
+                log.info("Task Item details for scenario {}, id = {}, TaskItemEn = {}, TaskItemCy = {}",
+                         scenarioReference,
+                         taskItemEntity.getId(),
+                         taskItemEntity.getTaskItemEn(),
+                         taskItemEntity.getTaskItemCy()
+                );
                 taskListService.saveOrUpdate(taskItemEntity, taskItem.getName());
 
             });
@@ -108,8 +121,8 @@ public class DashboardScenariosService {
             notificationsToBeDeleted.forEach(removableTemplate -> {
                 Optional<NotificationTemplateEntity> templateToRemove = notificationTemplateRepository
                     .findByName(removableTemplate);
-                templateToRemove.ifPresent(t -> {
 
+                templateToRemove.ifPresent(t -> {
                     int noOfRowsRemoved = notificationRepository.deleteByNameAndReferenceAndCitizenRole(
                         t.getName(),
                         uniqueCaseIdentifier,
