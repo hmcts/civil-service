@@ -70,19 +70,30 @@ public class DashboardControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnTaskListForGiveCaseReferenceAndRole() {
+
+        doGet(BEARER_TOKEN, getTaskListUrl,  "123","defendant")
+            .andExpect(status().isOk())
+            .andExpect(content().json(toJson(getTaskLists())));
+    }
+
+    private List<TaskList> getTaskLists() {
+
         String timeStamp = "2024-02-12 21:32:49";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime dateTime = LocalDateTime.parse(timeStamp, formatter);
+        LocalDateTime dateTime = getLocalDateTimeFromString(timeStamp);
 
         List<TaskList> taskList = new ArrayList<>();
         taskList.add(TaskList.builder().id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e5")).taskNameCy("task_name_cy").taskNameEn("task_name_en").taskOrder(0).categoryCy("category_cy").categoryEn("category_en")
-                             .role("defendant").currentStatus(0).nextStatus(1).hintTextCy("hint_text_cy").hintTextEn("hint_text_en").reference("123")
-                             .createdAt(dateTime).updatedAt(dateTime).updatedBy("Test").build());
-        doGet(BEARER_TOKEN, getTaskListUrl,  "123","defendant")
-            .andExpect(status().isOk())
-            .andExpect(content().json(toJson(taskList)));
+                         .role("defendant").currentStatus(0).nextStatus(1).hintTextCy("hint_text_cy").hintTextEn("hint_text_en").reference("123")
+                         .createdAt(dateTime).updatedAt(dateTime).updatedBy("Test").build());
+
+        return taskList;
     }
 
+    private LocalDateTime getLocalDateTimeFromString(String localDateTime) {
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return LocalDateTime.parse(localDateTime, formatter);
+
+    }
 
 }
