@@ -233,6 +233,10 @@ test {
   failFast = true
 }
 
+tasks.withType(Copy) {
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 task integration(type: Test) {
   description = "Runs integration tests"
   group = "Verification"
