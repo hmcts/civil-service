@@ -31,10 +31,8 @@ public class TaskItemTemplateEntity implements Serializable {
     @Size(max = 512)
     private String hintTextEn;
 
-    // Is it needed ??
-
-//    @Size(max = 256)
-//    private String categoryEn;
+    @Size(max = 256)
+    private String categoryEn;
 
     @Size(max = 256)
     private String taskNameCy;
@@ -42,8 +40,8 @@ public class TaskItemTemplateEntity implements Serializable {
     @Size(max = 512)
     private String hintTextCy;
 
-//    @Size(max = 256)
-//    private String categoryCy;
+    @Size(max = 256)
+    private String categoryCy;
 
     @Size(max = 256)
     private String name;

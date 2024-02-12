@@ -43,10 +43,16 @@ public class TaskListEntity implements Serializable {
     private int nextStatus;
 
     @Size(max = 256)
-    private String categoryEn;
+    private String taskNameEn;
+
+    @Size(max = 512)
+    private String hintTextEn;
 
     @Size(max = 256)
-    private String categoryCy;
+    private String taskNameCy;
+
+    @Size(max = 512)
+    private String hintTextCy;
 
     @NotNull
     private LocalDateTime createdAt;
