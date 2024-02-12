@@ -15,8 +15,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-@Data
-@NoArgsConstructor
+@lombok.Data
+@lombok.Builder(toBuilder = true)
+@lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications", schema = "dbs")
 @AllArgsConstructor

@@ -9,7 +9,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 @lombok.Data
+@lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications_Templates", schema = "dbs")
 public class NotificationTemplateEntity implements Serializable {
@@ -24,8 +26,10 @@ public class NotificationTemplateEntity implements Serializable {
     private String name;
     @Type(type = "com.vladmihalcea.hibernate.type.array.StringArrayType")
     private String[] notificationsToBeDeleted;
-    private String enHTML;
-    private String cyHTML;
+    private String titleEn;
+    private String titleCy;
+    private String descriptionEn;
+    private String descriptionCy;
     private Date createdAt;
     private String timeToLive;
 }

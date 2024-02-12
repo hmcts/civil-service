@@ -18,9 +18,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @lombok.Data
-@lombok.Builder
-@AllArgsConstructor
+@lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 @Entity
 @Table(name = "task_list", schema = "dbs")
 public class TaskListEntity implements Serializable {
