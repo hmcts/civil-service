@@ -25,7 +25,7 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
-        this::noRemssionHWF,
+        this::noRemissionHWF,
         callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
     );
 
@@ -39,7 +39,7 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse noRemssionHWF(CallbackParams callbackParams) {
+    private CallbackResponse noRemissionHWF(CallbackParams callbackParams) {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(callbackParams.getCaseData().toMap(objectMapper))
             .build();
