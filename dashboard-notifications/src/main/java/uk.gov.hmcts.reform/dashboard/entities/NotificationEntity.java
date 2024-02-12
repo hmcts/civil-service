@@ -19,7 +19,6 @@ import javax.validation.constraints.Size;
 @lombok.Data
 @lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
-@lombok.AllArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications", schema = "dbs")
 @AllArgsConstructor

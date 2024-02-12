@@ -91,7 +91,7 @@ public class DashboardController {
             "Received UUID for deletion: {}",
             id
         );
-        dashboardNotificationService.delete(id);
+        dashboardNotificationService.deleteById(id);
         return new ResponseEntity(HttpStatus.OK);
     }
 

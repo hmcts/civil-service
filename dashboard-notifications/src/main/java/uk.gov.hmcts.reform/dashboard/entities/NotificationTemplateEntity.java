@@ -15,7 +15,6 @@ import java.util.Date;
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
-@AllArgsConstructor
 @Table(name = "dashboard_notifications_Templates", schema = "dbs")
 public class NotificationTemplateEntity implements Serializable {
 

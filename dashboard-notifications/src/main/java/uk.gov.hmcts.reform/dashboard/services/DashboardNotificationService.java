@@ -34,11 +34,11 @@ public class DashboardNotificationService {
         NotificationEntity existingNotification = notificationRepository.findById(id).orElse(null);
 
         if (existingNotification != null) {
-            existingNotification.builder().notificationTemplateEntity(notification.getNotificationTemplateEntity())
+            existingNotification.builder().dashboardNotificationsTemplates(notification.getDashboardNotificationsTemplates())
             .reference(notification.getReference())
-            .enHTML(notification.getEnHTML())
-            .cyHTML(notification.getCyHTML())
-            .params(notification.getParams())
+            .enHtml(notification.getEnHtml())
+            .cyHtml(notification.getCyHtml())
+            .messageParam(notification.getMessageParam())
             .citizenRole(notification.getCitizenRole())
             .createdBy(notification.getCreatedBy())
             .createdAt(notification.getCreatedAt())
