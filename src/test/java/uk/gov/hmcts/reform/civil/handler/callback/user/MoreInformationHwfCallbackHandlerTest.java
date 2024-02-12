@@ -47,7 +47,7 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStatePendingClaimIssued()
                 .build()
                 .builder()
-                .helpWithFeesMoreInformation_ClaimIssue(
+                .helpWithFeesMoreInformationClaimIssue(
                     HelpWithFeesMoreInformation.builder()
                         .hwFMoreInfoDocumentDate(LocalDate.now())
                         .build())
@@ -67,7 +67,7 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build()
                 .builder()
                 .hwFeesDetails(HelpWithFeesDetails.builder().hwfFeeType(FeeType.HEARING).build())
-                .helpWithFeesMoreInformation_Hearing(
+                .helpWithFeesMoreInformationHearing(
                     HelpWithFeesMoreInformation.builder()
                         .hwFMoreInfoDocumentDate(LocalDate.now())
                         .build())
