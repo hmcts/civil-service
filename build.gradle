@@ -338,7 +338,8 @@ def versions = [
   springStatemachine : '4.0.0',
   lombok             : '1.18.26',
   pact               : '3.5.24',
-  springSecurity     : '5.8.5'
+  springSecurity     : '5.8.5',
+  testcontainers     : '1.17.6'
 ]
 
 ext.libraries = [
@@ -483,6 +484,13 @@ dependencies {
 
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.0')
   contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.0')
+
+  // dashboard specific changes
+
+  testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+  testImplementation group: 'com.h2database', name: 'h2', version: '2.1.214'
+  // dashboard specific changes ends
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath

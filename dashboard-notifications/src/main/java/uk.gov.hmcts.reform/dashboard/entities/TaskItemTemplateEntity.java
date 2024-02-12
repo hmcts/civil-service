@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
+import lombok.AllArgsConstructor;
 import org.hibernate.annotations.Type;
 import javax.persistence.Entity;
 import javax.persistence.Id;
