@@ -13,8 +13,5 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 @AllArgsConstructor
 public class HelpWithFeesDetails {
 
-    @JsonProperty("hwfFeeType")
     private FeeType hwfFeeType;
-    @JsonProperty("helpWithFeesMoreInformation")
-    private HelpWithFeesMoreInformation helpWithFeesMoreInformation;
 }

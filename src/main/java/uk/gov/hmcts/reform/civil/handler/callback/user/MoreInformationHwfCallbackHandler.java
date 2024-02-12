@@ -10,13 +10,13 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -50,7 +50,13 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
     private CallbackResponse validationMoreInformation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
-        LocalDate hwFMoreInfoDocumentDate = caseData.getHwFeesDetails().getHelpWithFeesMoreInformation().getHwFMoreInfoDocumentDate();
+        HelpWithFeesMoreInformation moreInformationData =
+            FeeType.HEARING.equals(Optional.ofNullable(caseData.getHwFeesDetails())
+                                       .map(HelpWithFeesDetails::getHwfFeeType).orElse(null)) ?
+            caseData.getHelpWithFeesMoreInformation_Hearing() :
+            caseData.getHelpWithFeesMoreInformation_ClaimIssue();
+        LocalDate hwFMoreInfoDocumentDate = moreInformationData.getHwFMoreInfoDocumentDate();
+        System.out.println(hwFMoreInfoDocumentDate);
         if (!hwFMoreInfoDocumentDate.isAfter(LocalDate.now())) {
             errors.add(ERROR_MESSAGE_DOCUMENT_DATE_MUST_BE_AFTER_TODAY);
         }

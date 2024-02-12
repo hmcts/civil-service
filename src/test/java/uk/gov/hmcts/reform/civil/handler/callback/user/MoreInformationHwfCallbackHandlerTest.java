@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
@@ -41,20 +42,35 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToStartCallback {
 
         @Test
-        void shouldValidationMoreInformation_withInvalidDate() {
-            HelpWithFeesDetails hwFeesDetails = HelpWithFeesDetails.builder()
-                .helpWithFeesMoreInformation(
-                    HelpWithFeesMoreInformation.builder()
-                        .hwFMoreInfoDocumentDate(LocalDate.now())
-                        .build()
-                )
-                .build();
-
+        void shouldValidationMoreInformationClaimIssued_withInvalidDate() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStatePendingClaimIssued()
                 .build()
                 .builder()
-                .hwFeesDetails(hwFeesDetails)
+                .helpWithFeesMoreInformation_ClaimIssue(
+                    HelpWithFeesMoreInformation.builder()
+                        .hwFMoreInfoDocumentDate(LocalDate.now())
+                        .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "more-information-hwf");
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            Assertions.assertThat(response.getErrors()).containsExactly("Documents date must be future date");
+        }
+
+        @Test
+        void shouldValidationMoreInformationHearing_withInvalidDate() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStatePendingClaimIssued()
+                .build()
+                .builder()
+                .hwFeesDetails(HelpWithFeesDetails.builder().hwfFeeType(FeeType.HEARING).build())
+                .helpWithFeesMoreInformation_Hearing(
+                    HelpWithFeesMoreInformation.builder()
+                        .hwFMoreInfoDocumentDate(LocalDate.now())
+                        .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, "more-information-hwf");
