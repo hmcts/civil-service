@@ -934,7 +934,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
         Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(getCaseDataLiP());
         YesOrNo hasDoneSettlementAgreement = optionalCaseDataLiP.map(CaseDataLiP::getRespondentSignSettlementAgreement).orElse(null);
         boolean hasDoneSettlementAgreementInTime = (nonNull(hasDoneSettlementAgreement) && hasDoneSettlementAgreement == YesOrNo.YES)
-            ||  (isNull(hasDoneSettlementAgreement) && isDateAfterToday(respondentSettlementAgreementDeadline));
+                                                    ||  (isNull(hasDoneSettlementAgreement) && isDateAfterToday(respondentSettlementAgreementDeadline));
 
         return (isNull(whenWillThisAmountBePaid) && isNull(firstRepaymentDate))
             || (isDateAfterToday(whenWillThisAmountBePaid) && hasDoneSettlementAgreementInTime)
@@ -959,9 +959,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isPartAdmitImmediatePaymentClaimSettled() {
         return (isPartAdmitClaimSpec()
-            && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
-            && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
-            && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
+                && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
+                && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
+                && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
     }
 
     @JsonIgnore
@@ -1065,8 +1065,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public Optional<Element<CaseDocument>> getSDODocument() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                    .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
+                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                   .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
         }
         return Optional.empty();
     }
@@ -1159,8 +1159,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isTranslatedDocumentUploaded() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                    .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
+                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                   .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
         }
         return false;
     }
