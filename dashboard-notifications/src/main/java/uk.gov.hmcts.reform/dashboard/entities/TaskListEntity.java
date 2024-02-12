@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.AllArgsConstructor;
 import uk.gov.hmcts.reform.dashboard.utils.JsonDataConverter;
 import javax.persistence.Column;
 import javax.persistence.Convert;

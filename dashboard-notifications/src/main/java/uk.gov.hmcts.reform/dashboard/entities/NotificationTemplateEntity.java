@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 import javax.persistence.Column;
 import javax.persistence.Entity;
