@@ -64,6 +64,11 @@ resource "azurerm_app_service_plan" "functionapp_service_plan" {
   }
 }
 
+data "azurerm_user_assigned_identity" "managed_identity" {
+  name                = "${var.product}-${var.env}-mi"
+  resource_group_name = "managed-identities-${var.env}-rg"
+}
+
 resource "azurerm_function_app" "civil-camunda-stuck-alert-function-app" {
   name                = "civilcamundastuckalert${var.env}"
   location            = var.appinsights_location
@@ -88,6 +93,6 @@ resource "azurerm_function_app" "civil-camunda-stuck-alert-function-app" {
 
   identity {
     type = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.managed_identity[0].id]
+    identity_ids = [data.azurerm_user_assigned_identity.managed_identity.id]
   }
 }
