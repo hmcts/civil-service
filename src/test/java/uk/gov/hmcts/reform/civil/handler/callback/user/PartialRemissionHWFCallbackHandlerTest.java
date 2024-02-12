@@ -42,6 +42,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
 
     private ObjectMapper objectMapper;
     private PartialRemissionHWFCallbackHandler handler;
+
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
@@ -138,6 +139,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
         var errors = response.getErrors();
         assertTrue(errors.contains(errMsg));
     }
+
     private static Stream<Arguments> provideFeeTypes() {
         return Stream.of(
             Arguments.of(FeeType.CLAIMISSUED, ERR_MSG_REMISSION_AMOUNT_LESS_THAN_CLAIM_FEE),
