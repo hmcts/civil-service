@@ -5,9 +5,9 @@ module "camunda-process-stuck-alert" {
 
   alert_name                 = "camunda-process-stuck-alert"
   alert_desc                 = "Triggers when an Camunda business logic fails resulting in a case getting stuck"
-  app_insights_query         = "traces | where message contains \"is not allowed on the case\""
-  frequency_in_minutes       = "5"
-  time_window_in_minutes     = "5"
+  app_insights_query         = "traces | where message contains \"is not allowed on the case\" | extend caseId=extract(\"([0-9]{16})\", 1, message) | extend error=extract(\"([A-Z_]+)\", 1, message) | distinct caseId,error,timestamp | summarize min(timestamp) by caseId,error"
+  frequency_in_minutes       = "1440"
+  time_window_in_minutes     = "1440"
   severity_level             = "1"
   action_group_name          = module.civil-fail-action-group-slack.action_group_name
   custom_email_subject       = "Stuck Case Alert"
@@ -33,5 +33,5 @@ module "civil-fail-action-group-slack" {
   short_name             = "Civil_slack"
   email_receiver_name    = "Civil Alerts"
   email_receiver_address = data.azurerm_key_vault_secret.slackmonitoringaddress.value
-
+  count                 = var.custom_alerts_enabled
 }
