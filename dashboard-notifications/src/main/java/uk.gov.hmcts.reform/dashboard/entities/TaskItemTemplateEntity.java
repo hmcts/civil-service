@@ -23,26 +23,38 @@ public class TaskItemTemplateEntity implements Serializable {
 
     @Id
     private Long id;
+
+
     @Size(max = 256)
-    private String titleEn;
+    private String taskNameEn;
+
     @Size(max = 512)
-    private String contentEn;
+    private String hintTextEn;
+
     @Size(max = 256)
     private String categoryEn;
+
     @Size(max = 256)
-    private String titleCy;
+    private String taskNameCy;
+
     @Size(max = 512)
-    private String contentCy;
+    private String hintTextCy;
+
     @Size(max = 256)
     private String categoryCy;
+
     @Size(max = 256)
     private String name;
+
     @Size(max = 256)
     private String role;
+
     private int taskOrder;
+
     @NotNull
     @javax.persistence.Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
     @Type(type = "com.vladmihalcea.hibernate.type.array.IntArrayType")
     private int[] taskStatusSequence;
 }
