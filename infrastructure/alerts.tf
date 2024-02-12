@@ -52,40 +52,43 @@ data "archive_file" "function_app_data" {
   source_dir  = "${path.module}/slack-alerts-data"
   output_path = "${path.module}/function-app.zip"
 }
-#
-#resource "azurerm_app_service_plan" "functionapp_service_plan" {
-#  name                = "civil-camunda-stuck-alert-service-plan"
-#  location            = var.appinsights_location
-#  resource_group_name = azurerm_resource_group.rg.name
-#  kind = "Linux"
-#
-#  sku {
-#    tier = "Dynamic"
-#    size = "Y1"
-#  }
-#}
-#
-#resource "azurerm_function_app" "civil-camunda-stuck-alert-function-app" {
-#  name                = "civilcamundastuckalert${var.env}"
-#  location            = var.appinsights_location
-#  resource_group_name = azurerm_resource_group.rg.name
-#  app_service_plan_id = azurerm_app_service_plan.functionapp_service_plan.id
-#  storage_account_name = module.slack-alerts-storage-account.storage_account_name
-#  storage_account_access_key = module.slack-alerts-storage-account.storage_account_access_key
-#  version = "4"
-#  os_type = "linux"
-#  app_settings = {
-#    FUNCTIONS_WORKER_RUNTIME = "python"
-#  }
-#
-#  site_config {
-#    linux_fx_version = "python|3.10"
-#  }
-#
-#  tags = var.common_tags + {
-#    expiresAfter = "3000-01-01"
-#  }
-#
-#  key_vault_reference_identity_id =
-#
-#}
+
+resource "azurerm_app_service_plan" "functionapp_service_plan" {
+  name                = "civil-camunda-stuck-alert-service-plan"
+  location            = var.appinsights_location
+  resource_group_name = azurerm_resource_group.rg.name
+  kind = "Linux"
+
+  sku = {
+    tier = "Dynamic"
+    size = "Y1"
+  }
+}
+
+resource "azurerm_function_app" "civil-camunda-stuck-alert-function-app" {
+  name                = "civilcamundastuckalert${var.env}"
+  location            = var.appinsights_location
+  resource_group_name = azurerm_resource_group.rg.name
+  app_service_plan_id = azurerm_app_service_plan.functionapp_service_plan.id
+  storage_account_name = module.slack-alerts-storage-account.storage_account_name
+  storage_account_access_key = module.slack-alerts-storage-account.storage_account_access_key
+#  zip_deploy_file
+  version = "4"
+  os_type = "linux"
+  app_settings = {
+    FUNCTIONS_WORKER_RUNTIME = "python"
+  }
+
+  site_config = {
+    linux_fx_version = "python|3.10"
+  }
+
+  tags = var.common_tags + {
+    expiresAfter = "3000-01-01"
+  }
+
+  identity {
+    type = "UserAssigned"
+    identity_ids = [module.key-vault.civil_key_vault.
+  }
+}
