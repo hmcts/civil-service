@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.enums.HWFFeeDetailsSummary;
+import uk.gov.hmcts.reform.civil.enums.NoRemissionDetailsSummary;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
@@ -38,7 +38,7 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateNoRemissionData() {
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder().noRemissionDetails("no remission")
-                .noRemissionDetailsSummary(HWFFeeDetailsSummary.FEES_REQUIREMENT_NOT_MET).hwfFeeType(
+                .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).hwfFeeType(
                     FeeType.CLAIMISSUED).build();
             CaseData caseData = CaseData.builder()
                 .hwFeesDetails(hwfeeDetails)

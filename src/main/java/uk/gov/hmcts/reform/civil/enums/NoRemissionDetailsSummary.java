@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.enums;
 
-public enum HWFFeeDetailsSummary {
+public enum NoRemissionDetailsSummary {
     NOT_QUALIFY_FEE_ASSISTANCE,
     INCORRECT_EVIDENCE,
     INSUFFICIENT_EVIDENCE,

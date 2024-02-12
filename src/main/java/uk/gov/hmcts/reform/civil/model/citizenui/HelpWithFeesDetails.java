@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.enums.HWFFeeDetailsSummary;
+import uk.gov.hmcts.reform.civil.enums.NoRemissionDetailsSummary;
 
 @Data
 @Builder
@@ -14,6 +14,6 @@ import uk.gov.hmcts.reform.civil.enums.HWFFeeDetailsSummary;
 public class HelpWithFeesDetails {
 
     private String noRemissionDetails;
-    private HWFFeeDetailsSummary noRemissionDetailsSummary;
+    private NoRemissionDetailsSummary noRemissionDetailsSummary;
     private FeeType hwfFeeType;
 }
