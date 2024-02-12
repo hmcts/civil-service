@@ -1050,7 +1050,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (SdoHelper.isFastTrack(caseData)) {
             toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            if (featureToggleService.isSdoR2Enabled() && caseData.getIsSdoR2NewScreen().equals(YES)) {
+            if (featureToggleService.isSdoR2Enabled() && caseData.getIsSdoR2NewScreen() != null && caseData.getIsSdoR2NewScreen().equals(YES)) {
                 toUseList = caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList() != null
                     ? Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList())
                     : Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList());
