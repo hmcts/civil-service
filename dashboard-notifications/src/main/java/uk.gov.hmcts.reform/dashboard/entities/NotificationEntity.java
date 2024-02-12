@@ -1,6 +1,10 @@
-package uk.gov.hmcts.reform.dashboard.data;
+package uk.gov.hmcts.reform.dashboard.entities;
 
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -12,15 +16,14 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import lombok.EqualsAndHashCode;
-import net.bytebuddy.asm.Advice;
-
-@lombok.Getter
-@lombok.Setter
+@Data
+@NoArgsConstructor
 @Entity
-@EqualsAndHashCode
 @Table(name = "dashboard_notifications", schema = "dbs")
-public class NotificationEntity {
+@AllArgsConstructor
+public class NotificationEntity implements Serializable {
+
+    private static final long serialVersionUID = -649190928299762655L;
 
     @Id
     @Column(name = "id", nullable = false)
@@ -37,6 +40,10 @@ public class NotificationEntity {
     @Size(max = 256)
     @Column(name = "notification_name", length = 256)
     private String notificationName;
+
+    @Size(max = 256)
+    @Column(name = "citizen_role", length = 256)
+    private String citizenRole;
 
     @Size(max = 256)
     @Column(name = "en_html", length = 256)
@@ -56,7 +63,7 @@ public class NotificationEntity {
 
     @NotNull
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private Date createdAt;
 
     @Size(max = 256)
     @Column(name = "updated_by", length = 256)
@@ -64,6 +71,5 @@ public class NotificationEntity {
 
     @NotNull
     @Column(name = "updated_on", nullable = false)
-    private LocalDateTime updatedOn;
-
+    private Date updatedOn;
 }

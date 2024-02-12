@@ -1,9 +1,9 @@
-package uk.gov.hmcts.reform.dashboard.service;
+package uk.gov.hmcts.reform.dashboard.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.dashboard.data.NotificationEntity;
-import uk.gov.hmcts.reform.dashboard.repository.NotificationRepository;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

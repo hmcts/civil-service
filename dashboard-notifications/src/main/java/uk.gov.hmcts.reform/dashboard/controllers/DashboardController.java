@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dashboard.controller;
+package uk.gov.hmcts.reform.dashboard.controllers;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -8,11 +8,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.reform.dashboard.data.NotificationEntity;
-import uk.gov.hmcts.reform.dashboard.data.TaskListEntity;
-import uk.gov.hmcts.reform.dashboard.service.DashboardNotificationService;
-import uk.gov.hmcts.reform.dashboard.service.TaskListService;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
+import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +63,7 @@ public class DashboardController {
         "notifications/{uuid}",
     })
     public ResponseEntity<Optional<NotificationEntity>> getDashboardNotificationByUuid(
-        @PathVariable("uuId") UUID uuid,
+        @PathVariable("uuid") UUID uuid,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
         log.info(

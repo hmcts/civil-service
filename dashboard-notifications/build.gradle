@@ -1,3 +1,21 @@
+
+def versions = [
+  junit              : '5.10.0',
+  junitPlatform      : '1.10.0',
+  testcontainers: '1.17.6',
+  lombok             : '1.18.26'
+]
+
+ext.libraries = [
+  junit5: [
+    "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
+    "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",
+    "org.junit.jupiter:junit-jupiter-params:${versions.junit}",
+    "org.junit.platform:junit-platform-commons:${versions.junitPlatform}",
+    "org.junit.platform:junit-platform-engine:${versions.junitPlatform}"
+  ]
+]
+
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation "org.hibernate:hibernate-core:5.6.10.Final"
@@ -7,15 +25,27 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.21.1'
   implementation group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.2.9'
+  testImplementation 'junit:junit:4.13.1'
   runtimeOnly 'org.postgresql:postgresql'
   compileOnly 'org.projectlombok:lombok'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   annotationProcessor 'org.projectlombok:lombok'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
+  testImplementation libraries.junit5
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
 }
 bootJar.enabled = false
 group = 'uk.gov.hmcts.reform.dashboard'
 version = '0.0.1'
+
+tasks.withType(Test) {
+  useJUnitPlatform()
+
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
 
 repositories {
   mavenCentral()

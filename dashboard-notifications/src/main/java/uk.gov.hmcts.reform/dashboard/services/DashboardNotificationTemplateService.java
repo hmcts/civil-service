@@ -1,8 +1,8 @@
-package uk.gov.hmcts.reform.dashboard.service;
+package uk.gov.hmcts.reform.dashboard.services;
 
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.dashboard.data.NotificationTemplateEntity;
-import uk.gov.hmcts.reform.dashboard.repository.NotificationTemplateRepository;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
 import java.util.List;
 
 @Service
@@ -30,10 +30,10 @@ public class DashboardNotificationTemplateService {
         NotificationTemplateEntity existingNotification = repository.findById(id).orElse(null);
 
         if (existingNotification != null) {
-            existingNotification.setNotificationRole(notificationTemplateEntity.getNotificationRole());
-            existingNotification.setTemplateName(notificationTemplateEntity.getTemplateName());
-            existingNotification.setEnHtml(notificationTemplateEntity.getEnHtml());
-            existingNotification.setCyHtml(notificationTemplateEntity.getCyHtml());
+            existingNotification.setRole(notificationTemplateEntity.getRole());
+            existingNotification.setName(notificationTemplateEntity.getName());
+            existingNotification.setEnHTML(notificationTemplateEntity.getEnHTML());
+            existingNotification.setCyHTML(notificationTemplateEntity.getCyHTML());
             existingNotification.setCreatedAt(notificationTemplateEntity.getCreatedAt());
             existingNotification.setTimeToLive(notificationTemplateEntity.getTimeToLive());
 
