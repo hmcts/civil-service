@@ -1257,6 +1257,4 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return nonNull(date)
             && date.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
-
-
 }

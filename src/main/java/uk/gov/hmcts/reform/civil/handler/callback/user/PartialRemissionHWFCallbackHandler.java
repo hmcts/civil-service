@@ -101,6 +101,4 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
             .data(updatedData.build().toMap(objectMapper))
             .build();
     }
-
-
 }
