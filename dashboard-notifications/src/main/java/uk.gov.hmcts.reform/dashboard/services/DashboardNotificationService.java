@@ -38,8 +38,10 @@ public class DashboardNotificationService {
         if (existingNotification != null) {
             existingNotification.builder().notificationTemplateEntity(notification.getNotificationTemplateEntity())
             .reference(notification.getReference())
-            .enHTML(notification.getEnHTML())
-            .cyHTML(notification.getCyHTML())
+            .titleEn(notification.getTitleEn())
+            .titleCy(notification.getTitleCy())
+            .descriptionEn(notification.getDescriptionEn())
+            .descriptionCy(notification.getDescriptionCy())
             .params(notification.getParams())
             .citizenRole(notification.getCitizenRole())
             .createdBy(notification.getCreatedBy())

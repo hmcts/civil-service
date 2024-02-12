@@ -29,7 +29,7 @@ public class DashboardControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnOkWhenGettingExistingEntity() {
         UUID id = UUID.randomUUID();
-        NotificationEntity notification = new NotificationEntity(id, new NotificationTemplateEntity(), "12345", "name", "Defendant", "en", "cy", "params", "createdBy",
+        NotificationEntity notification = new NotificationEntity(id, new NotificationTemplateEntity(), "12345", "name", "Defendant", "en", "cy", "en", "cy", "params", "createdBy",
                                                                  new Date(),  "updatedBy", new Date());
 
         when(notificationRepository.findById(any())).thenReturn(Optional.of(notification));
