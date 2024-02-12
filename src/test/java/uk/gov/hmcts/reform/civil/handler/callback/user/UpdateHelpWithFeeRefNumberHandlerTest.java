@@ -24,7 +24,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_
 @ExtendWith(MockitoExtension.class)
 class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
 
-
     private UpdateHelpWithFeeRefNumberHandler handler;
 
     private ObjectMapper objectMapper;
