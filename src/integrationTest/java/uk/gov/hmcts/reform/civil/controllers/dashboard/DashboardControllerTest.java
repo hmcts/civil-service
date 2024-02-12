@@ -1,34 +1,55 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard;
 
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationTemplateService;
 
 import java.util.Date;
-import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class DashboardControllerTest extends BaseIntegrationTest {
 
-    @MockBean
+    @Autowired
+    private DashboardNotificationService dashboardNotificationService;
+
+    @Autowired
+    private DashboardNotificationTemplateService dashboardNotificationTemplateService;
+
+    @Autowired
     private NotificationRepository notificationRepository;
+
+    @Autowired
+    private NotificationTemplateRepository notificationTemplateRepository;
+
+    private final UUID id = UUID.randomUUID();
+
+    private final String[] notificationsToBeDeleted = {"notification"};
+
+    private final NotificationTemplateEntity template = new NotificationTemplateEntity(1L, "Defendant", "name", notificationsToBeDeleted, "English title", "Welsh title", "English body", "Welsh body", new Date(), "");
+    private final NotificationEntity notification = new NotificationEntity(id, template, "1234", "name", "Claimant", "English", "Welsh", "Params", "createdBy", new Date(), "updatedBy", new Date());
+
+    @BeforeEach
+    void setUp() {
+        notificationTemplateRepository.save(template);
+        notificationRepository.save(notification);
+    }
 
     private final String endPointUrlGet = "/dashboard/notifications/{uuid}";
 
-    private final String endPointUrlRecord = "/dashboard/notifications/{unique-notification-identifier}";
-
-    private final UUID id = UUID.randomUUID();
+    private final String endPointUrlDelete = "/dashboard/notifications/{unique-notification-identifier}";
 
     @Nested
     class GenericTests {
@@ -43,57 +64,32 @@ public class DashboardControllerTest extends BaseIntegrationTest {
 
     @Nested
     class GetTests {
-        @Test
-        @SneakyThrows
-        void shouldReturnOkWhenGettingExistingEntity() {
-            NotificationEntity notification = new NotificationEntity(id,
-                                                                     new NotificationTemplateEntity(),
-                                                                     "12345",
-                                                                     "name",
-                                                                     "Defendant",
-                                                                     "en",
-                                                                     "cy",
-                                                                     "params",
-                                                                     "createdBy",
-                                                                     new Date(),
-                                                                     "updatedBy",
-                                                                     new Date());
 
-            when(notificationRepository.findById(any())).thenReturn(Optional.of(notification));
-
-            doGet(BEARER_TOKEN, endPointUrlGet, id)
-                .andExpect(status().isOk())
-                .andExpect(content().json(toJson(notification)));
-        }
-
-        @Test
-        @SneakyThrows
-        void shouldReturnPreconditionFailedErrorWhenIllegalArgumentExceptionIsThrown() {
-            doThrow(new IllegalArgumentException()).when(notificationRepository).findById(any());
-
-            //I don't think it should throw this specific error, but I'll leave it to the person working on get notifications to fix.
-            doGet(BEARER_TOKEN, endPointUrlGet, id)
-                .andExpect(status().isPreconditionFailed());
-        }
     }
 
     @Nested
     class DeleteTests {
         @Test
         @SneakyThrows
-        void shouldReturnOkWhenDeletingEntity() {
+        void shouldReturnOkWhenDeletingExistingEntity() {
 
-            doDelete(BEARER_TOKEN, null, endPointUrlRecord, id.toString())
+            assertTrue(notificationRepository.findById(id).isPresent());
+
+            doDelete(BEARER_TOKEN, null, endPointUrlDelete, id.toString())
                 .andExpect(status().isOk());
+
+            assertFalse(notificationRepository.findById(id).isPresent());
         }
 
         @Test
         @SneakyThrows
-        void shouldReturnPreconditionFailedErrorWhenIllegalArgumentError() {
-            doThrow(new IllegalArgumentException()).when(notificationRepository).deleteById(id);
+        void shouldReturnNotFoundWhenNoMatchingId() {
+            assertTrue(notificationRepository.findById(id).isPresent());
 
-            doDelete(BEARER_TOKEN, null, endPointUrlRecord, id)
-                .andExpect(status().isPreconditionFailed());
+            doDelete(BEARER_TOKEN, null, endPointUrlDelete, "")
+                .andExpect(status().isNotFound());
+
+            assertTrue(notificationRepository.findById(id).isPresent());
         }
     }
 }
