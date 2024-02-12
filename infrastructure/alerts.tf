@@ -58,8 +58,7 @@ resource "azurerm_app_service_plan" "functionapp_service_plan" {
   location            = var.appinsights_location
   resource_group_name = azurerm_resource_group.rg.name
   kind = "Linux"
-
-  sku = {
+  sku {
     tier = "Dynamic"
     size = "Y1"
   }
@@ -89,6 +88,6 @@ resource "azurerm_function_app" "civil-camunda-stuck-alert-function-app" {
 
   identity {
     type = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.managed_identity.id]
+    identity_ids = [azurerm_user_assigned_identity.managed_identity[0].id]
   }
 }
