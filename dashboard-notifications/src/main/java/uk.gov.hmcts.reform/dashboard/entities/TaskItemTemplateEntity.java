@@ -12,9 +12,9 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @lombok.Data
-@lombok.Builder
-@AllArgsConstructor
+@lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 @Entity
 @Table(name = "task_item_template", schema = "dbs")
 public class TaskItemTemplateEntity implements Serializable {

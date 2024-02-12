@@ -16,8 +16,10 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Data
-@NoArgsConstructor
+@lombok.Data
+@lombok.Builder(toBuilder = true)
+@lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications", schema = "dbs")
 @AllArgsConstructor
