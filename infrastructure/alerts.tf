@@ -72,7 +72,7 @@ resource "azurerm_function_app" "civil-camunda-stuck-alert-function-app" {
   app_service_plan_id = azurerm_app_service_plan.functionapp_service_plan.id
   storage_account_name = module.slack-alerts-storage-account.storage_account_name
   storage_account_access_key = module.slack-alerts-storage-account.storage_account_access_key
-#  zip_deploy_file
+  zip_deploy_file = data.archive_file.function_app_data.output_path
   version = "4"
   os_type = "linux"
   app_settings = {
@@ -89,6 +89,6 @@ resource "azurerm_function_app" "civil-camunda-stuck-alert-function-app" {
 
   identity {
     type = "UserAssigned"
-    identity_ids = [module.key-vault.civil_key_vault.
+    identity_ids = [azurerm_user_assigned_identity.managed_identity.id]
   }
 }
