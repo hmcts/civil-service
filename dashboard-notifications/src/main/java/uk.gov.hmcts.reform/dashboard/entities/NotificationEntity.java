@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
+import lombok.AllArgsConstructor;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
@@ -16,6 +18,7 @@ import javax.validation.constraints.Size;
 @lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
 @Entity
+@AllArgsConstructor
 @Table(name = "dashboard_notifications", schema = "dbs")
 public class NotificationEntity implements Serializable {
 
