@@ -53,15 +53,18 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
     private CaseData.CaseDataBuilder<?, ?> updateHwFReference(CaseData caseData) {
         if (FeeType.CLAIMISSUED == caseData.getHwfFeeType()) {
             ofNullable(caseData.getCaseDataLiP())
-                    .map( CaseDataLiP::getHelpWithFees)
+                    .map(CaseDataLiP::getHelpWithFees)
                     .ifPresent(hwf -> hwf.setHelpWithFeesReferenceNumber(getHwFNewReferenceNumber(caseData)));
             clearHwFReferenceNumber(caseData);
             return caseData.toBuilder();
         }
-        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-        updatedData.hearingHelpFeesReferenceNumber(getHwFNewReferenceNumber(caseData));
-        clearHwFReferenceNumber(caseData);
-        return updatedData;
+        if (FeeType.HEARING == caseData.getHwfFeeType()) {
+            CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+            updatedData.hearingHelpFeesReferenceNumber(getHwFNewReferenceNumber(caseData));
+            clearHwFReferenceNumber(caseData);
+            return updatedData;
+        }
+        return caseData.toBuilder();
     }
 
     private String getHwFNewReferenceNumber(CaseData caseData) {
