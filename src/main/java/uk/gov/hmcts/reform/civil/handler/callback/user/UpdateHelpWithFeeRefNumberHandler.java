@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 
 import java.util.List;
@@ -42,20 +43,18 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
 
     private CallbackResponse updateHwFReferenceNumber(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        FeeType feeType = ofNullable(caseData.getHwFeesDetails())
-                .map(HelpWithFeesDetails::getHwfFeeType).orElse(null);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = updateHwFReference(feeType, caseData);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = updateHwFReference(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseDataBuilder.build().toMap(objectMapper))
                 .build();
     }
 
-    private CaseData.CaseDataBuilder<?, ?> updateHwFReference(FeeType hwFeeType, CaseData caseData) {
-        if (FeeType.CLAIMISSUED == hwFeeType) {
+    private CaseData.CaseDataBuilder<?, ?> updateHwFReference(CaseData caseData) {
+        if (FeeType.CLAIMISSUED == caseData.getHwfFeeType()) {
             ofNullable(caseData.getCaseDataLiP())
-                    .ifPresent(lipData -> ofNullable(lipData.getHelpWithFees())
-                            .ifPresent(hwf -> hwf.setHelpWithFeesReferenceNumber(getHwFNewReferenceNumber(caseData))));
+                    .map( CaseDataLiP::getHelpWithFees)
+                    .ifPresent(hwf -> hwf.setHelpWithFeesReferenceNumber(getHwFNewReferenceNumber(caseData)));
             clearHwFReferenceNumber(caseData);
             return caseData.toBuilder();
         }
@@ -67,12 +66,18 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
 
     private String getHwFNewReferenceNumber(CaseData caseData) {
         return ofNullable(caseData.getHwFeesDetails())
-                .map(HelpWithFeesDetails::getHwfReferenceNumber).orElse("");
+                .map(HelpWithFeesDetails::getHwfReferenceNumber).orElse(null);
     }
 
     private void clearHwFReferenceNumber(CaseData caseData) {
-        if (ofNullable(caseData.getHwFeesDetails()).isPresent() &&
-                ofNullable(caseData.getHwFeesDetails().getHwfReferenceNumber()).isPresent()) {
+        if (ofNullable(caseData.getHwFeesDetails()).isPresent()
+                && ofNullable(caseData.getHwFeesDetails().getHwfReferenceNumber()).isPresent()) {
+            HelpWithFeesDetails hwFeesDetails = caseData.getHwFeesDetails();
+            hwFeesDetails.setHwfReferenceNumber(null);
+            caseData.toBuilder().hwFeesDetails(hwFeesDetails);
+        }
+        if (ofNullable(caseData.getHwFeesDetails())
+                .map(HelpWithFeesDetails::getHwfReferenceNumber).isPresent()) {
             HelpWithFeesDetails hwFeesDetails = caseData.getHwFeesDetails();
             hwFeesDetails.setHwfReferenceNumber(null);
             caseData.toBuilder().hwFeesDetails(hwFeesDetails);

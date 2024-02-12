@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -1235,5 +1236,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private boolean isDateAfterToday(LocalDate date) {
         return nonNull(date)
             && date.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+    }
+
+    @JsonIgnore
+    public FeeType getHwfFeeType() {
+        return Optional.ofNullable(getHwFeesDetails())
+                .map(HelpWithFeesDetails::getHwfFeeType)
+                .orElse(null);
     }
 }
