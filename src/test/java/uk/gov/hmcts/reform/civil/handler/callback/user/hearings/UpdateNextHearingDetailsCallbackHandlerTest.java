@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.ADJOURNED;
@@ -45,7 +47,11 @@ import static uk.gov.hmcts.reform.hmc.model.messaging.HmcStatus.LISTED;
 class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
+    SystemUpdateUserConfiguration userConfig;
+
+    @MockBean
     HearingsService hearingService;
+
     @MockBean
     Time datetime;
 
@@ -56,11 +62,17 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
     private ObjectMapper mapper;
 
     @Nested
-    class AboutToSubmit {
+    class AboutToStart {
         private static final LocalDateTime TODAY = LocalDateTime.of(2024, 1, 22, 0, 0, 0);
 
         @BeforeEach
         void setup() {
+            String mockSystemUsername = "username";
+            String mockSystemUserPassword = "password";
+            when(userConfig.getUserName()).thenReturn(mockSystemUsername);
+            when(userConfig.getPassword()).thenReturn(mockSystemUserPassword);
+            when(userService.getAccessToken(eq(mockSystemUsername), eq(mockSystemUserPassword)))
+                .thenReturn("mock-token");
             when(datetime.now()).thenReturn(TODAY);
         }
 
@@ -151,7 +163,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
             @EnumSource(
                 value = HmcStatus.class,
                 names = {"LISTED", "AWAITING_ACTUALS"})
-            void shouldSetNextHearingDetails_whenNextHearingDateForTodayAndNextHearingDateFortheFutureExists(HmcStatus hmcstatus) {
+            void shouldSetNextHearingDetails_whenNextHearingDateForTodayAndNextHearingDateForTheFutureExists(HmcStatus hmcstatus) {
                 LocalDateTime hearingStartTime = TODAY.plusHours(10);
                 LocalDateTime requestedDateTime = TODAY.plusHours(9);
 

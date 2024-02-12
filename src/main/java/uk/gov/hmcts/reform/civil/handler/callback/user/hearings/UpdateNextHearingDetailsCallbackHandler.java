@@ -9,9 +9,11 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.NextHearingDetails;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
 import uk.gov.hmcts.reform.hmc.model.hearings.CaseHearing;
 import uk.gov.hmcts.reform.hmc.model.hearings.HearingsResponse;
@@ -44,6 +46,8 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
     private static final List<String> UPDATE_HEARING_DATE_STATUSES = List.of(LISTED.name(), AWAITING_ACTUALS.name());
     private static final List<String> CLEAR_HEARING_DATE_STATUSES = List.of(COMPLETED.name(), CANCELLED.name(), ADJOURNED.name());
 
+    private final SystemUpdateUserConfiguration userConfig;
+    private final UserService userService;
     private final HearingsService hearingService;
     private final Time datetime;
     private final ObjectMapper objectMapper;
@@ -64,7 +68,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
         Long caseId = callbackParams.getRequest().getCaseDetails().getId();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = callbackParams.getCaseData().toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        HearingsResponse hearingsResponse = hearingService.getHearings(authToken, caseId, null);
+        HearingsResponse hearingsResponse = getHearings(caseId);
 
         CaseHearing latestHearing = getLatestHearing(hearingsResponse);
 
@@ -85,6 +89,11 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper)).build();
+    }
+
+    private HearingsResponse getHearings(Long caseId) {
+        String userToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
+        return hearingService.getHearings(userToken, caseId, null);
     }
 
     public CaseHearing getLatestHearing(HearingsResponse hearingsResponse) {
