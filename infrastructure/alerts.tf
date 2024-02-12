@@ -33,5 +33,4 @@ module "civil-fail-action-group-slack" {
   short_name             = "Civil_slack"
   email_receiver_name    = "Civil Alerts"
   email_receiver_address = data.azurerm_key_vault_secret.slackmonitoringaddress.value
-  count                 = var.custom_alerts_enabled
 }
