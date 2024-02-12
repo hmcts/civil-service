@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
@@ -47,15 +46,16 @@ class DashboardScenariosServiceTest {
             notificationTemplateRepository,
             notificationRepository,
             taskListService,
-            taskItemTemplateRepository,
-            new TaskItemContentBuilder()
+            taskItemTemplateRepository
         );
 
         when(notificationTemplateRepository.findByName(NOTIFICATION_ISSUE_CLAIM_START))
             .thenReturn(Optional.of(NotificationTemplateEntity.builder()
                                         .role("claimant")
-                                        .enHTML("")
-                                        .cyHTML("")
+                                        .titleEn("")
+                                        .descriptionEn("")
+                                        .titleCy("")
+                                        .descriptionCy("")
                                         .notificationsToBeDeleted(new String[]{NOTIFICATION_DRAFT_CLAIM_START})
                                         .build()));
 
@@ -68,14 +68,14 @@ class DashboardScenariosServiceTest {
 
         when(taskItemTemplateRepository.findByNameAndRole(NOTIFICATION_ISSUE_CLAIM_START, "claimant"))
             .thenReturn(List.of(TaskItemTemplateEntity.builder()
-                                    .taskStatusSequence(new int[]{1,2})
+                                    .taskStatusSequence(new int[]{1, 2})
                                     .name(TASK_ITEM_HEARING_FEE_PAYMENT)
                                     .categoryEn("Hearing")
                                     .categoryCy("Hearing")
-                                    .contentEn("Must use ${url} to make payment for status ${status}")
-                                    .contentCy("Must use ${url} to make payment for status ${status}")
-                                    .titleEn("Pay hearing fee")
-                                    .titleCy("Pay hearing fee")
+                                    .hintTextEn("Must use ${url} to make payment for status ${status}")
+                                    .hintTextCy("Must use ${url} to make payment for status ${status}")
+                                    .taskNameEn("Pay hearing fee")
+                                    .taskNameCy("Pay hearing fee")
                                     .build()));
 
         when(notificationTemplateRepository.findByName(NOTIFICATION_DRAFT_CLAIM_START))
@@ -103,11 +103,11 @@ class DashboardScenariosServiceTest {
         verify(notificationTemplateRepository).findByName(NOTIFICATION_DRAFT_CLAIM_START);
         verify(notificationRepository).save(any(NotificationEntity.class));
         verify(taskListService).saveOrUpdate(any(TaskListEntity.class), eq(TASK_ITEM_HEARING_FEE_PAYMENT));
-//        verify(notificationRepository).deleteByNameAndReferenceAndCitizenRole(
-//            NOTIFICATION_DRAFT_CLAIM_START,
-//            "ccd-case-id",
-//            "claimant"
-//        );
+        verify(notificationRepository).deleteByNameAndReferenceAndCitizenRole(
+            NOTIFICATION_DRAFT_CLAIM_START,
+            "ccd-case-id",
+            "claimant"
+        );
     }
 
 }

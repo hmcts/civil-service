@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationTemplateService;
 
 import java.util.List;
 
@@ -18,45 +18,40 @@ import java.util.List;
 @RequestMapping("/dashboard_notification_template")
 public class NotificationTemplateController {
 
+    private final DashboardNotificationTemplateService dashboardNotificationTemplateService;
+
     @Autowired
-    private NotificationTemplateRepository repository;
+    public NotificationTemplateController(DashboardNotificationTemplateService dashboardNotificationTemplateService) {
+
+        this.dashboardNotificationTemplateService = dashboardNotificationTemplateService;
+    }
 
     @GetMapping("/")
     public List<NotificationTemplateEntity> getAll() {
-        return (List<NotificationTemplateEntity>) repository.findAll();
+        return (List<NotificationTemplateEntity>) dashboardNotificationTemplateService.getAll();
     }
 
     @GetMapping("/{id}")
     public NotificationTemplateEntity getById(@PathVariable Long id) {
-        return repository.findById(id).orElse(null);
+        return dashboardNotificationTemplateService.findById(id).orElse(null);
     }
 
     @PostMapping("/")
     public NotificationTemplateEntity create(@RequestBody NotificationTemplateEntity template) {
-        return repository.save(template);
+        return dashboardNotificationTemplateService.create(template);
     }
 
     @PutMapping("/{id}")
     public NotificationTemplateEntity update(@PathVariable Long id, @RequestBody NotificationTemplateEntity template) {
-        NotificationTemplateEntity existingTemplate = repository.findById(id).orElse(null);
 
-        if (existingTemplate != null) {
-            existingTemplate.setName(template.getName());
-            existingTemplate.setEnHTML(template.getEnHTML());
-            existingTemplate.setCyHTML(template.getCyHTML());
-            existingTemplate.setRole(template.getRole());
-            existingTemplate.setTimeToLive(template.getTimeToLive());
-            existingTemplate.setCreatedAt(template.getCreatedAt());
+        dashboardNotificationTemplateService.update(id, template);
 
-            return repository.save(existingTemplate);
-        } else {
-            return null;
-        }
+        return template;
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        repository.deleteById(id);
+        dashboardNotificationTemplateService.deleteById(id);
     }
 
 }

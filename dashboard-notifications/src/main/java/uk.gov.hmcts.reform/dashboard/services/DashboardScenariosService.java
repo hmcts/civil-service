@@ -26,18 +26,15 @@ public class DashboardScenariosService {
     private final NotificationRepository notificationRepository;
     private final TaskListService taskListService;
     private final TaskItemTemplateRepository taskItemTemplateRepository;
-    private final TaskItemContentBuilder taskItemContentBuilder;
 
     public DashboardScenariosService(NotificationTemplateRepository notificationTemplateRepository,
                                      NotificationRepository notificationRepository,
                                      TaskListService taskListService,
-                                     TaskItemTemplateRepository taskItemTemplateRepository,
-                                     TaskItemContentBuilder taskItemContentBuilder) {
+                                     TaskItemTemplateRepository taskItemTemplateRepository) {
         this.notificationTemplateRepository = notificationTemplateRepository;
         this.notificationRepository = notificationRepository;
         this.taskListService = taskListService;
         this.taskItemTemplateRepository = taskItemTemplateRepository;
-        this.taskItemContentBuilder = taskItemContentBuilder;
     }
 
     public void recordScenarios(String authorisation, String scenarioReference,
@@ -60,20 +57,23 @@ public class DashboardScenariosService {
                 .name(template.getName())
                 .citizenRole(citizenRole)
                 .notificationTemplateEntity(template)
-                .enHTML(stringSubstitutor.replace(template.getEnHTML()))
-                .cyHTML(stringSubstitutor.replace(template.getCyHTML()))
+                .titleCy(stringSubstitutor.replace(template.getTitleCy()))
+                .titleEn(stringSubstitutor.replace(template.getTitleEn()))
+                .descriptionCy(stringSubstitutor.replace(template.getDescriptionCy()))
+                .descriptionEn(stringSubstitutor.replace(template.getDescriptionEn()))
                 .createdAt(OffsetDateTime.now())
                 .build();
 
-            log.info("Task Notification details for scenario {}, id = {}, enHTML = {}, cyHTML = {}",
-                     scenarioReference,
-                     notification.getId(),
-                     notification.getEnHTML(),
-                     notification.getCyHTML()
+            log.info(
+                "Task Notification details for scenario {}, id = {}, enHTML = {}, cyHTML = {}",
+                scenarioReference,
+                notification.getId(),
+                notification.getTitleCy(),
+                notification.getDescriptionEn()
             );
+
             // insert new record in notifications table
             notificationRepository.save(notification);
-
 
             //TODO Create or update taskItem(s) based on task items template for given scenario ref.
 
@@ -87,32 +87,24 @@ public class DashboardScenariosService {
                     .id(UUID.randomUUID())
                     .reference(uniqueCaseIdentifier)
                     .taskItemTemplate(taskItem)
-                    .role(citizenRole)
                     .currentStatus(taskItem.getTaskStatusSequence()[0])
                     .nextStatus(taskItem.getTaskStatusSequence()[1])
-                    .taskItemCy(taskItemContentBuilder.buildTaskItemContent(
-                        stringSubstitutor,
-                        taskItem.getCategoryCy(),
-                        taskItem.getContentCy(),
-                        taskItem.getTitleCy()
-                    ))
-                    .taskItemEn(taskItemContentBuilder.buildTaskItemContent(
-                        stringSubstitutor,
-                        taskItem.getCategoryEn(),
-                        taskItem.getContentEn(),
-                        taskItem.getTitleEn()
-                    ))
+                    .taskNameEn(stringSubstitutor.replace(taskItem.getTaskNameEn()))
+                    .hintTextEn(stringSubstitutor.replace(taskItem.getHintTextEn()))
+                    .taskNameCy(stringSubstitutor.replace(taskItem.getTaskNameCy()))
+                    .hintTextCy(stringSubstitutor.replace(taskItem.getHintTextCy()))
+
                     .build();
-                log.info("Task Item details for scenario {}, id = {}, TaskItemEn = {}, TaskItemCy = {}",
-                         scenarioReference,
-                         taskItemEntity.getId(),
-                         taskItemEntity.getTaskItemEn(),
-                         taskItemEntity.getTaskItemCy()
+                log.info(
+                    "Task Item details for scenario {}, id = {}, TaskItemEn = {}, TaskItemCy = {}",
+                    scenarioReference,
+                    taskItemEntity.getId(),
+                    taskItemEntity.getTaskNameEn(),
+                    taskItemEntity.getHintTextEn()
                 );
                 taskListService.saveOrUpdate(taskItemEntity, taskItem.getName());
 
             });
-
 
             //TODO Delete old notifications as notification template says for scenario ref (if exist for case ref)
 
@@ -133,5 +125,4 @@ public class DashboardScenariosService {
             });
         });
     }
-
 }

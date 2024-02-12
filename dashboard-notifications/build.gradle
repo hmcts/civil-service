@@ -1,3 +1,21 @@
+
+def versions = [
+  junit              : '5.10.0',
+  junitPlatform      : '1.10.0',
+  testcontainers: '1.17.6',
+  lombok             : '1.18.26'
+]
+
+ext.libraries = [
+  junit5: [
+    "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
+    "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",
+    "org.junit.jupiter:junit-jupiter-params:${versions.junit}",
+    "org.junit.platform:junit-platform-commons:${versions.junitPlatform}",
+    "org.junit.platform:junit-platform-engine:${versions.junitPlatform}"
+  ]
+]
+
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation "org.hibernate:hibernate-core:5.6.10.Final"
@@ -12,7 +30,10 @@ dependencies {
   compileOnly 'org.projectlombok:lombok'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   annotationProcessor 'org.projectlombok:lombok'
+  testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
+  testImplementation libraries.junit5
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
 }
 bootJar.enabled = false
 group = 'uk.gov.hmcts.reform.dashboard'

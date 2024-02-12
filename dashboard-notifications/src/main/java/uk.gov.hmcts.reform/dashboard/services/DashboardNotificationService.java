@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class DashboardNotificationService {
 
     private final NotificationRepository notificationRepository;
@@ -34,15 +36,18 @@ public class DashboardNotificationService {
         NotificationEntity existingNotification = notificationRepository.findById(id).orElse(null);
 
         if (existingNotification != null) {
-            existingNotification.setNotificationTemplateEntity(notification.getNotificationTemplateEntity());
-            existingNotification.setReference(notification.getReference());
-            existingNotification.setEnHTML(notification.getEnHTML());
-            existingNotification.setCyHTML(notification.getCyHTML());
-            existingNotification.setParams(notification.getParams());
-            existingNotification.setCreatedBy(notification.getCreatedBy());
-            existingNotification.setCreatedAt(notification.getCreatedAt());
-            existingNotification.setUpdatedBy(notification.getUpdatedBy());
-            existingNotification.setUpdatedOn(notification.getUpdatedOn());
+            existingNotification.builder().notificationTemplateEntity(notification.getNotificationTemplateEntity())
+            .reference(notification.getReference())
+            .titleEn(notification.getTitleEn())
+            .descriptionEn(notification.getDescriptionEn())
+            .titleCy(notification.getTitleCy())
+            .descriptionCy(notification.getDescriptionCy())
+            .params(notification.getParams())
+            .citizenRole(notification.getCitizenRole())
+            .createdBy(notification.getCreatedBy())
+            .createdAt(notification.getCreatedAt())
+            .updatedBy(notification.getUpdatedBy())
+            .updatedOn(notification.getUpdatedOn());
 
             return notificationRepository.save(existingNotification);
         } else {
@@ -50,7 +55,7 @@ public class DashboardNotificationService {
         }
     }
 
-    public void delete(UUID id) {
+    public void deleteById(UUID id) {
         notificationRepository.deleteById(id);
     }
 }

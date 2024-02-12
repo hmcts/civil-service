@@ -1,24 +1,21 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
-import lombok.AllArgsConstructor;
 import org.hibernate.annotations.Type;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 @lombok.Data
-@lombok.Builder
-@AllArgsConstructor
+@lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
+@lombok.AllArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications_Templates", schema = "dbs")
 public class NotificationTemplateEntity implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = -7113029898212912034L;
 
     @Id
@@ -29,8 +26,10 @@ public class NotificationTemplateEntity implements Serializable {
     private String name;
     @Type(type = "com.vladmihalcea.hibernate.type.array.StringArrayType")
     private String[] notificationsToBeDeleted;
-    private String enHTML;
-    private String cyHTML;
+    private String titleEn;
+    private String titleCy;
+    private String descriptionEn;
+    private String descriptionCy;
     private Date createdAt;
     private String timeToLive;
 }

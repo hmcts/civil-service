@@ -11,5 +11,7 @@ import java.util.Optional;
 @Repository
 public interface NotificationTemplateRepository extends CrudRepository<NotificationTemplateEntity, Long> {
 
+    Optional<NotificationTemplateEntity> findById(Long id);
+
     Optional<NotificationTemplateEntity> findByName(String scenarioReference);
 }
