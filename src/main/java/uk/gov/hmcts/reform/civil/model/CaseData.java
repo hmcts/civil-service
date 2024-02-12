@@ -92,6 +92,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
@@ -367,6 +369,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final String smallClaimHearingInterpreterDescription;
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
     private final YesOrNo specDefenceAdmittedRequired;
+
+    private final MediationContactInformation resp1MediationContactInfo;
+    private final MediationContactInformation resp2MediationContactInfo;
+    private final MediationAvailability resp1MediationAvailability;
+    private final MediationAvailability resp2MediationAvailability;
 
     private final String additionalInformationForJudge;
     private final String applicantAdditionalInformationForJudge;
@@ -952,9 +959,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isPartAdmitImmediatePaymentClaimSettled() {
         return (isPartAdmitClaimSpec()
-                && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
-                && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
-                && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
+            && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
+            && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
+            && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
     }
 
     @JsonIgnore
@@ -1058,8 +1065,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public Optional<Element<CaseDocument>> getSDODocument() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                   .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.SDO_ORDER)).findAny();
         }
         return Optional.empty();
     }
@@ -1152,8 +1159,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isTranslatedDocumentUploaded() {
         if (getSystemGeneratedCaseDocuments() != null) {
             return getSystemGeneratedCaseDocuments().stream()
-                   .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
-                   .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
+                .filter(systemGeneratedCaseDocument -> systemGeneratedCaseDocument.getValue()
+                    .getDocumentType().equals(DocumentType.DEFENCE_TRANSLATED_DOCUMENT)).findAny().isPresent();
         }
         return false;
     }
