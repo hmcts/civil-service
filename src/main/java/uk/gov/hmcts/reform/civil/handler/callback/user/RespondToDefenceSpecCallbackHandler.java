@@ -87,6 +87,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
+import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
@@ -417,21 +418,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         // must always move to in mediation for small claims when claimant proceeds
-        if (shouldMoveToInMediationState(caseData)) {
+        if (shouldMoveToInMediationState(
+            caseData, featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))) {
             response.state(CaseState.IN_MEDIATION.name());
         }
 
         return response.build();
-    }
-
-    private boolean shouldMoveToInMediationState(CaseData caseData) {
-        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
-            if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
-                return YES.equals(caseData.getApplicant1ProceedWithClaim())
-                    || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1());
-            }
-        }
-        return false;
     }
 
     private void updateDQCourtLocations(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder,
