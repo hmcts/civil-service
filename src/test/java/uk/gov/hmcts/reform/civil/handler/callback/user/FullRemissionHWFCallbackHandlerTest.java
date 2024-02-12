@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
@@ -25,12 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private FullRemissionHWFCallbackHandler handler;
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper;
 
     @BeforeEach
     void setUp() {
-        handler = new FullRemissionHWFCallbackHandler(new ObjectMapper());
+        mapper = new ObjectMapper();
+        handler = new FullRemissionHWFCallbackHandler(mapper);
     }
 
     @Test
@@ -68,7 +67,7 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
             //Then
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHwFeesDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(30000));
-            assertThat(updatedData.getHearingFeeAmount()).isEqualTo(BigDecimal.ZERO);
+            assertThat(updatedData.getCalculatedHearingFeeInPence()).isEqualTo(BigDecimal.ZERO);
         }
     }
 }
