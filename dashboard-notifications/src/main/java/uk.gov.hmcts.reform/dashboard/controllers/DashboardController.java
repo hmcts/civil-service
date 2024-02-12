@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dashboard.controller;
+package uk.gov.hmcts.reform.dashboard.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
-import uk.gov.hmcts.reform.dashboard.data.NotificationEntity;
-import uk.gov.hmcts.reform.dashboard.data.TaskListEntity;
-import uk.gov.hmcts.reform.dashboard.service.DashboardNotificationService;
-import uk.gov.hmcts.reform.dashboard.service.TaskListService;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
+import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 import java.util.Optional;

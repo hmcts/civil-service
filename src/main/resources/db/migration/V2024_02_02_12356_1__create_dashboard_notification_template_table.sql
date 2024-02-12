@@ -5,9 +5,12 @@ CREATE SEQUENCE IF NOT EXISTS dbs.dashboard_notifications_Templates_id_seq START
 CREATE TABLE IF NOT EXISTS dbs.dashboard_notifications_Templates (
  id BIGINT PRIMARY KEY DEFAULT nextval('dbs.dashboard_notifications_Templates_id_seq'),
  template_name VARCHAR(256),
- en_HTML VARCHAR(256),
- cy_HTML VARCHAR(256),
+ title_En VARCHAR(256),
+ title_Cy VARCHAR(256),
+ description_En VARCHAR(256),
+ description_Cy VARCHAR(256),
  notification_role VARCHAR(256),
+ notifications_To_Be_Deleted VARCHAR(256)[],
  time_to_live VARCHAR(256),
  created_At timestamp without time zone DEFAULT now() NOT NULL
 );
