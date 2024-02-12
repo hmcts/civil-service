@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class HelpWithFeesDetails {
-    
+
     private String hwfReferenceNumber;
     private FeeType hwfFeeType;
 }
