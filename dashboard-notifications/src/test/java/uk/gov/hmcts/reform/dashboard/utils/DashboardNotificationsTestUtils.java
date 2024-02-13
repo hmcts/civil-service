@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.dashboard.utils;
 
+import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
+import uk.gov.hmcts.reform.dashboard.model.Notification;
 import uk.gov.hmcts.reform.dashboard.model.TaskList;
 
 import java.util.ArrayList;
@@ -27,5 +29,18 @@ public  class DashboardNotificationsTestUtils {
                                    .taskItemTemplate(TaskItemTemplateEntity.builder().id(Long.valueOf(123)).taskNameCy("TaskNameCy").taskNameEn("TaskNameEn")
                                                          .taskOrder(1).hintTextCy("HintCY").hintTextEn("HintEn").role("Defendant").categoryCy("CategoryCy").categoryEn("CategoryEn").build()).build());
         return taskListEntityList;
+    }
+
+    public static List<NotificationEntity> getNotificationEntityList(){
+
+        List<NotificationEntity> notificationEntityList = new ArrayList<>();
+        notificationEntityList.add(NotificationEntity.builder().id(uuid).descriptionEn("desc").descriptionCy("descCy").build());
+        return notificationEntityList;
+    }
+
+    public static List<Notification> getNotificationList(){
+        List<Notification> notificationList = new ArrayList<>();
+        notificationList.add(Notification.builder().id(uuid).descriptionEn("desc").descriptionCy("descCy").build());
+        return notificationList;
     }
 }
