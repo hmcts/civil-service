@@ -100,6 +100,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateRespondentCopies_WhenAboutToStartIsInvoked() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -116,6 +117,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenRespondentRespondsAgain1v2SameLegalRep() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -136,6 +138,31 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
+                .respondent2AcknowledgeNotificationDate(null)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .addRespondent2(YES)
+                .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2Represented(YES)
+                .respondent2OrgRegistered(YES)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsExactly("Defendant acknowledgement has already been recorded");
+        }
+
+        @Test
+        void shouldReturnError_whenRespondentRespondsAgain1v2LipAndLegalRep() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(false);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .respondent1(PartyBuilder.builder().individual().build())
+                .respondent1Represented(NO)
                 .respondent2(PartyBuilder.builder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
@@ -152,6 +179,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldNotError_WhenNoRespondent2() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -524,6 +552,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedResponse_whenInvoked() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
 
