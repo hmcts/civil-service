@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
+import uk.gov.hmcts.reform.dashboard.model.Notification;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -58,5 +60,15 @@ public class DashboardNotificationService {
 
     public void deleteById(UUID id) {
         notificationRepository.deleteById(id);
+    }
+
+    public List<Notification> getNotifications(String ccdCaseIdentifier, String roleType) {
+
+        List<NotificationEntity> notificationEntityList = notificationRepository
+            .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
+        return notificationEntityList.stream().map(
+            p -> new Notification(
+                p.getId(), p.getTitleEn(), p.getTitleCy(), p.getDescriptionEn(), p.getDescriptionCy()))
+            .collect(Collectors.toList());
     }
 }

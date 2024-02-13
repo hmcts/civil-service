@@ -23,7 +23,7 @@ public class TaskListService {
 
     public List<TaskList> getTaskList(String ccdCaseIdentifier, String roleType) {
 
-      List<TaskListEntity>  taskListEntityList =  taskListRepository.findByReferenceAndTaskItemTemplateRole(ccdCaseIdentifier, roleType);
+        List<TaskListEntity>  taskListEntityList =  taskListRepository.findByReferenceAndTaskItemTemplateRole(ccdCaseIdentifier, roleType);
 
         List<TaskList> taskList = taskListEntityList.stream()
             .map(p -> TaskList.from(p))
