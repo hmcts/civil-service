@@ -13,7 +13,7 @@ import java.util.Date;
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity
-@Table(name = "dashboard_notifications_Templates", schema = "dbs")
+@Table(name = "dashboard_notifications_templates", schema = "dbs")
 public class NotificationTemplateEntity implements Serializable {
 
     private static final long serialVersionUID = -7113029898212912034L;

@@ -26,7 +26,7 @@ public class NotificationEntity implements Serializable {
     @NotNull
     private UUID id;
     @ManyToOne
-    @JoinColumn(name = "notifications_Templates_id", referencedColumnName = "id")
+    @JoinColumn(name = "dashboard_notifications_templates_id", referencedColumnName = "id")
     private NotificationTemplateEntity notificationTemplateEntity;
     private String reference;
     @Column(name = "notification_name")
