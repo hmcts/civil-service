@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.reform.civil.handler.HmcMessageHandler;
+import uk.gov.hmcts.reform.civil.handler.ReviewHearingExceptionHandler;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 
@@ -58,7 +58,7 @@ public class ServiceBusConfiguration {
     private int threadCount;
 
     private final ObjectMapper objectMapper;
-    private final HmcMessageHandler handler;
+    private final ReviewHearingExceptionHandler handler;
     private final FeatureToggleService featureToggleService;
 
     @Bean
@@ -103,7 +103,7 @@ public class ServiceBusConfiguration {
                                 ofNullable(hmcMessage.getHearingUpdate()).map(update -> update.getHmcStatus().name())
                                         .orElse("-")
                         );
-                        exceptionEventTriggered = handler.handleMessage(hmcMessage);
+                        exceptionEventTriggered = handler.handleExceptionEvent(hmcMessage);
                         if (exceptionEventTriggered) {
                             return receiveClient.completeAsync(message.getLockToken());
                         }

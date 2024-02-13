@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 
 @Service
@@ -25,7 +24,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo
 public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS =  List.of(
-        UPDATE_NEXT_HEARING_DETAILS,
         UpdateNextHearingInfo
     );
 
