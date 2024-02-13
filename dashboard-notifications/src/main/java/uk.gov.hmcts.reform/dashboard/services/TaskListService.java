@@ -24,10 +24,10 @@ public class TaskListService {
         return taskListRepository.findByReferenceAndTaskItemTemplateRole(ccdCaseIdentifier, roleType);
     }
 
-    public TaskListEntity saveOrUpdate(TaskListEntity taskListEntity, String templateId) {
+    public TaskListEntity saveOrUpdate(TaskListEntity taskListEntity, String templateName) {
         Optional<TaskListEntity> existingEntity = taskListRepository
-            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateId(
-            taskListEntity.getReference(), taskListEntity.getTaskItemTemplate().getRole(), templateId);
+            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
+            taskListEntity.getReference(), taskListEntity.getTaskItemTemplate().getRole(), templateName);
 
         TaskListEntity beingUpdated = taskListEntity;
         if (existingEntity.isPresent()) {

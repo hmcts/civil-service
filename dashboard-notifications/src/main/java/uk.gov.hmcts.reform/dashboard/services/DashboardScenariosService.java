@@ -94,7 +94,10 @@ public class DashboardScenariosService {
                     .hintTextEn(stringSubstitutor.replace(taskItem.getHintTextEn()))
                     .taskNameCy(stringSubstitutor.replace(taskItem.getTaskNameCy()))
                     .hintTextCy(stringSubstitutor.replace(taskItem.getHintTextCy()))
-
+                    //TODO work on messageParams for specific template
+                    .messageParm(scenarioRequestParams.getParams())
+                    .createdAt(OffsetDateTime.now())
+                    .updatedAt(OffsetDateTime.now())
                     .build();
                 log.info(
                     "Task Item details for scenario {}, id = {}, TaskItemEn = {}, TaskItemCy = {}",

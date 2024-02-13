@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
@@ -22,7 +20,6 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
 
     public static final String NOTICE_HEARING_FEE_PAYMENT_REQUIRED = "notice-hearing-fee-payment-required";
     private static final String DASHBOARD_CREATE_SCENARIO_URL = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
-
 
     @Test
     void should_create_scenario() throws Exception {
