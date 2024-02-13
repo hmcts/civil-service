@@ -38,15 +38,6 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenAutomatedHearingNoticeEnabledInvoked(Boolean toggleStat) {
-        var hearingAndListingKey = "ahn";
-        givenToggle(hearingAndListingKey, toggleStat);
-
-        assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(false);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsCaseFlagsEnabledInvoked(Boolean toggleStat) {
         var caseFlagsKey = "case-flags";
         givenToggle(caseFlagsKey, toggleStat);
