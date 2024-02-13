@@ -73,7 +73,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             PARTY_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }
 

@@ -73,6 +73,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
         private static final String ORGANISATION_NAME = "Org Name";
         private static final String DEFENDANT_PARTY_NAME = "Lets party";
         private static final String REFERENCE_NUMBER = "8372942374";
+        private static final Long CCD_REFERENCE_NUMBER = 123456789L;
         private static final String EMAIL_TEMPLATE = "test-notification-id";
         private static final String CARM_MAIL_TEMPLATE = "carm-test-notification-id";
 
@@ -81,7 +82,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                                                                        CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER);
         private static final Map<String, String> CARM_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                                                                        PARTY_NAME, DEFENDANT_PARTY_NAME,
-                                                                       CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER);
+                                                                       CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
 
         @BeforeEach
         void setUp() {
@@ -122,6 +123,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
                 .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
                 .legacyCaseReference(REFERENCE_NUMBER)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .mediation(Mediation.builder()

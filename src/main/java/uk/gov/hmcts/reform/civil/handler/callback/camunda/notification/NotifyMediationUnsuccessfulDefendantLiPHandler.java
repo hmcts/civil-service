@@ -59,7 +59,7 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
 
     public Map<String, String> addPropertiesCARM(CaseData caseData) {
         return Map.of(PARTY_NAME, caseData.getRespondent1().getPartyName(),
-                      CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference()
+                      CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }
 

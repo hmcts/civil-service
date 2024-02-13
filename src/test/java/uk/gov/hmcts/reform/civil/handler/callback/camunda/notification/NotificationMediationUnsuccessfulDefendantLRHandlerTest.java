@@ -68,13 +68,13 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     private static final String ORGANISATION_NAME = "Org Name";
     private static final String EMAIL_TEMPLATE = "test-notification-id";
     private static final String APPLICANT_PARTY_NAME = "Lets party";
-    private static final String REFERENCE_NUMBER = "8372942374";
+    private static final Long CCD_REFERENCE_NUMBER = 123456789L;
     private static final String CLAIMANT_EMAIL_ADDRESS = "applicantemail@hmcts.net";
     private static final String DEFENDANT_1_EMAIL_ADDRESS = "defendant1email@hmcts.net";
     private static final String DEFENDANT_2_EMAIL_ADDRESS = "defendant2email@hmcts.net";
     private static final Map<String, String> CARM_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
                                                                         PARTY_NAME, APPLICANT_PARTY_NAME,
-                                                                        CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER);
+                                                                        CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
 
     @BeforeEach
     void setUp() {
@@ -91,7 +91,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
             .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
-            .legacyCaseReference(REFERENCE_NUMBER)
+            .ccdCaseReference(CCD_REFERENCE_NUMBER)
             .addApplicant2(YesOrNo.NO)
             .addRespondent2(YesOrNo.NO)
             .mediation(Mediation.builder()
@@ -121,7 +121,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
             .respondentSolicitor2EmailAddress(DEFENDANT_2_EMAIL_ADDRESS)
-            .legacyCaseReference(REFERENCE_NUMBER)
+            .ccdCaseReference(CCD_REFERENCE_NUMBER)
             .addApplicant2(YesOrNo.NO)
             .addRespondent2(YesOrNo.NO)
             .mediation(Mediation.builder()
@@ -151,7 +151,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
             .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
             .respondentSolicitor2EmailAddress(DEFENDANT_2_EMAIL_ADDRESS)
-            .legacyCaseReference(REFERENCE_NUMBER)
+            .ccdCaseReference(CCD_REFERENCE_NUMBER)
             .addApplicant2(YesOrNo.NO)
             .addRespondent2(YesOrNo.NO)
             .mediation(Mediation.builder()

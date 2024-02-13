@@ -69,6 +69,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
         private static final String CLAIMANT_ORG_NAME = "Org Name";
         private static final String DEFENDANT_PARTY_NAME = "Lets party";
         private static final String REFERENCE_NUMBER = "8372942374";
+        private static final Long CCD_REFERENCE_NUMBER = 123456789L;
         private static final String EMAIL_TEMPLATE = "test-notification-id";
         private static final String CARM_EMAIL_TEMPLATE = "carm-test-notification-id";
         private static final String BILINGUAL_EMAIL_TEMPLATE = "test-notification-bilingual-id";
@@ -83,7 +84,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
 
         private static final Map<String, String> CARM_PROPERTY_MAP = Map.of(
             PARTY_NAME, DEFENDANT_PARTY_NAME,
-            CLAIM_REFERENCE_NUMBER, REFERENCE_NUMBER
+            CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString()
         );
 
         @BeforeEach
@@ -103,6 +104,7 @@ class NotifyMediationUnsuccessfulDefendantLiPHandlerTest extends BaseCallbackHan
                     DEFENDANT_EMAIL_ADDRESS).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
                 .legacyCaseReference(REFERENCE_NUMBER)
+                .ccdCaseReference(CCD_REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .mediation(Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(List.of(PARTY_WITHDRAWS)).build())
