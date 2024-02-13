@@ -57,7 +57,7 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             //Then
             CaseData data = getCaseData(response);
             Assertions.assertThat(data.getCaseDataLiP().getHelpWithFees().getHelpWithFeesReferenceNumber()).isEqualTo("7890");
-            Assertions.assertThat(data.getClaimIssuedHwfDetails().getHwfReferenceNumber()).isEqualTo(null);
+            Assertions.assertThat(data.getClaimIssuedHwfDetails().getHwfReferenceNumber()).isNull();
         }
 
         @Test
@@ -76,7 +76,7 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             //Then
             CaseData data = getCaseData(response);
             Assertions.assertThat(data.getHearingHelpFeesReferenceNumber()).isEqualTo("78905185430");
-            Assertions.assertThat(data.getHearingHwfDetails().getHwfReferenceNumber()).isEqualTo(null);
+            Assertions.assertThat(data.getHearingHwfDetails().getHwfReferenceNumber()).isNull();
         }
     }
 
