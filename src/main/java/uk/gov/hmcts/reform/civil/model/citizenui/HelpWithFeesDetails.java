@@ -14,5 +14,4 @@ public class HelpWithFeesDetails {
 
     private String noRemissionDetails;
     private NoRemissionDetailsSummary noRemissionDetailsSummary;
-
 }

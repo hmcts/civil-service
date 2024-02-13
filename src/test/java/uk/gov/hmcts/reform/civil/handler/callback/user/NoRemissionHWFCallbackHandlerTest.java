@@ -22,10 +22,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private NoRemissionHWFCallbackHandler handler;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         handler = new NoRemissionHWFCallbackHandler(new ObjectMapper());
+        objectMapper = new ObjectMapper();
     }
 
     @Test
@@ -48,7 +50,6 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            ObjectMapper objectMapper = new ObjectMapper();
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getClaimIssuedHwfDetails()).isEqualTo(hwfeeDetails);
         }
@@ -66,7 +67,6 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
-            ObjectMapper objectMapper = new ObjectMapper();
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingHwfDetails()).isEqualTo(hwfeeDetails);
         }
