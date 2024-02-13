@@ -5,8 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.context.jdbc.Sql;
 
+import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
@@ -28,7 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@Sql("/scripts/dashboardNotifications/get_task_list_data.sql")
+
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Testcontainers
 public class DashboardControllerTest extends BaseIntegrationTest {
 
     @Autowired
@@ -78,6 +82,7 @@ public class DashboardControllerTest extends BaseIntegrationTest {
     class GetTests {
         @Test
         @SneakyThrows
+        @Sql("/scripts/dashboardNotifications/get_task_list_data.sql")
         void shouldReturnTaskListForGiveCaseReferenceAndRole() {
 
             doGet(BEARER_TOKEN, getTaskListUrl,  "123","defendant")
