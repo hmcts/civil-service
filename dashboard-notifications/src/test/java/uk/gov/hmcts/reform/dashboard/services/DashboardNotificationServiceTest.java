@@ -33,8 +33,10 @@ public class DashboardNotificationServiceTest {
         @Test
         void shouldReturnOkWhenDeletingEntity() {
 
+            //when
             dashboardNotificationService.deleteById(id);
 
+            //then
             verify(notificationRepository).deleteById(id);
         }
     }

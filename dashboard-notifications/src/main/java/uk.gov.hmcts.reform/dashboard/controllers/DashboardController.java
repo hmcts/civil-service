@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
-import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
+import uk.gov.hmcts.reform.dashboard.model.TaskList;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
@@ -44,7 +44,7 @@ public class DashboardController {
     @GetMapping(path = {
         "taskList/{ccd-case-identifier}/role/{role-type}",
     })
-    public ResponseEntity<Optional<List<TaskListEntity>>> getTaskListByCaseIdentifierAndRole(
+    public ResponseEntity<List<TaskList>> getTaskListByCaseIdentifierAndRole(
         @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
         @PathVariable("role-type") String roleType,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation

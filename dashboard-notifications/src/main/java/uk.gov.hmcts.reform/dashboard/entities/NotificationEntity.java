@@ -44,20 +44,13 @@ public class NotificationEntity implements Serializable {
     @Column(name = "citizen_role", length = 256)
     private String citizenRole;
 
-    @Size(max = 256)
-    @Column(name = "en_html", length = 256)
-    private String enHtml;
+    private String titleEn;
+    private String titleCy;
+    private String descriptionEn;
+    private String descriptionCy;
 
-    @Size(max = 256)
-    @Column(name = "cy_html", length = 256)
-    private String cyHtml;
-
-    @Size(max = 256)
-    @Column(name = "message_param", length = 256)
-    private String messageParam;
-
-    @Size(max = 256)
-    @Column(name = "created_by", length = 256)
+    @Column(name = "message_param")
+    private String params;
     private String createdBy;
 
     @NotNull
