@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.dashboard.utils;
 
+import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 
@@ -43,5 +45,18 @@ public class DashboardNotificationsTestUtils {
                                                          .build())
                                    .build());
         return taskListEntityList;
+    }
+
+    public static List<NotificationEntity> getNotificationEntityList() {
+
+        List<NotificationEntity> notificationEntityList = new ArrayList<>();
+        notificationEntityList.add(NotificationEntity.builder().id(uuid).descriptionEn("desc").descriptionCy("descCy").build());
+        return notificationEntityList;
+    }
+
+    public static List<Notification> getNotificationList() {
+        List<Notification> notificationList = new ArrayList<>();
+        notificationList.add(Notification.builder().id(uuid).descriptionEn("desc").descriptionCy("descCy").build());
+        return notificationList;
     }
 }

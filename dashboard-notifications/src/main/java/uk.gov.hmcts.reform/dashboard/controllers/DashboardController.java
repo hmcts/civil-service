@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
@@ -83,6 +84,24 @@ public class DashboardController {
         var notificationResponse = dashboardNotificationService.getNotification(uuid);
 
         return new ResponseEntity<>(notificationResponse, HttpStatus.OK);
+    }
+
+    @GetMapping(path = {
+        "notifications/{ccd-case-identifier}/role/{role-type}",
+    })
+    public ResponseEntity<List<Notification>> getNotificationsByCaseIdentifierAndRole(
+        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
+        @PathVariable("role-type") String roleType,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info(
+            "Received ccd-case-identifier: {}, role-type : {}",
+            ccdCaseIdentifier, roleType
+        );
+
+        var notificationsResponse = dashboardNotificationService.getNotifications(ccdCaseIdentifier, roleType);
+
+        return new ResponseEntity<>(notificationsResponse, HttpStatus.OK);
     }
 
     @DeleteMapping(path = {
