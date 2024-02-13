@@ -217,19 +217,22 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     @ParameterizedTest
     @CsvSource({
         // listing/relisting,case state
-        "LISTING,HEARING_READINESS",
-        "RELISTING,PREPARE_FOR_HEARING_CONDUCT_HEARING"
+        "LISTING,SMALL_CLAIMS,HEARING_READINESS",
+        "RELISTING,SMALL_CLAIMS,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "LISTING,OTHER,PREPARE_FOR_HEARING_CONDUCT_HEARING",
+        "RELISTING,OTHER,PREPARE_FOR_HEARING_CONDUCT_HEARING"
     })
-    void shouldSetHearingReadinessStateOnListing_whenAboutToSubmit(String listingType, String expectedStateStr) {
+    void shouldSetHearingReadinessStateOnListing_whenAboutToSubmit(String listingType, String hearingNoticeType, String expectedStateStr) {
         // Given: a case either in listing or relisting
         ListingOrRelisting listingOrRelisting = ListingOrRelisting.valueOf(listingType);
+        HearingNoticeList hearingNoticeList = HearingNoticeList.valueOf(hearingNoticeType);
         CaseState expectedState = CaseState.valueOf(expectedStateStr);  // converting the string would be redundant but ensures there are no typos
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .addRespondent2(NO)
             .hearingDate(time.now().toLocalDate().plusWeeks(2))
             .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
-            .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
+            .hearingNoticeList(hearingNoticeList)
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .listingOrRelisting(listingOrRelisting)
             .build();

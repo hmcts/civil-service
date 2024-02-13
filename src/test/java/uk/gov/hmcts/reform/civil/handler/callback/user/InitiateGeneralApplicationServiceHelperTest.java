@@ -427,6 +427,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                        .getOrganisationIdentifier()).isEqualTo("345");
         assertThat(result.getApplicantPartyName()).isEqualTo("Applicant1");
         assertThat(result.getGaApplicantDisplayName()).isEqualTo("Applicant1 - Claimant");
+        assertThat(result.getLitigiousPartyID()).isEqualTo("001");
     }
 
     @Test
@@ -479,6 +480,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
 
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent1");
         assertThat(result.getGaApplicantDisplayName()).isEqualTo("Respondent1 - Defendant");
+        assertThat(result.getLitigiousPartyID()).isEqualTo("002");
     }
 
     @Test
@@ -544,6 +546,7 @@ public class InitiateGeneralApplicationServiceHelperTest {
                 .stream().filter(e -> org.equals(e.getValue().getOrganisationIdentifier()))
                 .count()).isEqualTo(1));
         assertThat(result.getApplicantPartyName()).isEqualTo("Respondent2");
+        assertThat(result.getLitigiousPartyID()).isEqualTo("003");
     }
 
     public CaseData getTestCaseData(CaseData caseData, boolean respondentExits) {
