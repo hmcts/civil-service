@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +24,14 @@ import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtil
 
 @ExtendWith(MockitoExtension.class)
 class DashboardNotificationServiceTest {
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
+
+import java.util.UUID;
+
+import static org.mockito.Mockito.verify;
+
+@ExtendWith(MockitoExtension.class)
+public class DashboardNotificationServiceTest {
 
     @Mock
     private NotificationRepository notificationRepository;
@@ -48,4 +58,19 @@ class DashboardNotificationServiceTest {
         assertThat(actual).isEqualTo(getNotificationList());
     }
 
+    private final UUID id = UUID.randomUUID();
+
+    @Nested
+    class DeleteTests {
+
+        @Test
+        void shouldReturnOkWhenDeletingEntity() {
+
+            //when
+            dashboardNotificationService.deleteById(id);
+
+            //then
+            verify(notificationRepository).deleteById(id);
+        }
+    }
 }
