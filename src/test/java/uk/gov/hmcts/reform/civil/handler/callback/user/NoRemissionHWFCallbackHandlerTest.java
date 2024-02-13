@@ -36,12 +36,13 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmitCallback {
         @Test
-        void shouldUpdateNoRemissionData() {
+        void shouldUpdateNoRemissionDataForClaimFee() {
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder().noRemissionDetails("no remission")
-                .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).hwfFeeType(
-                    FeeType.CLAIMISSUED).build();
+                .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
             CaseData caseData = CaseData.builder()
-                .hwFeesDetails(hwfeeDetails)
+                .claimIssuedHwfDetails(hwfeeDetails)
+                .hwfFeeType(
+                    FeeType.CLAIMISSUED)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
@@ -49,7 +50,25 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             ObjectMapper objectMapper = new ObjectMapper();
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getHwFeesDetails()).isEqualTo(hwfeeDetails);
+            assertThat(updatedData.getClaimIssuedHwfDetails()).isEqualTo(hwfeeDetails);
+        }
+
+        @Test
+        void shouldUpdateNoRemissionDataForHearingFee() {
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder().noRemissionDetails("no remission")
+                .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
+            CaseData caseData = CaseData.builder()
+                .hearingHwfDetails(hwfeeDetails)
+                .hwfFeeType(
+                    FeeType.HEARING)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            ObjectMapper objectMapper = new ObjectMapper();
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getHearingHwfDetails()).isEqualTo(hwfeeDetails);
         }
     }
 }
