@@ -86,9 +86,7 @@ resource "azurerm_function_app" "civil-camunda-stuck-alert-function-app" {
     linux_fx_version = "python|3.10"
   }
 
-  tags = var.common_tags + {
-    expiresAfter = "3000-01-01"
-  }
+  tags = merge(var.common_tags, { expiresAfter = "3000-01-01" })
 
   identity {
     type = "UserAssigned"
