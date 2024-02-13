@@ -32,12 +32,11 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.PartialRemissionHW
 @ExtendWith(MockitoExtension.class)
 public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    private ObjectMapper objectMapper;
     private PartialRemissionHWFCallbackHandler handler;
 
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
+        var objectMapper = new ObjectMapper();
         handler = new PartialRemissionHWFCallbackHandler(objectMapper);
     }
 
@@ -50,56 +49,62 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
     class AboutToSubmitCallback {
 
         @Test
-        void shouldUpdatePartialRemissionHwfClaimFeeWhenHwfFeeTypeIsClaimIssued() {
+        void shouldCallPartialRemissionHwfEvent() {
             CaseData caseData = CaseData.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-                .hwFeesDetails(HelpWithFeesDetails.builder().hwfFeeType(FeeType.CLAIMISSUED)
-                                   .remissionAmount(BigDecimal.valueOf(4000))
-                                   .build())
+                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
+                                           .remissionAmount(BigDecimal.valueOf(1000))
+                                           .build())
+                .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
+
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then
-            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getHwFeesDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(4000));
-            assertThat(updatedData.getCalculatedClaimFeeInPence()).isEqualTo(BigDecimal.valueOf(6000));
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).isNotNull();
         }
-
-        @Test
-        void shouldUpdatePartialRemissionHwfHearingFeeWhenHwfFeeTypeIsHearing() {
-            //Given
-            CaseData caseData = CaseData.builder()
-                .hearingReferenceNumber("000HN001")
-                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-                .hwFeesDetails(HelpWithFeesDetails.builder().hwfFeeType(FeeType.HEARING)
-                                   .remissionAmount(BigDecimal.valueOf(4000))
-                                   .build())
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
-
-            //When
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            //Then
-            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getHwFeesDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(4000));
-            assertThat(updatedData.getHearingFeeAmount()).isEqualTo(BigDecimal.valueOf(26000));
-        }
-
     }
 
     @Test
-    void shouldPopulateErrorWhenRemissionAmountIsNegative() {
+    void shouldPopulateErrorWhenClaimIssuedRemissionAmountIsNegative() {
         //Given
         CaseData caseData = CaseData.builder()
             .hearingReferenceNumber("000HN001")
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-            .hwFeesDetails(HelpWithFeesDetails.builder().hwfFeeType(FeeType.CLAIMISSUED)
-                               .remissionAmount(BigDecimal.valueOf(-1000))
-                               .build())
+            .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
+                                       .remissionAmount(BigDecimal.valueOf(-1000))
+                                       .build())
+            .hwfFeeType(FeeType.CLAIMISSUED)
+
+            .build();
+        CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-amount");
+
+        //When
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        //Then
+        var errors = response.getErrors();
+        assertTrue(errors.contains(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO));
+    }
+
+    @Test
+    void shouldPopulateErrorWhenHearingRemissionAmountIsNegative() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .hearingReferenceNumber("000HN001")
+            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+            .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
+                                       .remissionAmount(BigDecimal.valueOf(-1000))
+                                       .build())
+            .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                   .remissionAmount(BigDecimal.valueOf(-1000))
+                                   .build())
+            .hwfFeeType(FeeType.CLAIMISSUED)
+
             .build();
         CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-amount");
 
@@ -118,9 +123,10 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
         CaseData caseData = CaseData.builder()
             .hearingReferenceNumber("000HN001")
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-            .hwFeesDetails(HelpWithFeesDetails.builder().hwfFeeType(feeType)
-                               .remissionAmount(BigDecimal.valueOf(35000))
-                               .build())
+            .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                   .remissionAmount(BigDecimal.valueOf(35000))
+                                   .build())
+            .hwfFeeType(feeType)
             .build();
         CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-amount");
 

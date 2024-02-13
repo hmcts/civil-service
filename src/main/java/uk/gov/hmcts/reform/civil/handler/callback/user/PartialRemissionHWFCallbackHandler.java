@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +52,8 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateRemissionAmount(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        var remissionAmount = new BigDecimal("0"); // caseData.getHwFeesDetails().getRemissionAmount();
+        var claimIssueRemissionAmount = caseData.getClaimIssueRemissionAmount();
+        var hearingRemissionAmount = caseData.getHearingRemissionAmount();
         var claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
         var hearingFeeAmount = caseData.getHearingFeeAmount();
         var feeType = caseData.getHwfFeeType();
@@ -62,11 +62,11 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
             errors.add(ERR_MSG_FEE_TYPE_NOT_CONFIGURED);
         }
 
-        if (remissionAmount.signum() == -1) {
+        if (claimIssueRemissionAmount.signum() == -1 || hearingRemissionAmount.signum() == -1) {
             errors.add(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO);
-        } else if (FeeType.CLAIMISSUED == feeType && remissionAmount.compareTo(claimFeeAmount) >= 0) {
+        } else if (FeeType.CLAIMISSUED == feeType && claimIssueRemissionAmount.compareTo(claimFeeAmount) >= 0) {
             errors.add(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_CLAIM_FEE);
-        } else if (FeeType.HEARING == feeType && remissionAmount.compareTo(hearingFeeAmount) >= 0) {
+        } else if (FeeType.HEARING == feeType && hearingRemissionAmount.compareTo(hearingFeeAmount) >= 0) {
             errors.add(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_HEARING_FEE);
         }
 
@@ -77,28 +77,10 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse partRemissionHWF(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        var updatedData = caseData.toBuilder();
-        var remissionAmount = new BigDecimal("0");
-        var claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
-        var hearingFeeAmount = caseData.getHearingFeeAmount();
-        var feeType = caseData.getHwfFeeType();
-
-        if (FeeType.CLAIMISSUED == feeType && BigDecimal.ZERO.compareTo(claimFeeAmount) != 0) {
-            var updatedClaimFeeAmount = claimFeeAmount.subtract(remissionAmount);
-            var claimFee = caseData.getClaimFee();
-
-            claimFee.setCalculatedAmountInPence(updatedClaimFeeAmount);
-            updatedData.claimFee(claimFee);
-        } else if (FeeType.HEARING == feeType && BigDecimal.ZERO.compareTo(hearingFeeAmount) != 0) {
-            var updatedHearingFeeAmount = hearingFeeAmount.subtract(remissionAmount);
-            var hearingFee = caseData.getHearingFee();
-
-            hearingFee.setCalculatedAmountInPence(updatedHearingFeeAmount);
-            updatedData.hearingFee(hearingFee);
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
+
 }

@@ -1221,6 +1221,20 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .orElse(BigDecimal.ZERO);
     }
 
+    @JsonIgnore
+    public BigDecimal getClaimIssueRemissionAmount() {
+        return Optional.ofNullable(getClaimIssuedHwfDetails())
+            .map(HelpWithFeesDetails::getRemissionAmount)
+            .orElse(BigDecimal.ZERO);
+    }
+
+    @JsonIgnore
+    public BigDecimal getHearingRemissionAmount() {
+        return Optional.ofNullable(getHearingHwfDetails())
+            .map(HelpWithFeesDetails::getRemissionAmount)
+            .orElse(BigDecimal.ZERO);
+    }
+
     public boolean hasApplicant1SignedSettlementAgreement() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
