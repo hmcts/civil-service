@@ -1,5 +1,3 @@
-delete from dbs.task_list ;
-delete from dbs.task_item_template ;
 
 INSERT INTO dbs.task_item_template
 (id, task_name_en, hint_text_en, category_en, task_name_cy, hint_text_cy, category_cy, "name", task_status_sequence, "role", task_order, created_at)
