@@ -205,6 +205,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimTypeUnspec claimTypeUnSpec;
     private final ClaimType claimType;
+    private final HelpWithFeesDetails claimIssuedHwfDetails;
+    private final HelpWithFeesDetails hearingHwfDetails;
+    private final FeeType hwfFeeType;
     private final SuperClaimType superClaimType;
     private final String claimTypeOther;
     private final PersonalInjuryType personalInjuryType;
@@ -1236,12 +1239,5 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private boolean isDateAfterToday(LocalDate date) {
         return nonNull(date)
             && date.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
-    }
-
-    @JsonIgnore
-    public FeeType getHwfFeeType() {
-        return Optional.ofNullable(getHwFeesDetails())
-                .map(HelpWithFeesDetails::getHwfFeeType)
-                .orElse(null);
     }
 }

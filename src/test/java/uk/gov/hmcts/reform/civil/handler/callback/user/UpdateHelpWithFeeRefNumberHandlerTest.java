@@ -41,9 +41,9 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateHwFReferenceNumberSuccessfully_FeeType_ClaimIssued() {
             //Given
             CaseData caseData = CaseData.builder()
-                    .hwFeesDetails(HelpWithFeesDetails.builder()
-                            .hwfFeeType(FeeType.CLAIMISSUED)
+                    .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
                             .hwfReferenceNumber("7890").build())
+                    .hwfFeeType(FeeType.CLAIMISSUED)
                     .caseDataLiP(CaseDataLiP.builder().helpWithFees(
                             HelpWithFees.builder()
                                     .helpWithFee(YesOrNo.YES)
@@ -57,16 +57,16 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             //Then
             CaseData data = getCaseData(response);
             Assertions.assertThat(data.getCaseDataLiP().getHelpWithFees().getHelpWithFeesReferenceNumber()).isEqualTo("7890");
-            Assertions.assertThat(data.getHwFeesDetails().getHwfReferenceNumber()).isEqualTo(null);
+            Assertions.assertThat(data.getClaimIssuedHwfDetails().getHwfReferenceNumber()).isEqualTo(null);
         }
 
         @Test
         void shouldUpdateHwFReferenceNumberSuccessfully_FeeType_Hearing() {
             //Given
             CaseData caseData = CaseData.builder()
-                    .hwFeesDetails(HelpWithFeesDetails.builder()
-                            .hwfFeeType(FeeType.HEARING)
+                    .hearingHwfDetails(HelpWithFeesDetails.builder()
                             .hwfReferenceNumber("78905185430").build())
+                    .hwfFeeType(FeeType.HEARING)
                     .hearingHelpFeesReferenceNumber("54376543219")
                     .build();
 
@@ -76,7 +76,7 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             //Then
             CaseData data = getCaseData(response);
             Assertions.assertThat(data.getHearingHelpFeesReferenceNumber()).isEqualTo("78905185430");
-            Assertions.assertThat(data.getHwFeesDetails().getHwfReferenceNumber()).isEqualTo(null);
+            Assertions.assertThat(data.getHearingHwfDetails().getHwfReferenceNumber()).isEqualTo(null);
         }
     }
 

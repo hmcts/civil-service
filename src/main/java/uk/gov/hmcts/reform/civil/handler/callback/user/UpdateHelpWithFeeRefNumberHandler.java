@@ -54,30 +54,28 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
         if (FeeType.CLAIMISSUED == caseData.getHwfFeeType()) {
             ofNullable(caseData.getCaseDataLiP())
                     .map(CaseDataLiP::getHelpWithFees)
-                    .ifPresent(hwf -> hwf.setHelpWithFeesReferenceNumber(getHwFNewReferenceNumber(caseData)));
-            clearHwFReferenceNumber(caseData);
+                    .ifPresent(hwf -> hwf.setHelpWithFeesReferenceNumber(getHwFNewReferenceNumber(caseData.getClaimIssuedHwfDetails())));
+            clearHwFReferenceNumber(caseData.getClaimIssuedHwfDetails());
             return caseData.toBuilder();
         }
         if (FeeType.HEARING == caseData.getHwfFeeType()) {
             CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
-            updatedData.hearingHelpFeesReferenceNumber(getHwFNewReferenceNumber(caseData));
-            clearHwFReferenceNumber(caseData);
+            updatedData.hearingHelpFeesReferenceNumber(getHwFNewReferenceNumber(caseData.getHearingHwfDetails()));
+            clearHwFReferenceNumber(caseData.getHearingHwfDetails());
             return updatedData;
         }
         return caseData.toBuilder();
     }
 
-    private String getHwFNewReferenceNumber(CaseData caseData) {
-        return ofNullable(caseData.getHwFeesDetails())
+    private String getHwFNewReferenceNumber(HelpWithFeesDetails  helpWithFeesDetails) {
+        return ofNullable(helpWithFeesDetails)
                 .map(HelpWithFeesDetails::getHwfReferenceNumber).orElse(null);
     }
 
-    private void clearHwFReferenceNumber(CaseData caseData) {
-        if (ofNullable(caseData.getHwFeesDetails())
+    private void clearHwFReferenceNumber(HelpWithFeesDetails  helpWithFeesDetails) {
+        if (ofNullable(helpWithFeesDetails)
                 .map(HelpWithFeesDetails::getHwfReferenceNumber).isPresent()) {
-            HelpWithFeesDetails hwFeesDetails = caseData.getHwFeesDetails();
-            hwFeesDetails.setHwfReferenceNumber(null);
-            caseData.toBuilder().hwFeesDetails(hwFeesDetails);
+            helpWithFeesDetails.setHwfReferenceNumber(null);
         }
     }
 }
