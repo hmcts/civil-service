@@ -38,6 +38,10 @@ bootJar.enabled = false
 group = 'uk.gov.hmcts.reform.dashboard'
 version = '0.0.1'
 
+repositories {
+  mavenCentral()
+}
+
 tasks.withType(Test) {
   useJUnitPlatform()
 
@@ -45,8 +49,3 @@ tasks.withType(Test) {
     exceptionFormat = 'full'
   }
 }
-
-repositories {
-  mavenCentral()
-}
-
