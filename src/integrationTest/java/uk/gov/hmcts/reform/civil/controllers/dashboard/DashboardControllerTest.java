@@ -38,8 +38,15 @@ public class DashboardControllerTest extends BaseIntegrationTest {
 
     private final String[] notificationsToBeDeleted = {"notification"};
 
-    private final NotificationTemplateEntity template = new NotificationTemplateEntity(1L, "Defendant", "name", notificationsToBeDeleted, "English title", "Welsh title", "English body", "Welsh body", new Date(), "");
-    private final NotificationEntity notification = new NotificationEntity(id, template, "1234", "name", "Claimant", "English Title", "Welsh Title", "English body", "Welsh body", "Params", "createdBy", new Date(), "updatedBy", new Date());
+    private final NotificationTemplateEntity template =
+        new NotificationTemplateEntity(1L, "Defendant", "name", notificationsToBeDeleted,
+                                       "English title", "Welsh title", "English body",
+                                       "Welsh body", new Date(), "");
+    private final NotificationEntity notification =
+        new NotificationEntity(id, template, "1234", "name", "Claimant",
+                               "English Title", "Welsh Title", "English body",
+                               "Welsh body", "Params", "createdBy", new Date(),
+                               "updatedBy", new Date());
 
     @BeforeEach
     void setUp() {
