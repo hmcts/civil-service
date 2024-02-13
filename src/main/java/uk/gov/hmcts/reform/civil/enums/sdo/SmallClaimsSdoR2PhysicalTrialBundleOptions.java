@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum SmallClaimsSdoR2PhysicalTrialBundleOptions {
-    NONE("None"),
+    NO("No"),
     PARTY("Party");
 
     private final String label;

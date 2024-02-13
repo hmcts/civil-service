@@ -738,7 +738,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                 .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
                                                 .methodOfHearing(SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING)
                                                 .lengthList(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES)
-                                                .physicalBundleOptions(SmallClaimsSdoR2PhysicalTrialBundleOptions.NONE)
+                                                .physicalBundleOptions(SmallClaimsSdoR2PhysicalTrialBundleOptions.NO)
                                                 .sdoR2SmallClaimsHearingFirstOpenDateAfter(SdoR2SmallClaimsHearingFirstOpenDateAfter.builder()
                                                                                   .listFrom(LocalDate.now().plusDays(56)).build())
                                                 .sdoR2SmallClaimsHearingWindow(SdoR2SmallClaimsHearingWindow.builder().dateTo(LocalDate.now().plusDays(70))
