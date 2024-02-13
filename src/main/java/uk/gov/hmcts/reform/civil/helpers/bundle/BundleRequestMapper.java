@@ -47,6 +47,7 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getEvidenceUploadDocsByPartyAndDocType;
 import static uk.gov.hmcts.reform.civil.helpers.bundle.BundleFileNameHelper.getExpertDocsByPartyAndDocType;
@@ -541,19 +542,33 @@ public class BundleRequestMapper {
 
     private List<Element<BundlingRequestDocument>> mapDq(CaseData caseData) {
         List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
-        bundlingRequestDocuments.addAll(getDqByCategory(caseData,
-                DocCategory.APP1_DQ.getValue(), PartyType.CLAIMANT1));
-        bundlingRequestDocuments.addAll(getDqByCategory(caseData,
-                DocCategory.DEF1_DEFENSE_DQ.getValue(), PartyType.DEFENDANT1));
-        bundlingRequestDocuments.addAll(getDqByCategory(caseData,
-                DocCategory.DEF2_DEFENSE_DQ.getValue(), PartyType.DEFENDANT2));
+        bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
+                                                          DocCategory.APP1_DQ.getValue(), PartyType.CLAIMANT1));
+        bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
+                                                          DocCategory.DEF1_DEFENSE_DQ.getValue(), PartyType.DEFENDANT1));
+        bundlingRequestDocuments.addAll(getDqByCategoryId(caseData,
+                                                          DocCategory.DEF2_DEFENSE_DQ.getValue(), PartyType.DEFENDANT2));
+
+        bundlingRequestDocuments.addAll(getDqWithNoCategoryId(caseData));
         return ElementUtils.wrapElements(bundlingRequestDocuments);
     }
 
-    List<BundlingRequestDocument> getDqByCategory(CaseData caseData, String category, PartyType partyType) {
+    List<BundlingRequestDocument> getDqWithNoCategoryId(CaseData caseData) {
+        List<BundlingRequestDocument> bundlingRequestDocuments = new ArrayList<>();
+        bundlingRequestDocuments.addAll(mapSystemGeneratedCaseDocument(caseData.getSystemGeneratedCaseDocuments().stream()
+                                                                           .filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
+                                                                               .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                                                                               && caseDocumentElement.getValue().getDocumentLink().getCategoryID() == null)
+                                                                           .collect(Collectors.toList()),
+                                                                       BundleFileNameList.DIRECTIONS_QUESTIONNAIRE_NO_CATEGORY_ID.getDisplayName()));
+        return bundlingRequestDocuments;
+    }
+
+    List<BundlingRequestDocument> getDqByCategoryId(CaseData caseData, String category, PartyType partyType) {
         List<Element<CaseDocument>> docs = caseData.getSystemGeneratedCaseDocuments().stream()
                 .filter(caseDocumentElement -> (caseDocumentElement.getValue().getDocumentType()
                         .equals(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                        && nonNull(caseDocumentElement.getValue().getDocumentLink().getCategoryID())
                         && caseDocumentElement.getValue().getDocumentLink().getCategoryID().equals(category)))
                 .sorted(Comparator.comparing(caseDocumentElement -> caseDocumentElement
                         .getValue().getCreatedDatetime())).collect(Collectors.toList());

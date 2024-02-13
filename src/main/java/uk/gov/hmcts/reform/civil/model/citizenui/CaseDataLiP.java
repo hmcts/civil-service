@@ -20,6 +20,8 @@ public class CaseDataLiP {
 
     @JsonProperty("respondent1LiPResponse")
     private RespondentLiPResponse respondent1LiPResponse;
+    @JsonProperty("respondent1LiPResponseCarm")
+    private MediationLiPCarm respondent1MediationLiPResponseCarm;
     @JsonProperty("applicant1LiPResponse")
     private ClaimantLiPResponse applicant1LiPResponse;
     private List<Element<TranslatedDocument>> translatedDocuments;

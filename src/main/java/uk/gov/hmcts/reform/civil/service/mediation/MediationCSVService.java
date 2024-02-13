@@ -14,34 +14,39 @@ public abstract class MediationCSVService {
     private static final String CLAIMANT = "1";
     private static final String RESPONDENT = "2";
 
-    public String generateCSVContent(CaseData caseData) {
+    public String generateCSVContent(CaseData caseData, boolean isR2FlagEnabled) {
         MediationParams mediationParams = getMediationParams(caseData);
-        return getCSVContent(mediationParams);
+        return getCSVContent(mediationParams, isR2FlagEnabled);
     }
 
-    private String getCSVContent(MediationParams params) {
+    private String getCSVContent(MediationParams params, boolean isR2FlagEnabled) {
         CaseData data = params.getCaseData();
         ApplicantContactDetails applicantContactDetails = getApplicantContactDetails();
         DefendantContactDetails defendantContactDetails = getDefendantContactDetails();
         String totalClaimAmount = data.getTotalClaimAmount().toString();
         String[] claimantData = {
-            SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
-            CLAIMANT, getCsvCompanyName(data.getApplicant1()),
-            applicantContactDetails.getApplicantContactName(params), applicantContactDetails.getApplicantContactNumber(params),
-            CHECK_LIST, PARTY_STATUS, applicantContactDetails.getApplicantContactEmail(params),
+            SITE_ID, CASE_TYPE, CHECK_LIST, PARTY_STATUS, data.getLegacyCaseReference(), totalClaimAmount, CLAIMANT,
+            getCsvCompanyName(data.getApplicant1()), applicantContactDetails.getApplicantContactName(params),
+            applicantContactDetails.getApplicantContactNumber(params),
+            applicantContactDetails.getApplicantContactEmail(params),
             isPilot(data.getTotalClaimAmount())
         };
 
         String[] respondentData = {
-            SITE_ID, data.getLegacyCaseReference(), CASE_TYPE, totalClaimAmount,
-            RESPONDENT, getCsvCompanyName(data.getRespondent1()),
-            defendantContactDetails.getDefendantContactName(params), defendantContactDetails.getDefendantContactNumber(params),
-            CHECK_LIST, PARTY_STATUS, defendantContactDetails.getDefendantContactEmail(params),
+            SITE_ID, CASE_TYPE, CHECK_LIST, PARTY_STATUS, data.getLegacyCaseReference(), totalClaimAmount, RESPONDENT,
+            getCsvCompanyName(data.getRespondent1()), defendantContactDetails.getDefendantContactName(params),
+            defendantContactDetails.getDefendantContactNumber(params),
+            defendantContactDetails.getDefendantContactEmail(params),
             isPilot(data.getTotalClaimAmount())
         };
 
-        return generateCSVRow(claimantData)
-            + generateCSVRow(respondentData);
+        if (isR2FlagEnabled) {
+            return generateCSVRow(claimantData, getWelshFlag(data.isBilingual()), isR2FlagEnabled)
+                    + generateCSVRow(respondentData, null, isR2FlagEnabled);
+        }
+
+        return generateCSVRow(claimantData, null, false)
+                + generateCSVRow(respondentData, null, false);
     }
 
     protected abstract ApplicantContactDetails getApplicantContactDetails();
@@ -54,11 +59,14 @@ public abstract class MediationCSVService {
         return amount.compareTo(new BigDecimal(10000)) < 0 ? "Yes" : "No";
     }
 
-    private String generateCSVRow(String[] row) {
+    private String generateCSVRow(String[] row, String bilingualFlag, boolean isR2FlagEnabled) {
         StringBuilder builder = new StringBuilder();
 
-        for (String s : row) {
-            builder.append(s).append(",");
+        for (String rowValue : row) {
+            builder.append(rowValue).append(",");
+        }
+        if (isR2FlagEnabled) {
+            builder.append(bilingualFlag).append(",");
         }
         builder.append("\n");
 
@@ -69,4 +77,7 @@ public abstract class MediationCSVService {
         return (party.isCompany() || party.isOrganisation()) ? party.getPartyName() : null;
     }
 
+    private String getWelshFlag(boolean isBilingualFlag) {
+        return isBilingualFlag ? "Yes" : "No";
+    }
 }

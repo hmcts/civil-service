@@ -299,13 +299,18 @@ notifications:
   respondent1DefaultJudgmentRequestedTemplate: "d4cf381f-a2b3-4a81-a442-eb2aa5deb210"
   respondent1LipClaimUpdatedTemplate: "9c44f3fb-a340-49e5-bf64-32a3187d7dcd"
   claimantLipClaimUpdatedTemplate: "0abdcb29-edd3-418a-aeab-a102da4ad441"
+  claimantLipClaimUpdatedBilingualTemplate: "e880dc43-dc4e-440d-8c34-d0feec70e196"
   applicantLiPDefaultJudgmentRequested: "668d4703-e97f-4e2f-8d07-1a697aac6d0b"
+  applicantLiPDefaultJudgmentRequestedBilingualTemplate: "cad66be4-ee96-4114-b2a7-489690cd6ebf"
 
   hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
 
   mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
   mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
   mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
+
+  mediationUnsuccessfulLRTemplate: "0b0f7846-6238-4ece-87b1-597e22ed518b"
+  mediationUnsuccessfulLIPTemplate: "a986a00b-83f6-459e-a2cb-5bc76ba39164"
 
   respondentLipPartAdmitSettleClaimBilingualTemplate: "59ea18ee-1b30-4e80-9a7e-89ae7e940aed"
   notifyClaimantTranslatedDocumentUploaded: "a4b1051f-9f66-4f35-9674-e70b413a598a"
@@ -340,11 +345,21 @@ notifications:
   notifyApplicantForSignedSettlementAgreement: "65459efd-a351-4a1b-814a-435aabe3beb5"
   notifyApplicantForNotAgreedSignSettlement: "b775583b-7964-41f8-8b3b-d767557cffb2"
 
+  notifyApplicantLipForSignedSettlementAgreementInBilingual: "cac93c5f-599d-417b-af0c-74a249bd2681"
+  notifyApplicantLipForNotAgreedSignSettlementInBilingual: "da141be5-ba22-43c1-8fe3-ba36cc3fbb47"
+
   notifyRespondentForSignedSettlementAgreement: "aeb3951e-4956-4542-a73b-e2e3abec8867"
   notifyRespondentForNotAgreedSignSettlement: "1742841b-d915-43a9-9d76-b6d17a189ba5"
 
   notifyRespondentLipForClaimantRepresentedTemplate: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
   notifyClaimantLipForNoLongerAccessTemplate: "8bf1b6c6-2ee7-442d-8b72-550d2aca9bdf"
+  notifyClaimantLipForNoLongerAccessWelshTemplate: "4186a193-3135-41dc-b4d3-a0f31911e46f"
+  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual: "e880dc43-dc4e-440d-8c34-d0feec70e196"
+  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish: "f372a4df-4577-402a-a2cd-142fd8ff9028"
+  notifyClaimantLipForClaimSubmissionTemplate: "16bb1a39-96f8-4091-8d11-8375a2cc5905"
+  notifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate: "f2080ac4-2585-47fd-ac18-5f94148adc07"
+  notifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate: "1f6006bb-6726-48c4-ac5f-a456d043f1b7"
+  bilingualClaimantClaimContinuingOnlineForSpec: "461b4ce6-3783-409d-be47-ea1230170833"
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
