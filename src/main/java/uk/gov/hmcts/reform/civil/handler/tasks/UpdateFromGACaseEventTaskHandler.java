@@ -102,6 +102,7 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, gaDraft);
             updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaResp");
             updateDocCollection(output, generalAppCaseData, "gaRespondDoc", civilCaseData, "gaRespondDoc");
+            updateDocCollectionField(output, civilCaseData, generalAppCaseData, "gaAddl");
 
         } catch (Exception e) {
             log.error(e.getMessage());
