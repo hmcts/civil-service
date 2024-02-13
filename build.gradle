@@ -246,10 +246,6 @@ task integration(type: Test) {
   testLogging.showStandardStreams = false
 }
 
-tasks.withType(Copy) {
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
 task contract(type: Test) {
   useJUnitPlatform()
   description = "Runs pact contract tests"
