@@ -24,7 +24,7 @@ public final class SdoR2UiConstantSmallClaim {
 
         The parties shall endeavour to agree a calculation of the sums in issue and upload to the Digital Portal the agreed calculation.\
          In default of agreement each party shall upload to the Digital Portal its own calculation not later than 7 days before any hearing.\
-         The calculation must show the amount which is intended to remove any unfairness from the relationship,broken down into:
+         The calculation must show the amount which is intended to remove any unfairness from the relationship, broken down into:
         a) The principal sum claimed;
         b) The amount of contractual interest already paid on that sum;
         c) The amount of discretionary interest sought under to Section 69 County Courts Act 1984, if claimed, at rates of 1%, 2%, 4% and 8% per annum.""";
