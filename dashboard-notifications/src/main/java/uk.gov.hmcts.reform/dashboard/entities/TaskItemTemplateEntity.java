@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
@@ -62,7 +62,7 @@ public class TaskItemTemplateEntity implements Serializable {
 
     @NotNull
     @Schema(name = "created_at")
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @Type(type = "com.vladmihalcea.hibernate.type.array.IntArrayType")
     @Schema(name = "task_status_sequence")

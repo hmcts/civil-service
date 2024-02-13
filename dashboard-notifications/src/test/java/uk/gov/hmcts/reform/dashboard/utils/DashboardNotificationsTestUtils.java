@@ -1,31 +1,47 @@
 package uk.gov.hmcts.reform.dashboard.utils;
 
+import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
-import uk.gov.hmcts.reform.dashboard.data.TaskList;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public  class DashboardNotificationsTestUtils {
+public class DashboardNotificationsTestUtils {
 
     private static final UUID uuid = UUID.randomUUID();
 
-    public static List<TaskList> getTaskListList(){
+    private DashboardNotificationsTestUtils() {
+        //utility class
+    }
+
+    public static List<TaskList> getTaskListList() {
+
         List<TaskList> taskListList = new ArrayList<>();
-        taskListList.add(TaskList.builder().id(uuid).taskNameCy("HearingCY").taskNameEn("HearingEN").taskOrder(1).categoryCy("CategoryCy").categoryEn("CategoryEn")
-                             .role("Defendant").currentStatus(1).nextStatus(1).hintTextCy("HintCy").hintTextEn("HintEn").reference("123").build());
+        taskListList.add(TaskList.builder().id(uuid).taskNameCy("HearingCY")
+                             .taskNameEn("HearingEN").taskOrder(1).categoryCy("CategoryCy")
+                             .categoryEn("CategoryEn")
+                             .role("Defendant").currentStatus(1).nextStatus(1)
+                             .hintTextCy("HintCy").hintTextEn("HintEn").reference("123").build());
         return taskListList;
     }
 
-    public static List<TaskListEntity> getTaskListEntityList(){
+    public static List<TaskListEntity> getTaskListEntityList() {
 
         List<TaskListEntity> taskListEntityList = new ArrayList<>();
-        taskListEntityList.add(TaskListEntity.builder().id(uuid).taskNameCy("HearingCY").taskNameEn("HearingEN")
-                                   .currentStatus(1).nextStatus(1).hintTextCy("HintCy").hintTextEn("HintEn").reference("123")
-                                   .taskItemTemplate(TaskItemTemplateEntity.builder().id(Long.valueOf(123)).taskNameCy("TaskNameCy").taskNameEn("TaskNameEn")
-                                                         .taskOrder(1).hintTextCy("HintCY").hintTextEn("HintEn").role("Defendant").categoryCy("CategoryCy").categoryEn("CategoryEn").build()).build());
+        taskListEntityList.add(TaskListEntity.builder()
+                                   .id(uuid).taskNameCy("HearingCY").taskNameEn("HearingEN")
+                                   .currentStatus(1).nextStatus(1).hintTextCy("HintCy")
+                                   .hintTextEn("HintEn").reference("123")
+                                   .taskItemTemplate(TaskItemTemplateEntity.builder()
+                                                         .id(Long.valueOf(123)).taskNameCy("TaskNameCy")
+                                                         .taskNameEn("TaskNameEn")
+                                                         .taskOrder(1).hintTextCy("HintCY")
+                                                         .hintTextEn("HintEn").role("Defendant")
+                                                         .categoryCy("CategoryCy").categoryEn("CategoryEn")
+                                                         .build())
+                                   .build());
         return taskListEntityList;
     }
 }

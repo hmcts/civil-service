@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.dashboard.services;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
@@ -15,17 +15,13 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class DashboardNotificationServiceTest {
 
-    private DashboardNotificationService dashboardNotificationService;
-
     @Mock
     private NotificationRepository notificationRepository;
 
-    private final UUID id = UUID.randomUUID();
+    @InjectMocks
+    private DashboardNotificationService dashboardNotificationService;
 
-    @BeforeEach
-    void setUp() {
-        dashboardNotificationService = new DashboardNotificationService(notificationRepository);
-    }
+    private final UUID id = UUID.randomUUID();
 
     @Nested
     class DeleteTests {
@@ -33,8 +29,10 @@ public class DashboardNotificationServiceTest {
         @Test
         void shouldReturnOkWhenDeletingEntity() {
 
+            //when
             dashboardNotificationService.deleteById(id);
 
+            //then
             verify(notificationRepository).deleteById(id);
         }
     }

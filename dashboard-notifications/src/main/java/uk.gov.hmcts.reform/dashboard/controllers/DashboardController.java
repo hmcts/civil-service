@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
@@ -82,6 +83,25 @@ public class DashboardController {
         var notificationResponse = dashboardNotificationService.getNotification(uuid);
 
         return new ResponseEntity<>(notificationResponse, HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = {
+        "notifications/{unique-notification-identifier}"
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity recordClick(
+        @PathVariable("unique-notification-identifier") UUID id,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info(
+            "Received UUID for deletion: {}",
+            id
+        );
+        dashboardNotificationService.deleteById(id);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PostMapping(path = "/scenarios/{scenario_ref}/{unique_case_identifier}")

@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getTaskListEntityList;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getTaskListList;
@@ -25,23 +26,34 @@ class TaskListServiceTest {
     @InjectMocks
     private TaskListService taskListService;
 
-
     @Test
     void shouldReturnEmpty_whenTaskListIsNotPresent() {
-        when(taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any())).thenReturn(List.of());
-        List<TaskList> actual = taskListService.getTaskList("123","Claimant"
-        );
 
+        //given
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any())).thenReturn(List.of());
+
+        //when
+        List<TaskList> actual = taskListService.getTaskList("123", "Claimant");
+
+        //then
+        verify(taskListRepository).findByReferenceAndTaskItemTemplateRole("123", "Claimant");
         assertThat(actual).isEqualTo(List.of());
     }
 
     @Test
     void shouldReturnTaskList_whenTaskListIsPresent() {
-        when(taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any())).thenReturn(getTaskListEntityList());
-        List<TaskList> actual = taskListService.getTaskList("123","Claimant"
-        );
 
+        //given
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRole(
+            any(),
+            any()
+        )).thenReturn(getTaskListEntityList());
 
+        //when
+        List<TaskList> actual = taskListService.getTaskList("123", "Claimant");
+
+        //then
+        verify(taskListRepository).findByReferenceAndTaskItemTemplateRole("123", "Claimant");
         assertThat(actual).isEqualTo(getTaskListList());
     }
 
