@@ -19,6 +19,7 @@ bin/main/application.yaml
 *.iws
 *.iml
 *.ipr
+.aat-env
 
 .DS_Store
 
