@@ -24,7 +24,9 @@ dependencies {
   implementation 'javax.validation:validation-api:2.0.0.Final'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   implementation group: 'com.vladmihalcea', name: 'hibernate-types-52', version: '2.21.1'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.11.0'
   implementation group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.2.9'
+
   runtimeOnly 'org.postgresql:postgresql'
   compileOnly 'org.projectlombok:lombok'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -48,4 +50,8 @@ tasks.withType(Test) {
   testLogging {
     exceptionFormat = 'full'
   }
+}
+
+test {
+  failFast = true
 }

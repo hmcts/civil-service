@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Transactional
@@ -13,4 +14,7 @@ import java.util.UUID;
 public interface TaskListRepository extends CrudRepository<TaskListEntity, UUID> {
 
     List<TaskListEntity> findByReferenceAndTaskItemTemplateRole(String reference, String role);
+
+    Optional<TaskListEntity> findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
+        String reference, String role, String templateName);
 }

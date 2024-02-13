@@ -4,7 +4,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.model.Notification;
+import uk.gov.hmcts.reform.dashboard.data.Notification;
 
 import java.util.ArrayList;
 import java.util.List;

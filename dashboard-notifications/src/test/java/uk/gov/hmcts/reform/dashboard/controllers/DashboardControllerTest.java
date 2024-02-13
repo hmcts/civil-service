@@ -6,8 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.dashboard.model.Notification;
-import uk.gov.hmcts.reform.dashboard.model.TaskList;
+import uk.gov.hmcts.reform.dashboard.data.Notification;
+import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
@@ -43,7 +43,11 @@ class DashboardControllerTest {
             .thenReturn(taskList);
 
         //when
-        ResponseEntity<List<TaskList>> output = dashboardController.getTaskListByCaseIdentifierAndRole("123", "Claimant", AUTHORISATION);
+        ResponseEntity<List<TaskList>> output = dashboardController.getTaskListByCaseIdentifierAndRole(
+            "123",
+            "Claimant",
+            AUTHORISATION
+        );
 
         //then
         verify(taskListService).getTaskList("123", "Claimant");
@@ -59,7 +63,11 @@ class DashboardControllerTest {
             .thenReturn(notifications);
 
         //when
-        ResponseEntity<List<Notification>> output = dashboardController.getNotificationsByCaseIdentifierAndRole("123", "Claimant", AUTHORISATION);
+        ResponseEntity<List<Notification>> output = dashboardController.getNotificationsByCaseIdentifierAndRole(
+            "123",
+            "Claimant",
+            AUTHORISATION
+        );
 
         //then
         assertThat(output.getBody()).isEqualTo(notifications);

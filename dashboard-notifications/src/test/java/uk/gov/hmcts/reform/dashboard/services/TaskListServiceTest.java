@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.dashboard.model.TaskList;
+import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
 import java.util.List;
@@ -44,7 +44,10 @@ class TaskListServiceTest {
     void shouldReturnTaskList_whenTaskListIsPresent() {
 
         //given
-        when(taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any())).thenReturn(getTaskListEntityList());
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRole(
+            any(),
+            any()
+        )).thenReturn(getTaskListEntityList());
 
         //when
         List<TaskList> actual = taskListService.getTaskList("123", "Claimant");

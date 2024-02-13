@@ -3,9 +3,10 @@ package uk.gov.hmcts.reform.dashboard.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
-import uk.gov.hmcts.reform.dashboard.model.Notification;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,19 +39,19 @@ public class DashboardNotificationService {
         NotificationEntity existingNotification = notificationRepository.findById(id).orElse(null);
 
         if (existingNotification != null) {
-
-            existingNotification.builder().notificationTemplateEntity(notification.getNotificationTemplateEntity())
-            .reference(notification.getReference())
-            .titleEn(notification.getTitleEn())
-            .titleCy(notification.getTitleCy())
-            .descriptionEn(notification.getDescriptionEn())
-            .descriptionCy(notification.getDescriptionCy())
-            .params(notification.getParams())
-            .citizenRole(notification.getCitizenRole())
-            .createdBy(notification.getCreatedBy())
-            .createdAt(notification.getCreatedAt())
-            .updatedBy(notification.getUpdatedBy())
-            .updatedOn(notification.getUpdatedOn());
+            existingNotification.builder()
+                .dashboardNotificationsTemplates(notification.getDashboardNotificationsTemplates())
+                .reference(notification.getReference())
+                .titleEn(notification.getTitleEn())
+                .titleCy(notification.getTitleCy())
+                .descriptionEn(notification.getDescriptionEn())
+                .descriptionCy(notification.getDescriptionCy())
+                .params(notification.getParams())
+                .citizenRole(notification.getCitizenRole())
+                .createdBy(notification.getCreatedBy())
+                .createdAt(notification.getCreatedAt())
+                .updatedBy(notification.getUpdatedBy())
+                .updatedOn(notification.getUpdatedOn());
 
             return notificationRepository.save(existingNotification);
         } else {
@@ -67,8 +68,8 @@ public class DashboardNotificationService {
         List<NotificationEntity> notificationEntityList = notificationRepository
             .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
         return notificationEntityList.stream().map(
-            p -> new Notification(
-                p.getId(), p.getTitleEn(), p.getTitleCy(), p.getDescriptionEn(), p.getDescriptionCy()))
+                p -> new Notification(
+                    p.getId(), p.getTitleEn(), p.getTitleCy(), p.getDescriptionEn(), p.getDescriptionCy()))
             .collect(Collectors.toList());
     }
 }

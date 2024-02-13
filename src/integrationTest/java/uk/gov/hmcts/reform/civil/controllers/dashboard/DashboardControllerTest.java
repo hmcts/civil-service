@@ -7,17 +7,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.context.jdbc.Sql;
-
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
-import uk.gov.hmcts.reform.dashboard.model.TaskList;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationTemplateService;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,10 +25,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -56,12 +54,14 @@ public class DashboardControllerTest extends BaseIntegrationTest {
     private final NotificationTemplateEntity template =
         new NotificationTemplateEntity(1L, "Defendant", "name", notificationsToBeDeleted,
                                        "English title", "Welsh title", "English body",
-                                       "Welsh body", new Date(), "");
+                                       "Welsh body", new Date(), ""
+        );
     private final NotificationEntity notification =
         new NotificationEntity(id, template, "1234", "name", "Claimant",
                                "English Title", "Welsh Title", "English body",
-                               "Welsh body", "Params", "createdBy", new Date(),
-                               "updatedBy", new Date());
+                               "Welsh body", "Params", "createdBy", OffsetDateTime.now(),
+                               "updatedBy", OffsetDateTime.now()
+        );
 
     private final String endPointUrlGet = "/dashboard/notifications/{uuid}";
 
@@ -73,7 +73,7 @@ public class DashboardControllerTest extends BaseIntegrationTest {
         @SneakyThrows
         void shouldReturnErrorWhenNotUuidFormat() {
 
-            doGet(BEARER_TOKEN, endPointUrlGet,  "1234")
+            doGet(BEARER_TOKEN, endPointUrlGet, "1234")
                 .andExpect(status().isBadRequest());
         }
     }
@@ -85,7 +85,7 @@ public class DashboardControllerTest extends BaseIntegrationTest {
         @Sql("/scripts/dashboardNotifications/get_task_list_data.sql")
         void shouldReturnTaskListForGiveCaseReferenceAndRole() {
 
-            doGet(BEARER_TOKEN, getTaskListUrl,  "123","defendant")
+            doGet(BEARER_TOKEN, getTaskListUrl, "123", "defendant")
                 .andExpect(status().isOk())
                 .andExpect(content().json(toJson(getTaskLists())));
         }
@@ -127,8 +127,10 @@ public class DashboardControllerTest extends BaseIntegrationTest {
     private List<TaskList> getTaskLists() {
 
         List<TaskList> taskList = new ArrayList<>();
-        taskList.add(TaskList.builder().id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e5")).taskNameCy("task_name_cy").taskNameEn("task_name_en").taskOrder(0).categoryCy("category_cy").categoryEn("category_en")
-                         .role("defendant").currentStatus(0).nextStatus(1).hintTextCy("hint_text_cy").hintTextEn("hint_text_en").reference("123")
+        taskList.add(TaskList.builder().id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e5")).taskNameCy(
+                "task_name_cy").taskNameEn("task_name_en").taskOrder(0).categoryCy("category_cy").categoryEn("category_en")
+                         .role("defendant").currentStatus(0).nextStatus(1).hintTextCy("hint_text_cy").hintTextEn(
+                "hint_text_en").reference("123")
                          .updatedBy("Test").build());
 
         return taskList;

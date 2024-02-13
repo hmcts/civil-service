@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.dashboard.model;
+package uk.gov.hmcts.reform.dashboard.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
