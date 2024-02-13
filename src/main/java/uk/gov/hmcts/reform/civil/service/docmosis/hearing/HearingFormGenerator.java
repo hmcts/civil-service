@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
@@ -42,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingType;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> {
 
     private final DocumentManagementService documentManagementService;
@@ -56,6 +58,8 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
         List<CaseDocument> caseDocuments = new ArrayList<>();
         HearingForm templateData = getTemplateData(caseData, authorisation);
         DocmosisTemplates template = getTemplate(caseData);
+
+        log.info("template is " + template);
         DocmosisDocument document =
             documentGeneratorService.generateDocmosisDocument(templateData, template);
         CaseDocument caseDocument = documentManagementService.uploadDocument(

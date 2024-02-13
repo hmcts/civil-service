@@ -42,7 +42,7 @@ class FeatureToggleServiceTest {
         var hearingAndListingKey = "ahn";
         givenToggle(hearingAndListingKey, toggleStat);
 
-        assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(false);
     }
 
     @ParameterizedTest
