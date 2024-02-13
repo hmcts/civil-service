@@ -49,12 +49,6 @@ public class DashboardControllerTest extends BaseIntegrationTest {
                                "Welsh body", "Params", "createdBy", new Date(),
                                "updatedBy", new Date());
 
-    @BeforeEach
-    void setUp() {
-        notificationTemplateRepository.save(template);
-        notificationRepository.save(notification);
-    }
-
     private final String endPointUrlGet = "/dashboard/notifications/{uuid}";
 
     private final String endPointUrlDelete = "/dashboard/notifications/{unique-notification-identifier}";
@@ -77,6 +71,13 @@ public class DashboardControllerTest extends BaseIntegrationTest {
 
     @Nested
     class DeleteTests {
+
+        @BeforeEach
+        void setUp() {
+            notificationTemplateRepository.save(template);
+            notificationRepository.save(notification);
+        }
+
         @Test
         @SneakyThrows
         void shouldReturnOkWhenDeletingExistingEntity() {
