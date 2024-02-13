@@ -2352,6 +2352,30 @@ class StateFlowEngineTest {
         }
 
         @Test
+        void shouldReturnFullDefense_whenDefendantHasRespondedAndApplicantHasResponseDate() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
+
+            // When
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(FULL_DEFENCE_PROCEED.fullName());
+            assertThat(stateFlow.getStateHistory())
+                .hasSize(11)
+                .extracting(State::getName)
+                .containsExactly(
+                    DRAFT.fullName(), CLAIM_SUBMITTED.fullName(), CLAIM_ISSUED_PAYMENT_SUCCESSFUL.fullName(),
+                    PENDING_CLAIM_ISSUED.fullName(), CLAIM_ISSUED.fullName(), CLAIM_NOTIFIED.fullName(),
+                    CLAIM_DETAILS_NOTIFIED.fullName(), NOTIFICATION_ACKNOWLEDGED.fullName(),
+                    ALL_RESPONSES_RECEIVED.fullName(), FULL_DEFENCE.fullName(), FULL_DEFENCE_PROCEED.fullName()
+                );
+        }
+
+        @Test
         void shouldReturnTakenOffline_whenApplicantIsOutOfTimeAndCamundaHasProcessedCase() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflinePastApplicantResponseDeadline().build();
