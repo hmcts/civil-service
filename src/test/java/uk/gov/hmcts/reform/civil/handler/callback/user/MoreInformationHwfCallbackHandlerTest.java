@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -66,7 +65,7 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .atStatePendingClaimIssued()
                 .build()
                 .builder()
-                .hwFeesDetails(HelpWithFeesDetails.builder().hwfFeeType(FeeType.HEARING).build())
+                .hwfFeeType(FeeType.HEARING)
                 .helpWithFeesMoreInformationHearing(
                     HelpWithFeesMoreInformation.builder()
                         .hwFMoreInfoDocumentDate(LocalDate.now())

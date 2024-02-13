@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 
 import java.time.LocalDate;
@@ -55,8 +54,7 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         HelpWithFeesMoreInformation moreInformationData =
-            FeeType.HEARING.equals(Optional.ofNullable(caseData.getHwFeesDetails())
-                                       .map(HelpWithFeesDetails::getHwfFeeType).orElse(null))
+            FeeType.HEARING.equals(Optional.ofNullable(caseData.getHwfFeeType()).orElse(null))
                 ? caseData.getHelpWithFeesMoreInformationHearing()
                 : caseData.getHelpWithFeesMoreInformationClaimIssue();
         LocalDate hwFMoreInfoDocumentDate = moreInformationData.getHwFMoreInfoDocumentDate();
