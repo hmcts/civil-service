@@ -87,6 +87,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.model.dq.Expert.fromSmallClaimExpertDetails;
+import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ExpertUtils.addEventAndDateAddedToApplicantExperts;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateDQPartyIds;
@@ -415,6 +416,13 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
                 response.state(CaseState.CASE_SETTLED.name());
             }
         }
+
+        // must always move to in mediation for small claims when claimant proceeds
+        if (shouldMoveToInMediationState(
+            caseData, featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))) {
+            response.state(CaseState.IN_MEDIATION.name());
+        }
+
         return response.build();
     }
 
