@@ -24,7 +24,6 @@ public class TaskItemTemplateEntity implements Serializable {
     @Id
     private Long id;
 
-
     @Size(max = 256)
     private String taskNameEn;
 

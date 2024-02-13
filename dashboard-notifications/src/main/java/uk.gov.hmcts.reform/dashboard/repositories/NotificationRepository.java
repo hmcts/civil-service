@@ -11,6 +11,6 @@ import javax.transaction.Transactional;
 @Transactional
 @Repository
 public interface NotificationRepository extends CrudRepository<NotificationEntity, UUID> {
-    Optional<NotificationEntity> findById(UUID uuid);
 
+    Optional<NotificationEntity> findById(UUID uuid);
 }
