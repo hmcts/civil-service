@@ -2224,6 +2224,33 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getSdoOrderDocument().getDocumentLink().getCategoryID()).isEqualTo("sdo");
         }
 
+        @Test
+        void ShouldValidate() { //TODO complete
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            fastTrackList.add(FastTrack.fastClaimBuildingDispute);
+            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .fastClaims(fastTrackList)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("setSmallClaimsFlag").isEqualTo("No");
+            assertThat(response.getData()).extracting("setFastTrackFlag").isEqualTo("Yes");
+            assertThat(response.getData()).extracting("isSdoR2NewScreen").isEqualTo("Yes");
+        }
+
     }
 
     @Nested

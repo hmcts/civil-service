@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SdoR2TrialHearingLengthOther {
 
-    private String trialLengthDays;
-    private String trialLengthHours;
-    private String trialLengthMinutes;
+    private Integer trialLengthDays;
+    private Integer trialLengthHours;
+    private Integer trialLengthMinutes;
 }

@@ -722,8 +722,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         if (featureToggleService.isSdoR2Enabled()) {
-            List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
             prePopulateNihlFields(callbackParams, caseData, updatedData);
+            List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
             setCheckListNihl(updatedData, includeInOrderToggle);
         }
 
@@ -1084,6 +1084,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .ifPresent(errors::add);
         }
 
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays() != null) {
+            validateGreaterOrEqualZero(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours() != null) {
+            validateHours(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes() != null) {
+            validateMinutes(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes())
+                .ifPresent(errors::add);
+        }
+
         return errors;
     }
 
@@ -1105,6 +1118,20 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private Optional<String> validateGreaterThanZero(Integer quantity) {
         if (quantity < 1) {
             return Optional.of("ERROR_MESSAGE_Quantity < 1");
+        }
+        return Optional.empty();
+    }
+
+    private Optional<String> validateHours(Integer hours) {
+        if (hours < 0 || hours > 23) {
+            return Optional.of("ERROR_MESSAGE_Hours must be between 0 and 23");
+        }
+        return Optional.empty();
+    }
+
+    private Optional<String> validateMinutes(Integer minutes) {
+        if (minutes < 0 || minutes > 59) {
+            return Optional.of("ERROR_MESSAGE_Minutes must be between 0 and 59");
         }
         return Optional.empty();
     }
