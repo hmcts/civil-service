@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dashboard.entities;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import uk.gov.hmcts.reform.dashboard.utils.JsonDataConverter;
+
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -13,7 +14,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @lombok.Data
@@ -54,10 +55,9 @@ public class TaskListEntity implements Serializable {
     @Size(max = 512)
     private String hintTextCy;
 
-    @NotNull
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     @Size(max = 256)
     private String updatedBy;

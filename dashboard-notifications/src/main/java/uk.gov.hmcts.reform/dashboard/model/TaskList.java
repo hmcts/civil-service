@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
+import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -31,9 +31,9 @@ public class TaskList {
 
     private String hintTextCy;
 
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
     private String updatedBy;
 
@@ -46,5 +46,26 @@ public class TaskList {
     private String role;
 
     private int taskOrder;
+
+    public static TaskList from(TaskListEntity taskListEntity) {
+        return TaskList.builder()
+            .id(taskListEntity.getId())
+            .reference(taskListEntity.getReference())
+            .currentStatus(taskListEntity.getCurrentStatus())
+            .nextStatus(taskListEntity.getNextStatus())
+            .taskNameEn(taskListEntity.getTaskNameEn())
+            .hintTextEn(taskListEntity.getHintTextEn())
+            .taskNameCy(taskListEntity.getTaskNameCy())
+            .hintTextCy(taskListEntity.getHintTextCy())
+            .createdAt(taskListEntity.getCreatedAt())
+            .updatedBy(taskListEntity.getUpdatedBy())
+            .updatedAt(taskListEntity.getUpdatedAt())
+            .messageParm(taskListEntity.getMessageParm())
+            .categoryEn(taskListEntity.getTaskItemTemplate().getCategoryEn())
+            .categoryCy(taskListEntity.getTaskItemTemplate().getCategoryCy())
+            .role(taskListEntity.getTaskItemTemplate().getRole())
+            .taskOrder(taskListEntity.getTaskItemTemplate().getTaskOrder())
+            .build();
+    }
 
 }

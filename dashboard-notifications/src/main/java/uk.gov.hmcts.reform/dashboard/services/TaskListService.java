@@ -22,21 +22,11 @@ public class TaskListService {
     }
 
     public List<TaskList> getTaskList(String ccdCaseIdentifier, String roleType) {
-        List<TaskListEntity>  taskListEntityList =  taskListRepository.findByReferenceAndTaskItemTemplateRole(ccdCaseIdentifier, roleType);
 
-        // TODO can we use any external Library like MapStruct for entity to DTO conversion ???
-        // ModelMapper modelMapper = new ModelMapper();
-        // TypeMap<TaskListEntity, TaskList> propertyMapper = modelMapper.createTypeMap(TaskListEntity.class, TaskList.class);
-        // propertyMapper.addMapping(TaskItemTemplateEntity::getCategoryEn, TaskList::getCategoryEn);
-
-        //List<TaskList> taskList = modelMapper.map(taskListEntityList, new TypeToken<List<TaskList>>() {}.getType());
+      List<TaskListEntity>  taskListEntityList =  taskListRepository.findByReferenceAndTaskItemTemplateRole(ccdCaseIdentifier, roleType);
 
         List<TaskList> taskList = taskListEntityList.stream()
-            .map(p -> new TaskList(p.getId(), p.getReference(), p.getCurrentStatus(), p.getNextStatus(),
-                                   p.getTaskNameEn(), p.getHintTextEn(), p.getTaskNameCy(), p.getHintTextCy(),
-                                   p.getCreatedAt(), p.getUpdatedAt(), p.getUpdatedBy(), p.getMessageParm(),
-                                   p.getTaskItemTemplate().getCategoryEn(), p.getTaskItemTemplate().getCategoryCy(),
-                                   p.getTaskItemTemplate().getRole(), p.getTaskItemTemplate().getTaskOrder()))
+            .map(p -> TaskList.from(p))
             .collect(Collectors.toList());
 
         return taskList;
