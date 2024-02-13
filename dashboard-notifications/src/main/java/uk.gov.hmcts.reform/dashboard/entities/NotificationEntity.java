@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.CascadeType;
@@ -26,25 +27,39 @@ public class NotificationEntity implements Serializable {
 
     @Id
     @NotNull
+    @Schema(name = "id")
     private UUID id;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn
+    @Schema(name = "dashboard_notifications_templates_id")
     private NotificationTemplateEntity dashboardNotificationsTemplates;
 
+    @Schema(name = "reference")
     private String reference;
     @Column(name = "notification_name")
+    @Schema(name = "notification_name")
     private String name;
+    @Schema(name = "citizen_role")
     private String citizenRole;
+    @Schema(name = "title_en")
     private String titleEn;
+    @Schema(name = "description_en")
     private String descriptionEn;
+    @Schema(name = "title_cy")
     private String titleCy;
+    @Schema(name = "description_cy")
     private String descriptionCy;
     @Type(type = "jsonb")
     @Column(name = "message_param")
+    @Schema(name = "message_param")
     private String params;
+    @Schema(name = "created_by")
     private String createdBy;
+    @Schema(name = "created_at")
     private OffsetDateTime createdAt;
+    @Schema(name = "updated_by")
     private String updatedBy;
+    @Schema(name = "updated_on")
     private OffsetDateTime updatedOn;
 }

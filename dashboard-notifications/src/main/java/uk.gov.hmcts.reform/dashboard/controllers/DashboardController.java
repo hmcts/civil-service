@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.dashboard.controllers;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -81,7 +83,11 @@ public class DashboardController {
     }
 
     @PostMapping(path = "/scenarios/{scenario_ref}/{unique_case_identifier}")
-    public ResponseEntity<String> recordScenario(
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity recordScenario(
         @PathVariable("unique_case_identifier") String uniqueCaseIdentifier,
         @PathVariable("scenario_ref") String scenarioReference,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
@@ -91,6 +97,6 @@ public class DashboardController {
         dashboardScenariosService.recordScenarios(authorisation, scenarioReference,
                                                   uniqueCaseIdentifier, scenarioRequestParams
         );
-        return ResponseEntity.ok("Created");
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

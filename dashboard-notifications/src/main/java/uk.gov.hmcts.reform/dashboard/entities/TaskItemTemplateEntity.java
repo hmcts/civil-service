@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Entity;
@@ -21,38 +22,49 @@ public class TaskItemTemplateEntity implements Serializable {
     private static final long serialVersionUID = -2461367611245226407L;
 
     @Id
+    @Schema(name = "id")
     private Long id;
 
     @Size(max = 256)
+    @Schema(name = "task_name_en")
     private String taskNameEn;
 
     @Size(max = 512)
+    @Schema(name = "hint_text_en")
     private String hintTextEn;
 
     @Size(max = 256)
+    @Schema(name = "category_en")
     private String categoryEn;
 
     @Size(max = 256)
+    @Schema(name = "task_name_cy")
     private String taskNameCy;
 
     @Size(max = 512)
+    @Schema(name = "hint_text_cy")
     private String hintTextCy;
 
     @Size(max = 256)
+    @Schema(name = "category_cy")
     private String categoryCy;
 
     @Size(max = 256)
+    @Schema(name = "name")
     private String name;
 
     @Size(max = 256)
+    @Schema(name = "role")
     private String role;
 
+    @Schema(name = "task_order")
     private int taskOrder;
 
     @NotNull
-    @javax.persistence.Column(name = "created_at", nullable = false)
+    @Schema(name = "created_at")
     private LocalDateTime createdAt;
 
     @Type(type = "com.vladmihalcea.hibernate.type.array.IntArrayType")
+    @Schema(name = "task_status_sequence")
     private int[] taskStatusSequence;
 }
