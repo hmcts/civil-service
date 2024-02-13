@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
@@ -25,7 +26,7 @@ public class NotificationEntity implements Serializable {
     @NotNull
     private UUID id;
     @ManyToOne
-    @JoinColumn(name = "notifications_Templates_id", referencedColumnName = "id")
+    @JoinColumn(name = "dashboard_notifications_templates_id", referencedColumnName = "id")
     private NotificationTemplateEntity notificationTemplateEntity;
     private String reference;
     @Column(name = "notification_name")

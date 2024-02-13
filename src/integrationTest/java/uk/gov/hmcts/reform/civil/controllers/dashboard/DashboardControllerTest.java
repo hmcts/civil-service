@@ -1,25 +1,29 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard;
 
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
+
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.model.TaskList;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationTemplateService;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import java.util.Optional;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,53 +31,92 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql("/scripts/dashboardNotifications/get_task_list_data.sql")
 public class DashboardControllerTest extends BaseIntegrationTest {
 
-    @MockBean
+    @Autowired
+    private DashboardNotificationService dashboardNotificationService;
+
+    @Autowired
+    private DashboardNotificationTemplateService dashboardNotificationTemplateService;
+
+    @Autowired
     private NotificationRepository notificationRepository;
 
-    private final String endPointUrl = "/dashboard/notifications/{uuid}";
+    @Autowired
+    private NotificationTemplateRepository notificationTemplateRepository;
+
+    private final UUID id = UUID.randomUUID();
 
     private final String getTaskListUrl = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
 
-    @Test
-    @SneakyThrows
-    void shouldReturnOkWhenGettingExistingEntity() {
-        UUID id = UUID.randomUUID();
+    private final String[] notificationsToBeDeleted = {"notification"};
 
-        NotificationEntity notification = new NotificationEntity(id, new NotificationTemplateEntity(), "12345", "name", "Defendant", "en", "cy", "en", "cy", "params", "createdBy",
-                                                                 new Date(),  "updatedBy", new Date());
+    private final NotificationTemplateEntity template =
+        new NotificationTemplateEntity(1L, "Defendant", "name", notificationsToBeDeleted,
+                                       "English title", "Welsh title", "English body",
+                                       "Welsh body", new Date(), "");
+    private final NotificationEntity notification =
+        new NotificationEntity(id, template, "1234", "name", "Claimant",
+                               "English Title", "Welsh Title", "English body",
+                               "Welsh body", "Params", "createdBy", new Date(),
+                               "updatedBy", new Date());
 
-        when(notificationRepository.findById(any())).thenReturn(Optional.of(notification));
+    private final String endPointUrlGet = "/dashboard/notifications/{uuid}";
 
-        doGet(BEARER_TOKEN, endPointUrl, UUID.randomUUID().toString())
-            .andExpect(status().isOk())
-            .andExpect(content().json(toJson(notification)));
+    private final String endPointUrlDelete = "/dashboard/notifications/{unique-notification-identifier}";
+
+    @Nested
+    class GenericTests {
+        @Test
+        @SneakyThrows
+        void shouldReturnErrorWhenNotUuidFormat() {
+
+            doGet(BEARER_TOKEN, endPointUrlGet,  "1234")
+                .andExpect(status().isBadRequest());
+        }
     }
 
-    @Test
-    @SneakyThrows
-    void shouldReturnPreconditionFailedErrorWhenIllegalArgumentExceptionIsThrown() {
-        doThrow(new IllegalArgumentException()).when(notificationRepository).findById(any());
+    @Nested
+    class GetTests {
+        @Test
+        @SneakyThrows
+        void shouldReturnTaskListForGiveCaseReferenceAndRole() {
 
-        //I don't think it should throw this specific error, but I'll leave it to the person working on get notifications to fix.
-        doGet(BEARER_TOKEN, endPointUrl, UUID.randomUUID().toString())
-            .andExpect(status().isPreconditionFailed());
+            doGet(BEARER_TOKEN, getTaskListUrl,  "123","defendant")
+                .andExpect(status().isOk())
+                .andExpect(content().json(toJson(getTaskLists())));
+        }
     }
 
-    @Test
-    @SneakyThrows
-    void shouldReturnErrorWhenNotUuidFormat() {
+    @Nested
+    class DeleteTests {
 
-        doGet(BEARER_TOKEN, endPointUrl,  "1234")
-            .andExpect(status().isBadRequest());
-    }
+        @BeforeEach
+        void setUp() {
+            notificationTemplateRepository.save(template);
+            notificationRepository.save(notification);
+        }
 
-    @Test
-    @SneakyThrows
-    void shouldReturnTaskListForGiveCaseReferenceAndRole() {
+        @Test
+        @SneakyThrows
+        void shouldReturnOkWhenDeletingExistingEntity() {
 
-        doGet(BEARER_TOKEN, getTaskListUrl,  "123","defendant")
-            .andExpect(status().isOk())
-            .andExpect(content().json(toJson(getTaskLists())));
+            assertTrue(notificationRepository.findById(id).isPresent());
+
+            doDelete(BEARER_TOKEN, null, endPointUrlDelete, id.toString())
+                .andExpect(status().isOk());
+
+            assertFalse(notificationRepository.findById(id).isPresent());
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldReturnNotFoundWhenNoMatchingId() {
+            assertTrue(notificationRepository.findById(id).isPresent());
+
+            doDelete(BEARER_TOKEN, null, endPointUrlDelete, "")
+                .andExpect(status().isNotFound());
+
+            assertTrue(notificationRepository.findById(id).isPresent());
+        }
     }
 
     private List<TaskList> getTaskLists() {
