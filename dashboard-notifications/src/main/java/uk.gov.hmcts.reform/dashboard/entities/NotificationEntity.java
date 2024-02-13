@@ -31,8 +31,10 @@ public class NotificationEntity implements Serializable {
     @Column(name = "notification_name")
     private String name;
     private String citizenRole;
-    private String enHTML;
-    private String cyHTML;
+    private String titleEn;
+    private String titleCy;
+    private String descriptionEn;
+    private String descriptionCy;
     @Column(name = "message_param")
     private String params;
     private String createdBy;

@@ -15,6 +15,7 @@ public class DashboardNotificationsTestUtils {
     private static final UUID uuid = UUID.randomUUID();
 
     public static List<TaskList> getTaskListList() {
+
         List<TaskList> taskListList = new ArrayList<>();
         taskListList.add(TaskList.builder().id(uuid).taskNameCy("HearingCY").taskNameEn("HearingEN").taskOrder(1).categoryCy("CategoryCy").categoryEn("CategoryEn")
                              .role("Defendant").currentStatus(1).nextStatus(1).hintTextCy("HintCy").hintTextEn("HintEn").reference("123").build());

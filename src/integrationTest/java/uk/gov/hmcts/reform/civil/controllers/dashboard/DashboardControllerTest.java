@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,7 +38,8 @@ public class DashboardControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnOkWhenGettingExistingEntity() {
         UUID id = UUID.randomUUID();
-        NotificationEntity notification = new NotificationEntity(id, new NotificationTemplateEntity(), "12345", "name", "Defendant", "en", "cy", "params", "createdBy",
+
+        NotificationEntity notification = new NotificationEntity(id, new NotificationTemplateEntity(), "12345", "name", "Defendant", "en", "cy", "en", "cy", "params", "createdBy",
                                                                  new Date(),  "updatedBy", new Date());
 
         when(notificationRepository.findById(any())).thenReturn(Optional.of(notification));

@@ -55,7 +55,6 @@ public class TaskListEntity implements Serializable {
     @Size(max = 512)
     private String hintTextCy;
 
-    @NotNull
     private OffsetDateTime createdAt;
 
     private OffsetDateTime updatedAt;

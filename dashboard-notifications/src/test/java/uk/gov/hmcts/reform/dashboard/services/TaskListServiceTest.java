@@ -29,6 +29,7 @@ class TaskListServiceTest {
 
     @Test
     void shouldReturnEmpty_whenTaskListIsNotPresent() {
+      
         //given
         when(taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any())).thenReturn(List.of());
 
@@ -42,6 +43,7 @@ class TaskListServiceTest {
 
     @Test
     void shouldReturnTaskList_whenTaskListIsPresent() {
+      
         //given
         when(taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any())).thenReturn(getTaskListEntityList());
 
