@@ -43,15 +43,15 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
         void shouldUpdateFullRemissionData_ClaimFee() {
             CaseData caseData = CaseData.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-                .hwFeesDetails(HelpWithFeesDetails.builder().hwfFeeType(FeeType.CLAIMISSUED).build())
+                .claimIssuedHwfDetails(HelpWithFeesDetails.builder().build())
+                .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getHwFeesDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(10000));
-            assertThat(updatedData.getCalculatedClaimFeeInPence()).isEqualTo(BigDecimal.ZERO);
+            assertThat(updatedData.getClaimIssuedHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(10000));
         }
 
         @Test
@@ -59,15 +59,15 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
             CaseData caseData = CaseData.builder()
                 .hearingReferenceNumber("000HN001")
                 .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
-                .hwFeesDetails(HelpWithFeesDetails.builder().hwfFeeType(FeeType.HEARING).build())
+                .hearingHwfDetails(HelpWithFeesDetails.builder().build())
+                .hwfFeeType(FeeType.HEARING)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getHwFeesDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(30000));
-            assertThat(updatedData.getCalculatedHearingFeeInPence()).isEqualTo(BigDecimal.ZERO);
+            assertThat(updatedData.getHearingHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(30000));
         }
     }
 }

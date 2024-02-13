@@ -205,7 +205,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimTypeUnspec claimTypeUnSpec;
     private final ClaimType claimType;
-    private final HelpWithFeesDetails hwFeesDetails;
+    private final HelpWithFeesDetails claimIssuedHwfDetails;
+    private final HelpWithFeesDetails hearingHwfDetails;
+    private final FeeType hwfFeeType;
     private final SuperClaimType superClaimType;
     private final String claimTypeOther;
     private final PersonalInjuryType personalInjuryType;
@@ -1217,13 +1219,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return Optional.ofNullable(getHearingFee())
             .map(Fee::getCalculatedAmountInPence)
             .orElse(BigDecimal.ZERO);
-    }
-
-    @JsonIgnore
-    public FeeType getHwfFeeType() {
-        return Optional.ofNullable(getHwFeesDetails())
-            .map(HelpWithFeesDetails::getHwfFeeType)
-            .orElse(null);
     }
 
     public boolean hasApplicant1SignedSettlementAgreement() {

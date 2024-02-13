@@ -48,22 +48,21 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
         var feeType = caseData.getHwfFeeType();
         BigDecimal claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
         BigDecimal hearingFeeAmount = caseData.getCalculatedHearingFeeInPence();
-        HelpWithFeesDetails helpWithFeesDetails = caseData.getHwFeesDetails();
 
         if (FeeType.CLAIMISSUED == feeType && claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
+            HelpWithFeesDetails claimIssuedHwfDetails = caseData.getClaimIssuedHwfDetails();
             var claimFee = caseData.getClaimFee();
-            claimFee.setCalculatedAmountInPence(BigDecimal.ZERO);
-            helpWithFeesDetails.setRemissionAmount(claimFeeAmount);
+            claimIssuedHwfDetails.setRemissionAmount(claimFeeAmount);
 
             updatedData.claimFee(claimFee);
-            updatedData.hwFeesDetails(helpWithFeesDetails);
+            updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails);
         } else if (FeeType.HEARING == feeType && hearingFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
+            HelpWithFeesDetails hearingHwfDetails = caseData.getHearingHwfDetails();
             var hearingFee = caseData.getHearingFee();
-            hearingFee.setCalculatedAmountInPence(BigDecimal.ZERO);
-            helpWithFeesDetails.setRemissionAmount(hearingFeeAmount);
+            hearingHwfDetails.setRemissionAmount(hearingFeeAmount);
 
             updatedData.hearingFee(hearingFee);
-            updatedData.hwFeesDetails(helpWithFeesDetails);
+            updatedData.hearingHwfDetails(hearingHwfDetails);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
