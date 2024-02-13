@@ -53,7 +53,7 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateRemissionAmount(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        var remissionAmount = caseData.getHwFeesDetails().getRemissionAmount();
+        var remissionAmount = new BigDecimal("0"); // caseData.getHwFeesDetails().getRemissionAmount();
         var claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
         var hearingFeeAmount = caseData.getHearingFeeAmount();
         var feeType = caseData.getHwfFeeType();
@@ -78,7 +78,7 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
     private CallbackResponse partRemissionHWF(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         var updatedData = caseData.toBuilder();
-        var remissionAmount = caseData.getHwFeesDetails().getRemissionAmount();
+        var remissionAmount = new BigDecimal("0");
         var claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
         var hearingFeeAmount = caseData.getHearingFeeAmount();
         var feeType = caseData.getHwfFeeType();

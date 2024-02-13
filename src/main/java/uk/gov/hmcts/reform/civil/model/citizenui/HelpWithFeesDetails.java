@@ -17,5 +17,4 @@ public class HelpWithFeesDetails {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal remissionAmount;
-    private FeeType hwfFeeType;
 }
