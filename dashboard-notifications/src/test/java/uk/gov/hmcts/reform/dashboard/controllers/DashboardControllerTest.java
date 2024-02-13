@@ -39,7 +39,7 @@ class DashboardControllerTest {
 
         List<TaskList> taskList = getTaskListList();
         //given
-        when(taskListService.getTaskList(any(),any()))
+        when(taskListService.getTaskList(any(), any()))
             .thenReturn(taskList);
 
         //when
@@ -55,7 +55,7 @@ class DashboardControllerTest {
 
         List<Notification> notifications = getNotificationList();
         //given
-        when(dashboardNotificationService.getNotifications(any(),any()))
+        when(dashboardNotificationService.getNotifications(any(), any()))
             .thenReturn(notifications);
 
         //when

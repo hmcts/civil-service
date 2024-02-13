@@ -26,15 +26,14 @@ class TaskListServiceTest {
     @InjectMocks
     private TaskListService taskListService;
 
-
     @Test
     void shouldReturnEmpty_whenTaskListIsNotPresent() {
-      
+
         //given
         when(taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any())).thenReturn(List.of());
 
         //when
-        List<TaskList> actual = taskListService.getTaskList("123","Claimant");
+        List<TaskList> actual = taskListService.getTaskList("123", "Claimant");
 
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRole("123", "Claimant");
@@ -43,12 +42,12 @@ class TaskListServiceTest {
 
     @Test
     void shouldReturnTaskList_whenTaskListIsPresent() {
-      
+
         //given
         when(taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any())).thenReturn(getTaskListEntityList());
 
         //when
-        List<TaskList> actual = taskListService.getTaskList("123","Claimant");
+        List<TaskList> actual = taskListService.getTaskList("123", "Claimant");
 
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRole("123", "Claimant");
