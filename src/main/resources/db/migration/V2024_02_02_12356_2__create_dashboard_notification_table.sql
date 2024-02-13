@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS dbs.dashboard_notifications (
  id UUID NOT NULL PRIMARY KEY,
- dashboard_notifications_Templates_id INTEGER REFERENCES dbs.dashboard_notifications_Templates(id),
+ dashboard_notifications_templates_id INTEGER REFERENCES dbs.dashboard_notifications_templates(id),
  reference VARCHAR(256),
  notification_name VARCHAR(256),
  citizen_Role VARCHAR(256),

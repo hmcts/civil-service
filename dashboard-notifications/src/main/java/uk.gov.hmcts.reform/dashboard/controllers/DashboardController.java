@@ -81,7 +81,7 @@ public class DashboardController {
     }
 
     @PostMapping(path = "/scenarios/{scenario_ref}/{unique_case_identifier}")
-    public void recordScenario(
+    public ResponseEntity<String> recordScenario(
         @PathVariable("unique_case_identifier") String uniqueCaseIdentifier,
         @PathVariable("scenario_ref") String scenarioReference,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
@@ -91,5 +91,6 @@ public class DashboardController {
         dashboardScenariosService.recordScenarios(authorisation, scenarioReference,
                                                   uniqueCaseIdentifier, scenarioRequestParams
         );
+        return ResponseEntity.ok("Created");
     }
 }

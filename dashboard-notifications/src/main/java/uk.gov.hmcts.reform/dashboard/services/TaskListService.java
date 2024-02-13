@@ -25,7 +25,8 @@ public class TaskListService {
     }
 
     public TaskListEntity saveOrUpdate(TaskListEntity taskListEntity, String templateId) {
-        Optional<TaskListEntity> existingEntity = taskListRepository.findByReferenceAndRoleAndTaskItemTemplateAndId(
+        Optional<TaskListEntity> existingEntity = taskListRepository
+            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateId(
             taskListEntity.getReference(), taskListEntity.getTaskItemTemplate().getRole(), templateId);
 
         TaskListEntity beingUpdated = taskListEntity;

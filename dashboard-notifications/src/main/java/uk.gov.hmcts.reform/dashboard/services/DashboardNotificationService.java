@@ -36,7 +36,7 @@ public class DashboardNotificationService {
         NotificationEntity existingNotification = notificationRepository.findById(id).orElse(null);
 
         if (existingNotification != null) {
-            existingNotification.builder().notificationTemplateEntity(notification.getNotificationTemplateEntity())
+            existingNotification.builder().dashboardNotificationsTemplates(notification.getDashboardNotificationsTemplates())
             .reference(notification.getReference())
             .titleEn(notification.getTitleEn())
             .descriptionEn(notification.getDescriptionEn())

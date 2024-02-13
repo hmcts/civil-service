@@ -56,12 +56,13 @@ public class DashboardScenariosService {
                 .reference(uniqueCaseIdentifier)
                 .name(template.getName())
                 .citizenRole(citizenRole)
-                .notificationTemplateEntity(template)
+                .dashboardNotificationsTemplates(template)
                 .titleCy(stringSubstitutor.replace(template.getTitleCy()))
                 .titleEn(stringSubstitutor.replace(template.getTitleEn()))
                 .descriptionCy(stringSubstitutor.replace(template.getDescriptionCy()))
                 .descriptionEn(stringSubstitutor.replace(template.getDescriptionEn()))
                 .createdAt(OffsetDateTime.now())
+                .updatedOn(OffsetDateTime.now())
                 .build();
 
             log.info(
