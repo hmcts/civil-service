@@ -27,9 +27,9 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF
 public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(PARTIAL_REMISSION_HWF_GRANTED);
+    public static final String ERR_MSG_FEE_TYPE_NOT_CONFIGURED = "Fee Type is not configured properly";
     public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_CLAIM_FEE = "Remission amount should be less than claim fee";
     public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_HEARING_FEE = "Remission amount should be less than hearing fee";
-    public static final String ERR_MSG_FEE_TYPE_NOT_CONFIGURED = "Fee Type is not configured properly";
     public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO = "Remission amount should be greater than zero";
 
     private final ObjectMapper objectMapper;
@@ -57,7 +57,8 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
         var claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
         var hearingFeeAmount = caseData.getHearingFeeAmount();
         var feeType = caseData.getHwfFeeType();
-        List<String> errors = new ArrayList<>();
+        var errors = new ArrayList<String>();
+
         if (feeType == null) {
             errors.add(ERR_MSG_FEE_TYPE_NOT_CONFIGURED);
         }
@@ -82,5 +83,4 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
             .data(caseData.toMap(objectMapper))
             .build();
     }
-
 }
