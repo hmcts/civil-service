@@ -50,7 +50,6 @@ public class TaskItemTemplateEntity implements Serializable {
 
     private int taskOrder;
 
-    @NotNull
     @javax.persistence.Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
