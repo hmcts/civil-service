@@ -74,15 +74,15 @@ resource "azurerm_function_app" "civil-camunda-stuck-alert-function-app" {
   location            = var.appinsights_location
   resource_group_name = azurerm_resource_group.rg.name
   app_service_plan_id = azurerm_app_service_plan.functionapp_service_plan.id
-  storage_account_name = module.slack-alerts-storage-account.name
-  storage_account_access_key = module.slack-alerts-storage-account.primary_access_key
+  storage_account_name = module.slack-alerts-storage-account.storage_account_name
+  storage_account_access_key = module.slack-alerts-storage-account.storage_account_primary_access_key
   version = "4"
   os_type = "linux"
   app_settings = {
     FUNCTIONS_WORKER_RUNTIME = "python"
   }
 
-  site_config = {
+  site_config {
     linux_fx_version = "python|3.10"
   }
 
