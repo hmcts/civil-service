@@ -332,6 +332,9 @@ public enum CaseEvent {
     UPDATE_CLAIM_STATE_AFTER_TRANSLATED_DOCUMENT_UPLOADED(CAMUNDA),
     NOTIFY_CLAIMANT_LIP_HELP_WITH_FEES(CAMUNDA),
     RETRIGGER_CASES(CAMUNDA),
+    RETRIGGER_CLAIMANT_RESPONSE(CAMUNDA),
+    RETRIGGER_CLAIMANT_RESPONSE_SPEC(CAMUNDA),
+    RETRIGGER_NOTIFY_INTERIM_JUDGMENT_DEFENDANT(CAMUNDA),
     GENERATE_DEFAULT_JUDGMENT_BY_ADMISSION_RESPONSE_DOC(CAMUNDA),
     GENERATE_JUDGMENT_BY_ADMISSION_RESPONSE_DOC(CAMUNDA),
     GENERATE_JUDGMENT_BY_DETERMINATION_RESPONSE_DOC(CAMUNDA),
@@ -350,4 +353,12 @@ public enum CaseEvent {
         return this.getUserType() == CAMUNDA;
     }
 
+    public static CaseEvent fromString(String text) {
+        for (CaseEvent event : CaseEvent.values()) {
+            if (event.name().equalsIgnoreCase(text)) {
+                return event;
+            }
+        }
+        throw new IllegalArgumentException("No constant with name " + text + " found in CaseEvent enum");
+    }
 }

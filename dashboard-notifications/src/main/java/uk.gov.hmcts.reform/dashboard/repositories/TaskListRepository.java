@@ -13,7 +13,7 @@ import java.util.UUID;
 @Repository
 public interface TaskListRepository extends CrudRepository<TaskListEntity, UUID> {
 
-    Optional<List<TaskListEntity>> findByReferenceAndTaskItemTemplateRole(String reference, String role);
+    List<TaskListEntity> findByReferenceAndTaskItemTemplateRole(String reference, String role);
 
     Optional<TaskListEntity> findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
         String reference, String role, String templateName);

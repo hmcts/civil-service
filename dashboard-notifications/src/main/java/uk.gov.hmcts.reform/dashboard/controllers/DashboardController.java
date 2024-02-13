@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
-import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
+import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
@@ -52,7 +52,7 @@ public class DashboardController {
     @GetMapping(path = {
         "taskList/{ccd-case-identifier}/role/{role-type}",
     })
-    public ResponseEntity<Optional<List<TaskListEntity>>> getTaskListByCaseIdentifierAndRole(
+    public ResponseEntity<List<TaskList>> getTaskListByCaseIdentifierAndRole(
         @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
         @PathVariable("role-type") String roleType,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
@@ -67,7 +67,9 @@ public class DashboardController {
         return new ResponseEntity<>(taskListResponse, HttpStatus.OK);
     }
 
-    @GetMapping(path = {"notifications/{uuid}"})
+    @GetMapping(path = {
+        "notifications/{uuid}",
+    })
     public ResponseEntity<Optional<NotificationEntity>> getDashboardNotificationByUuid(
         @PathVariable("uuid") UUID uuid,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation

@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql("/scripts/create_dashboard_notifications_and_task_list_templates.sql")
 public class CreateDashboardScenarioTest extends BaseIntegrationTest {
 
-    public static final String NOTICE_HEARING_FEE_PAYMENT_REQUIRED = "notice-hearing-fee-payment-required";
+    public static final String NOTICE_HEARING_FEE_PAYMENT_REQUIRED = "notice.hearing.fee.payment.required";
     private static final String DASHBOARD_CREATE_SCENARIO_URL = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
 
     @Test
