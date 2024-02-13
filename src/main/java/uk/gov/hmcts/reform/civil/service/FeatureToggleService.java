@@ -52,7 +52,7 @@ public class FeatureToggleService {
     }
 
     public boolean isAutomatedHearingNoticeEnabled() {
-        return false;
+        return this.featureToggleApi.isFeatureEnabled("ahn");
     }
 
     public boolean isFastTrackUpliftsEnabled() {
