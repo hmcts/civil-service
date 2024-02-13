@@ -30,25 +30,28 @@ public class DashboardNotificationServiceTest {
     @InjectMocks
     private DashboardNotificationService dashboardNotificationService;
 
-    @Test
-    void shouldReturnEmpty_whenNotificationListIsNotPresent() {
-        when(notificationRepository.findByReferenceAndCitizenRole(any(), any())).thenReturn(List.of());
-        List<Notification> actual = dashboardNotificationService.getNotifications("123", "Claimant"
-        );
-
-        assertThat(actual).isEqualTo(List.of());
-    }
-
-    @Test
-    void shouldReturnTaskList_whenTaskListIsPresent() {
-        when(notificationRepository.findByReferenceAndCitizenRole(any(), any())).thenReturn(getNotificationEntityList());
-        List<Notification> actual = dashboardNotificationService.getNotifications("123", "Claimant"
-        );
-
-        assertThat(actual).isEqualTo(getNotificationList());
-    }
-
     private final UUID id = UUID.randomUUID();
+
+    @Nested
+    class GetTests {
+        @Test
+        void shouldReturnEmpty_whenNotificationListIsNotPresent() {
+            when(notificationRepository.findByReferenceAndCitizenRole(any(), any())).thenReturn(List.of());
+            List<Notification> actual = dashboardNotificationService.getNotifications("123", "Claimant"
+            );
+
+            assertThat(actual).isEqualTo(List.of());
+        }
+
+        @Test
+        void shouldReturnTaskList_whenTaskListIsPresent() {
+            when(notificationRepository.findByReferenceAndCitizenRole(any(), any())).thenReturn(getNotificationEntityList());
+            List<Notification> actual = dashboardNotificationService.getNotifications("123", "Claimant"
+            );
+
+            assertThat(actual).isEqualTo(getNotificationList());
+        }
+    }
 
     @Nested
     class DeleteTests {
