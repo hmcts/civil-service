@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.DefendantResponseApplicantNotificationHandler.TASK_ID_CC_RESP1;
@@ -191,6 +192,41 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                     ArgumentMatchers.eq("spec-claimant-template-id"),
                     ArgumentMatchers.argThat(map -> {
                         Map<String, String> expected = getNotificationDataMapSpec(finalCaseData);
+                        return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
+                            && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
+                    }),
+                    ArgumentMatchers.eq("defendant-response-applicant-notification-000DC001")
+                );
+            }
+
+            @Test
+            void shouldNotifyCitizenApplicantSpec_whenInvoked() {
+
+                LocalDate whenWillPay = LocalDate.now().plusMonths(1);
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateNotificationAcknowledged()
+                    .build().toBuilder()
+                    .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                    .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
+                    .respondToClaimAdmitPartLRspec(
+                        RespondToClaimAdmitPartLRspec.builder()
+                            .whenWillThisAmountBePaid(whenWillPay)
+                            .build()
+                    )
+                    .build();
+                caseData = caseData.toBuilder().applicant1Represented(NO).caseAccessCategory(SPEC_CLAIM).build();
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                        CallbackRequest.builder().eventId("NOTIFY_APPLICANT_SOLICITOR1_FOR_DEFENDANT_RESPONSE").build())
+                    .build();
+
+                handler.handle(params);
+                final CaseData finalCaseData = caseData;
+                verify(notificationService).sendMail(
+                    ArgumentMatchers.eq("rambo@email.com"),
+                    ArgumentMatchers.eq("spec-claimant-template-id"),
+                    ArgumentMatchers.argThat(map -> {
+                        Map<String, String> expected = getNotificationDataMapSpecCui(finalCaseData);
                         return map.get(CLAIM_REFERENCE_NUMBER).equals(expected.get(CLAIM_REFERENCE_NUMBER))
                             && map.get(CLAIM_LEGAL_ORG_NAME_SPEC).equals(expected.get(CLAIM_LEGAL_ORG_NAME_SPEC));
                     }),
@@ -581,6 +617,14 @@ class DefendantResponseApplicantNotificationHandlerTest extends BaseCallbackHand
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 "defendantName", "Mr. Sole Trader",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name"
+            );
+        }
+
+        private Map<String, String> getNotificationDataMapSpecCui(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                "defendantName", "Mr. Sole Trader",
+                CLAIM_LEGAL_ORG_NAME_SPEC, "Mr. John Rambo"
             );
         }
 

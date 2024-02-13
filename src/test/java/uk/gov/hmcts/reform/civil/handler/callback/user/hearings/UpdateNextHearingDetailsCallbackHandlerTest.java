@@ -43,7 +43,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 CallbackParams params = callbackParamsOf(
                     caseData,
-                    CaseEvent.UPDATE_NEXT_HEARING_DETAILS,
+                    CaseEvent.UpdateNextHearingInfo,
                     ABOUT_TO_START
                 );
 
