@@ -338,7 +338,7 @@ def versions = [
   springStatemachine : '4.0.0',
   lombok             : '1.18.26',
   pact               : '3.5.24',
-  springSecurity     : '5.8.5'
+  springSecurity     : '5.8.7'
 ]
 
 ext.libraries = [
