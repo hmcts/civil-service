@@ -31,7 +31,6 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
         log.info("User authentication successful.");
         var caseIdForNotifyRpaOnCaseHandedOffline = readCaseIds("/caseIdForRetrigger.txt");
         String caseEventForRetriggerString = externalTask.getVariable("eventForRetrigger");
-
         CaseEvent caseEvent = CaseEvent.fromString(caseEventForRetriggerString);
         updateCaseByEvent(caseIdForNotifyRpaOnCaseHandedOffline, caseEvent);
     }
