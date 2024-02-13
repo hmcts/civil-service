@@ -14,5 +14,4 @@ public class HelpWithFees {
 
     private YesOrNo helpWithFee;
     private String helpWithFeesReferenceNumber;
-    private YesOrNo invalidHelpWithFee;
 }

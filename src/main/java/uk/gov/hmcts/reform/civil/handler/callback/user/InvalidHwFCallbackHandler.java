@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 
 import java.util.List;
 import java.util.Map;
@@ -40,10 +41,10 @@ public class InvalidHwFCallbackHandler extends CallbackHandler {
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder();
-        var caseDataLip = caseDataUpdated.build().getCaseDataLiP();
-        caseDataLip.getHelpWithFees().setInvalidHelpWithFee(YesOrNo.NO);
-        caseDataUpdated.caseDataLiP(caseDataLip);
+        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder()
+            .hwFeesDetails(HelpWithFeesDetails.builder()
+                               .invalidHelpWithFee(YesOrNo.YES).build());
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.build().toMap(objectMapper))
             .build();
