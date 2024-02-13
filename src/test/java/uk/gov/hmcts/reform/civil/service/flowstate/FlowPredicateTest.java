@@ -2004,6 +2004,14 @@ class FlowPredicateTest {
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed().build();
             assertFalse(applicantOutOfTime.test(caseData));
         }
+
+        @Test
+        void shouldReturnTrue_whenCaseDataPastApplicantResponseDeadlineButHasApplicantResponseDate() {
+            CaseData caseData = CaseDataBuilder.builder().atStatePastApplicantResponseDeadline()
+                .applicant1ResponseDate(LocalDateTime.now().minusDays(1))
+                .build();
+            assertFalse(applicantOutOfTime.test(caseData));
+        }
     }
 
     @Nested
