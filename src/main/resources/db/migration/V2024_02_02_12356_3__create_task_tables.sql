@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS dbs.task_item_template (
        task_status_sequence int[],
        role character varying(256),
        task_order int,
-       created_at timestamp without time zone DEFAULT now() NOT NULL
+       created_at timestamp without time zone
 );
 
 
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS dbs.task_list (
       task_name_cy  character varying(256),
       hint_text_cy  character varying(512),
       message_params jsonb,
-      created_at timestamp without time zone DEFAULT now() NOT NULL,
+      created_at timestamp without time zone,
       updated_at timestamp without time zone,
       updated_by character varying(256),
       CONSTRAINT fk_task_list_task_item_template
