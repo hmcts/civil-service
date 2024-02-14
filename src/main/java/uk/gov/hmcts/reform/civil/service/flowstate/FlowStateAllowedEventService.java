@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EXTEND_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
@@ -824,7 +825,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
                 asyncStitchingComplete,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                FULL_REMISSION_HWF
             )
         ),
         entry(
@@ -1564,7 +1566,8 @@ public class FlowStateAllowedEventService {
         entry(
             PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName(),
             List.of(
-                UPLOAD_TRANSLATED_DOCUMENT
+                UPLOAD_TRANSLATED_DOCUMENT,
+                FULL_REMISSION_HWF
             )
         ),
         entry(

@@ -56,6 +56,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISCONTINUE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DISMISS_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLICANT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
@@ -812,7 +813,8 @@ class FlowStateAllowedEventServiceTest {
                         BUNDLE_CREATION_NOTIFICATION,
                         ADD_UNAVAILABLE_DATES,
                         asyncStitchingComplete,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        FULL_REMISSION_HWF
                     }
                 )
             );

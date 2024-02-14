@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
@@ -28,6 +29,7 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(FULL_REMISSION_HWF);
     private final ObjectMapper objectMapper;
     private final Map<String, Callback> callbackMap = Map.of(
+        callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
         callbackKey(ABOUT_TO_SUBMIT),
         this::fullRemissionHWF,
         callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
