@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,5 +53,6 @@ public class UpdateClaimantIntentionClaimStateCallbackHandlerTests extends BaseC
 
         // then
         assertThat(response.getErrors()).isNull();
+        verify(updateClaimStateService, times(1)).setUpCaseState(caseData);
     }
 }
