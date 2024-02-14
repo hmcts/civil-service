@@ -13,19 +13,25 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
 import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
@@ -75,6 +81,16 @@ import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsUploadDoc;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictPages;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingFirstOpenDateAfter;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
@@ -106,10 +122,12 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
@@ -164,6 +182,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
     private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
+    private final  List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -224,7 +243,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.hearingMethodValuesSmallClaims(hearingMethodList);
         }
 
-        DynamicList locationsList = getLocationList(callbackParams, updatedData, preferredCourt.orElse(null));
+        DynamicList locationsList = getLocationList(callbackParams, updatedData, preferredCourt.orElse(null), false);
         updatedData.disposalHearingMethodInPerson(locationsList);
         updatedData.fastTrackMethodInPerson(locationsList);
         updatedData.smallClaimsMethodInPerson(locationsList);
@@ -666,6 +685,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
 
+        if (featureToggleService.isSdoR2Enabled()) {
+            populateDRHFields(callbackParams, updatedData, preferredCourt);
+        }
         //This the flowafter request for reconsideration
         if (featureToggleService.isSdoR2Enabled() && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
@@ -689,6 +711,49 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private void populateDRHFields(CallbackParams callbackParams,
+                                   CaseData.CaseDataBuilder<?, ?> updatedData, Optional<RequestedCourt> preferredCourt) {
+        DynamicList courtList = getCourtLocationForSdoR2(callbackParams, updatedData, preferredCourt.orElse(null));
+        courtList.setValue(courtList.getListItems().get(0));
+        updatedData.sdoR2SmallClaimsJudgesRecital(SdoR2SmallClaimsJudgesRecital.builder().input(
+            SdoR2UiConstantSmallClaim.JUDGE_RECITAL).build());
+        updatedData.sdoR2SmallClaimsPPI(SdoR2SmallClaimsPPI.builder().ppiDate(LocalDate.now().plusDays(21)).text(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION).build());
+        updatedData.sdoR2SmallClaimsUploadDoc(SdoR2SmallClaimsUploadDoc.builder().sdoUploadOfDocumentsTxt(SdoR2UiConstantSmallClaim.UPLOAD_DOC_DESCRIPTION).build());
+        updatedData.sdoR2SmallClaimsWitnessStatements(SdoR2SmallClaimsWitnessStatements.builder()
+                                                          .sdoStatementOfWitness(SdoR2UiConstantSmallClaim.WITNESS_STATEMENT_TEXT)
+                                                          .isRestrictWitness(NO)
+                                                          .isRestrictPages(NO)
+                                                          .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness
+                                                                                               .builder()
+                                                                                               .partyIsCountedAsWitnessTxt(SdoR2UiConstantSmallClaim.RESTRICT_WITNESS_TEXT)
+                                                                                               .build())
+                                                          .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
+                                                                                             .fontDetails(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2)
+                                                                                             .witnessShouldNotMoreThanTxt(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1)
+                                                                                             .build())
+                                                          .text(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT).build());
+        updatedData.sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder()
+                                                .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
+                                                .methodOfHearing(SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING)
+                                                .lengthList(SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES)
+                                                .physicalBundleOptions(SmallClaimsSdoR2PhysicalTrialBundleOptions.NO)
+                                                .sdoR2SmallClaimsHearingFirstOpenDateAfter(SdoR2SmallClaimsHearingFirstOpenDateAfter.builder()
+                                                                                  .listFrom(LocalDate.now().plusDays(56)).build())
+                                                .sdoR2SmallClaimsHearingWindow(SdoR2SmallClaimsHearingWindow.builder().dateTo(LocalDate.now().plusDays(70))
+                                                                      .listFrom(LocalDate.now().plusDays(56)).build())
+                                                .hearingCourtLocationList(courtList)
+                                                .altHearingCourtLocationList(getLocationList(callbackParams,
+                                                                                             updatedData,
+                                                                                             preferredCourt.orElse(null), true))
+                                                .physicalBundlePartyTxt(SdoR2UiConstantSmallClaim.BUNDLE_TEXT).build());
+        updatedData.sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder()
+                                                 .text(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT)
+                                                 .date(LocalDate.now().plusDays(7)).build());
+        updatedData.sdoR2SmallClaimsUploadDocToggle(includeInOrderToggle);
+        updatedData.sdoR2SmallClaimsHearingToggle(includeInOrderToggle);
+        updatedData.sdoR2SmallClaimsWitnessStatementsToggle(includeInOrderToggle);
     }
 
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
@@ -729,17 +794,22 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
      */
     private DynamicList getLocationList(CallbackParams callbackParams,
                                         CaseData.CaseDataBuilder<?, ?> updatedData,
-                                        RequestedCourt preferredCourt) {
+                                        RequestedCourt preferredCourt, boolean getAllCourts) {
         List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
+        DynamicList locationsList;
         Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
             .flatMap(requestedCourt -> locationHelper.updateCaseManagementLocation(
                 updatedData,
                 requestedCourt,
                 () -> locations
             ));
-        DynamicList locationsList;
+
+        if (featureToggleService.isSdoR2Enabled() && getAllCourts) {
+            //for SDOR2 we need to display all court in alternative court locations
+            matchingLocation = Optional.empty();
+        }
         if (matchingLocation.isPresent()) {
             locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
                                                  matchingLocation.get(), true
@@ -752,6 +822,27 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return locationsList;
     }
 
+    private DynamicList getCourtLocationForSdoR2(CallbackParams callbackParams,
+                                               CaseData.CaseDataBuilder<?, ?> updatedData,
+                                               RequestedCourt preferredCourt) {
+        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
+            callbackParams.getParams().get(BEARER_TOKEN).toString()
+        );
+        Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
+            .flatMap(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                updatedData,
+                requestedCourt,
+                () -> locations
+            ));
+        List<DynamicListElement> dynamicListOptions = new ArrayList<>();
+        if (matchingLocation.isPresent()) {
+            dynamicListOptions.add(dynamicElementFromCode(matchingLocation.get().getEpimmsId(),
+                                                          LocationRefDataService.getDisplayEntry(matchingLocation.get())));
+        }
+        dynamicListOptions.add(dynamicElementFromCode("OTHER_LOCATION", "Other location"));
+        return DynamicList.fromDynamicListElementList(dynamicListOptions);
+    }
+
     private String getLocationEpimms(LocationRefData location) {
         return location.getEpimmsId();
     }
@@ -762,11 +853,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updateDeductionValue(caseData, updatedData);
 
-        updatedData.setSmallClaimsFlag(YesOrNo.NO).build();
-        updatedData.setFastTrackFlag(YesOrNo.NO).build();
-
+        updatedData.setSmallClaimsFlag(NO).build();
+        updatedData.setFastTrackFlag(NO).build();
+        updatedData.isSdoR2NewScreen(NO).build();
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             updatedData.setSmallClaimsFlag(YES).build();
+            if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)) {
+                updatedData.isSdoR2NewScreen(YES).build();
+            }
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
         }
@@ -774,6 +868,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private boolean isSDOR2ScreenForDRHSmallClaim(CaseData caseData) {
+        return ((caseData.getDrawDirectionsOrderRequired() == NO
+            && caseData.getSmallClaims() != null
+            && caseData.getSmallClaims().contains(
+            SmallTrack.smallClaimDisputeResolutionHearing))
+            || (caseData.getDrawDirectionsOrderRequired() == YES
+            && caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections() != null
+            && caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections()
+            .contains(SmallTrack.smallClaimDisputeResolutionHearing)));
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
@@ -885,7 +990,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 dataBuilder.eaCourtLocation(YES);
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(YesOrNo.NO);
+                dataBuilder.eaCourtLocation(NO);
             }
         }
 
@@ -945,7 +1050,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (SdoHelper.isFastTrack(caseData)) {
             toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            toUseList = Optional.ofNullable(caseData.getSmallClaimsMethodInPerson());
+            if (featureToggleService.isSdoR2Enabled() && caseData.getIsSdoR2NewScreen() != null && caseData.getIsSdoR2NewScreen().equals(YES)) {
+                toUseList = caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList() != null
+                    ? Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList())
+                    : Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList());
+            } else {
+                toUseList = Optional.ofNullable(caseData.getSmallClaimsMethodInPerson());
+            }
         } else {
             throw new IllegalArgumentException("Could not determine claim track");
         }
