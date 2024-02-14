@@ -67,7 +67,7 @@ class TaskListServiceTest {
             any(),
             any(),
             any()
-        )).thenReturn(Optional.of(getTaskListEntity()));
+        )).thenReturn(Optional.ofNullable(getTaskListEntity()));
 
         when(taskListRepository.save(
             any(TaskListEntity.class)
