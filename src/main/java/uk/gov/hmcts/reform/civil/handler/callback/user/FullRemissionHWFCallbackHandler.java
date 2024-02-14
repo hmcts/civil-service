@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -50,23 +51,31 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
         BigDecimal hearingFeeAmount = caseData.getCalculatedHearingFeeInPence();
 
         if (FeeType.CLAIMISSUED == feeType && claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
-            HelpWithFeesDetails claimIssuedHwfDetails = caseData.getClaimIssuedHwfDetails();
-            var claimFee = caseData.getClaimFee();
-            claimIssuedHwfDetails.setRemissionAmount(claimFeeAmount);
 
-            updatedData.claimFee(claimFee);
-            updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails);
+            Optional.ofNullable(caseData.getClaimIssuedHwfDetails())
+                .ifPresentOrElse(
+                    claimIssuedHwfDetails -> updatedData.claimIssuedHwfDetails(
+                        claimIssuedHwfDetails.builder().remissionAmount(claimFeeAmount).build()
+                    ),
+                    () -> updatedData.claimIssuedHwfDetails(
+                        HelpWithFeesDetails.builder().remissionAmount(claimFeeAmount).build()
+                    )
+                );
         } else if (FeeType.HEARING == feeType && hearingFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
-            HelpWithFeesDetails hearingHwfDetails = caseData.getHearingHwfDetails();
-            var hearingFee = caseData.getHearingFee();
-            hearingHwfDetails.setRemissionAmount(hearingFeeAmount);
+            Optional.ofNullable(caseData.getHearingHwfDetails())
+                .ifPresentOrElse(
+                    hearingHwfDetails -> updatedData.hearingHwfDetails(
+                        hearingHwfDetails.builder().remissionAmount(hearingFeeAmount).build()
+                    ),
+                    () -> updatedData.hearingHwfDetails(
+                        HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount).build()
+                    )
+                );
 
-            updatedData.hearingFee(hearingFee);
-            updatedData.hearingHwfDetails(hearingHwfDetails);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(callbackParams.getCaseData().toMap(objectMapper))
+            .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 }
