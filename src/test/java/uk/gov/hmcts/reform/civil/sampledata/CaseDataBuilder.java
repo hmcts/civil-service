@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -98,6 +99,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -554,6 +556,7 @@ public class CaseDataBuilder {
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
 
     private YesOrNo eaCourtLocation;
+    private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
 
     public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
         this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
@@ -6297,6 +6300,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder feePaymentOutcomeDetails(FeePaymentOutcomeDetails details) {
+        this.feePaymentOutcomeDetails = details;
+        return this;
+    }
+
     public CaseDataBuilder specClaim1v1LrVsLip() {
         this.caseAccessCategory = SPEC_CLAIM;
         this.respondent1Represented = NO;
@@ -6920,6 +6928,8 @@ public class CaseDataBuilder {
             .eaCourtLocation(eaCourtLocation)
             .upholdingPreviousOrderReason(upholdingPreviousOrderReason)
             .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)
+            .hwfFeeType(FeeType.CLAIMISSUED)
+            .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
             .build();
     }
 }
