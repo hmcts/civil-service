@@ -187,7 +187,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     public static final String FEEDBACK_LINK = "<p>%s"
         + " <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>";
 
-    private static final String ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE = "Date must be in the future";
+    public static final String ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE = "Date must be in the future";
+    public static final String ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO = "The number entered cannot be less than zero";
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
@@ -716,9 +717,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.disposalHearingAddNewDirections(null);
             updatedData.smallClaimsAddNewDirections(null);
             updatedData.fastTrackAddNewDirections(null);
-            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
-            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build()); // TODO ask Azam!
+            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input(null).build()); // TODO check if hearing notes work (if we send "" then it will return it because it's not null)
+            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input(null).build()); // TODO
             updatedData.disposalHearingHearingNotes(null);
+            // Add NIHL variables
         }
 
         if (featureToggleService.isSdoR2Enabled()) {
@@ -1010,8 +1012,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert().getSdoDefendantMayAskDate())
                 .ifPresent(errors::add);
         }
-        if (caseData.getSdoR2QuestionsClaimantExpert() != null && caseData.getSdoR2QuestionsClaimantExpert().getSdoQuestionsShallBeAnsweredDate() != null) {
-            validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert().getSdoQuestionsShallBeAnsweredDate())
+        if (caseData.getSdoR2QuestionsToEntExpert() != null && caseData.getSdoR2QuestionsToEntExpert().getSdoQuestionsShallBeAnsweredDate() != null) {
+            validateFutureDate(caseData.getSdoR2QuestionsToEntExpert().getSdoQuestionsShallBeAnsweredDate())
                 .ifPresent(errors::add);
         }
         if (caseData.getSdoR2PermissionToRelyOnExpert() != null && caseData.getSdoR2PermissionToRelyOnExpert().getSdoPermissionToRelyOnExpertDate() != null) {
@@ -1110,7 +1112,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private Optional<String> validateGreaterOrEqualZero(Integer quantity) {
         if (quantity < 0) {
-            return Optional.of("ERROR_MESSAGE_Quantity < 0");
+            return Optional.of(ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO);
         }
         return Optional.empty();
     }
@@ -1331,7 +1333,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 ? ofNullable(caseData.getSdoR2Trial().getHearingCourtLocationList())
                 : ofNullable(caseData.getSdoR2Trial().getAltHearingCourtLocationList());
         } else if (SdoHelper.isFastTrack(caseData)) {
-            toUseList = ofNullable(caseData.getFastTrackMethodInPerson());
+            toUseList = ofNullable(caseData.getFastTrackMethodInPerson()); // TODO check if OK for NIHL or we need new variable
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
             toUseList = ofNullable(caseData.getSmallClaimsMethodInPerson());
         } else {

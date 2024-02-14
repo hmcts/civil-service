@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,24 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialHearingLengthOther;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -106,6 +124,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v1;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_1v2;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.CONFIRMATION_SUMMARY_2v1;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.FEEDBACK_LINK;
 
 @SpringBootTest(classes = {
@@ -326,6 +346,43 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getSdoHearingNotes()).isNull();
             assertThat(responseCaseData.getFastTrackHearingNotes()).isNull();
             assertThat(responseCaseData.getDisposalHearingHearingNotes()).isNull();
+        }
+
+        @Test
+        void ShouldPopulateDefaultFieldsNihl() {
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
+            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .claimsTrack(ClaimsTrack.fastTrack)
+                .fastClaims(fastTrackList)
+                .build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("sdoAltDisputeResolution").extracting("includeInOrderToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoVariationOfDirections").extracting("includeInOrderToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2Settlement").extracting("includeInOrderToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2DisclosureOfDocumentsToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2SeparatorWitnessesOfFactToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2SeparatorExpertEvidenceToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2SeparatorAddendumReportToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2SeparatorFurtherAudiogramToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2SeparatorQuestionsClaimantExpertToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2SeparatorPermissionToRelyOnExpertToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2SeparatorEvidenceAcousticEngineerToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2SeparatorQuestionsToEntExpertToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2ScheduleOfLossToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2SeparatorUploadOfDocumentsToggle").asString().isEqualTo("[INCLUDE]");
+            assertThat(response.getData()).extracting("sdoR2TrialToggle").asString().isEqualTo("[INCLUDE]");
         }
     }
 
@@ -2224,31 +2281,59 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getSdoOrderDocument().getDocumentLink().getCategoryID()).isEqualTo("sdo");
         }
 
-        @Test
-        void ShouldValidate() { //TODO complete
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void ShouldValidateNihlFields(boolean valid) {
 
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
             List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
-            fastTrackList.add(FastTrack.fastClaimBuildingDispute);
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
+
+            LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now();
+            Integer testDays = valid ? 0 : -1;
+            Integer testHours = valid ? 0 : -1;
+            Integer testMinutes = valid ? 0 : -1;
+            Integer testWitnesses = valid ? 0 : -1;
+            Integer testPages = valid ? 1 : 0;
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()
                 .toBuilder()
-                .drawDirectionsOrderRequired(YesOrNo.NO)
+                .drawDirectionsOrderRequired(NO)
                 .claimsTrack(ClaimsTrack.fastTrack)
                 .fastClaims(fastTrackList)
+                .sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder().standardDisclosureDate(testDate).inspectionDate(testDate).build())
+                .sdoR2AddendumReport(SdoR2AddendumReport.builder().sdoAddendumReportDate(testDate).build())
+                .sdoR2FurtherAudiogram(SdoR2FurtherAudiogram.builder().sdoClaimantShallUndergoDate(testDate).sdoServiceReportDate(testDate).build())
+                .sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder().sdoDefendantMayAskDate(testDate).build())
+                .sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder().sdoQuestionsShallBeAnsweredDate(testDate).build())
+                .sdoR2PermissionToRelyOnExpert(SdoR2PermissionToRelyOnExpert.builder().sdoPermissionToRelyOnExpertDate(testDate).sdoJointMeetingOfExpertsDate(testDate).build())
+                .sdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder().sdoInstructionOfTheExpertDate(testDate).sdoExpertReportDate(testDate).sdoWrittenQuestionsDate(testDate).sdoRepliesDate(testDate).build())
+                .sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder().sdoQuestionsShallBeAnsweredDate(testDate).sdoWrittenQuestionsDate(testDate).build())
+                .sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder().sdoR2ScheduleOfLossClaimantDate(testDate).sdoR2ScheduleOfLossDefendantDate(testDate).build())
+                .sdoR2Trial(SdoR2Trial.builder().sdoR2TrialFirstOpenDateAfter(SdoR2TrialFirstOpenDateAfter.builder().listFrom(testDate).build()).sdoR2TrialWindow(SdoR2TrialWindow.builder().listFrom(testDate).dateTo(testDate).build())
+                                .lengthListOther(SdoR2TrialHearingLengthOther.builder().trialLengthDays(testDays).trialLengthHours(testHours).trialLengthMinutes(testMinutes).build()).build())
+                .sdoR2ImportantNotesDate(testDate)
+                .sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder().sdoWitnessDeadlineDate(testDate).sdoR2RestrictWitness(SdoR2RestrictWitness.builder().restrictNoOfWitnessDetails(SdoR2RestrictNoOfWitnessDetails.builder().noOfWitnessClaimant(testWitnesses).noOfWitnessDefendant(testWitnesses).build()).build())
+                                          .sdoRestrictPages(SdoR2RestrictPages.builder().restrictNoOfPagesDetails(SdoR2RestrictNoOfPagesDetails.builder().noOfPages(testPages).build()).build()).build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("setSmallClaimsFlag").isEqualTo("No");
-            assertThat(response.getData()).extracting("setFastTrackFlag").isEqualTo("Yes");
-            assertThat(response.getData()).extracting("isSdoR2NewScreen").isEqualTo("Yes");
+            if (valid) {
+                assertThat(response.getErrors()).size().isZero();
+            } else {
+                assertThat(response.getErrors()).size().isEqualTo(28);
+                assertThat(response.getErrors()).contains(ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE);
+                assertThat(response.getErrors()).contains(ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO);
+                assertThat(response.getErrors()).contains("ERROR_MESSAGE_Quantity < 1");
+                assertThat(response.getErrors()).contains("ERROR_MESSAGE_Hours must be between 0 and 23");
+                assertThat(response.getErrors()).contains("ERROR_MESSAGE_Minutes must be between 0 and 59");
+            }
         }
 
     }
