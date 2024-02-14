@@ -49,8 +49,7 @@ public class DashboardNotificationsTestUtils {
     }
     public static TaskListEntity getTaskListEntity() {
 
-        TaskListEntity taskListEntity = new TaskListEntity();
-        taskListEntity.builder()
+        TaskListEntity taskListEntity = TaskListEntity.builder()
             .id(uuid).taskNameCy("HearingCY").taskNameEn("HearingEN")
             .currentStatus(1).nextStatus(1).hintTextCy("HintCy")
             .hintTextEn("HintEn").reference("123")

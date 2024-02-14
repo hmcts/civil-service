@@ -50,18 +50,17 @@ public class TaskListService {
     }
     public TaskListEntity updateTaskList(String name , String reference, String role ) {
         Optional<TaskListEntity> existingEntity = taskListRepository
-            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
-                reference,role,name);
-
-        TaskListEntity beingUpdated = new TaskListEntity();
+                .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
+                        reference, role, name);
+        TaskListEntity beingUpdated=new TaskListEntity();
         if (existingEntity.isPresent()) {
-            TaskItemTemplateEntity  taskItemTemplateEntity = existingEntity.get().getTaskItemTemplate();
+            TaskItemTemplateEntity taskItemTemplateEntity = existingEntity.get().getTaskItemTemplate();
             taskItemTemplateEntity.toBuilder().name(name);
-            beingUpdated.toBuilder()
-                .reference(reference)
-                .currentStatus(existingEntity.get().getNextStatus())
-                .taskItemTemplate(taskItemTemplateEntity)
-                .build();
+            beingUpdated = TaskListEntity.builder()
+                    .reference(reference)
+                    .currentStatus(existingEntity.get().getNextStatus())
+                    .taskItemTemplate(taskItemTemplateEntity)
+                    .build();
         }
 
         return taskListRepository.save(beingUpdated);

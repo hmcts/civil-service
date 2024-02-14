@@ -66,7 +66,7 @@ class TaskListServiceTest {
             any(),
             any(),
             any()
-        )).thenReturn(Optional.of(getTaskListEntity()));
+        )).thenReturn(Optional.ofNullable(getTaskListEntity()));
 
         //when
         TaskListEntity actual = taskListService.updateTaskList("hearing", "123","Claimant");
