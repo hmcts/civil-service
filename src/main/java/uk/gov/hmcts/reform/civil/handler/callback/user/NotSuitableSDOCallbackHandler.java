@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.transferonlinecase.NotSuitableSdoOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
@@ -94,16 +95,26 @@ public class NotSuitableSDOCallbackHandler extends CallbackHandler {
         final int lengthAllowed = 150;
         List<String> errors = new ArrayList<>();
         String reason;
+
+        if (toggleService.isSdoR2Enabled()
+            && callbackParams.getCaseData().getNotSuitableSdoOptions() == NotSuitableSdoOptions.CHANGE_LOCATION
+            && callbackParams.getCaseData().getCcdState() == CaseState.CASE_PROGRESSION) {
+            errors.add(
+                "Unable to process this request. To transfer the case to another court you need to issue a General Order.");
+        }
+
         if (isTransferOnlineCase(callbackParams.getCaseData())) {
             reason = callbackParams.getCaseData().getTocTransferCaseReason().getReasonForCaseTransferJudgeTxt();
         } else {
             reason = callbackParams.getCaseData().getReasonNotSuitableSDO().getInput();
         }
+
         if (reason.length() > lengthAllowed) {
             errors.add("Character Limit Reached: "
-                + "Reason for not drawing Standard Directions order cannot exceed "
-                + lengthAllowed + " characters.");
+                           + "Reason for not drawing Standard Directions order cannot exceed "
+                           + lengthAllowed + " characters.");
         }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .build();

@@ -4663,6 +4663,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStatePastApplicantResponseDeadline() {
         atStateRespondentFullDefenceAfterNotificationAcknowledgement();
         applicant1ResponseDeadline = LocalDateTime.now().minusDays(1);
+        applicant1ResponseDate = null;
         return this;
     }
 
