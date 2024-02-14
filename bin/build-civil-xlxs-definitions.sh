@@ -1,15 +1,7 @@
 #!/usr/bin/env bash
 
-set -eu
+basePath=${PWD%/*/*}
+definitionsPath=$basePath/civil-ccd-definition/ccd-definition/
+xlsxOutputFile=$basePath/civil-service/build/civil-definitions.xlsx
 
-scriptPath=$(dirname $(realpath $0))
-basePath=$(dirname $scriptPath)
-ccdDefinitionRepoPath=$basePath/civil-ccd-definition
-
-definition_processor_version=latest
-additionalParameters=${1-}
-
-ccdDefinitionPath="/Users/ellis/Documents/WorkFiles/civil-ccd-definition/ccd-definition"
-definitionOutputFile="/Users/ellis/Documents/WorkFiles/civil-service/build/ccd-civil-dev.xlsx"
-
-sh /Users/ellis/Documents/WorkFiles/civil-ccd-definition/bin/utils/process-definition.sh ${ccdDefinitionPath} ${definitionOutputFile}
+sh ${basePath}/civil-ccd-definition/bin/utils/process-definition.sh ${definitionsPath} ${xlsxOutputFile}
