@@ -32,11 +32,12 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.PartialRemissionHW
 @ExtendWith(MockitoExtension.class)
 public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
 
+    private ObjectMapper objectMapper;
     private PartialRemissionHWFCallbackHandler handler;
 
     @BeforeEach
     void setUp() {
-        var objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper();
         handler = new PartialRemissionHWFCallbackHandler(objectMapper);
     }
 
@@ -64,8 +65,9 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData()).isNotNull();
+            assertThat(updatedData).usingRecursiveComparison().ignoringActualNullFields().isEqualTo(caseData);
         }
     }
 
