@@ -956,55 +956,56 @@ public class CaseDataTest {
             assertTrue(isJudgementDateNotPermitted);
         }
     }
-}
 
-@Nested
-class HWFType {
-    @Test
-    void shouldReturnTrueIfHWFTypeIsHearing() {
-        //Given
-        CaseData caseData = CaseData.builder()
+    @Nested
+    class HWFType {
+        @Test
+        void shouldReturnTrueIfHWFTypeIsHearing() {
+            //Given
+            CaseData caseData = CaseData.builder()
                 .hwfFeeType(FeeType.HEARING)
                 .build();
-        //When
-        boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
-        //Then
-        assertTrue(isHWFTypeHearing);
-    }
+            //When
+            boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
+            //Then
+            assertTrue(isHWFTypeHearing);
+        }
 
-    @Test
-    void shouldReturnFalseIfHWFTypeIsNull() {
-        //Given
-        CaseData caseData = CaseData.builder()
+        @Test
+        void shouldReturnFalseIfHWFTypeIsNull() {
+            //Given
+            CaseData caseData = CaseData.builder()
                 .build();
-        //When
-        boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
-        //Then
-        assertFalse(isHWFTypeHearing);
-    }
+            //When
+            boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
+            //Then
+            assertFalse(isHWFTypeHearing);
+        }
 
-    @Test
-    void shouldReturnTrueIfHWFTypeIsClaimIssued() {
-        //Given
-        CaseData caseData = CaseData.builder()
+        @Test
+        void shouldReturnTrueIfHWFTypeIsClaimIssued() {
+            //Given
+            CaseData caseData = CaseData.builder()
                 .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
-        //When
-        boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
-        //Then
-        assertTrue(isHWFTypeClaimIssued);
-    }
+            //When
+            boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
+            //Then
+            assertTrue(isHWFTypeClaimIssued);
+        }
 
-    @Test
-    void shouldReturnFalseIfHWFTypeIsNotClaimIssued() {
-        //Given
-        CaseData caseData = CaseData.builder()
+        @Test
+        void shouldReturnFalseIfHWFTypeIsNotClaimIssued() {
+            //Given
+            CaseData caseData = CaseData.builder()
                 .hwfFeeType(FeeType.HEARING)
                 .build();
-        //When
-        boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
-        //Then
-        assertFalse(isHWFTypeClaimIssued);
+            //When
+            boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
+            //Then
+            assertFalse(isHWFTypeClaimIssued);
+        }
     }
 }
+
 
