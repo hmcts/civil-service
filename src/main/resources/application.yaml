@@ -185,6 +185,11 @@ aca:
   api:
     baseurl: ${ACA_SERVICE_API_BASEURL:http://localhost:4454}
 
+
+dashboard:
+  api:
+    url: http://localhost:4000
+
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
   breathingSpaceEnterApplicantEmailTemplate: "31a06373-1eea-4faa-ba3d-4110821a65af"
