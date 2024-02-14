@@ -65,7 +65,7 @@ public class CftLibConfig implements CFTLibConfigurer {
                                         .getInputStream(), Charset.defaultCharset());
         lib.configureRoleAssignments(json);
 
-        var civilDefs = Files.readAllBytes(Path.of("build/ccd-development-config/ccd-civil-dev.xlsx"));
+        var civilDefs = Files.readAllBytes(Path.of("build/civil-definitions.xlsx"));
         lib.importDefinition(civilDefs);
     }
 }
