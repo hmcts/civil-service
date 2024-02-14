@@ -67,7 +67,7 @@ public class DashboardController {
         return new ResponseEntity<>(taskListResponse, HttpStatus.OK);
     }
     @PutMapping(path = {
-        "taskList/{ccd-case-identifier}/{taskI}/role/{role-type}",
+        "taskList/{ccd-case-identifier}/{template-name}/role/{role-type}",
     })
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -75,7 +75,7 @@ public class DashboardController {
         @ApiResponse(responseCode = "400", description = "Bad Request")})
     public ResponseEntity<TaskListEntity> updateTaskListByCaseIdentifierAndIdAndRole(
         @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
-        @PathVariable("reference") String name,
+        @PathVariable("template-name") String name,
         @PathVariable("role-type") String roleType,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {

@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.test.context.jdbc.Sql;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 
@@ -13,8 +15,10 @@ import java.util.UUID;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Sql("/scripts/dashboardNotifications/get_notifications_data.sql")
-public class DashboardNotificationControllerTest extends BaseIntegrationTest {
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Testcontainers
+@Sql("/scripts/dashboardNotifications/notifications_data.sql")
+public class GetNotificationControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
