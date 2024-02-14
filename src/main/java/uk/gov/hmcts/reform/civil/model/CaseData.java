@@ -1251,4 +1251,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isHWFTypeClaimIssued() {
         return getHwfFeeType() == FeeType.CLAIMISSUED;
     }
+  
+    public boolean hasApplicant1AcceptedCourtDecision() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasClaimantAcceptedCourtDecision).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean hasApplicant1CourtDecisionInFavourOfClaimant() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfClaimant).isPresent();
+    }
 }
