@@ -19,7 +19,13 @@ import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
-import uk.gov.hmcts.reform.civil.enums.sdo.*;
+import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
+import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
@@ -31,7 +37,44 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
-import uk.gov.hmcts.reform.civil.model.sdo.*;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingMedicalEvidence;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingQuestionsToExperts;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.DisposalOrderWithoutHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
+import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
@@ -67,7 +110,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
-import static uk.gov.hmcts.reform.civil.model.common.DynamicListElement.dynamicElementFromCode;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingNotes;
 
@@ -121,7 +163,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final LocationHelper locationHelper;
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
-    private final List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
+    private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -643,81 +685,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
             updatedData.disposalHearingHearingNotes(null);
         }
-        if (featureToggleService.isSdoR2Enabled()) {
-            prePopulateFlightDelayFields(callbackParams, caseData, updatedData);
-            List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
-            setCheckListFlightDelay(updatedData, includeInOrderToggle);
-        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
-    }
-
-    private void setCheckListFlightDelay(CaseData.CaseDataBuilder<?, ?> updatedData, List<IncludeInOrderToggle> includeInOrderToggle) {
-
-        updatedData.sdoR2TrialToggle(includeInOrderToggle);
-        updatedData.sdoR2Trial(SdoR2Trial.builder()
-                                   .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
-                                   .sdoR2TrialFirstOpenDateAfter(SdoR2TrialFirstOpenDateAfter.builder()
-                                                                     .build())
-                                   .build());
-    }
-
-
-    private void prePopulateFlightDelayFields(CallbackParams callbackParams, CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
-        preferredCourt.map(RequestedCourt::getCaseLocation)
-            .ifPresent(updatedData::caseManagementLocation);
-
-        updatedData.sdoR2Trial(SdoR2Trial.builder()
-                                   .sdoR2TrialFirstOpenDateAfter(
-                                       SdoR2TrialFirstOpenDateAfter.builder()
-                                           .listFrom(LocalDate.now().plusDays(434)).build())
-                                   .sdoR2TrialWindow(SdoR2TrialWindow.builder()
-                                                         .listFrom(LocalDate.now().plusDays(434))
-                                                         .dateTo(LocalDate.now().plusDays(455))
-                                                         .build())
-                                   .hearingCourtLocationList(getCourtLocationForFlightDelay(callbackParams, updatedData,
-                                                                                            preferredCourt.orElse(null)
-                                   ))
-                                   .altHearingCourtLocationList(getAlternativeCourtLocationsForFlightDelay(
-                                       callbackParams))
-                                   .build());
-    }
-
-    private DynamicList getCourtLocationForFlightDelay(CallbackParams callbackParams,
-                                                       CaseData.CaseDataBuilder<?, ?> updatedData,
-                                                       RequestedCourt preferredCourt) {
-        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
-        Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
-            .flatMap(requestedCourt -> locationHelper.updateCaseManagementLocation(
-                updatedData,
-                requestedCourt,
-                () -> locations
-            ));
-        List<DynamicListElement> dynamicListOptions = new ArrayList<>();
-        if (matchingLocation.isPresent()) {
-            dynamicListOptions.add(dynamicElementFromCode(
-                matchingLocation.get().getEpimmsId(),
-                LocationRefDataService.getDisplayEntry(matchingLocation.get())
-            ));
-        }
-        dynamicListOptions.add(dynamicElementFromCode("OTHER_LOCATION", "Other location"));
-        return DynamicList.fromDynamicListElementList(dynamicListOptions);
-    }
-
-    private DynamicList getAlternativeCourtLocationsForFlightDelay(CallbackParams callbackParams) {
-
-        List<DynamicListElement> dynamicListOptions = new ArrayList<>();
-        List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
-
-        locations.stream().forEach(loc -> dynamicListOptions.add(
-            dynamicElementFromCode(loc.getEpimmsId(), LocationRefDataService.getDisplayEntry(loc))));
-        return DynamicList.fromDynamicListElementList(dynamicListOptions);
     }
 
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
@@ -770,18 +741,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             ));
         DynamicList locationsList;
         if (matchingLocation.isPresent()) {
-            locationsList = DynamicList.fromList(locations,
-                                                 this::getLocationEpimms,
-                                                 LocationRefDataService::getDisplayEntry,
-                                                 matchingLocation.get(),
-                                                 true
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
+                                                 matchingLocation.get(), true
             );
         } else {
-            locationsList = DynamicList.fromList(locations,
-                                                 this::getLocationEpimms,
-                                                 LocationRefDataService::getDisplayEntry,
-                                                 null,
-                                                 true
+            locationsList = DynamicList.fromList(locations, this::getLocationEpimms, LocationRefDataService::getDisplayEntry,
+                                                 null, true
             );
         }
         return locationsList;
@@ -957,8 +922,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                     dataBuilder.responseClaimTrack(FAST_CLAIM.name());
                 }
                 break;
-            default:
-                break;
+            default: break;
         }
     }
 
@@ -1046,14 +1010,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         );
 
         if (applicant2 != null) {
-            initialBody = format(
+            initialBody =  format(
                 CONFIRMATION_SUMMARY_2v1,
                 applicant1Name,
                 applicant2.getPartyName(),
                 respondent1Name
             );
         } else if (respondent2 != null) {
-            initialBody = format(
+            initialBody =  format(
                 CONFIRMATION_SUMMARY_1v2,
                 applicant1Name,
                 respondent1Name,
