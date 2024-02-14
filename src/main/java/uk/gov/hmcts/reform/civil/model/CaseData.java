@@ -1259,8 +1259,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && Objects.nonNull(getHearingReferenceNumber())
             && Objects.nonNull(getFeePaymentOutcomeDetails())
             && Objects.nonNull(getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee());
-      
-    @JsonIgnore  
+    }
+
+    @JsonIgnore
     public boolean hasApplicant1AcceptedCourtDecision() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
