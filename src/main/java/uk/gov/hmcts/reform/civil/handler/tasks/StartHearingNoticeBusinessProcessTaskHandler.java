@@ -69,7 +69,7 @@ public class StartHearingNoticeBusinessProcessTaskHandler implements BaseExterna
                 log.error("CAMUNDAERROR CaseId ({})", caseId);
                 log.error("CAMUNDAERROR CaseEvent ({})", caseEvent);
                 log.error("CAMUNDAERROR LegacyCaseReference ({})", data.getLegacyCaseReference());
-                log.error("CAMUNDAERROR AllocatedTrack ({})", data.getAssignedTrack());
+                log.error("CAMUNDAERROR AllocatedTrack ({})", data.getAllocatedTrack());
                 log.error("CAMUNDAERROR BusinessProcessStatus ({})", businessProcess.getStatusOrDefault());
                 log.error("----------------CAMUNDAERROR -END------------------");
                 throw new BpmnError("ABORT");

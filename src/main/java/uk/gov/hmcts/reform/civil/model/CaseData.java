@@ -1237,6 +1237,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getAssignedTrack() {
-        return getAllocatedTrack() != null ? getAllocatedTrack().name() : getResponseClaimTrack();
+        return nonNull(getAllocatedTrack()) ? getAllocatedTrack().name() : getResponseClaimTrack();
     }
 }
