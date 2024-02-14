@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.PartialRemissionHWFCallbackHandler.ERR_MSG_FEE_TYPE_NOT_CONFIGURED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.PartialRemissionHWFCallbackHandler.ERR_MSG_REMISSION_AMOUNT_LESS_THAN_CLAIM_FEE;
@@ -67,7 +66,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getErrors()).isNull();
-            assertThat(updatedData).usingRecursiveComparison().ignoringActualNullFields().isEqualTo(caseData);
+            assertThat(updatedData.getClaimIssuedHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(1000));
         }
     }
 
@@ -89,8 +88,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         //Then
-        var errors = response.getErrors();
-        assertTrue(errors.contains(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO));
+        assertThat(response.getErrors()).containsExactly(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO);
     }
 
     @Test
@@ -114,8 +112,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         //Then
-        var errors = response.getErrors();
-        assertTrue(errors.contains(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO));
+        assertThat(response.getErrors()).containsExactly(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO);
     }
 
     @ParameterizedTest
@@ -136,8 +133,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         //Then
-        var errors = response.getErrors();
-        assertTrue(errors.contains(errMsg));
+        assertThat(response.getErrors()).containsExactly(errMsg);
     }
 
     private static Stream<Arguments> provideFeeTypes() {

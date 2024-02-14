@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.FeeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,9 +67,9 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
 
         if (claimIssuedRemissionAmount.signum() == -1 || hearingRemissionAmount.signum() == -1) {
             errors.add(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO);
-        } else if (FeeType.CLAIMISSUED == feeType && claimIssuedRemissionAmount.compareTo(claimFeeAmount) >= 0) {
+        } else if (caseData.isHWFTypeClaimIssued() && claimIssuedRemissionAmount.compareTo(claimFeeAmount) >= 0) {
             errors.add(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_CLAIM_FEE);
-        } else if (FeeType.HEARING == feeType && hearingRemissionAmount.compareTo(hearingFeeAmount) >= 0) {
+        } else if (caseData.isHWFTypeHearing() && hearingRemissionAmount.compareTo(hearingFeeAmount) >= 0) {
             errors.add(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_HEARING_FEE);
         }
 
