@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLib;
 import uk.gov.hmcts.rse.ccd.lib.api.CFTLibConfigurer;
 
-import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,11 +65,7 @@ public class CftLibConfig implements CFTLibConfigurer {
                                         .getInputStream(), Charset.defaultCharset());
         lib.configureRoleAssignments(json);
 
-        var consentedDef = Files.readAllBytes(Path.of("build/definitionsToBeImported/ccd-config-local-consented-base.xlsx"));
-        lib.importDefinition(consentedDef);
-
-        // Import CCD definitions
-        lib.importJsonDefinition(new File("build/definitions/NFD"));
-        lib.importJsonDefinition(new File("build/definitions/NO_FAULT_DIVORCE_BulkAction"));
+        var civilDefs = Files.readAllBytes(Path.of("build/ccd-development-config/ccd-civil-dev.xlsx"));
+        lib.importDefinition(civilDefs);
     }
 }
