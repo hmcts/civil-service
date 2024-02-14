@@ -1241,4 +1241,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return nonNull(date)
             && date.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
     }
+
+    @JsonIgnore
+    public boolean isHWFTypeHearing(){
+        return getHwfFeeType() == FeeType.HEARING;
+    }
+
+    @JsonIgnore
+    public boolean isHWFTypeClaimIssued(){
+        return getHwfFeeType() == FeeType.CLAIMISSUED;
+    }
 }

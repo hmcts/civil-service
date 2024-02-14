@@ -825,7 +825,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
                 asyncStitchingComplete,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                UPDATE_HELP_WITH_FEE_NUMBER
             )
         ),
         entry(
@@ -1372,8 +1373,7 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
                 UPLOAD_MEDIATION_DOCUMENTS,
-                TRANSFER_ONLINE_CASE,
-                UPDATE_HELP_WITH_FEE_NUMBER
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(

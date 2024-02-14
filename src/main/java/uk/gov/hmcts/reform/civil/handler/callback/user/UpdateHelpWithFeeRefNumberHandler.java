@@ -53,14 +53,14 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
     }
 
     private CaseData updateHwFReference(CaseData caseData) {
-        if (FeeType.CLAIMISSUED == caseData.getHwfFeeType()) {
+        if (caseData.isHWFTypeClaimIssued()) {
             ofNullable(caseData.getCaseDataLiP())
                     .map(CaseDataLiP::getHelpWithFees)
                     .ifPresent(hwf -> hwf.setHelpWithFeesReferenceNumber(getHwFNewReferenceNumber(caseData.getClaimIssuedHwfDetails())));
             clearHwFReferenceNumber(caseData.getClaimIssuedHwfDetails());
             return caseData;
         }
-        if (FeeType.HEARING == caseData.getHwfFeeType()) {
+        if (caseData.isHWFTypeHearing()) {
             CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
             updatedData.hearingHelpFeesReferenceNumber(getHwFNewReferenceNumber(caseData.getHearingHwfDetails()));
             clearHwFReferenceNumber(caseData.getHearingHwfDetails());
