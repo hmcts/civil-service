@@ -61,6 +61,7 @@ class TaskListServiceTest {
     @Test
     void shouldReturnTaskListEntity_whenTaskListEntityIsUpdated() {
 
+
         //given
         when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
             any(),
@@ -68,11 +69,15 @@ class TaskListServiceTest {
             any()
         )).thenReturn(Optional.of(getTaskListEntity()));
 
+        when(taskListRepository.save(
+            any(TaskListEntity.class)
+        )).thenReturn(TaskListEntity.builder().currentStatus(1).build());
+
         //when
-        TaskListEntity actual = taskListService.updateTaskList("hearing", "123","Claimant");
+        TaskListEntity actual = taskListService.updateTaskList("123", "Claimant","hearing");
 
         //then
-        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("hearing","123","Claimant");
-        assertThat(actual).isEqualTo(getTaskListList());
+        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("123","Claimant","hearing");
+        assertThat(actual.getCurrentStatus()).isEqualTo(getTaskListEntity().getNextStatus());
     }
 }

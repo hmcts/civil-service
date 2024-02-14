@@ -25,7 +25,7 @@ public class DashboardNotificationsTestUtils {
         taskListList.add(TaskList.builder().id(uuid).taskNameCy("HearingCY")
                              .taskNameEn("HearingEN").taskOrder(1).categoryCy("CategoryCy")
                              .categoryEn("CategoryEn")
-                             .role("Defendant").currentStatus(1).nextStatus(1)
+                             .role("Defendant").currentStatus(0).nextStatus(1)
                              .hintTextCy("HintCy").hintTextEn("HintEn").reference("123").build());
         return taskListList;
     }
@@ -49,10 +49,10 @@ public class DashboardNotificationsTestUtils {
     }
     public static TaskListEntity getTaskListEntity() {
 
-        TaskListEntity taskListEntity = new TaskListEntity();
-        taskListEntity.builder()
+        //TaskListEntity taskListEntity = new TaskListEntity();
+        return  TaskListEntity.builder()
             .id(uuid).taskNameCy("HearingCY").taskNameEn("HearingEN")
-            .currentStatus(1).nextStatus(1).hintTextCy("HintCy")
+            .currentStatus(0).nextStatus(1).hintTextCy("HintCy")
             .hintTextEn("HintEn").reference("123")
             .taskItemTemplate(TaskItemTemplateEntity.builder()
                                   .id(Long.valueOf(123)).taskNameCy("TaskNameCy")
@@ -62,7 +62,7 @@ public class DashboardNotificationsTestUtils {
                                   .hintTextEn("HintEn").role("Defendant")
                                   .categoryCy("CategoryCy").categoryEn("CategoryEn")
                                   .build()).build();
-        return taskListEntity;
+        //return taskListEntity;
     }
     public static List<NotificationEntity> getNotificationEntityList() {
 

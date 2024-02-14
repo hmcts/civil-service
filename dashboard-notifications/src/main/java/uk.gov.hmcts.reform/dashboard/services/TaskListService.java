@@ -48,22 +48,18 @@ public class TaskListService {
 
         return taskListRepository.save(beingUpdated);
     }
-    public TaskListEntity updateTaskList(String name , String reference, String role ) {
+    public TaskListEntity updateTaskList(String reference , String role, String name ) {
+
         Optional<TaskListEntity> existingEntity = taskListRepository
             .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
                 reference,role,name);
 
-        TaskListEntity beingUpdated = new TaskListEntity();
-        if (existingEntity.isPresent()) {
-            TaskItemTemplateEntity  taskItemTemplateEntity = existingEntity.get().getTaskItemTemplate();
-            taskItemTemplateEntity.toBuilder().name(name);
-            beingUpdated.toBuilder()
-                .reference(reference)
-                .currentStatus(existingEntity.get().getNextStatus())
-                .taskItemTemplate(taskItemTemplateEntity)
-                .build();
-        }
+        existingEntity.ifPresent(taskListEntity -> {
+            taskListEntity.setCurrentStatus(taskListEntity.getNextStatus());
+            //taskListEntity.setNextStatus(taskListEntity.getNextStatus()+1);
+            taskListRepository.save(taskListEntity);
+        });
 
-        return taskListRepository.save(beingUpdated);
+        return existingEntity.isPresent() ? existingEntity.get() : new TaskListEntity() ;
     }
 }
