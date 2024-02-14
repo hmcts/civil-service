@@ -7,32 +7,55 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
+import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.OK;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getNotificationList;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getTaskListList;
 
 @ExtendWith(MockitoExtension.class)
 class DashboardControllerTest {
 
+    private static final String AUTHORISATION = "Bearer: aaa";
+    private static final String CASE_ID = "SomeUniqueIdentifier";
+    public static final String NOTIFICATION_DRAFT_CLAIM_START = "notification.draft.claim.start";
+    public static final ScenarioRequestParams SCENARIO_REQUEST_PARAMS = new ScenarioRequestParams(Map.of(
+        "url",
+        "http://testUrl",
+        "status",
+        "InProgress",
+        "helpText",
+        "Should be helpful!",
+        "animal",
+        "Tiger",
+        "target",
+        "Safari"
+    ));
+
     @Mock
     private TaskListService taskListService;
 
     @Mock
     private DashboardNotificationService dashboardNotificationService;
+    @Mock
+    private DashboardScenariosService dashboardScenariosService;
 
     @InjectMocks
     private DashboardController dashboardController;
-
-    private static final String AUTHORISATION = "Bearer: aaa";
 
     @Test
     public void shouldReturnTaskListForCaseReferenceAndRole() {
@@ -51,7 +74,43 @@ class DashboardControllerTest {
 
         //then
         verify(taskListService).getTaskList("123", "Claimant");
+        assertThat(output.getStatusCode().is2xxSuccessful());
         assertThat(output.getBody()).isEqualTo(taskList);
+    }
+
+    @Test
+    public void shouldReturnEmptyTaskListForCaseReferenceAndRoleIfNotPresent() {
+
+        //given
+        when(taskListService.getTaskList(any(), any()))
+            .thenReturn(List.of());
+
+        //when
+        ResponseEntity<List<TaskList>> output = dashboardController.getTaskListByCaseIdentifierAndRole(
+            "123",
+            "Claimant",
+            AUTHORISATION
+        );
+
+        //then
+        verify(taskListService).getTaskList("123", "Claimant");
+        assertThat(output.getStatusCode().is2xxSuccessful());
+        assertThat(output.getBody().isEmpty());
+    }
+
+    @Test
+    public void shouldThrow500ErrorForCaseReferenceAndRoleIfException() {
+
+        //given
+        when(taskListService.getTaskList(any(), any()))
+            .thenThrow(new RuntimeException());
+
+        //then
+        assertThrows(RuntimeException.class, () ->  dashboardController.getTaskListByCaseIdentifierAndRole(
+            "123",
+            "Claimant",
+            AUTHORISATION
+        ));
     }
 
     @Test
@@ -73,4 +132,17 @@ class DashboardControllerTest {
         assertThat(output.getBody()).isEqualTo(notifications);
     }
 
+    @Test
+    void should_create_scenario() {
+        doNothing().when(dashboardScenariosService)
+            .recordScenarios(AUTHORISATION, NOTIFICATION_DRAFT_CLAIM_START, CASE_ID, SCENARIO_REQUEST_PARAMS);
+
+        final ResponseEntity responseEntity = dashboardController
+            .recordScenario(CASE_ID, NOTIFICATION_DRAFT_CLAIM_START, AUTHORISATION, SCENARIO_REQUEST_PARAMS);
+
+        assertEquals(responseEntity.getStatusCode(), OK);
+
+        verify(dashboardScenariosService)
+            .recordScenarios(AUTHORISATION, NOTIFICATION_DRAFT_CLAIM_START, CASE_ID, SCENARIO_REQUEST_PARAMS);
+    }
 }

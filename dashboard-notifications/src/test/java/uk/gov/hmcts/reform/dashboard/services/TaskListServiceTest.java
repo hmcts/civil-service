@@ -14,10 +14,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.*;
+import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getTaskListEntityList;
+import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getTaskListList;
+import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getTaskListEntity;
 
 @ExtendWith(MockitoExtension.class)
 class TaskListServiceTest {
@@ -94,4 +97,19 @@ class TaskListServiceTest {
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("123","Claimant","hearing");
         assertThat(actual).isEqualTo(new TaskListEntity());
     }
+    @Test
+    void shouldThrowExceptionWhenExceptionInGetTaskList() {
+
+        //given
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any()))
+            .thenThrow(new RuntimeException());
+
+        //then
+        assertThrows(RuntimeException.class, () ->  taskListRepository.findByReferenceAndTaskItemTemplateRole(
+            any(),
+            any()
+        ));
+
+    }
+
 }

@@ -156,7 +156,7 @@ public class DashboardController {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity recordScenario(
+    public ResponseEntity<Void> recordScenario(
         @PathVariable("unique_case_identifier") String uniqueCaseIdentifier,
         @PathVariable("scenario_ref") String scenarioReference,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
@@ -166,6 +166,6 @@ public class DashboardController {
         dashboardScenariosService.recordScenarios(authorisation, scenarioReference,
                                                   uniqueCaseIdentifier, scenarioRequestParams
         );
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
