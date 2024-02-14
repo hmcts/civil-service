@@ -80,4 +80,22 @@ class TaskListServiceTest {
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("123","Claimant","hearing");
         assertThat(actual.getCurrentStatus()).isEqualTo(getTaskListEntity().getNextStatus());
     }
+    @Test
+    void shouldReturnEmptyTaskListEntity_whenTaskListEntityIsNotUpdated() {
+
+
+        //given
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
+            any(),
+            any(),
+            any()
+        )).thenReturn(Optional.empty());
+
+        //when
+        TaskListEntity actual = taskListService.updateTaskList("123", "Claimant","hearing");
+
+        //then
+        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("123","Claimant","hearing");
+        assertThat(actual).isEqualTo(new TaskListEntity());
+    }
 }

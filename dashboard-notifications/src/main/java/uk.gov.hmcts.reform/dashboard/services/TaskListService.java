@@ -56,7 +56,6 @@ public class TaskListService {
 
         existingEntity.ifPresent(taskListEntity -> {
             taskListEntity.setCurrentStatus(taskListEntity.getNextStatus());
-            //taskListEntity.setNextStatus(taskListEntity.getNextStatus()+1);
             taskListRepository.save(taskListEntity);
         });
 
