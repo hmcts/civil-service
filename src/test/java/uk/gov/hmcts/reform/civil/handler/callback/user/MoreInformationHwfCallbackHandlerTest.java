@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
@@ -38,14 +37,11 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
     private FeatureToggleService featureToggleService;
 
     @Nested
-    class AboutToStartCallback {
+    class MidCallback {
 
         @Test
         void shouldValidationMoreInformationClaimIssued_withInvalidDate() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued()
-                .build()
-                .builder()
+            CaseData caseData = CaseData.builder()
                 .helpWithFeesMoreInformationClaimIssue(
                     HelpWithFeesMoreInformation.builder()
                         .hwFMoreInfoDocumentDate(LocalDate.now())
@@ -61,10 +57,7 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidationMoreInformationHearing_withInvalidDate() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued()
-                .build()
-                .builder()
+            CaseData caseData = CaseData.builder()
                 .hwfFeeType(FeeType.HEARING)
                 .helpWithFeesMoreInformationHearing(
                     HelpWithFeesMoreInformation.builder()
@@ -85,8 +78,7 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCallSubmitMoreInformationHwfAboutToSubmit() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStatePendingClaimIssued()
+            CaseData caseData = CaseData.builder()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

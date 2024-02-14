@@ -33,14 +33,16 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
 
     private static final String ERROR_MESSAGE_DOCUMENT_DATE_MUST_BE_AFTER_TODAY = "Documents date must be future date";
 
+    private final Map<String, Callback> callbackMap = Map.of(
+        callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+        callbackKey(MID, "more-information-hwf"), this::validationMoreInformation,
+        callbackKey(ABOUT_TO_SUBMIT), this::submitMoreInformationHwf,
+        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+    );
+
     @Override
     protected Map<String, Callback> callbacks() {
-        return new ImmutableMap.Builder<String, Callback>()
-            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
-            .put(callbackKey(MID, "more-information-hwf"), this::validationMoreInformation)
-            .put(callbackKey(ABOUT_TO_SUBMIT), this::submitMoreInformationHwf)
-            .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
-            .build();
+        return callbackMap;
     }
 
     @Override
@@ -54,11 +56,10 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         HelpWithFeesMoreInformation moreInformationData =
-            FeeType.HEARING.equals(Optional.ofNullable(caseData.getHwfFeeType()).orElse(null))
+            FeeType.HEARING == Optional.ofNullable(caseData.getHwfFeeType()).orElse(null)
                 ? caseData.getHelpWithFeesMoreInformationHearing()
                 : caseData.getHelpWithFeesMoreInformationClaimIssue();
         LocalDate hwFMoreInfoDocumentDate = moreInformationData.getHwFMoreInfoDocumentDate();
-        System.out.println(hwFMoreInfoDocumentDate);
         if (!hwFMoreInfoDocumentDate.isAfter(LocalDate.now())) {
             errors.add(ERROR_MESSAGE_DOCUMENT_DATE_MUST_BE_AFTER_TODAY);
         }
