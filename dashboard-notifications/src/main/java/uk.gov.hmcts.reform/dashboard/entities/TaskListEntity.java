@@ -28,6 +28,7 @@ public class TaskListEntity implements Serializable {
     private static final long serialVersionUID = 679573393379454443L;
 
     @Id
+    @NotNull
     @Schema(name = "id")
     private UUID id;
 

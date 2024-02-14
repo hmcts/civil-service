@@ -145,6 +145,14 @@ public abstract class BaseIntegrationTest {
     }
 
     @SneakyThrows
+    protected <T> ResultActions doPut(String auth, T content, String urlTemplate, Object... uriVars) {
+        return mockMvc.perform(
+            MockMvcRequestBuilders.put(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, auth)
+                .contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @SneakyThrows
     protected <T> ResultActions doDelete(String auth, T content, String urlTemplate, Object... uriVars) {
         return mockMvc.perform(
             MockMvcRequestBuilders.delete(urlTemplate, uriVars)
