@@ -1243,12 +1243,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isHWFTypeHearing(){
+    public boolean isHWFTypeHearing() {
         return getHwfFeeType() == FeeType.HEARING;
     }
 
     @JsonIgnore
-    public boolean isHWFTypeClaimIssued(){
+    public boolean isHWFTypeClaimIssued() {
         return getHwfFeeType() == FeeType.CLAIMISSUED;
     }
 }
