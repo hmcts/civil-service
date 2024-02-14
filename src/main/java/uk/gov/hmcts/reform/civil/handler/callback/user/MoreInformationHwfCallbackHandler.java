@@ -56,7 +56,7 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         List<String> errors = new ArrayList<>();
         HelpWithFeesMoreInformation moreInformationData =
-            FeeType.HEARING == Optional.ofNullable(caseData.getHwfFeeType()).orElse(null)
+            FeeType.HEARING == caseData.getHwfFeeType()
                 ? caseData.getHelpWithFeesMoreInformationHearing()
                 : caseData.getHelpWithFeesMoreInformationClaimIssue();
         LocalDate hwFMoreInfoDocumentDate = moreInformationData.getHwFMoreInfoDocumentDate();
