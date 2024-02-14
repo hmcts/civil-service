@@ -93,6 +93,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_MEDIATION_DOCU
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
@@ -1371,7 +1372,8 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
                 UPLOAD_MEDIATION_DOCUMENTS,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                UPDATE_HELP_WITH_FEE_NUMBER
             )
         ),
         entry(
@@ -1564,7 +1566,8 @@ public class FlowStateAllowedEventService {
         entry(
             PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName(),
             List.of(
-                UPLOAD_TRANSLATED_DOCUMENT
+                UPLOAD_TRANSLATED_DOCUMENT,
+                UPDATE_HELP_WITH_FEE_NUMBER
             )
         ),
         entry(
