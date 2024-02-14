@@ -69,5 +69,36 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(30000));
         }
+
+        @Test
+        void shouldNotUpdateFullRemissionData_ifClaimFeeIsZero() {
+            CaseData caseData = CaseData.builder()
+                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.ZERO).code("OOOCM002").build())
+                .claimIssuedHwfDetails(HelpWithFeesDetails.builder().build())
+                .hwfFeeType(FeeType.CLAIMISSUED)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getClaimIssuedHwfDetails().getRemissionAmount()).isNull();
+        }
+
+        @Test
+        void shouldNotUpdateFullRemissionData_ifHearingFeeIsZero() {
+            CaseData caseData = CaseData.builder()
+                .hearingReferenceNumber("000HN001")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ZERO).build())
+                .hearingHwfDetails(HelpWithFeesDetails.builder().build())
+                .hwfFeeType(FeeType.HEARING)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getHearingHwfDetails().getRemissionAmount()).isNull();
+        }
     }
 }

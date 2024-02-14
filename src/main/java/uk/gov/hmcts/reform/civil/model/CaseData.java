@@ -1223,6 +1223,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .orElse(BigDecimal.ZERO);
     }
 
+    @JsonIgnore
+    public boolean isHWFTypeHearing(){
+        return getHwfFeeType() == FeeType.HEARING;
+    }
+
+    @JsonIgnore
+    public boolean isHWFTypeClaimIssued(){
+        return getHwfFeeType() == FeeType.CLAIMISSUED;
+    }
+
     public boolean hasApplicant1SignedSettlementAgreement() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)

@@ -48,12 +48,10 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
     private CallbackResponse fullRemissionHWF(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         var updatedData = caseData.toBuilder();
-        var feeType = caseData.getHwfFeeType();
         BigDecimal claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
         BigDecimal hearingFeeAmount = caseData.getCalculatedHearingFeeInPence();
 
-        if (FeeType.CLAIMISSUED == feeType && claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
-
+        if (caseData.isHWFTypeClaimIssued() && claimFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
             Optional.ofNullable(caseData.getClaimIssuedHwfDetails())
                 .ifPresentOrElse(
                     claimIssuedHwfDetails -> updatedData.claimIssuedHwfDetails(
@@ -63,7 +61,7 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                         HelpWithFeesDetails.builder().remissionAmount(claimFeeAmount).build()
                     )
                 );
-        } else if (FeeType.HEARING == feeType && hearingFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
+        } else if (caseData.isHWFTypeHearing() && hearingFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
             Optional.ofNullable(caseData.getHearingHwfDetails())
                 .ifPresentOrElse(
                     hearingHwfDetails -> updatedData.hearingHwfDetails(
