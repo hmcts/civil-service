@@ -137,6 +137,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(locationHelper.updateCaseManagementLocation(any(), any(), any())).willReturn(Optional.ofNullable(
                 locationRefData));
             given(deadlinesCalculator.getRespondToSettlementAgreementDeadline(any())).willReturn(LocalDateTime.MAX);
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         }
 
         @Test

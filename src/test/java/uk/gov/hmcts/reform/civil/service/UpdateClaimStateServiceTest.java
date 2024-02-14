@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -22,7 +24,10 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.Party.Type.COMPANY;
@@ -32,6 +37,55 @@ class UpdateClaimStateServiceTest {
 
     @InjectMocks
     private UpdateClaimStateService service;
+
+    @Mock
+    FeatureToggleService featureToggleService;
+
+    @BeforeEach
+    void before() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+    }
+
+    @Test
+    void shouldUpdateCaseStateToInMediation_WhenSmallClaimCarmEnabled1v1() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+            .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                         .hasAgreedFreeMediation(MediationDecision.No).build())
+            .build();
+        CaseData caseData =
+            CaseDataBuilder.builder().caseDataLip(caseDataLiP)
+                .applicant1ProceedWithClaim(YES)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .atStateClaimIssued()
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .build();
+        String actualState = service.setUpCaseState(caseData);
+
+        assertEquals(CaseState.IN_MEDIATION.name(), actualState);
+    }
+
+    @Test
+    void shouldUpdateCaseStateToJudicialReferral_WhenSmallClaimCarmNotEnabled() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
+            .applicant1ClaimMediationSpecRequiredLip(ClaimantMediationLip.builder()
+                                                         .hasAgreedFreeMediation(MediationDecision.No).build())
+            .build();
+        CaseData caseData =
+            CaseDataBuilder.builder().caseDataLip(caseDataLiP)
+                .applicant1ProceedWithClaim(YES)
+                .applicant1PartAdmitIntentionToSettleClaimSpec(NO)
+                .atStateClaimIssued()
+                .build().toBuilder()
+                .responseClaimTrack(SMALL_CLAIM.name())
+                .build();
+
+        String actualState = service.setUpCaseState(caseData);
+
+        assertEquals(CaseState.JUDICIAL_REFERRAL.name(), actualState);
+    }
 
     @Test
     void shouldUpdateCaseStateToJudicialReferral_WhenPartAdmitNoSettle_NoMediation() {
