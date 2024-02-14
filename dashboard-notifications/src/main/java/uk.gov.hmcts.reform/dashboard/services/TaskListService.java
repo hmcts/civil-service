@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.dashboard.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
@@ -47,14 +48,20 @@ public class TaskListService {
 
         return taskListRepository.save(beingUpdated);
     }
-    public TaskListEntity updateTaskList(UUID id , String reference, String role ) {
+    public TaskListEntity updateTaskList(String name , String reference, String role ) {
         Optional<TaskListEntity> existingEntity = taskListRepository
-            .findByTaskItemTemplateIdAndTaskItemTemplateRole(
-                id,role);
+            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
+                reference,role,name);
 
         TaskListEntity beingUpdated = new TaskListEntity();
         if (existingEntity.isPresent()) {
-            beingUpdated.toBuilder().id(existingEntity.get().getId()).reference(reference).currentStatus(existingEntity.get().getNextStatus()).build();
+            TaskItemTemplateEntity  taskItemTemplateEntity = existingEntity.get().getTaskItemTemplate();
+            taskItemTemplateEntity.toBuilder().name(name);
+            beingUpdated.toBuilder()
+                .reference(reference)
+                .currentStatus(existingEntity.get().getNextStatus())
+                .taskItemTemplate(taskItemTemplateEntity)
+                .build();
         }
 
         return taskListRepository.save(beingUpdated);

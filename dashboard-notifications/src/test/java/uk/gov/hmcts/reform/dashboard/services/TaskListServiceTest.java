@@ -62,17 +62,17 @@ class TaskListServiceTest {
     void shouldReturnTaskListEntity_whenTaskListEntityIsUpdated() {
 
         //given
-        when(taskListRepository.findByTaskItemTemplateIdAndTaskItemTemplateRole(
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
+            any(),
             any(),
             any()
-        )).thenReturn(getTaskListEntity());
-        UUID uuid = java.util.UUID.randomUUID();
+        )).thenReturn(Optional.of(getTaskListEntity()));
 
         //when
-        TaskListEntity actual = taskListService.updateTaskList(uuid, "1645882162449409", "Claimant");
+        TaskListEntity actual = taskListService.updateTaskList("hearing", "123","Claimant");
 
         //then
-        verify(taskListRepository).findByTaskItemTemplateIdAndTaskItemTemplateRole(uuid, "Claimant");
+        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("hearing","123","Claimant");
         assertThat(actual).isEqualTo(getTaskListList());
     }
 }

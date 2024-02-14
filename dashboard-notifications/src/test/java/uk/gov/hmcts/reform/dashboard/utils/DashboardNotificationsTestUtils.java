@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class DashboardNotificationsTestUtils {
@@ -56,10 +57,11 @@ public class DashboardNotificationsTestUtils {
             .taskItemTemplate(TaskItemTemplateEntity.builder()
                                   .id(Long.valueOf(123)).taskNameCy("TaskNameCy")
                                   .taskNameEn("TaskNameEn")
+                                  .name("hearing")
                                   .taskOrder(1).hintTextCy("HintCY")
                                   .hintTextEn("HintEn").role("Defendant")
                                   .categoryCy("CategoryCy").categoryEn("CategoryEn")
-                                  .build());
+                                  .build()).build();
         return taskListEntity;
     }
     public static List<NotificationEntity> getNotificationEntityList() {
