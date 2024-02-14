@@ -46,7 +46,22 @@ public class DashboardNotificationsTestUtils {
                                    .build());
         return taskListEntityList;
     }
+    public static TaskListEntity getTaskListEntity() {
 
+        TaskListEntity taskListEntity = new TaskListEntity();
+        taskListEntity.builder()
+            .id(uuid).taskNameCy("HearingCY").taskNameEn("HearingEN")
+            .currentStatus(1).nextStatus(1).hintTextCy("HintCy")
+            .hintTextEn("HintEn").reference("123")
+            .taskItemTemplate(TaskItemTemplateEntity.builder()
+                                  .id(Long.valueOf(123)).taskNameCy("TaskNameCy")
+                                  .taskNameEn("TaskNameEn")
+                                  .taskOrder(1).hintTextCy("HintCY")
+                                  .hintTextEn("HintEn").role("Defendant")
+                                  .categoryCy("CategoryCy").categoryEn("CategoryEn")
+                                  .build());
+        return taskListEntity;
+    }
     public static List<NotificationEntity> getNotificationEntityList() {
 
         List<NotificationEntity> notificationEntityList = new ArrayList<>();

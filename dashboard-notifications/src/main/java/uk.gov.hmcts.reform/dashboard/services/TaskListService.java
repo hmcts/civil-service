@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,6 +43,18 @@ public class TaskListService {
         TaskListEntity beingUpdated = taskListEntity;
         if (existingEntity.isPresent()) {
             beingUpdated = taskListEntity.toBuilder().id(existingEntity.get().getId()).build();
+        }
+
+        return taskListRepository.save(beingUpdated);
+    }
+    public TaskListEntity updateTaskList(UUID id , String reference, String role ) {
+        Optional<TaskListEntity> existingEntity = taskListRepository
+            .findByTaskItemTemplateIdAndTaskItemTemplateRole(
+                id,role);
+
+        TaskListEntity beingUpdated = new TaskListEntity();
+        if (existingEntity.isPresent()) {
+            beingUpdated.toBuilder().id(existingEntity.get().getId()).reference(reference).currentStatus(existingEntity.get().getNextStatus()).build();
         }
 
         return taskListRepository.save(beingUpdated);
