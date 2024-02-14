@@ -69,10 +69,6 @@ class TaskListServiceTest {
             any()
         )).thenReturn(Optional.ofNullable(getTaskListEntity()));
 
-        when(taskListRepository.save(
-            any(TaskListEntity.class)
-        )).thenReturn(TaskListEntity.builder().currentStatus(1).build());
-
         //when
         TaskListEntity actual = taskListService.updateTaskList("123", "Claimant","hearing");
 
