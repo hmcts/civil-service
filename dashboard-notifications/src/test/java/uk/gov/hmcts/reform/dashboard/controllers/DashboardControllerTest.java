@@ -18,6 +18,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -73,7 +74,43 @@ class DashboardControllerTest {
 
         //then
         verify(taskListService).getTaskList("123", "Claimant");
+        assertThat(output.getStatusCode().is2xxSuccessful());
         assertThat(output.getBody()).isEqualTo(taskList);
+    }
+
+    @Test
+    public void shouldReturnEmptyTaskListForCaseReferenceAndRoleIfNotPresent() {
+
+        //given
+        when(taskListService.getTaskList(any(), any()))
+            .thenReturn(List.of());
+
+        //when
+        ResponseEntity<List<TaskList>> output = dashboardController.getTaskListByCaseIdentifierAndRole(
+            "123",
+            "Claimant",
+            AUTHORISATION
+        );
+
+        //then
+        verify(taskListService).getTaskList("123", "Claimant");
+        assertThat(output.getStatusCode().is2xxSuccessful());
+        assertThat(output.getBody().isEmpty());
+    }
+
+    @Test
+    public void shouldThrow500ErrorForCaseReferenceAndRoleIfException() {
+
+        //given
+        when(taskListService.getTaskList(any(), any()))
+            .thenThrow(new RuntimeException());
+
+        //then
+        assertThrows(RuntimeException.class, () ->  dashboardController.getTaskListByCaseIdentifierAndRole(
+            "123",
+            "Claimant",
+            AUTHORISATION
+        ));
     }
 
     @Test

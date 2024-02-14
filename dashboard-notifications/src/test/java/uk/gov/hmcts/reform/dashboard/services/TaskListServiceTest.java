@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,6 +56,21 @@ class TaskListServiceTest {
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRole("123", "Claimant");
         assertThat(actual).isEqualTo(getTaskListList());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenExceptionInGetTaskList() {
+
+        //given
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any()))
+            .thenThrow(new RuntimeException());
+
+        //then
+        assertThrows(RuntimeException.class, () ->  taskListRepository.findByReferenceAndTaskItemTemplateRole(
+            any(),
+            any()
+        ));
+
     }
 
 }
