@@ -9,25 +9,25 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 
 @Service
 @RequiredArgsConstructor
-public class InvalidHwFCallbackHandler extends CallbackHandler {
+public class NoRemissionHWFCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(INVALID_HWF_REFERENCE);
+    private static final List<CaseEvent> EVENTS = List.of(NO_REMISSION_HWF);
     private final ObjectMapper objectMapper;
-
     private final Map<String, Callback> callbackMap = Map.of(
-        callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-        callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit);
+        callbackKey(ABOUT_TO_SUBMIT),
+        this::noRemissionHWF,
+        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+    );
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -39,14 +39,9 @@ public class InvalidHwFCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-
-        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder();
-
+    private CallbackResponse noRemissionHWF(CallbackParams callbackParams) {
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataUpdated.build().toMap(objectMapper))
+            .data(callbackParams.getCaseData().toMap(objectMapper))
             .build();
-
     }
 }

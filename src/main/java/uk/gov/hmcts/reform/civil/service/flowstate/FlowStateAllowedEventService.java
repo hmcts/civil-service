@@ -238,8 +238,7 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                TRANSFER_ONLINE_CASE,
-                INVALID_HWF_REFERENCE
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -1374,7 +1373,8 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
                 UPLOAD_MEDIATION_DOCUMENTS,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                INVALID_HWF_REFERENCE
             )
         ),
         entry(
@@ -1567,7 +1567,8 @@ public class FlowStateAllowedEventService {
         entry(
             PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName(),
             List.of(
-                UPLOAD_TRANSLATED_DOCUMENT
+                UPLOAD_TRANSLATED_DOCUMENT,
+                INVALID_HWF_REFERENCE
             )
         ),
         entry(
