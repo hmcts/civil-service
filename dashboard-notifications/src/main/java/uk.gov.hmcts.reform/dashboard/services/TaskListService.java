@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.dashboard.services;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
+import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
 import java.util.List;
@@ -45,5 +45,19 @@ public class TaskListService {
         }
 
         return taskListRepository.save(beingUpdated);
+    }
+
+    public TaskListEntity updateTaskList(String reference , String role, String name ) {
+
+        Optional<TaskListEntity> existingEntity = taskListRepository
+            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
+                reference,role,name);
+
+        existingEntity.ifPresent(taskListEntity -> {
+            taskListEntity.setCurrentStatus(taskListEntity.getNextStatus());
+            taskListRepository.save(taskListEntity);
+        });
+
+        return existingEntity.isPresent() ? existingEntity.get() : new TaskListEntity() ;
     }
 }

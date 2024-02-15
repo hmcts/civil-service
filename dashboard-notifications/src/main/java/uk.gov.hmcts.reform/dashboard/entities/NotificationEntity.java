@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @lombok.Data
@@ -51,9 +52,9 @@ public class NotificationEntity implements Serializable {
     @Schema(name = "description_cy")
     private String descriptionCy;
     @Type(type = "jsonb")
-    @Column(name = "message_param")
+    @Column(name = "message_param", columnDefinition = "jsonb")
     @Schema(name = "message_param")
-    private String params;
+    private Map<String, Object> params;
     @Schema(name = "created_by")
     private String createdBy;
     @Schema(name = "created_at")

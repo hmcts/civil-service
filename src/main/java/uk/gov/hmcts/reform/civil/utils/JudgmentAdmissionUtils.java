@@ -10,8 +10,13 @@ public class JudgmentAdmissionUtils {
 
     public static boolean getLIPJudgmentAdmission(CaseData caseData) {
         return (caseData.isLipvLipOneVOne()
-            && !caseData.isPayImmediately()
+            && ((!caseData.isPayImmediately()
             && caseData.hasApplicantAcceptedRepaymentPlan()
-            && caseData.isCcjRequestJudgmentByAdmission());
+            && caseData.isCcjRequestJudgmentByAdmission()) || (hasClaimantRequestedCcjAfterCourtDecision(caseData))));
+    }
+
+    private static boolean hasClaimantRequestedCcjAfterCourtDecision(CaseData caseData) {
+        return caseData.hasApplicant1AcceptedCcj()
+            && (caseData.hasApplicant1AcceptedCourtDecision() || caseData.hasApplicant1CourtDecisionInFavourOfClaimant());
     }
 }
