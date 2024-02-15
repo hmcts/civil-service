@@ -15,12 +15,14 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
@@ -32,6 +34,7 @@ class DashboardControllerTest {
 
     private static final String AUTHORISATION = "Bearer: aaa";
     private static final String CASE_ID = "SomeUniqueIdentifier";
+    private static final UUID ID = UUID.randomUUID();
     public static final String NOTIFICATION_DRAFT_CLAIM_START = "notification.draft.claim.start";
     public static final ScenarioRequestParams SCENARIO_REQUEST_PARAMS = new ScenarioRequestParams(Map.of(
         "url",
@@ -144,5 +147,26 @@ class DashboardControllerTest {
 
         verify(dashboardScenariosService)
             .recordScenarios(AUTHORISATION, NOTIFICATION_DRAFT_CLAIM_START, CASE_ID, SCENARIO_REQUEST_PARAMS);
+    }
+
+    @Test
+    public void shouldReturnOkWhenNotificationDeleted() {
+
+        //when
+        final ResponseEntity responseEntity = dashboardController.recordClick(ID, AUTHORISATION);
+
+        //then
+        assertEquals(responseEntity.getStatusCode(), OK);
+        verify(dashboardNotificationService).deleteById(ID);
+    }
+
+    @Test
+    public void shouldReturn401WhenNotificationDeletedUnauthorised() {
+
+        //given
+        doThrow(new RuntimeException()).when(dashboardNotificationService).deleteById(ID);
+
+        //then
+        assertThrows(RuntimeException.class, () -> dashboardController.recordClick(ID, AUTHORISATION));
     }
 }

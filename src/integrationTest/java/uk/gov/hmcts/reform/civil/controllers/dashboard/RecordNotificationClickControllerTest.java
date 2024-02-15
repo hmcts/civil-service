@@ -38,4 +38,21 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
 
         assertFalse(notificationRepository.findById(id).isPresent());
     }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnUnauthorisedWhenBearerTokenMissing() {
+
+        doDelete("", null, endPointUrlDelete, id.toString())
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnBadRequestWhenUuidNotInCorrectFormat() {
+
+        doDelete(BEARER_TOKEN, null, endPointUrlDelete, "123")
+            .andExpect(status().isBadRequest());
+
+    }
 }
