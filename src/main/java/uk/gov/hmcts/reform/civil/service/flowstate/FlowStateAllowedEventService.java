@@ -825,8 +825,7 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
                 asyncStitchingComplete,
-                TRANSFER_ONLINE_CASE,
-                MORE_INFORMATION_HWF
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
