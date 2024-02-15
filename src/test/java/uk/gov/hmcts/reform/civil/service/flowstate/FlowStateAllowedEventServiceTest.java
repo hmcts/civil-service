@@ -81,6 +81,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_CHECK;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READY_NOTIFICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIAL_READINESS;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
@@ -1141,6 +1142,15 @@ class FlowStateAllowedEventServiceTest {
             CaseDetailsBuilder.builder()
                 .atStateAwaitingCaseDetailsNotification().build();
         assertThat(flowStateAllowedEventService.isAllowed(caseDetails, MANAGE_CONTACT_INFORMATION))
+            .isEqualTo(true);
+    }
+
+    @Test
+    void shouldReturnTrue_whenCaseEventIsUpdateNextHearingDetails() {
+        CaseDetails caseDetails =
+            CaseDetailsBuilder.builder()
+                .atStateAwaitingCaseDetailsNotification().build();
+        assertThat(flowStateAllowedEventService.isAllowed(caseDetails, UPDATE_NEXT_HEARING_DETAILS))
             .isEqualTo(true);
     }
 }
