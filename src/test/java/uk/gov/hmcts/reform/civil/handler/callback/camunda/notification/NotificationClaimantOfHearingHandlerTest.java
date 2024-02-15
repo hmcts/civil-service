@@ -268,6 +268,48 @@ public class NotificationClaimantOfHearingHandlerTest {
         }
 
         @Test
+        void shouldNotifyApplicantSolicitor_whenInvokedWithSpecClaim() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC().build().toBuilder()
+                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .hearingFeePaymentDetails(PaymentDetails.builder()
+                                              .status(SUCCESS)
+                                              .build())
+                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .build();
+
+            when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
+                .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(0)).build());
+            when(hearingNoticeCamundaService.getProcessVariables(any()))
+                .thenReturn(HearingNoticeVariables.builder()
+                                .hearingId("HER1234")
+                                .hearingStartDateTime(LocalDateTime.of(
+                                    LocalDate.of(2022, 10, 7),
+                                    LocalTime.of(15, 30)))
+                                .hearingType("AAA7-TRI")
+                                .build());
+
+            LocalDate now = LocalDate.of(2022, 9, 29);
+            try (MockedStatic<LocalDate> mock = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
+                mock.when(LocalDate::now).thenReturn(now);
+                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING_HMC").build()).build();
+                // When
+                handler.handle(params);
+                // Then
+                verify(notificationService).sendMail(
+                    "applicantemail@hmcts.net",
+                    "test-template-no-fee-claimant-id-hmc",
+                    getNotificationNoFeeDatePMDataMapHMC(caseData),
+                    "notification-of-hearing-HER1234"
+                );
+            }
+        }
+
+        @Test
         void shouldNotifyApplicantSolicitor_whenInvokedWithFeeAnd1v1WithNoSolicitorReferences() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
