@@ -93,7 +93,7 @@ public class NotificationDefendantOfHearingHandler extends CallbackHandler imple
         if (!isRespondent1Lip || isHmc) {
             properties.put(DEFENDANT_REFERENCE_NUMBER, getDefRefNumber(caseData, isDefendant1));
         }
-       // notificationService.sendMail(recipient, getEmailTemplate(isRespondent1Lip, isHmc), properties, getReferenceTemplate(caseData, isRespondent1Lip, isHmc));
+        notificationService.sendMail(recipient, getEmailTemplate(isRespondent1Lip, isHmc), properties, getReferenceTemplate(caseData, isRespondent1Lip, isHmc));
     }
 
     @Override
