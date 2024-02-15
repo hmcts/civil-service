@@ -70,6 +70,18 @@ public class SdoHelper {
         return fastTrackPath1 || fastTrackPath2;
     }
 
+    public static boolean isNihlFastTrack(CaseData caseData) {
+
+        return  ((caseData.getDrawDirectionsOrderRequired() == NO
+            && caseData.getFastClaims() != null
+            && caseData.getFastClaims().contains(
+            FastTrack.fastClaimNoiseInducedHearingLoss))
+            || (caseData.getDrawDirectionsOrderRequired() == YES
+            && caseData.getTrialAdditionalDirectionsForFastTrack() != null
+            && caseData.getTrialAdditionalDirectionsForFastTrack()
+            .contains(FastTrack.fastClaimNoiseInducedHearingLoss)));
+    }
+
     public static boolean hasSharedVariable(CaseData caseData, String variableName) {
         switch (variableName) {
 
