@@ -37,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -405,7 +407,7 @@ public class CaseDataTest {
     void isFastTrackClaim_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+                .responseClaimTrack(FAST_CLAIM.name())
                 .build();
         //When
         //Then
@@ -438,7 +440,7 @@ public class CaseDataTest {
     void isSmallClaim_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+                .responseClaimTrack(FAST_CLAIM.name())
                 .build();
         //When
         //Then
@@ -954,6 +956,22 @@ public class CaseDataTest {
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
             //Then
             assertTrue(isJudgementDateNotPermitted);
+        }
+    }
+
+    @Nested
+    class GetAssignedTrack {
+
+        @Test
+        void shouldReturnExpectedAssignedTrack_whenAllocatedTrackIsDefined() {
+            CaseData caseData = CaseData.builder().allocatedTrack(FAST_CLAIM).build();
+            assertEquals(FAST_CLAIM.name(), caseData.getAssignedTrack());
+        }
+
+        @Test
+        void shouldReturnExpectedAssignedTrack_whenResponseClaimTrackIsDefined() {
+            CaseData caseData = CaseData.builder().responseClaimTrack(MULTI_CLAIM.name()).build();
+            assertEquals(MULTI_CLAIM.name(), caseData.getAssignedTrack());
         }
     }
 
