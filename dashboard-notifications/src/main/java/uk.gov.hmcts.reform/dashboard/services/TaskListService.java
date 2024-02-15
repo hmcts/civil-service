@@ -47,17 +47,17 @@ public class TaskListService {
         return taskListRepository.save(beingUpdated);
     }
 
-    public TaskListEntity updateTaskList(String reference , String role, String name ) {
+    public TaskListEntity updateTaskList(String reference, String role, String name) {
 
         Optional<TaskListEntity> existingEntity = taskListRepository
             .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
-                reference,role,name);
+                reference, role, name);
 
         existingEntity.ifPresent(taskListEntity -> {
             taskListEntity.setCurrentStatus(taskListEntity.getNextStatus());
             taskListRepository.save(taskListEntity);
         });
 
-        return existingEntity.isPresent() ? existingEntity.get() : new TaskListEntity() ;
+        return existingEntity.isPresent() ? existingEntity.get() : new TaskListEntity();
     }
 }

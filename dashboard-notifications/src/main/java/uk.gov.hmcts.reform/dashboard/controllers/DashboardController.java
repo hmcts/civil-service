@@ -74,6 +74,7 @@ public class DashboardController {
 
         return new ResponseEntity<>(taskListResponse, HttpStatus.OK);
     }
+
     @PutMapping(path = {
         "taskList/{ccd-case-identifier}/{template-name}/role/{role-type}",
     })
