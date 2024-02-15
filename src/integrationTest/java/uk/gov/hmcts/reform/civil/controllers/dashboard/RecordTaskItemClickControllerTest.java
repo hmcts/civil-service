@@ -33,7 +33,7 @@ public class RecordTaskItemClickControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
-    void shouldReturnOkWithTaskItemStatusChangedWhenTaskItemClickRecorded () {
+    void shouldReturnOkWithTaskItemStatusChangedWhenTaskItemClickRecorded() {
 
         TaskListEntity taskListEntity = taskListRepository
             .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(ccdCaseIdentifier, roleType, name).get();

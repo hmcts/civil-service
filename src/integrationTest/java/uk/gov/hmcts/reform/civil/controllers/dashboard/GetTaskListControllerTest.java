@@ -32,18 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 public class GetTaskListControllerTest extends BaseIntegrationTest {
 
-    @Autowired
-    private DashboardNotificationService dashboardNotificationService;
-
-    @Autowired
-    private DashboardNotificationTemplateService dashboardNotificationTemplateService;
-
-    @Autowired
-    private NotificationRepository notificationRepository;
-
-    @Autowired
-    private NotificationTemplateRepository notificationTemplateRepository;
-
     private final String getTaskListUrl = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
 
     private final String endPointUrlGet = "/dashboard/notifications/{uuid}";
@@ -78,7 +66,7 @@ public class GetTaskListControllerTest extends BaseIntegrationTest {
                          .role("defendant").currentStatus(0).nextStatus(1).hintTextCy("hint_text_cy").hintTextEn(
                 "hint_text_en").reference("123")
                          .updatedBy("Test").createdAt(odt).build()
-                         );
+        );
 
         return taskList;
     }
