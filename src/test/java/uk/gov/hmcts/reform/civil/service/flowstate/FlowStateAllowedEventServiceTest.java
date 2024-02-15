@@ -813,8 +813,7 @@ class FlowStateAllowedEventServiceTest {
                         BUNDLE_CREATION_NOTIFICATION,
                         ADD_UNAVAILABLE_DATES,
                         asyncStitchingComplete,
-                        TRANSFER_ONLINE_CASE,
-                        UPDATE_HELP_WITH_FEE_NUMBER
+                        TRANSFER_ONLINE_CASE
                     }
                 )
             );
