@@ -1238,6 +1238,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public String getAssignedTrack() {
+        return nonNull(getAllocatedTrack()) ? getAllocatedTrack().name() : getResponseClaimTrack();
+    }
+
+    @JsonIgnore
     public boolean hasApplicant1AcceptedCourtDecision() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
