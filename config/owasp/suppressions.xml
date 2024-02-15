@@ -52,7 +52,5 @@
     <cve>CVE-2023-42794</cve>
     <cve>CVE-2023-42795</cve>
     <cve>CVE-2023-45648</cve>
-    <notes>tomcat-embed-core-9.0.80.jar (pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@9.0.80, cpe:2.3:a:apache:tomcat:9.0.80:*:*:*:*:*:*:*, cpe:2.3:a:apache_tomcat:apache_tomcat:9.0.80:*:*:*:*:*:*:*) : CVE-2023-42794, CVE-2023-42795, CVE-2023-45648
-     tomcat-embed-websocket-9.0.80.jar (pkg:maven/org.apache.tomcat.embed/tomcat-embed-websocket@9.0.80, cpe:2.3:a:apache:tomcat:9.0.80:*:*:*:*:*:*:*, cpe:2.3:a:apache_tomcat:apache_tomcat:9.0.80:*:*:*:*:*:*:*) : CVE-2023-42794, CVE-2023-42795, CVE-2023-45648</notes>
-  </suppress>
+ </suppress>
 </suppressions>
