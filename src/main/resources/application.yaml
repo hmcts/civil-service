@@ -541,7 +541,7 @@ mediation:
 spring:
   config:
     activate:
-      on-profile:
+      on-profile: integration-test
   datasource:
     driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:postgresql:11.4://localhost/cmc
