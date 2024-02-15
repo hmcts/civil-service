@@ -35,22 +35,23 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldValidationMoreInformationClaimIssued_withInvalidDate() {
+            //Given
             CaseData caseData = CaseData.builder()
                 .helpWithFeesMoreInformationClaimIssue(
                     HelpWithFeesMoreInformation.builder()
                         .hwFMoreInfoDocumentDate(LocalDate.now())
                         .build())
                 .build();
-
+            //When
             CallbackParams params = callbackParamsOf(caseData, MID, "more-information-hwf");
-
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            //Then
             Assertions.assertThat(response.getErrors()).containsExactly("Documents date must be future date");
         }
 
         @Test
         void shouldValidationMoreInformationHearing_withInvalidDate() {
+            //Given
             CaseData caseData = CaseData.builder()
                 .hwfFeeType(FeeType.HEARING)
                 .helpWithFeesMoreInformationHearing(
@@ -58,11 +59,10 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .hwFMoreInfoDocumentDate(LocalDate.now())
                         .build())
                 .build();
-
+            //When
             CallbackParams params = callbackParamsOf(caseData, MID, "more-information-hwf");
-
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            //Then
             Assertions.assertThat(response.getErrors()).containsExactly("Documents date must be future date");
         }
     }
@@ -72,12 +72,13 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCallSubmitMoreInformationHwfAboutToSubmit() {
+            //Given
             CaseData caseData = CaseData.builder()
                 .build();
+            //When
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            //Then
             assertThat(response).isNotNull();
         }
     }
