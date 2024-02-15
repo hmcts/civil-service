@@ -60,9 +60,9 @@ class TaskListServiceTest {
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRole("123", "Claimant");
         assertThat(actual).isEqualTo(getTaskListList());
     }
+
     @Test
     void shouldReturnTaskListEntity_whenTaskListEntityIsUpdated() {
-
 
         //given
         when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
@@ -72,15 +72,16 @@ class TaskListServiceTest {
         )).thenReturn(Optional.ofNullable(getTaskListEntity()));
 
         //when
-        TaskListEntity actual = taskListService.updateTaskList("123", "Claimant","hearing");
+        TaskListEntity actual = taskListService.updateTaskList("123", "Claimant", "hearing");
 
         //then
-        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("123","Claimant","hearing");
+        verify(taskListRepository)
+            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("123", "Claimant", "hearing");
         assertThat(actual.getCurrentStatus()).isEqualTo(getTaskListEntity().getNextStatus());
     }
+
     @Test
     void shouldReturnEmptyTaskListEntity_whenTaskListEntityIsNotUpdated() {
-
 
         //given
         when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
@@ -90,12 +91,14 @@ class TaskListServiceTest {
         )).thenReturn(Optional.empty());
 
         //when
-        TaskListEntity actual = taskListService.updateTaskList("123", "Claimant","hearing");
+        TaskListEntity actual = taskListService.updateTaskList("123", "Claimant", "hearing");
 
         //then
-        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("123","Claimant","hearing");
+        verify(taskListRepository)
+            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("123", "Claimant", "hearing");
         assertThat(actual).isEqualTo(new TaskListEntity());
     }
+
     @Test
     void shouldThrowExceptionWhenExceptionInGetTaskList() {
 
@@ -104,7 +107,7 @@ class TaskListServiceTest {
             .thenThrow(new RuntimeException());
 
         //then
-        assertThrows(RuntimeException.class, () ->  taskListRepository.findByReferenceAndTaskItemTemplateRole(
+        assertThrows(RuntimeException.class, () -> taskListRepository.findByReferenceAndTaskItemTemplateRole(
             any(),
             any()
         ));
