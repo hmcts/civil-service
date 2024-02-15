@@ -717,8 +717,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.disposalHearingAddNewDirections(null);
             updatedData.smallClaimsAddNewDirections(null);
             updatedData.fastTrackAddNewDirections(null);
-            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input(null).build()); // TODO check if hearing notes work (if we send "" then it will return it because it's not null)
-            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input(null).build()); // TODO
+            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
+            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
             updatedData.disposalHearingHearingNotes(null);
             // Add NIHL variables
         }
@@ -1333,7 +1333,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 ? ofNullable(caseData.getSdoR2Trial().getHearingCourtLocationList())
                 : ofNullable(caseData.getSdoR2Trial().getAltHearingCourtLocationList());
         } else if (SdoHelper.isFastTrack(caseData)) {
-            toUseList = ofNullable(caseData.getFastTrackMethodInPerson()); // TODO check if OK for NIHL or we need new variable
+            toUseList = ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
             toUseList = ofNullable(caseData.getSmallClaimsMethodInPerson());
         } else {
