@@ -99,9 +99,10 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
         List<String> errors = new ArrayList<>();
         CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isEarlyAdoptersEnabled()
-            && (!(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
+            && (Objects.isNull(caseData.getCaseManagementLocation())
+                || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
                                                                                   .getBaseLocation()))
-                || Objects.isNull(caseData.getCaseManagementLocation()))) {
+                )) {
             errors.add(NOT_IN_EA_REGION);
         }
 
