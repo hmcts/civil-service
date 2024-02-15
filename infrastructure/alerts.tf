@@ -54,7 +54,7 @@ data "archive_file" "function_app_data" {
 }
 
 resource "azurerm_app_service_plan" "functionapp_service_plan" {
-  name                = "civil-camunda-stuck-alert-service-plan"
+  name                = "civil-camunda-stuck-alert-service-plan-${var.env}"
   location            = var.appinsights_location
   resource_group_name = azurerm_resource_group.rg.name
   kind = "Linux"
