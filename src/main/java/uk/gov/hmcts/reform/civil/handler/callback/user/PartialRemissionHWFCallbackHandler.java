@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -9,29 +11,31 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(PARTIAL_REMISSION_HWF_GRANTED);
+    public static final String ERR_MSG_FEE_TYPE_NOT_CONFIGURED = "Fee Type is not configured properly";
+    public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_CLAIM_FEE = "Remission amount must be less than claim fee";
+    public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_HEARING_FEE = "Remission amount must be less than hearing fee";
+    public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO = "Remission amount must be greater than zero";
+
     private final ObjectMapper objectMapper;
-    private final Map<String, Callback> callbackMap = Map.of(
+    private final Map<String, Callback> callbackMap = ImmutableMap.of(
+        callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
         callbackKey(MID, "remission-amount"), this::validateRemissionAmount,
         callbackKey(ABOUT_TO_SUBMIT),
         this::partRemissionHWF,
@@ -50,19 +54,23 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse validateRemissionAmount(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        var remissionAmount = caseData.getHwFeesDetails().getRemissionAmount();
-        var claimFeeAmount = getClaimFeeAmount(caseData);
-        var hearingFeeAmount = getHearingFeeAmount(caseData);
-        var feeType = getHwfFeeType(caseData);
-        List<String> errors = new ArrayList<>();
+        var claimIssuedRemissionAmount = caseData.getClaimIssueRemissionAmount();
+        var hearingRemissionAmount = caseData.getHearingRemissionAmount();
+        var claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
+        var hearingFeeAmount = caseData.getHearingFeeAmount();
+        var feeType = caseData.getHwfFeeType();
+        var errors = new ArrayList<String>();
+
         if (feeType == null) {
-            errors.add("Fee Type is not configured properly.");
+            errors.add(ERR_MSG_FEE_TYPE_NOT_CONFIGURED);
         }
 
-        if (FeeType.CLAIMISSUED == feeType && remissionAmount.compareTo(claimFeeAmount) > 0) {
-            errors.add("Remission amount should be less than or equal to claim fee");
-        } else if (FeeType.HEARING == feeType && remissionAmount.compareTo(hearingFeeAmount) > 0) {
-            errors.add("Remission amount should be less than or equal to hearing fee");
+        if (claimIssuedRemissionAmount.signum() == -1 || hearingRemissionAmount.signum() == -1) {
+            errors.add(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO);
+        } else if (caseData.isHWFTypeClaimIssued() && claimIssuedRemissionAmount.compareTo(claimFeeAmount) >= 0) {
+            errors.add(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_CLAIM_FEE);
+        } else if (caseData.isHWFTypeHearing() && hearingRemissionAmount.compareTo(hearingFeeAmount) >= 0) {
+            errors.add(ERR_MSG_REMISSION_AMOUNT_LESS_THAN_HEARING_FEE);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -72,49 +80,9 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse partRemissionHWF(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
-        var updatedData = caseData.toBuilder();
-        var remissionAmount = caseData.getHwFeesDetails().getRemissionAmount();
-        var claimFeeAmount = getClaimFeeAmount(caseData);
-        var hearingFeeAmount = getHearingFeeAmount(caseData);
-        var feeType = getHwfFeeType(caseData);
-
-        if (FeeType.CLAIMISSUED == feeType && claimFeeAmount != null) {
-            var updatedClaimFeeAmount = claimFeeAmount.subtract(remissionAmount);
-            var claimFee = caseData.getClaimFee();
-
-            claimFee.setCalculatedAmountInPence(updatedClaimFeeAmount);
-            updatedData.claimFee(claimFee);
-        } else if (FeeType.HEARING == feeType && hearingFeeAmount != null) {
-            var updatedHearingFeeAmount = hearingFeeAmount.subtract(remissionAmount);
-            var hearingFee = caseData.getHearingFee();
-
-            hearingFee.setCalculatedAmountInPence(updatedHearingFeeAmount);
-            updatedData.hearingFee(hearingFee);
-        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(updatedData.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
-    }
-
-    private FeeType getHwfFeeType(CaseData caseData) {
-        return Optional.ofNullable(caseData)
-            .map(CaseData::getHwFeesDetails)
-            .map(HelpWithFeesDetails::getHwfFeeType)
-            .orElse(null);
-    }
-
-    private BigDecimal getClaimFeeAmount(CaseData caseData) {
-        return Optional.ofNullable(caseData)
-            .map(CaseData::getClaimFee)
-            .map(Fee::getCalculatedAmountInPence)
-            .orElse(null);
-    }
-
-    private BigDecimal getHearingFeeAmount(CaseData caseData) {
-        return Optional.ofNullable(caseData)
-            .map(CaseData::getHearingFee)
-            .map(Fee::getCalculatedAmountInPence)
-            .orElse(null);
     }
 }
