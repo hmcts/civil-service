@@ -1260,6 +1260,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && Objects.nonNull(getFeePaymentOutcomeDetails())
             && Objects.nonNull(getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee());
     }
+  
+    @JsonIgnore
+    public String getAssignedTrack() {
+        return nonNull(getAllocatedTrack()) ? getAllocatedTrack().name() : getResponseClaimTrack();
+    }
 
     @JsonIgnore
     public boolean hasApplicant1AcceptedCourtDecision() {
