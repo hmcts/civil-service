@@ -30,7 +30,7 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
 
-    private static final String LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP = "notification-mediation-unsuccessful-defenant-LIP-%s";
+    private static final String LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP = "notification-mediation-unsuccessful-defendant-LIP-%s";
     private static final String TASK_ID_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP = "SendMediationUnsuccessfulDefendantLIP";
 
     private static final List<CaseEvent> EVENTS = List.of(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP);

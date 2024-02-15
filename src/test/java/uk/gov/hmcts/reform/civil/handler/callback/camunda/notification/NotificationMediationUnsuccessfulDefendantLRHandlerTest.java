@@ -67,13 +67,18 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
 
     private static final String ORGANISATION_NAME = "Org Name";
     private static final String EMAIL_TEMPLATE = "test-notification-id";
-    private static final String APPLICANT_PARTY_NAME = "Lets party";
+    private static final String APPLICANT_PARTY_NAME = "Alice";
+    private static final String APPLICANT_2_PARTY_NAME = "Portia";
     private static final Long CCD_REFERENCE_NUMBER = 123456789L;
     private static final String CLAIMANT_EMAIL_ADDRESS = "applicantemail@hmcts.net";
     private static final String DEFENDANT_1_EMAIL_ADDRESS = "defendant1email@hmcts.net";
     private static final String DEFENDANT_2_EMAIL_ADDRESS = "defendant2email@hmcts.net";
+    private static final String DEFENDANTS_TEXT = "'s claim against you";
     private static final Map<String, String> CARM_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
-                                                                        PARTY_NAME, APPLICANT_PARTY_NAME,
+                                                                        PARTY_NAME, APPLICANT_PARTY_NAME + DEFENDANTS_TEXT,
+                                                                        CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
+    private static final Map<String, String> CARM_2V1_PROPERTY_MAP = Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, ORGANISATION_NAME,
+                                                                        PARTY_NAME, APPLICANT_PARTY_NAME + " and " + APPLICANT_2_PARTY_NAME + DEFENDANTS_TEXT,
                                                                         CLAIM_REFERENCE_NUMBER, CCD_REFERENCE_NUMBER.toString());
 
     @BeforeEach
@@ -140,7 +145,36 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
         assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_2_EMAIL_ADDRESS);
         assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
         assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_PROPERTY_MAP);
+    }
 
+    @Test
+    void shouldSendNotificationToDefendantLR_2v1() {
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        CaseData caseData = CaseData.builder()
+            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_PARTY_NAME).build())
+            .applicant2(Party.builder().type(Party.Type.COMPANY).companyName(APPLICANT_2_PARTY_NAME).build())
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
+            .respondentSolicitor1EmailAddress(DEFENDANT_1_EMAIL_ADDRESS)
+            .ccdCaseReference(CCD_REFERENCE_NUMBER)
+            .addApplicant2(YesOrNo.YES)
+            .addRespondent2(YesOrNo.NO)
+            .mediation(Mediation.builder()
+                           .mediationUnsuccessfulReasonsMultiSelect(List.of(PARTY_WITHDRAWS)).build())
+            .build();
+        CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR.name()).build()).build();
+
+        //When
+        notificationHandler.handle(params);
+        //Then
+        verify(notificationService, times(1)).sendMail(targetEmail.capture(),
+                                                       emailTemplate.capture(),
+                                                       notificationDataMap.capture(), reference.capture()
+        );
+        assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_1_EMAIL_ADDRESS);
+        assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
+        assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_2V1_PROPERTY_MAP);
     }
 
     @Test

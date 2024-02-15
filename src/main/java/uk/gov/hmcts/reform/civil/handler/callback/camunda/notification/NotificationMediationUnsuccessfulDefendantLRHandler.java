@@ -19,6 +19,8 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NOT_ASSIGNED;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.PARTY_WITHDRAWS;
@@ -38,6 +40,7 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
     private static final String LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR = "notification-mediation-unsuccessful-defendant-2-LR-%s";
     private static final String TASK_ID_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR = "SendMediationUnsuccessfulDefendant1LR";
     private static final String TASK_ID_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR = "SendMediationUnsuccessfulDefendant2LR";
+    private static final String DEFENDANTS_TEXT = "'s claim against you";
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyDefendantLRForMediationUnsuccessful
     );
@@ -72,9 +75,15 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
     }
 
     public Map<String, String> addProperties(final CaseData caseData) {
+        String partyName = caseData.getApplicant1().getPartyName();
+
+        if (TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
+            partyName = String.format("%s and %s", partyName, caseData.getApplicant2().getPartyName());
+        }
+
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
-            PARTY_NAME, caseData.getApplicant1().getPartyName(),
+            PARTY_NAME, partyName + DEFENDANTS_TEXT,
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }
@@ -82,7 +91,7 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
     public Map<String, String> addPropertiesForDefendant2(final CaseData caseData) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent2LegalOrganisationName(caseData),
-            PARTY_NAME, caseData.getApplicant1().getPartyName(),
+            PARTY_NAME, caseData.getApplicant1().getPartyName() + DEFENDANTS_TEXT,
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }
