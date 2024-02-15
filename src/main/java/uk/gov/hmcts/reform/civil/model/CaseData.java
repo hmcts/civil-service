@@ -1241,4 +1241,18 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public String getAssignedTrack() {
         return nonNull(getAllocatedTrack()) ? getAllocatedTrack().name() : getResponseClaimTrack();
     }
+
+    @JsonIgnore
+    public boolean hasApplicant1AcceptedCourtDecision() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasClaimantAcceptedCourtDecision).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean hasApplicant1CourtDecisionInFavourOfClaimant() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfClaimant).isPresent();
+    }
 }
