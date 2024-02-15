@@ -67,6 +67,30 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getErrors()).isNull();
             assertThat(updatedData.getClaimIssuedHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(1000));
+            assertThat(updatedData.getClaimIssuedHwfDetails().getOutstandingFee()).isEqualTo(BigDecimal.valueOf(9000));
+        }
+
+        @Test
+        void shouldCallPartialRemissionHwfEventFoeHearingFee() {
+            CaseData caseData = CaseData.builder()
+                .hearingReferenceNumber("000HN001")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+                .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                           .remissionAmount(BigDecimal.valueOf(1000))
+                                           .build())
+                .hwfFeeType(FeeType.HEARING)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(response.getErrors()).isNull();
+            assertThat(updatedData.getHearingHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(1000));
+            assertThat(updatedData.getHearingHwfDetails().getOutstandingFee()).isEqualTo(BigDecimal.valueOf(29000));
         }
     }
 

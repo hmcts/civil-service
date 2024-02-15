@@ -314,7 +314,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
     private final ResponseDocument respondent2SpecDefenceResponseDocument;
-    private FeeType hwfFeeType;
 
     public RespondentResponseTypeSpec getRespondent1ClaimResponseTypeForSpec() {
 
@@ -1247,16 +1246,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasApplicant1SignedSettlementAgreement).isPresent();
 
-    }
-
-    @JsonIgnore
-    public boolean isHWFTypeHearing() {
-        return getHwfFeeType() == FeeType.HEARING;
-    }
-
-    @JsonIgnore
-    public boolean isHWFTypeClaimIssued() {
-        return getHwfFeeType() == FeeType.CLAIMISSUED;
     }
 
     @JsonIgnore

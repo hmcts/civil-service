@@ -69,7 +69,7 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
                                               .hwfFullRemissionGrantedForClaimIssue(YesOrNo.YES).build())
                 .build();
 
-            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
+            caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -80,13 +80,13 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldUpdateTheDataBaseWithHWFRefNumber_WhenFeeType_Hearing() {
-            CaseData caseData = CaseDataBuilder.builder()
+            CaseData caseData = CaseData.builder()
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
                                               .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
                                               .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
+                .hwfFeeType(FeeType.HEARING)
                 .build();
 
-            caseData.setHwfFeeType(FeeType.HEARING);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -97,9 +97,10 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
 
         @Test
         void shouldUpdateBusinessProcess_WhenFeeType_ClaimIssue() {
-            CaseData caseData = CaseDataBuilder.builder()
+            CaseData caseData = CaseData.builder()
+                .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
-            caseData.setHwfFeeType(FeeType.CLAIMISSUED);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
