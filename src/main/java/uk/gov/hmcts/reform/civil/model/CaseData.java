@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -204,6 +205,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final ClaimTypeUnspec claimTypeUnSpec;
     private final ClaimType claimType;
     private final SuperClaimType superClaimType;
+    private final FeeType hwfFeeType;
     private final String claimTypeOther;
     private final PersonalInjuryType personalInjuryType;
     private final String personalInjuryTypeOther;

@@ -6,6 +6,9 @@ import java.util.function.Predicate;
 
 public enum DashboardClaimStatus {
 
+    HWF_MORE_INFORMATION_NEEDED(
+        Claim::isHwFMoreInformationNeeded
+    ),
     MEDIATION_UNSUCCESSFUL(
         Claim::isMediationUnsuccessful
     ),

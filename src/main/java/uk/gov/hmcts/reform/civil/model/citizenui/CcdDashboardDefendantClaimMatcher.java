@@ -298,4 +298,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return false;
     }
 
+    @Override
+    public boolean isHwFMoreInformationNeeded() {
+        return false;
+    }
+
 }

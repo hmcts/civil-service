@@ -309,4 +309,11 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
             && caseData.hasApplicantRejectedRepaymentPlan());
     }
+
+    @Override
+    public boolean isHwFMoreInformationNeeded() {
+        return (null != caseData.getHelpWithFeesMoreInformationClaimIssue()
+            || null != caseData.getHelpWithFeesMoreInformationHearing());
+        //TODO will be added after remission code merged
+    }
 }
