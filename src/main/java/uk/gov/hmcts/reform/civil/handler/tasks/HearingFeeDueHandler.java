@@ -40,7 +40,7 @@ public class HearingFeeDueHandler implements BaseExternalTaskHandler {
 
                 if ((hearingFeePaymentDetails != null
                         && hearingFeePaymentDetails.getStatus() == PaymentStatus.SUCCESS)
-                        || caseData.hearingPaymentDoneWithHWF()) {
+                        || caseData.hearingFeePaymentDoneWithHWF()) {
                     log.info("Current case status '{}'", caseDetails.getState());
                     applicationEventPublisher.publishEvent(new HearingFeePaidEvent(caseDetails.getId()));
                 } else if (hearingFeePaymentDetails == null

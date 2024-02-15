@@ -16,7 +16,8 @@ public class HWFFeePaymentOutcomeService {
 
     public void updateHwfReferenceNumber(CaseData.CaseDataBuilder<?, ?> builder, CaseData caseData) {
 
-        if (Objects.nonNull(caseData.getFeePaymentOutcomeDetails())) {
+        if (Objects.nonNull(caseData.getFeePaymentOutcomeDetails())
+            && caseData.getFeePaymentOutcomeDetails().getHwfNumberAvailable() == YesOrNo.YES) {
             if (caseData.isHWFTypeClaimIssued()) {
                 HelpWithFees helpWithFees = HelpWithFees.builder()
                     .helpWithFee(YesOrNo.YES)
