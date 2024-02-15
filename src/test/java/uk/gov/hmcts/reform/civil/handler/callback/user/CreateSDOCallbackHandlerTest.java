@@ -44,7 +44,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
@@ -447,7 +446,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void ShouldPopulateDefaultFieldsNihl() {
+        void ShouldPopulateDefaultNIHLfields() {
 
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
@@ -478,83 +477,157 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getData()).extracting("sdoFastTrackJudgesRecital").extracting("input").asString().isEqualTo(JUDGE_RECITAL);
-            assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments").extracting("standardDisclosureTxt").asString().isEqualTo(STANDARD_DISCLOSURE);
-            assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments").extracting("standardDisclosureDate").asString().isEqualTo(LocalDate.now().plusDays(28).toString());
-            assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments").extracting("inspectionTxt").asString().isEqualTo(INSPECTION);
-            assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments").extracting("inspectionDate").asString().isEqualTo(LocalDate.now().plusDays(42).toString());
-            assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments").extracting("requestsWillBeCompiledLabel").asString().isEqualTo(REQUEST_COMPILED_WITH);
+            assertThat(response.getData()).extracting("sdoFastTrackJudgesRecital")
+                .extracting("input").asString().isEqualTo(JUDGE_RECITAL);
+            assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
+                .extracting("standardDisclosureTxt").asString().isEqualTo(STANDARD_DISCLOSURE);
+            assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
+                .extracting("standardDisclosureDate").asString().isEqualTo(LocalDate.now().plusDays(28).toString());
+            assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
+                .extracting("inspectionTxt").asString().isEqualTo(INSPECTION);
+            assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
+                .extracting("inspectionDate").asString().isEqualTo(LocalDate.now().plusDays(42).toString());
+            assertThat(response.getData()).extracting("sdoR2DisclosureOfDocuments")
+                .extracting("requestsWillBeCompiledLabel").asString().isEqualTo(REQUEST_COMPILED_WITH);
             assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoStatementOfWitness").asString().isEqualTo(STATEMENT_WITNESS);
             assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoR2RestrictWitness").extracting("isRestrictWitness").asString().isEqualTo("No");
-            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoR2RestrictWitness").extracting("restrictNoOfWitnessDetails").extracting("noOfWitnessClaimant").asString().isEqualTo("3");
-            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoR2RestrictWitness").extracting("restrictNoOfWitnessDetails").extracting("noOfWitnessDefendant").asString().isEqualTo("3");
-            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoR2RestrictWitness").extracting("restrictNoOfWitnessDetails").extracting("partyIsCountedAsWitnessTxt").asString().isEqualTo(RESTRICT_WITNESS_TEXT);
-            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoRestrictPages").extracting("isRestrictPages").asString().isEqualTo("No");
-            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoRestrictPages").extracting("isRestrictPages").asString().isEqualTo("No");
-            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoRestrictPages").extracting("restrictNoOfPagesDetails").extracting("witnessShouldNotMoreThanTxt").asString().isEqualTo(RESTRICT_NUMBER_PAGES_TEXT1);
-            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoRestrictPages").extracting("restrictNoOfPagesDetails").extracting("fontDetails").asString().isEqualTo(RESTRICT_NUMBER_PAGES_TEXT2);
+            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoR2RestrictWitness")
+                .extracting("restrictNoOfWitnessDetails").extracting("noOfWitnessClaimant").asString().isEqualTo("3");
+            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoR2RestrictWitness")
+                .extracting("restrictNoOfWitnessDetails").extracting("noOfWitnessDefendant").asString().isEqualTo("3");
+            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoR2RestrictWitness")
+                .extracting("restrictNoOfWitnessDetails").extracting("partyIsCountedAsWitnessTxt").asString().isEqualTo(RESTRICT_WITNESS_TEXT);
+            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoRestrictPages")
+                .extracting("isRestrictPages").asString().isEqualTo("No");
+            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoRestrictPages")
+                .extracting("isRestrictPages").asString().isEqualTo("No");
+            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoRestrictPages")
+                .extracting("restrictNoOfPagesDetails").extracting("witnessShouldNotMoreThanTxt").asString().isEqualTo(RESTRICT_NUMBER_PAGES_TEXT1);
+            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoRestrictPages")
+                .extracting("restrictNoOfPagesDetails").extracting("fontDetails").asString().isEqualTo(RESTRICT_NUMBER_PAGES_TEXT2);
             assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoWitnessDeadline").asString().isEqualTo(DEADLINE);
-            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoWitnessDeadlineDate").asString().isEqualTo(LocalDate.now().plusDays(70).toString());
-            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoWitnessDeadlineText").asString().isEqualTo(DEADLINE_EVIDENCE);
-            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss").extracting("sdoR2ScheduleOfLossClaimantText").asString().isEqualTo(SCHEDULE_OF_LOSS_CLAIMANT);
-            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss").extracting("isClaimForPecuniaryLoss").asString().isEqualTo("No");
-            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss").extracting("sdoR2ScheduleOfLossClaimantDate").asString().isEqualTo(LocalDate.now().plusDays(364).toString());
-            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss").extracting("sdoR2ScheduleOfLossDefendantText").asString().isEqualTo(SCHEDULE_OF_LOSS_DEFENDANT);
-            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss").extracting("sdoR2ScheduleOfLossDefendantDate").asString().isEqualTo(LocalDate.now().plusDays(378).toString());
-            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss").extracting("sdoR2ScheduleOfLossPecuniaryLossTxt").asString().isEqualTo(PECUNIARY_LOSS);
-            assertThat(response.getData()).extracting("sdoR2Trial").extracting("trialOnOptions").asString().isEqualTo(OPEN_DATE.toString());
-            assertThat(response.getData()).extracting("sdoR2Trial").extracting("lengthList").asString().isEqualTo(FIVE_HOURS.toString());
-            assertThat(response.getData()).extracting("sdoR2Trial").extracting("methodOfHearing").asString().isEqualTo(fastTrackMethodInPerson.toString());
-            assertThat(response.getData()).extracting("sdoR2Trial").extracting("physicalBundleOptions").asString().isEqualTo(PhysicalTrialBundleOptions.NONE.toString());
-            assertThat(response.getData()).extracting("sdoR2Trial").extracting("sdoR2TrialFirstOpenDateAfter").extracting("listFrom").asString().isEqualTo(LocalDate.now().plusDays(434).toString());
-            assertThat(response.getData()).extracting("sdoR2Trial").extracting("sdoR2TrialWindow").extracting("listFrom").asString().isEqualTo(LocalDate.now().plusDays(434).toString());
-            assertThat(response.getData()).extracting("sdoR2Trial").extracting("sdoR2TrialWindow").extracting("dateTo").asString().isEqualTo(LocalDate.now().plusDays(455).toString());
-            assertThat(response.getData()).extracting("sdoR2Trial").extracting("hearingCourtLocationList").asString().isEqualTo("{value={code=214320, label=court 2 - 2 address - Y02 7RB}, list_items=[{code=214320, label=court 2 - 2 address - Y02 7RB}, {code=OTHER_LOCATION, label=Other location}]}");
-            assertThat(response.getData()).extracting("sdoR2Trial").extracting("altHearingCourtLocationList").asString().isEqualTo("{value={}, list_items=[{code=00001, label=court 1 - 1 address - Y01 7RB}, {code=214320, label=court 2 - 2 address - Y02 7RB}, {code=00003, label=court 3 - 3 address - Y03 7RB}]}");
-            assertThat(response.getData()).extracting("sdoR2Trial").extracting("physicalBundlePartyTxt").asString().isEqualTo(PHYSICAL_TRIAL_BUNDLE);
+            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact")
+                .extracting("sdoWitnessDeadlineDate").asString().isEqualTo(LocalDate.now().plusDays(70).toString());
+            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact")
+                .extracting("sdoWitnessDeadlineText").asString().isEqualTo(DEADLINE_EVIDENCE);
+            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
+                .extracting("sdoR2ScheduleOfLossClaimantText").asString().isEqualTo(SCHEDULE_OF_LOSS_CLAIMANT);
+            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
+                .extracting("isClaimForPecuniaryLoss").asString().isEqualTo("No");
+            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
+                .extracting("sdoR2ScheduleOfLossClaimantDate").asString().isEqualTo(LocalDate.now().plusDays(364).toString());
+            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
+                .extracting("sdoR2ScheduleOfLossDefendantText").asString().isEqualTo(SCHEDULE_OF_LOSS_DEFENDANT);
+            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
+                .extracting("sdoR2ScheduleOfLossDefendantDate").asString().isEqualTo(LocalDate.now().plusDays(378).toString());
+            assertThat(response.getData()).extracting("sdoR2ScheduleOfLoss")
+                .extracting("sdoR2ScheduleOfLossPecuniaryLossTxt").asString().isEqualTo(PECUNIARY_LOSS);
+            assertThat(response.getData()).extracting("sdoR2Trial")
+                .extracting("trialOnOptions").asString().isEqualTo(OPEN_DATE.toString());
+            assertThat(response.getData()).extracting("sdoR2Trial")
+                .extracting("lengthList").asString().isEqualTo(FIVE_HOURS.toString());
+            assertThat(response.getData()).extracting("sdoR2Trial")
+                .extracting("methodOfHearing").asString().isEqualTo(fastTrackMethodInPerson.toString());
+            assertThat(response.getData()).extracting("sdoR2Trial")
+                .extracting("physicalBundleOptions").asString().isEqualTo(PhysicalTrialBundleOptions.NONE.toString());
+            assertThat(response.getData()).extracting("sdoR2Trial")
+                .extracting("sdoR2TrialFirstOpenDateAfter").extracting("listFrom").asString().isEqualTo(LocalDate.now().plusDays(434).toString());
+            assertThat(response.getData()).extracting("sdoR2Trial")
+                .extracting("sdoR2TrialWindow").extracting("listFrom").asString().isEqualTo(LocalDate.now().plusDays(434).toString());
+            assertThat(response.getData()).extracting("sdoR2Trial")
+                .extracting("sdoR2TrialWindow").extracting("dateTo").asString().isEqualTo(LocalDate.now().plusDays(455).toString());
+            assertThat(response.getData()).extracting("sdoR2Trial")
+                .extracting("hearingCourtLocationList").asString().isEqualTo("{value={code=214320, label=court 2 - 2 address - Y02 7RB}, list_items=[{code=214320, label=court 2 - 2 address - Y02 7RB}, {code=OTHER_LOCATION, label=Other location}]}");
+            assertThat(response.getData()).extracting("sdoR2Trial")
+                .extracting("altHearingCourtLocationList").asString().isEqualTo("{value={}, list_items=[{code=00001, label=court 1 - 1 address - Y01 7RB}, {code=214320, label=court 2 - 2 address - Y02 7RB}, {code=00003, label=court 3 - 3 address - Y03 7RB}]}");
+            assertThat(response.getData()).extracting("sdoR2Trial")
+                .extracting("physicalBundlePartyTxt").asString().isEqualTo(PHYSICAL_TRIAL_BUNDLE);
             assertThat(response.getData()).extracting("sdoR2ImportantNotesTxt").asString().isEqualTo(IMPORTANT_NOTES);
             assertThat(response.getData()).extracting("sdoR2ImportantNotesDate").asString().isEqualTo(LocalDate.now().plusDays(7).toString());
-            assertThat(response.getData()).extracting("sdoR2ExpertEvidence").extracting("sdoClaimantPermissionToRelyTxt").asString().isEqualTo(CLAIMANT_PERMISSION_TO_RELY);
-            assertThat(response.getData()).extracting("sdoR2AddendumReport").extracting("sdoAddendumReportTxt").asString().isEqualTo(ADDENDUM_REPORT);
-            assertThat(response.getData()).extracting("sdoR2AddendumReport").extracting("sdoAddendumReportDate").asString().isEqualTo(LocalDate.now().plusDays(56).toString());
-            assertThat(response.getData()).extracting("sdoR2FurtherAudiogram").extracting("sdoClaimantShallUndergoTxt").asString().isEqualTo(CLAIMANT_SHALL_UNDERGO);
-            assertThat(response.getData()).extracting("sdoR2FurtherAudiogram").extracting("sdoServiceReportTxt").asString().isEqualTo(SERVICE_REPORT);
-            assertThat(response.getData()).extracting("sdoR2FurtherAudiogram").extracting("sdoClaimantShallUndergoDate").asString().isEqualTo(LocalDate.now().plusDays(42).toString());
-            assertThat(response.getData()).extracting("sdoR2FurtherAudiogram").extracting("sdoServiceReportDate").asString().isEqualTo(LocalDate.now().plusDays(98).toString());
-            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert").extracting("sdoDefendantMayAskTxt").asString().isEqualTo(DEFENDANT_MAY_ASK);
-            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert").extracting("sdoDefendantMayAskDate").asString().isEqualTo(LocalDate.now().plusDays(126).toString());
-            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert").extracting("sdoQuestionsShallBeAnsweredTxt").asString().isEqualTo(QUESTIONS_SHALL_BE_ANSWERED);
-            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert").extracting("sdoQuestionsShallBeAnsweredDate").asString().isEqualTo(LocalDate.now().plusDays(147).toString());
-            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert").extracting("sdoUploadedToDigitalPortalTxt").asString().isEqualTo(UPLOADED_TO_DIGITAL_PORTAL);
-            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert").extracting("sdoApplicationToRelyOnFurther").extracting("doRequireApplicationToRely").asString().isEqualTo("No");
-            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert").extracting("sdoApplicationToRelyOnFurther").extracting("applicationToRelyOnFurtherDetails").extracting("applicationToRelyDetailsTxt").asString().isEqualTo(APPLICATION_TO_RELY_DETAILS);
-            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert").extracting("sdoApplicationToRelyOnFurther").extracting("applicationToRelyOnFurtherDetails").extracting("applicationToRelyDetailsDate").asString().isEqualTo(LocalDate.now().plusDays(161).toString());
-            assertThat(response.getData()).extracting("sdoR2PermissionToRelyOnExpert").extracting("sdoPermissionToRelyOnExpertTxt").asString().isEqualTo(PERMISSION_TO_RELY_ON_EXPERT);
-            assertThat(response.getData()).extracting("sdoR2PermissionToRelyOnExpert").extracting("sdoPermissionToRelyOnExpertDate").asString().isEqualTo(LocalDate.now().plusDays(119).toString());
-            assertThat(response.getData()).extracting("sdoR2PermissionToRelyOnExpert").extracting("sdoJointMeetingOfExpertsTxt").asString().isEqualTo(JOINT_MEETING_OF_EXPERTS);
-            assertThat(response.getData()).extracting("sdoR2PermissionToRelyOnExpert").extracting("sdoJointMeetingOfExpertsDate").asString().isEqualTo(LocalDate.now().plusDays(147).toString());
-            assertThat(response.getData()).extracting("sdoR2PermissionToRelyOnExpert").extracting("sdoUploadedToDigitalPortalTxt").asString().isEqualTo(UPLOADED_TO_DIGITAL_PORTAL_7_DAYS);
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoEvidenceAcousticEngineerTxt").asString().isEqualTo(EVIDENCE_ACOUSTIC_ENGINEER);
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoInstructionOfTheExpertTxt").asString().isEqualTo(INSTRUCTION_OF_EXPERT);
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoInstructionOfTheExpertDate").asString().isEqualTo(LocalDate.now().plusDays(42).toString());
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoInstructionOfTheExpertTxtArea").asString().isEqualTo(INSTRUCTION_OF_EXPERT_TA);
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoExpertReportTxt").asString().isEqualTo(EXPERT_REPORT);
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoExpertReportDate").asString().isEqualTo(LocalDate.now().plusDays(280).toString());
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoExpertReportDigitalPortalTxt").asString().isEqualTo(EXPERT_REPORT_DIGITAL_PORTAL);
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoWrittenQuestionsTxt").asString().isEqualTo(WRITTEN_QUESTIONS);
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoWrittenQuestionsDate").asString().isEqualTo(LocalDate.now().plusDays(294).toString());
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoWrittenQuestionsDigitalPortalTxt").asString().isEqualTo(WRITTEN_QUESTIONS_DIGITAL_PORTAL);
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoRepliesTxt").asString().isEqualTo(REPLIES);
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoRepliesDate").asString().isEqualTo(LocalDate.now().plusDays(315).toString());
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoRepliesDigitalPortalTxt").asString().isEqualTo(REPLIES_DIGITAL_PORTAL);
-            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer").extracting("sdoServiceOfOrderTxt").asString().isEqualTo(SERVICE_OF_ORDER);
-            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert").extracting("sdoWrittenQuestionsTxt").asString().isEqualTo(ENT_WRITTEN_QUESTIONS);
-            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert").extracting("sdoWrittenQuestionsDate").asString().isEqualTo(LocalDate.now().plusDays(336).toString());
-            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert").extracting("sdoWrittenQuestionsDigPortalTxt").asString().isEqualTo(ENT_WRITTEN_QUESTIONS_DIG_PORTAL);
-            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert").extracting("sdoQuestionsShallBeAnsweredTxt").asString().isEqualTo(ENT_QUESTIONS_SHALL_BE_ANSWERED);
-            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert").extracting("sdoQuestionsShallBeAnsweredDate").asString().isEqualTo(LocalDate.now().plusDays(350).toString());
-            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert").extracting("sdoShallBeUploadedTxt").asString().isEqualTo(ENT_SHALL_BE_UPLOADED);
-            assertThat(response.getData()).extracting("sdoR2UploadOfDocuments").extracting("sdoUploadOfDocumentsTxt").asString().isEqualTo(UPLOAD_OF_DOCUMENTS);
+            assertThat(response.getData()).extracting("sdoR2ExpertEvidence")
+                .extracting("sdoClaimantPermissionToRelyTxt").asString().isEqualTo(CLAIMANT_PERMISSION_TO_RELY);
+            assertThat(response.getData()).extracting("sdoR2AddendumReport")
+                .extracting("sdoAddendumReportTxt").asString().isEqualTo(ADDENDUM_REPORT);
+            assertThat(response.getData()).extracting("sdoR2AddendumReport")
+                .extracting("sdoAddendumReportDate").asString().isEqualTo(LocalDate.now().plusDays(56).toString());
+            assertThat(response.getData()).extracting("sdoR2FurtherAudiogram")
+                .extracting("sdoClaimantShallUndergoTxt").asString().isEqualTo(CLAIMANT_SHALL_UNDERGO);
+            assertThat(response.getData()).extracting("sdoR2FurtherAudiogram")
+                .extracting("sdoServiceReportTxt").asString().isEqualTo(SERVICE_REPORT);
+            assertThat(response.getData()).extracting("sdoR2FurtherAudiogram")
+                .extracting("sdoClaimantShallUndergoDate").asString().isEqualTo(LocalDate.now().plusDays(42).toString());
+            assertThat(response.getData()).extracting("sdoR2FurtherAudiogram")
+                .extracting("sdoServiceReportDate").asString().isEqualTo(LocalDate.now().plusDays(98).toString());
+            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert")
+                .extracting("sdoDefendantMayAskTxt").asString().isEqualTo(DEFENDANT_MAY_ASK);
+            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert")
+                .extracting("sdoDefendantMayAskDate").asString().isEqualTo(LocalDate.now().plusDays(126).toString());
+            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert")
+                .extracting("sdoQuestionsShallBeAnsweredTxt").asString().isEqualTo(QUESTIONS_SHALL_BE_ANSWERED);
+            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert")
+                .extracting("sdoQuestionsShallBeAnsweredDate").asString().isEqualTo(LocalDate.now().plusDays(147).toString());
+            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert")
+                .extracting("sdoUploadedToDigitalPortalTxt").asString().isEqualTo(UPLOADED_TO_DIGITAL_PORTAL);
+            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert")
+                .extracting("sdoApplicationToRelyOnFurther").extracting("doRequireApplicationToRely").asString().isEqualTo("No");
+            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert")
+                .extracting("sdoApplicationToRelyOnFurther")
+                .extracting("applicationToRelyOnFurtherDetails").extracting("applicationToRelyDetailsTxt").asString().isEqualTo(APPLICATION_TO_RELY_DETAILS);
+            assertThat(response.getData()).extracting("sdoR2QuestionsClaimantExpert")
+                .extracting("sdoApplicationToRelyOnFurther").extracting("applicationToRelyOnFurtherDetails")
+                .extracting("applicationToRelyDetailsDate").asString().isEqualTo(LocalDate.now().plusDays(161).toString());
+            assertThat(response.getData()).extracting("sdoR2PermissionToRelyOnExpert")
+                .extracting("sdoPermissionToRelyOnExpertTxt").asString().isEqualTo(PERMISSION_TO_RELY_ON_EXPERT);
+            assertThat(response.getData()).extracting("sdoR2PermissionToRelyOnExpert")
+                .extracting("sdoPermissionToRelyOnExpertDate").asString().isEqualTo(LocalDate.now().plusDays(119).toString());
+            assertThat(response.getData()).extracting("sdoR2PermissionToRelyOnExpert")
+                .extracting("sdoJointMeetingOfExpertsTxt").asString().isEqualTo(JOINT_MEETING_OF_EXPERTS);
+            assertThat(response.getData()).extracting("sdoR2PermissionToRelyOnExpert")
+                .extracting("sdoJointMeetingOfExpertsDate").asString().isEqualTo(LocalDate.now().plusDays(147).toString());
+            assertThat(response.getData()).extracting("sdoR2PermissionToRelyOnExpert")
+                .extracting("sdoUploadedToDigitalPortalTxt").asString().isEqualTo(UPLOADED_TO_DIGITAL_PORTAL_7_DAYS);
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoEvidenceAcousticEngineerTxt").asString().isEqualTo(EVIDENCE_ACOUSTIC_ENGINEER);
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoInstructionOfTheExpertTxt").asString().isEqualTo(INSTRUCTION_OF_EXPERT);
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoInstructionOfTheExpertDate").asString().isEqualTo(LocalDate.now().plusDays(42).toString());
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoInstructionOfTheExpertTxtArea").asString().isEqualTo(INSTRUCTION_OF_EXPERT_TA);
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoExpertReportTxt").asString().isEqualTo(EXPERT_REPORT);
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoExpertReportDate").asString().isEqualTo(LocalDate.now().plusDays(280).toString());
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoExpertReportDigitalPortalTxt").asString().isEqualTo(EXPERT_REPORT_DIGITAL_PORTAL);
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoWrittenQuestionsTxt").asString().isEqualTo(WRITTEN_QUESTIONS);
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoWrittenQuestionsDate").asString().isEqualTo(LocalDate.now().plusDays(294).toString());
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoWrittenQuestionsDigitalPortalTxt").asString().isEqualTo(WRITTEN_QUESTIONS_DIGITAL_PORTAL);
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoRepliesTxt").asString().isEqualTo(REPLIES);
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoRepliesDate").asString().isEqualTo(LocalDate.now().plusDays(315).toString());
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoRepliesDigitalPortalTxt").asString().isEqualTo(REPLIES_DIGITAL_PORTAL);
+            assertThat(response.getData()).extracting("sdoR2EvidenceAcousticEngineer")
+                .extracting("sdoServiceOfOrderTxt").asString().isEqualTo(SERVICE_OF_ORDER);
+            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert")
+                .extracting("sdoWrittenQuestionsTxt").asString().isEqualTo(ENT_WRITTEN_QUESTIONS);
+            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert")
+                .extracting("sdoWrittenQuestionsDate").asString().isEqualTo(LocalDate.now().plusDays(336).toString());
+            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert")
+                .extracting("sdoWrittenQuestionsDigPortalTxt").asString().isEqualTo(ENT_WRITTEN_QUESTIONS_DIG_PORTAL);
+            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert")
+                .extracting("sdoQuestionsShallBeAnsweredTxt").asString().isEqualTo(ENT_QUESTIONS_SHALL_BE_ANSWERED);
+            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert")
+                .extracting("sdoQuestionsShallBeAnsweredDate").asString().isEqualTo(LocalDate.now().plusDays(350).toString());
+            assertThat(response.getData()).extracting("sdoR2QuestionsToEntExpert")
+                .extracting("sdoShallBeUploadedTxt").asString().isEqualTo(ENT_SHALL_BE_UPLOADED);
+            assertThat(response.getData()).extracting("sdoR2UploadOfDocuments")
+                .extracting("sdoUploadOfDocumentsTxt").asString().isEqualTo(UPLOAD_OF_DOCUMENTS);
 
             assertThat(response.getData()).extracting("sdoAltDisputeResolution").extracting("includeInOrderToggle").asString().isEqualTo("[INCLUDE]");
             assertThat(response.getData()).extracting("sdoVariationOfDirections").extracting("includeInOrderToggle").asString().isEqualTo("[INCLUDE]");
@@ -2421,7 +2494,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
-        void ShouldValidateNihlFields(boolean valid) {
+        void ShouldValidateNIHLfields(boolean valid) {
 
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
