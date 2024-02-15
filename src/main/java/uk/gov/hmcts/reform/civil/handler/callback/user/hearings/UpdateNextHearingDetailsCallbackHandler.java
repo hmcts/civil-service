@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 
 @Service
@@ -26,7 +26,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS =  List.of(UPDATE_NEXT_HEARING_DETAILS);
     private final ObjectMapper objectMapper;
 
-    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit);
+    private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_START), this::updateNextHearingDetails);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -38,7 +38,7 @@ public class UpdateNextHearingDetailsCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
+    private CallbackResponse updateNextHearingDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData updateData = caseData.toBuilder()
             .nextHearingDetails(
