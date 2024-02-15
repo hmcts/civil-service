@@ -68,31 +68,6 @@ data "azurerm_user_assigned_identity" "managed_identity" {
   name                = "${var.product}-${var.env}-mi"
   resource_group_name = "managed-identities-${var.env}-rg"
 }
-#
-#resource "azurerm_function_app" "civil-camunda-stuck-alert-function-app" {
-#  name                = "civilcamundastuckalert${var.env}"
-#  location            = var.appinsights_location
-#  resource_group_name = azurerm_resource_group.rg.name
-#  app_service_plan_id = azurerm_app_service_plan.functionapp_service_plan.id
-#  storage_account_name = module.slack-alerts-storage-account.storageaccount_name
-#  storage_account_access_key = module.slack-alerts-storage-account.storageaccount_primary_access_key
-#  version = "4"
-#  os_type = "linux"
-#  app_settings = {
-#    FUNCTIONS_WORKER_RUNTIME = "python"
-#  }
-#
-#  site_config {
-#    linux_fx_version = "python|3.10"
-#  }
-#
-#  tags = merge(var.common_tags, { expiresAfter = "3000-01-01" })
-#
-#  identity {
-#    type = "UserAssigned"
-#    identity_ids = [data.azurerm_user_assigned_identity.managed_identity.id]
-#  }
-#}
 
 resource "azurerm_linux_function_app" "civil-camunda-stuck-alert-function-app" {
   name               = "civilcamundastuckalert${var.env}"
