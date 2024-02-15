@@ -1373,7 +1373,8 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
                 UPLOAD_MEDIATION_DOCUMENTS,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                MORE_INFORMATION_HWF
             )
         ),
         entry(
