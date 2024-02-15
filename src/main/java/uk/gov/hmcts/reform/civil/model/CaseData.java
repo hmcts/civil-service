@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
-import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -91,6 +90,8 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentRecordedReason;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusDetails;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.PaymentPlanSelection;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentPaidInFull;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationAvailability;
+import uk.gov.hmcts.reform.civil.model.mediation.MediationContactInformation;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingNotesDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingOrderMadeWithoutHearingDJ;
@@ -366,6 +367,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<EmploymentTypeCheckboxFixedListLRspec> respondToClaimAdmitPartEmploymentTypeLRspec;
     private final YesOrNo specDefenceAdmittedRequired;
 
+    private final MediationContactInformation resp1MediationContactInfo;
+    private final MediationContactInformation resp2MediationContactInfo;
+    private final MediationAvailability resp1MediationAvailability;
+    private final MediationAvailability resp2MediationAvailability;
+
     private final String additionalInformationForJudge;
     private final String applicantAdditionalInformationForJudge;
     @JsonUnwrapped
@@ -542,6 +548,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private List<Element<TrialHearingAddNewDirectionsDJ>> trialHearingAddNewDirectionsDJ;
     private HearingMethodTelephoneHearingDJ disposalHearingMethodTelephoneHearingDJ;
     private HearingMethodVideoConferenceDJ disposalHearingMethodVideoConferenceHearingDJ;
+
+    private YesOrNo setRequestDJDamagesFlagForWA;
     private String featureToggleWA;
 
     private String caseManagementOrderSelection;
@@ -818,7 +826,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isClaimantAcceptedClaimAmount() {
         return YES.equals(getApplicant1AcceptAdmitAmountPaidSpec());
     }
-    
+
     @JsonIgnore
     public boolean isClaimantRejectsClaimAmount() {
         return NO.equals(getApplicant1AcceptAdmitAmountPaidSpec());
@@ -921,10 +929,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
                 null);
         LocalDate firstRepaymentDate = Optional.ofNullable(getRespondent1RepaymentPlan()).map(RepaymentPlanLRspec::getFirstRepaymentDate).orElse(
             null);
+        LocalDate respondentSettlementAgreementDeadline = Optional.ofNullable(getRespondent1RespondToSettlementAgreementDeadline()).map(LocalDateTime::toLocalDate).orElse(null);
+        Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(getCaseDataLiP());
+        YesOrNo hasDoneSettlementAgreement = optionalCaseDataLiP.map(CaseDataLiP::getRespondentSignSettlementAgreement).orElse(null);
+        boolean hasDoneSettlementAgreementInTime = (nonNull(hasDoneSettlementAgreement) && hasDoneSettlementAgreement == YesOrNo.YES)
+                                                    ||  (isNull(hasDoneSettlementAgreement) && isDateAfterToday(respondentSettlementAgreementDeadline));
 
         return (isNull(whenWillThisAmountBePaid) && isNull(firstRepaymentDate))
-            || isPaymentDateAfterToday(whenWillThisAmountBePaid)
-            || isPaymentDateAfterToday(firstRepaymentDate);
+            || (isDateAfterToday(whenWillThisAmountBePaid) && hasDoneSettlementAgreementInTime)
+            || (isDateAfterToday(firstRepaymentDate) && hasDoneSettlementAgreementInTime)
+            || (isDateAfterToday(whenWillThisAmountBePaid) && isFullAdmitPayImmediatelyClaimSpec());
+
     }
 
     @JsonIgnore
@@ -945,12 +960,17 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return (isPartAdmitClaimSpec()
                 && (Objects.nonNull(getApplicant1AcceptAdmitAmountPaidSpec())
                 && YesOrNo.YES.equals(getApplicant1AcceptAdmitAmountPaidSpec()))
-                && PaymentType.IMMEDIATELY.equals(getApplicant1RepaymentOptionForDefendantSpec()));
+                && (Objects.isNull(getApplicant1AcceptPartAdmitPaymentPlanSpec())));
     }
 
     @JsonIgnore
     public boolean isFullAdmitClaimSpec() {
         return FULL_ADMISSION.equals(getRespondent1ClaimResponseTypeForSpec());
+    }
+
+    @JsonIgnore
+    public boolean isFullAdmitPayImmediatelyClaimSpec() {
+        return isFullAdmitClaimSpec() && isPayImmediately();
     }
 
     @JsonIgnore
@@ -1212,8 +1232,22 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    private boolean isPaymentDateAfterToday(LocalDate paymentDate) {
-        return nonNull(paymentDate)
-            && paymentDate.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+    private boolean isDateAfterToday(LocalDate date) {
+        return nonNull(date)
+            && date.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+    }
+
+    @JsonIgnore
+    public boolean hasApplicant1AcceptedCourtDecision() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasClaimantAcceptedCourtDecision).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean hasApplicant1CourtDecisionInFavourOfClaimant() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfClaimant).isPresent();
     }
 }

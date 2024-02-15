@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -58,12 +59,14 @@ public class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerT
         private static final String DEFENDANT_PARTY_NAME = "ABC ABC";
         private static final String REFERENCE_NUMBER = "8372942374";
         private static final String EMAIL_TEMPLATE = "test-notification-id";
+        private static final String EMAIL_WELSH_TEMPLATE = "test-notification-welsh-id";
         private static final String CLAIMANT_ORG_NAME = "Org Name";
 
         @BeforeEach
         void setUp() {
             given(notificationsProperties.getNotifyRespondentLipForClaimantRepresentedTemplate()).willReturn(EMAIL_TEMPLATE);
             given(notificationsProperties.getNotifyClaimantLipForNoLongerAccessTemplate()).willReturn(EMAIL_TEMPLATE);
+            given(notificationsProperties.getNotifyClaimantLipForNoLongerAccessWelshTemplate()).willReturn(EMAIL_WELSH_TEMPLATE);
         }
 
         @Test
@@ -102,6 +105,7 @@ public class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerT
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.ENGLISH.toString())
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId(NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL.name()).build())
@@ -115,6 +119,34 @@ public class NotificationForClaimantRepresentedTest extends BaseCallbackHandlerT
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(APPLICANT_EMAIL_ADDRESS);
             assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_TEMPLATE);
+        }
+
+        @Test
+        public void notifyApplicantAfterNocApprovalBilingual() {
+
+            //Given
+            CaseData caseData = CaseData.builder()
+                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
+                    DEFENDANT_EMAIL_ADDRESS).build())
+                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME)
+                                .partyEmail(APPLICANT_EMAIL_ADDRESS).build())
+                .legacyCaseReference(REFERENCE_NUMBER)
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.WELSH.toString())
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId(NOTIFY_CLAIMANT_LIP_AFTER_NOC_APPROVAL.name()).build())
+                .build();
+            //When
+            notificationHandler.handle(params);
+            //Then
+            verify(notificationService, times(1)).sendMail(targetEmail.capture(),
+                                                           emailTemplate.capture(),
+                                                           notificationDataMap.capture(), reference.capture()
+            );
+            assertThat(targetEmail.getAllValues().get(0)).isEqualTo(APPLICANT_EMAIL_ADDRESS);
+            assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(EMAIL_WELSH_TEMPLATE);
         }
     }
 }

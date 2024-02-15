@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.hearing.HearingNoticeHmcGenera
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeCamundaService;
 import uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingDaySchedule;
+import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
@@ -73,6 +74,7 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
     private static String EPIMS = "venue-id";
     private static Long VERSION_NUMBER = 1L;
     private static final String REFERENCE_NUMBER = "000DC001";
+    private static final String TRIAL_HEARING_TYPE = "AAA7-TRI";
 
     private static final String fileName_application = String.format(
         HEARING_NOTICE_HMC.getDocumentTitle(), REFERENCE_NUMBER);
@@ -106,6 +108,9 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
             .requestDetails(HearingRequestDetails.builder()
                                 .versionNumber(VERSION_NUMBER)
                                 .build())
+            .hearingDetails(HearingDetails.builder()
+                                .hearingType(TRIAL_HEARING_TYPE)
+                                .build())
             .build();
         HearingNoticeVariables inputVariables = HearingNoticeVariables.builder()
             .hearingId(HEARING_ID)
@@ -136,6 +141,7 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
                 .hearingLocationEpims(EPIMS)
                 .responseDateTime(hearingResponseDate)
                 .days(List.of(hearingDay))
+                .hearingType(TRIAL_HEARING_TYPE)
                 .build()
         );
 
@@ -169,6 +175,9 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
                                  .build())
             .requestDetails(HearingRequestDetails.builder()
                                 .versionNumber(VERSION_NUMBER)
+                                .build())
+            .hearingDetails(HearingDetails.builder()
+                                .hearingType(TRIAL_HEARING_TYPE)
                                 .build())
             .build();
         HearingNoticeVariables inputVariables = HearingNoticeVariables.builder()
@@ -206,6 +215,7 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
                 .hearingLocationEpims(EPIMS)
                 .responseDateTime(hearingResponseDate)
                 .days(expectedHearingDays)
+                .hearingType(TRIAL_HEARING_TYPE)
                 .build()
         );
 
