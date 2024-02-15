@@ -436,7 +436,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("12345");
 
             assertThat(getDynamicList(response))
-                .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).build());
+                .isEqualTo(DynamicList.builder().value(DynamicListElement.EMPTY).listItems(new ArrayList<>()).build());
         }
 
         @Test
