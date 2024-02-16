@@ -31,32 +31,28 @@ public class HmcMessageHandler {
     private final CoreCaseDataService coreCaseDataService;
     private final PaymentsConfiguration paymentsConfiguration;
 
-    public boolean handleMessage(HmcMessage hmcMessage) {
+    public void handleMessage(HmcMessage hmcMessage) {
         if (isMessageRelevantForService(hmcMessage)) {
             if (NEXT_HEARING_DETAILS_UPDATE_STATUSES.contains(hmcMessage.getHearingUpdate().getHmcStatus())) {
-                return triggerCaseEvent(UPDATE_NEXT_HEARING_DETAILS, hmcMessage.getCaseId(), hmcMessage.getHearingId());
+                triggerCaseEvent(UPDATE_NEXT_HEARING_DETAILS, hmcMessage.getCaseId(), hmcMessage.getHearingId());
             }
             if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
-                return triggerCaseEvent(REVIEW_HEARING_EXCEPTION, hmcMessage.getCaseId(), hmcMessage.getHearingId());
+                triggerCaseEvent(REVIEW_HEARING_EXCEPTION, hmcMessage.getCaseId(), hmcMessage.getHearingId());
             }
+        } else {
+            log.info("Message not relevant for service - Service code: {}", hmcMessage.getHmctsServiceCode());
         }
-        return true;
     }
 
-    private boolean triggerCaseEvent(CaseEvent event, Long caseId, String hearingId) {
+    private void triggerCaseEvent(CaseEvent event, Long caseId, String hearingId) {
         // trigger event for WA
         try {
-            log.info("Triggering {} event for Case ID {}, and Hearing ID {}.",
-                      event.name(), caseId, hearingId);
+            log.info("Triggering {} event for Case ID {} and Hearing ID {}.", event.name(), caseId, hearingId);
             coreCaseDataService.triggerEvent(caseId, event);
-            log.info(
-                "Triggered {} event for Case ID {}, and Hearing ID {}.",
-                event.name(), caseId, hearingId);
-            return true;
         } catch (Exception e) {
-            log.info("Error triggering CCD event {}", e.getMessage());
+            log.info("Error triggering {} event: {}", event, e.getMessage());
+            throw e;
         }
-        return false;
     }
 
     private boolean isMessageRelevantForService(HmcMessage hmcMessage) {

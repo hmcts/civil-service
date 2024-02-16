@@ -91,8 +91,7 @@ public class ServiceBusConfiguration {
                     @SneakyThrows
                     @Override
                     public CompletableFuture<Void> onMessageAsync(IMessage message) {
-                        boolean exceptionEventTriggered = false;
-                        log.info("message received");
+                        log.info("HMC Message Received");
                         List<byte[]> body = message.getMessageBody().getBinaryData();
 
                         HmcMessage hmcMessage = objectMapper.readValue(body.get(0), HmcMessage.class);
@@ -103,11 +102,14 @@ public class ServiceBusConfiguration {
                                 ofNullable(hmcMessage.getHearingUpdate()).map(update -> update.getHmcStatus().name())
                                         .orElse("-")
                         );
-                        exceptionEventTriggered = handler.handleMessage(hmcMessage);
-                        if (exceptionEventTriggered) {
+
+                        try {
+                            handler.handleMessage(hmcMessage);
                             return receiveClient.completeAsync(message.getLockToken());
+                        } catch (Exception e) {
+                            log.error("These was a problem processing the message: {}", e.getMessage());
+                            return receiveClient.abandonAsync(message.getLockToken());
                         }
-                        return receiveClient.abandonAsync(message.getLockToken());
                     }
 
                     @Override

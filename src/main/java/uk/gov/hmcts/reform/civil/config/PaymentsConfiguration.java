@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -21,5 +22,10 @@ public class PaymentsConfiguration {
         this.service = service;
         this.specSiteId = specSiteId;
         this.specService = specService;
+    }
+
+    @JsonIgnore
+    public String getSiteId() {
+        return "";
     }
 }

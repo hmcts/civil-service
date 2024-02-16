@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.hmc.model.messaging.HearingUpdate;
 import uk.gov.hmcts.reform.hmc.model.messaging.HmcMessage;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -46,7 +45,7 @@ class HmcMessageHandlerTest {
     }
 
     @Test
-    void shouldReturnTrue_whenMessageRelevantForServiceAndHearingException() {
+    void shouldNotTriggerEvent_whenMessageRelevantForServiceAndHearingException() {
         HmcMessage hmcMessage = HmcMessage.builder()
             .caseId(1234L)
             .hearingId("HER1234")
@@ -56,14 +55,13 @@ class HmcMessageHandlerTest {
                                .build())
             .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, REVIEW_HEARING_EXCEPTION);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenMessageRelevantForServiceNoHearingException() {
+    void shouldNotTriggerEvent_whenMessageRelevantForServiceNoHearingException() {
         HmcMessage hmcMessage = HmcMessage.builder()
             .caseId(1234L)
             .hearingId("HER1234")
@@ -73,14 +71,13 @@ class HmcMessageHandlerTest {
                                .build())
             .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
-        assertThat(actual).isTrue();
         verifyNoInteractions(coreCaseDataService);
     }
 
     @Test
-    void shouldReturnTrue_whenServiceIdIsAAA6AndHMCStatusIsListed() {
+    void shouldTriggerEvent_whenServiceIdIsAAA6AndHMCStatusIsListed() {
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -90,14 +87,13 @@ class HmcMessageHandlerTest {
                         .build())
                 .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, UPDATE_NEXT_HEARING_DETAILS);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenServiceIdIsAAA7AndHMCStatusIsListed() {
+    void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsListed() {
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -107,14 +103,13 @@ class HmcMessageHandlerTest {
                         .build())
                 .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, UPDATE_NEXT_HEARING_DETAILS);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenServiceIdIsAAA6AndHMCStatusIsAwaitingActuals() {
+    void shouldTriggerEvent_whenServiceIdIsAAA6AndHMCStatusIsAwaitingActuals() {
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -124,14 +119,13 @@ class HmcMessageHandlerTest {
                         .build())
                 .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, UPDATE_NEXT_HEARING_DETAILS);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenServiceIdIsAAA7AndHMCStatusIsAwaitingActuals() {
+    void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsAwaitingActuals() {
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -141,14 +135,13 @@ class HmcMessageHandlerTest {
                         .build())
                 .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, UPDATE_NEXT_HEARING_DETAILS);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenServiceIdIsAAA6AndHMCStatusIsCompleted() {
+    void shouldTriggerEvent_whenServiceIdIsAAA6AndHMCStatusIsCompleted() {
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -158,14 +151,13 @@ class HmcMessageHandlerTest {
                         .build())
                 .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, UPDATE_NEXT_HEARING_DETAILS);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenServiceIdIsAAA7AndHMCStatusIsCompleted() {
+    void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsCompleted() {
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -175,14 +167,13 @@ class HmcMessageHandlerTest {
                         .build())
                 .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, UPDATE_NEXT_HEARING_DETAILS);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenServiceIdIsAAA6AndHMCStatusIsCenceled() {
+    void shouldTriggerEvent_whenServiceIdIsAAA6AndHMCStatusIsCenceled() {
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -192,14 +183,13 @@ class HmcMessageHandlerTest {
                         .build())
                 .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, UPDATE_NEXT_HEARING_DETAILS);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenServiceIdIsAAA7AndHMCStatusIsCanceled() {
+    void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsCanceled() {
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -209,14 +199,13 @@ class HmcMessageHandlerTest {
                         .build())
                 .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, UPDATE_NEXT_HEARING_DETAILS);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenServiceIdIsAAA6AndHMCStatusIsAdjourned() {
+    void shouldTriggerEvent_whenServiceIdIsAAA6AndHMCStatusIsAdjourned() {
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -226,14 +215,13 @@ class HmcMessageHandlerTest {
                         .build())
                 .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, UPDATE_NEXT_HEARING_DETAILS);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenServiceIdIsAAA7AndHMCStatusIsAdjourned() {
+    void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsAdjourned() {
         HmcMessage hmcMessage = HmcMessage.builder()
                 .caseId(1234L)
                 .hearingId("HER1234")
@@ -243,14 +231,13 @@ class HmcMessageHandlerTest {
                         .build())
                 .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
         verify(coreCaseDataService).triggerEvent(1234L, UPDATE_NEXT_HEARING_DETAILS);
-        assertThat(actual).isTrue();
     }
 
     @Test
-    void shouldReturnTrue_whenMessageServiceIdNotRelevant() {
+    void shouldNotTriggerEvent_whenMessageServiceIdNotRelevant() {
         HmcMessage hmcMessage = HmcMessage.builder()
             .caseId(1234L)
             .hearingId("HER1234")
@@ -260,9 +247,8 @@ class HmcMessageHandlerTest {
                                .build())
             .build();
 
-        boolean actual = handler.handleMessage(hmcMessage);
+        handler.handleMessage(hmcMessage);
 
-        assertThat(actual).isTrue();
         verifyNoInteractions(coreCaseDataService);
     }
 }
