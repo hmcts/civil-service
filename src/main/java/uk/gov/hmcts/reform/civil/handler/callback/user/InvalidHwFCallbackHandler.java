@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 
 @Service
@@ -27,7 +28,8 @@ public class InvalidHwFCallbackHandler extends CallbackHandler {
 
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-        callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit);
+        callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
 
     @Override
     protected Map<String, Callback> callbacks() {
