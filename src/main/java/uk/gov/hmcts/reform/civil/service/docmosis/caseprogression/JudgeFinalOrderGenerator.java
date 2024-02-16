@@ -134,10 +134,8 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .withoutNoticeSelectionDate(nonNull(caseData.getOrderWithoutNotice())
                                             ? caseData.getOrderWithoutNotice().getWithoutNoticeSelectionDate() : null)
             .judgeNameTitle(userDetails.getFullName())
-            .courtName(caseManagementLocationDetails.getSiteName())
-            .courtLocation(featureToggleService.isHmcEnabled()
-                               ? getHearingLocationText(caseData, authorisation)
-                               : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails));
+            .courtName(caseManagementLocationDetails.getVenueName())
+            .courtLocation(getHearingLocationText(caseData, authorisation));
         return freeFormOrderBuilder.build();
     }
 
@@ -160,12 +158,10 @@ public class JudgeFinalOrderGenerator implements TemplateDataGenerator<JudgeFina
             .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
             .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
             .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
-            .courtName(caseManagementLocationDetails.getSiteName())
+            .courtName(caseManagementLocationDetails.getVenueName())
             .finalOrderMadeSelection(caseData.getFinalOrderMadeSelection())
             .orderMadeDate(orderMadeDateBuilder(caseData))
-            .courtLocation(featureToggleService.isHmcEnabled()
-                               ? getHearingLocationText(caseData, authorisation)
-                               : LocationRefDataService.getDisplayEntry(caseManagementLocationDetails))
+            .courtLocation(getHearingLocationText(caseData, authorisation))
             .judgeNameTitle(userDetails.getFullName())
             .recordedToggle(nonNull(caseData.getFinalOrderRecitals()))
             .recordedText(nonNull(caseData.getFinalOrderRecitalsRecorded()) ? caseData.getFinalOrderRecitalsRecorded().getText() : "")
