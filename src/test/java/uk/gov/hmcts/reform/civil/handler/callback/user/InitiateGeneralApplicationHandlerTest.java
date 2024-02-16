@@ -12,6 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -125,6 +126,24 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private final BigDecimal fee275 = new BigDecimal("27500");
     private static final String FEE_CODE = "test_fee_code";
     private static final String FEE_VERSION = "1";
+
+    @Test
+    void shouldThrowError_whenLRVsLiP() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1LiP()
+                .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
+                .caseManagementLocation(CaseLocationCivil.builder()
+                        .baseLocation("45678")
+                        .region("4").build())
+                .build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+        when(featureToggleService.isEarlyAdoptersEnabled()).thenReturn(true);
+        when(featureToggleService.isLocationWhiteListedForCaseProgression(any())).thenReturn(true);
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isNotNull();
+    }
 
     @Test
     void shouldThrowError_whenEpimsIdIsNotAValidRegion() {
