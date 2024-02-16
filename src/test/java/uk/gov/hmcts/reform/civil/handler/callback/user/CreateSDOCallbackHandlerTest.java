@@ -324,6 +324,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getFastTrackHearingNotes()).isNull();
             assertThat(responseCaseData.getDisposalHearingHearingNotes()).isNull();
         }
+
     }
 
     @Nested

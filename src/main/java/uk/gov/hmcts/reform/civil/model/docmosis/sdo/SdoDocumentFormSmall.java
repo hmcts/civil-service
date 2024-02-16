@@ -13,15 +13,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
+import uk.gov.hmcts.reform.civil.model.sdo.*;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
@@ -66,6 +58,7 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final String smallClaimsMethodVideoConferenceHearing;
     private final SmallClaimsDocuments smallClaimsDocuments;
     private final SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private final SmallClaimsFlightDelay smallClaimsFlightDelay;
     private final LocationRefData hearingLocation;
     private final LocationRefData caseManagementLocation;
     private final SmallClaimsCreditHire smallClaimsCreditHire;
@@ -83,6 +76,7 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final boolean smallClaimsDocumentsToggle;
     private final boolean smallClaimsWitnessStatementToggle;
     private final boolean smallClaimsNumberOfWitnessesToggle;
+    private final boolean smallClaimsFlightDelayToggle;
 
     @SuppressWarnings("unused")
     public boolean getSmallClaimsMethodToggle() {
