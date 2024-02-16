@@ -352,7 +352,7 @@ public class CaseDataParent implements MappableObject {
     private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
     private List<IncludeInOrderToggle> sdoR2ScheduleOfLossToggle;
     private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
-    private List<SdoR2AddNewDirection> sdoR2AddNewDirection;
+    private List<Element<SdoR2AddNewDirection>> sdoR2AddNewDirection;
     private List<IncludeInOrderToggle> sdoR2TrialToggle;
     private SdoR2Trial sdoR2Trial;
     private String sdoR2ImportantNotesTxt;
