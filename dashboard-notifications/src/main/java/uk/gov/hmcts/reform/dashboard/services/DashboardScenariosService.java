@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
 
@@ -23,16 +22,16 @@ import java.util.UUID;
 public class DashboardScenariosService {
 
     private final NotificationTemplateRepository notificationTemplateRepository;
-    private final NotificationRepository notificationRepository;
+    private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
     private final TaskItemTemplateRepository taskItemTemplateRepository;
 
     public DashboardScenariosService(NotificationTemplateRepository notificationTemplateRepository,
-                                     NotificationRepository notificationRepository,
+                                     DashboardNotificationService dashboardNotificationService,
                                      TaskListService taskListService,
                                      TaskItemTemplateRepository taskItemTemplateRepository) {
         this.notificationTemplateRepository = notificationTemplateRepository;
-        this.notificationRepository = notificationRepository;
+        this.dashboardNotificationService = dashboardNotificationService;
         this.taskListService = taskListService;
         this.taskItemTemplateRepository = taskItemTemplateRepository;
     }
@@ -74,7 +73,7 @@ public class DashboardScenariosService {
             );
 
             // insert new record in notifications table
-            notificationRepository.save(notification);
+            dashboardNotificationService.saveOrUpdate(notification);
 
             //TODO Create or update taskItem(s) based on task items template for given scenario ref.
 
@@ -121,7 +120,7 @@ public class DashboardScenariosService {
                     .findByName(removableTemplate);
 
                 templateToRemove.ifPresent(t -> {
-                    int noOfRowsRemoved = notificationRepository.deleteByNameAndReferenceAndCitizenRole(
+                    int noOfRowsRemoved = dashboardNotificationService.deleteByNameAndReferenceAndCitizenRole(
                         t.getName(),
                         uniqueCaseIdentifier,
                         t.getRole()

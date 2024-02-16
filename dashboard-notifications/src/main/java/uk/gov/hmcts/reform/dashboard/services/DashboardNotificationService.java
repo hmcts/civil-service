@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional
 public class DashboardNotificationService {
 
     private final NotificationRepository notificationRepository;
@@ -31,45 +33,36 @@ public class DashboardNotificationService {
         return notificationRepository.findById(id);
     }
 
-    public NotificationEntity create(NotificationEntity notification) {
-        return notificationRepository.save(notification);
+    public List<Notification> getNotifications(String ccdCaseIdentifier, String roleType) {
+
+        List<NotificationEntity> notificationEntityList = notificationRepository
+            .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
+
+        return notificationEntityList.stream()
+            .map(Notification::from)
+            .collect(Collectors.toList());
     }
 
-    public NotificationEntity update(UUID id, NotificationEntity notification) {
-        NotificationEntity existingNotification = notificationRepository.findById(id).orElse(null);
+    public NotificationEntity saveOrUpdate(NotificationEntity notification) {
+        Optional<NotificationEntity> existingNotification = notificationRepository
+            .findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
+                notification.getReference(), notification.getCitizenRole(),
+                notification.getDashboardNotificationsTemplates().getId()
+            );
 
-        if (existingNotification != null) {
-            existingNotification.builder()
-                .dashboardNotificationsTemplates(notification.getDashboardNotificationsTemplates())
-                .reference(notification.getReference())
-                .titleEn(notification.getTitleEn())
-                .titleCy(notification.getTitleCy())
-                .descriptionEn(notification.getDescriptionEn())
-                .descriptionCy(notification.getDescriptionCy())
-                .params(notification.getParams())
-                .citizenRole(notification.getCitizenRole())
-                .createdBy(notification.getCreatedBy())
-                .createdAt(notification.getCreatedAt())
-                .updatedBy(notification.getUpdatedBy())
-                .updatedOn(notification.getUpdatedOn());
-
-            return notificationRepository.save(existingNotification);
-        } else {
-            return null;
+        NotificationEntity updated = notification;
+        if (existingNotification.isPresent()) {
+            updated = notification.toBuilder().id(existingNotification.get().getId()).build();
         }
+        return notificationRepository.save(updated);
+
     }
 
     public void deleteById(UUID id) {
         notificationRepository.deleteById(id);
     }
 
-    public List<Notification> getNotifications(String ccdCaseIdentifier, String roleType) {
-
-        List<NotificationEntity> notificationEntityList = notificationRepository
-            .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
-        return notificationEntityList.stream().map(
-                p -> new Notification(
-                    p.getId(), p.getTitleEn(), p.getTitleCy(), p.getDescriptionEn(), p.getDescriptionCy()))
-            .collect(Collectors.toList());
+    public int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String citizenRole) {
+        return notificationRepository.deleteByNameAndReferenceAndCitizenRole(name, reference, citizenRole);
     }
 }

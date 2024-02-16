@@ -64,10 +64,11 @@ public class DashboardNotificationsTestUtils {
     }
 
     public static List<NotificationEntity> getNotificationEntityList() {
+        return List.of(getNotification(uuid));
+    }
 
-        List<NotificationEntity> notificationEntityList = new ArrayList<>();
-        notificationEntityList.add(NotificationEntity.builder().id(uuid).descriptionEn("desc").descriptionCy("descCy").build());
-        return notificationEntityList;
+    public static NotificationEntity getNotification(UUID notificationId) {
+        return NotificationEntity.builder().id(notificationId).descriptionEn("desc").descriptionCy("descCy").build();
     }
 
     public static List<Notification> getNotificationList() {

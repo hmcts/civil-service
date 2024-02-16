@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 
 import java.util.UUID;
 
@@ -22,4 +23,11 @@ public class Notification {
     private String descriptionEn;
 
     private String descriptionCy;
+
+    public static Notification from(NotificationEntity notificationEntity) {
+        return new Notification(notificationEntity.getId(), notificationEntity.getTitleEn(),
+                                notificationEntity.getTitleCy(), notificationEntity.getDescriptionEn(),
+                                notificationEntity.getDescriptionCy()
+        );
+    }
 }
