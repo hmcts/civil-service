@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
@@ -17,14 +18,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-@Sql("/scripts/dashboardNotifications/notifications_data.sql")
+@Sql("/scripts/dashboardNotifications/get_notifications_data.sql")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class GetNotificationControllerTest extends BaseIntegrationTest {
 
     @Test
     @SneakyThrows
     void shouldReturnNotificationListWhenRequestingWithReferenceAndRole() {
         String getNotificationsEndpoint = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
-        doGet(BEARER_TOKEN, getNotificationsEndpoint, "123", "defendant")
+        doGet(BEARER_TOKEN, getNotificationsEndpoint, "127", "defendant")
             .andExpect(status().isOk())
             .andExpect(content().json(toJson(getNotificationList())));
     }

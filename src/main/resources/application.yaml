@@ -558,7 +558,7 @@ spring:
         physical-strategy: com.vladmihalcea.hibernate.type.util.CamelCaseToSnakeCaseNamingStrategy
     properties:
       hibernate:
-        show_sql: true
+        show_sql: false
         format_sql: true
   flyway:
     enabled: true
