@@ -50,7 +50,7 @@ public class HmcMessageHandler {
             log.info("Triggering {} event for Case ID {} and Hearing ID {}.", event.name(), caseId, hearingId);
             coreCaseDataService.triggerEvent(caseId, event);
         } catch (Exception e) {
-            log.info("Error triggering {} event: {}", event, e.getMessage());
+            log.error("Error triggering {} event: {}", event, e.getMessage());
             throw e;
         }
     }
