@@ -4666,7 +4666,7 @@ class StateFlowEngineTest {
                 entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true),
                 entry(FlowFlag.LIP_CASE.name(), true),
                 entry(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true)
-             );
+            );
         }
 
         @Test
