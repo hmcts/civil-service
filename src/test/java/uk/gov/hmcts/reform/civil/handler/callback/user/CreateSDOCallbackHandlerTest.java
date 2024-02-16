@@ -446,7 +446,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void ShouldPopulateDefaultNIHLfields() {
+        void shouldPopulateDefaultFieldsForNihl() {
 
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
@@ -537,9 +537,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2Trial")
                 .extracting("sdoR2TrialWindow").extracting("dateTo").asString().isEqualTo(LocalDate.now().plusDays(455).toString());
             assertThat(response.getData()).extracting("sdoR2Trial")
-                .extracting("hearingCourtLocationList").asString().isEqualTo("{value={code=214320, label=court 2 - 2 address - Y02 7RB}, list_items=[{code=214320, label=court 2 - 2 address - Y02 7RB}, {code=OTHER_LOCATION, label=Other location}]}");
+                .extracting("hearingCourtLocationList").asString().isEqualTo("{value={code=214320, label=court 2 - 2 address - Y02 7RB}, list_items=[{code=214320, " +
+                                                                                 "label=court 2 - 2 address - Y02 7RB}, {code=OTHER_LOCATION, label=Other location}]}");
             assertThat(response.getData()).extracting("sdoR2Trial")
-                .extracting("altHearingCourtLocationList").asString().isEqualTo("{value={}, list_items=[{code=00001, label=court 1 - 1 address - Y01 7RB}, {code=214320, label=court 2 - 2 address - Y02 7RB}, {code=00003, label=court 3 - 3 address - Y03 7RB}]}");
+                .extracting("altHearingCourtLocationList").asString()
+                .isEqualTo("{value={}, list_items=[{code=00001, label=court 1 - 1 address - Y01 7RB}, " +
+                               "{code=214320, label=court 2 - 2 address - Y02 7RB}, {code=00003, label=court 3 - 3 address - Y03 7RB}]}");
             assertThat(response.getData()).extracting("sdoR2Trial")
                 .extracting("physicalBundlePartyTxt").asString().isEqualTo(PHYSICAL_TRIAL_BUNDLE);
             assertThat(response.getData()).extracting("sdoR2ImportantNotesTxt").asString().isEqualTo(IMPORTANT_NOTES);
@@ -2494,7 +2497,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
-        void ShouldValidateNIHLfields(boolean valid) {
+        void shouldValidateFieldsForNihl(boolean valid) {
 
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
@@ -2521,14 +2524,21 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder().sdoDefendantMayAskDate(testDate).build())
                 .sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder().sdoQuestionsShallBeAnsweredDate(testDate).build())
                 .sdoR2PermissionToRelyOnExpert(SdoR2PermissionToRelyOnExpert.builder().sdoPermissionToRelyOnExpertDate(testDate).sdoJointMeetingOfExpertsDate(testDate).build())
-                .sdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder().sdoInstructionOfTheExpertDate(testDate).sdoExpertReportDate(testDate).sdoWrittenQuestionsDate(testDate).sdoRepliesDate(testDate).build())
+                .sdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder().sdoInstructionOfTheExpertDate(testDate).sdoExpertReportDate(testDate)
+                                                   .sdoWrittenQuestionsDate(testDate).sdoRepliesDate(testDate).build())
                 .sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder().sdoQuestionsShallBeAnsweredDate(testDate).sdoWrittenQuestionsDate(testDate).build())
                 .sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder().sdoR2ScheduleOfLossClaimantDate(testDate).sdoR2ScheduleOfLossDefendantDate(testDate).build())
-                .sdoR2Trial(SdoR2Trial.builder().sdoR2TrialFirstOpenDateAfter(SdoR2TrialFirstOpenDateAfter.builder().listFrom(testDate).build()).sdoR2TrialWindow(SdoR2TrialWindow.builder().listFrom(testDate).dateTo(testDate).build())
-                                .lengthListOther(SdoR2TrialHearingLengthOther.builder().trialLengthDays(testDays).trialLengthHours(testHours).trialLengthMinutes(testMinutes).build()).build())
+                .sdoR2Trial(SdoR2Trial.builder().sdoR2TrialFirstOpenDateAfter(SdoR2TrialFirstOpenDateAfter.builder().listFrom(testDate).build())
+                                .sdoR2TrialWindow(SdoR2TrialWindow.builder().listFrom(testDate).dateTo(testDate).build())
+                                .lengthListOther(SdoR2TrialHearingLengthOther.builder().trialLengthDays(testDays).trialLengthHours(testHours)
+                                                     .trialLengthMinutes(testMinutes).build()).build())
                 .sdoR2ImportantNotesDate(testDate)
-                .sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder().sdoWitnessDeadlineDate(testDate).sdoR2RestrictWitness(SdoR2RestrictWitness.builder().restrictNoOfWitnessDetails(SdoR2RestrictNoOfWitnessDetails.builder().noOfWitnessClaimant(testWitnesses).noOfWitnessDefendant(testWitnesses).build()).build())
-                                          .sdoRestrictPages(SdoR2RestrictPages.builder().restrictNoOfPagesDetails(SdoR2RestrictNoOfPagesDetails.builder().noOfPages(testPages).build()).build()).build())
+                .sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder().sdoWitnessDeadlineDate(testDate)
+                                          .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
+                                                                    .restrictNoOfWitnessDetails(SdoR2RestrictNoOfWitnessDetails.builder().noOfWitnessClaimant(testWitnesses)
+                                                                                                    .noOfWitnessDefendant(testWitnesses).build()).build())
+                                          .sdoRestrictPages(SdoR2RestrictPages.builder().restrictNoOfPagesDetails(SdoR2RestrictNoOfPagesDetails.builder()
+                                                                                                                      .noOfPages(testPages).build()).build()).build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);

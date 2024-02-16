@@ -791,8 +791,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                          .dateTo(LocalDate.now().plusDays(455))
                                                          .build())
                                    .hearingCourtLocationList(DynamicList.builder()
-                                                                 .listItems(getCourtLocationForNihl(callbackParams, updatedData, preferredCourt.orElse(null)).getListItems())
-                                                                 .value(getCourtLocationForNihl(callbackParams, updatedData, preferredCourt.orElse(null)).getListItems().get(0)).build())
+                                                                 .listItems(getCourtLocationForNihl(callbackParams, updatedData, preferredCourt
+                                                                     .orElse(null)).getListItems())
+                                                                 .value(getCourtLocationForNihl(callbackParams, updatedData, preferredCourt
+                                                                     .orElse(null)).getListItems().get(0)).build())
 
                                    .altHearingCourtLocationList(getAlternativeCourtLocationsForNihl(callbackParams))
                                    .physicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE)
@@ -1094,15 +1096,18 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .ifPresent(errors::add);
         }
 
-        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays() != null) {
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null
+            && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays() != null) {
             validateGreaterOrEqualZero(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays())
                 .ifPresent(errors::add);
         }
-        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours() != null) {
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null
+            && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours() != null) {
             validateHours(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours())
                 .ifPresent(errors::add);
         }
-        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes() != null) {
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null
+            && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes() != null) {
             validateMinutes(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes())
                 .ifPresent(errors::add);
         }
@@ -1111,11 +1116,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private Optional<String> validateFutureDate(LocalDate date) {
-            LocalDate today = LocalDate.now();
-            if (date.isAfter(today)) {
-                return Optional.empty();
-            }
-            return Optional.of(ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE);
+        LocalDate today = LocalDate.now();
+        if (date.isAfter(today)) {
+            return Optional.empty();
+        }
+        return Optional.of(ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE);
     }
 
     private Optional<String> validateGreaterOrEqualZero(Integer quantity) {
@@ -1147,7 +1152,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private static boolean isSDOR2Screen(CaseData caseData) {
-
         return  ((caseData.getDrawDirectionsOrderRequired() == NO
             && caseData.getFastClaims() != null
             && caseData.getFastClaims().contains(
