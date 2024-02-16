@@ -18,8 +18,6 @@ public class HelpWithFeesDetails {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal remissionAmount;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private BigDecimal outstandingFee;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal outstandingFeeInPounds;
     private String noRemissionDetails;
     private NoRemissionDetailsSummary noRemissionDetailsSummary;

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
@@ -16,27 +17,30 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
+
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.FeePaymentOutcomeHWFCallBackHandler.WRONG_REMISSION_TYPE_SELECTED;
 
 @ExtendWith(MockitoExtension.class)
 public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandlerTest {
 
     private FeePaymentOutcomeHWFCallBackHandler handler;
     private ObjectMapper objectMapper;
-    private HWFFeePaymentOutcomeService hwfService;
 
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
-        hwfService = new HWFFeePaymentOutcomeService();
+        HWFFeePaymentOutcomeService hwfService = new HWFFeePaymentOutcomeService();
         handler = new FeePaymentOutcomeHWFCallBackHandler(objectMapper, hwfService);
     }
 
@@ -96,6 +100,25 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
         }
 
         @Test
+        void shouldValidateRemissionType() {
+            CaseData caseData = CaseData.builder()
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
+                                              .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
+                                              .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
+                .hwfFeeType(FeeType.HEARING)
+                .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                         .outstandingFeeInPounds(BigDecimal.valueOf(100.00))
+                                         .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-type");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(WRONG_REMISSION_TYPE_SELECTED);
+        }
+
+        @Test
         void shouldUpdateBusinessProcess_WhenFeeType_ClaimIssue() {
             CaseData caseData = CaseData.builder()
                 .hwfFeeType(FeeType.CLAIMISSUED)
@@ -114,6 +137,7 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
                 .extracting("status")
                 .isEqualTo("READY");
         }
+
     }
 
     @Test

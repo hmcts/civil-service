@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.math.BigDecimal;
 import java.util.stream.Stream;
@@ -37,7 +38,8 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        handler = new PartialRemissionHWFCallbackHandler(objectMapper);
+        HWFFeePaymentOutcomeService hwfService = new HWFFeePaymentOutcomeService();
+        handler = new PartialRemissionHWFCallbackHandler(objectMapper, hwfService);
     }
 
     @Test
@@ -67,7 +69,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getErrors()).isNull();
             assertThat(updatedData.getClaimIssuedHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(1000));
-            assertThat(updatedData.getClaimIssuedHwfDetails().getOutstandingFee()).isEqualTo(BigDecimal.valueOf(9000));
+            assertThat(updatedData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(90).setScale(2));
         }
 
         @Test
@@ -90,7 +92,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getErrors()).isNull();
             assertThat(updatedData.getHearingHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(1000));
-            assertThat(updatedData.getHearingHwfDetails().getOutstandingFee()).isEqualTo(BigDecimal.valueOf(29000));
+            assertThat(updatedData.getHearingHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(290).setScale(2));
         }
     }
 

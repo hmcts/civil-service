@@ -12,9 +12,8 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,7 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
     public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO = "Remission amount must be greater than zero";
 
     private final ObjectMapper objectMapper;
+    private final HWFFeePaymentOutcomeService hwfFeePaymentOutcomeService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -82,29 +82,10 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
     private CallbackResponse partRemissionHWF(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        caseData = calculateOutstandingFee(caseData);
+        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private CaseData calculateOutstandingFee(CaseData caseData) {
-
-        BigDecimal claimIssuedRemissionAmount = caseData.getClaimIssueRemissionAmount();
-        BigDecimal hearingRemissionAmount = caseData.getHearingRemissionAmount();
-        BigDecimal claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
-        BigDecimal hearingFeeAmount = caseData.getHearingFeeAmount();
-        BigDecimal outstandingFeeAmount;
-
-        if (caseData.isHWFTypeClaimIssued() && BigDecimal.ZERO.compareTo(claimFeeAmount) != 0) {
-            outstandingFeeAmount = claimFeeAmount.subtract(claimIssuedRemissionAmount);
-            caseData.getClaimIssuedHwfDetails().setOutstandingFee(outstandingFeeAmount);
-            caseData.getClaimIssuedHwfDetails().setOutstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount));
-        } else if (caseData.isHWFTypeHearing() && BigDecimal.ZERO.compareTo(hearingFeeAmount) != 0) {
-            outstandingFeeAmount = hearingFeeAmount.subtract(hearingRemissionAmount);
-            caseData.getHearingHwfDetails().setOutstandingFee(outstandingFeeAmount);
-            caseData.getHearingHwfDetails().setOutstandingFeeInPounds(MonetaryConversions.penniesToPounds(outstandingFeeAmount));
-        }
-        return caseData;
-    }
 }

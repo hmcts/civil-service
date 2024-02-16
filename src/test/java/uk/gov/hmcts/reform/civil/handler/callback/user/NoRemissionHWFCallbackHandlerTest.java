@@ -13,7 +13,11 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.NoRemissionDetailsSummary;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
+
+import java.math.BigDecimal;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,8 +30,9 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @BeforeEach
     void setUp() {
-        handler = new NoRemissionHWFCallbackHandler(new ObjectMapper());
         objectMapper = new ObjectMapper();
+        HWFFeePaymentOutcomeService hwfService = new HWFFeePaymentOutcomeService();
+        handler = new NoRemissionHWFCallbackHandler(objectMapper, hwfService);
     }
 
     @Test
@@ -42,6 +47,7 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder().noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
             CaseData caseData = CaseData.builder()
+                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
                 .claimIssuedHwfDetails(hwfeeDetails)
                 .hwfFeeType(
                     FeeType.CLAIMISSUED)
@@ -52,6 +58,7 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getClaimIssuedHwfDetails()).isEqualTo(hwfeeDetails);
+            assertThat(updatedData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(100).setScale(2));
         }
 
         @Test
@@ -60,6 +67,7 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
             CaseData caseData = CaseData.builder()
                 .hearingHwfDetails(hwfeeDetails)
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
                 .hwfFeeType(
                     FeeType.HEARING)
                 .build();
@@ -69,6 +77,7 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingHwfDetails()).isEqualTo(hwfeeDetails);
+            assertThat(updatedData.getHearingHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(300).setScale(2));
         }
     }
 }

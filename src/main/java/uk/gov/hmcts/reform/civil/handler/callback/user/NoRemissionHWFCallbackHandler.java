@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,7 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(NO_REMISSION_HWF);
     private final ObjectMapper objectMapper;
+    private final HWFFeePaymentOutcomeService hwfFeePaymentOutcomeService;
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
         this::noRemissionHWF,
@@ -40,8 +43,11 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse noRemissionHWF(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData);
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(callbackParams.getCaseData().toMap(objectMapper))
+            .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
     }
 }
