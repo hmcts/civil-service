@@ -45,9 +45,8 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
     private CallbackResponse noRemissionHWF(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
+            .data(caseData.toMap(objectMapper))
             .build();
     }
 }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -27,11 +28,12 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private NoRemissionHWFCallbackHandler handler;
     private ObjectMapper objectMapper;
+    @Mock
+    private HWFFeePaymentOutcomeService hwfService;
 
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        HWFFeePaymentOutcomeService hwfService = new HWFFeePaymentOutcomeService();
         handler = new NoRemissionHWFCallbackHandler(objectMapper, hwfService);
     }
 

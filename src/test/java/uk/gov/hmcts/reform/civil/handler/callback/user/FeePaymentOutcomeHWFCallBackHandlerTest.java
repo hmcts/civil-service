@@ -145,7 +145,3 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
         Assertions.assertThat(handler.handledEvents()).contains(FEE_PAYMENT_OUTCOME);
     }
 }
-
-
-
-

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -35,10 +36,12 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
     private ObjectMapper objectMapper;
     private PartialRemissionHWFCallbackHandler handler;
 
+    @Mock
+    private HWFFeePaymentOutcomeService hwfService;
+
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        HWFFeePaymentOutcomeService hwfService = new HWFFeePaymentOutcomeService();
         handler = new PartialRemissionHWFCallbackHandler(objectMapper, hwfService);
     }
 
