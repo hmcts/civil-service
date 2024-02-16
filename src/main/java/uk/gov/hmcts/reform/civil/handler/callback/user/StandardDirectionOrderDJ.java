@@ -215,7 +215,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
                 .collect(Collectors.toList());
             hearingMethodList.setListItems(hearingMethodListWithoutNotInAttendance);
             hearingMethodList.setValue(hearingMethodListWithoutNotInAttendance.stream().filter(
-                elem -> elem.getLabel().equals(HearingMethod.IN_PERSON.getLabel())).findFirst().orElse(null));
+                elem -> HearingMethod.IN_PERSON.getLabel().equals(elem.getLabel())).findFirst().orElse(null));
 
             caseDataBuilder.hearingMethodValuesDisposalHearingDJ(hearingMethodList);
             caseDataBuilder.hearingMethodValuesTrialHearingDJ(hearingMethodList);
