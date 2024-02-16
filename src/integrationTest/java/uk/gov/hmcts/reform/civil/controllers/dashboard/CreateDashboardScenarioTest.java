@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-@Sql("/scripts/create_dashboard_notifications_and_task_list_templates.sql")
+@Sql("/scripts/dashboardNotifications/create_dashboard_scenarios.sql")
 public class CreateDashboardScenarioTest extends BaseIntegrationTest {
 
     public static final String NOTICE_HEARING_FEE_PAYMENT_REQUIRED = "notice.hearing.fee.payment.required";

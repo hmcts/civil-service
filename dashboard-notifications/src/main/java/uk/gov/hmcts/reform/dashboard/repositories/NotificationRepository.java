@@ -17,5 +17,8 @@ public interface NotificationRepository extends CrudRepository<NotificationEntit
 
     List<NotificationEntity> findByReferenceAndCitizenRole(String reference, String role);
 
+    Optional<NotificationEntity> findByReferenceAndCitizenRoleAndDashboardNotificationsTemplatesId(
+        String reference, String role, Long templateId);
+
     int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String role);
 }

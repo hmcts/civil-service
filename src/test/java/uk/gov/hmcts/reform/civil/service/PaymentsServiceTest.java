@@ -34,6 +34,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 
 @ExtendWith(SpringExtension.class)
@@ -108,6 +109,23 @@ class PaymentsServiceTest {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
             .organisationID("OrgId").build();
         CaseData caseData = CaseData.builder()
+            .claimIssuedPBADetails(SRPbaDetails.builder().build())
+            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .build();
+
+        Exception exception = assertThrows(
+            InvalidPaymentRequestException.class,
+            () -> paymentsService.validateRequest(caseData)
+        );
+        assertThat(exception.getMessage()).isEqualTo(FEE_NOT_SET_CORRECTLY_ERROR);
+    }
+
+    @Test
+    void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided_withSpecAllocatedTrack() {
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
+            .organisationID("OrgId").build();
+        CaseData caseData = CaseData.builder()
+            .responseClaimTrack(FAST_CLAIM.name())
             .claimIssuedPBADetails(SRPbaDetails.builder().build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();

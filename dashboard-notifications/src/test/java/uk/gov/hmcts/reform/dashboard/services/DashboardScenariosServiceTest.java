@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
 import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.NotificationTemplateRepository;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskItemTemplateRepository;
 
@@ -33,7 +32,7 @@ class DashboardScenariosServiceTest {
     @Mock
     private NotificationTemplateRepository notificationTemplateRepository;
     @Mock
-    private NotificationRepository notificationRepository;
+    private DashboardNotificationService dashboardNotificationService;
     @Mock
     private TaskListService taskListService;
     @Mock
@@ -43,7 +42,7 @@ class DashboardScenariosServiceTest {
     void setup() {
         dashboardScenariosService = new DashboardScenariosService(
             notificationTemplateRepository,
-            notificationRepository,
+            dashboardNotificationService,
             taskListService,
             taskItemTemplateRepository
         );
@@ -108,9 +107,9 @@ class DashboardScenariosServiceTest {
         verify(notificationTemplateRepository).findByName(NOTIFICATION_ISSUE_CLAIM_START);
         verify(taskItemTemplateRepository).findByNameAndRole(NOTIFICATION_ISSUE_CLAIM_START, "claimant");
         verify(notificationTemplateRepository).findByName(NOTIFICATION_DRAFT_CLAIM_START);
-        verify(notificationRepository).save(any(NotificationEntity.class));
+        verify(dashboardNotificationService).saveOrUpdate(any(NotificationEntity.class));
         verify(taskListService).saveOrUpdate(any(TaskListEntity.class), eq(TASK_ITEM_HEARING_FEE_PAYMENT));
-        //verify(notificationRepository).deleteByNameAndReferenceAndCitizenRole(
+        //verify(dashboardNotificationService).deleteByNameAndReferenceAndCitizenRole(
         //    NOTIFICATION_DRAFT_CLAIM_START,
         //    "ccd-case-id",
         //    "claimant"

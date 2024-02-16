@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
@@ -17,18 +18,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-@Sql("/scripts/dashboardNotifications/notifications_data.sql")
 public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
 
     @Autowired
     private NotificationRepository notificationRepository;
 
-    private final UUID id = UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e5");
+    private final UUID id = UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e6");
 
     private final String endPointUrlDelete = "/dashboard/notifications/{unique-notification-identifier}";
 
     @Test
     @SneakyThrows
+    @Sql("/scripts/dashboardNotifications/record_notifications_click.sql")
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldReturnOkWhenDeletingExistingEntity() {
 
         assertTrue(notificationRepository.findById(id).isPresent());
@@ -51,7 +53,7 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnBadRequestWhenUuidNotInCorrectFormat() {
 
-        doDelete(BEARER_TOKEN, null, endPointUrlDelete, "123")
+        doDelete(BEARER_TOKEN, null, endPointUrlDelete, "126")
             .andExpect(status().isBadRequest());
 
     }
