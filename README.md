@@ -50,6 +50,10 @@ be found in the Azure key store.
 IntelliJ will create a Spring Boot run configuration for you. Which, after setting up your environment variables, can be
 run from there.
 
+They are also base64 encoded and stored in the aat-env keystore in azure, in civil-service-dot-env secret.
+
+The loadEnvSecrets gradle task downloads them to a local .aat-env file which is read in the gradle bootRun task.
+
 #### Create a Docker image
 
 While not necessary for local development, you can create the image of the application by executing the following
