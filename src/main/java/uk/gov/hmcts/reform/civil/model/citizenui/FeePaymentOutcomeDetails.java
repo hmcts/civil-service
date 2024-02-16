@@ -18,6 +18,6 @@ public class FeePaymentOutcomeDetails {
     private String  hwfNumberForFeePaymentOutcome;
     private YesOrNo hwfFullRemissionGrantedForClaimIssue;
     private YesOrNo hwfFullRemissionGrantedForHearingFee;
-    private List<String> hwfPartRemissionPaymentDoneForClaimIssue;
-    private List<String> hwfPartRemissionPaymentDoneForHearingFee;
+    private List<String> hwfOutstandingFeePaymentDoneForClaimIssue;
+    private List<String> hwfOutstandingFeePaymentDoneForHearingFee;
 }
