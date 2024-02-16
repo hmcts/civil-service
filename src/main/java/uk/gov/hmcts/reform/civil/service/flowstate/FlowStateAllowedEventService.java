@@ -1374,8 +1374,8 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
                 UPLOAD_MEDIATION_DOCUMENTS,
+                CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
-                CUI_UPLOAD_MEDIATION_DOCUMENT,
                 UPDATE_HELP_WITH_FEE_NUMBER
             )
         ),
