@@ -717,8 +717,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.disposalHearingAddNewDirections(null);
             updatedData.smallClaimsAddNewDirections(null);
             updatedData.fastTrackAddNewDirections(null);
-            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input(null).build()); // TODO check if hearing notes work (if we send "" then it will return it because it's not null)
-            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input(null).build()); // TODO
+            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
+            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
             updatedData.disposalHearingHearingNotes(null);
             // Add NIHL variables
         }
@@ -790,8 +790,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                          .listFrom(LocalDate.now().plusDays(434))
                                                          .dateTo(LocalDate.now().plusDays(455))
                                                          .build())
-                                   .hearingCourtLocationList(DynamicList.builder().listItems(getCourtLocationForNihl(callbackParams, updatedData, preferredCourt.orElse(null)).getListItems())
-                                                                 .value(getCourtLocationForNihl(callbackParams, updatedData, preferredCourt.orElse(null)).getListItems().get(0)).build())
+                                   .hearingCourtLocationList(DynamicList.builder()
+                                                                 .listItems(getCourtLocationForNihl(callbackParams, updatedData, preferredCourt
+                                                                     .orElse(null)).getListItems())
+                                                                 .value(getCourtLocationForNihl(callbackParams, updatedData, preferredCourt
+                                                                     .orElse(null)).getListItems().get(0)).build())
 
                                    .altHearingCourtLocationList(getAlternativeCourtLocationsForNihl(callbackParams))
                                    .physicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE)
@@ -1056,7 +1059,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             validateFutureDate(caseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossDefendantDate())
                 .ifPresent(errors::add);
         }
-        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter() != null && caseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter().getListFrom() != null) {
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter() != null
+            && caseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter().getListFrom() != null) {
             validateFutureDate(caseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter().getListFrom())
                 .ifPresent(errors::add);
         }
@@ -1073,28 +1077,37 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 .ifPresent(errors::add);
         }
 
-        if (caseData.getSdoR2WitnessesOfFact() != null && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness() != null && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails() != null && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessClaimant() != null) {
+        if (caseData.getSdoR2WitnessesOfFact() != null && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness() != null
+            && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails() != null
+            && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessClaimant() != null) {
             validateGreaterOrEqualZero(caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessClaimant())
                 .ifPresent(errors::add);
         }
-        if (caseData.getSdoR2WitnessesOfFact() != null && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness() != null && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails() != null && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessDefendant() != null) {
+        if (caseData.getSdoR2WitnessesOfFact() != null && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness() != null
+            && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails() != null
+            && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessDefendant() != null) {
             validateGreaterOrEqualZero(caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessDefendant())
                 .ifPresent(errors::add);
         }
-        if (caseData.getSdoR2WitnessesOfFact() != null && caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages() != null && caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails() != null && caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getNoOfPages() != null) {
+        if (caseData.getSdoR2WitnessesOfFact() != null && caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages() != null
+            && caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails() != null
+            && caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getNoOfPages() != null) {
             validateGreaterThanZero(caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getNoOfPages())
                 .ifPresent(errors::add);
         }
 
-        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays() != null) {
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null
+            && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays() != null) {
             validateGreaterOrEqualZero(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays())
                 .ifPresent(errors::add);
         }
-        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours() != null) {
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null
+            && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours() != null) {
             validateHours(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours())
                 .ifPresent(errors::add);
         }
-        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes() != null) {
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null
+            && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes() != null) {
             validateMinutes(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes())
                 .ifPresent(errors::add);
         }
@@ -1103,11 +1116,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private Optional<String> validateFutureDate(LocalDate date) {
-            LocalDate today = LocalDate.now();
-            if (date.isAfter(today)) {
-                return Optional.empty();
-            }
-            return Optional.of(ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE);
+        LocalDate today = LocalDate.now();
+        if (date.isAfter(today)) {
+            return Optional.empty();
+        }
+        return Optional.of(ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE);
     }
 
     private Optional<String> validateGreaterOrEqualZero(Integer quantity) {
@@ -1139,7 +1152,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private static boolean isSDOR2Screen(CaseData caseData) {
-
         return  ((caseData.getDrawDirectionsOrderRequired() == NO
             && caseData.getFastClaims() != null
             && caseData.getFastClaims().contains(
@@ -1333,7 +1345,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 ? ofNullable(caseData.getSdoR2Trial().getHearingCourtLocationList())
                 : ofNullable(caseData.getSdoR2Trial().getAltHearingCourtLocationList());
         } else if (SdoHelper.isFastTrack(caseData)) {
-            toUseList = ofNullable(caseData.getFastTrackMethodInPerson()); // TODO check if OK for NIHL or we need new variable
+            toUseList = ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
             toUseList = ofNullable(caseData.getSmallClaimsMethodInPerson());
         } else {
