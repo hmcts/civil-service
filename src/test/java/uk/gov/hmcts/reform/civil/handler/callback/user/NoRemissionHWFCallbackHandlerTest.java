@@ -20,8 +20,10 @@ import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.math.BigDecimal;
 
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 
 @ExtendWith(MockitoExtension.class)
 public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -56,11 +58,11 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
+            when(hwfService.updateOutstandingFee(any())).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getClaimIssuedHwfDetails()).isEqualTo(hwfeeDetails);
-            assertThat(updatedData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(100).setScale(2));
         }
 
         @Test
@@ -75,11 +77,11 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
+            when(hwfService.updateOutstandingFee(any())).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingHwfDetails()).isEqualTo(hwfeeDetails);
-            assertThat(updatedData.getHearingHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(300).setScale(2));
         }
     }
 }
