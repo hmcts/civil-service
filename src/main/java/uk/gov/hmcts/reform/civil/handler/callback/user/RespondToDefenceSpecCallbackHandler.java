@@ -268,10 +268,9 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
         CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
-        caseData = persistPartyAddress(oldCaseData, caseData);
+        CaseData caseData = persistPartyAddress(oldCaseData, callbackParams.getCaseData());
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(CLAIMANT_RESPONSE_SPEC))
             .applicant1ResponseDate(time.now());
