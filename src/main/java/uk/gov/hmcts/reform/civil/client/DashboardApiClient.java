@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
-import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
+import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -36,7 +36,7 @@ public interface DashboardApiClient {
     @GetMapping(path = {
         "notifications/{uuid}",
     })
-    ResponseEntity<Optional<NotificationEntity>> getDashboardNotificationByUuid(
+    ResponseEntity<Optional<DashboardNotificationsEntity>> getDashboardNotificationByUuid(
         @PathVariable("uuid") UUID uuid,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     );

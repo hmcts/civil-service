@@ -8,7 +8,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
+import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
 
 import java.util.UUID;
 
@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
 
     @Autowired
-    private NotificationRepository notificationRepository;
+    private DashboardNotificationsRepository dashboardNotificationsRepository;
 
     private final UUID id = UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e6");
 
@@ -33,12 +33,12 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldReturnOkWhenDeletingExistingEntity() {
 
-        assertTrue(notificationRepository.findById(id).isPresent());
+        assertTrue(dashboardNotificationsRepository.findById(id).isPresent());
 
         doDelete(BEARER_TOKEN, null, endPointUrlDelete, id.toString())
             .andExpect(status().isOk());
 
-        assertFalse(notificationRepository.findById(id).isPresent());
+        assertFalse(dashboardNotificationsRepository.findById(id).isPresent());
     }
 
     @Test

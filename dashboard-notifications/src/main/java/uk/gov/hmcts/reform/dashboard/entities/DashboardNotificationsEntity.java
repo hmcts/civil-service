@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -22,7 +23,7 @@ import java.util.UUID;
 @lombok.AllArgsConstructor
 @Entity
 @Table(name = "dashboard_notifications", schema = "dbs")
-public class NotificationEntity implements Serializable {
+public class DashboardNotificationsEntity implements Serializable {
 
     private static final long serialVersionUID = -649190928299762655L;
 
@@ -36,24 +37,36 @@ public class NotificationEntity implements Serializable {
     @Schema(name = "dashboard_notifications_templates_id")
     private NotificationTemplateEntity dashboardNotificationsTemplates;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn
+    @Schema(name = "notification_action_id")
+    private NotificationActionEntity notificationAction;
+
     @Schema(name = "reference")
     private String reference;
+
     @Column(name = "notification_name")
     @Schema(name = "notification_name")
     private String name;
+
     @Schema(name = "citizen_role")
     private String citizenRole;
+
     @Schema(name = "title_en")
     private String titleEn;
+
     @Schema(name = "description_en")
     private String descriptionEn;
+
     @Schema(name = "title_cy")
     private String titleCy;
+
     @Schema(name = "description_cy")
     private String descriptionCy;
+
     @Type(type = "jsonb")
-    @Column(name = "message_param", columnDefinition = "jsonb")
-    @Schema(name = "message_param")
+    @Column(name = "message_params", columnDefinition = "jsonb")
+    @Schema(name = "message_params")
     private Map<String, Object> params;
     @Schema(name = "created_by")
     private String createdBy;
