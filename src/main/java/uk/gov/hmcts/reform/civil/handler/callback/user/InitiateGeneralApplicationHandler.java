@@ -64,6 +64,7 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
     private static final String RESP_NOT_ASSIGNED_ERROR = "Application cannot be created until all the required "
             + "respondent solicitor are assigned to the case.";
     private static final String NOT_IN_EA_REGION = "Sorry this service is not available in the current case management location, please raise an application manually.";
+    private static final String LR_VS_LIP = "Sorry this service is not available, please raise an application manually.";
     private final InitiateGeneralApplicationService initiateGeneralApplicationService;
     private final ObjectMapper objectMapper;
     private final IdamClient idamClient;
@@ -94,20 +95,24 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
 
     private CallbackResponse aboutToStartValidationAndSetup(CallbackParams callbackParams) {
 
-        CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         List<String> errors = new ArrayList<>();
-
+        CaseData caseData = callbackParams.getCaseData();
         if (featureToggleService.isEarlyAdoptersEnabled()
-            && !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
-                                                                                  .getBaseLocation()))) {
+            && (Objects.isNull(caseData.getCaseManagementLocation())
+                || !(featureToggleService.isLocationWhiteListedForCaseProgression(caseData.getCaseManagementLocation()
+                                                                                  .getBaseLocation()))
+                )) {
             errors.add(NOT_IN_EA_REGION);
         }
 
         if (!initiateGeneralApplicationService.respondentAssigned(caseData, authToken)) {
             errors.add(RESP_NOT_ASSIGNED_ERROR);
         }
+        if (caseContainsLiP(caseData)) {
+            errors.add(LR_VS_LIP);
+        }
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder
                 .generalAppHearingDetails(
                     GAHearingDetails
@@ -309,5 +314,9 @@ public class InitiateGeneralApplicationHandler extends CallbackHandler {
                             GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build()).build();
         }
         return caseData;
+    }
+
+    private boolean caseContainsLiP(CaseData caseData) {
+        return caseData.isRespondent1LiP() || caseData.isRespondent2LiP() || caseData.isApplicantNotRepresented();
     }
 }
