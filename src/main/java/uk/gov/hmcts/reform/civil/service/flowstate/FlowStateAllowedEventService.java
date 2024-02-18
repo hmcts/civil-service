@@ -1576,7 +1576,6 @@ public class FlowStateAllowedEventService {
                 UPLOAD_TRANSLATED_DOCUMENT,
                 MORE_INFORMATION_HWF,
                 PARTIAL_REMISSION_HWF_GRANTED
-
             )
         ),
         entry(
