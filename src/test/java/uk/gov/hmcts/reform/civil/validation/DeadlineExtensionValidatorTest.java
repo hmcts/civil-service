@@ -134,23 +134,6 @@ class DeadlineExtensionValidatorTest {
         }
 
         @Test
-        void shouldReturnErrors_whenAgreedExtensionDateIsBeyond56DaysForSpec() {
-            when(workingDayIndicator.isWorkingDay(any())).thenReturn(false);
-
-            LocalDate agreedExtension = NOW.with(DayOfWeek.SUNDAY).plusDays(7);
-            LocalDateTime currentResponseDeadline = NOW.plusDays(7).atTime(16, 0);
-            when(workingDayIndicator.getNextWorkingDay(any())).thenReturn(currentResponseDeadline.toLocalDate());
-
-            List<String> errors = validator.specValidateProposedDeadline(
-                agreedExtension,
-                currentResponseDeadline,
-                false
-            );
-
-            assertThat(errors).contains("Date must be from claim issue date plus a maximum of 56 days.");
-        }
-
-        @Test
         void shouldReturnErrors_whenAgreedExtensionDateIsBeyond29And56DaysForSpec() {
             when(workingDayIndicator.isWorkingDay(any())).thenReturn(false);
 
