@@ -10,12 +10,19 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMediationState;
+
 @Service
 @RequiredArgsConstructor
 public class UpdateClaimStateService {
 
+    private final FeatureToggleService featureToggleService;
+
     public String setUpCaseState(CaseData updatedData) {
-        if (isJudicialReferralAllowed(updatedData)) {
+        if (shouldMoveToInMediationState(updatedData,
+                                         featureToggleService.isCarmEnabledForCase(updatedData.getSubmittedDate()))) {
+            return CaseState.IN_MEDIATION.name();
+        } else if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();
         } else if (updatedData.hasDefendantAgreedToFreeMediation() && updatedData.hasClaimantAgreedToFreeMediation()) {
             return CaseState.IN_MEDIATION.name();
@@ -84,9 +91,9 @@ public class UpdateClaimStateService {
         boolean isInFavourOfClaimant = applicant1Response != null
             && applicant1Response.hasCourtDecisionInFavourOfClaimant();
 
-        return (caseData.hasApplicantRejectedRepaymentPlan()
+        return ((caseData.hasApplicantRejectedRepaymentPlan()
             && (isCourtDecisionAccepted || isInFavourOfClaimant))
-            || caseData.hasApplicantAcceptedRepaymentPlan()
+            || caseData.hasApplicantAcceptedRepaymentPlan())
             && caseData.hasApplicant1SignedSettlementAgreement();
     }
 }

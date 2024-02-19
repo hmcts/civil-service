@@ -264,11 +264,11 @@ notifications:
   respondentHearingFeeUnpaid: "39c3f921-00e7-47ea-b297-6632643e438d"
   respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
   respondentLipResponseSubmissionBilingualTemplate: "37da53f4-2453-4d45-9910-b33d28274aa5"
-  hearingListedFeeClaimantLrTemplate: "193b245b-63fd-4a02-93b6-1acfb6e99fe5"
-  hearingListedNoFeeClaimantLrTemplate: "03763ce1-de17-4a9a-b1c6-d2e9ccffe9d7"
+  hearingListedFeeClaimantLrTemplate: "30ca6b92-4bf8-4bdc-b403-8c8b4d29c44c"
+  hearingListedNoFeeClaimantLrTemplate: "6b4e83be-3ae7-4d83-b777-6bfd0223643d"
   hearingListedFeeClaimantLrTemplateHMC: "2c7862fb-230f-4e8e-912c-07d265c8dd86"
   hearingListedNoFeeClaimantLrTemplateHMC: "b68825c4-fcca-48eb-85ce-2f5d7c2e6428"
-  hearingListedNoFeeDefendantLrTemplate: "81216268-36e6-4e0e-b510-24067ad32f24"
+  hearingListedNoFeeDefendantLrTemplate: "259229e7-3f28-42a7-ae6d-2ebd54a7b2f1"
   hearingListedNoFeeDefendantLrTemplateHMC: "aecaafde-fdf0-471f-8eca-a75534ac36aa"
   solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
   otherPartyTrialReady: "a44c9235-c009-4d1c-9e0e-36e1769dc0e6"
@@ -344,6 +344,9 @@ notifications:
 
   notifyApplicantForSignedSettlementAgreement: "65459efd-a351-4a1b-814a-435aabe3beb5"
   notifyApplicantForNotAgreedSignSettlement: "b775583b-7964-41f8-8b3b-d767557cffb2"
+
+  notifyApplicantLipForSignedSettlementAgreementInBilingual: "cac93c5f-599d-417b-af0c-74a249bd2681"
+  notifyApplicantLipForNotAgreedSignSettlementInBilingual: "da141be5-ba22-43c1-8fe3-ba36cc3fbb47"
 
   notifyRespondentForSignedSettlementAgreement: "aeb3951e-4956-4542-a73b-e2e3abec8867"
   notifyRespondentForNotAgreedSignSettlement: "1742841b-d915-43a9-9d76-b6d17a189ba5"
