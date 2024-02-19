@@ -13,7 +13,16 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
-import uk.gov.hmcts.reform.civil.model.sdo.*;
+import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsRoadTrafficAccident;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
