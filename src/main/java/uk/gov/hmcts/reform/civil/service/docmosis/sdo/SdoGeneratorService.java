@@ -343,49 +343,48 @@ public class SdoGeneratorService {
             .sdoR2ImportantNotesTxt(caseData.getSdoR2ImportantNotesTxt())
             .sdoR2ImportantNotesDate(caseData.getSdoR2ImportantNotesDate())
             .hasAltDisputeResolution(caseData.getSdoAltDisputeResolution().getIncludeInOrderToggle() != null)
-            .hasVariationOfDirections(caseData.getSdoVariationOfDirections().getIncludeInOrderToggle()!= null)
+            .hasVariationOfDirections(caseData.getSdoVariationOfDirections().getIncludeInOrderToggle() != null)
             .hasSettlement(caseData.getSdoR2Settlement()
-                                                                   .getIncludeInOrderToggle()!= null)
-            .hasDisclosureOfDocuments(caseData.getSdoR2DisclosureOfDocumentsToggle()!= null)
-            .hasWitnessOfFact(caseData.getSdoR2SeparatorWitnessesOfFactToggle()!= null)
+                               .getIncludeInOrderToggle() != null)
+            .hasDisclosureOfDocuments(caseData.getSdoR2DisclosureOfDocumentsToggle() != null)
+            .hasWitnessOfFact(caseData.getSdoR2SeparatorWitnessesOfFactToggle() != null)
             .hasRestrictWitness(YesOrNo.YES.equals(caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness()
-                                                      .getIsRestrictWitness()))
+                                                       .getIsRestrictWitness()))
             .hasRestrictPages(YesOrNo.YES.equals(caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages()
-                                                    .getIsRestrictPages()))
-            .hasExpertEvidence(caseData.getSdoR2SeparatorExpertEvidenceToggle()!= null)
-            .hasAddendumReport(caseData.getSdoR2SeparatorAddendumReportToggle()!= null)
-            .hasFurtherAudiogram(caseData.getSdoR2SeparatorFurtherAudiogramToggle()!= null)
-            .hasQuestionsOfClaimantExpert(caseData.getSdoR2SeparatorQuestionsClaimantExpertToggle()!= null)
+                                                     .getIsRestrictPages()))
+            .hasExpertEvidence(caseData.getSdoR2SeparatorExpertEvidenceToggle() != null)
+            .hasAddendumReport(caseData.getSdoR2SeparatorAddendumReportToggle() != null)
+            .hasFurtherAudiogram(caseData.getSdoR2SeparatorFurtherAudiogramToggle() != null)
+            .hasQuestionsOfClaimantExpert(caseData.getSdoR2SeparatorQuestionsClaimantExpertToggle() != null)
             .isApplicationToRelyOnFurther(YesOrNo.YES.equals(
                 caseData.getSdoR2QuestionsClaimantExpert()
-                    .getSdoApplicationToRelyOnFurther().getDoRequireApplicationToRely()) ? "Yes":"No")
-            .hasPermissionFromENT(caseData.getSdoR2SeparatorPermissionToRelyOnExpertToggle()!= null)
-            .hasEvidenceFromAcousticEngineer(caseData.getSdoR2SeparatorEvidenceAcousticEngineerToggle()!= null)
-            .hasQuestionsToENTAfterReport(caseData.getSdoR2SeparatorQuestionsToEntExpertToggle()!= null)
-            .hasScheduleOfLoss(caseData.getSdoR2ScheduleOfLossToggle()!= null)
+                    .getSdoApplicationToRelyOnFurther().getDoRequireApplicationToRely()) ? "Yes" : "No")
+            .hasPermissionFromENT(caseData.getSdoR2SeparatorPermissionToRelyOnExpertToggle() != null)
+            .hasEvidenceFromAcousticEngineer(caseData.getSdoR2SeparatorEvidenceAcousticEngineerToggle() != null)
+            .hasQuestionsToENTAfterReport(caseData.getSdoR2SeparatorQuestionsToEntExpertToggle() != null)
+            .hasScheduleOfLoss(caseData.getSdoR2ScheduleOfLossToggle() != null)
             .hasClaimForPecuniaryLoss(YesOrNo.YES.equals(caseData.getSdoR2ScheduleOfLoss().getIsClaimForPecuniaryLoss()))
             .hasUploadDocuments(caseData.getSdoR2SeparatorUploadOfDocumentsToggle() != null)
-            .hasSdoTrial(caseData.getSdoR2TrialToggle()!= null)
+            .hasSdoTrial(caseData.getSdoR2TrialToggle() != null)
             .hasNewDirections(caseData.getSdoR2AddNewDirection() != null)
             .sdoR2AddNewDirection(caseData.getSdoR2AddNewDirection())
-            .hasSdoR2TrialWindow((caseData.getSdoR2TrialToggle() != null && TrialOnRadioOptions.TRIAL_WINDOW.equals
-                (caseData.getSdoR2Trial().getTrialOnOptions()) )? true : false)
+            .hasSdoR2TrialWindow((caseData.getSdoR2TrialToggle() != null
+                && TrialOnRadioOptions.TRIAL_WINDOW.equals(caseData.getSdoR2Trial().getTrialOnOptions())) ? true : false)
             .sdoTrialHearingTimeAllocated(SdoHelper.getSdoTrialHearingTimeAllocated(caseData))
             .sdoTrialMethodOfHearing(SdoHelper.getSdoTrialMethodOfHearing(caseData))
             .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
-        if (caseData.getSdoR2Trial().getHearingCourtLocationList() !=null
+        if (caseData.getSdoR2Trial().getHearingCourtLocationList() != null
             && caseData.getSdoR2Trial().getHearingCourtLocationList().getValue() != null
             && caseData.getSdoR2Trial().getHearingCourtLocationList().getValue().getCode() != "OTHER_LOCATION") {
             sdoNihlDocumentFormBuilder
                 .hearingLocation(caseData.getSdoR2Trial().getHearingCourtLocationList().getValue().getCode());
 
-        } else if(caseData.getSdoR2Trial().getAltHearingCourtLocationList() !=null && caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue() != null) {
+        } else if (caseData.getSdoR2Trial().getAltHearingCourtLocationList() != null && caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue() != null) {
             sdoNihlDocumentFormBuilder
                 .hearingLocation(caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue().getCode());
         }
-        SdoDocumentFormFastNihl response = sdoNihlDocumentFormBuilder.build();
-        return response;
+        return sdoNihlDocumentFormBuilder.build();
     }
 
     private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {

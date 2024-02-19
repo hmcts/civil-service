@@ -76,13 +76,13 @@ public class SdoDocumentFormFastNihl implements MappableObject {
     private final boolean hasEvidenceFromAcousticEngineer;
     private final boolean hasQuestionsToENTAfterReport;
     private final boolean hasScheduleOfLoss;
-    private final boolean hasClaimForPecuniaryLoss ;
+    private final boolean hasClaimForPecuniaryLoss;
     private final boolean hasUploadDocuments;
     private final boolean hasSdoTrial;
     private final boolean hasNewDirections;
     private final boolean hasSdoR2TrialWindow;
 
-    private final String isApplicationToRelyOnFurther ;
+    private final String isApplicationToRelyOnFurther;
     private SdoR2FastTrackAltDisputeResolution sdoAltDisputeResolution;
     private SdoR2VariationOfDirections sdoVariationOfDirections;
     private SdoR2Settlement sdoR2Settlement;
