@@ -70,8 +70,6 @@ public class HWFFeePaymentOutcomeServiceTest {
 
         caseData = feePaymentOutcomeService.updateOutstandingFee(caseData);
         assertThat(caseData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(90).setScale(2));
-
-
     }
 
     @Test

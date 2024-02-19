@@ -1278,23 +1278,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isHWFTypeHearing() {
-        return getHwfFeeType() == FeeType.HEARING;
-    }
-
-    @JsonIgnore
-    public boolean isHWFTypeClaimIssued() {
-        return getHwfFeeType() == FeeType.CLAIMISSUED;
-    }
-
-    @JsonIgnore
     public boolean hearingFeePaymentDoneWithHWF() {
         return isLipvLipOneVOne()
             && Objects.nonNull(getHearingHelpFeesReferenceNumber())
             && Objects.nonNull(getFeePaymentOutcomeDetails())
             && Objects.nonNull(getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee());
     }
-  
+
     @JsonIgnore
     public String getAssignedTrack() {
         return nonNull(getAllocatedTrack()) ? getAllocatedTrack().name() : getResponseClaimTrack();
