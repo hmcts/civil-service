@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS dbs.scenario (
        name         character varying(256),
        notifications_to_delete         VARCHAR(256)[],
        notifications_to_create         jsonb,
-       created_at TIMESTAMP
+       created_at TIMESTAMP default CURRENT_TIMESTAMP
 );

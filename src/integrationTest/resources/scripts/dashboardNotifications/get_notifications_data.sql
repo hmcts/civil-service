@@ -1,7 +1,7 @@
 
 INSERT INTO dbs.dashboard_notifications_templates
-(id, template_name, title_en, title_cy, description_en, description_cy, notification_role, notifications_to_be_deleted, time_to_live, created_at)
-VALUES(12255, 'template_name', 'title_en', 'title_cy', 'description_en', 'description_cy', 'notification_role', array['1','2'], 'time_to_live', now());
+(id, template_name, title_en, title_cy, description_en, description_cy, notification_role, time_to_live, created_at)
+VALUES(12255, 'template_name', 'title_en', 'title_cy', 'description_en', 'description_cy', 'notification_role', 'time_to_live', now());
 
 
 INSERT INTO dbs.dashboard_notifications

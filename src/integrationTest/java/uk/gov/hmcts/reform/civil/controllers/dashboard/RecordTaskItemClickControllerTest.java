@@ -39,8 +39,8 @@ public class RecordTaskItemClickControllerTest extends BaseIntegrationTest {
         TaskListEntity taskListEntity = taskListRepository
             .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(ccdCaseIdentifier, roleType, name).get();
 
-        assertEquals(taskListEntity.getCurrentStatus(), 0);
-        taskListEntity.setCurrentStatus(1);
+        assertEquals(taskListEntity.getCurrentStatus(), 1);
+        taskListEntity.setCurrentStatus(6);
 
         doPut(BEARER_TOKEN, null, endPointUrlPut, ccdCaseIdentifier, name, roleType)
             .andExpect(status().isOk())

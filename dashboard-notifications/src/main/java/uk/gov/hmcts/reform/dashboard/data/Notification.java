@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Data
@@ -24,10 +25,17 @@ public class Notification {
 
     private String descriptionCy;
 
+    private NotificationAction notificationAction;
+
     public static Notification from(DashboardNotificationsEntity dashboardNotificationsEntity) {
-        return new Notification(dashboardNotificationsEntity.getId(), dashboardNotificationsEntity.getTitleEn(),
-                                dashboardNotificationsEntity.getTitleCy(), dashboardNotificationsEntity.getDescriptionEn(),
-                                dashboardNotificationsEntity.getDescriptionCy()
-        );
+        NotificationBuilder notification = Notification.builder()
+            .id(dashboardNotificationsEntity.getId())
+            .titleEn(dashboardNotificationsEntity.getTitleEn())
+            .titleCy(dashboardNotificationsEntity.getTitleCy())
+            .descriptionEn(dashboardNotificationsEntity.getDescriptionEn())
+            .descriptionCy(dashboardNotificationsEntity.getDescriptionCy());
+
+        Optional.ofNullable(dashboardNotificationsEntity.getNotificationAction()).ifPresent(NotificationAction::from);
+        return notification.build();
     }
 }

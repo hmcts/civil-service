@@ -20,16 +20,16 @@ CREATE TABLE IF NOT EXISTS dbs.dashboard_notifications (
  notification_action_id INTEGER REFERENCES dbs.notification_action(id),
  reference VARCHAR(256),
  notification_name VARCHAR(256),
- citizen_Role VARCHAR(256),
- title_En VARCHAR(256),
- title_Cy VARCHAR(256),
- description_En VARCHAR(256),
- description_Cy VARCHAR(256),
+ citizen_role VARCHAR(256),
+ title_en VARCHAR(256),
+ title_cy VARCHAR(256),
+ description_en VARCHAR(256),
+ description_cy VARCHAR(256),
  message_params jsonb,
- created_By VARCHAR(256),
- created_At TIMESTAMP default CURRENT_TIMESTAMP,
- updated_By VARCHAR(256),
- updated_On TIMESTAMP default CURRENT_TIMESTAMP
+ created_by VARCHAR(256),
+ created_at TIMESTAMP default CURRENT_TIMESTAMP,
+ updated_by VARCHAR(256),
+ updated_on TIMESTAMP default CURRENT_TIMESTAMP
 );
 
 ALTER TABLE dbs.notification_action

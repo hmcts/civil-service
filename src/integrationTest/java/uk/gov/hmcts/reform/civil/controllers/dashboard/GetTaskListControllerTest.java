@@ -8,6 +8,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
+import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -54,9 +55,16 @@ public class GetTaskListControllerTest extends BaseIntegrationTest {
         OffsetDateTime odt = zdt.toOffsetDateTime();
 
         List<TaskList> taskList = new ArrayList<>();
-        taskList.add(TaskList.builder().id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e8")).taskNameCy(
-                "task_name_cy").taskNameEn("task_name_en").taskOrder(0).categoryCy("category_cy").categoryEn("category_en")
-                         .role("defendant").currentStatus(0).nextStatus(1).hintTextCy("hint_text_cy").hintTextEn(
+        taskList.add(TaskList.builder().id(UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e8"))
+                         .taskNameCy("task_name_cy").taskNameEn("task_name_en")
+                         .taskOrder(0)
+                         .categoryCy("category_cy").categoryEn("category_en")
+                         .role("defendant")
+                         .currentStatusEn(TaskStatus.NOT_AVAILABLE_YET.getName())
+                         .currentStatusCy(TaskStatus.NOT_AVAILABLE_YET.getWelshName())
+                         .nextStatusEn(TaskStatus.IN_PROGRESS.getName())
+                         .nextStatusCy(TaskStatus.IN_PROGRESS.getWelshName())
+                         .hintTextCy("hint_text_cy").hintTextEn(
                 "hint_text_en").reference("124")
                          .updatedBy("Test").createdAt(odt).build()
         );
