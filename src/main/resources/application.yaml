@@ -362,6 +362,7 @@ notifications:
   bilingualClaimantClaimContinuingOnlineForSpec: "461b4ce6-3783-409d-be47-ea1230170833"
 
   notifyApplicantForHwfNoRemission: "3008a18a-07ec-445b-a226-62ffa19132ce"
+  notifyApplicantForHwFMoreInformationNeeded: "02956398-fffb-4461-93a0-3713788363a8"
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -32,7 +34,10 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private final FeatureToggleService toggleService;
 
     private final Map<String, Callback> callBackMap = Map.of(
-        callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForClaimSubmitted
+        callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForHwFOutcome
+    );
+    private final Map<CaseEvent, String> templateMap = ImmutableMap.of(
+        NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemission()
     );
 
     @Override
@@ -45,11 +50,11 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         return TASK_ID;
     }
 
-    private CallbackResponse notifyApplicantForClaimSubmitted(CallbackParams callbackParams) {
+    private CallbackResponse notifyApplicantForHwFOutcome(CallbackParams callbackParams) {
        CaseData caseData = callbackParams.getCaseData();
 
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-            generateEmail(caseData);
+            sendEmail(caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -65,22 +70,13 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     public Map<String, String> addProperties(CaseData caseData) {
         switch(caseData.getHwFEvent()){
             case NO_REMISSION_HWF:
-                return addNoRemissionProperties(caseData);
+                return getNoRemissionProperties(caseData);
             default:
                 return null;
         }
     }
 
-    private String addTemplate(CaseEvent hwfEvent) {
-        switch(hwfEvent){
-            case NO_REMISSION_HWF:
-                return notificationsProperties.getNotifyApplicantForHwFNoRemission();
-            default:
-                return null;
-        }
-    }
-
-    private Map<String, String> addNoRemissionProperties(CaseData caseData){
+    private Map<String, String> getNoRemissionProperties(CaseData caseData){
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
@@ -91,11 +87,11 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         );
     }
 
-    private void generateEmail(CaseData caseData) {
+    private void sendEmail(CaseData caseData) {
         if (Objects.nonNull(caseData.getApplicant1Email())) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                addTemplate(caseData.getHwFEvent()),
+                templateMap.get(caseData.getHwFEvent()),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
