@@ -5,4 +5,4 @@ VALUES(12258, 'task_name_en', 'hint_text_en', 'category_en', 'task_name_cy', 'hi
 
 INSERT INTO dbs.task_list
 (id, task_item_template_id, reference, current_status, next_status, task_name_en, hint_text_en, task_name_cy, hint_text_cy, message_params, created_at, updated_at, updated_by)
-VALUES('8c2712da-47ce-4050-bbee-650134a7b9e8', 12258, '124', 0, 1, 'task_name_en', 'hint_text_en', 'task_name_cy', 'hint_text_cy', null, '2024-01-01T10:15:30+00:00', null, 'Test');
+VALUES('8c2712da-47ce-4050-bbee-650134a7b9e8', 12258, '124', 1, 6, 'task_name_en', 'hint_text_en', 'task_name_cy', 'hint_text_cy', null, '2024-01-01T10:15:30+00:00', null, 'Test');

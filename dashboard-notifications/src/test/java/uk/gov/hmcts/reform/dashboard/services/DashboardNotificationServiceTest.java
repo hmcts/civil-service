@@ -7,8 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
-import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
-import uk.gov.hmcts.reform.dashboard.repositories.NotificationRepository;
+import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
+import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtil
 public class DashboardNotificationServiceTest {
 
     @Mock
-    private NotificationRepository notificationRepository;
+    private DashboardNotificationsRepository dashboardNotificationsRepository;
 
     @InjectMocks
     private DashboardNotificationService dashboardNotificationService;
@@ -39,7 +39,7 @@ public class DashboardNotificationServiceTest {
     class GetTests {
         @Test
         void shouldReturnEmpty_whenNotificationListIsNotPresent() {
-            when(notificationRepository.findByReferenceAndCitizenRole(any(), any()))
+            when(dashboardNotificationsRepository.findByReferenceAndCitizenRole(any(), any()))
                 .thenReturn(List.of());
             List<Notification> actual = dashboardNotificationService
                 .getNotifications("123", "Claimant");
@@ -49,7 +49,7 @@ public class DashboardNotificationServiceTest {
 
         @Test
         void should_return_notifications_for_case_and_role() {
-            when(notificationRepository.findByReferenceAndCitizenRole(any(), any()))
+            when(dashboardNotificationsRepository.findByReferenceAndCitizenRole(any(), any()))
                 .thenReturn(getNotificationEntityList());
             List<Notification> actual = dashboardNotificationService
                 .getNotifications("123", "Claimant");
@@ -60,21 +60,21 @@ public class DashboardNotificationServiceTest {
         @Test
         void should_return_notification_for_notification_id() {
             UUID notificationId = UUID.randomUUID();
-            NotificationEntity expected = getNotification(notificationId);
-            when(notificationRepository.findById(notificationId))
+            DashboardNotificationsEntity expected = getNotification(notificationId);
+            when(dashboardNotificationsRepository.findById(notificationId))
                 .thenReturn(Optional.of(expected));
 
-            Optional<NotificationEntity> actual = dashboardNotificationService.getNotification(notificationId);
+            Optional<DashboardNotificationsEntity> actual = dashboardNotificationService.getNotification(notificationId);
 
             assertThat(actual).isPresent().isEqualTo(Optional.of(expected));
         }
 
         @Test
         void should_return_all_notification() {
-            List<NotificationEntity> expectedList = getNotificationEntityList();
-            when(notificationRepository.findAll()).thenReturn(expectedList);
+            List<DashboardNotificationsEntity> expectedList = getNotificationEntityList();
+            when(dashboardNotificationsRepository.findAll()).thenReturn(expectedList);
 
-            List<NotificationEntity> actual = dashboardNotificationService.getAll();
+            List<DashboardNotificationsEntity> actual = dashboardNotificationService.getAll();
 
             assertThat(actual).isNotEmpty().isEqualTo(expectedList);
         }
@@ -89,7 +89,7 @@ public class DashboardNotificationServiceTest {
             dashboardNotificationService.deleteById(id);
 
             //then
-            verify(notificationRepository).deleteById(id);
+            verify(dashboardNotificationsRepository).deleteById(id);
         }
     }
 }

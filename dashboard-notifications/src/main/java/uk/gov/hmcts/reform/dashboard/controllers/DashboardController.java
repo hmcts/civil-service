@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
-import uk.gov.hmcts.reform.dashboard.entities.NotificationEntity;
+import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -105,7 +105,7 @@ public class DashboardController {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<Optional<NotificationEntity>> getDashboardNotificationByUuid(
+    public ResponseEntity<Optional<DashboardNotificationsEntity>> getDashboardNotificationByUuid(
         @PathVariable("uuid") UUID uuid,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
@@ -132,7 +132,7 @@ public class DashboardController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
         log.info(
-            "Received ccd-case-identifier: {}, role-type : {}",
+            "Get notifications for ccd-case-identifier: {}, role-type : {}",
             ccdCaseIdentifier, roleType
         );
 

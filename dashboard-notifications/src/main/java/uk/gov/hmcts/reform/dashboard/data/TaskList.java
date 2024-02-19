@@ -20,9 +20,13 @@ public class TaskList {
 
     private String reference;
 
-    private int currentStatus;
+    private String currentStatusEn;
 
-    private int nextStatus;
+    private String currentStatusCy;
+
+    private String nextStatusEn;
+
+    private String nextStatusCy;
 
     private String taskNameEn;
 
@@ -52,8 +56,10 @@ public class TaskList {
         return TaskList.builder()
             .id(taskListEntity.getId())
             .reference(taskListEntity.getReference())
-            .currentStatus(taskListEntity.getCurrentStatus())
-            .nextStatus(taskListEntity.getNextStatus())
+            .currentStatusEn(TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getCurrentStatus()).getName())
+            .currentStatusCy(TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getCurrentStatus()).getName())
+            .nextStatusEn(TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getNextStatus()).getName())
+            .nextStatusCy(TaskStatus.getTaskStatusByPlaceValue(taskListEntity.getNextStatus()).getName())
             .taskNameEn(taskListEntity.getTaskNameEn())
             .hintTextEn(taskListEntity.getHintTextEn())
             .taskNameCy(taskListEntity.getTaskNameCy())

@@ -34,14 +34,17 @@ public class TaskListService {
             .collect(Collectors.toList());
     }
 
-    public TaskListEntity saveOrUpdate(TaskListEntity taskListEntity, String templateName) {
+    public TaskListEntity saveOrUpdate(TaskListEntity taskList) {
         Optional<TaskListEntity> existingEntity = taskListRepository
             .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
-                taskListEntity.getReference(), taskListEntity.getTaskItemTemplate().getRole(), templateName);
+                taskList.getReference(),
+                taskList.getTaskItemTemplate().getRole(),
+                taskList.getTaskItemTemplate().getName()
+            );
 
-        TaskListEntity beingUpdated = taskListEntity;
+        TaskListEntity beingUpdated = taskList;
         if (existingEntity.isPresent()) {
-            beingUpdated = taskListEntity.toBuilder().id(existingEntity.get().getId()).build();
+            beingUpdated = taskList.toBuilder().id(existingEntity.get().getId()).build();
         }
 
         return taskListRepository.save(beingUpdated);

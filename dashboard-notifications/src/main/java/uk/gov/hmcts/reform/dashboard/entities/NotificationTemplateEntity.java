@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.hibernate.annotations.Type;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -28,9 +28,6 @@ public class NotificationTemplateEntity implements Serializable {
     @Column(name = "template_name")
     @Schema(name = "template_name")
     private String name;
-    @Type(type = "com.vladmihalcea.hibernate.type.array.StringArrayType")
-    @Schema(name = "notifications_to_be_deleted")
-    private String[] notificationsToBeDeleted;
     @Schema(name = "title_en")
     private String titleEn;
     @Schema(name = "title_cy")
