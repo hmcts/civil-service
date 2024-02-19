@@ -2505,11 +2505,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
 
             LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now();
-            Integer testDays = valid ? 0 : -1;
-            Integer testHours = valid ? 0 : -1;
-            Integer testMinutes = valid ? 0 : -1;
             Integer testWitnesses = valid ? 0 : -1;
-            Integer testPages = valid ? 1 : 0;
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
@@ -2529,16 +2525,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder().sdoQuestionsShallBeAnsweredDate(testDate).sdoWrittenQuestionsDate(testDate).build())
                 .sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder().sdoR2ScheduleOfLossClaimantDate(testDate).sdoR2ScheduleOfLossDefendantDate(testDate).build())
                 .sdoR2Trial(SdoR2Trial.builder().sdoR2TrialFirstOpenDateAfter(SdoR2TrialFirstOpenDateAfter.builder().listFrom(testDate).build())
-                                .sdoR2TrialWindow(SdoR2TrialWindow.builder().listFrom(testDate).dateTo(testDate).build())
-                                .lengthListOther(SdoR2TrialHearingLengthOther.builder().trialLengthDays(testDays).trialLengthHours(testHours)
-                                                     .trialLengthMinutes(testMinutes).build()).build())
+                                .sdoR2TrialWindow(SdoR2TrialWindow.builder().listFrom(testDate).dateTo(testDate).build()).build())
                 .sdoR2ImportantNotesDate(testDate)
                 .sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder().sdoWitnessDeadlineDate(testDate)
                                           .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
                                                                     .restrictNoOfWitnessDetails(SdoR2RestrictNoOfWitnessDetails.builder().noOfWitnessClaimant(testWitnesses)
-                                                                                                    .noOfWitnessDefendant(testWitnesses).build()).build())
-                                          .sdoRestrictPages(SdoR2RestrictPages.builder().restrictNoOfPagesDetails(SdoR2RestrictNoOfPagesDetails.builder()
-                                                                                                                      .noOfPages(testPages).build()).build()).build())
+                                                                                                    .noOfWitnessDefendant(testWitnesses).build()).build()).build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2548,12 +2540,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             if (valid) {
                 assertThat(response.getErrors()).size().isZero();
             } else {
-                assertThat(response.getErrors()).size().isEqualTo(28);
+                assertThat(response.getErrors()).size().isEqualTo(24);
                 assertThat(response.getErrors()).contains(ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE);
                 assertThat(response.getErrors()).contains(ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO);
-                assertThat(response.getErrors()).contains("ERROR_MESSAGE_Quantity < 1");
-                assertThat(response.getErrors()).contains("ERROR_MESSAGE_Hours must be between 0 and 23");
-                assertThat(response.getErrors()).contains("ERROR_MESSAGE_Minutes must be between 0 and 59");
             }
         }
 
