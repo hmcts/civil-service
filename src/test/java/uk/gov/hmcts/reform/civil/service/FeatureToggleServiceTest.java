@@ -53,8 +53,7 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
     }
-
-
+    
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnCorrectValue_whenIsPinInPostEnabledInvoked(Boolean toggleStat) {
