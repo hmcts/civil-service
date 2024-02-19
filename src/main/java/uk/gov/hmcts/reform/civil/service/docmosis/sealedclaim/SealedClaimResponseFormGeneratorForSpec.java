@@ -92,7 +92,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .responseType(caseData.getRespondentClaimResponseTypeForSpecGeneric())
             .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))
             .mediation(caseData.getResponseClaimMediationSpecRequired());
-        addCarmMediationDetails(builder, caseData, authorisation);
+        addCarmMediationDetails(builder, caseData);
         addRepaymentPlanDetails(builder, caseData);
         if (MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
             builder.respondent1(getDefendant1v2ds(caseData));
@@ -156,40 +156,49 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         }
     }
 
-    private void addCarmMediationDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData, String authorisation) {
+    private void addCarmMediationDetails(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_ONE, TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP:
-                builder
-                    .mediationFirstName(getRespondent1MediationFirstName(caseData))
-                    .mediationLastName(getRespondent1MediationLastName(caseData))
-                    .mediationContactNumber(getRespondent1MediationContactNumber(caseData))
-                    .mediationEmail(getRespondent1MediationEmail(caseData))
-                    .mediationUnavailableDatesExists(checkRespondent1MediationHasUnavailabilityDates(caseData))
-                    .mediationUnavailableDatesList(getRespondent1FromDateUnavailableList(caseData));
+                getCarmMediationFields(builder, getRespondent1MediationFirstName(caseData),
+                                       getRespondent1MediationLastName(caseData),
+                                       getRespondent1MediationContactNumber(caseData),
+                                       getRespondent1MediationEmail(caseData),
+                                       checkRespondent1MediationHasUnavailabilityDates(caseData),
+                                       getRespondent1FromDateUnavailableList(caseData));
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
                 if (caseData.getRespondent1ResponseDate() == null
                     || (caseData.getRespondent2ResponseDate() != null
                     && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()))) {
-                    builder.mediationFirstName(getRespondent2MediationFirstName(caseData))
-                    .mediationLastName(getRespondent2MediationLastName(caseData))
-                    .mediationContactNumber(getRespondent2MediationContactNumber(caseData))
-                    .mediationEmail(getRespondent2MediationEmail(caseData))
-                    .mediationUnavailableDatesExists(checkRespondent2MediationHasUnavailabilityDates(caseData))
-                        .mediationUnavailableDatesList(getRespondent2FromDateUnavailableList(caseData));
+                    getCarmMediationFields(builder, getRespondent2MediationFirstName(caseData),
+                                           getRespondent2MediationLastName(caseData),
+                                           getRespondent2MediationContactNumber(caseData),
+                                           getRespondent2MediationEmail(caseData),
+                                           checkRespondent2MediationHasUnavailabilityDates(caseData),
+                                           getRespondent2FromDateUnavailableList(caseData));
                 } else {
-                    builder.mediationFirstName(getRespondent1MediationFirstName(caseData))
-                        .mediationLastName(getRespondent1MediationLastName(caseData))
-                        .mediationContactNumber(getRespondent1MediationContactNumber(caseData))
-                        .mediationEmail(getRespondent1MediationEmail(caseData))
-                        .mediationUnavailableDatesExists(checkRespondent1MediationHasUnavailabilityDates(caseData))
-                        .mediationUnavailableDatesList(getRespondent1FromDateUnavailableList(caseData));
+                    getCarmMediationFields(builder, getRespondent1MediationFirstName(caseData),
+                                           getRespondent1MediationLastName(caseData),
+                                           getRespondent1MediationContactNumber(caseData),
+                                           getRespondent1MediationEmail(caseData),
+                                           checkRespondent1MediationHasUnavailabilityDates(caseData),
+                                           getRespondent1FromDateUnavailableList(caseData));
                 }
                 break;
             default: {
                 throw new CallbackException("Cannot populate CARM fields");
             }
         }
+    }
+
+    private void getCarmMediationFields(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, String firstName, String lastName, String contactNumber, String email, Boolean unavailableDatesExists, List<Element<UnavailableDate>> unavailableDatesList) {
+        builder
+            .mediationFirstName(firstName)
+            .mediationLastName(lastName)
+            .mediationContactNumber(contactNumber)
+            .mediationEmail(email)
+            .mediationUnavailableDatesExists(unavailableDatesExists)
+            .mediationUnavailableDatesList(unavailableDatesList);
     }
 
     /**
