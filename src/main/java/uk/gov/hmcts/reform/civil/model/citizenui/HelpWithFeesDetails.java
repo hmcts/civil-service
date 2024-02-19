@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.enums.NoRemissionDetailsSummary;
 import java.math.BigDecimal;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class HelpWithFeesDetails {
