@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,12 @@ import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsPPI;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingFirstOpenDateAfter;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
@@ -867,6 +874,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
             .setSmallClaimsFlag(YES)
             .drawDirectionsOrderRequired(NO)
+            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
             .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().hearingCourtLocationList(options.toBuilder().value(selectedCourt).build()).build())
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -886,6 +894,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
 
         assertThat(responseCaseData.getEaCourtLocation()).isEqualTo(isLocationWhiteListed ? YES : NO);
+        assertThat(responseCaseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList().getListItems()).isNull();
     }
 
     @ParameterizedTest
@@ -908,6 +917,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
             .setSmallClaimsFlag(YES)
+            .smallClaims(List.of(SmallTrack.smallClaimCreditHire))
             .isSdoR2NewScreen(NO)
             .drawDirectionsOrderRequired(NO)
             .build();
@@ -951,7 +961,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             .isSdoR2NewScreen(YES)
             .disposalHearingMethodInPerson(options)
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
-            .setFastTrackFlag(YES)
+            .setSmallClaimsFlag(YES)
+            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
             .drawDirectionsOrderRequired(NO)
             .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().altHearingCourtLocationList(options.toBuilder().value(selectedCourt).build()).build())
             .build();
@@ -2454,6 +2465,71 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isEmpty();
 
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldThrowValidationErrorForDRHFieldsIfNotNull(boolean valid) {
+            LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now().minusDays(2);
+            int countWitness = valid ? 0 : -1;
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsPPI(SdoR2SmallClaimsPPI.builder().ppiDate(testDate).build())
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
+                                             .sdoR2SmallClaimsHearingFirstOpenDateAfter(
+                                                 SdoR2SmallClaimsHearingFirstOpenDateAfter.builder().listFrom(testDate).build()).build())
+                .sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder().date(testDate).build())
+                .sdoR2SmallClaimsWitnessStatements(SdoR2SmallClaimsWitnessStatements.builder()
+                                                       .isRestrictWitness(YES)
+                                                       .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness
+                                                                                            .builder().noOfWitnessClaimant(countWitness)
+                                                                                            .noOfWitnessDefendant(countWitness).build())
+                                                       .build())
+
+                .build();
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            if (valid) {
+                assertThat(response.getErrors()).isEmpty();
+            } else {
+                assertThat(response.getErrors().size()).isEqualTo(5);
+            }
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldThrowValidationErrorForDRHHearingWindow(boolean valid) {
+            LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now().minusDays(2);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().trialOnOptions(TrialOnRadioOptions.TRIAL_WINDOW)
+                                             .sdoR2SmallClaimsHearingWindow(
+                                                 SdoR2SmallClaimsHearingWindow.builder().listFrom(testDate)
+                                                     .dateTo(testDate).build()).build())
+                .build();
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            if (valid) {
+                assertThat(response.getErrors()).isEmpty();
+            } else {
+                assertThat(response.getErrors().size()).isEqualTo(2);
+            }
         }
     }
 }

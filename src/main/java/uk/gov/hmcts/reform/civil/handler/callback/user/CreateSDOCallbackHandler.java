@@ -108,6 +108,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -172,6 +173,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     public static final String FEEDBACK_LINK = "<p>%s"
         + " <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>";
 
+    private static final String ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE = "Date must be in the future";
+    public static final String ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO = "The number entered cannot be less " +
+        "than zero";
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
     @Autowired
@@ -902,6 +906,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             if (!witnessValidationErrorMessage.isEmpty()) {
                 errors.add(witnessValidationErrorMessage);
             }
+        } else if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)) {
+            errors.addAll(validateDRHFields(caseData));
         }
 
         if (errors.isEmpty()) {
@@ -920,6 +926,45 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .errors(errors)
             .data(updatedData.build().toMap(objectMapper))
             .build();
+    }
+
+    private List<String> validateDRHFields(CaseData caseData) {
+        ArrayList<String> errors = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        if (Objects.nonNull(caseData.getSdoR2SmallClaimsPPI()) && Objects.nonNull(caseData.getSdoR2SmallClaimsPPI().getPpiDate())) {
+            validateFutureDate(caseData.getSdoR2SmallClaimsPPI().getPpiDate(), today).ifPresent(errors :: add);
+        }
+        if (Objects.nonNull(caseData.getSdoR2SmallClaimsWitnessStatements()) && caseData.getSdoR2SmallClaimsWitnessStatements().getIsRestrictWitness() == YES
+            && nonNull(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessClaimant())) {
+            validateGreaterThanZero(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessClaimant()).ifPresent(errors :: add);
+        }
+        if (Objects.nonNull(caseData.getSdoR2SmallClaimsWitnessStatements()) && caseData.getSdoR2SmallClaimsWitnessStatements().getIsRestrictWitness() == YES
+            && nonNull(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessDefendant())) {
+            validateGreaterThanZero(caseData.getSdoR2SmallClaimsWitnessStatements().getSdoR2SmallClaimsRestrictWitness().getNoOfWitnessDefendant()).ifPresent(errors :: add);
+        }
+        if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing()) && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == TrialOnRadioOptions.OPEN_DATE) {
+            validateFutureDate(caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingFirstOpenDateAfter().getListFrom(),
+                               today).ifPresent(errors :: add);
+        }
+        if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing()) && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == TrialOnRadioOptions.TRIAL_WINDOW) {
+            validateFutureDate(caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getDateTo(),
+                               today).ifPresent(errors :: add);
+        }
+        if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing()) && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == TrialOnRadioOptions.TRIAL_WINDOW) {
+            validateFutureDate(caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getListFrom(),
+                               today).ifPresent(errors :: add);
+        }
+        if (Objects.nonNull(caseData.getSdoR2SmallClaimsImpNotes())) {
+            validateFutureDate(caseData.getSdoR2SmallClaimsImpNotes().getDate(), today).ifPresent(errors :: add);
+        }
+        return  errors;
+    }
+
+    private Optional<String> validateFutureDate(LocalDate date, LocalDate today) {
+        if (date.isAfter(today)) {
+            return Optional.empty();
+        }
+        return Optional.of(ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE);
     }
 
     private CaseData mapHearingMethodFields(CaseData caseData) {
@@ -1000,11 +1045,31 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.getFastTrackMethodInPerson()));
         dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
             caseData.getSmallClaimsMethodInPerson()));
-
+        if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)) {
+            dataBuilder.sdoR2SmallClaimsHearing(updateHearingAfterDeletingLocationList(caseData.getSdoR2SmallClaimsHearing()));
+        }
         setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
+            .build();
+    }
+
+    private SdoR2SmallClaimsHearing updateHearingAfterDeletingLocationList(SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing) {
+        return SdoR2SmallClaimsHearing.builder()
+            .trialOnOptions(sdoR2SmallClaimsHearing.getTrialOnOptions())
+            .sdoR2SmallClaimsHearingFirstOpenDateAfter(sdoR2SmallClaimsHearing.getSdoR2SmallClaimsHearingFirstOpenDateAfter() != null
+                                                           ? sdoR2SmallClaimsHearing.getSdoR2SmallClaimsHearingFirstOpenDateAfter() : null)
+            .sdoR2SmallClaimsHearingWindow(sdoR2SmallClaimsHearing.getSdoR2SmallClaimsHearingWindow() != null
+                                            ? sdoR2SmallClaimsHearing.getSdoR2SmallClaimsHearingWindow() : null)
+            .hearingCourtLocationList(deleteLocationList(sdoR2SmallClaimsHearing.getHearingCourtLocationList()))
+            .altHearingCourtLocationList(deleteLocationList(sdoR2SmallClaimsHearing.getAltHearingCourtLocationList()))
+            .lengthList(sdoR2SmallClaimsHearing.getLengthList())
+            .lengthListOther(sdoR2SmallClaimsHearing.getLengthListOther() != null ? sdoR2SmallClaimsHearing.getLengthListOther() : null)
+            .methodOfHearing(sdoR2SmallClaimsHearing.getMethodOfHearing())
+            .physicalBundleOptions(sdoR2SmallClaimsHearing.getPhysicalBundleOptions())
+            .physicalBundlePartyTxt(sdoR2SmallClaimsHearing.getPhysicalBundlePartyTxt())
+            .hearingNotesTxt(sdoR2SmallClaimsHearing.getHearingNotesTxt() != null ? sdoR2SmallClaimsHearing.getHearingNotesTxt() : null)
             .build();
     }
 
@@ -1050,7 +1115,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (SdoHelper.isFastTrack(caseData)) {
             toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            if (featureToggleService.isSdoR2Enabled() && caseData.getIsSdoR2NewScreen() != null && caseData.getIsSdoR2NewScreen().equals(YES)) {
+            if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)) {
                 toUseList = caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList() != null
                     ? Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList())
                     : Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList());
@@ -1069,6 +1134,13 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else {
             return false;
         }
+    }
+
+    private Optional<String> validateGreaterThanZero(int count) {
+        if (count < 0) {
+            return Optional.of(ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO);
+        }
+        return Optional.empty();
     }
 
     private String validateNegativeWitness(String inputValue1, String inputValue2) {
