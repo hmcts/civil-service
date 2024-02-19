@@ -35,7 +35,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private final Map<String, Callback> callBackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForHwFOutcome
     );
-    private  Map<CaseEvent, String> emailTemplates;
+    private Map<CaseEvent, String> emailTemplates;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -48,7 +48,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     }
 
     private CallbackResponse notifyApplicantForHwFOutcome(CallbackParams callbackParams) {
-       CaseData caseData = callbackParams.getCaseData();
+        CaseData caseData = callbackParams.getCaseData();
 
         if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
             sendEmail(caseData);
@@ -65,7 +65,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        switch(caseData.getHwFEvent()){
+        switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF:
                 return getNoRemissionProperties(caseData);
             default:
@@ -74,13 +74,16 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     }
 
     private String getTemplate(CaseEvent hwfEvent) {
-        if(emailTemplates == null) {
-            emailTemplates = ImmutableMap.of(CaseEvent.NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemission());
+        if (emailTemplates == null) {
+            emailTemplates = ImmutableMap.of(
+                CaseEvent.NO_REMISSION_HWF,
+                notificationsProperties.getNotifyApplicantForHwfNoRemission()
+            );
         }
         return emailTemplates.get(hwfEvent);
     }
 
-    private Map<String, String> getNoRemissionProperties(CaseData caseData){
+    private Map<String, String> getNoRemissionProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
@@ -103,10 +106,10 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     }
 
     private String getHwFNoRemissionReason(CaseData caseData) {
-        if(caseData.isHWFTypeHearing()){
+        if (caseData.isHWFTypeHearing()) {
             return caseData.getHearingHwfDetails().getNoRemissionDetailsSummary().getLabel();
         }
-        if(caseData.isHWFTypeClaimIssued()){
+        if (caseData.isHWFTypeClaimIssued()) {
             return caseData.getClaimIssuedHwfDetails().getNoRemissionDetailsSummary().getLabel();
         }
         return "";

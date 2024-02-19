@@ -48,11 +48,11 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
 
-        if(caseData.isHWFTypeHearing()){
+        if (caseData.isHWFTypeHearing()) {
             HelpWithFeesDetails hearingFeeDetails = caseData.getHearingHwfDetails();
             updatedData.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(NO_REMISSION_HWF).build());
         }
-        if(caseData.isHWFTypeClaimIssued()){
+        if (caseData.isHWFTypeClaimIssued()) {
             HelpWithFeesDetails claimIssuedHwfDetails = caseData.getClaimIssuedHwfDetails();
             updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(NO_REMISSION_HWF).build());
         }
