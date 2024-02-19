@@ -481,4 +481,31 @@ public class SdoHelper {
                 return false;
         }
     }
+
+    public static String getSdoTrialHearingTimeAllocated(CaseData caseData) {
+
+        if (caseData.getSdoR2Trial() != null) {
+            if (caseData.getSdoR2Trial().getLengthList().getLabel().equals("Other")) {
+                return caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays() + " days, "
+                    + caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours() + " hours and "
+                    + caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes() + " minutes";
+            } else {
+                return caseData.getSdoR2Trial().getLengthList().getLabel();
+            }
+        }
+        return "";
+    }
+
+    public static String getSdoTrialMethodOfHearing(CaseData caseData) {
+
+        if (caseData.getSdoR2Trial() != null) {
+            if (caseData.getSdoR2Trial().getMethodOfHearing() != null) {
+                return caseData.getSdoR2Trial().getMethodOfHearing().getLabel();
+            } else {
+                return "";
+            }
+        }
+        return "";
+    }
+
 }
