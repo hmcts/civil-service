@@ -96,6 +96,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CUI_UPLOAD_MEDIATION_
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPLOAD_TRANSLATED_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WITHDRAW_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.migrateCase;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.CASE_STAYED;
@@ -1378,7 +1379,8 @@ public class FlowStateAllowedEventService {
                 MORE_INFORMATION_HWF,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
-                PARTIAL_REMISSION_HWF_GRANTED
+                PARTIAL_REMISSION_HWF_GRANTED,
+                UPDATE_HELP_WITH_FEE_NUMBER
             )
         ),
         entry(
@@ -1575,7 +1577,8 @@ public class FlowStateAllowedEventService {
             List.of(
                 UPLOAD_TRANSLATED_DOCUMENT,
                 MORE_INFORMATION_HWF,
-                PARTIAL_REMISSION_HWF_GRANTED
+                PARTIAL_REMISSION_HWF_GRANTED,
+                UPDATE_HELP_WITH_FEE_NUMBER
             )
         ),
         entry(
