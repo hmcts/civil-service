@@ -1249,6 +1249,16 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isHWFTypeHearing() {
+        return getHwfFeeType() == FeeType.HEARING;
+    }
+
+    @JsonIgnore
+    public boolean isHWFTypeClaimIssued() {
+        return getHwfFeeType() == FeeType.CLAIMISSUED;
+    }
+
+    @JsonIgnore
     public boolean isSettlementAgreementDeadlineExpired() {
         return nonNull(respondent1RespondToSettlementAgreementDeadline)
             && LocalDateTime.now().isAfter(respondent1RespondToSettlementAgreementDeadline);
