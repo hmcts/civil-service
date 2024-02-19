@@ -191,7 +191,9 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
         }
     }
 
-    private void getCarmMediationFields(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder, String firstName, String lastName, String contactNumber, String email, Boolean unavailableDatesExists, List<Element<UnavailableDate>> unavailableDatesList) {
+    private void getCarmMediationFields(SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder builder,
+                                        String firstName, String lastName, String contactNumber, String email,
+                                        Boolean unavailableDatesExists, List<Element<UnavailableDate>> unavailableDatesList) {
         builder
             .mediationFirstName(firstName)
             .mediationLastName(lastName)
