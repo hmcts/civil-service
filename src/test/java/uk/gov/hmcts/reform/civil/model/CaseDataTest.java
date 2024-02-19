@@ -981,8 +981,8 @@ public class CaseDataTest {
         void shouldReturnTrueIfHWFTypeIsHearing() {
             //Given
             CaseData caseData = CaseData.builder()
-                    .hwfFeeType(FeeType.HEARING)
-                    .build();
+                .hwfFeeType(FeeType.HEARING)
+                .build();
             //When
             boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
             //Then
@@ -993,7 +993,7 @@ public class CaseDataTest {
         void shouldReturnFalseIfHWFTypeIsNull() {
             //Given
             CaseData caseData = CaseData.builder()
-                    .build();
+                .build();
             //When
             boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
             //Then
@@ -1004,8 +1004,8 @@ public class CaseDataTest {
         void shouldReturnTrueIfHWFTypeIsClaimIssued() {
             //Given
             CaseData caseData = CaseData.builder()
-                    .hwfFeeType(FeeType.CLAIMISSUED)
-                    .build();
+                .hwfFeeType(FeeType.CLAIMISSUED)
+                .build();
             //When
             boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
             //Then
@@ -1016,8 +1016,8 @@ public class CaseDataTest {
         void shouldReturnFalseIfHWFTypeIsNotClaimIssued() {
             //Given
             CaseData caseData = CaseData.builder()
-                    .hwfFeeType(FeeType.HEARING)
-                    .build();
+                .hwfFeeType(FeeType.HEARING)
+                .build();
             //When
             boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
             //Then
