@@ -1089,28 +1089,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             validateGreaterOrEqualZero(caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessDefendant())
                 .ifPresent(errors::add);
         }
-        if (caseData.getSdoR2WitnessesOfFact() != null && caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages() != null
-            && caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails() != null
-            && caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getNoOfPages() != null) {
-            validateGreaterThanZero(caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages().getRestrictNoOfPagesDetails().getNoOfPages())
-                .ifPresent(errors::add);
-        }
-
-        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null
-            && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays() != null) {
-            validateGreaterOrEqualZero(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthDays())
-                .ifPresent(errors::add);
-        }
-        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null
-            && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours() != null) {
-            validateHours(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthHours())
-                .ifPresent(errors::add);
-        }
-        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getLengthListOther() != null
-            && caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes() != null) {
-            validateMinutes(caseData.getSdoR2Trial().getLengthListOther().getTrialLengthMinutes())
-                .ifPresent(errors::add);
-        }
 
         return errors;
     }
@@ -1126,27 +1104,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private Optional<String> validateGreaterOrEqualZero(Integer quantity) {
         if (quantity < 0) {
             return Optional.of(ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO);
-        }
-        return Optional.empty();
-    }
-
-    private Optional<String> validateGreaterThanZero(Integer quantity) {
-        if (quantity < 1) {
-            return Optional.of("ERROR_MESSAGE_Quantity < 1");
-        }
-        return Optional.empty();
-    }
-
-    private Optional<String> validateHours(Integer hours) {
-        if (hours < 0 || hours > 23) {
-            return Optional.of("ERROR_MESSAGE_Hours must be between 0 and 23");
-        }
-        return Optional.empty();
-    }
-
-    private Optional<String> validateMinutes(Integer minutes) {
-        if (minutes < 0 || minutes > 59) {
-            return Optional.of("ERROR_MESSAGE_Minutes must be between 0 and 59");
         }
         return Optional.empty();
     }
