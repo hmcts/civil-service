@@ -88,6 +88,12 @@ public interface NotificationData {
     // evidence upload
     String UPLOADED_DOCUMENTS = "uploaded documents";
 
+    // hwf outcome
+    String REASONS = "reasons";
+    String TYPE_OF_FEE = "typeOfFee";
+    String HWF_REFERENCE_NUMBER = "hwFReferenceNumber";
+    String AMOUNT = "amount";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }
