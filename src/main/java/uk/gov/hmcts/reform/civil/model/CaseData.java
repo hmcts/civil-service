@@ -1217,10 +1217,38 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public BigDecimal getHearingFeeAmount() {
+        return Optional.ofNullable(getHearingFee())
+            .map(Fee::getCalculatedAmountInPence)
+            .orElse(BigDecimal.ZERO);
+    }
+
+    @JsonIgnore
     public BigDecimal getCalculatedHearingFeeInPence() {
         return Optional.ofNullable(getHearingFee())
             .map(Fee::getCalculatedAmountInPence)
             .orElse(BigDecimal.ZERO);
+    }
+
+    @JsonIgnore
+    public BigDecimal getClaimIssueRemissionAmount() {
+        return Optional.ofNullable(getClaimIssuedHwfDetails())
+            .map(HelpWithFeesDetails::getRemissionAmount)
+            .orElse(BigDecimal.ZERO);
+    }
+
+    @JsonIgnore
+    public BigDecimal getHearingRemissionAmount() {
+        return Optional.ofNullable(getHearingHwfDetails())
+            .map(HelpWithFeesDetails::getRemissionAmount)
+            .orElse(BigDecimal.ZERO);
+    }
+
+    public boolean hasApplicant1SignedSettlementAgreement() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasApplicant1SignedSettlementAgreement).isPresent();
+
     }
 
     @JsonIgnore
@@ -1231,13 +1259,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isHWFTypeClaimIssued() {
         return getHwfFeeType() == FeeType.CLAIMISSUED;
-    }
-
-    public boolean hasApplicant1SignedSettlementAgreement() {
-        return Optional.ofNullable(getCaseDataLiP())
-            .map(CaseDataLiP::getApplicant1LiPResponse)
-            .filter(ClaimantLiPResponse::hasApplicant1SignedSettlementAgreement).isPresent();
-
     }
 
     @JsonIgnore
