@@ -236,12 +236,13 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                 CREATE_CLAIM_AFTER_PAYMENT,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                INVALID_HWF_REFERENCE
             )
         ),
 
@@ -360,10 +361,10 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
-                DEFAULT_JUDGEMENT,
-                STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
+                DEFAULT_JUDGEMENT,
+                STANDARD_DIRECTION_ORDER_DJ,
                 migrateCase,
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
@@ -828,7 +829,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
                 asyncStitchingComplete,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                INVALID_HWF_REFERENCE
             )
         ),
         entry(
@@ -1377,7 +1379,6 @@ public class FlowStateAllowedEventService {
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
                 UPLOAD_MEDIATION_DOCUMENTS,
-                INVALID_HWF_REFERENCE,
                 MORE_INFORMATION_HWF,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
@@ -1577,7 +1578,6 @@ public class FlowStateAllowedEventService {
             PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName(),
             List.of(
                 UPLOAD_TRANSLATED_DOCUMENT,
-                INVALID_HWF_REFERENCE,
                 MORE_INFORMATION_HWF,
                 PARTIAL_REMISSION_HWF_GRANTED
             )
