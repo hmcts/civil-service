@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
@@ -29,6 +30,7 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
     private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateCaseState);
     private final ObjectMapper objectMapper;
     private final UpdateClaimStateService updateClaimStateService;
+    private final ToggleConfiguration toggleConfiguration;
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -49,6 +51,7 @@ public class UpdateClaimantIntentionClaimStateCallbackHandler extends CallbackHa
         CaseData caseData = callbackParams.getCaseData();
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        caseDataBuilder.featureToggleWA(toggleConfiguration.getFeatureToggle());
         CaseData updatedData = caseDataBuilder.build();
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder response =
             AboutToStartOrSubmitCallbackResponse.builder()
