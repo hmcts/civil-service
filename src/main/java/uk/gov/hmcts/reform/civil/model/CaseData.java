@@ -1257,10 +1257,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public CaseEvent getHwFEvent() {
-        if(this.isHWFTypeHearing()){
+        if (this.isHWFTypeHearing()) {
             return this.getHearingHwfDetails().getHwfCaseEvent();
         }
-        if(this.isHWFTypeClaimIssued()){
+        if (this.isHWFTypeClaimIssued()) {
             return this.getClaimIssuedHwfDetails().getHwfCaseEvent();
         }
         return null;
@@ -1268,10 +1268,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public String getHwFReferenceNumber() {
-        if(this.isHWFTypeHearing()){
+        if (this.isHWFTypeHearing()) {
             return this.getHearingHelpFeesReferenceNumber();
         }
-        if(this.isHWFTypeClaimIssued()){
+        if (this.isHWFTypeClaimIssued()) {
             return this.getHelpWithFeesReferenceNumber();
         }
         return null;
@@ -1279,10 +1279,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public BigDecimal getHwFFeeAmount() {
-        if(this.isHWFTypeHearing()){
+        if (this.isHWFTypeHearing()) {
             return MonetaryConversions.penniesToPounds(this.getCalculatedHearingFeeInPence());
         }
-        if(this.isHWFTypeClaimIssued()){
+        if (this.isHWFTypeClaimIssued()) {
             return MonetaryConversions.penniesToPounds(this.getCalculatedClaimFeeInPence());
         }
         return null;
