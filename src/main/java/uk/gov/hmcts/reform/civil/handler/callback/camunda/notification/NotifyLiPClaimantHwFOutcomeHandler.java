@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -36,9 +35,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private final Map<String, Callback> callBackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForHwFOutcome
     );
-    private final Map<CaseEvent, String> templateMap = ImmutableMap.of(
-        NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemission()
-    );
+    private  Map<CaseEvent, String> emailTemplates;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -76,13 +73,20 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         }
     }
 
+    private String getTemplate(CaseEvent hwfEvent) {
+        if(emailTemplates == null) {
+            emailTemplates = ImmutableMap.of(CaseEvent.NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemission());
+        }
+        return emailTemplates.get(hwfEvent);
+    }
+
     private Map<String, String> getNoRemissionProperties(CaseData caseData){
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             REASONS, getHwFNoRemissionReason(caseData),
             TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
-            HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber().toString(),
+            HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber(),
             AMOUNT, caseData.getHwFFeeAmount().toString()
         );
     }
@@ -91,7 +95,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         if (Objects.nonNull(caseData.getApplicant1Email())) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                templateMap.get(caseData.getHwFEvent()),
+                getTemplate(caseData.getHwFEvent()),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
