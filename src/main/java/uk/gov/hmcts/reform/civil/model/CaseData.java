@@ -1217,13 +1217,6 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public BigDecimal getHearingFeeAmount() {
-        return Optional.ofNullable(getHearingFee())
-            .map(Fee::getCalculatedAmountInPence)
-            .orElse(BigDecimal.ZERO);
-    }
-
-    @JsonIgnore
     public BigDecimal getCalculatedHearingFeeInPence() {
         return Optional.ofNullable(getHearingFee())
             .map(Fee::getCalculatedAmountInPence)
