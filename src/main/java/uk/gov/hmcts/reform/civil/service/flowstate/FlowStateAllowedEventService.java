@@ -1577,7 +1577,7 @@ public class FlowStateAllowedEventService {
             PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName(),
             List.of(
                 UPLOAD_TRANSLATED_DOCUMENT,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
                 MORE_INFORMATION_HWF,
                 PARTIAL_REMISSION_HWF_GRANTED
             )
