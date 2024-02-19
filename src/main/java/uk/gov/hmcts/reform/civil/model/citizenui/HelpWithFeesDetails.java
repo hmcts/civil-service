@@ -19,7 +19,7 @@ public class HelpWithFeesDetails {
     private String noRemissionDetails;
     private NoRemissionDetailsSummary noRemissionDetailsSummary;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private CaseEvent hwfCaseEvent;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal remissionAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private CaseEvent hwfCaseEvent;
 }
