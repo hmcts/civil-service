@@ -559,3 +559,28 @@ pact {
 def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
+
+task loadEnvSecrets() {
+  doLast {
+    new ByteArrayOutputStream().withStream { os ->
+      exec {
+        commandLine 'az', 'keyvault', 'secret', 'show', '--vault-name', 'civil-aat', '-o', 'tsv', '--query', 'value', '--name', 'civil-service-dot-env'
+        standardOutput = os
+      }
+      project.file('./.aat-env').write(new String(os.toString().replace('\n', '').decodeBase64(), java.nio.charset.StandardCharsets.UTF_8))
+    }
+  }
+}
+
+bootRun {
+  doFirst() {
+    if (project.file('./.aat-env').exists()) {
+      project.file('./.aat-env').readLines().each() {
+        def index = it.indexOf("=")
+        def key = it.substring(0, index)
+        def value = it.substring(index + 1)
+        environment key, value
+      }
+    }
+  }
+}
