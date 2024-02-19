@@ -36,3 +36,6 @@ smokeTest/
 infrastructure/.terraform/**
 infrastructure/.terraform.lock.hcl
 infrastructure/override.tf
+
+### aat env file ###
+.aat-env
