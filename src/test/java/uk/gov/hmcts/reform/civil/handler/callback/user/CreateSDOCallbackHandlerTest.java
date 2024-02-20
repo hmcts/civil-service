@@ -504,6 +504,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoRestrictPages")
                 .extracting("restrictNoOfPagesDetails").extracting("witnessShouldNotMoreThanTxt").asString().isEqualTo(RESTRICT_NUMBER_PAGES_TEXT1);
             assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoRestrictPages")
+                .extracting("restrictNoOfPagesDetails").extracting("noOfPages").asString().isEqualTo("12");
+            assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoRestrictPages")
                 .extracting("restrictNoOfPagesDetails").extracting("fontDetails").asString().isEqualTo(RESTRICT_NUMBER_PAGES_TEXT2);
             assertThat(response.getData()).extracting("sdoR2WitnessesOfFact").extracting("sdoWitnessDeadline").asString().isEqualTo(DEADLINE);
             assertThat(response.getData()).extracting("sdoR2WitnessesOfFact")
