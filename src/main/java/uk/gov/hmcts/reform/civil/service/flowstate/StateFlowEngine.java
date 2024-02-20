@@ -83,6 +83,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmi
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimDetailsNotificationDeadline;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pastClaimNotificationDeadline;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.claimIssueHwF;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentFailed;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.pendingClaimIssued;
@@ -269,6 +270,9 @@ public class StateFlowEngine {
                         }
                         if (claimIssueBilingual.test(c)) {
                             flags.put(FlowFlag.CLAIM_ISSUE_BILINGUAL.name(), true);
+                        }
+                        if (claimIssueHwF.test(c)) {
+                            flags.put(FlowFlag.CLAIM_ISSUE_HWF.name(), true);
                         }
                         flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                         flags.put(FlowFlag.LIP_CASE.name(), true);
