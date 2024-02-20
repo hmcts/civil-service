@@ -814,7 +814,8 @@ class FlowStateAllowedEventServiceTest {
                         BUNDLE_CREATION_NOTIFICATION,
                         ADD_UNAVAILABLE_DATES,
                         asyncStitchingComplete,
-                        TRANSFER_ONLINE_CASE
+                        TRANSFER_ONLINE_CASE,
+                        INVALID_HWF_REFERENCE
                     }
                 )
             );
