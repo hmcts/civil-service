@@ -6387,8 +6387,8 @@ public class CaseDataBuilder {
     public CaseDataBuilder atSmallSmallClaimsFlightDelayInputs() {
         atStateClaimNotified();
         this.smallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
-            .input1(" ")
-            .input2(" ")
+            .relatedClaimsInput(" ")
+            .legalDocumentsInput(" ")
             .build();
 
         return this;
