@@ -135,6 +135,9 @@ public enum DashboardClaimStatus {
     RESPONSE_BY_POST(
         Claim::isPaperResponse
     ),
+    CLAIMANT_HWF_NO_REMISSION(
+        Claim::isHwfNoRemission
+    ),
     NO_STATUS(c -> false);
 
     @Getter

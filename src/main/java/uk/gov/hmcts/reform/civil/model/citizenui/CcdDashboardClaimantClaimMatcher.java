@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -308,5 +309,10 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
             && caseData.hasApplicantRejectedRepaymentPlan());
+    }
+
+    @Override
+    public boolean isHwfNoRemission() {
+        return caseData.isHWFOutcomeSent() && caseData.getHwFEvent() == CaseEvent.NO_REMISSION_HWF;
     }
 }

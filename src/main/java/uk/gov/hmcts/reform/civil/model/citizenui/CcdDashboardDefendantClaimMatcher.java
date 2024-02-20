@@ -3,10 +3,8 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
@@ -295,6 +293,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isPaymentPlanRejected() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfNoRemission() {
         return false;
     }
 
