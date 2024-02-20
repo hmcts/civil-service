@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,31 +23,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class RecordTaskItemClickControllerTest extends BaseIntegrationTest {
 
+    private static final UUID TASK_ITEM_IDENTIFIER = UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e7");
+    private static final String END_POINT_URL = "/dashboard/taskList/{task-item-identifier}";
+
     @Autowired
     private TaskListRepository taskListRepository;
-
-    private final String ccdCaseIdentifier = "125";
-
-    private final String name = "name";
-
-    private final String roleType = "defendant";
-
-    private final String endPointUrlPut = "/dashboard/taskList/{ccd-case-identifier}/{templateName}/role/{role-type}";
 
     @Test
     @SneakyThrows
     void shouldReturnOkWithTaskItemStatusChangedWhenTaskItemClickRecorded() {
 
-        TaskListEntity taskListEntity = taskListRepository
-            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(ccdCaseIdentifier, roleType, name).get();
+        TaskListEntity taskListEntity = taskListRepository.findById(TASK_ITEM_IDENTIFIER).get();
 
         assertEquals(taskListEntity.getCurrentStatus(), 1);
         taskListEntity.setCurrentStatus(6);
 
-        doPut(BEARER_TOKEN, null, endPointUrlPut, ccdCaseIdentifier, name, roleType)
+        doPut(BEARER_TOKEN, null, END_POINT_URL, TASK_ITEM_IDENTIFIER)
             .andExpect(status().isOk())
             .andExpect(content().json(toJson(taskListEntity)));
-
     }
 
 }

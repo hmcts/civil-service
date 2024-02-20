@@ -20,12 +20,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 public class DeleteNotificationControllerTest extends BaseIntegrationTest {
 
+    private static final UUID NOTIFICATION_IDENTIFIER = UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e6");
+    private static final String END_POINT_URL = "/dashboard/notifications/{unique-notification-identifier}";
+
     @Autowired
     private DashboardNotificationsRepository dashboardNotificationsRepository;
-
-    private final UUID id = UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e6");
-
-    private final String endPointUrlDelete = "/dashboard/notifications/{unique-notification-identifier}";
 
     @Test
     @SneakyThrows
@@ -33,19 +32,19 @@ public class DeleteNotificationControllerTest extends BaseIntegrationTest {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldReturnOkWhenDeletingExistingEntity() {
 
-        assertTrue(dashboardNotificationsRepository.findById(id).isPresent());
+        assertTrue(dashboardNotificationsRepository.findById(NOTIFICATION_IDENTIFIER).isPresent());
 
-        doDelete(BEARER_TOKEN, null, endPointUrlDelete, id.toString())
+        doDelete(BEARER_TOKEN, null, END_POINT_URL, NOTIFICATION_IDENTIFIER.toString())
             .andExpect(status().isOk());
 
-        assertFalse(dashboardNotificationsRepository.findById(id).isPresent());
+        assertFalse(dashboardNotificationsRepository.findById(NOTIFICATION_IDENTIFIER).isPresent());
     }
 
     @Test
     @SneakyThrows
     void shouldReturnUnauthorisedWhenBearerTokenMissing() {
 
-        doDelete("", null, endPointUrlDelete, id.toString())
+        doDelete("", null, END_POINT_URL, NOTIFICATION_IDENTIFIER.toString())
             .andExpect(status().isUnauthorized());
     }
 
@@ -53,7 +52,7 @@ public class DeleteNotificationControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnBadRequestWhenUuidNotInCorrectFormat() {
 
-        doDelete(BEARER_TOKEN, null, endPointUrlDelete, "126")
+        doDelete(BEARER_TOKEN, null, END_POINT_URL, "126")
             .andExpect(status().isBadRequest());
 
     }

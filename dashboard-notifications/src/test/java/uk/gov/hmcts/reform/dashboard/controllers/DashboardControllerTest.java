@@ -63,10 +63,9 @@ class DashboardControllerTest {
     @Test
     public void shouldReturnTaskListForCaseReferenceAndRole() {
 
-        List<TaskList> taskList = getTaskListList();
         //given
-        when(taskListService.getTaskList(any(), any()))
-            .thenReturn(taskList);
+        List<TaskList> taskList = getTaskListList();
+        when(taskListService.getTaskList(any(), any())).thenReturn(taskList);
 
         //when
         ResponseEntity<List<TaskList>> output = dashboardController.getTaskListByCaseIdentifierAndRole(

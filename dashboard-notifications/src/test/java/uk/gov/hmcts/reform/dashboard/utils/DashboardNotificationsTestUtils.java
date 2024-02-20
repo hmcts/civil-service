@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class DashboardNotificationsTestUtils {
 
-    private static final UUID uuid = UUID.randomUUID();
+    private static final UUID TASK_ITEM_IDENTIFIER = UUID.randomUUID();
 
     private DashboardNotificationsTestUtils() {
         //utility class
@@ -22,7 +22,8 @@ public class DashboardNotificationsTestUtils {
     public static List<TaskList> getTaskListList() {
 
         List<TaskList> taskListList = new ArrayList<>();
-        taskListList.add(TaskList.builder().id(uuid).taskNameCy("HearingCY")
+        taskListList.add(TaskList.builder().id(TASK_ITEM_IDENTIFIER)
+                             .taskNameCy("HearingCY")
                              .taskNameEn("HearingEN").taskOrder(1).categoryCy("CategoryCy")
                              .categoryEn("CategoryEn")
                              .role("Defendant")
@@ -37,31 +38,22 @@ public class DashboardNotificationsTestUtils {
     public static List<TaskListEntity> getTaskListEntityList() {
 
         List<TaskListEntity> taskListEntityList = new ArrayList<>();
-        taskListEntityList.add(TaskListEntity.builder()
-                                   .id(uuid).taskNameCy("HearingCY").taskNameEn("HearingEN")
-                                   .currentStatus(1).nextStatus(6).hintTextCy("HintCy")
-                                   .hintTextEn("HintEn").reference("123")
-                                   .taskItemTemplate(TaskItemTemplateEntity.builder()
-                                                         .id(Long.valueOf(123)).taskNameCy("TaskNameCy")
-                                                         .taskNameEn("TaskNameEn")
-                                                         .taskOrder(1).hintTextCy("HintCY")
-                                                         .hintTextEn("HintEn").role("Defendant")
-                                                         .categoryCy("CategoryCy").categoryEn("CategoryEn")
-                                                         .build())
-                                   .build());
+        taskListEntityList.add(getTaskListEntity(TASK_ITEM_IDENTIFIER));
         return taskListEntityList;
     }
 
-    public static TaskListEntity getTaskListEntity() {
+    public static TaskListEntity getTaskListEntity(UUID taskItemIdentifier) {
 
         return TaskListEntity.builder()
-            .id(uuid).taskNameCy("HearingCY").taskNameEn("HearingEN")
-            .currentStatus(0).nextStatus(1).hintTextCy("HintCy")
+            .id(taskItemIdentifier).taskNameCy("HearingCY").taskNameEn("HearingEN")
+            .currentStatus(1)
+            .nextStatus(6).hintTextCy("HintCy")
             .hintTextEn("HintEn").reference("123")
             .taskItemTemplate(TaskItemTemplateEntity.builder()
                                   .id(Long.valueOf(123)).taskNameCy("TaskNameCy")
                                   .taskNameEn("TaskNameEn")
-                                  .name("hearing")
+                                  .scenarioName("Scenario.hearing")
+                                  .templateName("Hearing.view")
                                   .taskOrder(1).hintTextCy("HintCY")
                                   .hintTextEn("HintEn").role("Defendant")
                                   .categoryCy("CategoryCy").categoryEn("CategoryEn")
@@ -69,7 +61,7 @@ public class DashboardNotificationsTestUtils {
     }
 
     public static List<DashboardNotificationsEntity> getNotificationEntityList() {
-        return List.of(getNotification(uuid));
+        return List.of(getNotification(TASK_ITEM_IDENTIFIER));
     }
 
     public static DashboardNotificationsEntity getNotification(UUID notificationId) {
@@ -80,7 +72,8 @@ public class DashboardNotificationsTestUtils {
 
     public static List<Notification> getNotificationList() {
         List<Notification> notificationList = new ArrayList<>();
-        notificationList.add(Notification.builder().id(uuid).descriptionEn("desc").descriptionCy("descCy").build());
+        notificationList.add(Notification.builder().id(TASK_ITEM_IDENTIFIER).descriptionEn("desc").descriptionCy(
+            "descCy").build());
         return notificationList;
     }
 }

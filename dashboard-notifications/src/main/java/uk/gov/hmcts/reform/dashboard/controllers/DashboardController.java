@@ -66,7 +66,7 @@ public class DashboardController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
         log.info(
-            "Received ccd-case-identifier: {}, role-type : {}",
+            "Get Task Lists for ccd-case-identifier: {}, role-type : {}",
             ccdCaseIdentifier, roleType
         );
 
@@ -76,24 +76,19 @@ public class DashboardController {
     }
 
     @PutMapping(path = {
-        "taskList/{ccd-case-identifier}/{template-name}/role/{role-type}",
+        "taskList/{task-item-identifier}",
     })
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity<TaskListEntity> updateTaskListByCaseIdentifierAndIdAndRole(
-        @PathVariable("ccd-case-identifier") String ccdCaseIdentifier,
-        @PathVariable("template-name") String name,
-        @PathVariable("role-type") String roleType,
+    public ResponseEntity<TaskListEntity> updateTaskList(
+        @PathVariable("task-item-identifier") UUID taskItemIdentifier,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        log.info(
-            "Received ccd-case-identifier: {}, role-type : {}",
-            ccdCaseIdentifier, roleType
-        );
+        log.info("Update TaskList item for task item identifier {}", taskItemIdentifier);
 
-        var taskListResponse = taskListService.updateTaskList(ccdCaseIdentifier, roleType, name);
+        var taskListResponse = taskListService.updateTaskListItem(taskItemIdentifier);
 
         return new ResponseEntity<>(taskListResponse, HttpStatus.OK);
     }
@@ -109,10 +104,7 @@ public class DashboardController {
         @PathVariable("uuid") UUID uuid,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        log.info(
-            "Received UUID: {}",
-            uuid
-        );
+        log.info("Get Notification for notification identifier: {}", uuid);
 
         var notificationResponse = dashboardNotificationService.getNotification(uuid);
 
@@ -131,10 +123,7 @@ public class DashboardController {
         @PathVariable("role-type") String roleType,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        log.info(
-            "Get notifications for ccd-case-identifier: {}, role-type : {}",
-            ccdCaseIdentifier, roleType
-        );
+        log.info("Get notifications for ccd-case-identifier: {}, role-type : {}", ccdCaseIdentifier, roleType);
 
         var notificationsResponse = dashboardNotificationService.getNotifications(ccdCaseIdentifier, roleType);
 

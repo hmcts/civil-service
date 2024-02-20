@@ -25,15 +25,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 public class GetTaskListControllerTest extends BaseIntegrationTest {
 
-    private final String getTaskListUrl = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
-
-    private final String endPointUrlGet = "/dashboard/notifications/{uuid}";
+    private static final String GET_TASK_LIST_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
+    private final String END_POINT_URL = "/dashboard/notifications/{uuid}";
 
     @Test
     @SneakyThrows
     void shouldReturnErrorWhenNotUuidFormat() {
 
-        doGet(BEARER_TOKEN, endPointUrlGet, "1234")
+        doGet(BEARER_TOKEN, END_POINT_URL, "1234")
             .andExpect(status().isBadRequest());
     }
 
@@ -43,7 +42,7 @@ public class GetTaskListControllerTest extends BaseIntegrationTest {
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
     void shouldReturnTaskListForGiveCaseReferenceAndRole() {
 
-        doGet(BEARER_TOKEN, getTaskListUrl, "124", "defendant")
+        doGet(BEARER_TOKEN, GET_TASK_LIST_URL, "124", "defendant")
             .andExpect(status().isOk())
             .andExpect(content().json(toJson(getTaskLists())));
     }
