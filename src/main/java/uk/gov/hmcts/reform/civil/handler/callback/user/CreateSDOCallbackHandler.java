@@ -717,10 +717,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.disposalHearingAddNewDirections(null);
             updatedData.smallClaimsAddNewDirections(null);
             updatedData.fastTrackAddNewDirections(null);
-            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
-            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
+            updatedData.sdoHearingNotes(null);
+            updatedData.fastTrackHearingNotes(null);
             updatedData.disposalHearingHearingNotes(null);
-            // Add NIHL variables
         }
 
         if (featureToggleService.isSdoR2Enabled()) {
@@ -765,6 +764,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                                  .restrictNoOfPagesDetails(
                                                                      SdoR2RestrictNoOfPagesDetails.builder()
                                                                          .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
+                                                                         .noOfPages(12)
                                                                          .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
                                                                          .build()).build())
                                            .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
@@ -1294,10 +1294,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (DISPOSAL.equals(caseData.getOrderType())) {
             toUseList = ofNullable(caseData.getDisposalHearingMethodInPerson());
         } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
-            && caseData.getIsSdoR2NewScreen().equals(NO)) {
+            && !isSDOR2Screen(caseData)) {
             toUseList = ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
-            && caseData.getIsSdoR2NewScreen().equals(YES)) {
+            && isSDOR2Screen(caseData)) {
             toUseList = caseData.getSdoR2Trial().getHearingCourtLocationList() != null
                 ? ofNullable(caseData.getSdoR2Trial().getHearingCourtLocationList())
                 : ofNullable(caseData.getSdoR2Trial().getAltHearingCourtLocationList());
