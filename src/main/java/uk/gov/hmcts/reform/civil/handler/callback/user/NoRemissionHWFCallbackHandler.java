@@ -9,6 +9,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +19,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_HWF_OUTCOME;
 
 @Service
 @RequiredArgsConstructor
@@ -40,8 +44,21 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse noRemissionHWF(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
+            .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
+
+        if (caseData.isHWFTypeHearing()) {
+            HelpWithFeesDetails hearingFeeDetails = caseData.getHearingHwfDetails();
+            updatedData.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(NO_REMISSION_HWF).build());
+        }
+        if (caseData.isHWFTypeClaimIssued()) {
+            HelpWithFeesDetails claimIssuedHwfDetails = caseData.getClaimIssuedHwfDetails();
+            updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(NO_REMISSION_HWF).build());
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(callbackParams.getCaseData().toMap(objectMapper))
+            .data(updatedData.build().toMap(objectMapper))
             .build();
     }
 }

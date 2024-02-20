@@ -28,6 +28,7 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
     void setUp() {
         handler = new NoRemissionHWFCallbackHandler(new ObjectMapper());
         objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
     }
 
     @Test
@@ -39,7 +40,9 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
     class AboutToSubmitCallback {
         @Test
         void shouldUpdateNoRemissionDataForClaimFee() {
-            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder().noRemissionDetails("no remission")
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(NO_REMISSION_HWF)
+                .noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
             CaseData caseData = CaseData.builder()
                 .claimIssuedHwfDetails(hwfeeDetails)
@@ -56,7 +59,9 @@ public class NoRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldUpdateNoRemissionDataForHearingFee() {
-            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder().noRemissionDetails("no remission")
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(NO_REMISSION_HWF)
+                .noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
             CaseData caseData = CaseData.builder()
                 .hearingHwfDetails(hwfeeDetails)
