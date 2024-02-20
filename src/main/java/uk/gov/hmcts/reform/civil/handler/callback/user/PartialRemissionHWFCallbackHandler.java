@@ -57,7 +57,7 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
         var claimIssuedRemissionAmount = caseData.getClaimIssueRemissionAmount();
         var hearingRemissionAmount = caseData.getHearingRemissionAmount();
         var claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
-        var hearingFeeAmount = caseData.getHearingFeeAmount();
+        var hearingFeeAmount = caseData.getCalculatedHearingFeeInPence();
         var feeType = caseData.getHwfFeeType();
         var errors = new ArrayList<String>();
 
