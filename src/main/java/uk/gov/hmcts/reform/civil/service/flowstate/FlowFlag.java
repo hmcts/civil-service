@@ -16,5 +16,6 @@ public enum FlowFlag {
     CLAIM_ISSUE_BILINGUAL,
     LR_V_LIP_ENABLED,
     LIP_CASE,
+    CLAIM_ISSUE_HWF,
     LIP_JUDGMENT_ADMISSION;
 }
