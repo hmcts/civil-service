@@ -152,10 +152,7 @@ public class DashboardController {
         @PathVariable("unique-notification-identifier") UUID id,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        log.info(
-            "Received UUID for deletion: {}",
-            id
-        );
+        log.info("Received UUID for recording click: {}", id);
         dashboardNotificationService.recordClick(id, authorisation);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -171,10 +168,7 @@ public class DashboardController {
         @PathVariable("unique-notification-identifier") UUID id,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
-        log.info(
-            "Received UUID for deletion: {}",
-            id
-        );
+        log.info("Received UUID for deleting notification: {}", id);
         dashboardNotificationService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
