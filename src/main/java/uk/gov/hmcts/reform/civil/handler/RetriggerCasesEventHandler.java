@@ -30,9 +30,7 @@ public class RetriggerCasesEventHandler implements BaseExternalTaskHandler {
                 coreCaseDataService.triggerEvent(Long.parseLong(caseId), caseEvent);
                 log.info("Retrigger CaseId: {} finished", caseId);
             } catch (Exception e) {
-                log.error("ERROR Retrigger CaseId: {}", caseId);
-                log.error(String.format("Updating case data failed: %s", e.getMessage()));
-                throw e;
+                log.error("ERROR Retrigger CaseId: {} {}", caseId, e.getMessage(), e);
             }
         }
     }
