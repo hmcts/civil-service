@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface TaskItemTemplateRepository extends CrudRepository<TaskItemTemplateEntity, Long> {
 
-    List<TaskItemTemplateEntity> findByName(String name);
+    List<TaskItemTemplateEntity> findByScenarioName(String name);
 
-    List<TaskItemTemplateEntity> findByNameAndRole(String name, String role);
+    List<TaskItemTemplateEntity> findByScenarioNameAndRole(String name, String role);
 }

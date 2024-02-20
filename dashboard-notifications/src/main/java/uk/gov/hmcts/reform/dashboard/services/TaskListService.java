@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
+import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,11 +37,14 @@ public class TaskListService {
     }
 
     public TaskListEntity saveOrUpdate(TaskListEntity taskList) {
+
+        TaskItemTemplateEntity taskItemTemplate = taskList.getTaskItemTemplate();
         Optional<TaskListEntity> existingEntity = taskListRepository
-            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
+            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateNameAndTaskItemTemplateScenarioName(
                 taskList.getReference(),
-                taskList.getTaskItemTemplate().getRole(),
-                taskList.getTaskItemTemplate().getName()
+                taskItemTemplate.getRole(),
+                taskItemTemplate.getTemplateName(),
+                taskItemTemplate.getScenarioName()
             );
 
         TaskListEntity beingUpdated = taskList;
@@ -50,17 +55,13 @@ public class TaskListService {
         return taskListRepository.save(beingUpdated);
     }
 
-    public TaskListEntity updateTaskList(String reference, String role, String name) {
+    public TaskListEntity updateTaskListItem(UUID taskItemIdentifier) {
 
-        Optional<TaskListEntity> existingEntity = taskListRepository
-            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
-                reference, role, name);
+        Optional<TaskListEntity> existingEntity = taskListRepository.findById(taskItemIdentifier);
 
-        existingEntity.ifPresent(taskListEntity -> {
-            taskListEntity.setCurrentStatus(taskListEntity.getNextStatus());
-            taskListRepository.save(taskListEntity);
-        });
-
-        return existingEntity.isPresent() ? existingEntity.get() : new TaskListEntity();
+        return existingEntity.map(taskListEntity -> {
+            TaskListEntity updated = taskListEntity.toBuilder().currentStatus(taskListEntity.getNextStatus()).build();
+            return taskListRepository.save(updated);
+        }).orElseThrow(() -> new IllegalArgumentException("Invalid task item identifier " + taskItemIdentifier));
     }
 }

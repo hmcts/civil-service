@@ -85,10 +85,11 @@ class DashboardScenariosServiceTest {
                                         .id(1L)
                                         .build()));
 
-        when(taskItemTemplateRepository.findByName(SCENARIO_ISSUE_CLAIM_START))
+        when(taskItemTemplateRepository.findByScenarioName(SCENARIO_ISSUE_CLAIM_START))
             .thenReturn(List.of(TaskItemTemplateEntity.builder()
                                     .taskStatusSequence(new int[]{1, 2})
-                                    .name(SCENARIO_ISSUE_CLAIM_START)
+                                    .scenarioName(SCENARIO_ISSUE_CLAIM_START)
+                                    .templateName("Hearing.View")
                                     .categoryEn("Hearing")
                                     .categoryCy("Hearing")
                                     .hintTextEn("Must use ${url} to make payment for status ${status}")
@@ -124,7 +125,7 @@ class DashboardScenariosServiceTest {
 
         verify(scenarioRepository).findByName(SCENARIO_ISSUE_CLAIM_START);
         verify(notificationTemplateRepository).findByName(NOTIFICATION_ISSUE_CLAIM_START);
-        verify(taskItemTemplateRepository).findByName(SCENARIO_ISSUE_CLAIM_START);
+        verify(taskItemTemplateRepository).findByScenarioName(SCENARIO_ISSUE_CLAIM_START);
         verify(notificationTemplateRepository).findByName(NOTIFICATION_DRAFT_CLAIM_START);
         verify(dashboardNotificationService).saveOrUpdate(any(DashboardNotificationsEntity.class));
         verify(taskListService).saveOrUpdate(any(TaskListEntity.class));

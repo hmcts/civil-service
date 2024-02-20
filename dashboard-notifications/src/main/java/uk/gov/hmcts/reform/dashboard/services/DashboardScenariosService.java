@@ -115,7 +115,8 @@ public class DashboardScenariosService {
 
         StringSubstitutor stringSubstitutor = new StringSubstitutor(scenarioRequestParams.getParams());
 
-        List<TaskItemTemplateEntity> taskItemTemplate = taskItemTemplateRepository.findByName(scenarioReference);
+        List<TaskItemTemplateEntity> taskItemTemplate = taskItemTemplateRepository
+            .findByScenarioName(scenarioReference);
 
         // TaskItemTemplates will have templateName, citizenRole and taskStatusSequence (Minimum two values,
         // if not different, just same value)

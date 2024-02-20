@@ -8,18 +8,20 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
+import uk.gov.hmcts.reform.idam.client.IdamApi;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getNotification;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getNotificationEntityList;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getNotificationList;
@@ -29,6 +31,11 @@ public class DashboardNotificationServiceTest {
 
     @Mock
     private DashboardNotificationsRepository dashboardNotificationsRepository;
+    @Mock
+    private NotificationActionRepository notificationActionRepository;
+
+    @Mock
+    private IdamApi idamApi;
 
     @InjectMocks
     private DashboardNotificationService dashboardNotificationService;
@@ -90,6 +97,38 @@ public class DashboardNotificationServiceTest {
 
             //then
             verify(dashboardNotificationsRepository).deleteById(id);
+        }
+    }
+
+    @Nested
+    class RecordClickOnNotification {
+
+        @Test
+        void shouldReturnOkWhenRecordingNotificationClick() {
+            String authToken = "Auth-token";
+            when(idamApi.retrieveUserDetails(authToken))
+                .thenReturn(UserDetails.builder().forename("Claimant").surname("user").build());
+
+            DashboardNotificationsEntity notification = getNotification(id);
+            when(dashboardNotificationsRepository.findById(id)).thenReturn(Optional.of(notification));
+
+            NotificationActionEntity notificationAction = NotificationActionEntity.builder()
+                .reference(notification.getReference())
+                .dashboardNotificationsId(notification.getId())
+                .actionPerformed("Click")
+                .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
+                .build();
+
+            when(notificationActionRepository.save(notificationAction)).thenReturn(notificationAction);
+
+            //when
+            dashboardNotificationService.recordClick(id, authToken);
+
+            //then
+            DashboardNotificationsEntity updated = notification.toBuilder()
+                .notificationAction(notificationAction).build();
+
+            verify(dashboardNotificationsRepository).save(updated);
         }
     }
 }

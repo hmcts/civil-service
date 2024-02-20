@@ -6,8 +6,8 @@ CREATE SEQUENCE IF NOT EXISTS dbs.notification_action_id_seq
   CACHE 1;
 
 CREATE TABLE IF NOT EXISTS dbs.notification_action (
-  id BIGINT NOT NULL PRIMARY KEY DEFAULT nextval('dbs.notification_action_id_seq'),
-  dashboard_notifications_id UUID NOT NULL,
+  id BIGINT NOT NULL PRIMARY KEY,
+  dashboard_notifications_id UUID,
   reference character varying(256),
   action_performed character varying(256),
   created_by character varying(256),

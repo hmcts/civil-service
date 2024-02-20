@@ -63,10 +63,9 @@ class DashboardControllerTest {
     @Test
     public void shouldReturnTaskListForCaseReferenceAndRole() {
 
-        List<TaskList> taskList = getTaskListList();
         //given
-        when(taskListService.getTaskList(any(), any()))
-            .thenReturn(taskList);
+        List<TaskList> taskList = getTaskListList();
+        when(taskListService.getTaskList(any(), any())).thenReturn(taskList);
 
         //when
         ResponseEntity<List<TaskList>> output = dashboardController.getTaskListByCaseIdentifierAndRole(
@@ -153,7 +152,7 @@ class DashboardControllerTest {
     public void shouldReturnOkWhenNotificationDeleted() {
 
         //when
-        final ResponseEntity responseEntity = dashboardController.recordClick(ID, AUTHORISATION);
+        final ResponseEntity responseEntity = dashboardController.deleteNotification(ID, AUTHORISATION);
 
         //then
         assertEquals(responseEntity.getStatusCode(), OK);
@@ -167,6 +166,6 @@ class DashboardControllerTest {
         doThrow(new RuntimeException()).when(dashboardNotificationService).deleteById(ID);
 
         //then
-        assertThrows(RuntimeException.class, () -> dashboardController.recordClick(ID, AUTHORISATION));
+        assertThrows(RuntimeException.class, () -> dashboardController.deleteNotification(ID, AUTHORISATION));
     }
 }

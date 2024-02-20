@@ -50,8 +50,12 @@ public class TaskItemTemplateEntity implements Serializable {
     private String categoryCy;
 
     @Size(max = 256)
-    @Schema(name = "name")
-    private String name;
+    @Schema(name = "scenario_name")
+    private String scenarioName;
+
+    @Size(max = 256)
+    @Schema(name = "template_name")
+    private String templateName;
 
     @Size(max = 256)
     @Schema(name = "role")
