@@ -55,6 +55,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_APPLI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EVIDENCE_UPLOAD_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EXTEND_RESPONSE_DEADLINE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DIRECTIONS_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_PAID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_FEE_UNPAID;
@@ -1380,7 +1381,8 @@ public class FlowStateAllowedEventService {
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
                 PARTIAL_REMISSION_HWF_GRANTED,
-                UPDATE_HELP_WITH_FEE_NUMBER
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                FULL_REMISSION_HWF
             )
         ),
         entry(
@@ -1578,7 +1580,8 @@ public class FlowStateAllowedEventService {
                 UPLOAD_TRANSLATED_DOCUMENT,
                 MORE_INFORMATION_HWF,
                 PARTIAL_REMISSION_HWF_GRANTED,
-                UPDATE_HELP_WITH_FEE_NUMBER
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                FULL_REMISSION_HWF
             )
         ),
         entry(

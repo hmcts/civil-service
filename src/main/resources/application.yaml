@@ -363,6 +363,9 @@ notifications:
 
   notifyApplicantForHwfNoRemission: "3008a18a-07ec-445b-a226-62ffa19132ce"
   notifyApplicantForHwFMoreInformationNeeded: "02956398-fffb-4461-93a0-3713788363a8"
+  notifyApplicantForHwfUpdateRefNumber: "7f87e629-6473-4732-8d80-4174d06696d5"
+  notifyApplicantForHwfPartialRemission: "2c5c5cae-f1b1-41b5-afe5-0ce2e68f8d3c"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
