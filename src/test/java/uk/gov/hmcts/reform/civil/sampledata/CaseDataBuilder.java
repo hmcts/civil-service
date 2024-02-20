@@ -4702,6 +4702,7 @@ public class CaseDataBuilder {
         ccdState = HEARING_READINESS;
         return this;
     }
+
     public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawn() {
 
         atStateApplicantRespondToDefenceAndProceed();
