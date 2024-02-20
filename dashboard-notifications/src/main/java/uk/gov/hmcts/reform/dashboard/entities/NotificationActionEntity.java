@@ -2,15 +2,17 @@ package uk.gov.hmcts.reform.dashboard.entities;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true)
@@ -21,16 +23,18 @@ import java.time.OffsetDateTime;
 public class NotificationActionEntity implements Serializable {
 
     private static final long serialVersionUID = 4840394520858984702L;
+    private static final String NOTIFICATION_ACTION_ID_SEQ = "dbs.notification_action_id_seq";
 
     @Id
     @NotNull
     @Schema(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = NOTIFICATION_ACTION_ID_SEQ)
+    @SequenceGenerator(name = NOTIFICATION_ACTION_ID_SEQ, sequenceName = NOTIFICATION_ACTION_ID_SEQ, allocationSize = 1)
+    @Column(name = "id", updatable = false, nullable = false, insertable = false)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn
     @Schema(name = "dashboard_notifications_id")
-    private DashboardNotificationsEntity dashboardNotifications;
+    private UUID dashboardNotificationsId;
 
     @Schema(name = "reference")
     private String reference;

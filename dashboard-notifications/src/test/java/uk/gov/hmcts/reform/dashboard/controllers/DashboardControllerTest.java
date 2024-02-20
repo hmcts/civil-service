@@ -153,7 +153,7 @@ class DashboardControllerTest {
     public void shouldReturnOkWhenNotificationDeleted() {
 
         //when
-        final ResponseEntity responseEntity = dashboardController.recordClick(ID, AUTHORISATION);
+        final ResponseEntity responseEntity = dashboardController.deleteNotification(ID, AUTHORISATION);
 
         //then
         assertEquals(responseEntity.getStatusCode(), OK);
@@ -167,6 +167,6 @@ class DashboardControllerTest {
         doThrow(new RuntimeException()).when(dashboardNotificationService).deleteById(ID);
 
         //then
-        assertThrows(RuntimeException.class, () -> dashboardController.recordClick(ID, AUTHORISATION));
+        assertThrows(RuntimeException.class, () -> dashboardController.deleteNotification(ID, AUTHORISATION));
     }
 }

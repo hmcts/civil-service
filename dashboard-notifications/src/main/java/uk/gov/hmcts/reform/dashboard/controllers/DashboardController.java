@@ -141,6 +141,25 @@ public class DashboardController {
         return new ResponseEntity<>(notificationsResponse, HttpStatus.OK);
     }
 
+    @PutMapping(path = {
+        "notifications/{unique-notification-identifier}"
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "401", description = "Not Authorized"),
+        @ApiResponse(responseCode = "400", description = "Bad Request")})
+    public ResponseEntity<Void> recordClick(
+        @PathVariable("unique-notification-identifier") UUID id,
+        @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
+    ) {
+        log.info(
+            "Received UUID for deletion: {}",
+            id
+        );
+        dashboardNotificationService.recordClick(id, authorisation);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @DeleteMapping(path = {
         "notifications/{unique-notification-identifier}"
     })
@@ -148,7 +167,7 @@ public class DashboardController {
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "401", description = "Not Authorized"),
         @ApiResponse(responseCode = "400", description = "Bad Request")})
-    public ResponseEntity recordClick(
+    public ResponseEntity<Void> deleteNotification(
         @PathVariable("unique-notification-identifier") UUID id,
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     ) {
@@ -157,7 +176,7 @@ public class DashboardController {
             id
         );
         dashboardNotificationService.deleteById(id);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping(path = "/scenarios/{scenario_ref}/{unique_case_identifier}")

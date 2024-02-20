@@ -73,7 +73,9 @@ public class DashboardNotificationsTestUtils {
     }
 
     public static DashboardNotificationsEntity getNotification(UUID notificationId) {
-        return DashboardNotificationsEntity.builder().id(notificationId).descriptionEn("desc").descriptionCy("descCy").build();
+        return DashboardNotificationsEntity.builder().id(notificationId)
+            .reference("ccd-case-reference")
+            .descriptionEn("desc").descriptionCy("descCy").build();
     }
 
     public static List<Notification> getNotificationList() {

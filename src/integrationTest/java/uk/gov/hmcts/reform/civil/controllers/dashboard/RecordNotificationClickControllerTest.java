@@ -8,44 +8,51 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
 
+    public static final String CCD_CASE_ID = "130";
+    public static final String ACTION_PAERFORMED = "Click";
+    private static final UUID NOTIFICATION_ID = UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b945");
+    private static final String NOTIFICATION_CLICK_END_POINT
+        = "/dashboard/notifications/{unique-notification-identifier}";
+
     @Autowired
     private DashboardNotificationsRepository dashboardNotificationsRepository;
 
-    private final UUID id = UUID.fromString("8c2712da-47ce-4050-bbee-650134a7b9e6");
-
-    private final String endPointUrlDelete = "/dashboard/notifications/{unique-notification-identifier}";
-
     @Test
     @SneakyThrows
-    @Sql("/scripts/dashboardNotifications/record_notifications_click.sql")
+    @Sql("/scripts/dashboardNotifications/record_notification_click.sql")
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.AFTER_METHOD)
-    void shouldReturnOkWhenDeletingExistingEntity() {
-
-        assertTrue(dashboardNotificationsRepository.findById(id).isPresent());
-
-        doDelete(BEARER_TOKEN, null, endPointUrlDelete, id.toString())
+    void shouldRecordNotificationClick() {
+        doPut(BEARER_TOKEN, null, NOTIFICATION_CLICK_END_POINT, NOTIFICATION_ID.toString())
             .andExpect(status().isOk());
 
-        assertFalse(dashboardNotificationsRepository.findById(id).isPresent());
+        Optional<DashboardNotificationsEntity> notification = dashboardNotificationsRepository.findById(NOTIFICATION_ID);
+        assertThat(notification).isPresent();
+        DashboardNotificationsEntity dashboardNotificationsEntity = notification.get();
+        NotificationActionEntity notificationAction = dashboardNotificationsEntity.getNotificationAction();
+        assertThat(notificationAction.getDashboardNotificationsId()).isEqualTo(dashboardNotificationsEntity.getId());
+        assertThat(notificationAction.getActionPerformed()).isEqualTo(ACTION_PAERFORMED);
+        assertThat(notificationAction.getReference()).isEqualTo(CCD_CASE_ID);
     }
 
     @Test
     @SneakyThrows
     void shouldReturnUnauthorisedWhenBearerTokenMissing() {
 
-        doDelete("", null, endPointUrlDelete, id.toString())
+        doDelete("", null, NOTIFICATION_CLICK_END_POINT, NOTIFICATION_ID.toString())
             .andExpect(status().isUnauthorized());
     }
 
@@ -53,7 +60,7 @@ public class RecordNotificationClickControllerTest extends BaseIntegrationTest {
     @SneakyThrows
     void shouldReturnBadRequestWhenUuidNotInCorrectFormat() {
 
-        doDelete(BEARER_TOKEN, null, endPointUrlDelete, "126")
+        doDelete(BEARER_TOKEN, null, NOTIFICATION_CLICK_END_POINT, "126")
             .andExpect(status().isBadRequest());
 
     }

@@ -27,6 +27,8 @@ import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.idam.client.IdamApi;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.Instant;
@@ -76,6 +78,8 @@ public abstract class BaseIntegrationTest {
     protected JwtDecoder jwtDecoder;
     @MockBean
     public AuthorisationService authorisationService;
+    @MockBean
+    public IdamApi idamApi;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -93,6 +97,8 @@ public abstract class BaseIntegrationTest {
         setSecurityAuthorities(authentication);
         when(serviceAuthorisationApi.getServiceName(any())).thenReturn("payment_app");
         when(jwtDecoder.decode(anyString())).thenReturn(getJwt());
+        when(idamApi.retrieveUserDetails(anyString()))
+            .thenReturn(UserDetails.builder().forename("Claimant").surname("test").build());
     }
 
     protected void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {
