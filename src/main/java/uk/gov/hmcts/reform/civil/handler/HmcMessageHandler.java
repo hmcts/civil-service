@@ -35,12 +35,15 @@ public class HmcMessageHandler {
         if (isMessageRelevantForService(hmcMessage)) {
             if (NEXT_HEARING_DETAILS_UPDATE_STATUSES.contains(hmcMessage.getHearingUpdate().getHmcStatus())) {
                 triggerCaseEvent(UPDATE_NEXT_HEARING_DETAILS, hmcMessage.getCaseId(), hmcMessage.getHearingId());
+                return;
             }
             if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
                 triggerCaseEvent(REVIEW_HEARING_EXCEPTION, hmcMessage.getCaseId(), hmcMessage.getHearingId());
+                return;
             }
+            log.info("HMC message status {} is not supported by handler.", hmcMessage.getHearingUpdate().getHmcStatus());
         } else {
-            log.info("Message not relevant for service - Service code: {}", hmcMessage.getHmctsServiceCode());
+            log.info("HMC message not relevant for service - Service code: {}", hmcMessage.getHmctsServiceCode());
         }
     }
 
