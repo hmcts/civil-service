@@ -1267,7 +1267,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
-    public boolean isHWFOutcomeSent() {
+    public boolean isHWFOutcomeReady() {
         return (this.getCcdState() == CaseState.PENDING_CASE_ISSUED && this.isHWFTypeClaimIssued())
             || (this.getCcdState() == CaseState.HEARING_READINESS && this.isHWFTypeHearing());
     }
