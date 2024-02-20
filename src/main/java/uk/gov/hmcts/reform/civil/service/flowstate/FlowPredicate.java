@@ -208,6 +208,9 @@ public class FlowPredicate {
     public static final Predicate<CaseData> notificationAcknowledged = caseData ->
         getPredicateForNotificationAcknowledged(caseData);
 
+    public static final Predicate<CaseData> claimIssueHwF = caseData ->
+            caseData.isHelpWithFees();
+
     private static boolean getPredicateForNotificationAcknowledged(CaseData caseData) {
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_TWO_LEGAL_REP:
