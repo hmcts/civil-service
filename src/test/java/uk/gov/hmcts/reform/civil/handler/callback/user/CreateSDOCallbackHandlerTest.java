@@ -1212,6 +1212,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
 
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1606,6 +1608,20 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "\n\nA witness whose statement has been uploaded in accordance with the above must"
                                + " attend the hearing. If they do not attend, it will be for the court to decide how"
                                + " much reliance, if any, to place on their evidence.");
+
+            assertThat(response.getData()).extracting("smallClaimsFlightDelay").extracting("relatedClaimsInput")
+                .isEqualTo("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
+                               + "claims relating to the same flight they must notify the court  \n"
+                               + "where the claim is being managed within 14 days of receipt of \n"
+                               + "this Order  providing all relevant details of those claims including \n"
+                               + "case number(s), hearing date(s) and copy final substantive order(s) \n"
+                               + "if any, to assist the Court with ongoing case management which may \n"
+                               + "include the cases being heard together.");
+            assertThat(response.getData()).extracting("smallClaimsFlightDelay").extracting("legalDocumentsInput")
+                .isEqualTo("Any arguments as to the law to be applied to this claim, together with \n"
+                               + "copies of legal authorities or precedents relied on, shall be uploaded \n"
+                               + "to the Digital Portal not later than 3 full working days before the \n"
+                               + "final hearing date.");
 
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input1")
                 .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "

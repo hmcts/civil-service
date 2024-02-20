@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class SmallClaimsFlightDelay {
 
-    private String input1;
-    private String input2;
+    private String relatedClaimsInput;
+    private String legalDocumentsInput;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsFlightDelayToggle;
 }

@@ -559,12 +559,15 @@ public class SdoHelperTest {
                 .smallClaimsMethodToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .smallClaimsDocumentsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .smallClaimsWitnessStatementToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
+                .smallClaimsFlightDelayToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")).isTrue();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsMethodToggle")).isTrue();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")).isTrue();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
+                .isTrue();
+            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
                 .isTrue();
         }
 

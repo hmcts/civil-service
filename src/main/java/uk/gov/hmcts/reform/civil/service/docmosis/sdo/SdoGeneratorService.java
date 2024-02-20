@@ -343,7 +343,6 @@ public class SdoGeneratorService {
             )
             .smallClaimsDocuments(caseData.getSmallClaimsDocuments())
             .smallClaimsWitnessStatement(caseData.getSmallClaimsWitnessStatement())
-            .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
             .smallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
             .smallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
             .hasNewDirections(
@@ -361,9 +360,6 @@ public class SdoGeneratorService {
             )
             .smallClaimsWitnessStatementToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle")
-            )
-            .smallClaimsFlightDelayToggle(
-                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle")
             )
             .smallClaimsNumberOfWitnessesToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsNumberOfWitnessesToggle")
