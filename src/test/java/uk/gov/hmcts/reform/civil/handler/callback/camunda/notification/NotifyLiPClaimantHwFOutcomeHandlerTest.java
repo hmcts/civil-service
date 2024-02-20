@@ -32,6 +32,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
@@ -57,7 +58,8 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
     @Nested
     class AboutToSubmitCallback {
 
-        private static final String EMAIL_TEMPLATE_HWF = "test-hwf-noremission-id";
+        private static final String EMAIL_TEMPLATE_NO_REMISSION = "test-hwf-noremission-id";
+        private static final String EMAIL_TEMPLATE_UPDATE_REF_NUMBER = "test-hwf-updaterefnumber-id";
         private static final String EMAIL = "test@email.com";
         private static final String REFERENCE_NUMBER = "hwf-outcome-notification-000DC001";
         private static final String CLAIMANT = "Mr. John Rambo";
@@ -69,7 +71,9 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         @BeforeEach
         void setup() {
             when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
-                EMAIL_TEMPLATE_HWF);
+                EMAIL_TEMPLATE_NO_REMISSION);
+            when(notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber()).thenReturn(
+                EMAIL_TEMPLATE_UPDATE_REF_NUMBER);
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
@@ -101,7 +105,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             // Then
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
-                EMAIL_TEMPLATE_HWF,
+                EMAIL_TEMPLATE_NO_REMISSION,
                 getNotificationDataMapNoRemissionClaimIssued(),
                 REFERENCE_NUMBER
             );
@@ -135,8 +139,72 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             // Then
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
-                EMAIL_TEMPLATE_HWF,
+                EMAIL_TEMPLATE_NO_REMISSION,
                 getNotificationDataMapNoRemissionHearing(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicant_HwfOutcome_RefNumberUpdated_ClaimIssued() {
+            // Given
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
+                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
+                                .partyEmail(EMAIL)
+                                .build())
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber(HWF_REFERENCE).build()).build())
+                .claimIssuedHwfDetails(hwfeeDetails)
+                .hwfFeeType(FeeType.CLAIMISSUED)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                EMAIL,
+                EMAIL_TEMPLATE_UPDATE_REF_NUMBER,
+                getNotificationDataMapUpdateRefNumberClaimIssued(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicant_HwfOutcome_RefNumberUpdated_Hearing() {
+            // Given
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER)
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
+                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
+                                .partyEmail(EMAIL)
+                                .build())
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .hearingHelpFeesReferenceNumber(HWF_REFERENCE)
+                .hearingHwfDetails(hwfeeDetails)
+                .hwfFeeType(FeeType.HEARING)
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                EMAIL,
+                EMAIL_TEMPLATE_UPDATE_REF_NUMBER,
+                getNotificationDataMapUpdateRefNumberHearing(),
                 REFERENCE_NUMBER
             );
         }
@@ -163,5 +231,22 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             );
         }
 
+        private Map<String, String> getNotificationDataMapUpdateRefNumberClaimIssued() {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                CLAIMANT_NAME, CLAIMANT,
+                TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
+                HWF_REFERENCE_NUMBER, HWF_REFERENCE
+            );
+        }
+
+        private Map<String, String> getNotificationDataMapUpdateRefNumberHearing() {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                CLAIMANT_NAME, CLAIMANT,
+                TYPE_OF_FEE, FeeType.HEARING.getLabel(),
+                HWF_REFERENCE_NUMBER, HWF_REFERENCE
+            );
+        }
     }
 }

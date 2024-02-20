@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -65,9 +68,19 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+        Map<String, String> commonProperties = getCommonProperties(caseData);
+        Map<String, String> furtherProperties = getFurtherProperties(caseData);
+        return Collections.unmodifiableMap(
+            Stream.concat(commonProperties.entrySet().stream(), furtherProperties.entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+    }
+
+    private Map<String, String> getFurtherProperties(CaseData caseData) {
         switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF:
                 return getNoRemissionProperties(caseData);
+            case UPDATE_HELP_WITH_FEE_NUMBER:
+                return Collections.emptyMap();
             default:
                 return null;
         }
@@ -77,7 +90,9 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         if (emailTemplates == null) {
             emailTemplates = ImmutableMap.of(
                 CaseEvent.NO_REMISSION_HWF,
-                notificationsProperties.getNotifyApplicantForHwfNoRemission()
+                notificationsProperties.getNotifyApplicantForHwfNoRemission(),
+                CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
+                notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber()
             );
         }
         return emailTemplates.get(hwfEvent);
@@ -85,14 +100,24 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     private Map<String, String> getNoRemissionProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             REASONS, getHwFNoRemissionReason(caseData),
-            TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
-            HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber(),
             AMOUNT, caseData.getHwFFeeAmount().toString()
         );
     }
+
+    private Map<String, String> getUpdateHelpWithFeeNumberProperties(CaseData caseData) {
+        return Map.of();
+    }
+
+    private Map<String, String> getCommonProperties(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
+            HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber()
+        );
+    }
+
 
     private void sendEmail(CaseData caseData) {
         if (Objects.nonNull(caseData.getApplicant1Email())) {

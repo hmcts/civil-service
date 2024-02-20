@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_HWF_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +32,7 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
         handler = new UpdateHelpWithFeeRefNumberHandler(objectMapper);
     }
 
@@ -58,6 +60,8 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             CaseData data = getCaseData(response);
             Assertions.assertThat(data.getCaseDataLiP().getHelpWithFees().getHelpWithFeesReferenceNumber()).isEqualTo("7890");
             Assertions.assertThat(data.getClaimIssuedHwfDetails().getHwfReferenceNumber()).isNull();
+            Assertions.assertThat(data.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
+            Assertions.assertThat(data.getClaimIssuedHwfDetails().getHwfCaseEvent()).isEqualTo(UPDATE_HELP_WITH_FEE_NUMBER);
         }
 
         @Test
@@ -77,6 +81,8 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             CaseData data = getCaseData(response);
             Assertions.assertThat(data.getHearingHelpFeesReferenceNumber()).isEqualTo("78905185430");
             Assertions.assertThat(data.getHearingHwfDetails().getHwfReferenceNumber()).isNull();
+            Assertions.assertThat(data.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
+            Assertions.assertThat(data.getHearingHwfDetails().getHwfCaseEvent()).isEqualTo(UPDATE_HELP_WITH_FEE_NUMBER);
         }
     }
 
