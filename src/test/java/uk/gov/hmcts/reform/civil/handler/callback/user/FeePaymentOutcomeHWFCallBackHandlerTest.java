@@ -100,7 +100,7 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
         }
 
         @Test
-        void shouldValidateRemissionType() {
+        void shouldValidateRemissionTypeForHearingFee() {
             CaseData caseData = CaseData.builder()
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
                                               .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
@@ -109,6 +109,25 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
                 .hearingHwfDetails(HelpWithFeesDetails.builder()
                                          .outstandingFeeInPounds(BigDecimal.valueOf(100.00))
                                          .build())
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-type");
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).containsExactly(WRONG_REMISSION_TYPE_SELECTED);
+        }
+
+        @Test
+        void shouldValidateRemissionTypeForClaimIssFee() {
+            CaseData caseData = CaseData.builder()
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
+                                              .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
+                                              .hwfFullRemissionGrantedForClaimIssue(YesOrNo.YES).build())
+                .hwfFeeType(FeeType.CLAIMISSUED)
+                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
+                                           .outstandingFeeInPounds(BigDecimal.valueOf(100.00))
+                                           .build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-type");

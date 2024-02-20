@@ -4695,6 +4695,13 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateHearingFeeDuePaidWithHwf() {
+        atStateApplicantRespondToDefenceAndProceed();
+        hearingDueDate = now().minusDays(1);
+        hearingFeePaymentDetails = null;
+        ccdState = HEARING_READINESS;
+        return this;
+    }
     public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawn() {
 
         atStateApplicantRespondToDefenceAndProceed();
