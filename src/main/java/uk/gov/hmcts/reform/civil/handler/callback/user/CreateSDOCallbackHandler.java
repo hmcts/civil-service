@@ -39,7 +39,6 @@ import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -61,7 +60,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
@@ -1248,6 +1246,20 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.getSmallClaimsMethodInPerson()));
 
         setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
+
+        // Avoid dropdown's locations list from being saved in caseData
+        if (featureToggleService.isSdoR2Enabled() && caseData.getSdoR2Trial() != null) {
+            SdoR2Trial sdoR2Trial = caseData.getSdoR2Trial();
+            if (caseData.getSdoR2Trial().getHearingCourtLocationList() != null) {
+                sdoR2Trial.setHearingCourtLocationList(DynamicList.builder().value(
+                    caseData.getSdoR2Trial().getHearingCourtLocationList().getValue()).build());
+            }
+            if (caseData.getSdoR2Trial().getAltHearingCourtLocationList() != null) {
+                sdoR2Trial.setAltHearingCourtLocationList(DynamicList.builder().value(
+                    caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue()).build());
+            }
+            dataBuilder.sdoR2Trial(sdoR2Trial);
+        }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
