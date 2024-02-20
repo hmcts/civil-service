@@ -43,10 +43,10 @@ class RetriggerCasesEventHandlerTest {
     void testHandleTask_RetriggerClaimantResponse() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("eventForRetrigger")).thenReturn("RETRIGGER_CLAIMANT_RESPONSE");
+        when(externalTask.getVariable("caseIds")).thenReturn("1,2");
         CoreCaseDataService coreCaseDataServiceMock = mock(CoreCaseDataService.class);
 
         RetriggerCasesEventHandler handler = spy(new RetriggerCasesEventHandler(coreCaseDataServiceMock));
-        doReturn(Arrays.asList("1", "2")).when(handler).readCaseIds("/caseIdForRetrigger.txt");
 
         handler.handleTask(externalTask);
 
@@ -58,10 +58,10 @@ class RetriggerCasesEventHandlerTest {
     void testHandleTask_RetriggerClaimantResponseSpecific() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("eventForRetrigger")).thenReturn("RETRIGGER_CLAIMANT_RESPONSE_SPEC");
+        when(externalTask.getVariable("caseIds")).thenReturn("1,2");
         CoreCaseDataService coreCaseDataServiceMock = mock(CoreCaseDataService.class);
 
         RetriggerCasesEventHandler handler = spy(new RetriggerCasesEventHandler(coreCaseDataServiceMock));
-        doReturn(Arrays.asList("1", "2")).when(handler).readCaseIds("/caseIdForRetrigger.txt");
 
         handler.handleTask(externalTask);
 
@@ -73,10 +73,10 @@ class RetriggerCasesEventHandlerTest {
     void testHandleTask_RetriggerCases() {
         ExternalTask externalTask = mock(ExternalTask.class);
         when(externalTask.getVariable("eventForRetrigger")).thenReturn("RETRIGGER_CASES");
+        when(externalTask.getVariable("caseIds")).thenReturn("1,2");
         CoreCaseDataService coreCaseDataServiceMock = mock(CoreCaseDataService.class);
 
         RetriggerCasesEventHandler handler = spy(new RetriggerCasesEventHandler(coreCaseDataServiceMock));
-        doReturn(Arrays.asList("1", "2")).when(handler).readCaseIds("/caseIdForRetrigger.txt");
 
         handler.handleTask(externalTask);
 
