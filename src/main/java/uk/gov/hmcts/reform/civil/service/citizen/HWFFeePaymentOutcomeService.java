@@ -45,7 +45,7 @@ public class HWFFeePaymentOutcomeService {
         BigDecimal claimIssuedRemissionAmount = caseData.getClaimIssueRemissionAmount();
         BigDecimal hearingRemissionAmount = caseData.getHearingRemissionAmount();
         BigDecimal claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
-        BigDecimal hearingFeeAmount = caseData.getHearingFeeAmount();
+        BigDecimal hearingFeeAmount = caseData.getCalculatedHearingFeeInPence();
         BigDecimal outstandingFeeAmount;
 
         if (caseData.isHWFTypeClaimIssued() && BigDecimal.ZERO.compareTo(claimFeeAmount) != 0) {
