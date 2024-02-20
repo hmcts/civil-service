@@ -32,18 +32,17 @@ public class HmcMessageHandler {
     private final PaymentsConfiguration paymentsConfiguration;
 
     public void handleMessage(HmcMessage hmcMessage) {
-        if (isMessageRelevantForService(hmcMessage)) {
-            if (NEXT_HEARING_DETAILS_UPDATE_STATUSES.contains(hmcMessage.getHearingUpdate().getHmcStatus())) {
-                triggerCaseEvent(UPDATE_NEXT_HEARING_DETAILS, hmcMessage.getCaseId(), hmcMessage.getHearingId());
-                return;
-            }
-            if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
-                triggerCaseEvent(REVIEW_HEARING_EXCEPTION, hmcMessage.getCaseId(), hmcMessage.getHearingId());
-                return;
-            }
-            log.info("HMC message status {} is not supported by handler.", hmcMessage.getHearingUpdate().getHmcStatus());
-        } else {
+        if (!isMessageRelevantForService(hmcMessage)) {
             log.info("HMC message not relevant for service - Service code: {}", hmcMessage.getHmctsServiceCode());
+            return;
+        }
+
+        if (NEXT_HEARING_DETAILS_UPDATE_STATUSES.contains(hmcMessage.getHearingUpdate().getHmcStatus())) {
+            triggerCaseEvent(UPDATE_NEXT_HEARING_DETAILS, hmcMessage.getCaseId(), hmcMessage.getHearingId());
+        } else if (EXCEPTION.equals(hmcMessage.getHearingUpdate().getHmcStatus())) {
+            triggerCaseEvent(REVIEW_HEARING_EXCEPTION, hmcMessage.getCaseId(), hmcMessage.getHearingId());
+        } else {
+            log.info("HMC message status {} is not supported by handler.", hmcMessage.getHearingUpdate().getHmcStatus());
         }
     }
 
