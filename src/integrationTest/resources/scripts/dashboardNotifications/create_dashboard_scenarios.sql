@@ -16,7 +16,7 @@ VALUES (2, 'notification.hearing.fee.payment.required', 'Pay the hearing fee', '
         'singout', '2021-05-09T20:15:45.345875+01:00');
 
 INSERT INTO dbs.task_item_template (id, task_name_en, hint_text_en, category_en, task_name_cy, hint_text_cy, category_cy,
-                                    name, task_status_sequence, role,task_order ,created_at)
+                                    template_name, scenario_name, task_status_sequence, role,task_order ,created_at)
 values (1, '<a href=#>Pay the hearing fee</a>', 'pay by ${hearingFeePayByTime} on ${hearingFeePayByDate}. you have (noOfDays) to pay.'
        , 'Hearing' ,'<a href=#>Pay the hearing fee</a>', 'pay by ${hearingFeePayByTime} on ${hearingFeePayByDate}. you have (noOfDays) to pay.'
-        ,'Hearing', 'scenario.hearing.fee.payment.required', '{1,2}', 'claimant', 10, '2024-02-09T20:15:45.345875+01:00');
+        ,'Hearing', 'Hearing.View','scenario.hearing.fee.payment.required', '{1,2}', 'claimant', 10, '2024-02-09T20:15:45.345875+01:00');

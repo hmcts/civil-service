@@ -5,7 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationActionEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.DashboardNotificationsRepository;
+import uk.gov.hmcts.reform.dashboard.repositories.NotificationActionRepository;
+import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -19,10 +22,16 @@ import java.util.stream.Collectors;
 public class DashboardNotificationService {
 
     private final DashboardNotificationsRepository dashboardNotificationsRepository;
+    private final NotificationActionRepository notificationActionRepository;
+    private final IdamApi idamApi;
 
     @Autowired
-    public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository) {
+    public DashboardNotificationService(DashboardNotificationsRepository dashboardNotificationsRepository,
+                                        NotificationActionRepository notificationActionRepository,
+                                        IdamApi idamApi) {
         this.dashboardNotificationsRepository = dashboardNotificationsRepository;
+        this.notificationActionRepository = notificationActionRepository;
+        this.idamApi = idamApi;
     }
 
     public List<DashboardNotificationsEntity> getAll() {
@@ -60,6 +69,23 @@ public class DashboardNotificationService {
 
     public void deleteById(UUID id) {
         dashboardNotificationsRepository.deleteById(id);
+    }
+
+    public void recordClick(UUID id, String authToken) {
+        Optional<DashboardNotificationsEntity> dashboardNotification = dashboardNotificationsRepository.findById(id);
+
+        dashboardNotification.ifPresent(notification -> {
+            NotificationActionEntity notificationAction = NotificationActionEntity.builder()
+                .reference(notification.getReference())
+                .dashboardNotificationsId(notification.getId())
+                .actionPerformed("Click")
+                .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
+                .build();
+
+            NotificationActionEntity actionEntity = notificationActionRepository.save(notificationAction);
+
+            dashboardNotificationsRepository.save(notification.toBuilder().notificationAction(actionEntity).build());
+        });
     }
 
     public int deleteByNameAndReferenceAndCitizenRole(String name, String reference, String citizenRole) {

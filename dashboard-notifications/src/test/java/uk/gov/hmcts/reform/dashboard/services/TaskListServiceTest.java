@@ -11,8 +11,10 @@ import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -63,40 +65,36 @@ class TaskListServiceTest {
 
     @Test
     void shouldReturnTaskListEntity_whenTaskListEntityIsUpdated() {
-
         //given
-        when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
-            any(),
-            any(),
-            any()
-        )).thenReturn(Optional.ofNullable(getTaskListEntity()));
+        UUID taskItemIdentifier = UUID.randomUUID();
+        TaskListEntity taskListEntity = getTaskListEntity(taskItemIdentifier);
+        when(taskListRepository.findById(taskItemIdentifier)).thenReturn(Optional.of(taskListEntity));
+        TaskListEntity expected = taskListEntity.toBuilder().currentStatus(taskListEntity.getNextStatus()).build();
+        when(taskListRepository.save(expected)).thenReturn(expected);
 
         //when
-        TaskListEntity actual = taskListService.updateTaskList("123", "Claimant", "hearing");
+        TaskListEntity actual = taskListService.updateTaskListItem(taskItemIdentifier);
 
         //then
-        verify(taskListRepository)
-            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("123", "Claimant", "hearing");
-        assertThat(actual.getCurrentStatus()).isEqualTo(getTaskListEntity().getNextStatus());
+        verify(taskListRepository).findById(taskItemIdentifier);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void shouldReturnEmptyTaskListEntity_whenTaskListEntityIsNotUpdated() {
 
         //given
-        when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName(
-            any(),
-            any(),
-            any()
-        )).thenReturn(Optional.empty());
+        UUID taskItemIdentifier = UUID.randomUUID();
+        when(taskListRepository.findById(taskItemIdentifier)).thenReturn(Optional.empty());
 
         //when
-        TaskListEntity actual = taskListService.updateTaskList("123", "Claimant", "hearing");
+        assertThatThrownBy(() -> taskListService.updateTaskListItem(taskItemIdentifier))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasNoCause()
+            .hasMessage("Invalid task item identifier " + taskItemIdentifier);
 
         //then
-        verify(taskListRepository)
-            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateName("123", "Claimant", "hearing");
-        assertThat(actual).isEqualTo(new TaskListEntity());
+        verify(taskListRepository).findById(taskItemIdentifier);
     }
 
     @Test
