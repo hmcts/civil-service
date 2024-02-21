@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
@@ -29,12 +28,10 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implements NotificationData {
 
     private static final List<CaseEvent> EVENTS = List.of(CaseEvent.NOTIFY_LIP_CLAIMANT_HWF_OUTCOME);
-    public static final String TASK_ID = "NotifyClaimantHwFOutcome";
+    private static final String TASK_ID = "NotifyClaimantHwFOutcome";
     private static final String REFERENCE_TEMPLATE = "hwf-outcome-notification-%s";
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
-    private final FeatureToggleService toggleService;
-
     private final Map<String, Callback> callBackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForHwFOutcome
     );
@@ -53,8 +50,13 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private CallbackResponse notifyApplicantForHwFOutcome(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        if (caseData.isLipvLipOneVOne() && toggleService.isLipVLipEnabled()) {
-            sendEmail(caseData);
+        if (Objects.nonNull(caseData.getApplicant1Email())) {
+            notificationService.sendMail(
+                caseData.getApplicant1Email(),
+                getTemplate(caseData.getHwFEvent()),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -76,14 +78,11 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     }
 
     private Map<String, String> getFurtherProperties(CaseData caseData) {
-        switch (caseData.getHwFEvent()) {
-            case NO_REMISSION_HWF:
-                return getNoRemissionProperties(caseData);
-            case UPDATE_HELP_WITH_FEE_NUMBER:
-                return Collections.emptyMap();
-            default:
-                return null;
-        }
+        return switch (caseData.getHwFEvent()) {
+            case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);
+            case UPDATE_HELP_WITH_FEE_NUMBER -> Collections.emptyMap();
+            default -> throw new IllegalArgumentException("case event not found");
+        };
     }
 
     private String getTemplate(CaseEvent hwfEvent) {
@@ -105,10 +104,6 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         );
     }
 
-    private Map<String, String> getUpdateHelpWithFeeNumberProperties(CaseData caseData) {
-        return Map.of();
-    }
-
     private Map<String, String> getCommonProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
@@ -116,18 +111,6 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
             TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
             HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber()
         );
-    }
-
-
-    private void sendEmail(CaseData caseData) {
-        if (Objects.nonNull(caseData.getApplicant1Email())) {
-            notificationService.sendMail(
-                caseData.getApplicant1Email(),
-                getTemplate(caseData.getHwFEvent()),
-                addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-            );
-        }
     }
 
     private String getHwFNoRemissionReason(CaseData caseData) {

@@ -312,6 +312,11 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
+    public boolean isHwfNoRemission() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.NO_REMISSION_HWF;
+    }
+
+    @Override
     public boolean isHwfUpdatedRefNumber() {
         return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
     }

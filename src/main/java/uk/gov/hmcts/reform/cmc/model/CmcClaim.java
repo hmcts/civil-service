@@ -461,6 +461,11 @@ public class CmcClaim implements Claim {
     }
 
     @Override
+    public boolean isHwfNoRemission() {
+        return false;
+    }
+
+    @Override
     public boolean isHwfUpdatedRefNumber() {
         return false;
     }
