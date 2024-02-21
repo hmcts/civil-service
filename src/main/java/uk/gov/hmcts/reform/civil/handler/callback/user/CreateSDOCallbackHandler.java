@@ -1019,7 +1019,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (caseData.getSdoR2QuestionsClaimantExpert() != null && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther()  != null
             && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails() != null
             && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails().getApplicationToRelyDetailsDate() != null) {
-            validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails().getApplicationToRelyDetailsDate())
+            validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert()
+                                   .getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails().getApplicationToRelyDetailsDate())
                 .ifPresent(errors::add);
         }
         if (caseData.getSdoR2PermissionToRelyOnExpert() != null && caseData.getSdoR2PermissionToRelyOnExpert().getSdoPermissionToRelyOnExpertDate() != null) {
