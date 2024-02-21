@@ -372,18 +372,19 @@ public class SdoGeneratorService {
                 && TrialOnRadioOptions.TRIAL_WINDOW.equals(caseData.getSdoR2Trial().getTrialOnOptions())) ? true : false)
             .sdoTrialHearingTimeAllocated(SdoHelper.getSdoTrialHearingTimeAllocated(caseData))
             .sdoTrialMethodOfHearing(SdoHelper.getSdoTrialMethodOfHearing(caseData))
+            .physicalBundlePartyTxt(SdoHelper.getPhysicalTrialText(caseData));
+
+        sdoNihlDocumentFormBuilder
+            .hearingLocation(locationHelper.getHearingLocation(
+                Optional.ofNullable(SdoHelper.getHearingLocationNihl(caseData))
+                    .map(DynamicList::getValue)
+                    .map(DynamicListElement::getLabel)
+                    .orElse(null),
+                caseData,
+                authorisation
+            ))
             .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
-        if (caseData.getSdoR2Trial().getHearingCourtLocationList() != null
-            && caseData.getSdoR2Trial().getHearingCourtLocationList().getValue() != null
-            && caseData.getSdoR2Trial().getHearingCourtLocationList().getValue().getCode() != "OTHER_LOCATION") {
-            sdoNihlDocumentFormBuilder
-                .hearingLocation(caseData.getSdoR2Trial().getHearingCourtLocationList().getValue().getCode());
-
-        } else if (caseData.getSdoR2Trial().getAltHearingCourtLocationList() != null && caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue() != null) {
-            sdoNihlDocumentFormBuilder
-                .hearingLocation(caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue().getCode());
-        }
         return sdoNihlDocumentFormBuilder.build();
     }
 
