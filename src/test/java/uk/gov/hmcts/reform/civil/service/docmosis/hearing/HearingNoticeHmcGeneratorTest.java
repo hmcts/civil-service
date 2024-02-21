@@ -98,7 +98,7 @@ class HearingNoticeHmcGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         when(locationRefDataService
-                 .getCourtLocationsForDefaultJudgments(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
+                 .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
                                                                                              .epimmsId(EPIMS)
                                                                                              .siteName("SiteName")
                                                                                              .courtAddress(
