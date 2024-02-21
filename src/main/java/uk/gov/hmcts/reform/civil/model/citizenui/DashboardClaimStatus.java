@@ -24,6 +24,12 @@ public enum DashboardClaimStatus {
     SDO_ORDER_CREATED(
         Claim::isSDOOrderCreated
     ),
+    CLAIMANT_HWF_NO_REMISSION(
+        Claim::isHwfNoRemission
+    ),
+    CLAIMANT_HWF_PARTIAL_REMISSION(
+        Claim::isHwfPartialRemission
+    ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
     ),
@@ -74,12 +80,6 @@ public enum DashboardClaimStatus {
     ),
     CLAIMANT_ASKED_FOR_SETTLEMENT(
         Claim::hasClaimantAskedToSignSettlementAgreement
-    ),
-    CLAIMANT_HWF_NO_REMISSION(
-        Claim::isHwfNoRemission
-    ),
-    CLAIMANT_HWF_PARTIAL_REMISSION(
-        Claim::isHwfPartialRemission
     ),
     HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
     REQUESTED_CCJ_BY_REDETERMINATION(
