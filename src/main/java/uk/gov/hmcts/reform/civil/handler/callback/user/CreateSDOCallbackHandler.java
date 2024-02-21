@@ -125,7 +125,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
-import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -863,7 +862,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private void updateDeductionValue(CaseData caseData, CaseData.CaseDataBuilder<?, ?> updatedData) {
-        ofNullable(caseData.getDrawDirectionsOrder())
+        Optional.ofNullable(caseData.getDrawDirectionsOrder())
             .map(JudgementSum::getJudgementSum)
             .map(d -> d + "%")
             .ifPresent(deductionPercentage -> {
@@ -904,7 +903,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        Optional<LocationRefData> matchingLocation = ofNullable(preferredCourt)
+        Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
             .flatMap(requestedCourt -> locationHelper.updateCaseManagementLocation(
                 updatedData,
                 requestedCourt,
@@ -929,7 +928,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         List<LocationRefData> locations = locationRefDataService.getHearingCourtLocations(
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        Optional<LocationRefData> matchingLocation = ofNullable(preferredCourt)
+        Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
             .flatMap(requestedCourt -> locationHelper.updateCaseManagementLocation(
                 updatedData,
                 requestedCourt,
@@ -1013,8 +1012,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert().getSdoDefendantMayAskDate())
                 .ifPresent(errors::add);
         }
-        if (caseData.getSdoR2QuestionsToEntExpert() != null && caseData.getSdoR2QuestionsToEntExpert().getSdoQuestionsShallBeAnsweredDate() != null) {
-            validateFutureDate(caseData.getSdoR2QuestionsToEntExpert().getSdoQuestionsShallBeAnsweredDate())
+        if (caseData.getSdoR2QuestionsClaimantExpert() != null && caseData.getSdoR2QuestionsClaimantExpert().getSdoQuestionsShallBeAnsweredDate() != null) {
+            validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert().getSdoQuestionsShallBeAnsweredDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2QuestionsClaimantExpert() != null && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther()  != null
+            && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails() != null
+            && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails().getApplicationToRelyDetailsDate() != null) {
+            validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert()
+                                   .getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails().getApplicationToRelyDetailsDate())
                 .ifPresent(errors::add);
         }
         if (caseData.getSdoR2PermissionToRelyOnExpert() != null && caseData.getSdoR2PermissionToRelyOnExpert().getSdoPermissionToRelyOnExpertDate() != null) {
@@ -1152,7 +1158,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
         }
 
-        if (featureToggleService.isSdoR2Enabled()) {
+        if (featureToggleService.isSdoR2Enabled() && isSDOR2Screen(caseData)) {
             List<String> errorsNihl;
             errorsNihl = validateFieldsNihl(caseData);
             if (!errorsNihl.isEmpty()) {
@@ -1247,7 +1253,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
 
-        // Avoid dropdown's locations list from being saved in caseData
+        // Avoid location lists (listItems) from being saved in caseData, just save the selected values
         if (featureToggleService.isSdoR2Enabled() && caseData.getSdoR2Trial() != null) {
             SdoR2Trial sdoR2Trial = caseData.getSdoR2Trial();
             if (caseData.getSdoR2Trial().getHearingCourtLocationList() != null) {
@@ -1304,19 +1310,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         Optional<DynamicList> toUseList;
         if (DISPOSAL.equals(caseData.getOrderType())) {
-            toUseList = ofNullable(caseData.getDisposalHearingMethodInPerson());
+            toUseList = Optional.ofNullable(caseData.getDisposalHearingMethodInPerson());
         } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
             && !isSDOR2Screen(caseData)) {
-            toUseList = ofNullable(caseData.getFastTrackMethodInPerson());
+            toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
             && isSDOR2Screen(caseData)) {
             toUseList = caseData.getSdoR2Trial().getHearingCourtLocationList() != null
-                ? ofNullable(caseData.getSdoR2Trial().getHearingCourtLocationList())
-                : ofNullable(caseData.getSdoR2Trial().getAltHearingCourtLocationList());
+                ? Optional.ofNullable(caseData.getSdoR2Trial().getHearingCourtLocationList())
+                : Optional.ofNullable(caseData.getSdoR2Trial().getAltHearingCourtLocationList());
         } else if (SdoHelper.isFastTrack(caseData)) {
-            toUseList = ofNullable(caseData.getFastTrackMethodInPerson());
+            toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            toUseList = ofNullable(caseData.getSmallClaimsMethodInPerson());
+            toUseList = Optional.ofNullable(caseData.getSmallClaimsMethodInPerson());
         } else {
             throw new IllegalArgumentException("Could not determine claim track");
         }
@@ -1337,7 +1343,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             int number1 = Integer.parseInt(inputValue1);
             int number2 = Integer.parseInt(inputValue2);
             if (number1 < 0 || number2 < 0) {
-                return "The number entered cannot be less than zero";
+                return ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
             }
         }
         return errorMessage;
