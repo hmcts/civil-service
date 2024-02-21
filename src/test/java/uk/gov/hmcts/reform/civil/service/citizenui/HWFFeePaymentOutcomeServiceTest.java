@@ -53,7 +53,5 @@ public class HWFFeePaymentOutcomeServiceTest {
         caseData = feePaymentOutcomeService.updateOutstandingFee(caseData);
         assertThat(caseData.getHearingHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(290).setScale(
             2));
-
     }
-
 }
