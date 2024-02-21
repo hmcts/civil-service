@@ -69,6 +69,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     public Map<String, String> addProperties(CaseData caseData) {
         return switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);
+            case INVALID_HWF_REFERENCE -> getCommonProperties(caseData);
             default -> throw new IllegalArgumentException("case event not found");
         };
     }
@@ -77,7 +78,9 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         if (emailTemplates == null) {
             emailTemplates = ImmutableMap.of(
                 CaseEvent.NO_REMISSION_HWF,
-                notificationsProperties.getNotifyApplicantForHwfNoRemission()
+                notificationsProperties.getNotifyApplicantForHwfNoRemission(),
+                CaseEvent.INVALID_HWF_REFERENCE,
+                notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber()
             );
         }
         return emailTemplates.get(hwfEvent);
@@ -92,6 +95,26 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
             HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber(),
             AMOUNT, caseData.getHwFFeeAmount().toString()
         );
+    }
+
+    private Map<String, String> getCommonProperties(CaseData caseData) {
+        return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+                TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
+                HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber()
+        );
+    }
+
+    private void sendEmail(CaseData caseData) {
+        if (Objects.nonNull(caseData.getApplicant1Email())) {
+            notificationService.sendMail(
+                caseData.getApplicant1Email(),
+                getTemplate(caseData.getHwFEvent()),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
+            );
+        }
     }
 
     private String getHwFNoRemissionReason(CaseData caseData) {
