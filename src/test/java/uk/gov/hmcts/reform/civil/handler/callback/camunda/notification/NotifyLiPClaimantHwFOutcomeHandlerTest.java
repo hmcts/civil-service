@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -46,8 +45,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
     private NotificationService notificationService;
     @Mock
     private NotificationsProperties notificationsProperties;
-    @Mock
-    private FeatureToggleService toggleService;
     @InjectMocks
     private NotifyLiPClaimantHwFOutcomeHandler handler;
 
@@ -61,10 +58,10 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         private static final String EMAIL = "test@email.com";
         private static final String REFERENCE_NUMBER = "hwf-outcome-notification-000DC001";
         private static final String CLAIMANT = "Mr. John Rambo";
-        public static final String HWF_REFERENCE = "000HWF001";
-        public static final String CLAIM_REFERENCE = "000DC001";
-        public static final String CLAIM_FEE_AMOUNT = "1000.00";
-        public static final String HEARING_FEE_AMOUNT = "2000.00";
+        private static final String HWF_REFERENCE = "000HWF001";
+        private static final String CLAIM_REFERENCE = "000DC001";
+        private static final String CLAIM_FEE_AMOUNT = "1000.00";
+        private static final String HEARING_FEE_AMOUNT = "2000.00";
 
         private static final CaseData CLAIM_ISSUE_CASE_DATA = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
@@ -90,10 +87,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             .hwfFeeType(FeeType.HEARING)
             .build();
 
-        @BeforeEach
-        void setup() {
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
-        }
+
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_NoRemission_ClaimIssued() {

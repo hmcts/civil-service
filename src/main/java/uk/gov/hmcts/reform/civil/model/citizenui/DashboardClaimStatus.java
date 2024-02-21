@@ -24,6 +24,9 @@ public enum DashboardClaimStatus {
     SDO_ORDER_CREATED(
         Claim::isSDOOrderCreated
     ),
+    CLAIMANT_HWF_NO_REMISSION(
+        Claim::isHwfNoRemission
+    ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
     ),
@@ -79,7 +82,6 @@ public enum DashboardClaimStatus {
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
-
     DEFAULT_JUDGEMENT(
         Claim::isClaimantDefaultJudgement
     ),
@@ -100,9 +102,6 @@ public enum DashboardClaimStatus {
     ),
     MORE_TIME_REQUESTED(
         Claim::hasResponseDeadlineBeenExtended
-    ),
-    CLAIMANT_HWF_NO_REMISSION(
-        Claim::isHwfNoRemission
     ),
     NO_RESPONSE(
         Claim::hasResponsePending
@@ -128,7 +127,6 @@ public enum DashboardClaimStatus {
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
-
     CLAIMANT_ACCEPTED_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionAccepted
     ),
