@@ -484,7 +484,7 @@ public class StateFlowEngine {
                     .onlyIf(caseDismissedAfterClaimAcknowledgedExtension)
                 .transitionTo(TAKEN_OFFLINE_SDO_NOT_DRAWN).onlyIf(takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension)
             .state(FULL_DEFENCE)
-                .transitionTo(IN_MEDIATION).onlyIf((agreedToMediation.and(allAgreedToLrMediationSpec.negate())).or(lipFullDefenceProceed.or(isCarmApplicableLipCase)))
+                .transitionTo(IN_MEDIATION).onlyIf((agreedToMediation.and(allAgreedToLrMediationSpec.negate())).or(lipFullDefenceProceed.and(isCarmApplicableLipCase)))
                 .transitionTo(FULL_DEFENCE_PROCEED)
                 .onlyIf(fullDefenceProceed.and(allAgreedToLrMediationSpec).and(agreedToMediation.negate()).and(declinedMediation.negate()))
             .set((c, flags) -> {
