@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsNotes;
@@ -67,7 +66,6 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final String smallClaimsMethodVideoConferenceHearing;
     private final SmallClaimsDocuments smallClaimsDocuments;
     private final SmallClaimsWitnessStatement smallClaimsWitnessStatement;
-    private final SmallClaimsFlightDelay smallClaimsFlightDelay;
     private final LocationRefData hearingLocation;
     private final LocationRefData caseManagementLocation;
     private final SmallClaimsCreditHire smallClaimsCreditHire;
@@ -85,7 +83,6 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final boolean smallClaimsDocumentsToggle;
     private final boolean smallClaimsWitnessStatementToggle;
     private final boolean smallClaimsNumberOfWitnessesToggle;
-    private final boolean smallClaimsFlightDelayToggle;
 
     @SuppressWarnings("unused")
     public boolean getSmallClaimsMethodToggle() {
