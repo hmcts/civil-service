@@ -2469,7 +2469,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
-        void shouldThrowValidationErrorForDRHFieldsIfNotNull(boolean valid) {
+        void shouldValidateDRHFields(boolean valid) {
             LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now().minusDays(2);
             int countWitness = valid ? 0 : -1;
             CaseData caseData = CaseDataBuilder.builder()
@@ -2502,6 +2502,25 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             } else {
                 assertThat(response.getErrors()).hasSize(5);
             }
+        }
+
+        @Test
+        void shouldNotThrowErrorIfDRHOptionalFieldsAreNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder().date(LocalDate.now().plusDays(2)).build())
+                .build();
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @ParameterizedTest
