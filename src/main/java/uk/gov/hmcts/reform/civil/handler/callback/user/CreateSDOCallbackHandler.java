@@ -1247,6 +1247,20 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
 
+        // Avoid dropdown's locations list from being saved in caseData
+        if (featureToggleService.isSdoR2Enabled() && caseData.getSdoR2Trial() != null) {
+            SdoR2Trial sdoR2Trial = caseData.getSdoR2Trial();
+            if (caseData.getSdoR2Trial().getHearingCourtLocationList() != null) {
+                sdoR2Trial.setHearingCourtLocationList(DynamicList.builder().value(
+                    caseData.getSdoR2Trial().getHearingCourtLocationList().getValue()).build());
+            }
+            if (caseData.getSdoR2Trial().getAltHearingCourtLocationList() != null) {
+                sdoR2Trial.setAltHearingCourtLocationList(DynamicList.builder().value(
+                    caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue()).build());
+            }
+            dataBuilder.sdoR2Trial(sdoR2Trial);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
