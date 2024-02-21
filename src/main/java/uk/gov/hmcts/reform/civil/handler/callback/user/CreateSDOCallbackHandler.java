@@ -1151,7 +1151,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
         }
 
-        if (featureToggleService.isSdoR2Enabled()) {
+        if (featureToggleService.isSdoR2Enabled() && isSDOR2Screen(caseData)) {
             List<String> errorsNihl;
             errorsNihl = validateFieldsNihl(caseData);
             if (!errorsNihl.isEmpty()) {
