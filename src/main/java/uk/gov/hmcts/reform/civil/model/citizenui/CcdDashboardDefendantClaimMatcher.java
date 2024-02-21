@@ -303,4 +303,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return false;
     }
 
+    @Override
+    public boolean isHwfNoRemission() {
+        return false;
+    }
+
 }

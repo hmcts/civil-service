@@ -91,6 +91,12 @@ public interface NotificationData {
     String HwF_MORE_INFO_FEE_TYPE = "typeOfFee";
     String HwF_MORE_INFO_DOCUMENTS = "documents";
 
+    // hwf outcome
+    String REASONS = "reasons";
+    String TYPE_OF_FEE = "typeOfFee";
+    String HWF_REFERENCE_NUMBER = "hwFReferenceNumber";
+    String AMOUNT = "amount";
+
     Map<String, String> addProperties(CaseData caseData);
 
 }
