@@ -50,7 +50,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         if (Objects.nonNull(caseData.getApplicant1Email())) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                getTemplate(caseData.getHwFEvent(),caseData.isBilingual()),
+                getTemplate(caseData.getHwFEvent(), caseData.isBilingual()),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );

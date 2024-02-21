@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -86,8 +85,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(200000)).build())
             .hwfFeeType(FeeType.HEARING)
             .build();
-
-
 
         @Test
         void shouldNotifyApplicant_HwfOutcome_NoRemission_ClaimIssued() {
