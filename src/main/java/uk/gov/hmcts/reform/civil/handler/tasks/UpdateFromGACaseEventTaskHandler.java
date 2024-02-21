@@ -35,6 +35,7 @@ import static java.util.Optional.ofNullable;
 public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler {
 
     private static final String gaDocSuffix = "Document";
+    private static final String gaAddlDocSuffix = "Doc";
     private static final String civilDocStaffSuffix = "DocStaff";
     private static final String civilDocClaimantSuffix = "DocClaimant";
     private static final String civilDocRespondentSolSuffix = "DocRespondentSol";
@@ -159,6 +160,10 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
 
         //staff collection will hold ga doc accessible for judge and staff
         String fromGaList = docFieldName + gaDocSuffix;
+        if (civilDocPrefix.equals("gaAddl")) {
+            fromGaList = docFieldName + gaAddlDocSuffix;
+        }
+
         String toCivilStaffList = civilDocPrefix + civilDocStaffSuffix;
         updateDocCollection(output, generalAppCaseData, fromGaList,
                 civilCaseData, toCivilStaffList);
