@@ -39,7 +39,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASONS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE;
 
-
 @ExtendWith(MockitoExtension.class)
 public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerTest {
 
@@ -64,7 +63,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         public static final String CLAIM_FEE_AMOUNT = "1000.00";
         public static final String HEARING_FEE_AMOUNT = "2000.00";
 
-        private final static CaseData CLAIM_ISSUE_CASE_DATA = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
+        private static final CaseData CLAIM_ISSUE_CASE_DATA = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
                             .partyEmail(EMAIL)
                             .build())
@@ -76,7 +75,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
             .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
-        private final static CaseData HEARING_CASE_DATA = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
+        private static final CaseData HEARING_CASE_DATA = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
                             .partyEmail(EMAIL)
                             .build())
