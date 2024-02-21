@@ -101,6 +101,9 @@ public enum DashboardClaimStatus {
     MORE_TIME_REQUESTED(
         Claim::hasResponseDeadlineBeenExtended
     ),
+    CLAIMANT_HWF_NO_REMISSION(
+        Claim::isHwfNoRemission
+    ),
     NO_RESPONSE(
         Claim::hasResponsePending
     ),
@@ -134,9 +137,6 @@ public enum DashboardClaimStatus {
     ),
     RESPONSE_BY_POST(
         Claim::isPaperResponse
-    ),
-    CLAIMANT_HWF_NO_REMISSION(
-        Claim::isHwfNoRemission
     ),
     NO_STATUS(c -> false);
 

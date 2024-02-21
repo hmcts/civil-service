@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
@@ -28,6 +29,7 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(NO_REMISSION_HWF);
     private final ObjectMapper objectMapper;
     private final Map<String, Callback> callbackMap = Map.of(
+        callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
         callbackKey(ABOUT_TO_SUBMIT),
         this::noRemissionHWF,
         callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
