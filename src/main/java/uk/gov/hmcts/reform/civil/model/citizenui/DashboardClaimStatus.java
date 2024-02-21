@@ -75,11 +75,16 @@ public enum DashboardClaimStatus {
     CLAIMANT_ASKED_FOR_SETTLEMENT(
         Claim::hasClaimantAskedToSignSettlementAgreement
     ),
+    CLAIMANT_HWF_NO_REMISSION(
+        Claim::isHwfNoRemission
+    ),
+    CLAIMANT_HWF_UPDATED_REF_NUMBER(
+        Claim::isHwfUpdatedRefNumber
+    ),
     HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination
     ),
-
     DEFAULT_JUDGEMENT(
         Claim::isClaimantDefaultJudgement
     ),
@@ -100,12 +105,6 @@ public enum DashboardClaimStatus {
     ),
     MORE_TIME_REQUESTED(
         Claim::hasResponseDeadlineBeenExtended
-    ),
-    CLAIMANT_HWF_NO_REMISSION(
-        Claim::isHwfNoRemission
-    ),
-    CLAIMANT_HWF_UPDATED_REF_NUMBER(
-        Claim::isHwfUpdatedRefNumber
     ),
     NO_RESPONSE(
         Claim::hasResponsePending
@@ -131,7 +130,6 @@ public enum DashboardClaimStatus {
     PASSED_TO_COUNTRY_COURT_BUSINESS_CENTRE(
         Claim::isPassedToCountyCourtBusinessCentre
     ),
-
     CLAIMANT_ACCEPTED_PARTIAL_ADMISSION(
         Claim::isPartialAdmissionAccepted
     ),
