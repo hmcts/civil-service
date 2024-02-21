@@ -735,6 +735,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                                                                .build())
                                                           .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
                                                                                              .fontDetails(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT2)
+                                                                                             .noOfPages(12)
                                                                                              .witnessShouldNotMoreThanTxt(SdoR2UiConstantSmallClaim.RESTRICT_NUMBER_PAGES_TEXT1)
                                                                                              .build())
                                                           .text(SdoR2UiConstantSmallClaim.WITNESS_DESCRIPTION_TEXT).build());
@@ -1045,7 +1046,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.getFastTrackMethodInPerson()));
         dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
             caseData.getSmallClaimsMethodInPerson()));
-        if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)) {
+        if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)
+            && caseData.getSdoR2SmallClaimsHearing() != null) {
             dataBuilder.sdoR2SmallClaimsHearing(updateHearingAfterDeletingLocationList(caseData.getSdoR2SmallClaimsHearing()));
         }
         setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
@@ -1056,21 +1058,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     }
 
     private SdoR2SmallClaimsHearing updateHearingAfterDeletingLocationList(SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing) {
-        return SdoR2SmallClaimsHearing.builder()
-            .trialOnOptions(sdoR2SmallClaimsHearing.getTrialOnOptions())
-            .sdoR2SmallClaimsHearingFirstOpenDateAfter(sdoR2SmallClaimsHearing.getSdoR2SmallClaimsHearingFirstOpenDateAfter() != null
-                                                           ? sdoR2SmallClaimsHearing.getSdoR2SmallClaimsHearingFirstOpenDateAfter() : null)
-            .sdoR2SmallClaimsHearingWindow(sdoR2SmallClaimsHearing.getSdoR2SmallClaimsHearingWindow() != null
-                                            ? sdoR2SmallClaimsHearing.getSdoR2SmallClaimsHearingWindow() : null)
-            .hearingCourtLocationList(deleteLocationList(sdoR2SmallClaimsHearing.getHearingCourtLocationList()))
-            .altHearingCourtLocationList(deleteLocationList(sdoR2SmallClaimsHearing.getAltHearingCourtLocationList()))
-            .lengthList(sdoR2SmallClaimsHearing.getLengthList())
-            .lengthListOther(sdoR2SmallClaimsHearing.getLengthListOther() != null ? sdoR2SmallClaimsHearing.getLengthListOther() : null)
-            .methodOfHearing(sdoR2SmallClaimsHearing.getMethodOfHearing())
-            .physicalBundleOptions(sdoR2SmallClaimsHearing.getPhysicalBundleOptions())
-            .physicalBundlePartyTxt(sdoR2SmallClaimsHearing.getPhysicalBundlePartyTxt())
-            .hearingNotesTxt(sdoR2SmallClaimsHearing.getHearingNotesTxt() != null ? sdoR2SmallClaimsHearing.getHearingNotesTxt() : null)
-            .build();
+        SdoR2SmallClaimsHearing updatedSdoR2SmallClaimsHearing = sdoR2SmallClaimsHearing;
+        if (sdoR2SmallClaimsHearing.getHearingCourtLocationList() != null) {
+            deleteLocationList(sdoR2SmallClaimsHearing.getHearingCourtLocationList());
+        }
+        if (sdoR2SmallClaimsHearing.getAltHearingCourtLocationList() != null) {
+            deleteLocationList(sdoR2SmallClaimsHearing.getAltHearingCourtLocationList());
+        }
+        return updatedSdoR2SmallClaimsHearing;
     }
 
     // During SDO the claim track can change based on judges selection. In this case we want to update claims track
@@ -1115,7 +1110,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (SdoHelper.isFastTrack(caseData)) {
             toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)) {
+            if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)
+             && caseData.getSdoR2SmallClaimsHearing() != null) {
                 toUseList = caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList() != null
                     ? Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList())
                     : Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList());
