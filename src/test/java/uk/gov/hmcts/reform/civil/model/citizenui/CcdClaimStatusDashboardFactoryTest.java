@@ -8,12 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
-import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.enums.*;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.MediationAgreementDocument;
@@ -34,6 +29,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 @ExtendWith(MockitoExtension.class)
@@ -424,5 +420,39 @@ class CcdClaimStatusDashboardFactoryTest {
             claim, featureToggleService));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.DEFENDANT_PART_ADMIT);
+    }
+
+    @Test
+    void givenClaimStatusInPendingCaseIssuedAndHWFNoRemission_WhenGetStatus_thenReturnHwfNoRemission() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(NO_REMISSION_HWF).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.PENDING_CASE_ISSUED)
+            .claimIssuedHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.CLAIMISSUED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION);
+    }
+
+    @Test
+    void givenClaimStatusInHearingReadinessAndHWFNoRemission_WhenGetStatus_thenReturnHwfNoRemission() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(NO_REMISSION_HWF).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.HEARING)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION);
     }
 }
