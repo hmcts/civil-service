@@ -1060,10 +1060,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private SdoR2SmallClaimsHearing updateHearingAfterDeletingLocationList(SdoR2SmallClaimsHearing sdoR2SmallClaimsHearing) {
         SdoR2SmallClaimsHearing updatedSdoR2SmallClaimsHearing = sdoR2SmallClaimsHearing;
         if (sdoR2SmallClaimsHearing.getHearingCourtLocationList() != null) {
-            deleteLocationList(sdoR2SmallClaimsHearing.getHearingCourtLocationList());
+            updatedSdoR2SmallClaimsHearing.setHearingCourtLocationList(deleteLocationList(sdoR2SmallClaimsHearing.getHearingCourtLocationList()));
         }
         if (sdoR2SmallClaimsHearing.getAltHearingCourtLocationList() != null) {
-            deleteLocationList(sdoR2SmallClaimsHearing.getAltHearingCourtLocationList());
+            updatedSdoR2SmallClaimsHearing.setAltHearingCourtLocationList(deleteLocationList(sdoR2SmallClaimsHearing.getAltHearingCourtLocationList()));
         }
         return updatedSdoR2SmallClaimsHearing;
     }
