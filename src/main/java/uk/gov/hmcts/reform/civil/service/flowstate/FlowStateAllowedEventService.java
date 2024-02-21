@@ -243,8 +243,7 @@ public class FlowStateAllowedEventService {
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                TRANSFER_ONLINE_CASE,
-                INVALID_HWF_REFERENCE
+                TRANSFER_ONLINE_CASE
             )
         ),
 
@@ -831,8 +830,7 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
                 asyncStitchingComplete,
-                TRANSFER_ONLINE_CASE,
-                INVALID_HWF_REFERENCE
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -941,8 +939,7 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
-                TRANSFER_ONLINE_CASE,
-                INVALID_HWF_REFERENCE
+                TRANSFER_ONLINE_CASE
             )
         ),
         entry(
@@ -1386,7 +1383,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 PARTIAL_REMISSION_HWF_GRANTED,
                 FULL_REMISSION_HWF,
-                UPDATE_HELP_WITH_FEE_NUMBER
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE
             )
         ),
         entry(
@@ -1585,7 +1583,8 @@ public class FlowStateAllowedEventService {
                 MORE_INFORMATION_HWF,
                 PARTIAL_REMISSION_HWF_GRANTED,
                 FULL_REMISSION_HWF,
-                UPDATE_HELP_WITH_FEE_NUMBER
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE
             )
         ),
         entry(
