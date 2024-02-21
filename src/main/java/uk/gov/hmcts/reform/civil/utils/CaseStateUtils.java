@@ -17,7 +17,8 @@ public class CaseStateUtils {
             if (SpecJourneyConstantLRSpec.SMALL_CLAIM.equals(caseData.getResponseClaimTrack())) {
                 return YES.equals(caseData.getApplicant1ProceedWithClaim())
                     || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())
-                    || NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim());
+                    || (caseData.getCaseDataLiP() != null
+                    && NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim()));
             }
         }
         return false;
