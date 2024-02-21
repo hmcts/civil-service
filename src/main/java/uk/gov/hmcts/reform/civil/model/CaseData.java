@@ -1308,7 +1308,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public BigDecimal getOutstandingFeeInPounds() {
         if (this.isHWFTypeHearing() && this.getHearingHwfDetails() != null) {
-            return this.getHearingHwfDetails() .getOutstandingFeeInPounds();
+            return this.getHearingHwfDetails().getOutstandingFeeInPounds();
         }
         if (this.isHWFTypeClaimIssued() && this.getClaimIssuedHwfDetails() != null) {
             return this.getClaimIssuedHwfDetails().getOutstandingFeeInPounds();

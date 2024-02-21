@@ -23,7 +23,7 @@ public final class HWFFeePaymentOutcomeService {
 
         if (caseData.isHWFTypeClaimIssued() && BigDecimal.ZERO.compareTo(claimFeeAmount) != 0) {
             outstandingFeeAmount = claimFeeAmount.subtract(claimIssuedRemissionAmount);
-          caseData.getClaimIssuedHwfDetails().setOutstandingFeeInPounds(MonetaryConversions.penniesToPounds(
+            caseData.getClaimIssuedHwfDetails().setOutstandingFeeInPounds(MonetaryConversions.penniesToPounds(
                 outstandingFeeAmount));
         } else if (caseData.isHWFTypeHearing() && BigDecimal.ZERO.compareTo(hearingFeeAmount) != 0) {
             outstandingFeeAmount = hearingFeeAmount.subtract(hearingRemissionAmount);
