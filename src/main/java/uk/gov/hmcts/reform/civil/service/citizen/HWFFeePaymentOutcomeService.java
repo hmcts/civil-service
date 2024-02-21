@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class HWFFeePaymentOutcomeService {
+public final class HWFFeePaymentOutcomeService {
 
     public CaseData updateOutstandingFee(CaseData caseData) {
 
