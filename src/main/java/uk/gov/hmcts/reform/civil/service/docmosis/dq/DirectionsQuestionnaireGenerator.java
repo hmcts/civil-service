@@ -1013,7 +1013,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             .expertRequired(caseData.isRespondent1NotRepresented() ? YesOrNo.NO : expertRequired)
             .expertReportsSent(null)
             .jointExpertSuitable(null)
-            .details(caseData.isRespondent1NotRepresented() ? getExpertsDetails(dq) : List.of(expertDetails))
+            .details(caseData.isRespondent1NotRepresented() && dq.getExperts() != null ? getExpertsDetails(dq) : List.of(expertDetails))
             .build();
     }
 
