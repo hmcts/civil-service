@@ -44,9 +44,7 @@ public class SdoDocumentFormFastNihl implements MappableObject {
 
     private final LocalDate currentDate;
     private final String judgeName;
-
     private final String caseNumber;
-
     private final Party applicant1;
     private final Party respondent1;
     private final boolean hasApplicant2;
@@ -56,11 +54,8 @@ public class SdoDocumentFormFastNihl implements MappableObject {
     private final YesOrNo drawDirectionsOrderRequired;
     private final JudgementSum drawDirectionsOrder;
     private final ClaimsTrack claimsTrack;
-
     private final List<FastTrack> fastClaims;
     private final boolean writtenByJudge;
-
-    private final FastTrackJudgesRecital sdoFastTrackJudgesRecital;
     private final boolean hasAltDisputeResolution;
     private final boolean hasVariationOfDirections;
     private final boolean hasSettlement;
@@ -81,40 +76,41 @@ public class SdoDocumentFormFastNihl implements MappableObject {
     private final boolean hasSdoTrial;
     private final boolean hasNewDirections;
     private final boolean hasSdoR2TrialWindow;
-
-    private final String isApplicationToRelyOnFurther;
+    private List<IncludeInOrderToggle> sdoR2DisclosureOfDocumentsToggle;
+    private List<IncludeInOrderToggle> sdoR2SeparatorWitnessesOfFactToggle;
+    private List<IncludeInOrderToggle> sdoR2ScheduleOfLossToggle;
+    private List<IncludeInOrderToggle>  sdoR2TrialToggle;
+    private List<IncludeInOrderToggle> sdoR2SeparatorExpertEvidenceToggle;
+    private List<IncludeInOrderToggle> sdoR2SeparatorAddendumReportToggle;
+    private List<IncludeInOrderToggle> sdoR2SeparatorFurtherAudiogramToggle;
+    private List<IncludeInOrderToggle> sdoR2SeparatorQuestionsClaimantExpertToggle;
+    private List<IncludeInOrderToggle> sdoR2SeparatorPermissionToRelyOnExpertToggle;
+    private List<IncludeInOrderToggle> sdoR2SeparatorEvidenceAcousticEngineerToggle;
+    private List<IncludeInOrderToggle> sdoR2SeparatorQuestionsToEntExpertToggle;
+    private List<IncludeInOrderToggle> sdoR2SeparatorUploadOfDocumentsToggle;
+    private SdoR2QuestionsToEntExpert sdoR2QuestionsToEntExpert;
+    private SdoR2EvidenceAcousticEngineer sdoR2EvidenceAcousticEngineer;
+    private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
+    private List<Element<SdoR2AddNewDirection>> sdoR2AddNewDirection;
+    private SdoR2Trial sdoR2Trial;
+    private SdoR2AddendumReport sdoR2AddendumReport;
+    private SdoR2QuestionsClaimantExpert sdoR2QuestionsClaimantExpert;
+    private SdoR2FurtherAudiogram sdoR2FurtherAudiogram;
+    private SdoR2PermissionToRelyOnExpert sdoR2PermissionToRelyOnExpert;
+    private SdoR2UploadOfDocuments sdoR2UploadOfDocuments;
+    private final FastTrackJudgesRecital sdoFastTrackJudgesRecital;
+    private LocalDate sdoR2ImportantNotesDate;
     private SdoR2FastTrackAltDisputeResolution sdoAltDisputeResolution;
     private SdoR2VariationOfDirections sdoVariationOfDirections;
     private SdoR2Settlement sdoR2Settlement;
-    private List<IncludeInOrderToggle> sdoR2DisclosureOfDocumentsToggle;
     private SdoR2DisclosureOfDocuments sdoR2DisclosureOfDocuments;
-    private List<IncludeInOrderToggle> sdoR2SeparatorWitnessesOfFactToggle;
-    private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
-    private List<IncludeInOrderToggle> sdoR2ScheduleOfLossToggle;
-    private SdoR2ScheduleOfLoss sdoR2ScheduleOfLoss;
-    private List<Element<SdoR2AddNewDirection>> sdoR2AddNewDirection;
-    private List<IncludeInOrderToggle>  sdoR2TrialToggle;
-    private SdoR2Trial sdoR2Trial;
-    private String sdoR2ImportantNotesTxt;
-    private LocalDate sdoR2ImportantNotesDate;
-    private List<IncludeInOrderToggle> sdoR2SeparatorExpertEvidenceToggle;
     private SdoR2ExpertEvidence sdoR2ExpertEvidence;
-    private List<IncludeInOrderToggle> sdoR2SeparatorAddendumReportToggle;
-    private SdoR2AddendumReport sdoR2AddendumReport;
-    private List<IncludeInOrderToggle> sdoR2SeparatorFurtherAudiogramToggle;
-    private SdoR2FurtherAudiogram sdoR2FurtherAudiogram;
-    private List<IncludeInOrderToggle> sdoR2SeparatorQuestionsClaimantExpertToggle;
-    private SdoR2QuestionsClaimantExpert sdoR2QuestionsClaimantExpert;
-    private List<IncludeInOrderToggle> sdoR2SeparatorPermissionToRelyOnExpertToggle;
-    private SdoR2PermissionToRelyOnExpert sdoR2PermissionToRelyOnExpert;
-    private List<IncludeInOrderToggle> sdoR2SeparatorEvidenceAcousticEngineerToggle;
-    private SdoR2EvidenceAcousticEngineer sdoR2EvidenceAcousticEngineer;
-    private List<IncludeInOrderToggle> sdoR2SeparatorQuestionsToEntExpertToggle;
-    private SdoR2QuestionsToEntExpert sdoR2QuestionsToEntExpert;
-    private List<IncludeInOrderToggle> sdoR2SeparatorUploadOfDocumentsToggle;
-    private SdoR2UploadOfDocuments sdoR2UploadOfDocuments;
-    private String hearingLocation;
+    private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
+    private final LocationRefData hearingLocation;
     private final LocationRefData caseManagementLocation;
     private String sdoTrialHearingTimeAllocated;
     private String sdoTrialMethodOfHearing;
+    private final String isApplicationToRelyOnFurther;
+    private String sdoR2ImportantNotesTxt;
+    private String physicalBundlePartyTxt;
 }

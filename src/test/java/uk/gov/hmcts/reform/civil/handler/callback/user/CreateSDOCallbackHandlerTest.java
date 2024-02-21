@@ -59,6 +59,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
@@ -2542,8 +2544,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder().standardDisclosureDate(testDate).inspectionDate(testDate).build())
                 .sdoR2AddendumReport(SdoR2AddendumReport.builder().sdoAddendumReportDate(testDate).build())
                 .sdoR2FurtherAudiogram(SdoR2FurtherAudiogram.builder().sdoClaimantShallUndergoDate(testDate).sdoServiceReportDate(testDate).build())
-                .sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder().sdoDefendantMayAskDate(testDate).build())
-                .sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder().sdoQuestionsShallBeAnsweredDate(testDate).build())
+                .sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder().sdoDefendantMayAskDate(testDate).sdoQuestionsShallBeAnsweredDate(testDate)
+                                                  .sdoApplicationToRelyOnFurther(SdoR2ApplicationToRelyOnFurther.builder().applicationToRelyOnFurtherDetails(
+                                                      SdoR2ApplicationToRelyOnFurtherDetails.builder().applicationToRelyDetailsDate(testDate).build()).build()).build())
                 .sdoR2PermissionToRelyOnExpert(SdoR2PermissionToRelyOnExpert.builder().sdoPermissionToRelyOnExpertDate(testDate).sdoJointMeetingOfExpertsDate(testDate).build())
                 .sdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder().sdoInstructionOfTheExpertDate(testDate).sdoExpertReportDate(testDate)
                                                    .sdoWrittenQuestionsDate(testDate).sdoRepliesDate(testDate).build())
@@ -2565,7 +2568,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             if (valid) {
                 assertThat(response.getErrors()).size().isZero();
             } else {
-                assertThat(response.getErrors()).size().isEqualTo(24);
+                assertThat(response.getErrors()).size().isEqualTo(25);
                 assertThat(response.getErrors()).contains(ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE);
                 assertThat(response.getErrors()).contains(ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO);
             }
