@@ -73,11 +73,13 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         }
     }
 
-    private String getTemplate(CaseEvent hwfEvent) {
+    private String getTemplate(CaseEvent hwfEvent, boolean isBilingual) {
         if (emailTemplates == null) {
             emailTemplates = ImmutableMap.of(
                 CaseEvent.NO_REMISSION_HWF,
-                notificationsProperties.getNotifyApplicantForHwfNoRemission()
+                isBilingual ? notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()
+                    : notificationsProperties.getNotifyApplicantForHwfNoRemission()
+
             );
         }
         return emailTemplates.get(hwfEvent);
@@ -98,7 +100,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         if (Objects.nonNull(caseData.getApplicant1Email())) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                getTemplate(caseData.getHwFEvent()),
+                getTemplate(caseData.getHwFEvent(), caseData.isBilingual()),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );

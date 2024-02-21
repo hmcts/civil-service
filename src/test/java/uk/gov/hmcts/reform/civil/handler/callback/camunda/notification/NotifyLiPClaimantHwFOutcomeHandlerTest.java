@@ -55,6 +55,9 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
     class AboutToSubmitCallback {
 
         private static final String EMAIL_TEMPLATE_HWF = "test-hwf-noremission-id";
+
+        private static final String EMAIL_NO_REMISSION_TEMPLATE_HWF_BILINGUAL = "test-hwf-noremission-bilingual-id";
+
         private static final String EMAIL = "test@email.com";
         private static final String REFERENCE_NUMBER = "hwf-outcome-notification-000DC001";
         private static final String CLAIMANT = "Mr. John Rambo";
@@ -89,8 +92,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
-                EMAIL_TEMPLATE_HWF);
             when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
@@ -102,7 +103,8 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 .noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
             CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder().claimIssuedHwfDetails(hwfeeDetails).build();
-
+            when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
+                EMAIL_TEMPLATE_HWF);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             // When
@@ -118,6 +120,43 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         }
 
         @Test
+        void shouldNotifyApplicant_HwfOutcome_NoRemission_ClaimIssuedBilingual() {
+            // Given
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(NO_REMISSION_HWF)
+                .noRemissionDetails("no remission")
+                .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
+                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
+                                .partyEmail(EMAIL)
+                                .build())
+                .respondent1Represented(YesOrNo.NO)
+                .specRespondent1Represented(YesOrNo.NO)
+                .applicant1Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference("BOTH")
+                .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber(
+                    HWF_REFERENCE).build()).build())
+                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
+                .claimIssuedHwfDetails(hwfeeDetails)
+                .hwfFeeType(FeeType.CLAIMISSUED)
+                .build();
+            when(notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()).thenReturn(
+                EMAIL_NO_REMISSION_TEMPLATE_HWF_BILINGUAL);
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                EMAIL,
+                EMAIL_NO_REMISSION_TEMPLATE_HWF_BILINGUAL,
+                getNotificationDataMapNoRemissionClaimIssued(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
         void shouldNotifyApplicant_HwfOutcome_NoRemission_Hearing() {
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
@@ -126,7 +165,8 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE).build();
 
             CaseData caseData = HEARING_CASE_DATA.toBuilder().hearingHwfDetails(hwfeeDetails).build();
-
+            when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
+                EMAIL_TEMPLATE_HWF);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             // When
