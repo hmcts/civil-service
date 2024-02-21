@@ -2500,7 +2500,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             if (valid) {
                 assertThat(response.getErrors()).isEmpty();
             } else {
-                assertThat(response.getErrors().size()).isEqualTo(5);
+                assertThat(response.getErrors()).hasSize(5);
             }
         }
 
@@ -2528,7 +2528,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             if (valid) {
                 assertThat(response.getErrors()).isEmpty();
             } else {
-                assertThat(response.getErrors().size()).isEqualTo(2);
+                assertThat(response.getErrors()).hasSize(2);
             }
         }
     }
