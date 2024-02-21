@@ -78,6 +78,9 @@ public enum DashboardClaimStatus {
     CLAIMANT_HWF_NO_REMISSION(
         Claim::isHwfNoRemission
     ),
+    CLAIMANT_HWF_PARTIAL_REMISSION(
+        Claim::isHwfPartialRemission
+    ),
     HEARING_FORM_GENERATED(Claim::isHearingFormGenerated),
     REQUESTED_CCJ_BY_REDETERMINATION(
         Claim::hasCCJByRedetermination

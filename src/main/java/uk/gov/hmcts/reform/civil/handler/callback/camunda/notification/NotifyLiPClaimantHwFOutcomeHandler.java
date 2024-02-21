@@ -69,6 +69,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     public Map<String, String> addProperties(CaseData caseData) {
         return switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);
+            case PARTIAL_REMISSION_HWF_GRANTED -> getPartialRemissionProperties(caseData);
             default -> throw new IllegalArgumentException("case event not found");
         };
     }
@@ -77,7 +78,9 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         if (emailTemplates == null) {
             emailTemplates = ImmutableMap.of(
                 CaseEvent.NO_REMISSION_HWF,
-                notificationsProperties.getNotifyApplicantForHwfNoRemission()
+                notificationsProperties.getNotifyApplicantForHwfNoRemission(),
+                CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
+                notificationsProperties.getNotifyApplicantForHwfPartialRemission()
             );
         }
         return emailTemplates.get(hwfEvent);
@@ -91,6 +94,17 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
             TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
             HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber(),
             AMOUNT, caseData.getHwFFeeAmount().toString()
+        );
+    }
+
+    private Map<String, String> getPartialRemissionProperties(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
+            HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber(),
+            PART_AMOUNT, caseData.getRemissionAmount().toString(),
+            REMAINING_AMOUNT, caseData.getOutstandingFeeInPounds().toString()
         );
     }
 
