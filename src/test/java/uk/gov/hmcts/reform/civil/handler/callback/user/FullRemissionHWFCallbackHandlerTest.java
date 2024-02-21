@@ -102,12 +102,9 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
         }
 
         @Test
-        void shouldUpdateFullRemissionData_ClaimFee_HwFDetailsExist() {
+        void shouldUpdateFullRemissionData_ClaimFee_HwFDetailsNotExist() {
             CaseData caseData = CaseData.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                                           .remissionAmount(BigDecimal.valueOf(5000))
-                                           .outstandingFeeInPounds(BigDecimal.valueOf(50)).build())
                 .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
