@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
@@ -2283,7 +2284,9 @@ public class EventHistoryMapper {
 
     private BigDecimal getCostOfJudgment(CaseData data) {
 
-        if (Optional.ofNullable(data.getCaseDataLiP()).map(CaseDataLiP::getHelpWithFees).isPresent()) {
+        if (Optional.ofNullable(data.getCaseDataLiP())
+            .map(CaseDataLiP::getHelpWithFees)
+            .map(HelpWithFees::getHelpWithFeesReferenceNumber).isPresent()) {
             return data.getClaimIssuedHwfDetails().getOutstandingFeeInPounds();
         }
 
