@@ -46,8 +46,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
     private NotificationService notificationService;
     @Mock
     private NotificationsProperties notificationsProperties;
-    @Mock
-    private FeatureToggleService toggleService;
     @InjectMocks
     private NotifyLiPClaimantHwFOutcomeHandler handler;
 
@@ -91,7 +89,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         void setup() {
             when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
                 EMAIL_TEMPLATE_HWF);
-            when(toggleService.isLipVLipEnabled()).thenReturn(true);
         }
 
         @Test
