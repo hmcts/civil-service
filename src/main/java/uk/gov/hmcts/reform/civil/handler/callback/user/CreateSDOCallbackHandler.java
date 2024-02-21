@@ -1146,6 +1146,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             }
         }
 
+        if (featureToggleService.isSdoR2Enabled() && isSDOR2Screen(caseData)) {
+            List<String> errorsNihl;
+            errorsNihl = validateFieldsNihl(caseData);
+            if (!errorsNihl.isEmpty()) {
+                errors.addAll(errorsNihl);
+            }
+        }
+
         if (errors.isEmpty()) {
             CaseDocument document = sdoGeneratorService.generate(
                 caseData,
@@ -1156,14 +1164,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 updatedData.sdoOrderDocument(document);
             }
             assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
-        }
-
-        if (featureToggleService.isSdoR2Enabled() && isSDOR2Screen(caseData)) {
-            List<String> errorsNihl;
-            errorsNihl = validateFieldsNihl(caseData);
-            if (!errorsNihl.isEmpty()) {
-                errors.addAll(errorsNihl);
-            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

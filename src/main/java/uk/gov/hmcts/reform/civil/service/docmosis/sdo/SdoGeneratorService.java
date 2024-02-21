@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
@@ -348,22 +347,18 @@ public class SdoGeneratorService {
                                .getIncludeInOrderToggle() != null)
             .hasDisclosureOfDocuments(caseData.getSdoR2DisclosureOfDocumentsToggle() != null)
             .hasWitnessOfFact(caseData.getSdoR2SeparatorWitnessesOfFactToggle() != null)
-            .hasRestrictWitness(YesOrNo.YES.equals(caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness()
-                                                       .getIsRestrictWitness()))
-            .hasRestrictPages(YesOrNo.YES.equals(caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages()
-                                                     .getIsRestrictPages()))
+            .hasRestrictWitness(SdoHelper.isRestrictWitnessNihl(caseData))
+            .hasRestrictPages(SdoHelper.isRestrictPagesNihl(caseData))
             .hasExpertEvidence(caseData.getSdoR2SeparatorExpertEvidenceToggle() != null)
             .hasAddendumReport(caseData.getSdoR2SeparatorAddendumReportToggle() != null)
             .hasFurtherAudiogram(caseData.getSdoR2SeparatorFurtherAudiogramToggle() != null)
             .hasQuestionsOfClaimantExpert(caseData.getSdoR2SeparatorQuestionsClaimantExpertToggle() != null)
-            .isApplicationToRelyOnFurther(YesOrNo.YES.equals(
-                caseData.getSdoR2QuestionsClaimantExpert()
-                    .getSdoApplicationToRelyOnFurther().getDoRequireApplicationToRely()) ? "Yes" : "No")
+            .isApplicationToRelyOnFurther(SdoHelper.isApplicationToRelyOnFurtherNihl(caseData))
             .hasPermissionFromENT(caseData.getSdoR2SeparatorPermissionToRelyOnExpertToggle() != null)
             .hasEvidenceFromAcousticEngineer(caseData.getSdoR2SeparatorEvidenceAcousticEngineerToggle() != null)
             .hasQuestionsToENTAfterReport(caseData.getSdoR2SeparatorQuestionsToEntExpertToggle() != null)
             .hasScheduleOfLoss(caseData.getSdoR2ScheduleOfLossToggle() != null)
-            .hasClaimForPecuniaryLoss(YesOrNo.YES.equals(caseData.getSdoR2ScheduleOfLoss().getIsClaimForPecuniaryLoss()))
+            .hasClaimForPecuniaryLoss(SdoHelper.isClaimForPecuniaryLossNihl(caseData))
             .hasUploadDocuments(caseData.getSdoR2SeparatorUploadOfDocumentsToggle() != null)
             .hasSdoTrial(caseData.getSdoR2TrialToggle() != null)
             .hasNewDirections(caseData.getSdoR2AddNewDirection() != null)
@@ -372,18 +367,20 @@ public class SdoGeneratorService {
                 && TrialOnRadioOptions.TRIAL_WINDOW.equals(caseData.getSdoR2Trial().getTrialOnOptions())) ? true : false)
             .sdoTrialHearingTimeAllocated(SdoHelper.getSdoTrialHearingTimeAllocated(caseData))
             .sdoTrialMethodOfHearing(SdoHelper.getSdoTrialMethodOfHearing(caseData))
-            .physicalBundlePartyTxt(SdoHelper.getPhysicalTrialText(caseData));
+            .physicalBundlePartyTxt(SdoHelper.getPhysicalTrialTextNihl(caseData));
 
-        sdoNihlDocumentFormBuilder
-            .hearingLocation(locationHelper.getHearingLocation(
-                Optional.ofNullable(SdoHelper.getHearingLocationNihl(caseData))
-                    .map(DynamicList::getValue)
-                    .map(DynamicListElement::getLabel)
-                    .orElse(null),
-                caseData,
-                authorisation
-            ))
-            .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
+        if (caseData.getSdoR2Trial() != null) {
+            sdoNihlDocumentFormBuilder
+                .hearingLocation(locationHelper.getHearingLocation(
+                    Optional.ofNullable(SdoHelper.getHearingLocationNihl(caseData))
+                        .map(DynamicList::getValue)
+                        .map(DynamicListElement::getLabel)
+                        .orElse(null),
+                    caseData,
+                    authorisation
+                ));
+        }
+        sdoNihlDocumentFormBuilder.caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
         return sdoNihlDocumentFormBuilder.build();
     }

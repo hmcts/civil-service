@@ -76,7 +76,7 @@ public class SdoHelper {
 
     public static boolean isNihlFastTrack(CaseData caseData) {
 
-        return  ((caseData.getDrawDirectionsOrderRequired() == NO
+        return ((caseData.getDrawDirectionsOrderRequired() == NO
             && caseData.getFastClaims() != null
             && caseData.getFastClaims().contains(
             FastTrack.fastClaimNoiseInducedHearingLoss))
@@ -98,7 +98,7 @@ public class SdoHelper {
         return null;
     }
 
-    public static String getPhysicalTrialText(CaseData caseData) {
+    public static String getPhysicalTrialTextNihl(CaseData caseData) {
         if (caseData.getSdoR2Trial() != null
             && PhysicalTrialBundleOptions.NONE.equals(caseData.getSdoR2Trial().getPhysicalBundleOptions())) {
             return "None";
@@ -108,6 +108,31 @@ public class SdoHelper {
             return caseData.getSdoR2Trial().getPhysicalBundlePartyTxt();
         }
         return EMPTY_STRING;
+    }
+
+    public static boolean isRestrictWitnessNihl(CaseData caseData) {
+        return caseData.getSdoR2WitnessesOfFact() != null
+            && YesOrNo.YES.equals(caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness()
+                                      .getIsRestrictWitness());
+    }
+
+    public static boolean isRestrictPagesNihl(CaseData caseData) {
+        return caseData.getSdoR2WitnessesOfFact() != null
+            && YesOrNo.YES.equals(caseData.getSdoR2WitnessesOfFact().getSdoRestrictPages()
+                                      .getIsRestrictPages());
+    }
+
+    public static String isApplicationToRelyOnFurtherNihl(CaseData caseData) {
+        return (caseData.getSdoR2QuestionsClaimantExpert() != null
+            && YesOrNo.YES.equals(
+            caseData.getSdoR2QuestionsClaimantExpert()
+                .getSdoApplicationToRelyOnFurther().getDoRequireApplicationToRely())) ? "Yes" : "No";
+    }
+
+    public static boolean isClaimForPecuniaryLossNihl(CaseData caseData) {
+
+        return (caseData.getSdoR2ScheduleOfLoss() != null
+            && YesOrNo.YES.equals(caseData.getSdoR2ScheduleOfLoss().getIsClaimForPecuniaryLoss()));
     }
 
     public static boolean hasSharedVariable(CaseData caseData, String variableName) {
