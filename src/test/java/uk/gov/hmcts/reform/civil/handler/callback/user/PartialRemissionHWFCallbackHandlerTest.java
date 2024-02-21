@@ -44,7 +44,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
     void setUp() {
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
-        handler = new PartialRemissionHWFCallbackHandler(objectMapper,hwfFeePaymentOutcomeService);
+        handler = new PartialRemissionHWFCallbackHandler(objectMapper, hwfFeePaymentOutcomeService);
     }
 
     @Test
@@ -83,9 +83,9 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
             CaseData caseData = CaseData.builder()
                 .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
                 .hearingHwfDetails(HelpWithFeesDetails.builder()
-                                           .remissionAmount(BigDecimal.valueOf(1000))
-                                           .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
-                                           .build())
+                                       .remissionAmount(BigDecimal.valueOf(1000))
+                                       .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
+                                       .build())
                 .hwfFeeType(FeeType.HEARING)
                 .build();
             when(hwfFeePaymentOutcomeService.updateOutstandingFee(any(CaseData.class))).thenReturn(caseData);
