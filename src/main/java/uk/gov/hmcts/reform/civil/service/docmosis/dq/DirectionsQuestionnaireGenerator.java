@@ -237,7 +237,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                               && fileName.equals(element.getValue().getDocumentName()));
     }
 
-
     private String getFileName(CaseData caseData, DocmosisTemplates templateId) {
         String userPrefix = isRespondentState(caseData) ? "defendant" : "claimant";
         return String.format(templateId.getDocumentTitle(), userPrefix, caseData.getLegacyCaseReference());
