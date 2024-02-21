@@ -1111,7 +1111,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
             if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)
-             && caseData.getSdoR2SmallClaimsHearing() != null) {
+                && caseData.getSdoR2SmallClaimsHearing() != null) {
                 toUseList = caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList() != null
                     ? Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList())
                     : Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList());
