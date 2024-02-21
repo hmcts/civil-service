@@ -230,6 +230,7 @@ class FeesPaymentServiceTest {
             .thenReturn(response);
         CardPaymentStatusResponse govPaymentRequestStatus = feesPaymentService.getGovPaymentRequestStatus(
             HEARING,
+            "123",
             "RC-1701-0909-0602-0418",
             BEARER_TOKEN
         );
@@ -244,7 +245,7 @@ class FeesPaymentServiceTest {
 
         assertThrows(
             PaymentsApiException.class,
-            () -> feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "RC-1701-0909-0602-0418", BEARER_TOKEN)
+            () -> feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN)
         );
 
         verify(paymentsClient, times(5)).getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);
@@ -257,7 +258,7 @@ class FeesPaymentServiceTest {
 
         assertThrows(
             PaymentsApiException.class,
-            () -> feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "RC-1701-0909-0602-0418", BEARER_TOKEN
+            () -> feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN
             )
         );
 
@@ -271,7 +272,7 @@ class FeesPaymentServiceTest {
             .thenThrow(FeignException.InternalServerError.class)
             .thenReturn(buildGovPayCardPaymentStatusResponse("Success"));
 
-        feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "RC-1701-0909-0602-0418", BEARER_TOKEN);
+        feesPaymentService.getGovPaymentRequestStatus(FeeType.HEARING, "123", "RC-1701-0909-0602-0418", BEARER_TOKEN);
 
         verify(paymentsClient, times(3))
             .getGovPayCardPaymentStatus("RC-1701-0909-0602-0418", BEARER_TOKEN);

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,8 +10,8 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
-import uk.gov.hmcts.reform.payments.client.PaymentsClient;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
 import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
@@ -28,9 +29,9 @@ public class FeesPaymentService {
 
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
-    private final PaymentsClient paymentsClient;
     private final PinInPostConfiguration pinInPostConfiguration;
     private final PaymentStatusService paymentStatusService;
+    private final UpdatePaymentStatusService updatePaymentStatusService;
 
     public CardPaymentStatusResponse createGovPaymentRequest(
         FeeType feeType, String caseReference, String authorization) {
@@ -41,7 +42,7 @@ public class FeesPaymentService {
 
         SRPbaDetails feePaymentDetails = feeType.equals(FeeType.HEARING)
             ? caseData.getHearingFeePBADetails()
-            : caseData.getClaimIssuedPBADetails();
+            : getClaimIssuePbaDetails(caseData.getServiceRequestReference(), caseData.getClaimFee());
 
         requireNonNull(feePaymentDetails, "Fee Payment details cannot be null");
         requireNonNull(feePaymentDetails.getServiceReqReference(), "Fee Payment service request cannot be null");
@@ -67,8 +68,15 @@ public class FeesPaymentService {
         return CardPaymentStatusResponse.from(govPayCardPaymentRequest);
     }
 
+    private SRPbaDetails getClaimIssuePbaDetails(String serviceReference, Fee claimFee) {
+        return SRPbaDetails.builder()
+            .serviceReqReference("1234")
+            .fee(claimFee)
+            .build();
+    }
+
     public CardPaymentStatusResponse getGovPaymentRequestStatus(
-        FeeType feeType, String paymentReference, String authorization) {
+        FeeType feeType, String caseReference, String paymentReference, String authorization) {
         log.info("Checking payment status for {} of fee type {}", paymentReference, feeType);
         PaymentDto cardPaymentDetails = paymentStatusService.getCardPaymentDetails(paymentReference, authorization);
         String paymentStatus = cardPaymentDetails.getStatus();
@@ -79,11 +87,19 @@ public class FeesPaymentService {
             .paymentFor(feeType.name().toLowerCase())
             .paymentAmount(cardPaymentDetails.getAmount());
 
+
         if (paymentStatus.equals("Failed")) {
             Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
                 .filter(h -> h.getStatus().equals(paymentStatus))
                 .findFirst()
                 .ifPresent(h -> response.errorCode(h.getErrorCode()).errorDescription(h.getErrorMessage()));
+        }
+
+        try {
+            updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, response.build());
+        }
+        catch (Exception e) {
+            log.error("Update payment status failed for claim [{}]", caseReference);
         }
 
         return response.build();

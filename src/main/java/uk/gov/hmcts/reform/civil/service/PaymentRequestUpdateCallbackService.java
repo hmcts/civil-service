@@ -69,18 +69,9 @@ public class PaymentRequestUpdateCallbackService {
             getEventNameFromFeeType(caseData, feeType)
         );
 
-        CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
-        BusinessProcess businessProcess = null;
-
-        if (feeType.equals(FeeType.HEARING.name())) {
-            businessProcess = startEventData.getBusinessProcess()
-                .updateActivityId(serviceRequestReceived);
-        }
-
         CaseDataContent caseDataContent = buildCaseDataContent(
             startEventResponse,
-            caseData,
-            businessProcess
+            caseData
         );
 
         coreCaseDataService.submitUpdate(caseId, caseDataContent);
@@ -143,13 +134,9 @@ public class PaymentRequestUpdateCallbackService {
         return pbaDetails;
     }
 
-    private CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData,
-                                                 BusinessProcess businessProcess) {
+    private CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData) {
 
         Map<String, Object> updatedData = caseData.toMap(objectMapper);
-        if (businessProcess != null) {
-            updatedData.put("businessProcess", businessProcess);
-        }
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
             .event(Event.builder().id(startEventResponse.getEventId())
