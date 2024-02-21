@@ -54,10 +54,14 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
             Optional.ofNullable(caseData.getClaimIssuedHwfDetails())
                 .ifPresentOrElse(
                     claimIssuedHwfDetails -> updatedData.claimIssuedHwfDetails(
-                        claimIssuedHwfDetails.toBuilder().remissionAmount(claimFeeAmount).build()
+                        claimIssuedHwfDetails.toBuilder().remissionAmount(claimFeeAmount)
+                            .outstandingFeeInPounds(BigDecimal.ZERO)
+                            .build()
                     ),
                     () -> updatedData.claimIssuedHwfDetails(
-                        HelpWithFeesDetails.builder().remissionAmount(claimFeeAmount).build()
+                        HelpWithFeesDetails.builder().remissionAmount(claimFeeAmount)
+                            .outstandingFeeInPounds(BigDecimal.ZERO)
+                            .build()
                     )
                 );
         } else if (caseData.isHWFTypeHearing() && hearingFeeAmount.compareTo(BigDecimal.ZERO) != 0) {

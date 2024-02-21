@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -59,7 +60,9 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
-        if (Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getHelpWithFees).isPresent()) {
+        if (Optional.ofNullable(caseData.getCaseDataLiP())
+            .map(CaseDataLiP::getHelpWithFees)
+            .map(HelpWithFees::getHelpWithFeesReferenceNumber).isPresent()) {
             return caseData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds();
         }
         return caseData.isLipvLipOneVOne()
