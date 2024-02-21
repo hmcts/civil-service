@@ -1257,13 +1257,19 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public CaseEvent getHwFEvent() {
-        if (this.isHWFTypeHearing()) {
+        if (this.isHWFTypeHearing() && this.getHearingHwfDetails() != null) {
             return this.getHearingHwfDetails().getHwfCaseEvent();
         }
-        if (this.isHWFTypeClaimIssued()) {
+        if (this.isHWFTypeClaimIssued() && this.getClaimIssuedHwfDetails() != null) {
             return this.getClaimIssuedHwfDetails().getHwfCaseEvent();
         }
         return null;
+    }
+
+    @JsonIgnore
+    public boolean isHWFOutcomeReady() {
+        return (this.getCcdState() == CaseState.PENDING_CASE_ISSUED && this.isHWFTypeClaimIssued())
+            || (this.getCcdState() == CaseState.HEARING_READINESS && this.isHWFTypeHearing());
     }
 
     @JsonIgnore
