@@ -21,4 +21,5 @@ public class HelpWithFeesDetails {
     private BigDecimal outstandingFeeInPounds;
     private String noRemissionDetails;
     private NoRemissionDetailsSummary noRemissionDetailsSummary;
+    private String hwfReferenceNumber;
 }
