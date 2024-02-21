@@ -55,6 +55,8 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
     class AboutToSubmitCallback {
 
         private static final String EMAIL_TEMPLATE_HWF = "test-hwf-noremission-id";
+        private static final String EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION = "test-hwf-partialRemission-id";
+
         private static final String EMAIL = "test@email.com";
         private static final String REFERENCE_NUMBER = "hwf-outcome-notification-000DC001";
         private static final String CLAIMANT = "Mr. John Rambo";
@@ -94,7 +96,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
                 EMAIL_TEMPLATE_HWF);
             when(notificationsProperties.getNotifyApplicantForHwfPartialRemission()).thenReturn(
-                EMAIL_TEMPLATE_HWF);
+                EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION);
         }
 
         @Test
@@ -163,7 +165,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             // Then
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
-                EMAIL_TEMPLATE_HWF,
+                EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION,
                 getNotificationDataMapPartialRemissionClaimIssued(),
                 REFERENCE_NUMBER
             );
@@ -188,7 +190,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             // Then
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
-                EMAIL_TEMPLATE_HWF,
+                EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION,
                 getNotificationDataMapPartialRemissionHearing(),
                 REFERENCE_NUMBER
             );
