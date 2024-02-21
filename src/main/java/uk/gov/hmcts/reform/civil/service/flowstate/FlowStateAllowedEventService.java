@@ -1386,7 +1386,8 @@ public class FlowStateAllowedEventService {
                 TRANSFER_ONLINE_CASE,
                 PARTIAL_REMISSION_HWF_GRANTED,
                 FULL_REMISSION_HWF,
-                UPDATE_HELP_WITH_FEE_NUMBER
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE
             )
         ),
         entry(
@@ -1585,7 +1586,8 @@ public class FlowStateAllowedEventService {
                 MORE_INFORMATION_HWF,
                 PARTIAL_REMISSION_HWF_GRANTED,
                 FULL_REMISSION_HWF,
-                UPDATE_HELP_WITH_FEE_NUMBER
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE
             )
         ),
         entry(
