@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
@@ -58,6 +59,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.lang.String.format;
+import static java.math.BigDecimal.ZERO;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
@@ -513,7 +515,7 @@ public class EventHistoryMapper {
             .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
                                   .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
                                            ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-                                           caseData.getTotalInterest())
+                                           Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO))
                                   .setScale(2))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
                                .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
@@ -2280,6 +2282,10 @@ public class EventHistoryMapper {
     }
 
     private BigDecimal getCostOfJudgment(CaseData data) {
+
+        if (Optional.ofNullable(data.getCaseDataLiP()).map(CaseDataLiP::getHelpWithFees).isPresent()) {
+            return data.getClaimIssuedHwfDetails().getOutstandingFeeInPounds();
+        }
 
         String repaymentSummary = data.getRepaymentSummaryObject();
         BigDecimal fixedCost = null;

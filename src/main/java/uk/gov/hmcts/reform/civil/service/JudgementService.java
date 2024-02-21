@@ -5,11 +5,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
 
@@ -57,8 +59,12 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
-        return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee() :
-            MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
+        if (Optional.ofNullable(caseData.getCaseDataLiP()).map(CaseDataLiP::getHelpWithFees).isPresent()) {
+            return caseData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds();
+        }
+        return caseData.isLipvLipOneVOne()
+            ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()
+            : MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
     }
 
     public BigDecimal ccjJudgmentPaidAmount(CaseData caseData) {
@@ -72,7 +78,7 @@ public class JudgementService {
 
     public BigDecimal ccjJudgmentInterest(CaseData caseData) {
         return caseData.isLipvLipOneVOne() ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-            caseData.getTotalInterest();
+            Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO);
     }
 
     public BigDecimal ccjJudgementSubTotal(CaseData caseData) {
