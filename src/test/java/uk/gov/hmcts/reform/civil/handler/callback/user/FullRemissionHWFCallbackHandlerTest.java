@@ -100,5 +100,23 @@ public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getHearingHwfDetails().getRemissionAmount()).isNull();
         }
+
+        @Test
+        void shouldUpdateFullRemissionData_ClaimFee_HwFDetailsExist() {
+            CaseData caseData = CaseData.builder()
+                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
+                                           .remissionAmount(BigDecimal.valueOf(5000))
+                                           .outstandingFeeInPounds(BigDecimal.valueOf(50)).build())
+                .hwfFeeType(FeeType.CLAIMISSUED)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+            //When
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            //Then
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+            assertThat(updatedData.getClaimIssuedHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(10000));
+            assertThat(updatedData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.ZERO);
+        }
     }
 }
