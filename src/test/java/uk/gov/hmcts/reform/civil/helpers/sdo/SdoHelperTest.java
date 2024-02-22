@@ -550,7 +550,7 @@ public class SdoHelperTest {
     @Nested
     class HasSmallClaimsVariableTest {
         @Test
-        void shouldReturnTrue_whenTogglesExist() {
+        void g() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .build()

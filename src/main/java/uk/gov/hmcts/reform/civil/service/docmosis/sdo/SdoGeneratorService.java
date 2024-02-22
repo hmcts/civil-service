@@ -365,6 +365,13 @@ public class SdoGeneratorService {
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsNumberOfWitnessesToggle")
             );
 
+        if (featureToggleService.isSdoR2Enabled()) {
+            sdoDocumentFormBuilder.smallClaimsFlightDelayToggle(
+                    SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle")
+                )
+                .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay());
+        }
+
         sdoDocumentFormBuilder.hearingLocation(
                 locationHelper.getHearingLocation(
                     Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
