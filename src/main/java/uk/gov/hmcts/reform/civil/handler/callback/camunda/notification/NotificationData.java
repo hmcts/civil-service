@@ -96,6 +96,8 @@ public interface NotificationData {
     String TYPE_OF_FEE = "typeOfFee";
     String HWF_REFERENCE_NUMBER = "hwFReferenceNumber";
     String AMOUNT = "amount";
+    String PART_AMOUNT = "partAmount";
+    String REMAINING_AMOUNT = "remainingAmount";
 
     Map<String, String> addProperties(CaseData caseData);
 

@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -13,9 +16,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -33,6 +39,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForHwFOutcome
     );
     private Map<CaseEvent, String> emailTemplates;
+    private Map<CaseEvent, String> emailTemplatesBilingual;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -46,11 +53,11 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     private CallbackResponse notifyApplicantForHwFOutcome(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        CaseEvent hwfEvent = caseData.getHwFEvent();
         if (Objects.nonNull(caseData.getApplicant1Email())) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                getTemplate(caseData.getHwFEvent()),
+                caseData.isBilingual() ? getTemplateBilingual(hwfEvent) : getTemplate(hwfEvent),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
@@ -67,8 +74,18 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+        Map<String, String> commonProperties = getCommonProperties(caseData);
+        Map<String, String> furtherProperties = getFurtherProperties(caseData);
+        return Collections.unmodifiableMap(
+            Stream.concat(commonProperties.entrySet().stream(), furtherProperties.entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+    }
+
+    private Map<String, String> getFurtherProperties(CaseData caseData) {
         return switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);
+            case UPDATE_HELP_WITH_FEE_NUMBER -> Collections.emptyMap();
+            case PARTIAL_REMISSION_HWF_GRANTED -> getPartialRemissionProperties(caseData);
             default -> throw new IllegalArgumentException("case event not found");
         };
     }
@@ -77,20 +94,45 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         if (emailTemplates == null) {
             emailTemplates = ImmutableMap.of(
                 CaseEvent.NO_REMISSION_HWF,
-                notificationsProperties.getNotifyApplicantForHwfNoRemission()
+                notificationsProperties.getNotifyApplicantForHwfNoRemission(),
+                CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
+                notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber(),
+                CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
+                notificationsProperties.getNotifyApplicantForHwfPartialRemission()
             );
         }
         return emailTemplates.get(hwfEvent);
     }
 
+    private String getTemplateBilingual(CaseEvent hwfEvent) {
+        if (emailTemplatesBilingual == null) {
+            emailTemplatesBilingual = ImmutableMap.of(
+                CaseEvent.NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()
+            );
+        }
+        return emailTemplatesBilingual.get(hwfEvent);
+    }
+
     private Map<String, String> getNoRemissionProperties(CaseData caseData) {
+        return Map.of(
+            REASONS, getHwFNoRemissionReason(caseData),
+            AMOUNT, caseData.getHwFFeeAmount().toString()
+        );
+    }
+
+    private Map<String, String> getPartialRemissionProperties(CaseData caseData) {
+        return Map.of(
+            PART_AMOUNT, caseData.getRemissionAmount().toString(),
+            REMAINING_AMOUNT, caseData.getOutstandingFeeInPounds().toString()
+        );
+    }
+
+    private Map<String, String> getCommonProperties(CaseData caseData) {
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-            REASONS, getHwFNoRemissionReason(caseData),
             TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
-            HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber(),
-            AMOUNT, caseData.getHwFFeeAmount().toString()
+            HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber()
         );
     }
 
