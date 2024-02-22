@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.NoRemissionDetailsSummary;
@@ -38,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
@@ -61,6 +65,14 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         private static final String CLAIM_REFERENCE = "000DC001";
         private static final String CLAIM_FEE_AMOUNT = "1000.00";
         private static final String HEARING_FEE_AMOUNT = "2000.00";
+
+        @BeforeEach
+        void setup() {
+            when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
+                EMAIL_TEMPLATE_HWF);
+            when(notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()).thenReturn(
+                EMAIL_NO_REMISSION_TEMPLATE_HWF_BILINGUAL);
+        }
 
         private static final CaseData CLAIM_ISSUE_CASE_DATA = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
             .applicant1(PartyBuilder.builder().individual().build().toBuilder()
@@ -94,8 +106,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 .noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
             CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder().claimIssuedHwfDetails(hwfeeDetails).build();
-            when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
-                EMAIL_TEMPLATE_HWF);
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             // When
@@ -131,8 +142,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 .claimIssuedHwfDetails(hwfeeDetails)
                 .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
-            when(notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()).thenReturn(
-                EMAIL_NO_REMISSION_TEMPLATE_HWF_BILINGUAL);
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             // When
@@ -156,8 +166,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE).build();
 
             CaseData caseData = HEARING_CASE_DATA.toBuilder().hearingHwfDetails(hwfeeDetails).build();
-            when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
-                EMAIL_TEMPLATE_HWF);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             // When
