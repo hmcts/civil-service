@@ -21,7 +21,5 @@ public class HelpWithFeesDetails {
     private BigDecimal outstandingFeeInPounds;
     private String noRemissionDetails;
     private NoRemissionDetailsSummary noRemissionDetailsSummary;
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private BigDecimal remissionAmount;
     private String hwfReferenceNumber;
 }
