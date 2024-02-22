@@ -308,6 +308,7 @@ notifications:
   mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
   mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
   mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
+  notifyApplicantForHwFMoreInformationNeeded: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
 
   mediationUnsuccessfulLRTemplate: "0b0f7846-6238-4ece-87b1-597e22ed518b"
   mediationUnsuccessfulLIPTemplate: "a986a00b-83f6-459e-a2cb-5bc76ba39164"
