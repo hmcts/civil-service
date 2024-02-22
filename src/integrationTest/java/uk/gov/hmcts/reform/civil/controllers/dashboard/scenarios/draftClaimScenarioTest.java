@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -16,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-@Sql("/scripts/dashboardNotifications/V2024_02_31_1546_create_draft_claim_scenario.sql")
 public class draftClaimScenarioTest extends BaseIntegrationTest {
     public static final String SCENARIO_DRAFT_CLAIM = "Scenario.AAA7.ClaimIssue.ClaimSubmit.Required";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
@@ -26,7 +24,7 @@ public class draftClaimScenarioTest extends BaseIntegrationTest {
     private static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
 
     @Test
-    void should_create_scenario() throws Exception {
+    void should_create_draft_claim_scenario() throws Exception {
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
