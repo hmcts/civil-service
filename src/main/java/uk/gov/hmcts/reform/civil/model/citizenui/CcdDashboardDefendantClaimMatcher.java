@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
