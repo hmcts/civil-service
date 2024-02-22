@@ -808,7 +808,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             if (document != null) {
                 updatedData.sdoOrderDocument(document);
             }
-            assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
+            assignCategoryId.assignCategoryIdToCaseDocument(document, "caseManagementOrders");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
