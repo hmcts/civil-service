@@ -763,7 +763,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                 .altHearingCourtLocationList(getLocationList(callbackParams,
                                                                                              updatedData,
                                                                                              preferredCourt.orElse(null), true))
-                                                .sdoR2SmallClaimsBundleOfDocs(SdoR2SmallClaimsBundleOfDocs.builder().physicalBundlePartyTxt(SdoR2UiConstantSmallClaim.BUNDLE_TEXT).build()).build());
+                                                .sdoR2SmallClaimsBundleOfDocs(SdoR2SmallClaimsBundleOfDocs.builder()
+                                                                                  .physicalBundlePartyTxt(SdoR2UiConstantSmallClaim.BUNDLE_TEXT).build()).build());
         updatedData.sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder()
                                                  .text(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT)
                                                  .date(LocalDate.now().plusDays(7)).build());
