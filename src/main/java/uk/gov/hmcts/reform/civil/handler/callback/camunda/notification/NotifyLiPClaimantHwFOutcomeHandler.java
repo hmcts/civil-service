@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Collections;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -107,7 +104,11 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private String getTemplateBilingual(CaseEvent hwfEvent) {
         if (emailTemplatesBilingual == null) {
             emailTemplatesBilingual = ImmutableMap.of(
-                CaseEvent.NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()
+                CaseEvent.NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh(),
+                CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
+                notificationsProperties.getNotifyApplicantForHwfUpdateRefNumberBilingual(),
+                CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
+                notificationsProperties.getNotifyApplicantForHwfPartialRemissionBilingual()
             );
         }
         return emailTemplatesBilingual.get(hwfEvent);
