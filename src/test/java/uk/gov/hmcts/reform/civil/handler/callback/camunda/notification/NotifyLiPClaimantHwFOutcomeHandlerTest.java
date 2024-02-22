@@ -92,7 +92,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 EMAIL_TEMPLATE_HWF);
             when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeeded()).thenReturn(
                 EMAIL_TEMPLATE_MORE_INFO_HWF);
-
             when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
                 EMAIL_TEMPLATE_NO_REMISSION);
             when(notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()).thenReturn(
@@ -225,7 +224,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF,
-                getNotificationDataMapMoreInfoClaimHearing(),
+                getNotificationDataMapMoreInfoHearing(),
                 REFERENCE_NUMBER
             );
         }
@@ -359,21 +358,23 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
 
         private Map<String, String> getNotificationDataMapMoreInfoClaimIssued() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
-                CLAIMANT_NAME, CLAIMANT,
                 HwF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
-                HwF_MORE_INFO_FEE_TYPE, FeeType.CLAIMISSUED.name(),
-                HwF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString()
+                CLAIMANT_NAME, CLAIMANT,
+                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                HwF_MORE_INFO_FEE_TYPE, FeeType.CLAIMISSUED.getLabel(),
+                HwF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
+                HWF_REFERENCE_NUMBER, HWF_REFERENCE
             );
         }
 
-        private Map<String, String> getNotificationDataMapMoreInfoClaimHearing() {
+        private Map<String, String> getNotificationDataMapMoreInfoHearing() {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
-                CLAIMANT_NAME, CLAIMANT,
                 HwF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
-                HwF_MORE_INFO_FEE_TYPE, FeeType.HEARING.name(),
-                HwF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString()
+                CLAIMANT_NAME, CLAIMANT,
+                CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
+                HwF_MORE_INFO_FEE_TYPE, FeeType.HEARING.getLabel(),
+                HwF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
+                HWF_REFERENCE_NUMBER, HWF_REFERENCE
             );
         }
 

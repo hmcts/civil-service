@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.google.common.collect.ImmutableMap;
+
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -12,7 +14,6 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.HwFMoreInfoRequiredDocuments;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
@@ -142,18 +143,14 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     }
 
     private Map<String, String> getMoreInformationProperties(CaseData caseData) {
-        String typeOfFee = "";
         HelpWithFeesMoreInformation moreInformation = new HelpWithFeesMoreInformation();
         if (null != caseData.getHelpWithFeesMoreInformationClaimIssue()) {
-            typeOfFee = FeeType.CLAIMISSUED.name();
             moreInformation = caseData.getHelpWithFeesMoreInformationClaimIssue();
         } else if (null != caseData.getHelpWithFeesMoreInformationHearing()) {
-            typeOfFee = FeeType.HEARING.name();
             moreInformation = caseData.getHelpWithFeesMoreInformationHearing();
         }
         return Map.of(
             HwF_MORE_INFO_DATE, formatLocalDate(moreInformation.getHwFMoreInfoDocumentDate(), DATE),
-            HwF_MORE_INFO_FEE_TYPE, typeOfFee,
             HwF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentList(moreInformation.getHwFMoreInfoRequiredDocuments())
         );
     }
