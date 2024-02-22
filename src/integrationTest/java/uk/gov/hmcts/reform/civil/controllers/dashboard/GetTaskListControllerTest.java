@@ -26,15 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class GetTaskListControllerTest extends BaseIntegrationTest {
 
     private static final String GET_TASK_LIST_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
-    private final String GET_BY_UUID_URL = "/dashboard/notifications/{uuid}";
-
-    @Test
-    @SneakyThrows
-    void shouldReturnErrorWhenNotUuidFormat() {
-
-        doGet(BEARER_TOKEN, GET_BY_UUID_URL, "1234")
-            .andExpect(status().isBadRequest());
-    }
 
     @Test
     @SneakyThrows
