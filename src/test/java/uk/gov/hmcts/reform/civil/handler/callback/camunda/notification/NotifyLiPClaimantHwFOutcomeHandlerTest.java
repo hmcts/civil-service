@@ -33,8 +33,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
@@ -62,9 +62,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         private static final String EMAIL_TEMPLATE_UPDATE_REF_NUMBER = "test-hwf-updaterefnumber-id";
         private static final String EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION = "test-hwf-partialRemission-id";
         private static final String EMAIL_NO_REMISSION_TEMPLATE_HWF_BILINGUAL = "test-hwf-noremission-bilingual-id";
-        private static final String EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION_BILINGUAL = "test-hwf-partialRemission-bilingual-id";
-        private static final String EMAIL_TEMPLATE_UPDATE_REF_NUMBER_BILINGUAL = "test-hwf-updaterefnumber-bilingual-id";
-
         private static final String EMAIL = "test@email.com";
         private static final String REFERENCE_NUMBER = "hwf-outcome-notification-000DC001";
         private static final String CLAIMANT = "Mr. John Rambo";
@@ -85,10 +82,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 EMAIL_TEMPLATE_UPDATE_REF_NUMBER);
             when(notificationsProperties.getNotifyApplicantForHwfPartialRemission()).thenReturn(
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION);
-            when(notificationsProperties.getNotifyApplicantForHwfPartialRemissionBilingual()).thenReturn(
-                EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION_BILINGUAL);
-            when(notificationsProperties.getNotifyApplicantForHwfUpdateRefNumberBilingual()).thenReturn(
-                EMAIL_TEMPLATE_UPDATE_REF_NUMBER_BILINGUAL);
         }
 
         private static final CaseData CLAIM_ISSUE_CASE_DATA = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
@@ -279,59 +272,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 REFERENCE_NUMBER
             );
         }
-
-        @Test
-        void shouldNotifyApplicant_HwfOutcome_RefNumberUpdated_Bilingual() {
-            // Given
-            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER)
-                .build();
-            CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder()
-                .claimIssuedHwfDetails(hwfeeDetails)
-                .claimantBilingualLanguagePreference("BOTH")
-                .build();
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verify(notificationService, times(1)).sendMail(
-                EMAIL,
-                EMAIL_TEMPLATE_UPDATE_REF_NUMBER_BILINGUAL,
-                getNotificationDataMapUpdateRefNumberClaimIssued(),
-                REFERENCE_NUMBER
-            );
-        }
-
-        @Test
-        void shouldNotifyApplicant_HwfOutcome_partRemission_Bilingual() {
-            // Given
-            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED)
-                .remissionAmount(new BigDecimal(REMISSION_AMOUNT))
-                .outstandingFeeInPounds(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-                .build();
-
-            CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder()
-                .claimantBilingualLanguagePreference("BOTH")
-                .claimIssuedHwfDetails(hwfeeDetails).build();
-
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
-
-            // When
-            handler.handle(params);
-
-            // Then
-            verify(notificationService, times(1)).sendMail(
-                EMAIL,
-                EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION_BILINGUAL,
-                getNotificationDataMapPartialRemissionClaimIssued(),
-                REFERENCE_NUMBER
-            );
-        }
-
 
         private Map<String, String> getNotificationDataMapNoRemissionClaimIssued() {
             return Map.of(
