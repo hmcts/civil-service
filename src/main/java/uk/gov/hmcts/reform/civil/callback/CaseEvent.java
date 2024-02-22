@@ -21,6 +21,7 @@ public enum CaseEvent {
     LIFT_BREATHING_SPACE_SPEC(USER),
     LIFT_BREATHING_SPACE_LIP(USER),
     NO_REMISSION_HWF(USER),
+    FULL_REMISSION_HWF(USER),
     NOTIFY_DEFENDANT_OF_CLAIM(USER),
     NOTIFY_DEFENDANT_OF_CLAIM_DETAILS(USER),
     ADD_OR_AMEND_CLAIM_DOCUMENTS(USER),
@@ -114,6 +115,7 @@ public enum CaseEvent {
     JUDGMENT_PAID_IN_FULL(USER),
     TRANSFER_ONLINE_CASE(USER),
     REQUEST_FOR_RECONSIDERATION(USER),
+    UPDATE_HELP_WITH_FEE_NUMBER(USER),
     DECISION_ON_RECONSIDERATION_REQUEST(USER),
     PARTIAL_REMISSION_HWF_GRANTED(USER),
     ASSIGN_CASE_TO_APPLICANT_SOLICITOR1(CAMUNDA),
@@ -357,12 +359,4 @@ public enum CaseEvent {
         return this.getUserType() == CAMUNDA;
     }
 
-    public static CaseEvent fromString(String text) {
-        for (CaseEvent event : CaseEvent.values()) {
-            if (event.name().equalsIgnoreCase(text)) {
-                return event;
-            }
-        }
-        throw new IllegalArgumentException("No constant with name " + text + " found in CaseEvent enum");
-    }
 }
