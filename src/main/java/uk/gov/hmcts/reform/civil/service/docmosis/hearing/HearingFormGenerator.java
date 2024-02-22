@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.hearing;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.civil.enums.DocCategory;
@@ -42,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getHearingType;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> {
 
     private final DocumentManagementService documentManagementService;
@@ -77,11 +79,13 @@ public class HearingFormGenerator implements TemplateDataGenerator<HearingForm> 
         var foundLocations = locations.stream()
             .filter(location -> location.getEpimmsId().equals(caseData.getCaseManagementLocation().getBaseLocation())).toList();
         if (!foundLocations.isEmpty()) {
+            log.info("foundLocations {}", foundLocations);
             caseManagementLocationDetails = foundLocations.get(0);
         } else {
+            log.error("Base Court Location not found, in location data");
             throw new IllegalArgumentException("Base Court Location not found, in location data");
         }
-
+        log.info("caseManagementLocationDetails.getVenueName {}", caseManagementLocationDetails.getVenueName());
         return HearingForm.builder()
             .courtName(caseManagementLocationDetails.getVenueName())
             .listingOrRelisting(caseData.getListingOrRelisting().toString())
