@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -59,11 +60,13 @@ public class InvalidHwFCallbackHandler extends CallbackHandler {
                 .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
 
         if (caseData.isHWFTypeHearing()) {
-            HelpWithFeesDetails hearingFeeDetails = caseData.getHearingHwfDetails();
+            HelpWithFeesDetails hearingFeeDetails =
+                Optional.ofNullable(caseData.getHearingHwfDetails()).orElse(new HelpWithFeesDetails());
             updatedData.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(INVALID_HWF_REFERENCE).build());
         }
         if (caseData.isHWFTypeClaimIssued()) {
-            HelpWithFeesDetails claimIssuedHwfDetails = caseData.getClaimIssuedHwfDetails();
+            HelpWithFeesDetails claimIssuedHwfDetails =
+                Optional.ofNullable(caseData.getClaimIssuedHwfDetails()).orElse(new HelpWithFeesDetails());
             updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(INVALID_HWF_REFERENCE).build());
         }
         return updatedData.build();
