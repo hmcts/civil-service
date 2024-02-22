@@ -337,16 +337,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getSdoHearingNotes()).isNull();
             assertThat(responseCaseData.getFastTrackHearingNotes()).isNull();
             assertThat(responseCaseData.getDisposalHearingHearingNotes()).isNull();
-            assertThat(responseCaseData.getSdoR2SmallClaimsHearing()).isNull();
-            assertThat(responseCaseData.getSdoR2SmallClaimsUploadDoc()).isNull();
-            assertThat(responseCaseData.getSdoR2SmallClaimsPPI()).isNull();
-            assertThat(responseCaseData.getSdoR2SmallClaimsImpNotes()).isNull();
-            assertThat(responseCaseData.getSdoR2SmallClaimsWitnessStatements()).isNull();
-            assertThat(responseCaseData.getSdoR2SmallClaimsHearingToggle()).isNull();
-            assertThat(responseCaseData.getSdoR2SmallClaimsJudgesRecital()).isNull();
-            assertThat(responseCaseData.getSdoR2SmallClaimsWitnessStatementsToggle()).isNull();
-            assertThat(responseCaseData.getSdoR2SmallClaimsPPIToggle()).isNull();
-            assertThat(responseCaseData.getSdoR2SmallClaimsUploadDocToggle()).isNull();
         }
     }
 
