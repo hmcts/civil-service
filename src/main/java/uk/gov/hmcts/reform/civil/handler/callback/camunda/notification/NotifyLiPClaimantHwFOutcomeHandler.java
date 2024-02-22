@@ -135,17 +135,6 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         );
     }
 
-    private void sendEmail(CaseData caseData) {
-        if (Objects.nonNull(caseData.getApplicant1Email())) {
-            notificationService.sendMail(
-                caseData.getApplicant1Email(),
-                getTemplate(caseData.getHwFEvent()),
-                addProperties(caseData),
-                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
-            );
-        }
-    }
-
     private String getHwFNoRemissionReason(CaseData caseData) {
         if (caseData.isHWFTypeHearing()) {
             return caseData.getHearingHwfDetails().getNoRemissionDetailsSummary().getLabel();
