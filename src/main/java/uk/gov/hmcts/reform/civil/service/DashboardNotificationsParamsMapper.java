@@ -14,14 +14,13 @@ import java.util.Map;
 public class DashboardNotificationsParamsMapper {
 
     public Map<String, Object> mapCaseDataToParams(CaseData caseData){
-        // TODO Check for notification variables
         LocalDate currentDate = LocalDate.now();
-        long daysDifference = ChronoUnit.DAYS.between(caseData.getClaimDismissedDeadline(), currentDate);
+        long daysDifference = ChronoUnit.DAYS.between(caseData.getRespondent1ResponseDeadline(), currentDate);
 
         Map<String, Object> params = new HashMap<>();
+        params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
-        // TODO: find the correct data
-        params.put("date", caseData.getClaimDismissedDeadline());
+        params.put("responseDeadline", caseData.getRespondent1ResponseDeadline());
         params.put("daysLeftToRespond", daysDifference);
 
         return params;

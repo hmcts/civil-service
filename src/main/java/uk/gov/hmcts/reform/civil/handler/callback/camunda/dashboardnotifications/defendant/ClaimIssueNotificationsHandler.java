@@ -53,9 +53,9 @@ public class ClaimIssueNotificationsHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-        // TODO Script to INSERTS
         Map<String, Object> params = dashboardNotificationsParamsMapper.mapCaseDataToParams(caseData);
 
+        System.out.println(params);
         dashboardApiClient.recordScenario(
             caseData.getCcdCaseReference().toString(),
             "Scenario.AAA7.ClaimIssue.Response.Required",
