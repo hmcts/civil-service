@@ -115,6 +115,7 @@ public enum CaseEvent {
     JUDGMENT_PAID_IN_FULL(USER),
     TRANSFER_ONLINE_CASE(USER),
     REQUEST_FOR_RECONSIDERATION(USER),
+    UPDATE_HELP_WITH_FEE_NUMBER(USER),
     DECISION_ON_RECONSIDERATION_REQUEST(USER),
     PARTIAL_REMISSION_HWF_GRANTED(USER),
     ASSIGN_CASE_TO_APPLICANT_SOLICITOR1(CAMUNDA),
@@ -359,12 +360,4 @@ public enum CaseEvent {
         return this.getUserType() == CAMUNDA;
     }
 
-    public static CaseEvent fromString(String text) {
-        for (CaseEvent event : CaseEvent.values()) {
-            if (event.name().equalsIgnoreCase(text)) {
-                return event;
-            }
-        }
-        throw new IllegalArgumentException("No constant with name " + text + " found in CaseEvent enum");
-    }
 }
