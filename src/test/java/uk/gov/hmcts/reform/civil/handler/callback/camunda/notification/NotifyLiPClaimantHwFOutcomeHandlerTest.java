@@ -147,17 +147,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER)
                 .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                                .partyEmail(EMAIL)
-                                .build())
-                .respondent1Represented(YesOrNo.NO)
-                .specRespondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber(HWF_REFERENCE).build()).build())
-                .claimIssuedHwfDetails(hwfeeDetails)
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .build();
+            CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder().claimIssuedHwfDetails(hwfeeDetails).build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -179,18 +169,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER)
                 .build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                                .partyEmail(EMAIL)
-                                .build())
-                .respondent1Represented(YesOrNo.NO)
-                .specRespondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
-                .hearingHelpFeesReferenceNumber(HWF_REFERENCE)
-                .hearingHwfDetails(hwfeeDetails)
-                .hwfFeeType(FeeType.HEARING)
-                .build();
-
+            CaseData caseData = HEARING_CASE_DATA.toBuilder().hearingHwfDetails(hwfeeDetails).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             // When

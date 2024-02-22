@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -58,10 +57,10 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             CaseData data = getCaseData(response);
-            Assertions.assertThat(data.getCaseDataLiP().getHelpWithFees().getHelpWithFeesReferenceNumber()).isEqualTo("7890");
-            Assertions.assertThat(data.getClaimIssuedHwfDetails().getHwfReferenceNumber()).isNull();
-            Assertions.assertThat(data.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
-            Assertions.assertThat(data.getClaimIssuedHwfDetails().getHwfCaseEvent()).isEqualTo(UPDATE_HELP_WITH_FEE_NUMBER);
+            assertThat(data.getCaseDataLiP().getHelpWithFees().getHelpWithFeesReferenceNumber()).isEqualTo("7890");
+            assertThat(data.getClaimIssuedHwfDetails().getHwfReferenceNumber()).isNull();
+            assertThat(data.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
+            assertThat(data.getClaimIssuedHwfDetails().getHwfCaseEvent()).isEqualTo(UPDATE_HELP_WITH_FEE_NUMBER);
         }
 
         @Test
@@ -79,10 +78,10 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             CaseData data = getCaseData(response);
-            Assertions.assertThat(data.getHearingHelpFeesReferenceNumber()).isEqualTo("78905185430");
-            Assertions.assertThat(data.getHearingHwfDetails().getHwfReferenceNumber()).isNull();
-            Assertions.assertThat(data.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
-            Assertions.assertThat(data.getHearingHwfDetails().getHwfCaseEvent()).isEqualTo(UPDATE_HELP_WITH_FEE_NUMBER);
+            assertThat(data.getHearingHelpFeesReferenceNumber()).isEqualTo("78905185430");
+            assertThat(data.getHearingHwfDetails().getHwfReferenceNumber()).isNull();
+            assertThat(data.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
+            assertThat(data.getHearingHwfDetails().getHwfCaseEvent()).isEqualTo(UPDATE_HELP_WITH_FEE_NUMBER);
         }
     }
 
