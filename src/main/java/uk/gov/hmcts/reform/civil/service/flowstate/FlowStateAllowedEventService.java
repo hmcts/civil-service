@@ -1383,11 +1383,10 @@ public class FlowStateAllowedEventService {
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
                 PARTIAL_REMISSION_HWF_GRANTED,
+                INVALID_HWF_REFERENCE,
                 FULL_REMISSION_HWF,
-                UPDATE_HELP_WITH_FEE_NUMBER,
                 NO_REMISSION_HWF,
-                INVALID_HWF_REFERENCE
-
+                UPDATE_HELP_WITH_FEE_NUMBER
             )
         ),
         entry(

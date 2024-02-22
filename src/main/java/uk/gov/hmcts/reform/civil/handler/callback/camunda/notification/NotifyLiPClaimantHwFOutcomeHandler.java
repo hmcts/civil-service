@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -67,9 +70,18 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
+        Map<String, String> commonProperties = getCommonProperties(caseData);
+        Map<String, String> furtherProperties = getFurtherProperties(caseData);
+        return Collections.unmodifiableMap(
+            Stream.concat(commonProperties.entrySet().stream(), furtherProperties.entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+    }
+
+    private Map<String, String> getFurtherProperties(CaseData caseData) {
         return switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);
-            case INVALID_HWF_REFERENCE -> getCommonProperties(caseData);
+            case PARTIAL_REMISSION_HWF_GRANTED -> getPartialRemissionProperties(caseData);
+            case INVALID_HWF_REFERENCE, UPDATE_HELP_WITH_FEE_NUMBER -> Collections.emptyMap();
             default -> throw new IllegalArgumentException("case event not found");
         };
     }
@@ -80,7 +92,11 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
                 CaseEvent.NO_REMISSION_HWF,
                 notificationsProperties.getNotifyApplicantForHwfNoRemission(),
                 CaseEvent.INVALID_HWF_REFERENCE,
-                notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber()
+                notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber(),
+                CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
+                notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber(),
+                CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
+                notificationsProperties.getNotifyApplicantForHwfPartialRemission()
             );
         }
         return emailTemplates.get(hwfEvent);
@@ -88,21 +104,24 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     private Map<String, String> getNoRemissionProperties(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             REASONS, getHwFNoRemissionReason(caseData),
-            TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
-            HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber(),
             AMOUNT, caseData.getHwFFeeAmount().toString()
+        );
+    }
+
+    private Map<String, String> getPartialRemissionProperties(CaseData caseData) {
+        return Map.of(
+            PART_AMOUNT, caseData.getRemissionAmount().toString(),
+            REMAINING_AMOUNT, caseData.getOutstandingFeeInPounds().toString()
         );
     }
 
     private Map<String, String> getCommonProperties(CaseData caseData) {
         return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
-                TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
-                HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber()
+            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
+            TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
+            HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber()
         );
     }
 
