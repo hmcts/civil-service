@@ -91,6 +91,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsBundleOfDocs;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
@@ -762,7 +763,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                 .altHearingCourtLocationList(getLocationList(callbackParams,
                                                                                              updatedData,
                                                                                              preferredCourt.orElse(null), true))
-                                                .physicalBundlePartyTxt(SdoR2UiConstantSmallClaim.BUNDLE_TEXT).build());
+                                                .sdoR2SmallClaimsBundleOfDocs(SdoR2SmallClaimsBundleOfDocs.builder().physicalBundlePartyTxt(SdoR2UiConstantSmallClaim.BUNDLE_TEXT).build()).build());
         updatedData.sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder()
                                                  .text(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT)
                                                  .date(LocalDate.now().plusDays(7)).build());
