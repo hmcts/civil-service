@@ -1295,6 +1295,28 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public BigDecimal getRemissionAmount() {
+        if (this.isHWFTypeHearing()) {
+            return MonetaryConversions.penniesToPounds(this.getHearingRemissionAmount());
+        }
+        if (this.isHWFTypeClaimIssued()) {
+            return MonetaryConversions.penniesToPounds(this.getClaimIssueRemissionAmount());
+        }
+        return null;
+    }
+
+    @JsonIgnore
+    public BigDecimal getOutstandingFeeInPounds() {
+        if (this.isHWFTypeHearing() && this.getHearingHwfDetails() != null) {
+            return this.getHearingHwfDetails().getOutstandingFeeInPounds();
+        }
+        if (this.isHWFTypeClaimIssued() && this.getClaimIssuedHwfDetails() != null) {
+            return this.getClaimIssuedHwfDetails().getOutstandingFeeInPounds();
+        }
+        return null;
+    }
+
+    @JsonIgnore
     public boolean isSettlementAgreementDeadlineExpired() {
         return nonNull(respondent1RespondToSettlementAgreementDeadline)
             && LocalDateTime.now().isAfter(respondent1RespondToSettlementAgreementDeadline);

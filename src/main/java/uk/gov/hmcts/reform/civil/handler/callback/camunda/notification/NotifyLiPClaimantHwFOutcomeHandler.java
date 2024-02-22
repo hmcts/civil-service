@@ -16,9 +16,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -81,6 +84,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         return switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);
             case UPDATE_HELP_WITH_FEE_NUMBER -> Collections.emptyMap();
+            case PARTIAL_REMISSION_HWF_GRANTED -> getPartialRemissionProperties(caseData);
             default -> throw new IllegalArgumentException("case event not found");
         };
     }
@@ -91,7 +95,9 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
                 CaseEvent.NO_REMISSION_HWF,
                 notificationsProperties.getNotifyApplicantForHwfNoRemission(),
                 CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
-                notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber()
+                notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber(),
+                CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
+                notificationsProperties.getNotifyApplicantForHwfPartialRemission()
             );
         }
         return emailTemplates.get(hwfEvent);
@@ -101,6 +107,13 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         return Map.of(
             REASONS, getHwFNoRemissionReason(caseData),
             AMOUNT, caseData.getHwFFeeAmount().toString()
+        );
+    }
+
+    private Map<String, String> getPartialRemissionProperties(CaseData caseData) {
+        return Map.of(
+            PART_AMOUNT, caseData.getRemissionAmount().toString(),
+            REMAINING_AMOUNT, caseData.getOutstandingFeeInPounds().toString()
         );
     }
 

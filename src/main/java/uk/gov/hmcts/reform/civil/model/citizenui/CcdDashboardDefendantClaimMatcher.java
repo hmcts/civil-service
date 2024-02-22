@@ -304,8 +304,12 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
-    public boolean isHwfUpdatedRefNumber() {
+    public boolean isHwfPartialRemission() {
         return false;
     }
 
+    @Override
+    public boolean isHwfUpdatedRefNumber() {
+        return false;
+    }
 }
