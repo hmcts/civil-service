@@ -332,7 +332,6 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             );
         }
 
-
         private Map<String, String> getNotificationDataMapNoRemissionClaimIssued() {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
