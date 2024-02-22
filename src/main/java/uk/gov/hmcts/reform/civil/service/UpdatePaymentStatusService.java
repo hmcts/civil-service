@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -18,7 +19,8 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import java.util.Map;
 
 import static java.util.Optional.ofNullable;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_PAYMENT_STATUS_CUI;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_CLAIM_ISSUE_PAYMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_PAYMENT;
 
 @Slf4j
 @Service
@@ -35,14 +37,14 @@ public class UpdatePaymentStatusService {
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         caseData = updateCaseDataWithStateAndPaymentDetails(cardPaymentStatusResponse, caseData, feeType.name());
 
-        createEvent(caseData, caseReference);
+        createEvent(caseData, caseReference, feeType.name());
     }
 
-    private void createEvent(CaseData caseData, String caseId) {
+    private void createEvent(CaseData caseData, String caseReference, String feeType) {
 
         StartEventResponse startEventResponse = coreCaseDataService.startUpdate(
-            caseId,
-            UPDATE_PAYMENT_STATUS_CUI
+            caseReference,
+            getEventNameFromFeeType(feeType)
         );
 
         CaseDataContent caseDataContent = buildCaseDataContent(
@@ -50,7 +52,16 @@ public class UpdatePaymentStatusService {
             caseData
         );
 
-        coreCaseDataService.submitUpdate(caseId, caseDataContent);
+        coreCaseDataService.submitUpdate(caseReference, caseDataContent);
+    }
+
+    private CaseEvent getEventNameFromFeeType(String feeType) {
+
+        if (feeType.equals(FeeType.HEARING.name())) {
+            return CITIZEN_HEARING_FEE_PAYMENT;
+        }  else {
+            return CITIZEN_CLAIM_ISSUE_PAYMENT;
+        }
     }
 
     private CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, CaseData caseData) {

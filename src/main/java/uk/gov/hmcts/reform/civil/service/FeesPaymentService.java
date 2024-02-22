@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,7 +9,6 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
@@ -42,7 +40,7 @@ public class FeesPaymentService {
 
         SRPbaDetails feePaymentDetails = feeType.equals(FeeType.HEARING)
             ? caseData.getHearingFeePBADetails()
-            : getClaimIssuePbaDetails(caseData.getServiceRequestReference(), caseData.getClaimFee());
+            : caseData.getClaimIssuedPBADetails();
 
         requireNonNull(feePaymentDetails, "Fee Payment details cannot be null");
         requireNonNull(feePaymentDetails.getServiceReqReference(), "Fee Payment service request cannot be null");
@@ -66,13 +64,6 @@ public class FeesPaymentService {
                 requestDto
             );
         return CardPaymentStatusResponse.from(govPayCardPaymentRequest);
-    }
-
-    private SRPbaDetails getClaimIssuePbaDetails(String serviceReference, Fee claimFee) {
-        return SRPbaDetails.builder()
-            .serviceReqReference("1234")
-            .fee(claimFee)
-            .build();
     }
 
     public CardPaymentStatusResponse getGovPaymentRequestStatus(

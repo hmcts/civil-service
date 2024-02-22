@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
@@ -32,11 +31,9 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 public class PaymentRequestUpdateCallbackService {
 
     public static final String PAID = "Paid";
-    public static final String serviceRequestReceived = "ServiceRequestReceived";
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper objectMapper;
-    private final Time time;
 
     private CaseData data;
 
@@ -53,7 +50,12 @@ public class PaymentRequestUpdateCallbackService {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
             if (feeType.equals(FeeType.HEARING.name()) || feeType.equals(FeeType.CLAIMISSUED.name())) {
-                createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
+                if(!caseData.isLipvLipOneVOne()) {
+                    createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
+                }
+                {
+                    log.info("Ignoring the callback for the caseId {} as it is a LipVLipOneVOne claim", caseData.getCcdCaseReference());
+                }
             }
 
         } else {

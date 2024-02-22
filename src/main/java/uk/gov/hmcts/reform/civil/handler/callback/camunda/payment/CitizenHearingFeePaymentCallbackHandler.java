@@ -19,20 +19,20 @@ import java.util.Map;
 import static java.util.Collections.singletonList;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_PAYMENT_STATUS_CUI;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CITIZEN_HEARING_FEE_PAYMENT;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UpdatePaymentStatusCUICallbackHandler extends CallbackHandler {
+public class CitizenHearingFeePaymentCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = singletonList(UPDATE_PAYMENT_STATUS_CUI);
+    private static final List<CaseEvent> EVENTS = singletonList(CITIZEN_HEARING_FEE_PAYMENT);
     private final ObjectMapper objectMapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::updatePaymentDetails,
+            callbackKey(ABOUT_TO_SUBMIT), this::citizenHearingFeePayment,
             callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
         );
     }
@@ -42,12 +42,13 @@ public class UpdatePaymentStatusCUICallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse updatePaymentDetails(CallbackParams callbackParams) {
+    private CallbackResponse citizenHearingFeePayment(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
 
-        dataBuilder.businessProcess(BusinessProcess.ready(UPDATE_PAYMENT_STATUS_CUI));
+        dataBuilder.businessProcess(BusinessProcess.ready(CITIZEN_HEARING_FEE_PAYMENT));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
