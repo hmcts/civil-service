@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
@@ -1382,6 +1383,7 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete,
                 UPLOAD_MEDIATION_DOCUMENTS,
                 MORE_INFORMATION_HWF,
+                FEE_PAYMENT_OUTCOME,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
                 PARTIAL_REMISSION_HWF_GRANTED,
@@ -1585,6 +1587,7 @@ public class FlowStateAllowedEventService {
                 UPLOAD_TRANSLATED_DOCUMENT,
                 MORE_INFORMATION_HWF,
                 PARTIAL_REMISSION_HWF_GRANTED,
+                FEE_PAYMENT_OUTCOME,
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
                 INVALID_HWF_REFERENCE
