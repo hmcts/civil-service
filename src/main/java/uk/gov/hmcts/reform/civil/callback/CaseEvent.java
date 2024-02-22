@@ -351,7 +351,8 @@ public enum CaseEvent {
     SET_SETTLEMENT_AGREEMENT_DEADLINE(CAMUNDA),
     GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC(CAMUNDA),
     GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC(CAMUNDA),
-    NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION(CAMUNDA);
+    NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION(CAMUNDA),
+    FEE_PAYMENT_OUTCOME(USER);
 
     private final UserType userType;
 
@@ -359,12 +360,4 @@ public enum CaseEvent {
         return this.getUserType() == CAMUNDA;
     }
 
-    public static CaseEvent fromString(String text) {
-        for (CaseEvent event : CaseEvent.values()) {
-            if (event.name().equalsIgnoreCase(text)) {
-                return event;
-            }
-        }
-        throw new IllegalArgumentException("No constant with name " + text + " found in CaseEvent enum");
-    }
 }
