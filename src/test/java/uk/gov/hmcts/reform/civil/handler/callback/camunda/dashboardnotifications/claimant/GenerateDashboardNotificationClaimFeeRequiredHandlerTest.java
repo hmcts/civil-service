@@ -1,9 +1,8 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.cuidashboard;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -27,18 +27,20 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DASHBOARD_NOTIFICATION_CUI;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DASHBOARD_NOTIFICATION_CLAIM_FEE_REQUIRED;
 
 @SpringBootTest(classes = {
-    GenerateDashboardNotificationHandler.class,
+    GenerateDashboardNotificationClaimFeeRequiredHandler.class,
     JacksonAutoConfiguration.class
 })
-public class GenerateDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
+public class GenerateDashboardNotificationClaimFeeRequiredHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private DashboardApiClient dashboardApiClient;
+    @MockBean
+    private DashboardNotificationsParamsMapper mapper;
     @Autowired
-    private GenerateDashboardNotificationHandler handler;
+    private GenerateDashboardNotificationClaimFeeRequiredHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
@@ -52,13 +54,17 @@ public class GenerateDashboardNotificationHandlerTest extends BaseCallbackHandle
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(GENERATE_DASHBOARD_NOTIFICATION_CUI.name()).build()
+                CallbackRequest.builder().eventId(GENERATE_DASHBOARD_NOTIFICATION_CLAIM_FEE_REQUIRED.name()).build()
             ).build();
-
-            handler.handle(params);
 
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("claimFee", "1.00");
+            scenarioParams.put("ccdCaseReference", caseData.getCcdCaseReference());
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            handler.handle(params);
+
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 "Scenario.AAA7.ClaimIssue.ClaimFee.Required",

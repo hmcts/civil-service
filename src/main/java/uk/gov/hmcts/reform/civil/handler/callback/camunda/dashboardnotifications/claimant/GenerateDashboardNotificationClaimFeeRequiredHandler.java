@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.cuidashboard;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,32 +10,30 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
+import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DASHBOARD_NOTIFICATION_CUI;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.cuidashboard.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_FEE_REQUIRED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DASHBOARD_NOTIFICATION_CLAIM_FEE_REQUIRED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_FEE_REQUIRED;
 
 @Service
 @RequiredArgsConstructor
-public class GenerateDashboardNotificationHandler extends CallbackHandler {
+public class GenerateDashboardNotificationClaimFeeRequiredHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(GENERATE_DASHBOARD_NOTIFICATION_CUI);
-    public static final String TASK_ID = "GenerateDashboardNotificationCUI";
+    private static final List<CaseEvent> EVENTS = List.of(GENERATE_DASHBOARD_NOTIFICATION_CLAIM_FEE_REQUIRED);
+    public static final String TASK_ID = "GenerateDashboardNotificationClaimFeeRequiredCUI";
     private final DashboardApiClient dashboardApiClient;
+    private final DashboardNotificationsParamsMapper mapper;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::sendScenario,
-            callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
+            callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForClaimSubmission
         );
     }
     @Override
@@ -48,16 +46,13 @@ public class GenerateDashboardNotificationHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse sendScenario(CallbackParams callbackParams) {
+    private CallbackResponse configureScenarioForClaimSubmission(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("claimFee", MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence()).toString());
-
         dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                           SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_FEE_REQUIRED.getScenario(), authToken,
-                                          ScenarioRequestParams.builder().params(params).build()
+                                          ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
                                           );
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
