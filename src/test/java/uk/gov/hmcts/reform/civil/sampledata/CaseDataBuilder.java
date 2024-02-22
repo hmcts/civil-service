@@ -561,16 +561,17 @@ public class CaseDataBuilder {
     private List<Element<MediationDocumentsReferredInStatement>> res1MediationDocumentsReferred;
 
     private YesOrNo eaCourtLocation;
-    public CaseDataBuilder helpWithFeesMoreInformationClaimIssue( HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
+
+    public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
         this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
         return this;
     }
-
 
     public CaseDataBuilder helpWithFeesMoreInformationHearing(HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing) {
         this.helpWithFeesMoreInformationHearing = helpWithFeesMoreInformationHearing;
         return this;
     }
+
     public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
         this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
         return this;
