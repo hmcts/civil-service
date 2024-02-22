@@ -1382,6 +1382,7 @@ public class FlowStateAllowedEventService {
                 MORE_INFORMATION_HWF,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
+                UPDATE_HELP_WITH_FEE_NUMBER,
                 PARTIAL_REMISSION_HWF_GRANTED,
                 INVALID_HWF_REFERENCE,
                 FULL_REMISSION_HWF,
