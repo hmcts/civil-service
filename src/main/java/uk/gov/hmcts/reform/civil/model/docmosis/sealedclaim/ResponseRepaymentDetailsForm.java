@@ -108,6 +108,7 @@ public class ResponseRepaymentDetailsForm {
                                       .build())
                 .payBy(repaymentPlan.finalPaymentBy(totalClaimAmount))
                 .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+            builder.amountToPay = (totalClaimAmount + "");
         }
     }
 
