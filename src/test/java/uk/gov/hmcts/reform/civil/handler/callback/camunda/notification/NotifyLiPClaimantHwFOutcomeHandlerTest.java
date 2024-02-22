@@ -128,20 +128,9 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 .hwfCaseEvent(NO_REMISSION_HWF)
                 .noRemissionDetails("no remission")
                 .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                                .partyEmail(EMAIL)
-                                .build())
-                .respondent1Represented(YesOrNo.NO)
-                .specRespondent1Represented(YesOrNo.NO)
-                .applicant1Represented(YesOrNo.NO)
+            CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder()
                 .claimantBilingualLanguagePreference("BOTH")
-                .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber(
-                    HWF_REFERENCE).build()).build())
-                .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
-                .claimIssuedHwfDetails(hwfeeDetails)
-                .hwfFeeType(FeeType.CLAIMISSUED)
-                .build();
+                .claimIssuedHwfDetails(hwfeeDetails).build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
