@@ -229,20 +229,19 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER)
                 .build();
             CaseData caseData = HEARING_CASE_DATA.toBuilder().hearingHwfDetails(hwfeeDetails).build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-                // When
-                handler.handle(params);
+            // When
+            handler.handle(params);
 
-                // Then
-                verify(notificationService, times(1)).sendMail(
-                    EMAIL,
-                    EMAIL_TEMPLATE_UPDATE_REF_NUMBER,
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                EMAIL,
+                EMAIL_TEMPLATE_UPDATE_REF_NUMBER,
                 getNotificationDataMapUpdateRefNumberHearing(),
-                    REFERENCE_NUMBER
+                REFERENCE_NUMBER
             );
         }
-
 
         private Map<String, String> getNotificationDataMapNoRemissionClaimIssued() {
             return Map.of(
