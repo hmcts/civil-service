@@ -98,7 +98,7 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
         );
     }
 
-    public Map<String, String> addPropertiesCARMNoAttendance(CaseData caseData, boolean isDefendant1) {
+    public Map<String, String> addPropertiesNoAttendanceCARM(CaseData caseData, boolean isDefendant1) {
         return Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, isDefendant1 ? organisationDetailsService.getRespondent1LegalOrganisationName(caseData)
                           : organisationDetailsService.getRespondent2LegalOrganisationName(caseData),
                       CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
@@ -155,7 +155,7 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
         notificationService.sendMail(
             caseData.getRespondentSolicitor1EmailAddress(),
             notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate(),
-            addPropertiesCARMNoAttendance(caseData, true),
+            addPropertiesNoAttendanceCARM(caseData, true),
             String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR, caseData.getLegacyCaseReference()));
     }
 
@@ -163,7 +163,7 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
         notificationService.sendMail(
             caseData.getRespondentSolicitor2EmailAddress(),
             notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate(),
-            addPropertiesCARMNoAttendance(caseData, false),
+            addPropertiesNoAttendanceCARM(caseData, false),
             String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR, caseData.getLegacyCaseReference()));
     }
 

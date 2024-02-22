@@ -74,7 +74,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
         );
     }
 
-    public Map<String, String> addPropertiesCARMNoAttendance(final CaseData caseData) {
+    public Map<String, String> addPropertiesNoAttendanceCARM(final CaseData caseData) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
@@ -138,7 +138,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
         notificationService.sendMail(
             caseData.getApplicantSolicitor1UserDetails().getEmail(),
             notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate(),
-            addPropertiesCARMNoAttendance(caseData),
+            addPropertiesNoAttendanceCARM(caseData),
             String.format(LOG_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR, caseData.getLegacyCaseReference()));
     }
 
