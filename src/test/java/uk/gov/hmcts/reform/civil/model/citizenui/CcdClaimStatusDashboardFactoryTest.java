@@ -37,6 +37,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 @ExtendWith(MockitoExtension.class)
@@ -495,5 +496,39 @@ class CcdClaimStatusDashboardFactoryTest {
             caseData, featureToggleService));
 
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_PARTIAL_REMISSION);
+    }
+
+    @Test
+    void givenClaimStatusInPendingCaseIssuedAndHWFUpdateRefNumber_WhenGetStatus_thenReturnHwfUpdateRefNumber() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.PENDING_CASE_ISSUED)
+            .claimIssuedHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.CLAIMISSUED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER);
+    }
+
+    @Test
+    void givenClaimStatusInHearingReadinessAndHWFUpdateRefNumber_WhenGetStatus_thenReturnHwfUpdateRefNumber() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.HEARING)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER);
     }
 }

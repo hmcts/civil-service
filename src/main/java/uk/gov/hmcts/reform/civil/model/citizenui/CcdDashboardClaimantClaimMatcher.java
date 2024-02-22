@@ -320,4 +320,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isHwfPartialRemission() {
         return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
     }
+
+    @Override
+    public boolean isHwfUpdatedRefNumber() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
+    }
 }
