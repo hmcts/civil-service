@@ -36,6 +36,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         callbackKey(ABOUT_TO_SUBMIT), this::notifyApplicantForHwFOutcome
     );
     private Map<CaseEvent, String> emailTemplates;
+    private Map<CaseEvent, String> emailTemplatesBilingual;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -49,11 +50,11 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     private CallbackResponse notifyApplicantForHwFOutcome(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        CaseEvent hwfEvent = caseData.getHwFEvent();
         if (Objects.nonNull(caseData.getApplicant1Email())) {
             notificationService.sendMail(
                 caseData.getApplicant1Email(),
-                getTemplate(caseData.getHwFEvent()),
+                caseData.isBilingual() ? getTemplateBilingual(hwfEvent) : getTemplate(hwfEvent),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
@@ -100,6 +101,15 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
             );
         }
         return emailTemplates.get(hwfEvent);
+    }
+
+    private String getTemplateBilingual(CaseEvent hwfEvent) {
+        if (emailTemplatesBilingual == null) {
+            emailTemplatesBilingual = ImmutableMap.of(
+                CaseEvent.NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()
+            );
+        }
+        return emailTemplatesBilingual.get(hwfEvent);
     }
 
     private Map<String, String> getNoRemissionProperties(CaseData caseData) {
