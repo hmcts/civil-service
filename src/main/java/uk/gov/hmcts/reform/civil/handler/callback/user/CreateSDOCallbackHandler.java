@@ -710,6 +710,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
             updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
             updatedData.disposalHearingHearingNotes(null);
+            updatedData.sdoR2SmallClaimsHearing(null);
+            updatedData.sdoR2SmallClaimsUploadDoc(null);
+            updatedData.sdoR2SmallClaimsPPI(null);
+            updatedData.sdoR2SmallClaimsImpNotes(null);
+            updatedData.sdoR2SmallClaimsWitnessStatements(null);
+            updatedData.sdoR2SmallClaimsHearingToggle(null);
+            updatedData.sdoR2SmallClaimsJudgesRecital(null);
+            updatedData.sdoR2SmallClaimsWitnessStatementsToggle(null);
+            updatedData.sdoR2SmallClaimsPPIToggle(null);
+            updatedData.sdoR2SmallClaimsUploadDocToggle(null);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
