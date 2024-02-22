@@ -609,7 +609,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             SmallClaimsFlightDelay tempSmallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
                 .smallClaimsFlightDelayToggle(checkList)
                 .relatedClaimsInput("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
-                            + "claims relating to the same flight they must notify the court  \n"
+                            + "claims relating to the same flight they must notify the court \n"
                             + "where the claim is being managed within 14 days of receipt of \n"
                             + "this Order providing all relevant details of those claims including \n"
                             + "case number(s), hearing date(s) and copy final substantive order(s) \n"
