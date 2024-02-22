@@ -96,4 +96,5 @@ public interface Claim {
 
     boolean isHwfNoRemission();
 
+    boolean isHwfPartialRemission();
 }
