@@ -10,10 +10,12 @@ import org.mockito.Mock;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.event.HearingFeeUnpaidEvent;
 import uk.gov.hmcts.reform.civil.event.HearingFeePaidEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.search.HearingFeeDueSearchService;
@@ -66,6 +68,30 @@ class HearingFeeDueHandlerTest {
     void shouldEmitHearingFeePaidEvent_whenCasesFoundPaid() {
         long caseId = 1L;
         CaseData caseData = CaseDataBuilder.builder().atStateHearingFeeDuePaid().build();
+        Map<String, Object> data = Map.of("data", caseData);
+        List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
+
+        when(searchService.getCases()).thenReturn(caseDetails);
+        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails.get(0));
+        when(caseDetailsConverter.toCaseData(caseDetails.get(0))).thenReturn(caseData);
+
+        handler.execute(mockTask, externalTaskService);
+
+        verify(applicationEventPublisher).publishEvent(new HearingFeePaidEvent(caseId));
+        verify(externalTaskService).complete(mockTask);
+    }
+
+    @Test
+    void shouldEmitHearingFeePaidEvent_whenCasesFoundPaidWithHWF() {
+        long caseId = 1L;
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateHearingFeeDuePaidWithHwf()
+            .respondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                                          .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
+            .build();
+        caseData = caseData.toBuilder().hearingHelpFeesReferenceNumber("HWF-111-111").build();
         Map<String, Object> data = Map.of("data", caseData);
         List<CaseDetails> caseDetails = List.of(CaseDetails.builder().id(caseId).data(data).build());
 

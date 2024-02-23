@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
@@ -43,9 +44,13 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -203,6 +208,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final DynamicList applicantSolicitor1PbaAccounts;
     private final ClaimTypeUnspec claimTypeUnSpec;
     private final ClaimType claimType;
+    private final HelpWithFeesDetails claimIssuedHwfDetails;
+    private final HelpWithFeesDetails hearingHwfDetails;
+    private final FeeType hwfFeeType;
     private final SuperClaimType superClaimType;
     private final String claimTypeOther;
     private final PersonalInjuryType personalInjuryType;
@@ -669,6 +677,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private String casePartyRequestForReconsideration;
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
+
+    @JsonUnwrapped
+    private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1211,11 +1222,42 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .orElse(BigDecimal.ZERO);
     }
 
+    @JsonIgnore
+    public BigDecimal getCalculatedHearingFeeInPence() {
+        return Optional.ofNullable(getHearingFee())
+            .map(Fee::getCalculatedAmountInPence)
+            .orElse(BigDecimal.ZERO);
+    }
+
+    @JsonIgnore
+    public BigDecimal getClaimIssueRemissionAmount() {
+        return Optional.ofNullable(getClaimIssuedHwfDetails())
+            .map(HelpWithFeesDetails::getRemissionAmount)
+            .orElse(BigDecimal.ZERO);
+    }
+
+    @JsonIgnore
+    public BigDecimal getHearingRemissionAmount() {
+        return Optional.ofNullable(getHearingHwfDetails())
+            .map(HelpWithFeesDetails::getRemissionAmount)
+            .orElse(BigDecimal.ZERO);
+    }
+
     public boolean hasApplicant1SignedSettlementAgreement() {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasApplicant1SignedSettlementAgreement).isPresent();
 
+    }
+
+    @JsonIgnore
+    public boolean isHWFTypeHearing() {
+        return getHwfFeeType() == FeeType.HEARING;
+    }
+
+    @JsonIgnore
+    public boolean isHWFTypeClaimIssued() {
+        return getHwfFeeType() == FeeType.CLAIMISSUED;
     }
 
     @JsonIgnore
@@ -1235,5 +1277,32 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private boolean isDateAfterToday(LocalDate date) {
         return nonNull(date)
             && date.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+    }
+
+    @JsonIgnore
+    public boolean hearingFeePaymentDoneWithHWF() {
+        return isLipvLipOneVOne()
+            && Objects.nonNull(getHearingHelpFeesReferenceNumber())
+            && Objects.nonNull(getFeePaymentOutcomeDetails())
+            && Objects.nonNull(getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee());
+    }
+
+    @JsonIgnore
+    public String getAssignedTrack() {
+        return nonNull(getAllocatedTrack()) ? getAllocatedTrack().name() : getResponseClaimTrack();
+    }
+
+    @JsonIgnore
+    public boolean hasApplicant1AcceptedCourtDecision() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasClaimantAcceptedCourtDecision).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean hasApplicant1CourtDecisionInFavourOfClaimant() {
+        return Optional.ofNullable(getCaseDataLiP())
+            .map(CaseDataLiP::getApplicant1LiPResponse)
+            .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfClaimant).isPresent();
     }
 }
