@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,8 +48,11 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import java.time.LocalDate;
@@ -58,6 +62,7 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -96,6 +101,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     @MockBean
     private DocumentHearingLocationHelper locationHelper;
 
+    @MockBean
+    private IdamClient idamClient;
+
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
     private static final String ON_INITIATIVE_SELECTION_TEXT = "As this order was made on the court's own initiative "
@@ -115,7 +123,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         .createdDatetime(LocalDateTime.now())
         .documentLink(Document.builder()
                           .documentUrl("fake-url")
-                          .documentFileName("file-name")
+                          .documentFileName("file-name.pdf")
                           .documentBinaryUrl("binary-url")
                           .build())
         .build();
@@ -131,6 +139,14 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         .courtName("Court Name Ccmc").region("Region").regionId("4").courtVenueId("000")
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("000000").build();
+
+    @BeforeEach
+    void setUp() {
+        when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
+                                                                    .forename("Judge")
+                                                                    .surname("Judy")
+                                                                    .roles(Collections.emptyList()).build());
+    }
 
     @Nested
     class AboutToStartCallback {
@@ -796,9 +812,12 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             // Then
+            String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
             assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
-                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("finalOrders");
+                           .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
+            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+                           .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
         }
 
         @Test
