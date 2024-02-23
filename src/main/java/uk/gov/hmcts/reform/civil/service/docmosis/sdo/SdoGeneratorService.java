@@ -59,7 +59,7 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         }  else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isNihlFastTrack(caseData)) {
-            docmosisTemplate =   DocmosisTemplates.SDO_FAST_TRACK_NIHL;
+            docmosisTemplate = DocmosisTemplates.SDO_FAST_TRACK_NIHL;
             templateData = getTemplateDataFastNihl(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isFastTrack(caseData)) {
             docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
