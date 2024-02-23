@@ -59,7 +59,7 @@ public class SdoGeneratorService {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         }  else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isNihlFastTrack(caseData)) {
-            docmosisTemplate =   DocmosisTemplates.SDO_FAST_TRACK_NIHL;
+            docmosisTemplate = DocmosisTemplates.SDO_FAST_TRACK_NIHL;
             templateData = getTemplateDataFastNihl(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isFastTrack(caseData)) {
             docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
@@ -78,15 +78,18 @@ public class SdoGeneratorService {
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                getFileName(docmosisTemplate, caseData),
+                getFileName(judgeName),
                 docmosisDocument.getBytes(),
                 DocumentType.SDO_ORDER
             )
         );
     }
 
-    private String getFileName(DocmosisTemplates docmosisTemplate, CaseData caseData) {
-        return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
+    private String getFileName(String judgeName) {
+        StringBuilder updatedFileName = new StringBuilder();
+        updatedFileName.append(LocalDate.now()).append("_").append(judgeName).append(".pdf");
+
+        return updatedFileName.toString();
     }
 
     private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
