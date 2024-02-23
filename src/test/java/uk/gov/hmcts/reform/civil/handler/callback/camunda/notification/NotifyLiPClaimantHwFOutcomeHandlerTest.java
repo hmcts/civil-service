@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -44,14 +44,13 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.AMOUNT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HwF_MORE_INFO_DATE;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HwF_MORE_INFO_DOCUMENTS;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HwF_MORE_INFO_FEE_TYPE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PART_AMOUNT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASONS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REMAINING_AMOUNT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 
@@ -358,22 +357,22 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
 
         private Map<String, String> getNotificationDataMapMoreInfoClaimIssued() {
             return Map.of(
-                HwF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
+                HWF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
                 CLAIMANT_NAME, CLAIMANT,
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
-                HwF_MORE_INFO_FEE_TYPE, FeeType.CLAIMISSUED.getLabel(),
-                HwF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
+                TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
+                HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
             );
         }
 
         private Map<String, String> getNotificationDataMapMoreInfoHearing() {
             return Map.of(
-                HwF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
+                HWF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
                 CLAIMANT_NAME, CLAIMANT,
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
-                HwF_MORE_INFO_FEE_TYPE, FeeType.HEARING.getLabel(),
-                HwF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
+                TYPE_OF_FEE, FeeType.HEARING.getLabel(),
+                HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
             );
         }
@@ -431,9 +430,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
     }
 
     private List<HwFMoreInfoRequiredDocuments> getMoreInformationDocumentList() {
-        List<HwFMoreInfoRequiredDocuments> docList = new ArrayList<>();
-        docList.add(HwFMoreInfoRequiredDocuments.CHILD_MAINTENANCE);
-        return docList;
+        return Collections.singletonList(HwFMoreInfoRequiredDocuments.CHILD_MAINTENANCE);
     }
 
     private String getMoreInformationDocumentListString() {

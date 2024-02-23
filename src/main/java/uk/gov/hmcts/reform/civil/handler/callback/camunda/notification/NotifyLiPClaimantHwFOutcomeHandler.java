@@ -143,15 +143,13 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     }
 
     private Map<String, String> getMoreInformationProperties(CaseData caseData) {
-        HelpWithFeesMoreInformation moreInformation = new HelpWithFeesMoreInformation();
-        if (null != caseData.getHelpWithFeesMoreInformationClaimIssue()) {
-            moreInformation = caseData.getHelpWithFeesMoreInformationClaimIssue();
-        } else if (null != caseData.getHelpWithFeesMoreInformationHearing()) {
-            moreInformation = caseData.getHelpWithFeesMoreInformationHearing();
-        }
+        HelpWithFeesMoreInformation moreInformation =
+            null != caseData.getHelpWithFeesMoreInformationClaimIssue()
+                ? caseData.getHelpWithFeesMoreInformationClaimIssue()
+                : caseData.getHelpWithFeesMoreInformationHearing();
         return Map.of(
-            HwF_MORE_INFO_DATE, formatLocalDate(moreInformation.getHwFMoreInfoDocumentDate(), DATE),
-            HwF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentList(moreInformation.getHwFMoreInfoRequiredDocuments())
+            HWF_MORE_INFO_DATE, formatLocalDate(moreInformation.getHwFMoreInfoDocumentDate(), DATE),
+            HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentList(moreInformation.getHwFMoreInfoRequiredDocuments())
         );
     }
 

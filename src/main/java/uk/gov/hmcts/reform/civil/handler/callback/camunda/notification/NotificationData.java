@@ -87,9 +87,8 @@ public interface NotificationData {
 
     // evidence upload
     String UPLOADED_DOCUMENTS = "uploaded documents";
-    String HwF_MORE_INFO_DATE = "date";
-    String HwF_MORE_INFO_FEE_TYPE = "typeOfFee";
-    String HwF_MORE_INFO_DOCUMENTS = "documents";
+    String HWF_MORE_INFO_DATE = "date";
+    String HWF_MORE_INFO_DOCUMENTS = "documents";
 
     // hwf outcome
     String REASONS = "reasons";

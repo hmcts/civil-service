@@ -24,6 +24,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_HWF_OUTCOME;
 
 @ExtendWith(MockitoExtension.class)
 class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -95,6 +96,10 @@ class MoreInformationHwfCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             assertThat(response).isNotNull();
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+            Assertions.assertThat(data.getClaimIssuedHwfDetails().getHwfReferenceNumber()).isNull();
+            Assertions.assertThat(data.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
+            Assertions.assertThat(data.getClaimIssuedHwfDetails().getHwfCaseEvent()).isEqualTo(MORE_INFORMATION_HWF);
         }
 
         @Test

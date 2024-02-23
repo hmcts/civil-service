@@ -89,6 +89,5 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
-
     }
 }
