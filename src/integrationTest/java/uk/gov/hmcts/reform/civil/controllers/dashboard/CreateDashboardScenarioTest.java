@@ -87,22 +87,6 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
         )
             .andExpect(status().isOk());
 
-        //Verify task Item is created
-        /*
-        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "claimant")
-            .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameCy").value("<a href=#>Pay the hearing fee</a>"),
-                jsonPath("$[0].hintTextCy")
-                    .value("pay by "
-                               + hearingFeeByTime
-                               + " on "
-                               + hearingFeeByDate
-                               + ". you have (noOfDays) to pay.")
-            );
-        */
-
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
             .andExpect(status().isOk())

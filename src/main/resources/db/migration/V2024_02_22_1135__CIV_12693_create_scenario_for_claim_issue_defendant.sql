@@ -19,7 +19,7 @@ VALUES ('Notice.AAA7.ClaimIssue.Response.Required', 'You haven´t responded to t
  */
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
-values ('<a href="/test">View the claim</a>', 'The claim','<a href=#>View the claim</a>',
+values ('<a href=#>View the claim</a>', 'The claim','<a href=#>View the claim</a>',
         'The claim', 'Claim.View', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 1),
        ('<a href=#>View information about the claimant</a>', 'The claim','<a href=#>View information about the claimant</a>',
         'The claim', 'Claim.Claimant.Info', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 2),
@@ -33,13 +33,11 @@ values ('<a href="/test">View the claim</a>', 'The claim','<a href=#>View the cl
         'Hearings', 'Hearing.Document.Upload', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 6),
        ('<a href=#>Add the trial arrangements</a>', 'Hearings' ,'<a href=#>Add the trial arrangements</a>',
         'Hearings', 'Hearing.Arrangements.Add', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 7),
-       ('<a href=#>Pay the hearing fee</a>', 'Hearings' ,'<a href=#>Pay the hearing fee</a>',
-        'Hearings', 'Hearing.Fee.Pay', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 8),
        ('<a href=#>View the bundle</a>', 'Hearings' ,'<a href=#>View the bundle</a>',
-        'Hearings', 'Hearing.Bundle.View', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 9),
+        'Hearings', 'Hearing.Bundle.View', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 8),
        ('<a href=#>View orders and notices</a>', 'Orders and notices from the court' ,'<a href=#>View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 10),
+        'Orders and notices from the court', 'Order.View', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 9),
        ('<a href=#>View the judgment</a>', 'Judgments from the court' ,'<a href=#>View the judgment</a>',
-        'Judgments from the court', 'Judgment.View', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 11),
+        'Judgments from the court', 'Judgment.View', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 10),
        ('<a href=#>View applications</a>', 'Applications' ,'<a href=#>View applications</a>',
-        'Applications', 'Application.View', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 12);
+        'Applications', 'Application.View', 'Scenario.AAA7.ClaimIssue.Response.Required', '{1, 1}', 'DEFENDANT', 11);

@@ -55,7 +55,6 @@ public class ClaimIssueNotificationsHandler extends CallbackHandler {
 
         Map<String, Object> params = dashboardNotificationsParamsMapper.mapCaseDataToParams(caseData);
 
-        System.out.println(params);
         dashboardApiClient.recordScenario(
             caseData.getCcdCaseReference().toString(),
             "Scenario.AAA7.ClaimIssue.Response.Required",
