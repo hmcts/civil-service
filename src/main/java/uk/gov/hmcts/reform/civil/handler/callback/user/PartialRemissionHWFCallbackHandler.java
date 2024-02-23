@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,17 +36,16 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
     public static final String ERR_MSG_REMISSION_AMOUNT_LESS_THAN_ZERO = "Remission amount must be greater than zero";
 
     private final ObjectMapper objectMapper;
-    private final Map<String, Callback> callbackMap = ImmutableMap.of(
-        callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
-        callbackKey(MID, "remission-amount"), this::validateRemissionAmount,
-        callbackKey(ABOUT_TO_SUBMIT),
-        this::partRemissionHWF,
-        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
-    );
+    private final HWFFeePaymentOutcomeService hwfFeePaymentOutcomeService;
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return callbackMap;
+        return new ImmutableMap.Builder<String, Callback>()
+            .put(callbackKey(ABOUT_TO_START), this::emptyCallbackResponse)
+            .put(callbackKey(ABOUT_TO_SUBMIT), this::partRemissionHWF)
+            .put(callbackKey(MID, "remission-amount"), this::validateRemissionAmount)
+            .put(callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse)
+            .build();
     }
 
     @Override
@@ -79,10 +80,12 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse partRemissionHWF(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
+        CaseData caseData = callbackParams.getCaseData();
 
+        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
     }
+
 }

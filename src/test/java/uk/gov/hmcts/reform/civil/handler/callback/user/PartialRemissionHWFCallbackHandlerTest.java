@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -17,11 +18,14 @@ import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.PartialRemissionHWFCallbackHandler.ERR_MSG_FEE_TYPE_NOT_CONFIGURED;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.PartialRemissionHWFCallbackHandler.ERR_MSG_REMISSION_AMOUNT_LESS_THAN_CLAIM_FEE;
@@ -34,10 +38,13 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
     private ObjectMapper objectMapper;
     private PartialRemissionHWFCallbackHandler handler;
 
+    @Mock
+    private HWFFeePaymentOutcomeService hwfService;
+
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        handler = new PartialRemissionHWFCallbackHandler(objectMapper);
+        handler = new PartialRemissionHWFCallbackHandler(objectMapper, hwfService);
     }
 
     @Test
@@ -61,12 +68,36 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
             //When
+            when(hwfService.updateOutstandingFee(any())).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(response.getErrors()).isNull();
             assertThat(updatedData.getClaimIssuedHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(1000));
+        }
+
+        @Test
+        void shouldCallPartialRemissionHwfEventFoeHearingFee() {
+            CaseData caseData = CaseData.builder()
+                .hearingReferenceNumber("000HN001")
+                .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+                .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                           .remissionAmount(BigDecimal.valueOf(1000))
+                                           .build())
+                .hwfFeeType(FeeType.HEARING)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+            //When
+            when(hwfService.updateOutstandingFee(any())).thenReturn(caseData);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            //Then
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
+            assertThat(response.getErrors()).isNull();
+            assertThat(updatedData.getHearingHwfDetails().getRemissionAmount()).isEqualTo(BigDecimal.valueOf(1000));
         }
     }
 
