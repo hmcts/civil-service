@@ -4,12 +4,14 @@ import lombok.Getter;
 
 @Getter
 public enum FeeType {
-    HEARING("hearing"),
-    CLAIMISSUED("claim");
+    HEARING("hearing", "clyw"),
+    CLAIMISSUED("claim","hawlio");
 
     private final String label;
+    private final String labelInWelsh;
 
-    FeeType(String value) {
-        this.label = value;
+    FeeType(String label, String labelInWelsh) {
+        this.label = label;
+        this.labelInWelsh = labelInWelsh;
     }
 }
