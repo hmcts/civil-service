@@ -689,10 +689,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
-
-        if (featureToggleService.isSdoR2Enabled()) {
-            populateDRHFields(callbackParams, updatedData, preferredCourt);
-        }
+        
         //This the flowafter request for reconsideration
         if (featureToggleService.isSdoR2Enabled() && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
