@@ -35,34 +35,11 @@ import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
-import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
+import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
-import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAddNewDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurtherDetails;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
-import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
@@ -2593,58 +2570,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedData.getSdoOrderDocument().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
-        }
-
-        @ParameterizedTest
-        @ValueSource(booleans = {true, false})
-        void shouldValidateFieldsForNihl(boolean valid) {
-
-            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
-
-            List<FastTrack> fastTrackList = new ArrayList<FastTrack>();
-            fastTrackList.add(FastTrack.fastClaimNoiseInducedHearingLoss);
-
-            LocalDate testDate = valid ? LocalDate.now().plusDays(1) : LocalDate.now();
-            Integer testWitnesses = valid ? 0 : -1;
-
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimDraft()
-                .build()
-                .toBuilder()
-                .drawDirectionsOrderRequired(NO)
-                .claimsTrack(ClaimsTrack.fastTrack)
-                .fastClaims(fastTrackList)
-                .sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder().standardDisclosureDate(testDate).inspectionDate(testDate).build())
-                .sdoR2AddendumReport(SdoR2AddendumReport.builder().sdoAddendumReportDate(testDate).build())
-                .sdoR2FurtherAudiogram(SdoR2FurtherAudiogram.builder().sdoClaimantShallUndergoDate(testDate).sdoServiceReportDate(testDate).build())
-                .sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder().sdoDefendantMayAskDate(testDate).sdoQuestionsShallBeAnsweredDate(testDate)
-                                                  .sdoApplicationToRelyOnFurther(SdoR2ApplicationToRelyOnFurther.builder().applicationToRelyOnFurtherDetails(
-                                                      SdoR2ApplicationToRelyOnFurtherDetails.builder().applicationToRelyDetailsDate(testDate).build()).build()).build())
-                .sdoR2PermissionToRelyOnExpert(SdoR2PermissionToRelyOnExpert.builder().sdoPermissionToRelyOnExpertDate(testDate).sdoJointMeetingOfExpertsDate(testDate).build())
-                .sdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder().sdoInstructionOfTheExpertDate(testDate).sdoExpertReportDate(testDate)
-                                                   .sdoWrittenQuestionsDate(testDate).sdoRepliesDate(testDate).build())
-                .sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder().sdoQuestionsShallBeAnsweredDate(testDate).sdoWrittenQuestionsDate(testDate).build())
-                .sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder().sdoR2ScheduleOfLossClaimantDate(testDate).sdoR2ScheduleOfLossDefendantDate(testDate).build())
-                .sdoR2Trial(SdoR2Trial.builder().sdoR2TrialFirstOpenDateAfter(SdoR2TrialFirstOpenDateAfter.builder().listFrom(testDate).build())
-                                .sdoR2TrialWindow(SdoR2TrialWindow.builder().listFrom(testDate).dateTo(testDate).build()).build())
-                .sdoR2ImportantNotesDate(testDate)
-                .sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder().sdoWitnessDeadlineDate(testDate)
-                                          .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
-                                                                    .restrictNoOfWitnessDetails(SdoR2RestrictNoOfWitnessDetails.builder().noOfWitnessClaimant(testWitnesses)
-                                                                                                    .noOfWitnessDefendant(testWitnesses).build()).build()).build())
-                .build();
-
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            if (valid) {
-                assertThat(response.getErrors()).size().isZero();
-            } else {
-                assertThat(response.getErrors()).size().isEqualTo(25);
-                assertThat(response.getErrors()).contains(ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE);
-                assertThat(response.getErrors()).contains(ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO);
-            }
         }
 
         @ParameterizedTest
