@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
@@ -59,6 +60,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
@@ -75,6 +77,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
@@ -1109,6 +1112,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             return Optional.of(ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO);
         }
         return Optional.empty();
+    }
+
+    private static boolean isSDOR2Screen(CaseData caseData) {
+        return  ((caseData.getDrawDirectionsOrderRequired() == NO
+            && caseData.getFastClaims() != null
+            && caseData.getFastClaims().contains(
+            FastTrack.fastClaimNoiseInducedHearingLoss))
+            || (caseData.getDrawDirectionsOrderRequired() == YES
+            && caseData.getTrialAdditionalDirectionsForFastTrack() != null
+            && caseData.getTrialAdditionalDirectionsForFastTrack()
+            .contains(FastTrack.fastClaimNoiseInducedHearingLoss)));
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
