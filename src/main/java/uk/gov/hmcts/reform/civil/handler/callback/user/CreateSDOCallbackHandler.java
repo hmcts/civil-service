@@ -1112,17 +1112,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return Optional.empty();
     }
 
-    private static boolean isSDOR2Screen(CaseData caseData) {
-        return  ((caseData.getDrawDirectionsOrderRequired() == NO
-            && caseData.getFastClaims() != null
-            && caseData.getFastClaims().contains(
-            FastTrack.fastClaimNoiseInducedHearingLoss))
-            || (caseData.getDrawDirectionsOrderRequired() == YES
-            && caseData.getTrialAdditionalDirectionsForFastTrack() != null
-            && caseData.getTrialAdditionalDirectionsForFastTrack()
-            .contains(FastTrack.fastClaimNoiseInducedHearingLoss)));
-    }
-
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
         CaseData caseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
