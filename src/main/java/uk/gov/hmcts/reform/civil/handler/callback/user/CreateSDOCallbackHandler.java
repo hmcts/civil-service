@@ -23,18 +23,22 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
+import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -56,7 +60,6 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
@@ -70,14 +73,17 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
@@ -177,6 +183,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     public static final String FEEDBACK_LINK = "<p>%s"
         + " <a href='https://www.smartsurvey.co.uk/s/QKJTVU//' target=_blank>here</a></p>";
+
+    public static final String ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE = "Date must be in the future";
+    public static final String ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO = "The number entered cannot be less than zero";
 
     private final ObjectMapper objectMapper;
     private final LocationRefDataService locationRefDataService;
@@ -705,9 +714,15 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.disposalHearingAddNewDirections(null);
             updatedData.smallClaimsAddNewDirections(null);
             updatedData.fastTrackAddNewDirections(null);
-            updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
-            updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
+            updatedData.sdoHearingNotes(null);
+            updatedData.fastTrackHearingNotes(null);
             updatedData.disposalHearingHearingNotes(null);
+        }
+
+        if (featureToggleService.isSdoR2Enabled()) {
+            prePopulateNihlFields(callbackParams, caseData, updatedData);
+            List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
+            setCheckListNihl(updatedData, includeInOrderToggle);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -737,6 +752,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                                      .restrictNoOfWitnessDetails(
                                                                          SdoR2RestrictNoOfWitnessDetails
                                                                              .builder()
+                                                                             .noOfWitnessClaimant(3).noOfWitnessDefendant(3)
                                                                              .partyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
                                                                              .build())
                                                                      .build())
@@ -745,6 +761,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                                  .restrictNoOfPagesDetails(
                                                                      SdoR2RestrictNoOfPagesDetails.builder()
                                                                          .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
+                                                                         .noOfPages(12)
                                                                          .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
                                                                          .build()).build())
                                            .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
@@ -759,6 +776,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                             .sdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS)
                                             .build());
         updatedData.sdoR2Trial(SdoR2Trial.builder()
+                                   .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
+                                   .lengthList(FastTrackHearingTimeEstimate.FIVE_HOURS)
+                                   .methodOfHearing(SdoR2FastTrackMethod.fastTrackMethodInPerson)
+                                   .physicalBundleOptions(PhysicalTrialBundleOptions.NONE)
                                    .sdoR2TrialFirstOpenDateAfter(
                                        SdoR2TrialFirstOpenDateAfter.builder()
                                                                      .listFrom(LocalDate.now().plusDays(434)).build())
@@ -766,8 +787,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                          .listFrom(LocalDate.now().plusDays(434))
                                                          .dateTo(LocalDate.now().plusDays(455))
                                                          .build())
-                                   .hearingCourtLocationList(getCourtLocationForNihl(callbackParams, updatedData,
-                                                                                     preferredCourt.orElse(null)))
+                                   .hearingCourtLocationList(DynamicList.builder()
+                                                                 .listItems(getCourtLocationForNihl(callbackParams, updatedData, preferredCourt
+                                                                     .orElse(null)).getListItems())
+                                                                 .value(getCourtLocationForNihl(callbackParams, updatedData, preferredCourt
+                                                                     .orElse(null)).getListItems().get(0)).build())
+
                                    .altHearingCourtLocationList(getAlternativeCourtLocationsForNihl(callbackParams))
                                    .physicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE)
                                    .build());
@@ -785,7 +810,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                               .sdoServiceReportTxt(SdoR2UiConstantFastTrack.SERVICE_REPORT)
                                               .sdoClaimantShallUndergoDate(LocalDate.now().plusDays(42))
                                               .sdoServiceReportDate(LocalDate.now().plusDays(98)).build());
-        updatedData.sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder().build().builder()
+        updatedData.sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder()
                                                      .sdoDefendantMayAskTxt(SdoR2UiConstantFastTrack.DEFENDANT_MAY_ASK)
                                                      .sdoDefendantMayAskDate(LocalDate.now().plusDays(126))
                                                      .sdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.QUESTIONS_SHALL_BE_ANSWERED)
@@ -950,7 +975,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.setFastTrackFlag(YES).build();
             if (featureToggleService.isSdoR2Enabled() && isSDOR2Screen(caseData)) {
                 updatedData.isSdoR2NewScreen(YES).build();
-                prePopulateNihlFields(callbackParams, caseData, updatedData);
             }
         }
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -958,8 +982,137 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private static boolean isSDOR2Screen(CaseData caseData) {
+    private ArrayList<String> validateFieldsNihl(CaseData caseData) {
+        ArrayList<String> errors = new ArrayList<>();
+        if (caseData.getSdoR2DisclosureOfDocuments() != null && caseData.getSdoR2DisclosureOfDocuments().getStandardDisclosureDate() != null) {
+            validateFutureDate(caseData.getSdoR2DisclosureOfDocuments().getStandardDisclosureDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2DisclosureOfDocuments() != null && caseData.getSdoR2DisclosureOfDocuments().getInspectionDate() != null) {
+            validateFutureDate(caseData.getSdoR2DisclosureOfDocuments().getInspectionDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2WitnessesOfFact() != null && caseData.getSdoR2WitnessesOfFact().getSdoWitnessDeadlineDate() != null) {
+            validateFutureDate(caseData.getSdoR2WitnessesOfFact().getSdoWitnessDeadlineDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2AddendumReport() != null && caseData.getSdoR2AddendumReport().getSdoAddendumReportDate() != null) {
+            validateFutureDate(caseData.getSdoR2AddendumReport().getSdoAddendumReportDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2FurtherAudiogram() != null && caseData.getSdoR2FurtherAudiogram().getSdoClaimantShallUndergoDate() != null) {
+            validateFutureDate(caseData.getSdoR2FurtherAudiogram().getSdoClaimantShallUndergoDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2FurtherAudiogram() != null && caseData.getSdoR2FurtherAudiogram().getSdoServiceReportDate() != null) {
+            validateFutureDate(caseData.getSdoR2FurtherAudiogram().getSdoServiceReportDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2QuestionsClaimantExpert() != null && caseData.getSdoR2QuestionsClaimantExpert().getSdoDefendantMayAskDate() != null) {
+            validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert().getSdoDefendantMayAskDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2QuestionsClaimantExpert() != null && caseData.getSdoR2QuestionsClaimantExpert().getSdoQuestionsShallBeAnsweredDate() != null) {
+            validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert().getSdoQuestionsShallBeAnsweredDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2QuestionsClaimantExpert() != null && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther()  != null
+            && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails() != null
+            && caseData.getSdoR2QuestionsClaimantExpert().getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails().getApplicationToRelyDetailsDate() != null) {
+            validateFutureDate(caseData.getSdoR2QuestionsClaimantExpert()
+                                   .getSdoApplicationToRelyOnFurther().getApplicationToRelyOnFurtherDetails().getApplicationToRelyDetailsDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2PermissionToRelyOnExpert() != null && caseData.getSdoR2PermissionToRelyOnExpert().getSdoPermissionToRelyOnExpertDate() != null) {
+            validateFutureDate(caseData.getSdoR2PermissionToRelyOnExpert().getSdoPermissionToRelyOnExpertDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2PermissionToRelyOnExpert() != null && caseData.getSdoR2PermissionToRelyOnExpert().getSdoJointMeetingOfExpertsDate() != null) {
+            validateFutureDate(caseData.getSdoR2PermissionToRelyOnExpert().getSdoJointMeetingOfExpertsDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2EvidenceAcousticEngineer() != null && caseData.getSdoR2EvidenceAcousticEngineer().getSdoInstructionOfTheExpertDate() != null) {
+            validateFutureDate(caseData.getSdoR2EvidenceAcousticEngineer().getSdoInstructionOfTheExpertDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2EvidenceAcousticEngineer() != null && caseData.getSdoR2EvidenceAcousticEngineer().getSdoExpertReportDate() != null) {
+            validateFutureDate(caseData.getSdoR2EvidenceAcousticEngineer().getSdoExpertReportDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2EvidenceAcousticEngineer() != null && caseData.getSdoR2EvidenceAcousticEngineer().getSdoWrittenQuestionsDate() != null) {
+            validateFutureDate(caseData.getSdoR2EvidenceAcousticEngineer().getSdoWrittenQuestionsDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2EvidenceAcousticEngineer() != null && caseData.getSdoR2EvidenceAcousticEngineer().getSdoRepliesDate() != null) {
+            validateFutureDate(caseData.getSdoR2EvidenceAcousticEngineer().getSdoRepliesDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2QuestionsToEntExpert() != null && caseData.getSdoR2QuestionsToEntExpert().getSdoWrittenQuestionsDate() != null) {
+            validateFutureDate(caseData.getSdoR2QuestionsToEntExpert().getSdoWrittenQuestionsDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2QuestionsToEntExpert() != null && caseData.getSdoR2QuestionsToEntExpert().getSdoQuestionsShallBeAnsweredDate() != null) {
+            validateFutureDate(caseData.getSdoR2QuestionsToEntExpert().getSdoQuestionsShallBeAnsweredDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2ScheduleOfLoss() != null && caseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossClaimantDate() != null) {
+            validateFutureDate(caseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossClaimantDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2ScheduleOfLoss() != null && caseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossDefendantDate() != null) {
+            validateFutureDate(caseData.getSdoR2ScheduleOfLoss().getSdoR2ScheduleOfLossDefendantDate())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter() != null
+            && caseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter().getListFrom() != null) {
+            validateFutureDate(caseData.getSdoR2Trial().getSdoR2TrialFirstOpenDateAfter().getListFrom())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getSdoR2TrialWindow() != null && caseData.getSdoR2Trial().getSdoR2TrialWindow().getListFrom() != null) {
+            validateFutureDate(caseData.getSdoR2Trial().getSdoR2TrialWindow().getListFrom())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2Trial() != null && caseData.getSdoR2Trial().getSdoR2TrialWindow() != null && caseData.getSdoR2Trial().getSdoR2TrialWindow().getDateTo() != null) {
+            validateFutureDate(caseData.getSdoR2Trial().getSdoR2TrialWindow().getDateTo())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2ImportantNotesDate() != null) {
+            validateFutureDate(caseData.getSdoR2ImportantNotesDate())
+                .ifPresent(errors::add);
+        }
 
+        if (caseData.getSdoR2WitnessesOfFact() != null && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness() != null
+            && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails() != null
+            && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessClaimant() != null) {
+            validateGreaterOrEqualZero(caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessClaimant())
+                .ifPresent(errors::add);
+        }
+        if (caseData.getSdoR2WitnessesOfFact() != null && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness() != null
+            && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails() != null
+            && caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessDefendant() != null) {
+            validateGreaterOrEqualZero(caseData.getSdoR2WitnessesOfFact().getSdoR2RestrictWitness().getRestrictNoOfWitnessDetails().getNoOfWitnessDefendant())
+                .ifPresent(errors::add);
+        }
+
+        return errors;
+    }
+
+    private Optional<String> validateFutureDate(LocalDate date) {
+        LocalDate today = LocalDate.now();
+        if (date.isAfter(today)) {
+            return Optional.empty();
+        }
+        return Optional.of(ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE);
+    }
+
+    private Optional<String> validateGreaterOrEqualZero(Integer quantity) {
+        if (quantity < 0) {
+            return Optional.of(ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO);
+        }
+        return Optional.empty();
+    }
+
+    private static boolean isSDOR2Screen(CaseData caseData) {
         return  ((caseData.getDrawDirectionsOrderRequired() == NO
             && caseData.getFastClaims() != null
             && caseData.getFastClaims().contains(
@@ -1003,6 +1156,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 updatedData.sdoOrderDocument(document);
             }
             assignCategoryId.assignCategoryIdToCaseDocument(document, "caseManagementOrders");
+        }
+
+        if (featureToggleService.isSdoR2Enabled() && isSDOR2Screen(caseData)) {
+            List<String> errorsNihl;
+            errorsNihl = validateFieldsNihl(caseData);
+            if (!errorsNihl.isEmpty()) {
+                errors.addAll(errorsNihl);
+            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -1092,6 +1253,20 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         setClaimsTrackBasedOnJudgeSelection(dataBuilder, caseData);
 
+        // Avoid location lists (listItems) from being saved in caseData, just save the selected values
+        if (featureToggleService.isSdoR2Enabled() && caseData.getSdoR2Trial() != null) {
+            SdoR2Trial sdoR2Trial = caseData.getSdoR2Trial();
+            if (caseData.getSdoR2Trial().getHearingCourtLocationList() != null) {
+                sdoR2Trial.setHearingCourtLocationList(DynamicList.builder().value(
+                    caseData.getSdoR2Trial().getHearingCourtLocationList().getValue()).build());
+            }
+            if (caseData.getSdoR2Trial().getAltHearingCourtLocationList() != null) {
+                sdoR2Trial.setAltHearingCourtLocationList(DynamicList.builder().value(
+                    caseData.getSdoR2Trial().getAltHearingCourtLocationList().getValue()).build());
+            }
+            dataBuilder.sdoR2Trial(sdoR2Trial);
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
@@ -1137,10 +1312,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (DISPOSAL.equals(caseData.getOrderType())) {
             toUseList = Optional.ofNullable(caseData.getDisposalHearingMethodInPerson());
         } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
-            && caseData.getIsSdoR2NewScreen().equals(NO)) {
+            && !isSDOR2Screen(caseData)) {
             toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
-            && caseData.getIsSdoR2NewScreen().equals(YES)) {
+            && isSDOR2Screen(caseData)) {
             toUseList = caseData.getSdoR2Trial().getHearingCourtLocationList() != null
                 ? Optional.ofNullable(caseData.getSdoR2Trial().getHearingCourtLocationList())
                 : Optional.ofNullable(caseData.getSdoR2Trial().getAltHearingCourtLocationList());
@@ -1168,7 +1343,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             int number1 = Integer.parseInt(inputValue1);
             int number2 = Integer.parseInt(inputValue2);
             if (number1 < 0 || number2 < 0) {
-                return "The number entered cannot be less than zero";
+                return ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
             }
         }
         return errorMessage;
@@ -1259,4 +1434,24 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsWitnessStatementToggle(checkList);
     }
 
+    private void setCheckListNihl(
+        CaseData.CaseDataBuilder<?, ?> updatedData,
+        List<IncludeInOrderToggle> includeInOrderToggle
+    ) {
+        updatedData.sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder().includeInOrderToggle(includeInOrderToggle).build());
+        updatedData.sdoVariationOfDirections(SdoR2VariationOfDirections.builder().includeInOrderToggle(includeInOrderToggle).build());
+        updatedData.sdoR2Settlement(SdoR2Settlement.builder().includeInOrderToggle(includeInOrderToggle).build());
+        updatedData.sdoR2DisclosureOfDocumentsToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorWitnessesOfFactToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorExpertEvidenceToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorAddendumReportToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorFurtherAudiogramToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorQuestionsClaimantExpertToggle(includeInOrderToggle).build();
+        updatedData.sdoR2SeparatorPermissionToRelyOnExpertToggle(includeInOrderToggle);
+        updatedData.sdoR2SeparatorEvidenceAcousticEngineerToggle(includeInOrderToggle);
+        updatedData.sdoR2SeparatorQuestionsToEntExpertToggle(includeInOrderToggle);
+        updatedData.sdoR2ScheduleOfLossToggle(includeInOrderToggle);
+        updatedData.sdoR2SeparatorUploadOfDocumentsToggle(includeInOrderToggle);
+        updatedData.sdoR2TrialToggle(includeInOrderToggle);
+    }
 }
