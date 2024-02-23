@@ -96,8 +96,8 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
             updatedData.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED).build());
         }
         if (caseData.isHWFTypeClaimIssued()) {
-            HelpWithFeesDetails claimIssuedHwfDetails = caseData.getClaimIssuedHwfDetails();
-            updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(
+            HelpWithFeesDetails claimIssuedHwfDetails;
+            updatedData.claimIssuedHwfDetails(caseData.getClaimIssuedHwfDetails().toBuilder().hwfCaseEvent(
                 PARTIAL_REMISSION_HWF_GRANTED).build());
         }
 
