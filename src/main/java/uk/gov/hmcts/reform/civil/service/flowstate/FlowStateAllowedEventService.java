@@ -1384,7 +1384,6 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete,
                 UPLOAD_MEDIATION_DOCUMENTS,
                 MORE_INFORMATION_HWF,
-                UPDATE_HELP_WITH_FEE_NUMBER,
                 FEE_PAYMENT_OUTCOME,
                 NO_REMISSION_HWF,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,

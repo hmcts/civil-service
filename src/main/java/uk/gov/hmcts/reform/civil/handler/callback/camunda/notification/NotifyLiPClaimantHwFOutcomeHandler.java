@@ -16,12 +16,9 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -84,8 +81,8 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private Map<String, String> getFurtherProperties(CaseData caseData) {
         return switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);
-            case UPDATE_HELP_WITH_FEE_NUMBER -> Collections.emptyMap();
             case PARTIAL_REMISSION_HWF_GRANTED -> getPartialRemissionProperties(caseData);
+            case INVALID_HWF_REFERENCE, UPDATE_HELP_WITH_FEE_NUMBER -> Collections.emptyMap();
             default -> throw new IllegalArgumentException("case event not found");
         };
     }
@@ -95,6 +92,8 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
             emailTemplates = ImmutableMap.of(
                 CaseEvent.NO_REMISSION_HWF,
                 notificationsProperties.getNotifyApplicantForHwfNoRemission(),
+                CaseEvent.INVALID_HWF_REFERENCE,
+                notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber(),
                 CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
                 notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber(),
                 CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
