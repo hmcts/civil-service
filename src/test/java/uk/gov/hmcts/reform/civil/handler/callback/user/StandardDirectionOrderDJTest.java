@@ -794,7 +794,8 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
             //Then
-            assertThat(updatedData.getOrderSDODocumentDJCollection().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("sdo");
+            assertThat(updatedData.getOrderSDODocumentDJCollection().get(0).getValue().getDocumentLink()
+                           .getCategoryID()).isEqualTo("caseManagementOrders");
         }
 
         @ParameterizedTest
