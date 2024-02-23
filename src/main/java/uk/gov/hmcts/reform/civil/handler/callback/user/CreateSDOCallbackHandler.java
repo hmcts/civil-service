@@ -1075,7 +1075,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
-        updatedData.smallClaimsFlightDelayToggle(checkList);
+        if (featureToggleService.isSdoR2Enabled()) {
+            updatedData.smallClaimsFlightDelayToggle(checkList);
+        }
     }
 
 }
