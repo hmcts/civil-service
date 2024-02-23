@@ -52,7 +52,6 @@ public class InvalidHwFCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedCaseData.toMap(objectMapper))
             .build();
-
     }
 
     private CaseData setUpBusinessProcess(CaseData caseData) {
