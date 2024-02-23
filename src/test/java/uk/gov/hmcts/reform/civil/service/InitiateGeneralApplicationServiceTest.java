@@ -1183,7 +1183,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     }
 
     @Test
-    void shouldThrowException_whenApplicationMadeAfterSDOHasBeenMadeWhenRespondentTypeIsIndividual() {
+    void shouldUseMainLocation_whenApplicationMadeAfterSDOHasBeenMadeWhenRespondentTypeIsIndividual() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getCaseDataForWorkAllocation(null, SPEC_CLAIM, INDIVIDUAL, applicant1DQ, null,
                                           null);
@@ -1191,7 +1191,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         CaseData result = service.buildCaseData(caseData.toBuilder(), caseData, UserDetails.builder()
             .email(APPLICANT_EMAIL_ID_CONSTANT).build(), CallbackParams.builder().toString());
         assertThat(result.getGeneralApplications().get(0).getValue().getCaseManagementLocation().getBaseLocation())
-            .isNull();
+                .isEqualTo("22222");
     }
 
     @Test

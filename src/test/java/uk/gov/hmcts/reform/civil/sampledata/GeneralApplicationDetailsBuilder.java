@@ -886,6 +886,7 @@ public class GeneralApplicationDetailsBuilder {
                                                  Applicant1DQ applicant1DQ,
                                                  Respondent1DQ respondent1DQ,
                                                  Respondent2DQ respondent2DQ) {
+        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
         CaseData.CaseDataBuilder<?, ?> builder = CaseData.builder()
                 .ccdCaseReference(1234L)
                 .courtLocation(CourtLocation.builder().caseLocation(CaseLocationCivil.builder()
@@ -976,7 +977,8 @@ public class GeneralApplicationDetailsBuilder {
                 .applicant1DQ(applicant1DQ)
                 .respondent1DQ(respondent1DQ)
                 .respondent2DQ(respondent2DQ)
-                .ccdState(state);
+                .ccdState(state)
+                .caseManagementLocation(caseManagementLoc);
         if (claimType != null) {
             builder.caseAccessCategory(claimType);
         }
