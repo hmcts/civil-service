@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -41,6 +42,8 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.JudgeFinalOrderGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -103,6 +106,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final JudgeFinalOrderGenerator judgeFinalOrderGenerator;
     private final DocumentHearingLocationHelper locationHelper;
+    private String ext = "";
+    private final IdamClient idamClient;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -420,15 +425,25 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
     private CallbackResponse addGeneratedDocumentToCollection(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
+        UserDetails userDetails = idamClient.getUserDetails(callbackParams.getParams().get(BEARER_TOKEN).toString());
         CaseDocument finalDocument = caseData.getFinalOrderDocument();
-
         List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
         finalCaseDocuments.add(element(finalDocument));
+
         if (!isEmpty(caseData.getFinalOrderDocumentCollection())) {
             finalCaseDocuments.addAll(caseData.getFinalOrderDocumentCollection());
         }
-        finalCaseDocuments.forEach(document -> document.getValue().getDocumentLink().setCategoryID("finalOrders"));
+
+        String judgeName = userDetails.getFullName();
+        finalCaseDocuments.forEach(document -> document.getValue().getDocumentLink().setCategoryID("caseManagementOrders"));
+        finalCaseDocuments.forEach(document -> {
+            StringBuilder updatedFileName = new StringBuilder();
+            ext = FilenameUtils.getExtension(document.getValue().getDocumentLink().getDocumentFileName());
+            document.getValue().getDocumentLink().setDocumentFileName(updatedFileName
+                                                                          .append(document.getValue().getCreatedDatetime().toLocalDate().toString())
+                                                                          .append("_").append(judgeName).append(".").append(ext).toString());
+        });
+
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.finalOrderDocumentCollection(finalCaseDocuments);
         // Casefileview will show any document uploaded even without an categoryID under uncategorized section,

@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.crd.model.Category;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -98,6 +99,7 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirements;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -556,6 +558,10 @@ public class CaseDataBuilder {
 
     private  HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue;
     private  HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing;
+
+    private YesOrNo eaCourtLocation;
+    private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
+
 
     private List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs;
     private List<Element<MediationDocumentsReferredInStatement>> res1MediationDocumentsReferred;
@@ -4706,6 +4712,14 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateHearingFeeDuePaidWithHwf() {
+        atStateApplicantRespondToDefenceAndProceed();
+        hearingDueDate = now().minusDays(1);
+        hearingFeePaymentDetails = null;
+        ccdState = HEARING_READINESS;
+        return this;
+    }
+
     public CaseDataBuilder atStateBeforeTakenOfflineSDONotDrawn() {
 
         atStateApplicantRespondToDefenceAndProceed();
@@ -6315,6 +6329,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder feePaymentOutcomeDetails(FeePaymentOutcomeDetails details) {
+        this.feePaymentOutcomeDetails = details;
+        return this;
+    }
+
     public CaseDataBuilder specClaim1v1LrVsLip() {
         this.caseAccessCategory = SPEC_CLAIM;
         this.respondent1Represented = NO;
@@ -6949,6 +6968,8 @@ public class CaseDataBuilder {
             .eaCourtLocation(eaCourtLocation)
             .upholdingPreviousOrderReason(upholdingPreviousOrderReason)
             .decisionOnRequestReconsiderationOptions(decisionOnRequestReconsiderationOptions)
+            .hwfFeeType(FeeType.CLAIMISSUED)
+            .feePaymentOutcomeDetails(feePaymentOutcomeDetails)
             .res1MediationNonAttendanceDocs(res1MediationNonAttendanceDocs)
             .res1MediationDocumentsReferred(res1MediationDocumentsReferred)
             .build();
