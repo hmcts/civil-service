@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
@@ -1109,6 +1110,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             return Optional.of(ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO);
         }
         return Optional.empty();
+    }
+
+    private static boolean isSDOR2Screen(CaseData caseData) {
+        return  ((caseData.getDrawDirectionsOrderRequired() == NO
+            && caseData.getFastClaims() != null
+            && caseData.getFastClaims().contains(
+            FastTrack.fastClaimNoiseInducedHearingLoss))
+            || (caseData.getDrawDirectionsOrderRequired() == YES
+            && caseData.getTrialAdditionalDirectionsForFastTrack() != null
+            && caseData.getTrialAdditionalDirectionsForFastTrack()
+            .contains(FastTrack.fastClaimNoiseInducedHearingLoss)));
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
