@@ -90,10 +90,10 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private String getTemplate(CaseEvent hwfEvent) {
         if (emailTemplates == null) {
             emailTemplates = ImmutableMap.of(
-                CaseEvent.NO_REMISSION_HWF,
-                notificationsProperties.getNotifyApplicantForHwfNoRemission(),
                 CaseEvent.INVALID_HWF_REFERENCE,
                 notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber(),
+                CaseEvent.NO_REMISSION_HWF,
+                notificationsProperties.getNotifyApplicantForHwfNoRemission(),
                 CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
                 notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber(),
                 CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
@@ -106,7 +106,10 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private String getTemplateBilingual(CaseEvent hwfEvent) {
         if (emailTemplatesBilingual == null) {
             emailTemplatesBilingual = ImmutableMap.of(
-                CaseEvent.NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh(),
+                CaseEvent.INVALID_HWF_REFERENCE,
+                notificationsProperties.getNotifyApplicantForHwfInvalidRefNumberBilingual(),
+                CaseEvent.NO_REMISSION_HWF,
+                notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh(),
                 CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
                 notificationsProperties.getNotifyApplicantForHwfUpdateRefNumberBilingual(),
                 CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,

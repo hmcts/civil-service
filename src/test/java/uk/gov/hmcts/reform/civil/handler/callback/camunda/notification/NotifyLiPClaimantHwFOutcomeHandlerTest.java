@@ -66,6 +66,8 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         private static final String EMAIL_NO_REMISSION_TEMPLATE_HWF_BILINGUAL = "test-hwf-noremission-bilingual-id";
         private static final String EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION_BILINGUAL = "test-hwf-partialRemission-bilingual-id";
         private static final String EMAIL_TEMPLATE_UPDATE_REF_NUMBER_BILINGUAL = "test-hwf-updaterefnumber-bilingual-id";
+        private static final String EMAIL_TEMPLATE_INVALID_HWF_REFERENCE_BILINGUAL = "test-hwf-invalidrefnumber-bilingual-id";
+
         private static final String EMAIL = "test@email.com";
         private static final String REFERENCE_NUMBER = "hwf-outcome-notification-000DC001";
         private static final String CLAIMANT = "Mr. John Rambo";
@@ -117,6 +119,8 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION_BILINGUAL);
             when(notificationsProperties.getNotifyApplicantForHwfUpdateRefNumberBilingual()).thenReturn(
                 EMAIL_TEMPLATE_UPDATE_REF_NUMBER_BILINGUAL);
+            when(notificationsProperties.getNotifyApplicantForHwfInvalidRefNumberBilingual()).thenReturn(
+                EMAIL_TEMPLATE_INVALID_HWF_REFERENCE_BILINGUAL);
         }
 
         @Test
@@ -375,6 +379,31 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 EMAIL,
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION_BILINGUAL,
                 getNotificationDataMapPartialRemissionClaimIssued(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicant_HwfOutcome_InvalidRefNumber_Bilingual() {
+            // Given
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(INVALID_HWF_REFERENCE)
+                .build();
+
+            CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder()
+                .claimantBilingualLanguagePreference("BOTH")
+                .claimIssuedHwfDetails(hwfeeDetails).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                EMAIL,
+                EMAIL_TEMPLATE_INVALID_HWF_REFERENCE_BILINGUAL,
+                getNotificationCommonDataMapForClaimIssued(),
                 REFERENCE_NUMBER
             );
         }

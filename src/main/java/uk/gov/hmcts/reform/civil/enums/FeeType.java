@@ -4,8 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum FeeType {
-    HEARING("hearing", "clyw"),
-    CLAIMISSUED("claim","hawlio");
+
+    CLAIMISSUED("claim", "hawlio"),
+    HEARING("hearing", "clyw");
 
     private final String label;
     private final String labelInWelsh;

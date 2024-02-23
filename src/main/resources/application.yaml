@@ -369,7 +369,8 @@ notifications:
   notifyApplicantForHwfInvalidRefNumber: "8d7cb08f-96ae-4469-944d-c92650f45fb6"
   notifyApplicantForHwfPartialRemissionBilingual: "5bbd4518-5501-4737-8a1e-a6adacd5e679"
   notifyApplicantForHwfUpdateRefNumberBilingual: "a7c206b5-8a27-4419-83ff-61351cbc69fb"
-
+  notifyApplicantForHwFMoreInformationNeededWelsh: "65b3524b-b58c-4cdb-b8b5-5fc2cec505a5"
+  notifyApplicantForHwfInvalidRefNumberBilingual: "8950e206-6d15-4575-9d99-734908389fa7"
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
