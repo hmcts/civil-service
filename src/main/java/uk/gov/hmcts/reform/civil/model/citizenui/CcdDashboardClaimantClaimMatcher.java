@@ -332,4 +332,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean isHwfUpdatedRefNumber() {
         return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
     }
+
+    @Override
+    public boolean isHwfInvalidRefNumber() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.INVALID_HWF_REFERENCE;
+    }
 }

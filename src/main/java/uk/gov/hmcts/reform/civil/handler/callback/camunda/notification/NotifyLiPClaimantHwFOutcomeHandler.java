@@ -88,7 +88,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         return switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);
             case MORE_INFORMATION_HWF -> getMoreInformationProperties(caseData);
-            case UPDATE_HELP_WITH_FEE_NUMBER -> Collections.emptyMap();
+            case UPDATE_HELP_WITH_FEE_NUMBER, INVALID_HWF_REFERENCE -> Collections.emptyMap();
             case PARTIAL_REMISSION_HWF_GRANTED -> getPartialRemissionProperties(caseData);
             default -> throw new IllegalArgumentException("case event not found");
         };
@@ -99,6 +99,8 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
             emailTemplates = ImmutableMap.of(
                 CaseEvent.NO_REMISSION_HWF,
                 notificationsProperties.getNotifyApplicantForHwfNoRemission(),
+                CaseEvent.INVALID_HWF_REFERENCE,
+                notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber(),
                 CaseEvent.MORE_INFORMATION_HWF,
                 notificationsProperties.getNotifyApplicantForHwFMoreInformationNeeded(),
                 CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,

@@ -559,9 +559,7 @@ public class CaseDataBuilder {
     private  HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue;
     private  HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing;
 
-    private YesOrNo eaCourtLocation;
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
-
 
     private List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs;
     private List<Element<MediationDocumentsReferredInStatement>> res1MediationDocumentsReferred;
