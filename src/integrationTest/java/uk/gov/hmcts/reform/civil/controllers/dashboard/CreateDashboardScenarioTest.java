@@ -8,6 +8,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
@@ -32,7 +33,7 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
 
         UUID caseId = UUID.randomUUID();
         String hearingFeeByTime = "4 pm";
-        OffsetDateTime hearingFeeByDate = OffsetDateTime.now();
+        LocalDate hearingFeeByDate = OffsetDateTime.now().toLocalDate();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
                    .params(Map.of("hearingFeePayByTime", hearingFeeByTime,

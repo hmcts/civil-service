@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 import static java.util.Objects.nonNull;
@@ -57,10 +58,14 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
             : getDocmosisTemplateTrial();
         DocmosisDocument docmosisDocument =
             documentGeneratorService.generateDocmosisDocument(templateData, docmosisTemplate);
+
+        UserDetails userDetails = idamClient.getUserDetails(authorisation);
+        String judgeName = userDetails.getFullName();
+
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                getFileName(caseData, docmosisTemplate),
+                getFileName(judgeName),
                 docmosisDocument.getBytes(),
                 DocumentType.DEFAULT_JUDGMENT_SDO_ORDER
             )
@@ -72,8 +77,10 @@ public class DefaultJudgmentOrderFormGenerator implements TemplateDataGenerator<
         return null;
     }
 
-    private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate) {
-        return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
+    private String getFileName(String judgeName) {
+        StringBuilder updatedFileName = new StringBuilder();
+        updatedFileName.append(LocalDate.now()).append("_").append(judgeName).append(".pdf");
+        return updatedFileName.toString();
     }
 
     private DefaultJudgmentSDOOrderForm getDefaultJudgmentForms(CaseData caseData, String authorisation) {
