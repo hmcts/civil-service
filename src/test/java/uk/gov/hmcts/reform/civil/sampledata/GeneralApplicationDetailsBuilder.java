@@ -49,6 +49,7 @@ import java.util.UUID;
 import static java.time.LocalDate.EPOCH;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonList;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -58,6 +59,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GAHearingType.IN_PERSON;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.EXTEND_TIME;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.GENERAL_ORDER;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -1075,6 +1077,28 @@ public class GeneralApplicationDetailsBuilder {
             builder.caseAccessCategory(claimType);
         }
         return builder.build();
+    }
+
+    public CaseData getCaseDataForWorkAllocation1V1FailSafeData() {
+        Applicant1DQ applicant1DQ =
+                Applicant1DQ.builder().applicant1DQRequestedCourt(RequestedCourt.builder()
+                        .responseCourtCode("applicant1DQRequestedCourt")
+                        .caseLocation(CaseLocationCivil.builder()
+                                .region("2")
+                                .baseLocation("00000")
+                                .build())
+                        .build()).build();
+        Respondent1DQ respondent1DQ =
+                Respondent1DQ.builder().respondent1DQRequestedCourt(RequestedCourt.builder()
+                        .responseCourtCode(null)
+                        .caseLocation(CaseLocationCivil.builder()
+                                .region("2")
+                                .baseLocation("11111")
+                                .build())
+                        .build()).build();
+        CaseLocationCivil caseManagementLoc = CaseLocationCivil.builder().region("1").baseLocation("22222").build();
+        return getCaseDataForWorkAllocation1V1(null, SPEC_CLAIM, INDIVIDUAL, applicant1DQ, respondent1DQ)
+                .toBuilder().caseManagementLocation(caseManagementLoc).build();
     }
 
     public CaseData getMultiCaseDataForWorkAllocationForOne_V_Two(CaseState state,
