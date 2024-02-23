@@ -71,7 +71,6 @@ public class HearingNoticeSchedulerEventHandler {
         }
     }
 
-
     private void triggerHearingNoticeEvent(HearingNoticeMessageVars messageVars) {
         runtimeService
             .createMessageCorrelation(HEARING_NOTICE_MESSAGE)
