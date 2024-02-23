@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -36,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFENCE_TRANSLATED_DOCUMENT;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_ADMISSION;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -437,7 +440,7 @@ public class CaseDataTest {
     void isSmallClaim_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
+                .responseClaimTrack(FAST_CLAIM.name())
                 .build();
         //When
         //Then
@@ -953,6 +956,72 @@ public class CaseDataTest {
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
             //Then
             assertTrue(isJudgementDateNotPermitted);
+        }
+    }
+
+    @Nested
+    class GetAssignedTrack {
+
+        @Test
+        void shouldReturnExpectedAssignedTrack_whenAllocatedTrackIsDefined() {
+            CaseData caseData = CaseData.builder().allocatedTrack(FAST_CLAIM).build();
+            assertEquals(FAST_CLAIM.name(), caseData.getAssignedTrack());
+        }
+
+        @Test
+        void shouldReturnExpectedAssignedTrack_whenResponseClaimTrackIsDefined() {
+            CaseData caseData = CaseData.builder().responseClaimTrack(MULTI_CLAIM.name()).build();
+            assertEquals(MULTI_CLAIM.name(), caseData.getAssignedTrack());
+        }
+    }
+
+    @Nested
+    class HWFType {
+        @Test
+        void shouldReturnTrueIfHWFTypeIsHearing() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hwfFeeType(FeeType.HEARING)
+                .build();
+            //When
+            boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
+            //Then
+            assertTrue(isHWFTypeHearing);
+        }
+
+        @Test
+        void shouldReturnFalseIfHWFTypeIsNull() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .build();
+            //When
+            boolean isHWFTypeHearing = caseData.isHWFTypeHearing();
+            //Then
+            assertFalse(isHWFTypeHearing);
+        }
+
+        @Test
+        void shouldReturnTrueIfHWFTypeIsClaimIssued() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hwfFeeType(FeeType.CLAIMISSUED)
+                .build();
+            //When
+            boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
+            //Then
+            assertTrue(isHWFTypeClaimIssued);
+        }
+
+        @Test
+        void shouldReturnFalseIfHWFTypeIsNotClaimIssued() {
+            //Given
+            CaseData caseData = CaseData.builder()
+                .hwfFeeType(FeeType.HEARING)
+                .build();
+            //When
+            boolean isHWFTypeClaimIssued = caseData.isHWFTypeClaimIssued();
+            //Then
+            assertFalse(isHWFTypeClaimIssued);
         }
     }
 }

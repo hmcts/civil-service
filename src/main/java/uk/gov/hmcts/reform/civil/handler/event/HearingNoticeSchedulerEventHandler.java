@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.hmc.service.HearingsService;
 @RequiredArgsConstructor
 public class HearingNoticeSchedulerEventHandler {
 
+    private static int MAX_RETRIES = 3;
     private static String HEARING_NOTICE_MESSAGE = "NOTIFY_HEARING_PARTIES";
     private final UserService userService;
     private final SystemUpdateUserConfiguration userConfig;
@@ -35,32 +36,38 @@ public class HearingNoticeSchedulerEventHandler {
     @Async("asyncHandlerExecutor")
     @EventListener
     public void handle(HearingNoticeSchedulerTaskEvent event) {
-        String hearingId = event.getHearingId();
-
-        try {
-            HearingGetResponse hearing = hearingsService.getHearingResponse(getSystemUpdateUser().getUserToken(), hearingId);
-            ListAssistCaseStatus hearingStatus = hearing.getHearingResponse().getLaCaseStatus();
-            log.info("Processing hearing id: [{}] status: [{}]", hearingId, hearingStatus);
-
-            if (hearingStatus.equals(ListAssistCaseStatus.LISTED)) {
-                PartiesNotifiedResponse partiesNotified = getLatestPartiesNotifiedResponse(hearingId);
-                if (HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
-                    log.info("Dispatching hearing notice task for hearing [{}].",
-                             hearingId);
-                    triggerHearingNoticeEvent(HearingNoticeMessageVars.builder()
-                                                  .hearingId(hearingId)
-                                                  .caseId(hearing.getCaseDetails().getCaseRef())
-                                                  .triggeredViaScheduler(true)
-                                                  .build());
-
-                } else {
-                    notifyHmc(hearingId, hearing, partiesNotified.getServiceData());
-                }
-            } else {
-                notifyHmc(hearingId, hearing, PartiesNotifiedServiceData.builder().build());
+        for (int i = 0; i < MAX_RETRIES; i++) {
+            String hearingId = event.getHearingId();
+            try {
+                processHearing(hearingId);
+                break;
+            } catch (Exception e) {
+                log.error("Processing hearingId [{}] failed due to error: {}", hearingId, e.getMessage());
             }
-        } catch (Exception e) {
-            log.error("Processing hearingId [{}] failed due to error: {}", hearingId, e.getMessage());
+        }
+    }
+
+    private void processHearing(String hearingId) {
+        HearingGetResponse hearing = hearingsService.getHearingResponse(getSystemUpdateUser().getUserToken(), hearingId);
+        ListAssistCaseStatus hearingStatus = hearing.getHearingResponse().getLaCaseStatus();
+        log.info("Processing hearing id: [{}] status: [{}]", hearingId, hearingStatus);
+
+        if (hearingStatus.equals(ListAssistCaseStatus.LISTED)) {
+            PartiesNotifiedResponse partiesNotified = getLatestPartiesNotifiedResponse(hearingId);
+            if (HmcDataUtils.hearingDataChanged(partiesNotified, hearing)) {
+                log.info("Dispatching hearing notice task for hearing [{}].",
+                        hearingId);
+                triggerHearingNoticeEvent(HearingNoticeMessageVars.builder()
+                        .hearingId(hearingId)
+                        .caseId(hearing.getCaseDetails().getCaseRef())
+                        .triggeredViaScheduler(true)
+                        .build());
+
+            } else {
+                notifyHmc(hearingId, hearing, partiesNotified.getServiceData());
+            }
+        } else {
+            notifyHmc(hearingId, hearing, PartiesNotifiedServiceData.builder().build());
         }
     }
 
