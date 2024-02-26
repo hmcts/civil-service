@@ -20,6 +20,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_REQUIRED;
 
 @Service
 @Slf4j
@@ -57,7 +58,7 @@ public class ClaimIssueNotificationsHandler extends CallbackHandler {
 
         dashboardApiClient.recordScenario(
             caseData.getCcdCaseReference().toString(),
-            "Scenario.AAA7.ClaimIssue.Response.Required",
+            SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
             authToken,
             ScenarioRequestParams.builder().params(params).build()
         );

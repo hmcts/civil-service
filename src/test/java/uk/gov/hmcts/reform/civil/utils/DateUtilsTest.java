@@ -10,6 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DateUtilsTest {
 
     @Test
+    public void testFormatDate() {
+        LocalDateTime date = LocalDateTime.of(2022, 7, 28, 9, 00, 00);
+        String dateFormatted = DateUtils.formatDate(date);
+
+        Assertions.assertEquals("28 July 2022", dateFormatted);
+    }
+
+    @Test
     public void testConvertFromUTC_withBSTDate() {
         LocalDateTime utcDate = LocalDateTime.of(2022, 7, 28, 9, 00, 00);
         LocalDateTime ukDate = DateUtils.convertFromUTC(utcDate);
