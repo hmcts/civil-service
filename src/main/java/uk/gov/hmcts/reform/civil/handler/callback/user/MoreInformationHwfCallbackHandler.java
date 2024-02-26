@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -78,12 +79,15 @@ public class MoreInformationHwfCallbackHandler extends CallbackHandler {
             .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
 
         if (caseData.isHWFTypeHearing()) {
-            HelpWithFeesDetails hearingFeeDetails = caseData.getHearingHwfDetails();
+            HelpWithFeesDetails hearingFeeDetails =
+                Optional.ofNullable(caseData.getHearingHwfDetails()).orElse(new HelpWithFeesDetails());
             updatedData.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(MORE_INFORMATION_HWF).build());
         }
         if (caseData.isHWFTypeClaimIssued()) {
-            HelpWithFeesDetails claimIssuedHwfDetails = caseData.getClaimIssuedHwfDetails();
+            HelpWithFeesDetails claimIssuedHwfDetails =
+                Optional.ofNullable(caseData.getClaimIssuedHwfDetails()).orElse(new HelpWithFeesDetails());
             updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(MORE_INFORMATION_HWF).build());
+
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
