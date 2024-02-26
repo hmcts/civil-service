@@ -107,6 +107,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderType.DISPOSAL;
@@ -198,6 +199,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
+
+        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+            updatedData.showCarmFields(YES);
+        } else {
+            updatedData.showCarmFields(NO);
+        }
 
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
         preferredCourt.map(RequestedCourt::getCaseLocation)
@@ -605,6 +612,16 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
 
+        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+            updatedData.smallClaimsMediationSectionStatement("If you failed to attend a mediation appointment,"
+                                                                 + " then the judge at the hearing may impose a sanction. "
+                                                                 + "This could require you to pay costs, or could result in your claim or defence being dismissed. "
+                                                                 + "You should deliver to every other party, and to the court, your explanation for non-attendance, "
+                                                                 + "with any supporting documents, at least 14 days before the hearing. "
+                                                                 + "Any other party who wishes to comment on the failure to attend the mediation appointment should deliver their comments,"
+                                                                 + " with any supporting documents, to all parties and to the court at least 14 days before the hearing.");
+        }
+
         if (featureToggleService.isSdoR2Enabled()) {
             SmallClaimsFlightDelay tempSmallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
                 .smallClaimsFlightDelayToggle(checkList)
@@ -782,8 +799,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updateDeductionValue(caseData, updatedData);
 
-        updatedData.setSmallClaimsFlag(YesOrNo.NO).build();
-        updatedData.setFastTrackFlag(YesOrNo.NO).build();
+        updatedData.setSmallClaimsFlag(NO).build();
+        updatedData.setFastTrackFlag(NO).build();
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             updatedData.setSmallClaimsFlag(YES).build();
@@ -905,7 +922,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 dataBuilder.eaCourtLocation(YES);
             } else {
                 log.info("Case {} is NOT whitelisted for case progression.", caseData.getCcdCaseReference());
-                dataBuilder.eaCourtLocation(YesOrNo.NO);
+                dataBuilder.eaCourtLocation(NO);
             }
         }
 
@@ -1077,6 +1094,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsWitnessStatementToggle(checkList);
         if (featureToggleService.isSdoR2Enabled()) {
             updatedData.smallClaimsFlightDelayToggle(checkList);
+        }
+        if (featureToggleService.isCarmEnabledForCase(updatedData.build().getSubmittedDate())) {
+            updatedData.smallClaimsMediationSectionToggle(checkList);
         }
     }
 
