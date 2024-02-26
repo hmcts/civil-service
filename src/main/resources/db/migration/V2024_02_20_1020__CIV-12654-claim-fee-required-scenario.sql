@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{"Notice.AAA7.ClaimIssue.ClaimSubmit.Required": []}', '{"Notice.AAA7.ClaimIssue.ClaimFee.Required" : []}');
+VALUES ('Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{"Notice.AAA7.ClaimIssue.ClaimFee.Required"}', '{"Notice.AAA7.ClaimIssue.ClaimFee.Required" : []}');
 
 /**
  * Add notification template
@@ -10,8 +10,8 @@ VALUES ('Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{"Notice.AAA7.ClaimIssue.
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA7.ClaimIssue.ClaimFee.Required', 'You need to pay your claim fee', 'You need to pay your claim fee',
-        'Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href="/claim/task-list">Pay the claim fee</a>.',
-        'Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href="/claim/task-list">Pay the claim fee</a>.',
+        'Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href="/claim/${ccdCaseReference}/fee">Pay the claim fee</a>.',
+        'Your claim has not yet been issued, in order to proceed you must pay the claim fee of ${claimFee}. <a href="/claim/${ccdCaseReference}/fee">Pay the claim fee</a>.',
         'CLAIMANT');
 
 /**
@@ -20,9 +20,9 @@ VALUES ('Notice.AAA7.ClaimIssue.ClaimFee.Required', 'You need to pay your claim 
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role,task_order)
 values ('<a>View the claim</a>', 'The claim','<a>View the claim</a>',
-        'The claim', 'Claim.View', 'Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{1, 2}', 'CLAIMANT', 1),
+        'The claim', 'Claim.View', 'Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{2, 2}', 'CLAIMANT', 1),
        ('<a>View information about the claimant</a>', 'The claim','<a>View information about the claimant</a>',
-        'The claim', 'Claim.Claimant.Info', 'Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{1, 2}', 'CLAIMANT', 2),
+        'The claim', 'Claim.Claimant.Info', 'Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{2, 2}', 'CLAIMANT', 2),
        ('<a>View the response to the claim</a>', 'The response','<a>View the response to the claim</a>',
         'The response', 'Response.View', 'Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 3),
        ('<a>View information about the defendant</a>', 'The response','<a>View information about the defendant</a>',
@@ -38,7 +38,7 @@ values ('<a>View the claim</a>', 'The claim','<a>View the claim</a>',
        ('<a>View the bundle</a>', 'Hearings' ,'<a>View the bundle</a>',
         'Hearings', 'Hearing.Bundle.View', 'Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 9),
        ('<a>View orders and notices</a>', 'Orders and notices from the court' ,'<a>View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{1, 2}', 'CLAIMANT', 10),
+        'Orders and notices from the court', 'Order.View', 'Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{2, 2}', 'CLAIMANT', 10),
        ('<a>View the judgment</a>', 'Judgments from the court' ,'<a>View the judgment</a>',
         'Judgments from the court', 'Judgment.View', 'Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{1, 1}', 'CLAIMANT', 11),
        ('<a>View applications</a>', 'Applications' ,'<a>View applications</a>',

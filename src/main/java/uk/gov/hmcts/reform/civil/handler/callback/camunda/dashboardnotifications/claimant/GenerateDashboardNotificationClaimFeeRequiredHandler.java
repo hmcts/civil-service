@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class GenerateDashboardNotificationClaimFeeRequiredHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(GENERATE_DASHBOARD_NOTIFICATION_CLAIM_FEE_REQUIRED);
-    public static final String TASK_ID = "GenerateDashboardNotificationClaimFeeRequiredCUI";
+    public static final String TASK_ID = "GenerateDashboardNotificationClaimFeeRequired";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
 

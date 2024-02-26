@@ -58,7 +58,7 @@ public interface DashboardApiClient {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation
     );
 
-    @PostMapping(path = "/scenarios/{scenario_ref}/{unique_case_identifier}")
+    @PostMapping(path = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}")
     ResponseEntity<Void> recordScenario(
         @PathVariable("unique_case_identifier") String uniqueCaseIdentifier,
         @PathVariable("scenario_ref") String scenarioReference,
