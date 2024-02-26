@@ -138,6 +138,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
             CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()),
             TYPE_OF_FEE, caseData.getHwfFeeType().getLabel(),
+            TYPE_OF_FEE_WELSH, caseData.getHwfFeeType().getLabelInWelsh(),
             HWF_REFERENCE_NUMBER, caseData.getHwFReferenceNumber()
         );
     }

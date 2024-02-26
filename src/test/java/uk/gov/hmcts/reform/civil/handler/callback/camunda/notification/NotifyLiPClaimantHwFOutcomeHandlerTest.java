@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASONS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REMAINING_AMOUNT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.TYPE_OF_FEE_WELSH;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -414,6 +415,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 CLAIMANT_NAME, CLAIMANT,
                 REASONS, NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET.getLabel(),
                 TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
+                TYPE_OF_FEE_WELSH, FeeType.CLAIMISSUED.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
                 AMOUNT, CLAIM_FEE_AMOUNT
             );
@@ -425,6 +427,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 CLAIMANT_NAME, CLAIMANT,
                 REASONS, NoRemissionDetailsSummary.INCORRECT_EVIDENCE.getLabel(),
                 TYPE_OF_FEE, FeeType.HEARING.getLabel(),
+                TYPE_OF_FEE_WELSH, FeeType.HEARING.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
                 AMOUNT, HEARING_FEE_AMOUNT
             );
@@ -435,6 +438,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
+                TYPE_OF_FEE_WELSH, FeeType.CLAIMISSUED.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
             );
         }
@@ -444,6 +448,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.HEARING.getLabel(),
+                TYPE_OF_FEE_WELSH, FeeType.HEARING.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
             );
         }
@@ -453,6 +458,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
+                TYPE_OF_FEE_WELSH, FeeType.CLAIMISSUED.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
                 PART_AMOUNT, "1000.00",
                 REMAINING_AMOUNT, OUTSTANDING_AMOUNT_IN_POUNDS
@@ -464,6 +470,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 CLAIMANT_NAME, CLAIMANT,
                 TYPE_OF_FEE, FeeType.HEARING.getLabel(),
+                TYPE_OF_FEE_WELSH, FeeType.HEARING.getLabelInWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE,
                 PART_AMOUNT, "1000.00",
                 REMAINING_AMOUNT, OUTSTANDING_AMOUNT_IN_POUNDS
