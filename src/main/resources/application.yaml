@@ -373,6 +373,7 @@ notifications:
   notifyApplicantForHwfInvalidRefNumberBilingual: "8950e206-6d15-4575-9d99-734908389fa7"
   notifyApplicantForHwfFeePaymentOutcome: "0abdcb29-edd3-418a-aeab-a102da4ad441"
   notifyApplicantForHwfFeePaymentOutcomeInBilingual: "ca84e76e-f178-4c63-9eca-96b491cc538c"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
