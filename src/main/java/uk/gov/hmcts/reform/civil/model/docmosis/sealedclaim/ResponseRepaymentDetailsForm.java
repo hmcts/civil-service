@@ -148,16 +148,31 @@ public class ResponseRepaymentDetailsForm {
         if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
             alreadyPaid(caseData, builder);
         } else {
+            if (useRespondent2(caseData)) {
+                addRepaymentMethod(
+                    caseData,
+                    builder,
+                    MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount2())
+                );
+            } else {
             BigDecimal amountInPennies =
                 useRespondent2(caseData) ? caseData.getRespondToAdmittedClaimOwingAmount2() :
                     caseData.getRespondToAdmittedClaimOwingAmount();
 
-            addRepaymentMethod(
-                caseData,
-                builder,
+                addRepaymentMethod(
+                    caseData,
+                    builder,
                 MonetaryConversions.penniesToPounds(amountInPennies)
-            );
+                );
+            }
         }
+
+    private static boolean useRespondent2(CaseData caseData) {
+        return MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
+            && caseData.getRespondent1ResponseDate() == null
+            || (caseData.getRespondent2ResponseDate() != null
+            && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
+    }
     }
 
     private static boolean useRespondent2(CaseData caseData) {
