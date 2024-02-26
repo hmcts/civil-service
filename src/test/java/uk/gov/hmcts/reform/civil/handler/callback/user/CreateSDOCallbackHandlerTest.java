@@ -391,7 +391,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getDisposalHearingHearingNotes()).isNull();
         }
 
-
         @Test
         void shouldPopulateHearingCourtLocationForNihl() {
 
