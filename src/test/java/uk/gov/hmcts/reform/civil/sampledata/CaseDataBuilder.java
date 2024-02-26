@@ -159,6 +159,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
@@ -509,6 +510,7 @@ public class CaseDataBuilder {
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private SmallClaimsFlightDelay smallClaimsFlightDelay;
     private FastTrackWitnessOfFact fastTrackWitnessOfFact;
     private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
 
@@ -6398,6 +6400,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atSmallSmallClaimsFlightDelayInputs() {
+        atStateClaimNotified();
+        this.smallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
+            .relatedClaimsInput(" ")
+            .legalDocumentsInput(" ")
+            .build();
+
+        return this;
+    }
+
     public CaseDataBuilder atFastTrackWitnessOfFactWithPositiveInputs() {
         atStateClaimNotified();
         this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
@@ -6920,6 +6932,7 @@ public class CaseDataBuilder {
             .updateDetailsForm(updateDetailsForm)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
             .smallClaimsWitnessStatement(smallClaimsWitnessStatement)
+            .smallClaimsFlightDelay(smallClaimsFlightDelay)
             .fastTrackWitnessOfFact(fastTrackWitnessOfFact)
             .trialHearingWitnessOfFactDJ(trialHearingWitnessOfFactDJ)
             //Transfer Online Case
