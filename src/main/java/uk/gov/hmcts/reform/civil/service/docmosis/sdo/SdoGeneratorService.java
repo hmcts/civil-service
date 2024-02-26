@@ -60,6 +60,9 @@ public class SdoGeneratorService {
             docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
                 ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT : DocmosisTemplates.SDO_FAST;
             templateData = getTemplateDataFast(caseData, judgeName, isJudge, authorisation);
+        } else if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+                docmosisTemplate = DocmosisTemplates.SDO_SMALL_DRH;
+                templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         } else {
             docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName, isJudge, authorisation);
@@ -333,6 +336,85 @@ public class SdoGeneratorService {
             )
             // CIV-5514: smallClaimsMethodInPerson, smallClaimsMethodTelephoneHearing and
             // smallClaimsMethodVideoConferenceHearing can be removed after HNL is live
+            .smallClaimsMethod(caseData.getSmallClaimsMethod())
+            .smallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
+            .smallClaimsMethodTelephoneHearing(
+                SdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)
+            )
+            .smallClaimsMethodVideoConferenceHearing(
+                SdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData)
+            )
+            .smallClaimsDocuments(caseData.getSmallClaimsDocuments())
+            .smallClaimsWitnessStatement(caseData.getSmallClaimsWitnessStatement())
+            .smallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
+            .smallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
+            .hasNewDirections(
+                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsAddNewDirections")
+            )
+            .smallClaimsAddNewDirections(caseData.getSmallClaimsAddNewDirections())
+            .smallClaimsNotes(caseData.getSmallClaimsNotes())
+            .smallClaimsHearingToggle(
+                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")
+            )
+            // SNI-5142
+            .smallClaimsMethodToggle(true)
+            .smallClaimsDocumentsToggle(
+                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")
+            )
+            .smallClaimsWitnessStatementToggle(
+                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle")
+            )
+            .smallClaimsNumberOfWitnessesToggle(
+                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsNumberOfWitnessesToggle")
+            );
+
+        sdoDocumentFormBuilder.hearingLocation(
+                locationHelper.getHearingLocation(
+                    Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
+                        .map(DynamicList::getValue)
+                        .map(DynamicListElement::getLabel)
+                        .orElse(null),
+                    caseData,
+                    authorisation
+                ))
+            .caseManagementLocation(
+                locationHelper.getHearingLocation(null, caseData, authorisation));
+
+        return sdoDocumentFormBuilder
+            .build();
+    }
+
+    private SdoDocumentFormSmall getTemplateDataSmallDrh(CaseData caseData, String judgeName, boolean isJudge, String authorisation) { //TODO Change to suit SDO R2 DRH
+        SdoDocumentFormSmall.SdoDocumentFormSmallBuilder sdoDocumentFormBuilder = SdoDocumentFormSmall.builder()
+            .writtenByJudge(isJudge)
+            .currentDate(LocalDate.now())
+            .judgeName(judgeName)
+            .caseNumber(caseData.getLegacyCaseReference())
+            .applicant1(caseData.getApplicant1())
+            .hasApplicant2(
+                SdoHelper.hasSharedVariable(caseData, "applicant2")
+            )
+            .applicant2(caseData.getApplicant2())
+            .respondent1(caseData.getRespondent1())
+            .hasRespondent2(
+                SdoHelper.hasSharedVariable(caseData, "respondent2")
+            )
+            .respondent2(caseData.getRespondent2())
+            .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
+            .drawDirectionsOrder(caseData.getDrawDirectionsOrder())
+            .claimsTrack(caseData.getClaimsTrack())
+            .smallClaims(caseData.getSmallClaims())
+            .hasCreditHire(
+                SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimCreditHire")
+            )
+            .hasRoadTrafficAccident(
+                SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident")
+            )
+            .smallClaimsJudgesRecital(caseData.getSmallClaimsJudgesRecital())
+            .smallClaimsHearing(caseData.getSmallClaimsHearing())
+            .smallClaimsHearingTime(
+                SdoHelper.getSmallClaimsHearingTimeLabel(caseData)
+            )
             .smallClaimsMethod(caseData.getSmallClaimsMethod())
             .smallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
             .smallClaimsMethodTelephoneHearing(

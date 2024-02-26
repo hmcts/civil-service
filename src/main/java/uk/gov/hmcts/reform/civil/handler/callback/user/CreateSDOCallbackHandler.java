@@ -863,7 +863,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.isSdoR2NewScreen(NO).build();
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             updatedData.setSmallClaimsFlag(YES).build();
-            if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)) {
+            if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
                 updatedData.isSdoR2NewScreen(YES).build();
             }
         } else if (SdoHelper.isFastTrack(caseData)) {
@@ -873,17 +873,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
-    }
-
-    private boolean isSDOR2ScreenForDRHSmallClaim(CaseData caseData) {
-        return ((caseData.getDrawDirectionsOrderRequired() == NO
-            && caseData.getSmallClaims() != null
-            && caseData.getSmallClaims().contains(
-            SmallTrack.smallClaimDisputeResolutionHearing))
-            || (caseData.getDrawDirectionsOrderRequired() == YES
-            && caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections() != null
-            && caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections()
-            .contains(SmallTrack.smallClaimDisputeResolutionHearing)));
     }
 
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
@@ -907,7 +896,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             if (!witnessValidationErrorMessage.isEmpty()) {
                 errors.add(witnessValidationErrorMessage);
             }
-        } else if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)) {
+        } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
             errors.addAll(validateDRHFields(caseData));
         }
 
@@ -1046,7 +1035,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             caseData.getFastTrackMethodInPerson()));
         dataBuilder.smallClaimsMethodInPerson(deleteLocationList(
             caseData.getSmallClaimsMethodInPerson()));
-        if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)
+        if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
             && caseData.getSdoR2SmallClaimsHearing() != null) {
             dataBuilder.sdoR2SmallClaimsHearing(updateHearingAfterDeletingLocationList(caseData.getSdoR2SmallClaimsHearing()));
         }
@@ -1110,7 +1099,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         } else if (SdoHelper.isFastTrack(caseData)) {
             toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            if (featureToggleService.isSdoR2Enabled() && isSDOR2ScreenForDRHSmallClaim(caseData)
+            if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)
                 && caseData.getSdoR2SmallClaimsHearing() != null) {
                 toUseList = caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList() != null
                     ? Optional.ofNullable(caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList())

@@ -70,6 +70,17 @@ public class SdoHelper {
         return fastTrackPath1 || fastTrackPath2;
     }
 
+    public static  boolean isSDOR2ScreenForDRHSmallClaim(CaseData caseData) {
+        return ((caseData.getDrawDirectionsOrderRequired() == NO
+            && caseData.getSmallClaims() != null
+            && caseData.getSmallClaims().contains(
+            SmallTrack.smallClaimDisputeResolutionHearing))
+            || (caseData.getDrawDirectionsOrderRequired() == YES
+            && caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections() != null
+            && caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections()
+            .contains(SmallTrack.smallClaimDisputeResolutionHearing)));
+    }
+
     public static boolean hasSharedVariable(CaseData caseData, String variableName) {
         switch (variableName) {
 
