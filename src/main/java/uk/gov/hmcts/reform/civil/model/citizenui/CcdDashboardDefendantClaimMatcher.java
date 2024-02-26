@@ -299,6 +299,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
+    public boolean isHwFMoreInformationNeeded() {
+        return false;
+    }
+
+    @Override
     public boolean isHwfNoRemission() {
         return false;
     }
@@ -310,6 +315,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isHwfUpdatedRefNumber() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfInvalidRefNumber() {
         return false;
     }
 
