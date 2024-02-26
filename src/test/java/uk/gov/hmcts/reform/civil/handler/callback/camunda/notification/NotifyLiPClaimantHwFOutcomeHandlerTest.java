@@ -37,6 +37,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
@@ -74,10 +75,10 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         private static final String EMAIL_TEMPLATE_UPDATE_REF_NUMBER = "test-hwf-updaterefnumber-id";
         private static final String EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION = "test-hwf-partialRemission-id";
         private static final String EMAIL_NO_REMISSION_TEMPLATE_HWF_BILINGUAL = "test-hwf-noremission-bilingual-id";
-        private static final String EMAIL_TEMPLATE_HWF = "test-hwf-noremission-id";
-
         private static final String EMAIL_TEMPLATE_MORE_INFO_HWF = "test-hwf-more-info-id";
         private static final String EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL = "test-hwf-more-info-bilingual-id";
+        private static final String EMAIL_TEMPLATE_FEE_PAYMENT_OUTCOME = "test-hwf-feePayment-outcome-id";
+        private static final String EMAIL_TEMPLATE_BILINGUAL_FEE_PAYMENT_OUTCOME = "test-hwf-feePayment-outcome-bilingual-id";
         private static final String EMAIL = "test@email.com";
         private static final String REFERENCE_NUMBER = "hwf-outcome-notification-000DC001";
         private static final String CLAIMANT = "Mr. John Rambo";
@@ -93,19 +94,22 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             when(notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber()).thenReturn(
                 EMAIL_TEMPLATE_INVALID_HWF_REFERENCE);
             when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
-                EMAIL_TEMPLATE_HWF);
+                EMAIL_TEMPLATE_NO_REMISSION);
             when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeeded()).thenReturn(
                 EMAIL_TEMPLATE_MORE_INFO_HWF);
             when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh()).thenReturn(
                 EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL);
-            when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
-                EMAIL_TEMPLATE_NO_REMISSION);
             when(notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()).thenReturn(
                 EMAIL_NO_REMISSION_TEMPLATE_HWF_BILINGUAL);
             when(notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber()).thenReturn(
                 EMAIL_TEMPLATE_UPDATE_REF_NUMBER);
             when(notificationsProperties.getNotifyApplicantForHwfPartialRemission()).thenReturn(
                 EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION);
+            when(notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcome()).thenReturn(
+                EMAIL_TEMPLATE_FEE_PAYMENT_OUTCOME);
+            when(notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcomeInBilingual()).thenReturn(
+                EMAIL_TEMPLATE_BILINGUAL_FEE_PAYMENT_OUTCOME);
+
         }
 
         private static final LocalDate NOW = LocalDate.now();
@@ -289,8 +293,8 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         void shouldNotifyApplicant_HwfOutcome_InvalidRefNumber_ClaimIssued() {
             // Given
             HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                    .hwfCaseEvent(INVALID_HWF_REFERENCE)
-                    .build();
+                .hwfCaseEvent(INVALID_HWF_REFERENCE)
+                .build();
             CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder().claimIssuedHwfDetails(hwfeeDetails).build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -418,6 +422,49 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_UPDATE_REF_NUMBER,
+                getNotificationCommonDataMapForHearing(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicant_HwfOutcome_FeePaymentOutcome_Hearing_ClaimIssueInEnglish() {
+            // Given
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(FEE_PAYMENT_OUTCOME)
+                .build();
+            CaseData caseData = HEARING_CASE_DATA.toBuilder().hearingHwfDetails(hwfeeDetails).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                EMAIL,
+                EMAIL_TEMPLATE_FEE_PAYMENT_OUTCOME,
+                getNotificationCommonDataMapForHearing(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicant_HwfOutcome_FeePaymentOutcome_Hearing_ClaimIssueInBilingual() {
+            // Given
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(FEE_PAYMENT_OUTCOME)
+                .build();
+            CaseData caseData = HEARING_CASE_DATA.toBuilder().hearingHwfDetails(hwfeeDetails)
+                .claimantBilingualLanguagePreference("BOTH").build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                EMAIL,
+                EMAIL_TEMPLATE_BILINGUAL_FEE_PAYMENT_OUTCOME,
                 getNotificationCommonDataMapForHearing(),
                 REFERENCE_NUMBER
             );

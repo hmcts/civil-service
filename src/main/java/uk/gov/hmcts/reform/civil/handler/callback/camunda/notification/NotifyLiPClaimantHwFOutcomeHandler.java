@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -88,7 +86,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         return switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);
             case MORE_INFORMATION_HWF -> getMoreInformationProperties(caseData);
-            case UPDATE_HELP_WITH_FEE_NUMBER, INVALID_HWF_REFERENCE -> Collections.emptyMap();
+            case UPDATE_HELP_WITH_FEE_NUMBER, INVALID_HWF_REFERENCE, FEE_PAYMENT_OUTCOME -> Collections.emptyMap();
             case PARTIAL_REMISSION_HWF_GRANTED -> getPartialRemissionProperties(caseData);
             default -> throw new IllegalArgumentException("case event not found");
         };
@@ -96,7 +94,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     private String getTemplate(CaseEvent hwfEvent) {
         if (emailTemplates == null) {
-            emailTemplates = ImmutableMap.of(
+            emailTemplates = Map.of(
                 CaseEvent.NO_REMISSION_HWF,
                 notificationsProperties.getNotifyApplicantForHwfNoRemission(),
                 CaseEvent.INVALID_HWF_REFERENCE,
@@ -106,7 +104,9 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
                 CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
                 notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber(),
                 CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
-                notificationsProperties.getNotifyApplicantForHwfPartialRemission()
+                notificationsProperties.getNotifyApplicantForHwfPartialRemission(),
+                CaseEvent.FEE_PAYMENT_OUTCOME,
+                notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcome()
             );
         }
         return emailTemplates.get(hwfEvent);
@@ -114,9 +114,11 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     private String getTemplateBilingual(CaseEvent hwfEvent) {
         if (emailTemplatesBilingual == null) {
-            emailTemplatesBilingual = ImmutableMap.of(
+            emailTemplatesBilingual = Map.of(
                 CaseEvent.NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh(),
-                CaseEvent.MORE_INFORMATION_HWF, notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh()
+                CaseEvent.MORE_INFORMATION_HWF, notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh(),
+                CaseEvent.FEE_PAYMENT_OUTCOME,
+                notificationsProperties.getNotifyApplicantForHwfFeePaymentOutcomeInBilingual()
             );
         }
         return emailTemplatesBilingual.get(hwfEvent);

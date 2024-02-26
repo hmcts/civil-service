@@ -39,6 +39,9 @@ public enum DashboardClaimStatus {
     HWF_MORE_INFORMATION_NEEDED(
         Claim::isHwFMoreInformationNeeded
     ),
+    CLAIMANT_HWF_FEE_PAYMENT_OUTCOME(
+        Claim::isHwfPaymentOutcome
+    ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
     ),
