@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -96,7 +94,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     private String getTemplate(CaseEvent hwfEvent) {
         if (emailTemplates == null) {
-            emailTemplates = ImmutableMap.of(
+            emailTemplates = Map.of(
                 CaseEvent.NO_REMISSION_HWF,
                 notificationsProperties.getNotifyApplicantForHwfNoRemission(),
                 CaseEvent.INVALID_HWF_REFERENCE,
@@ -116,7 +114,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     private String getTemplateBilingual(CaseEvent hwfEvent) {
         if (emailTemplatesBilingual == null) {
-            emailTemplatesBilingual = ImmutableMap.of(
+            emailTemplatesBilingual = Map.of(
                 CaseEvent.NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh(),
                 CaseEvent.MORE_INFORMATION_HWF, notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh(),
                 CaseEvent.FEE_PAYMENT_OUTCOME,
