@@ -28,6 +28,7 @@ public class HelpWithFeesForTabService {
             .remissionAmount(caseData.getHearingHwfDetails().getRemissionAmount())
             .applicantMustPay(caseData.getHearingHwfDetails().getOutstandingFeeInPounds())
             .claimFee(caseData.getCalculatedHearingFeeInPence())
+            .feeCode(caseData.getHearingFee().getCode())
             .hwfType("Hearing Fee")
             .hwfReferenceNumber(caseData.getHelpWithFeesReferenceNumber())
             .build();
