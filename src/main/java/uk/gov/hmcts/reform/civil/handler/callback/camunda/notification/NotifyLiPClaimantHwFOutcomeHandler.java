@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.notification;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -9,7 +8,9 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.HwFMoreInfoRequiredDocuments;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
+import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -81,6 +84,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private Map<String, String> getFurtherProperties(CaseData caseData) {
         return switch (caseData.getHwFEvent()) {
             case NO_REMISSION_HWF -> getNoRemissionProperties(caseData);
+            case MORE_INFORMATION_HWF -> getMoreInformationProperties(caseData);
             case PARTIAL_REMISSION_HWF_GRANTED -> getPartialRemissionProperties(caseData);
             case INVALID_HWF_REFERENCE, UPDATE_HELP_WITH_FEE_NUMBER -> Collections.emptyMap();
             default -> throw new IllegalArgumentException("case event not found");
@@ -89,11 +93,13 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     private String getTemplate(CaseEvent hwfEvent) {
         if (emailTemplates == null) {
-            emailTemplates = ImmutableMap.of(
+            emailTemplates = Map.of(
                 CaseEvent.INVALID_HWF_REFERENCE,
                 notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber(),
                 CaseEvent.NO_REMISSION_HWF,
                 notificationsProperties.getNotifyApplicantForHwfNoRemission(),
+                CaseEvent.MORE_INFORMATION_HWF,
+                notificationsProperties.getNotifyApplicantForHwFMoreInformationNeeded(),
                 CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
                 notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber(),
                 CaseEvent.PARTIAL_REMISSION_HWF_GRANTED,
@@ -105,9 +111,11 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
 
     private String getTemplateBilingual(CaseEvent hwfEvent) {
         if (emailTemplatesBilingual == null) {
-            emailTemplatesBilingual = ImmutableMap.of(
+            emailTemplatesBilingual = Map.of(
                 CaseEvent.INVALID_HWF_REFERENCE,
                 notificationsProperties.getNotifyApplicantForHwfInvalidRefNumberBilingual(),
+                CaseEvent.MORE_INFORMATION_HWF,
+                notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh(),
                 CaseEvent.NO_REMISSION_HWF,
                 notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh(),
                 CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER,
@@ -124,6 +132,26 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
             REASONS, getHwFNoRemissionReason(caseData),
             AMOUNT, caseData.getHwFFeeAmount().toString()
         );
+    }
+
+    private Map<String, String> getMoreInformationProperties(CaseData caseData) {
+        HelpWithFeesMoreInformation moreInformation =
+            null != caseData.getHelpWithFeesMoreInformationClaimIssue()
+                ? caseData.getHelpWithFeesMoreInformationClaimIssue()
+                : caseData.getHelpWithFeesMoreInformationHearing();
+        return Map.of(
+            HWF_MORE_INFO_DATE, formatLocalDate(moreInformation.getHwFMoreInfoDocumentDate(), DATE),
+            HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentList(moreInformation.getHwFMoreInfoRequiredDocuments())
+        );
+    }
+
+    private String getMoreInformationDocumentList(List<HwFMoreInfoRequiredDocuments> list) {
+        StringBuilder documentList = new StringBuilder();
+        for (HwFMoreInfoRequiredDocuments doc : list) {
+            documentList.append(doc.name());
+            documentList.append("\n");
+        }
+        return documentList.toString();
     }
 
     private Map<String, String> getPartialRemissionProperties(CaseData caseData) {

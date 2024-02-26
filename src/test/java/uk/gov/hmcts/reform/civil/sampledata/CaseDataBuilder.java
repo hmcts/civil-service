@@ -100,6 +100,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.RevisedHearingRequirement
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -159,6 +160,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonForReconsideration;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsWitnessStatement;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialHearingTimeDJ;
 import uk.gov.hmcts.reform.civil.model.sdo.TrialOrderMadeWithoutHearingDJ;
@@ -509,6 +511,7 @@ public class CaseDataBuilder {
     private RespondentResponsePartAdmissionPaymentTimeLRspec defenceAdmitPartPaymentTimeRouteRequired;
     private ResponseOneVOneShowTag showResponseOneVOneFlag;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private SmallClaimsFlightDelay smallClaimsFlightDelay;
     private FastTrackWitnessOfFact fastTrackWitnessOfFact;
     private TrialHearingWitnessOfFact trialHearingWitnessOfFactDJ;
 
@@ -555,11 +558,25 @@ public class CaseDataBuilder {
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
 
-    private YesOrNo eaCourtLocation;
+    private  HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue;
+    private  HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing;
+
     private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
 
     private List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs;
     private List<Element<MediationDocumentsReferredInStatement>> res1MediationDocumentsReferred;
+
+    private YesOrNo eaCourtLocation;
+
+    public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
+        this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
+        return this;
+    }
+
+    public CaseDataBuilder helpWithFeesMoreInformationHearing(HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing) {
+        this.helpWithFeesMoreInformationHearing = helpWithFeesMoreInformationHearing;
+        return this;
+    }
 
     public CaseDataBuilder applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo applicant1AcceptFullAdmitPaymentPlanSpec) {
         this.applicant1AcceptFullAdmitPaymentPlanSpec = applicant1AcceptFullAdmitPaymentPlanSpec;
@@ -6398,6 +6415,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atSmallSmallClaimsFlightDelayInputs() {
+        atStateClaimNotified();
+        this.smallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
+            .relatedClaimsInput(" ")
+            .legalDocumentsInput(" ")
+            .build();
+
+        return this;
+    }
+
     public CaseDataBuilder atFastTrackWitnessOfFactWithPositiveInputs() {
         atStateClaimNotified();
         this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
@@ -6644,6 +6671,8 @@ public class CaseDataBuilder {
             // Create Claim
             .caseNameHmctsInternal(caseNameHmctsInternal)
             .legacyCaseReference(legacyCaseReference)
+            .helpWithFeesMoreInformationClaimIssue(helpWithFeesMoreInformationClaimIssue)
+            .helpWithFeesMoreInformationHearing(helpWithFeesMoreInformationHearing)
             .allocatedTrack(allocatedTrack)
             .generalAppType(generalAppType)
             .generalAppVaryJudgementType(generalAppVaryJudgementType)
@@ -6920,6 +6949,7 @@ public class CaseDataBuilder {
             .updateDetailsForm(updateDetailsForm)
             .defaultJudgmentDocuments(defaultJudgmentDocuments)
             .smallClaimsWitnessStatement(smallClaimsWitnessStatement)
+            .smallClaimsFlightDelay(smallClaimsFlightDelay)
             .fastTrackWitnessOfFact(fastTrackWitnessOfFact)
             .trialHearingWitnessOfFactDJ(trialHearingWitnessOfFactDJ)
             //Transfer Online Case
