@@ -154,6 +154,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
@@ -299,6 +300,7 @@ public class CaseDataParent implements MappableObject {
     private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
     private SmallClaimsNotes smallClaimsNotes;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
+    private SmallClaimsFlightDelay smallClaimsFlightDelay;
     private SDOHearingNotes sdoHearingNotes;
     private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private final List<SmallTrack> smallClaims;
@@ -339,6 +341,7 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMethodToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
+    private List<OrderDetailsPagesSectionsToggle> smallClaimsFlightDelayToggle;
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
