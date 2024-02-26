@@ -2536,7 +2536,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .claimsTrack(ClaimsTrack.smallClaimsTrack)
                 .drawDirectionsOrderRequired(NO)
                 .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().trialOnOptions(TrialOnRadioOptions.TRIAL_WINDOW)
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().trialOnOptions(TrialOnRadioOptions.HEARING_WINDOW)
                                              .sdoR2SmallClaimsHearingWindow(
                                                  SdoR2SmallClaimsHearingWindow.builder().listFrom(testDate)
                                                      .dateTo(testDate).build()).build())
