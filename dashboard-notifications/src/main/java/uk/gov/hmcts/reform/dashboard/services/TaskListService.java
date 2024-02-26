@@ -40,11 +40,10 @@ public class TaskListService {
 
         TaskItemTemplateEntity taskItemTemplate = taskList.getTaskItemTemplate();
         Optional<TaskListEntity> existingEntity = taskListRepository
-            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateNameAndTaskItemTemplateScenarioName(
+            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateName(
                 taskList.getReference(),
                 taskItemTemplate.getRole(),
-                taskItemTemplate.getTemplateName(),
-                taskItemTemplate.getScenarioName()
+                taskItemTemplate.getTemplateName()
             );
 
         TaskListEntity beingUpdated = taskList;
