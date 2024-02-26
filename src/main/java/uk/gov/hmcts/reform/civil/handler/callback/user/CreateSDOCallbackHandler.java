@@ -97,6 +97,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
@@ -636,6 +637,25 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .build();
 
         updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
+
+        if (featureToggleService.isSdoR2Enabled()) {
+            SmallClaimsFlightDelay tempSmallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
+                .smallClaimsFlightDelayToggle(checkList)
+                .relatedClaimsInput("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
+                            + "claims relating to the same flight they must notify the court \n"
+                            + "where the claim is being managed within 14 days of receipt of \n"
+                            + "this Order providing all relevant details of those claims including \n"
+                            + "case number(s), hearing date(s) and copy final substantive order(s) \n"
+                            + "if any, to assist the Court with ongoing case management which may \n"
+                            + "include the cases being heard together.")
+                .legalDocumentsInput("Any arguments as to the law to be applied to this claim, together with \n"
+                            + "copies of legal authorities or precedents relied on, shall be uploaded \n"
+                            + "to the Digital Portal not later than 3 full working days before the \n"
+                            + "final hearing date.")
+                .build();
+
+            updatedData.smallClaimsFlightDelay(tempSmallClaimsFlightDelay).build();
+        }
 
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
@@ -1432,6 +1452,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
+        if (featureToggleService.isSdoR2Enabled()) {
+            updatedData.smallClaimsFlightDelayToggle(checkList);
+        }
     }
 
     private void setCheckListNihl(
