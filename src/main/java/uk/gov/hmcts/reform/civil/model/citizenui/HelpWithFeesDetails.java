@@ -10,14 +10,16 @@ import uk.gov.hmcts.reform.civil.enums.NoRemissionDetailsSummary;
 import java.math.BigDecimal;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class HelpWithFeesDetails {
 
-    private String noRemissionDetails;
-    private NoRemissionDetailsSummary noRemissionDetailsSummary;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal remissionAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private BigDecimal outstandingFeeInPounds;
+    private String noRemissionDetails;
+    private NoRemissionDetailsSummary noRemissionDetailsSummary;
+    private String hwfReferenceNumber;
 }
