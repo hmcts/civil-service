@@ -155,6 +155,8 @@ public class SdoHelper {
                 return SmallTrack.smallClaimRoadTrafficAccident;
             case "smallClaimDisputeResolutionHearing":
                 return SmallTrack.smallClaimDisputeResolutionHearing;
+            case "smallClaimFlightDelay":
+                return SmallTrack.smallClaimFlightDelay;
             default:
                 return null;
         }
@@ -294,6 +296,8 @@ public class SdoHelper {
                 return caseData.getSmallClaimsDocumentsToggle() != null;
             case "smallClaimsWitnessStatementToggle":
                 return caseData.getSmallClaimsWitnessStatementToggle() != null;
+            case "smallClaimsFlightDelayToggle":
+                return caseData.getSmallClaimsFlightDelayToggle() != null;
             case "smallClaimsNumberOfWitnessesToggle":
                 return caseData.getSmallClaimsWitnessStatement() != null
                     && caseData.getSmallClaimsWitnessStatement().getSmallClaimsNumberOfWitnessesToggle() != null;
