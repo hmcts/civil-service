@@ -2,7 +2,8 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{"Notice.AAA7.ClaimIssue.ClaimFee.Required"}', '{"Notice.AAA7.ClaimIssue.ClaimFee.Required" : []}');
+VALUES ('Scenario.AAA7.ClaimIssue.ClaimFee.Required', '{"Notice.AAA7.ClaimIssue.ClaimFee.Required"}',
+        '{"Notice.AAA7.ClaimIssue.ClaimFee.Required" : [{"claimFee", "claimFee"}, {"ccdCaseReference", "ccdCaseReference"}]}');
 
 /**
  * Add notification template
