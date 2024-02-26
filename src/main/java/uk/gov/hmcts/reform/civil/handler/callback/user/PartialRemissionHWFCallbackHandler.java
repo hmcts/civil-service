@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
+import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +83,7 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
     private CallbackResponse partRemissionHWF(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData);
+        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData, HWFFeePaymentType.PART_REMISSION);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();

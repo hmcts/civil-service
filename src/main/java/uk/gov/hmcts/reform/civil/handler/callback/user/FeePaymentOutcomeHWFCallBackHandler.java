@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
+import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -36,6 +37,7 @@ public class FeePaymentOutcomeHWFCallBackHandler extends CallbackHandler {
 
     private final ObjectMapper objectMapper;
     private final HWFFeePaymentOutcomeService hwfFeePaymentOutcomeService;
+    private final HelpWithFeesForTabService helpWithFeesForTabService;
     public static final String WRONG_REMISSION_TYPE_SELECTED = "Incorrect remission type selected";
 
     @Override

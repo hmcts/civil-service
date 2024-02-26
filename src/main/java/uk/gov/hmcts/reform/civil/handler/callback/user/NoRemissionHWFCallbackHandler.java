@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
+import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentType;
 
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse noRemissionHWF(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData);
+        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData, HWFFeePaymentType.NO_REMISSION);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
