@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormDisposal;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormFast;
 import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmall;
+import uk.gov.hmcts.reform.civil.model.docmosis.sdo.SdoDocumentFormSmallDrh;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
@@ -60,9 +61,9 @@ public class SdoGeneratorService {
             docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
                 ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT : DocmosisTemplates.SDO_FAST;
             templateData = getTemplateDataFast(caseData, judgeName, isJudge, authorisation);
-        } else if (SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
-                docmosisTemplate = DocmosisTemplates.SDO_SMALL_DRH;
-                templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
+        } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+            docmosisTemplate = DocmosisTemplates.SDO_SMALL_DRH;
+            templateData = getTemplateDataSmallDrh(caseData, judgeName, isJudge, authorisation);
         } else {
             docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName, isJudge, authorisation);
@@ -384,8 +385,8 @@ public class SdoGeneratorService {
             .build();
     }
 
-    private SdoDocumentFormSmall getTemplateDataSmallDrh(CaseData caseData, String judgeName, boolean isJudge, String authorisation) { //TODO Change to suit SDO R2 DRH
-        SdoDocumentFormSmall.SdoDocumentFormSmallBuilder sdoDocumentFormBuilder = SdoDocumentFormSmall.builder()
+    private SdoDocumentFormSmallDrh getTemplateDataSmallDrh(CaseData caseData, String judgeName, boolean isJudge, String authorisation) { //TODO Change to suit SDO R2 DRH
+        SdoDocumentFormSmallDrh.SdoDocumentFormSmallDrhBuilder sdoDocumentFormBuilderDrh = SdoDocumentFormSmallDrh.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
             .judgeName(judgeName)
@@ -400,66 +401,37 @@ public class SdoGeneratorService {
                 SdoHelper.hasSharedVariable(caseData, "respondent2")
             )
             .respondent2(caseData.getRespondent2())
-            .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
-            .drawDirectionsOrder(caseData.getDrawDirectionsOrder())
-            .claimsTrack(caseData.getClaimsTrack())
-            .smallClaims(caseData.getSmallClaims())
-            .hasCreditHire(
-                SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimCreditHire")
-            )
-            .hasRoadTrafficAccident(
-                SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident")
-            )
-            .smallClaimsJudgesRecital(caseData.getSmallClaimsJudgesRecital())
-            .smallClaimsHearing(caseData.getSmallClaimsHearing())
-            .smallClaimsHearingTime(
-                SdoHelper.getSmallClaimsHearingTimeLabel(caseData)
-            )
-            .smallClaimsMethod(caseData.getSmallClaimsMethod())
-            .smallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
-            .smallClaimsMethodTelephoneHearing(
-                SdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)
-            )
-            .smallClaimsMethodVideoConferenceHearing(
-                SdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData)
-            )
-            .smallClaimsDocuments(caseData.getSmallClaimsDocuments())
-            .smallClaimsWitnessStatement(caseData.getSmallClaimsWitnessStatement())
-            .smallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
-            .smallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
-            .hasNewDirections(
-                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsAddNewDirections")
-            )
-            .smallClaimsAddNewDirections(caseData.getSmallClaimsAddNewDirections())
-            .smallClaimsNotes(caseData.getSmallClaimsNotes())
-            .smallClaimsHearingToggle(
-                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")
-            )
-            // SNI-5142
-            .smallClaimsMethodToggle(true)
-            .smallClaimsDocumentsToggle(
-                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")
-            )
-            .smallClaimsWitnessStatementToggle(
-                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle")
-            )
-            .smallClaimsNumberOfWitnessesToggle(
-                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsNumberOfWitnessesToggle")
-            );
+            .hasPaymentProtectionInsurance(caseData.getSdoR2SmallClaimsPPIToggle() != null)
+            .hasHearingToggle(caseData.getSdoR2SmallClaimsHearingToggle() != null)
+            .hasWitnessStatement(caseData.getSdoR2SmallClaimsWitnessStatements() != null)
+            .hasUploadDocToggle(caseData.getSdoR2SmallClaimsUploadDocToggle() != null)
+            .hasSdoR2HearingTrialWindow(SdoHelper.hasSdoR2HearingTrialWindow(caseData))
+            .sdoR2SmallClaimsPhysicalTrialBundleTxt(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData))
+            .sdoR2SmallClaimsJudgesRecital(caseData.getSdoR2SmallClaimsJudgesRecital())
+            .sdoR2SmallClaimsHearing(caseData.getSdoR2SmallClaimsHearing())
+            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatements())
+            .sdoR2SmallClaimsPPI(caseData.getSdoR2SmallClaimsPPI())
+            .sdoR2SmallClaimsUploadDoc(caseData.getSdoR2SmallClaimsUploadDoc())
+            .smallClaimsMethod(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData))
+            .hearingTime(SdoHelper.getSdoR2HearingTime(caseData))
+            .sdoR2SmallClaimsImpNotes(caseData.getSdoR2SmallClaimsImpNotes())
+            .caseManagementLocation(
+                locationHelper.getHearingLocation(null, caseData, authorisation));
 
-        sdoDocumentFormBuilder.hearingLocation(
+        if (caseData.getSdoR2SmallClaimsHearing() != null) {
+            sdoDocumentFormBuilderDrh.hearingLocation(
                 locationHelper.getHearingLocation(
-                    Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
+                    Optional.ofNullable(SdoHelper.getHearingLocationDrh(caseData))
                         .map(DynamicList::getValue)
                         .map(DynamicListElement::getLabel)
                         .orElse(null),
                     caseData,
                     authorisation
-                ))
-            .caseManagementLocation(
-                locationHelper.getHearingLocation(null, caseData, authorisation));
+                ));
 
-        return sdoDocumentFormBuilder
+        }
+
+        return sdoDocumentFormBuilderDrh
             .build();
     }
 
