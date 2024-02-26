@@ -6255,6 +6255,8 @@ public class CaseDataBuilder {
             .flagCode("AB001")
             .hearingRelevant(YES)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         FlagDetail details2 = FlagDetail.builder()
@@ -6263,6 +6265,8 @@ public class CaseDataBuilder {
             .flagCode("SM001")
             .hearingRelevant(YES)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         FlagDetail details3 = FlagDetail.builder()
@@ -6271,6 +6275,8 @@ public class CaseDataBuilder {
             .flagCode("RA001")
             .hearingRelevant(NO)
             .status("Active")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         FlagDetail details4 = FlagDetail.builder()
@@ -6279,6 +6285,8 @@ public class CaseDataBuilder {
             .flagCode("AB001")
             .hearingRelevant(YES)
             .status("Inactive")
+            .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+            .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
             .build();
 
         return wrapElements(details1, details2, details3, details4);
