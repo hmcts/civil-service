@@ -100,4 +100,5 @@ public interface Claim {
 
     boolean isHwfUpdatedRefNumber();
 
+    boolean isHwfPaymentOutcome();
 }

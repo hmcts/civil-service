@@ -33,6 +33,9 @@ public enum DashboardClaimStatus {
     CLAIMANT_HWF_UPDATED_REF_NUMBER(
         Claim::isHwfUpdatedRefNumber
     ),
+    CLAIMANT_HWF_FEE_PAYMENT_OUTCOME(
+        Claim::isHwfPaymentOutcome
+    ),
     MORE_DETAILS_REQUIRED(
         Claim::isMoreDetailsRequired
     ),

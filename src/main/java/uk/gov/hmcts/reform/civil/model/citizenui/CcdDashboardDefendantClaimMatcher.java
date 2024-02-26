@@ -312,4 +312,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean isHwfUpdatedRefNumber() {
         return false;
     }
+
+    @Override
+    public boolean isHwfPaymentOutcome() {
+        return false;
+    }
 }
