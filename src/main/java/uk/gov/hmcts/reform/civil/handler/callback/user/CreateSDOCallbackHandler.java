@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
@@ -618,7 +617,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                                  + "This could require you to pay costs, or could result in your claim or defence being dismissed. "
                                                                  + "You should deliver to every other party, and to the court, your explanation for non-attendance, "
                                                                  + "with any supporting documents, at least 14 days before the hearing. "
-                                                                 + "Any other party who wishes to comment on the failure to attend the mediation appointment should deliver their comments,"
+                                                                 + "Any other party who wishes to comment on the failure to attend the mediation appointment should "
+                                                                 + "deliver their comments,"
                                                                  + " with any supporting documents, to all parties and to the court at least 14 days before the hearing.");
         }
 
