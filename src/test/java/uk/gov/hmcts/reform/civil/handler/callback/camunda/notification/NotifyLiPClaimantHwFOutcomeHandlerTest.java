@@ -77,6 +77,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
         private static final String EMAIL_TEMPLATE_HWF = "test-hwf-noremission-id";
 
         private static final String EMAIL_TEMPLATE_MORE_INFO_HWF = "test-hwf-more-info-id";
+        private static final String EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL = "test-hwf-more-info-bilingual-id";
         private static final String EMAIL = "test@email.com";
         private static final String REFERENCE_NUMBER = "hwf-outcome-notification-000DC001";
         private static final String CLAIMANT = "Mr. John Rambo";
@@ -95,6 +96,8 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 EMAIL_TEMPLATE_HWF);
             when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeeded()).thenReturn(
                 EMAIL_TEMPLATE_MORE_INFO_HWF);
+            when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh()).thenReturn(
+                EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL);
             when(notificationsProperties.getNotifyApplicantForHwfNoRemission()).thenReturn(
                 EMAIL_TEMPLATE_NO_REMISSION);
             when(notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()).thenReturn(
@@ -228,6 +231,33 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF,
                 getNotificationDataMapMoreInfoHearing(),
+                REFERENCE_NUMBER
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicant_HwfOutcome_MoreInformationNeeded_Bilingual() {
+            // Given
+            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+                .hwfCaseEvent(MORE_INFORMATION_HWF).build();
+            CaseData caseData = CLAIM_ISSUE_CASE_DATA.toBuilder()
+                .claimantBilingualLanguagePreference("BOTH")
+                .helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation.builder()
+                                                           .hwFMoreInfoDocumentDate(NOW)
+                                                           .hwFMoreInfoRequiredDocuments(
+                                                               getMoreInformationDocumentList()).build())
+                .claimIssuedHwfDetails(hwfeeDetails).build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(notificationService, times(1)).sendMail(
+                EMAIL,
+                EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL,
+                getNotificationDataMapMoreInfoClaimIssued(),
                 REFERENCE_NUMBER
             );
         }

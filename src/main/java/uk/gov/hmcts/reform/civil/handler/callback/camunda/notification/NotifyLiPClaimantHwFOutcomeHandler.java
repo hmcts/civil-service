@@ -115,7 +115,8 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private String getTemplateBilingual(CaseEvent hwfEvent) {
         if (emailTemplatesBilingual == null) {
             emailTemplatesBilingual = ImmutableMap.of(
-                CaseEvent.NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()
+                CaseEvent.NO_REMISSION_HWF, notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh(),
+                CaseEvent.MORE_INFORMATION_HWF, notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh()
             );
         }
         return emailTemplatesBilingual.get(hwfEvent);
