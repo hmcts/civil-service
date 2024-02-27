@@ -178,6 +178,10 @@ public class InitiateGeneralApplicationService {
             GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
         Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+        if (Objects.isNull(caseLocation.getLeft().getBaseLocation()) && !caseLocation.getRight()) {
+            caseLocation.getLeft().setBaseLocation(caseData.getCaseManagementLocation().getBaseLocation());
+            caseLocation.getLeft().setRegion(caseData.getCaseManagementLocation().getRegion());
+        }
         //Setting Work Allocation location and location name
         if (Objects.isNull(caseLocation.getLeft().getSiteName())
             && Objects.nonNull(caseLocation.getLeft().getBaseLocation())) {
