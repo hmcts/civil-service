@@ -11,7 +11,7 @@ public class FlowLipPredicate {
     }
 
     public static final Predicate<CaseData> isLipCase = caseData ->
-        caseData.isLipvLipOneVOne();
+        caseData.isApplicantNotRepresented();
 
     public static final Predicate<CaseData> agreedToMediation = CaseData::hasClaimantAgreedToFreeMediation;
 
