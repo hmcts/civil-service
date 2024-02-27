@@ -1715,9 +1715,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).extracting("smallClaimsFlightDelay").extracting("relatedClaimsInput")
                 .isEqualTo("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
-                               + "claims relating to the same flight they must notify the court  \n"
+                               + "claims relating to the same flight they must notify the court \n"
                                + "where the claim is being managed within 14 days of receipt of \n"
-                               + "this Order  providing all relevant details of those claims including \n"
+                               + "this Order providing all relevant details of those claims including \n"
                                + "case number(s), hearing date(s) and copy final substantive order(s) \n"
                                + "if any, to assist the Court with ongoing case management which may \n"
                                + "include the cases being heard together.");
@@ -2056,7 +2056,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getSdoOrderDocument().getDocumentLink().getCategoryID()).isEqualTo("sdo");
+            assertThat(updatedData.getSdoOrderDocument().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
         }
 
     }
