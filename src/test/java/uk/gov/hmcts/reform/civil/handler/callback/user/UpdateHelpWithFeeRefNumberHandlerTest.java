@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -25,13 +26,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_
 class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
 
     private UpdateHelpWithFeeRefNumberHandler handler;
+    private HelpWithFeesForTabService hwfForTabService;
 
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        handler = new UpdateHelpWithFeeRefNumberHandler(objectMapper);
+        handler = new UpdateHelpWithFeeRefNumberHandler(objectMapper, hwfForTabService);
     }
 
     @Nested

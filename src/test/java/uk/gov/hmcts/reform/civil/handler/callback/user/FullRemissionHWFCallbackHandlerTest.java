@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 
 import java.math.BigDecimal;
+import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FULL_REMISSION_HWF;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,12 +25,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private FullRemissionHWFCallbackHandler handler;
+    private HelpWithFeesForTabService hwfForTabService;
     private ObjectMapper mapper;
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        handler = new FullRemissionHWFCallbackHandler(mapper);
+        hwfForTabService = new HelpWithFeesForTabService();
+        handler = new FullRemissionHWFCallbackHandler(mapper, hwfForTabService);
     }
 
     @Test

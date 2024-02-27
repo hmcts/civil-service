@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.math.BigDecimal;
+import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -34,13 +35,15 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.FeePaymentOutcomeH
 public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandlerTest {
 
     private FeePaymentOutcomeHWFCallBackHandler handler;
+    private HelpWithFeesForTabService hwfForTabService;
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules();
-        HWFFeePaymentOutcomeService hwfService = new HWFFeePaymentOutcomeService();
+        hwfForTabService = new HelpWithFeesForTabService();
+        HWFFeePaymentOutcomeService hwfService = new HWFFeePaymentOutcomeService(hwfForTabService);
         handler = new FeePaymentOutcomeHWFCallBackHandler(objectMapper, hwfService);
     }
 

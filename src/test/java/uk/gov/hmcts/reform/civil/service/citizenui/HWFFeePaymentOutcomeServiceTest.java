@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.math.BigDecimal;
+import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,10 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class HWFFeePaymentOutcomeServiceTest {
 
     private HWFFeePaymentOutcomeService feePaymentOutcomeService;
+    private HelpWithFeesForTabService helpWithFeesForTabService;
 
     @BeforeEach
     void setUp() {
-        feePaymentOutcomeService = new HWFFeePaymentOutcomeService();
+        helpWithFeesForTabService = new HelpWithFeesForTabService();
+        feePaymentOutcomeService = new HWFFeePaymentOutcomeService(helpWithFeesForTabService);
     }
 
     @Test
@@ -68,7 +71,7 @@ public class HWFFeePaymentOutcomeServiceTest {
             .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
-        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData);
+        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData, HWFFeePaymentType.PART_REMISSION);
         assertThat(caseData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(90).setScale(2));
     }
 
@@ -83,7 +86,7 @@ public class HWFFeePaymentOutcomeServiceTest {
             .hwfFeeType(FeeType.HEARING)
             .build();
 
-        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData);
+        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData, HWFFeePaymentType.PART_REMISSION);
         assertThat(caseData.getHearingHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(290).setScale(2));
 
     }

@@ -68,7 +68,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
             //When
-            when(hwfService.updateOutstandingFee(any())).thenReturn(caseData);
+            when(hwfService.updateOutstandingFee(any(), any())).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then
@@ -91,7 +91,7 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
             //When
-            when(hwfService.updateOutstandingFee(any())).thenReturn(caseData);
+            when(hwfService.updateOutstandingFee(any(), any())).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then
