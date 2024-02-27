@@ -20,7 +20,7 @@ public class UpdateClaimStateService {
 
     public String setUpCaseState(CaseData updatedData) {
         if (shouldMoveToInMediationState(updatedData,
-                                         featureToggleService.isCarmEnabledForCase(updatedData.getSubmittedDate()))) {
+                                         featureToggleService.isCarmEnabledForCase(updatedData))) {
             return CaseState.IN_MEDIATION.name();
         } else if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();

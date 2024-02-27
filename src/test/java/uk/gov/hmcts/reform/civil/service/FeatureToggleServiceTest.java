@@ -7,6 +7,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDateTime;
 
@@ -180,12 +182,16 @@ class FeatureToggleServiceTest {
         var carmDateKey = "cam-enabled-for-case";
         givenToggle(carmKey, toggleStat);
 
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .setClaimTypeToSpecClaim()
+            .build();
+
         if (toggleStat) {
             when(featureToggleApi.isFeatureEnabledForDate(eq(carmDateKey), anyLong(), eq(false)))
                 .thenReturn(true);
         }
 
-        assertThat(featureToggleService.isCarmEnabledForCase(LocalDateTime.now())).isEqualTo(toggleStat);
+        assertThat(featureToggleService.isCarmEnabledForCase(caseData)).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {

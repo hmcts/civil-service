@@ -199,7 +199,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
 
-        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
             updatedData.showCarmFields(YES);
         } else {
             updatedData.showCarmFields(NO);
@@ -611,7 +611,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
 
-        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
             updatedData.smallClaimsMediationSectionStatement("If you failed to attend a mediation appointment,"
                                                                  + " then the judge at the hearing may impose a sanction. "
                                                                  + "This could require you to pay costs, or could result in your claim or defence being dismissed. "
@@ -1095,7 +1095,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (featureToggleService.isSdoR2Enabled()) {
             updatedData.smallClaimsFlightDelayToggle(checkList);
         }
-        if (featureToggleService.isCarmEnabledForCase(updatedData.build().getSubmittedDate())) {
+        if (featureToggleService.isCarmEnabledForCase(updatedData.build())) {
             updatedData.smallClaimsMediationSectionToggle(checkList);
         }
     }
