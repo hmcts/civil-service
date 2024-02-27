@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
@@ -33,6 +34,7 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
+        hwfForTabService = new HelpWithFeesForTabService();
         handler = new UpdateHelpWithFeeRefNumberHandler(objectMapper, hwfForTabService);
     }
 
@@ -46,6 +48,7 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
                     .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
                             .hwfReferenceNumber("7890").build())
                     .hwfFeeType(FeeType.CLAIMISSUED)
+                    .claimFee(Fee.builder().code("CODE").build())
                     .caseDataLiP(CaseDataLiP.builder().helpWithFees(
                             HelpWithFees.builder()
                                     .helpWithFee(YesOrNo.YES)
@@ -69,6 +72,7 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
                     .hearingHwfDetails(HelpWithFeesDetails.builder()
                             .hwfReferenceNumber("78905185430").build())
                     .hwfFeeType(FeeType.HEARING)
+                    .hearingFee(Fee.builder().code("CODE").build())
                     .hearingHelpFeesReferenceNumber("54376543219")
                     .build();
 
