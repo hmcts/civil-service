@@ -6,7 +6,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsAddNewDirection;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsJudgesRecital;
@@ -16,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Builder
@@ -39,13 +42,13 @@ public class SdoDocumentFormSmallDrh implements MappableObject {
     //Toggles
     private final boolean hasPaymentProtectionInsurance;
     private final boolean hasWitnessStatement;
-
     private final boolean hasUploadDocToggle;
     private final boolean hasHearingToggle;
     private final boolean hasWitnessStatements;
     private final boolean hasNewDirections;
     private final boolean hasSdoR2HearingTrialWindow;
-    //private final List<Element<SdoR2SmallClaimsAddNewDirections>> smallClaimsAddNewDirections;
+
+    private final List<Element<SdoR2SmallClaimsAddNewDirection>> smallClaimsAddNewDirection;
     private final SdoR2SmallClaimsJudgesRecital sdoR2SmallClaimsJudgesRecital;
     private final SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
     private final SdoR2SmallClaimsPPI sdoR2SmallClaimsPPI;
