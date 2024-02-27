@@ -3,15 +3,17 @@ package uk.gov.hmcts.reform.civil.service.citizen;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 
 @Slf4j
 @Service
@@ -26,11 +28,12 @@ public class HWFFeePaymentOutcomeService {
         if (Objects.nonNull(caseData.getFeePaymentOutcomeDetails())
             && caseData.getFeePaymentOutcomeDetails().getHwfNumberAvailable() == YesOrNo.YES) {
             if (caseData.isHWFTypeClaimIssued()) {
+                var caseDataLip = caseData.getCaseDataLiP();
                 HelpWithFees helpWithFees = HelpWithFees.builder()
                     .helpWithFee(YesOrNo.YES)
                     .helpWithFeesReferenceNumber(caseData.getFeePaymentOutcomeDetails().getHwfNumberForFeePaymentOutcome())
                     .build();
-                updatedData.caseDataLiP(CaseDataLiP.builder().helpWithFees(helpWithFees).build());
+                updatedData.caseDataLiP(caseDataLip.toBuilder().helpWithFees(helpWithFees).build());
                 helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
             }
             if (caseData.isHWFTypeHearing()) {
@@ -47,12 +50,12 @@ public class HWFFeePaymentOutcomeService {
         caseDataBuilder.feePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().toBuilder().hwfNumberForFeePaymentOutcome(null).build());
     }
 
-    public CaseData updateOutstandingFee(CaseData caseData, HWFFeePaymentType paymentType) {
+    public CaseData updateOutstandingFee(CaseData caseData, String caseEventId) {
         var updatedData = caseData.toBuilder();
-        BigDecimal claimIssuedRemissionAmount = HWFFeePaymentType.NO_REMISSION.equals(paymentType)
+        BigDecimal claimIssuedRemissionAmount = NO_REMISSION_HWF.equals(CaseEvent.valueOf(caseEventId))
             ? BigDecimal.ZERO
             : caseData.getClaimIssueRemissionAmount();
-        BigDecimal hearingRemissionAmount = HWFFeePaymentType.NO_REMISSION.equals(paymentType)
+        BigDecimal hearingRemissionAmount = NO_REMISSION_HWF.equals(CaseEvent.valueOf(caseEventId))
             ? BigDecimal.ZERO
             : caseData.getHearingRemissionAmount();
         BigDecimal claimFeeAmount = caseData.getCalculatedClaimFeeInPence();

@@ -58,17 +58,20 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
         if (caseData.isHWFTypeClaimIssued()) {
             ofNullable(caseData.getCaseDataLiP())
                     .map(CaseDataLiP::getHelpWithFees)
-                    .ifPresent(hwf -> updatedData.caseDataLiP(CaseDataLiP.builder().helpWithFees(
+                    .ifPresent(hwf -> {
+                        var caseDataLip = caseData.getCaseDataLiP();
+                        updatedData.caseDataLiP(caseDataLip.toBuilder().helpWithFees(
                         hwf.toBuilder().helpWithFeesReferenceNumber(
                             getHwFNewReferenceNumber(caseData.getClaimIssuedHwfDetails()))
-                            .build()).build()));
-            clearHwFReferenceNumber(caseData.getClaimIssuedHwfDetails());
+                            .build()).build());
+                    });
+            updatedData.claimIssuedHwfDetails(caseData.getClaimIssuedHwfDetails().toBuilder().hwfReferenceNumber(null).build());
             helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
             return updatedData.build();
         }
         if (caseData.isHWFTypeHearing()) {
             updatedData.hearingHelpFeesReferenceNumber(getHwFNewReferenceNumber(caseData.getHearingHwfDetails()));
-            clearHwFReferenceNumber(caseData.getHearingHwfDetails());
+            updatedData.hearingHwfDetails(caseData.getHearingHwfDetails().toBuilder().hwfReferenceNumber(null).build());
             helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
             return updatedData.build();
         }

@@ -66,7 +66,6 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                             .build()
                     )
                 );
-            helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
         } else if (caseData.isHWFTypeHearing() && hearingFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
             Optional.ofNullable(caseData.getHearingHwfDetails())
                 .ifPresentOrElse(
@@ -77,8 +76,8 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                         HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount).build()
                     )
                 );
-            helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
         }
+        helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))

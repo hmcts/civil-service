@@ -16,9 +16,9 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.math.BigDecimal;
-import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentType;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 
 @ExtendWith(MockitoExtension.class)
 public class HWFFeePaymentOutcomeServiceTest {
@@ -71,7 +71,7 @@ public class HWFFeePaymentOutcomeServiceTest {
             .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
-        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData, HWFFeePaymentType.PART_REMISSION);
+        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData, PARTIAL_REMISSION_HWF_GRANTED.name());
         assertThat(caseData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(90).setScale(2));
     }
 
@@ -86,7 +86,7 @@ public class HWFFeePaymentOutcomeServiceTest {
             .hwfFeeType(FeeType.HEARING)
             .build();
 
-        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData, HWFFeePaymentType.PART_REMISSION);
+        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData, PARTIAL_REMISSION_HWF_GRANTED.name());
         assertThat(caseData.getHearingHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(290).setScale(2));
 
     }

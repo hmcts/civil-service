@@ -83,7 +83,7 @@ public class PartialRemissionHWFCallbackHandler extends CallbackHandler {
     private CallbackResponse partRemissionHWF(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData, HWFFeePaymentType.PART_REMISSION);
+        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData, callbackParams.getRequest().getEventId());
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();

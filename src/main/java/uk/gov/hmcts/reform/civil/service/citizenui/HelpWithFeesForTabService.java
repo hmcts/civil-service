@@ -16,9 +16,9 @@ public class HelpWithFeesForTabService {
 
     public void setUpHelpWithFeeTab(CaseData.CaseDataBuilder caseDataBuilder) {
         CaseData caseData = caseDataBuilder.build();
-        if (FeeType.CLAIMISSUED.equals(caseData.getHwfFeeType())) {
+        if (FeeType.CLAIMISSUED == caseData.getHwfFeeType()) {
             caseDataBuilder.claimIssuedHwfForTab(setUpClaimIssuedHelpWithFeeTab(caseData));
-        } else if (FeeType.HEARING.equals(caseData.getHwfFeeType())) {
+        } else if (FeeType.HEARING == caseData.getHwfFeeType()) {
             caseDataBuilder.hearingHwfForTab(setUpHearingHelpWithFeeTab(caseData));
         }
         return;
@@ -28,7 +28,7 @@ public class HelpWithFeesForTabService {
         return HelpWithFeesForTab.builder()
             .remissionAmount(caseData.getHearingHwfDetails().getRemissionAmount())
             .applicantMustPay(caseData.getHearingHwfDetails().getOutstandingFeeInPounds())
-            .claimFee(caseData.getCalculatedHearingFeeInPence())
+            .claimFee(MonetaryConversions.penniesToPounds(caseData.getCalculatedHearingFeeInPence()))
             .feeCode(caseData.getHearingFee().getCode())
             .hwfType("Hearing Fee")
             .hwfReferenceNumber(caseData.getHelpWithFeesReferenceNumber())

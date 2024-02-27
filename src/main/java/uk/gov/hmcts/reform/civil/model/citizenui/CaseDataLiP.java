@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseDataLiP {
