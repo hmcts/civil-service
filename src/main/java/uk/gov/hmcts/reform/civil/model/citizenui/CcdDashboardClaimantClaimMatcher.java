@@ -313,9 +313,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isHwFMoreInformationNeeded() {
-        return caseData.isHWFOutcomeReady() && ((null != caseData.getHelpWithFeesMoreInformationClaimIssue()
-            || null != caseData.getHelpWithFeesMoreInformationHearing())
-            && caseData.getHwFEvent() == CaseEvent.MORE_INFORMATION_HWF);
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.MORE_INFORMATION_HWF;
     }
 
     @Override
