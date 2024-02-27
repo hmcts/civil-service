@@ -6,10 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-
 import java.util.Map;
 import java.util.UUID;
-
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,7 +22,7 @@ public class ClaimantAfterPayFeeScenarioTest extends BaseIntegrationTest {
         = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
 
     @Test
-    void should_create_draft_claim_scenario() throws Exception {
+    void should_create_claimIssue_response_await_scenario() throws Exception {
 
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,

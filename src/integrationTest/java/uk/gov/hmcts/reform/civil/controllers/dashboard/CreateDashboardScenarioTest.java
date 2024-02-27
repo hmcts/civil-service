@@ -23,7 +23,6 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
 
     public static final String SCENARIO_HEARING_FEE_PAYMENT_REQUIRED = "scenario.hearing.fee.payment.required";
 
-    public static final String SCENARIO_CLAIMANT_AFTER_PAY_FEE_SCENARIO = "scenario.claimissue.claimfee.required";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
     private static final String GET_NOTIFICATIONS_URL
@@ -67,29 +66,6 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Pay the hearing fee"),
                 jsonPath("$[0].descriptionEn").value("Pay the hearing fee. <a href=#>Click here</a>")
-            );
-    }
-    @Test
-    void should_create_scenario_for_after_pay_fee_required() throws Exception {
-
-        UUID caseId = UUID.randomUUID();
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(Map.of("claimantName", "testName"
-                   ))
-                   .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_CLAIMANT_AFTER_PAY_FEE_SCENARIO, caseId
-        )
-            .andExpect(status().isOk());
-
-        //Verify Notification is created
-        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
-            .andExpect(status().isOk())
-            .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("Wait for defendant to respond"),
-                jsonPath("$[0].descriptionEn")
-                    .value("${claimantName} has until <Date> to respond. They can request an extra 28 days if they need it.")
             );
     }
 }
