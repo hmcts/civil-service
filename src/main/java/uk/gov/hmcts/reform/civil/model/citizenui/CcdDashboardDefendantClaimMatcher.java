@@ -299,6 +299,11 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     }
 
     @Override
+    public boolean isHwFClaimSubmit() {
+        return false;
+    }
+
+    @Override
     public boolean isHwFMoreInformationNeeded() {
         return false;
     }
