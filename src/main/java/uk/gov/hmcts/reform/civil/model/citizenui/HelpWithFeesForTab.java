@@ -1,14 +1,10 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.civil.enums.FeeType;
-import uk.gov.hmcts.reform.civil.enums.NoRemissionDetailsSummary;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.math.BigDecimal;
 

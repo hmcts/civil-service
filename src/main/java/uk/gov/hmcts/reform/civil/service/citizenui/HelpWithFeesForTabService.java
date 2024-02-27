@@ -13,9 +13,10 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class HelpWithFeesForTabService {
+
     public void setUpHelpWithFeeTab(CaseData.CaseDataBuilder caseDataBuilder) {
         CaseData caseData = caseDataBuilder.build();
-        if(FeeType.CLAIMISSUED.equals(caseData.getHwfFeeType())) {
+        if (FeeType.CLAIMISSUED.equals(caseData.getHwfFeeType())) {
             caseDataBuilder.claimIssuedHwfForTab(setUpClaimIssuedHelpWithFeeTab(caseData));
         } else if (FeeType.HEARING.equals(caseData.getHwfFeeType())) {
             caseDataBuilder.hearingHwfForTab(setUpHearingHelpWithFeeTab(caseData));
