@@ -61,9 +61,9 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
                     .ifPresent(hwf -> {
                         var caseDataLip = caseData.getCaseDataLiP();
                         updatedData.caseDataLiP(caseDataLip.toBuilder().helpWithFees(
-                        hwf.toBuilder().helpWithFeesReferenceNumber(
-                            getHwFNewReferenceNumber(caseData.getClaimIssuedHwfDetails()))
-                            .build()).build());
+                            hwf.toBuilder().helpWithFeesReferenceNumber(
+                                getHwFNewReferenceNumber(caseData.getClaimIssuedHwfDetails()))
+                                .build()).build());
                     });
             updatedData.claimIssuedHwfDetails(caseData.getClaimIssuedHwfDetails().toBuilder().hwfReferenceNumber(null).build());
             helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
