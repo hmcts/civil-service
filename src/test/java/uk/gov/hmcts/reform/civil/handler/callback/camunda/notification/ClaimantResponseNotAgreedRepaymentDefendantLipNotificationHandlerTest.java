@@ -58,7 +58,7 @@ class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest exte
             when(notificationsProperties.getNotifyDefendantLipTemplate()).thenReturn("template-id");
             when(notificationsProperties.getNotifyDefendantLipWelshTemplate()).thenReturn("template-welsh-id");
             when(notificationsProperties.getNotifyDefendantLrTemplate()).thenReturn("template-id-lr");
-            when(organisationDetailsService.getRespondentLegalOrganizationName(any())).thenReturn(ORGANISATION_NAME);
+            when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
         }
 
         @Test
@@ -148,7 +148,7 @@ class ClaimantResponseNotAgreedRepaymentDefendantLipNotificationHandlerTest exte
             } else {
                 return Map.of(
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
+                    CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData)
                 );
             }
         }
