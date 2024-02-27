@@ -76,7 +76,7 @@ class CcdClaimStatusDashboardFactoryTest {
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             claim, featureToggleService));
-        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_SUBMIT_HFW);
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_SUBMIT_HWF);
     }
 
     @Test
