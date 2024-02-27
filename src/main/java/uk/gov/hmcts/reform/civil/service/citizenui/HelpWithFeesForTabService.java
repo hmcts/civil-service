@@ -15,8 +15,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class HelpWithFeesForTabService {
 
-    private String HEARING_FEE = "Hearing Fee";
-    private String CLAIM_ISSUED_FEE = "Claim Fee";
+    private String hearingFee = "Hearing Fee";
+    private String claimIssuedFee = "Claim Fee";
 
     public void setUpHelpWithFeeTab(CaseData.CaseDataBuilder caseDataBuilder) {
         CaseData caseData = caseDataBuilder.build();
@@ -38,7 +38,7 @@ public class HelpWithFeesForTabService {
                                   .orElse(BigDecimal.ZERO))
             .claimFee(MonetaryConversions.penniesToPounds(caseData.getCalculatedHearingFeeInPence()))
             .feeCode(caseData.getHearingFee().getCode())
-            .hwfType(HEARING_FEE)
+            .hwfType(hearingFee)
             .hwfReferenceNumber(caseData.getHelpWithFeesReferenceNumber())
             .build();
     }
@@ -54,7 +54,7 @@ public class HelpWithFeesForTabService {
                                   .orElse(BigDecimal.ZERO))
             .claimFee(MonetaryConversions.penniesToPounds(caseData.getCalculatedClaimFeeInPence()))
             .feeCode(caseData.getClaimFee().getCode())
-            .hwfType(CLAIM_ISSUED_FEE)
+            .hwfType(claimIssuedFee)
             .hwfReferenceNumber(caseData.getHelpWithFeesReferenceNumber())
             .build();
     }
