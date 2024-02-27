@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.cuidashboard;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -12,9 +12,11 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.ClaimantAfterPayFeeHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -26,8 +28,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DASHBOARD_NOTIFICATION_CUI;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.cuidashboard.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DASHBOARD_CLAIMANT_AFTER_PAY_FEE_SCENARIO;
 
 @SpringBootTest(classes = {
     ClaimantAfterPayFeeHandler.class,
@@ -37,6 +38,8 @@ public class ClaimantAfterPayFeeHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private DashboardApiClient dashboardApiClient;
+    @MockBean
+    private DashboardNotificationsParamsMapper mapper;
     @Autowired
     private ClaimantAfterPayFeeHandler handler;
 
@@ -52,16 +55,18 @@ public class ClaimantAfterPayFeeHandlerTest extends BaseCallbackHandlerTest {
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT.name()).build()
+                CallbackRequest.builder().eventId(DASHBOARD_CLAIMANT_AFTER_PAY_FEE_SCENARIO.name()).build()
             ).build();
 
-            handler.handle(params);
-
             Map<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("claimantName", "claimant_Name_Test");
+            scenarioParams.put("ccdCaseReference", caseData.getCcdCaseReference());
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            handler.handle(params);
             verify(dashboardApiClient).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                "SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT",
+                "Scenario.AAA7.ClaimIssue.Response.Await",
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );

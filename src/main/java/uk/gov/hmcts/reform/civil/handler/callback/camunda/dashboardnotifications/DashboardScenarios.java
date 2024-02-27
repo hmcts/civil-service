@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.cuidashboard;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
 @lombok.Getter
 public enum DashboardScenarios {

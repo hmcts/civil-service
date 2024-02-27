@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.cuidashboard;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,6 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DASHBOARD_CLAIMANT_AFTER_PAY_FEE_SCENARIO;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.cuidashboard.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +50,7 @@ public class ClaimantAfterPayFeeHandler extends CallbackHandler {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                          SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(), authToken,
+                                          DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(), authToken,
                                           ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
         );
 
