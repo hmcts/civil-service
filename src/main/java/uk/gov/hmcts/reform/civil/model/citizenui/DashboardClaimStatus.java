@@ -36,7 +36,7 @@ public enum DashboardClaimStatus {
     CLAIMANT_HWF_INVALID_REF_NUMBER(
         Claim::isHwfInvalidRefNumber
     ),
-    CLAIM_SUBMIT_HFW(
+    CLAIM_SUBMIT_HWF(
         Claim::isHwFClaimSubmit
     ),
     HWF_MORE_INFORMATION_NEEDED(
