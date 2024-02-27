@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CreateDashboardScenarioTest extends BaseIntegrationTest {
 
     public static final String SCENARIO_HEARING_FEE_PAYMENT_REQUIRED = "scenario.hearing.fee.payment.required";
-
     private static final String DASHBOARD_CREATE_SCENARIO_URL
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
     private static final String GET_NOTIFICATIONS_URL
