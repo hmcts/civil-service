@@ -4944,6 +4944,12 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder atStateLipClaimantDoesNotSettle() {
+        caseDataLiP = CaseDataLiP.builder()
+            .applicant1SettleClaim(NO).build();
+        return this;
+    }
+
     public CaseDataBuilder atStateMediationSuccessful(MultiPartyScenario mpScenario) {
         atStateApplicantProceedAllMediation(mpScenario);
         applicantsProceedIntention = YES;

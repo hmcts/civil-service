@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,6 +18,20 @@ class CaseStateUtilsTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .responseClaimTrack(SMALL_CLAIM.name())
             .applicant1ProceedWithClaim(YES)
+            .build();
+
+        boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
+
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrue_whenCarmEnabledSmallClaim1v1ClaimantNotSettle() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+            .responseClaimTrack(SMALL_CLAIM.name())
+            .caseDataLip(CaseDataLiP.builder()
+                             .applicant1SettleClaim(NO)
+                             .build())
             .build();
 
         boolean actual = CaseStateUtils.shouldMoveToInMediationState(caseData, true);
