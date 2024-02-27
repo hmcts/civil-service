@@ -60,12 +60,10 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
-        if (Optional.ofNullable(caseData.getCaseDataLiP())
-            .map(CaseDataLiP::getHelpWithFees)
-            .map(HelpWithFees::getHelpWithFeesReferenceNumber).isPresent()) {
-            return caseData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds();
+        if ( caseData.getOutstandingFeeInPounds() != null) {
+            return caseData.getOutstandingFeeInPounds();
         }
-        return caseData.isLipvLipOneVOne()
+          return caseData.isLipvLipOneVOne()
             ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()
             : MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
     }
