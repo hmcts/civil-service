@@ -53,14 +53,12 @@ public class SdoGeneratorService {
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
         }
 
-        if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            if(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle")) {
-                docmosisTemplate = DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
-                templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation, true);
-            } else {
-                docmosisTemplate = DocmosisTemplates.SDO_SMALL;
-                templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation, false);
-            }
+        if (SdoHelper.isSmallClaimsTrack(caseData) && SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle")) {
+            docmosisTemplate = DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
+            templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation, true);
+        } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            docmosisTemplate = DocmosisTemplates.SDO_SMALL;
+            templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation, false);
         } else if (SdoHelper.isFastTrack(caseData)) {
             docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
                 ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT : DocmosisTemplates.SDO_FAST;
