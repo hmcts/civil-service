@@ -74,29 +74,12 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("claimFee", "£70",
-                                  "ccdCaseReference", caseId
+                   .params(Map.of("claimFee", "£70"
                    ))
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimIssue.ClaimFee.Required", caseId
+               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimIssue.ClaimFee.Required.Test", caseId
         )
             .andExpect(status().isOk());
-
-        //Verify task Item is created
-        /*
-        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "claimant")
-            .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameCy").value("<a href=#>Pay the hearing fee</a>"),
-                jsonPath("$[0].hintTextCy")
-                    .value("pay by "
-                               + hearingFeeByTime
-                               + " on "
-                               + hearingFeeByDate
-                               + ". you have (noOfDays) to pay.")
-            );
-        */
 
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
@@ -105,7 +88,7 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("You need to pay your claim fee"),
                 jsonPath("$[0].descriptionEn")
-                    .value("Your claim has not yet been issued")
+                    .value("Your claim has not yet been issued, in order to proceed you must pay the claim fee of £70. <a href={CLAIM_FEE_URL}>Pay the claim fee</a>.")
             );
     }
 

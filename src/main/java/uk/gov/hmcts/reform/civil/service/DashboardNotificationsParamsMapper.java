@@ -37,7 +37,6 @@ public class DashboardNotificationsParamsMapper {
         }
 
         params.put("claimFee", "£" + fee.toPounds());
-        params.put("ccdCaseReference", caseData.getCcdCaseReference());
 
         return params;
     }
