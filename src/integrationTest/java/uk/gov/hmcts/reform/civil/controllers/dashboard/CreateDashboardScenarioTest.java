@@ -68,7 +68,6 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
             );
     }
 
-
     @Test
     void should_create_scenario_for_claim_issue() throws Exception {
 
