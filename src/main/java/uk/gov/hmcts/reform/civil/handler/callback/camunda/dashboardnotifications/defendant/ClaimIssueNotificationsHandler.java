@@ -50,7 +50,7 @@ public class ClaimIssueNotificationsHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse createDashboardNotifications(CallbackParams callbackParams) {
+    public CallbackResponse createDashboardNotifications(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
