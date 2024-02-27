@@ -54,16 +54,16 @@ public class SdoGeneratorService {
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
         }
 
-        if (SdoHelper.isSmallClaimsTrack(caseData)) {
+        if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
+            docmosisTemplate = DocmosisTemplates.SDO_SMALL_DRH;
+            templateData = getTemplateDataSmallDrh(caseData, judgeName, isJudge, authorisation);
+        } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isFastTrack(caseData)) {
             docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
                 ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT : DocmosisTemplates.SDO_FAST;
             templateData = getTemplateDataFast(caseData, judgeName, isJudge, authorisation);
-        } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
-            docmosisTemplate = DocmosisTemplates.SDO_SMALL_DRH;
-            templateData = getTemplateDataSmallDrh(caseData, judgeName, isJudge, authorisation);
         } else {
             docmosisTemplate = DocmosisTemplates.SDO_DISPOSAL;
             templateData = getTemplateDataDisposal(caseData, judgeName, isJudge, authorisation);
