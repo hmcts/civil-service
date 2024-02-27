@@ -107,6 +107,5 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
 
     private void setUpHelpWithFees(CaseData.CaseDataBuilder caseDataBuilder) {
         helpWithFeesForTabService.setUpHelpWithFeeTab(caseDataBuilder);
-        return;
     }
 }
