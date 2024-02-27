@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class SdoR2SmallClaimsHearingLengthOther {
+public class SdoR2SmallClaimsBundleOfDocs {
 
-    private Integer trialLengthDays;
-    private Integer trialLengthHours;
-    private Integer trialLengthMinutes;
+    private String physicalBundlePartyTxt;
 }
