@@ -280,6 +280,7 @@ public class StateFlowEngine {
                     })
                 .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLRvLiPCase)
                    .set((c, flags) -> {
+                       flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true);
                        flags.put(FlowFlag.LIP_CASE.name(), false);
                    })
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
