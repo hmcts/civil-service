@@ -528,6 +528,7 @@ bootWithCCD {
   dependsOn(buildCCDXlsx)
 
   environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-camunda.yml'
+  environment 'RSE_LIB_ADDITIONAL_DATABASES', 'cmc'
   doFirst() {
     project.file('./.aat-env').readLines().each() {
       def index = it.indexOf("=")
