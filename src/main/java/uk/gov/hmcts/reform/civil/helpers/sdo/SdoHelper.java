@@ -132,13 +132,13 @@ public class SdoHelper {
         if (caseData.getSdoR2SmallClaimsHearing() != null) {
             if (SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING
                 .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
-                return "smallClaimsMethodTelephone";
+                return "by telephone";
             } else if (SmallClaimsSdoR2HearingMethod.VIDEO_CONFERENCE
                 .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
-                return "smallClaimsMethodVideo";
+                return "by video";
             } else if (SmallClaimsSdoR2HearingMethod.IN_PERSON
                 .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
-                return "smallClaimsMethodInPerson";
+                return "in person";
             }
         }
         return "";
