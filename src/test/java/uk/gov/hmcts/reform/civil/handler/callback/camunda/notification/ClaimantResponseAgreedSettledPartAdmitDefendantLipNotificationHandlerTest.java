@@ -70,7 +70,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             when(notificationsProperties.getRespondentLipPartAdmitSettleClaimTemplate()).thenReturn(template);
             when(notificationsProperties.getRespondentLipPartAdmitSettleClaimBilingualTemplate()).thenReturn(bilingualTemplate);
             when(notificationsProperties.getRespondentLrPartAdmitSettleClaimTemplate()).thenReturn(template_id_lr);
-            when(organisationDetailsService.getRespondentLegalOrganizationName(any())).thenReturn(ORGANISATION_NAME);
+            when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
         }
 
         @Test
@@ -204,7 +204,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             } else {
                 return Map.of(
                     CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                    CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondentLegalOrganizationName(caseData)
+                    CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData)
                 );
             }
         }

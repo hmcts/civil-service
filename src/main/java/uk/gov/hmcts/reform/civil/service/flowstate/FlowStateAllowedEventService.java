@@ -18,6 +18,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLE
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -167,6 +168,14 @@ public class FlowStateAllowedEventService {
 
     private final StateFlowEngine stateFlowEngine;
     private final CaseDetailsConverter caseDetailsConverter;
+
+    private static final List<CaseEvent> EVENT_WHITELIST = List.of(
+        migrateCase,
+        NOTIFY_HEARING_PARTIES,
+        MANAGE_CONTACT_INFORMATION,
+        CASE_PROCEEDS_IN_CASEMAN,
+        UpdateNextHearingInfo
+    );
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
         entry(
@@ -1634,19 +1643,7 @@ public class FlowStateAllowedEventService {
     }
 
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
-        if (caseEvent.equals(migrateCase)) {
-            return true;
-        }
-
-        if (caseEvent.equals(NOTIFY_HEARING_PARTIES)) {
-            return true;
-        }
-
-        if (caseEvent.equals(MANAGE_CONTACT_INFORMATION)) {
-            return true;
-        }
-
-        if (caseEvent.equals(CASE_PROCEEDS_IN_CASEMAN)) {
+        if (EVENT_WHITELIST.contains(caseEvent)) {
             return true;
         }
 

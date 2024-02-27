@@ -1059,6 +1059,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public String getRespondent2OrganisationId() {
+        return getOrganisationId(Optional.ofNullable(getRespondent2OrganisationPolicy()));
+    }
+
+    @JsonIgnore
     private String getOrganisationId(Optional<OrganisationPolicy> policy) {
         return policy
             .map(OrganisationPolicy::getOrganisation)
