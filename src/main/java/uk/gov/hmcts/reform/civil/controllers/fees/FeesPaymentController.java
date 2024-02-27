@@ -54,7 +54,6 @@ public class FeesPaymentController {
         @PathVariable("feeType") FeeType feeType,
         @PathVariable("caseReference") String caseReference,
         @PathVariable("paymentReference") String paymentReference) {
-        log.info("caseReference : " + caseReference);
         return new ResponseEntity<>(
             feesPaymentService.getGovPaymentRequestStatus(feeType, caseReference, paymentReference, authorization),
             HttpStatus.OK
