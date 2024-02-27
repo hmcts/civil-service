@@ -10,8 +10,8 @@ VALUES ('Scenario.AAA7.ClaimIssue.ClaimSubmit.Required', '{}', '{"Notice.AAA7.Cl
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA7.ClaimIssue.ClaimSubmit.Required', 'This claim has not been submitted', 'This claim has not been submitted',
-        'Your claim is saved as a draft. <a href="/claim/task-list">Continue with claim</a>.',
-        'Your claim is saved as a draft. <a href="/claim/task-list">Continue with claim</a>.',
+        'Your claim is saved as a draft. <a href="{DRAFT_CLAIM_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">Continue with claim</a>.',
+        'Your claim is saved as a draft. <a href="{DRAFT_CLAIM_TASK_LIST}" rel="noopener noreferrer" class="govuk-link">Continue with claim</a>.',
         'CLAIMANT');
 
 /**
