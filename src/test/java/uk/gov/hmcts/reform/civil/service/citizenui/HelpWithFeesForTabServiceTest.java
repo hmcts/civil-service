@@ -86,7 +86,7 @@ public class HelpWithFeesForTabServiceTest {
         assertThat(hwfForTab.getFeeCode()).isEqualTo("CODE");
         assertThat(hwfForTab.getHwfType()).isEqualTo("Hearing Fee");
         assertThat(hwfForTab.getHwfReferenceNumber()).isEqualTo("HWF-REF");
-        assertThat(hwfForTab.getRemissionAmount()).isEqualTo(new BigDecimal("50000"));
+        assertThat(hwfForTab.getRemissionAmount()).isEqualTo(new BigDecimal("500.00"));
         assertThat(hwfForTab.getApplicantMustPay()).isEqualTo(new BigDecimal("30"));
     }
 }
