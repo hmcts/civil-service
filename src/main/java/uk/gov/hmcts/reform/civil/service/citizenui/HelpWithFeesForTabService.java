@@ -31,7 +31,7 @@ public class HelpWithFeesForTabService {
         return HelpWithFeesForTab.builder()
             .remissionAmount(Optional.ofNullable(caseData.getHearingHwfDetails())
                                  .map(HelpWithFeesDetails::getRemissionAmount).isPresent()
-                                 ? MonetaryConversions.penniesToPounds(caseData.getClaimIssuedHwfDetails().getRemissionAmount())
+                                 ? MonetaryConversions.penniesToPounds(caseData.getHearingHwfDetails().getRemissionAmount())
                                  : BigDecimal.ZERO)
             .applicantMustPay(Optional.ofNullable(caseData.getHearingHwfDetails())
                                   .map(HelpWithFeesDetails::getOutstandingFeeInPounds)
