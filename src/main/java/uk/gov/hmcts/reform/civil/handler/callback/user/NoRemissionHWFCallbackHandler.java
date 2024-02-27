@@ -65,7 +65,6 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
             updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(NO_REMISSION_HWF).build());
         }
 
-
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
             .build();
