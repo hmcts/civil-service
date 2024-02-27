@@ -18,13 +18,13 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DASHBOARD_CLAIMANT_AFTER_PAY_FEE_SCENARIO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1;
 
 @Service
 @RequiredArgsConstructor
 public class ClaimantAfterPayFeeHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(DASHBOARD_CLAIMANT_AFTER_PAY_FEE_SCENARIO);
+    private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1);
     public static final String TASK_ID = "GenerateDashboardNotificationClaimFeeRequiredCUI";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;

@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DASHBOARD_CLAIMANT_AFTER_PAY_FEE_SCENARIO;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1;
 
 @SpringBootTest(classes = {
     ClaimantAfterPayFeeHandler.class,
@@ -55,7 +55,7 @@ public class ClaimantAfterPayFeeHandlerTest extends BaseCallbackHandlerTest {
         void shouldRecordScenario_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(DASHBOARD_CLAIMANT_AFTER_PAY_FEE_SCENARIO.name()).build()
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1.name()).build()
             ).build();
 
             Map<String, Object> scenarioParams = new HashMap<>();
