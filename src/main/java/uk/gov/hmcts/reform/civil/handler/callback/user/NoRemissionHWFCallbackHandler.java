@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -54,11 +55,13 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
             .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
 
         if (caseData.isHWFTypeHearing()) {
-            HelpWithFeesDetails hearingFeeDetails = caseData.getHearingHwfDetails();
+            HelpWithFeesDetails hearingFeeDetails =
+                Optional.ofNullable(caseData.getHearingHwfDetails()).orElse(new HelpWithFeesDetails());
             updatedData.hearingHwfDetails(hearingFeeDetails.toBuilder().hwfCaseEvent(NO_REMISSION_HWF).build());
         }
         if (caseData.isHWFTypeClaimIssued()) {
-            HelpWithFeesDetails claimIssuedHwfDetails = caseData.getClaimIssuedHwfDetails();
+            HelpWithFeesDetails claimIssuedHwfDetails =
+                Optional.ofNullable(caseData.getClaimIssuedHwfDetails()).orElse(new HelpWithFeesDetails());
             updatedData.claimIssuedHwfDetails(claimIssuedHwfDetails.toBuilder().hwfCaseEvent(NO_REMISSION_HWF).build());
         }
 
