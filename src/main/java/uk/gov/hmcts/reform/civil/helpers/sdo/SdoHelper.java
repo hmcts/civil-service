@@ -121,7 +121,7 @@ public class SdoHelper {
                 case OTHER:
                     return caseData.getSdoR2SmallClaimsHearing().getLengthListOther().getTrialLengthDays() + " days, "
                         + caseData.getSdoR2SmallClaimsHearing().getLengthListOther().getTrialLengthHours() + " hours, "
-                        + caseData.getSdoR2SmallClaimsHearing().getLengthListOther().getTrialLengthMinutes() + " minutes.";
+                        + caseData.getSdoR2SmallClaimsHearing().getLengthListOther().getTrialLengthMinutes() + " minutes";
                 default: return "";
             }
         }

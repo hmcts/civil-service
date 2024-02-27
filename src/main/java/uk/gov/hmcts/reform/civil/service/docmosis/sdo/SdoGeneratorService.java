@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
 import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -406,6 +407,8 @@ public class SdoGeneratorService {
             .hasWitnessStatement(caseData.getSdoR2SmallClaimsWitnessStatements() != null)
             .hasUploadDocToggle(caseData.getSdoR2SmallClaimsUploadDocToggle() != null)
             .hasSdoR2HearingTrialWindow(SdoHelper.hasSdoR2HearingTrialWindow(caseData))
+            .hasSdoR2SmallClaimsPhysicalTrialBundle(caseData.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions() == SmallClaimsSdoR2PhysicalTrialBundleOptions.PARTY)
+            .hasNewDirections(caseData.getSdoR2SmallClaimsAddNewDirection() != null)
             .sdoR2SmallClaimsPhysicalTrialBundleTxt(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData))
             .sdoR2SmallClaimsJudgesRecital(caseData.getSdoR2SmallClaimsJudgesRecital())
             .sdoR2SmallClaimsHearing(caseData.getSdoR2SmallClaimsHearing())
