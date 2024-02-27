@@ -5,8 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
@@ -60,10 +58,10 @@ public class JudgementService {
     }
 
     public BigDecimal ccjJudgmentClaimFee(CaseData caseData) {
-        if ( caseData.getOutstandingFeeInPounds() != null) {
+        if (caseData.getOutstandingFeeInPounds() != null) {
             return caseData.getOutstandingFeeInPounds();
         }
-          return caseData.isLipvLipOneVOne()
+        return caseData.isLipvLipOneVOne()
             ? caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()
             : MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence());
     }
