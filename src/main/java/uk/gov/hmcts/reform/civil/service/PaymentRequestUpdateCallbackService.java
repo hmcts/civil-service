@@ -52,16 +52,12 @@ public class PaymentRequestUpdateCallbackService {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             if (feeType.equals(FeeType.HEARING.name()) || feeType.equals(FeeType.CLAIMISSUED.name())) {
                 if (!caseData.isLipvLipOneVOne()) {
-                    caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
+                    updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                     createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
                 } else {
-                    if (feeType.equals(FeeType.HEARING.name()) && caseData.getHearingFeePaymentDetails() == null) {
-                        caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
-                        CardPaymentStatusResponse cardPaymentStatusResponse = getCardPaymentStatusResponse(serviceRequestUpdateDto);
-                        updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType), serviceRequestUpdateDto.getCcdCaseNumber(), cardPaymentStatusResponse);
-
-                    } else if (feeType.equals(FeeType.CLAIMISSUED.name()) && caseData.getClaimIssuedPaymentDetails() == null) {
-                        caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
+                    if ((feeType.equals(FeeType.HEARING.name()) && caseData.getHearingFeePaymentDetails() == null)
+                        || (feeType.equals(FeeType.CLAIMISSUED.name()) && caseData.getClaimIssuedPaymentDetails() == null)) {
+                        updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                         CardPaymentStatusResponse cardPaymentStatusResponse = getCardPaymentStatusResponse(serviceRequestUpdateDto);
                         updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType), serviceRequestUpdateDto.getCcdCaseNumber(), cardPaymentStatusResponse);
                     }

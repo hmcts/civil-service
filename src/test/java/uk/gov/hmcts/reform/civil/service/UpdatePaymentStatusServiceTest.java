@@ -80,7 +80,7 @@ class UpdatePaymentStatusServiceTest {
         updatePaymentStatusService.updatePaymentStatus(FeeType.HEARING, String.valueOf(CASE_ID), getCardPaymentStatusResponse());
 
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
-        verify(coreCaseDataService).startUpdate(any(), any());
+        verify(coreCaseDataService).startUpdate(String.valueOf(CASE_ID), CITIZEN_HEARING_FEE_PAYMENT);
         verify(coreCaseDataService).submitUpdate(any(), any());
 
     }
@@ -112,7 +112,7 @@ class UpdatePaymentStatusServiceTest {
         updatePaymentStatusService.updatePaymentStatus(FeeType.CLAIMISSUED, String.valueOf(CASE_ID), getCardPaymentStatusResponse());
 
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
-        verify(coreCaseDataService).startUpdate(any(), any());
+        verify(coreCaseDataService).startUpdate(String.valueOf(CASE_ID), CITIZEN_CLAIM_ISSUE_PAYMENT);
         verify(coreCaseDataService).submitUpdate(any(), any());
 
     }
