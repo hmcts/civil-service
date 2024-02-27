@@ -1,13 +1,11 @@
 package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +20,7 @@ public class DashboardNotificationsParamsMapper {
 
     public Map<String, Object> mapCaseDataToParams(CaseData caseData){
         // TODO Check for notification variables
-        LocalDate currentDate = LocalDate.now();
+        LocalDateTime currentDate = LocalDateTime.now();
         Fee fee = feesService
             .getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
 
