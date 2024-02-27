@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
@@ -35,6 +36,7 @@ class JudgementServiceTest {
             .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
                                        .outstandingFeeInPounds(BigDecimal.ZERO)
                                        .build())
+            .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
         // When
         assertThat(judgementService.ccjJudgmentClaimFee(caseData)).isEqualTo(BigDecimal.ZERO);
