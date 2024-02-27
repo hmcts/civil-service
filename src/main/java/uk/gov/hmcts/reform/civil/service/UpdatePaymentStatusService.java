@@ -37,11 +37,15 @@ public class UpdatePaymentStatusService {
     @Retryable(value = CaseDataUpdateException.class, maxAttempts = 3, backoff = @Backoff(delay = 500))
     public void updatePaymentStatus(FeeType feeType, String caseReference, CardPaymentStatusResponse cardPaymentStatusResponse) {
 
-        CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
-        CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-        caseData = updateCaseDataWithStateAndPaymentDetails(cardPaymentStatusResponse, caseData, feeType.name());
+        try {
+            CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseReference));
+            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+            caseData = updateCaseDataWithStateAndPaymentDetails(cardPaymentStatusResponse, caseData, feeType.name());
 
-        createEvent(caseData, caseReference, feeType.name());
+            createEvent(caseData, caseReference, feeType.name());
+        } catch (Exception ex) {
+            throw new CaseDataUpdateException();
+        }
     }
 
     private void createEvent(CaseData caseData, String caseReference, String feeType) {
