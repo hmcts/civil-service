@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -25,13 +26,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class FullRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private FullRemissionHWFCallbackHandler handler;
+    @Mock
     private HelpWithFeesForTabService hwfForTabService;
     private ObjectMapper mapper;
 
     @BeforeEach
     void setUp() {
         mapper = new ObjectMapper();
-        hwfForTabService = new HelpWithFeesForTabService();
         handler = new FullRemissionHWFCallbackHandler(mapper, hwfForTabService);
     }
 
