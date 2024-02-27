@@ -18,11 +18,9 @@ public class DashboardNotificationsParamsMapper {
 
     private final FeesService feesService;
 
-    public Map<String, Object> mapCaseDataToParams(CaseData caseData){
+    public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
         // TODO Check for notification variables
         LocalDateTime currentDate = LocalDateTime.now();
-        Fee fee = feesService
-            .getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
 
         Map<String, Object> params = new HashMap<>();
         params.put("defaultRespondTime", "4pm");
@@ -34,6 +32,8 @@ public class DashboardNotificationsParamsMapper {
             params.put("daysLeftToRespond", daysDifference);
         }
 
+        Fee fee = feesService
+            .getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
         params.put("claimFee", "£" + fee.toPounds());
 
         return params;

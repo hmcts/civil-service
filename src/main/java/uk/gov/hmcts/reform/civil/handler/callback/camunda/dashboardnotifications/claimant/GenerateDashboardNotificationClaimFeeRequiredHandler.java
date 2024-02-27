@@ -38,6 +38,7 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandler extends Callba
             callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForClaimSubmission
         );
     }
+
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;

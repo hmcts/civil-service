@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +29,14 @@ public class DashboardNotificationsParamsMapperTest {
     private DashboardNotificationsParamsMapper mapper;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         when(feesService.getFeeDataByTotalClaimAmount(any())).thenReturn(Fee.builder().calculatedAmountInPence(
             BigDecimal.valueOf(70)).build());
 
     }
 
     @Test
-    public void shouldMapAllParameters_WhenIsRequested(){
+    public void shouldMapAllParameters_WhenIsRequested() {
 
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
 
