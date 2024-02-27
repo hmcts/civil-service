@@ -81,7 +81,7 @@ public class HearingsPartyMapper {
 
         // applicant 1 solicitor firm individuals
         if (caseData.getApplicant1LRIndividuals() != null){
-            parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant1OrgIndividuals()));
+            parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant1LRIndividuals()));
         }
 
         // respondent 1 solicitor firm individuals
