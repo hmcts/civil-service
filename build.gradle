@@ -522,7 +522,7 @@ task buildCCDXlsx(type: Exec) {
 bootWithCCD {
   dependsOn(buildCCDXlsx)
 
-  environment 'RSE_LIB_ADDITIONAL_DATABASES', ''
+  environment 'ADDITIONAL_COMPOSE_FILES', 'cft-lib-camunda.yml'
   doFirst() {
     project.file('./.aat-env').readLines().each() {
       def index = it.indexOf("=")
