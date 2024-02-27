@@ -4675,6 +4675,7 @@ class StateFlowEngineTest {
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimSubmittedSpec()
                     .applicant1Represented(NO)
+                    .respondent1Represented(NO)
                     .build().toBuilder()
                     .takenOfflineDate(null)
                     .paymentSuccessfulDate(null)
