@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMedia
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("java:S2583")
 public class UpdateClaimStateService {
 
     private final FeatureToggleService featureToggleService;
