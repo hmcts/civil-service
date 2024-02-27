@@ -47,7 +47,6 @@ public class CitizenHearingFeePaymentCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
-
         dataBuilder.businessProcess(BusinessProcess.ready(CITIZEN_HEARING_FEE_PAYMENT));
 
         return AboutToStartOrSubmitCallbackResponse.builder()

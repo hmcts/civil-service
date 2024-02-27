@@ -67,6 +67,8 @@ class PaymentRequestUpdateCallbackServiceTest {
     FeatureToggleService featureToggleService;
     @MockBean
     CaseDetailsConverter caseDetailsConverter;
+    @MockBean
+    UpdatePaymentStatusService updatePaymentStatusService;
 
     @BeforeEach
     public void setup() {
@@ -191,7 +193,7 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     @Test
-    public void shouldStartAndSubmitEventWithCaseDetailsInLipClaim_Hearing() {
+    public void shouldStartCallUpdatePaymentServiceWhenLipVLipAndHearingFeeDetailsAreNull() {
 
         CaseData caseData = CaseDataBuilder.builder().receiveUpdatePaymentRequest().build();
         caseData = caseData.toBuilder()
@@ -202,6 +204,7 @@ class PaymentRequestUpdateCallbackServiceTest {
                                  .build())
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
+            .hearingFeePaymentDetails(null)
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -214,8 +217,9 @@ class PaymentRequestUpdateCallbackServiceTest {
         paymentRequestUpdateCallbackService.processCallback(buildServiceDto(PAID), FeeType.HEARING.name());
 
         verify(coreCaseDataService, times(1)).getCase(Long.valueOf(CASE_ID));
-        verify(coreCaseDataService, times(1)).startUpdate(any(), any());
-        verify(coreCaseDataService, times(1)).submitUpdate(any(), any());
+        verify(coreCaseDataService, never()).startUpdate(any(), any());
+        verify(coreCaseDataService, never()).submitUpdate(any(), any());
+        verify(updatePaymentStatusService).updatePaymentStatus(any(), any(), any());
     }
 
     @Test

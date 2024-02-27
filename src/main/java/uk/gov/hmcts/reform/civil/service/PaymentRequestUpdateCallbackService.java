@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
@@ -34,6 +35,7 @@ public class PaymentRequestUpdateCallbackService {
     private final CaseDetailsConverter caseDetailsConverter;
     private final CoreCaseDataService coreCaseDataService;
     private final ObjectMapper objectMapper;
+    private final UpdatePaymentStatusService updatePaymentStatusService;
 
     private CaseData data;
 
@@ -48,20 +50,30 @@ public class PaymentRequestUpdateCallbackService {
             CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(serviceRequestUpdateDto
                                                                                    .getCcdCaseNumber()));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-            caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
             if (feeType.equals(FeeType.HEARING.name()) || feeType.equals(FeeType.CLAIMISSUED.name())) {
-                if(!caseData.isLipvLipOneVOne()) {
+                if (!caseData.isLipvLipOneVOne()) {
+                    caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                     createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
-                }
-                {
-                    log.info("Ignoring the callback for the caseId {} as it is a LipVLipOneVOne claim", caseData.getCcdCaseReference());
+                } else {
+                    if (feeType.equals(FeeType.HEARING.name()) && caseData.getHearingFeePaymentDetails() == null) {
+                        caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
+                        CardPaymentStatusResponse cardPaymentStatusResponse = getCardPaymentStatusResponse(serviceRequestUpdateDto);
+                        updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType), serviceRequestUpdateDto.getCcdCaseNumber(), cardPaymentStatusResponse);
+
+                    } else if (feeType.equals(FeeType.CLAIMISSUED.name()) && caseData.getClaimIssuedPaymentDetails() == null) {
+                        caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
+                        CardPaymentStatusResponse cardPaymentStatusResponse = getCardPaymentStatusResponse(serviceRequestUpdateDto);
+                        updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType), serviceRequestUpdateDto.getCcdCaseNumber(), cardPaymentStatusResponse);
+                    }
                 }
             }
-
-        } else {
-            log.info("Service request status is not PAID for Case id {}",
-                     serviceRequestUpdateDto.getCcdCaseNumber());
         }
+    }
+
+    private CardPaymentStatusResponse getCardPaymentStatusResponse(ServiceRequestUpdateDto serviceRequestUpdateDto) {
+
+        return CardPaymentStatusResponse.builder().paymentReference(serviceRequestUpdateDto.getPayment().getPaymentReference())
+            .status(String.valueOf(SUCCESS)).build();
     }
 
     private void createEvent(CaseData caseData, String caseId, String feeType) {

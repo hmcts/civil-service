@@ -80,6 +80,8 @@ class FeesPaymentServiceTest {
     private ObjectMapper objectMapper = new ObjectMapper();
     @MockBean
     private PinInPostConfiguration pinInPostConfiguration;
+    @MockBean
+    private UpdatePaymentStatusService updatePaymentStatusService;
 
     @BeforeEach
     void before() {
@@ -236,6 +238,7 @@ class FeesPaymentServiceTest {
         );
 
         assertThat(govPaymentRequestStatus).isEqualTo(expectedResponse(status));
+        verify(updatePaymentStatusService, times(1)).updatePaymentStatus(any(), any(), any());
     }
 
     @Test

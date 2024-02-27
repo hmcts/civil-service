@@ -78,7 +78,6 @@ public class FeesPaymentService {
             .paymentFor(feeType.name().toLowerCase())
             .paymentAmount(cardPaymentDetails.getAmount());
 
-
         if (paymentStatus.equals("Failed")) {
             Arrays.asList(cardPaymentDetails.getStatusHistories()).stream()
                 .filter(h -> h.getStatus().equals(paymentStatus))
@@ -88,8 +87,9 @@ public class FeesPaymentService {
 
         try {
             updatePaymentStatusService.updatePaymentStatus(feeType, caseReference, response.build());
-        }
-        catch (Exception e) {
+
+        } catch (Exception e) {
+
             log.error("Update payment status failed for claim [{}]", caseReference);
         }
 

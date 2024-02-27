@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +50,7 @@ public class CitizenClaimIssueFeePaymentCallbackHandler extends CallbackHandler 
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
 
-        if(caseData.getClaimIssuedPaymentDetails()!= null && caseData.getClaimIssuedPaymentDetails().getStatus().equals(SUCCESS)) {
+        if (caseData.getClaimIssuedPaymentDetails() != null && caseData.getClaimIssuedPaymentDetails().getStatus().equals(SUCCESS)) {
 
             dataBuilder.issueDate(LocalDate.now());
             dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC_AFTER_PAYMENT));
@@ -61,6 +60,5 @@ public class CitizenClaimIssueFeePaymentCallbackHandler extends CallbackHandler 
             .data(dataBuilder.build().toMap(objectMapper))
             .build();
     }
-
 
 }
