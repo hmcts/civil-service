@@ -68,6 +68,18 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
+    void given_hwf_claim_submit_whenGetStatus_thenReturnNoResponse() {
+        CaseData claim = CaseData.builder()
+            .hwfFeeType(FeeType.CLAIMISSUED)
+            .ccdState(CaseState.PENDING_CASE_ISSUED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            claim, featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_SUBMIT_HWF);
+    }
+
+    @Test
     void given_isEligibleForCCJ_whenGetStatus_thenReturnEligibleForCCJStatus() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())

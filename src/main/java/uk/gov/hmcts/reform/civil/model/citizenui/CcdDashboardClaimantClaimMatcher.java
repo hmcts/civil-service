@@ -312,6 +312,12 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     }
 
     @Override
+    public boolean isHwFClaimSubmit() {
+        return caseData.isHWFTypeClaimIssued()
+            && caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED;
+    }
+
+    @Override
     public boolean isHwFMoreInformationNeeded() {
         return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.MORE_INFORMATION_HWF;
     }
