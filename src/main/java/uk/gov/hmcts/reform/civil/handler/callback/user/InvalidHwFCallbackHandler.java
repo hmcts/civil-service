@@ -10,27 +10,26 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 
 import java.util.List;
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 
 @Service
 @RequiredArgsConstructor
-public class NoRemissionHWFCallbackHandler extends CallbackHandler {
+public class InvalidHwFCallbackHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(NO_REMISSION_HWF);
+    private static final List<CaseEvent> EVENTS = List.of(INVALID_HWF_REFERENCE);
     private final ObjectMapper objectMapper;
-    private final HWFFeePaymentOutcomeService hwfFeePaymentOutcomeService;
+
     private final Map<String, Callback> callbackMap = Map.of(
-        callbackKey(ABOUT_TO_SUBMIT),
-        this::noRemissionHWF,
-        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
-    );
+        callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
+        callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit,
+        callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse);
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -42,11 +41,14 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse noRemissionHWF(CallbackParams callbackParams) {
+    private CallbackResponse aboutToSubmit(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData);
+
+        CaseData.CaseDataBuilder<?, ?> caseDataUpdated = caseData.toBuilder();
+
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
+            .data(caseDataUpdated.build().toMap(objectMapper))
             .build();
+
     }
 }

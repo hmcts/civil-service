@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -602,6 +603,8 @@ class CaseFlagUtilsTest {
                 .flagCode("AB001")
                 .hearingRelevant(YES)
                 .status("Active")
+                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                 .build();
 
             FlagDetail details2 = FlagDetail.builder()
@@ -610,6 +613,8 @@ class CaseFlagUtilsTest {
                 .flagCode("SM001")
                 .hearingRelevant(YES)
                 .status("Active")
+                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                 .build();
 
             FlagDetail details3 = FlagDetail.builder()
@@ -618,6 +623,8 @@ class CaseFlagUtilsTest {
                 .flagCode("RA001")
                 .hearingRelevant(NO)
                 .status("Active")
+                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                 .build();
 
             FlagDetail details4 = FlagDetail.builder()
@@ -626,6 +633,8 @@ class CaseFlagUtilsTest {
                 .flagCode("AB001")
                 .hearingRelevant(YES)
                 .status("Inactive")
+                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                 .build();
 
             return List.of(details1, details2, details3, details4);
@@ -638,6 +647,8 @@ class CaseFlagUtilsTest {
                 .flagCode("AB001")
                 .hearingRelevant(YES)
                 .status("Active")
+                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                 .build();
 
             FlagDetail details2 = FlagDetail.builder()
@@ -646,6 +657,8 @@ class CaseFlagUtilsTest {
                 .flagCode("SM001")
                 .hearingRelevant(YES)
                 .status("Active")
+                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                 .build();
 
             FlagDetail details3 = FlagDetail.builder()
@@ -654,6 +667,8 @@ class CaseFlagUtilsTest {
                 .flagCode("RA001")
                 .hearingRelevant(NO)
                 .status("Active")
+                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                 .build();
 
             return List.of(details1, details2, details3);
@@ -667,6 +682,8 @@ class CaseFlagUtilsTest {
                 .flagCode("AB001")
                 .hearingRelevant(YES)
                 .status("Active")
+                .dateTimeCreated(LocalDateTime.of(2024, 1, 1, 9, 0, 0))
+                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                 .build();
 
             FlagDetail details2 = FlagDetail.builder()
@@ -675,6 +692,8 @@ class CaseFlagUtilsTest {
                 .flagCode("SM001")
                 .hearingRelevant(YES)
                 .status("Active")
+                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                 .build();
 
             FlagDetail details3 = FlagDetail.builder()
@@ -683,6 +702,8 @@ class CaseFlagUtilsTest {
                 .flagCode("AB001")
                 .hearingRelevant(YES)
                 .status("Inactive")
+                .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
+                .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
                 .build();
 
             return List.of(details1, details2, details3);
