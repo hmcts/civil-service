@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder(toBuilder = true)
 @Data
@@ -19,4 +21,6 @@ public class PartyFlagsModel {
     private String flagId;
     private String flagDescription;
     private String flagStatus;
+    private LocalDateTime dateTimeCreated;
+    private LocalDateTime dateTimeModified;
 }
