@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
@@ -18,8 +20,12 @@ import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -33,7 +39,9 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsBundleOfDocs;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingLengthOther;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -1615,5 +1623,87 @@ public class SdoHelperTest {
                 assertThat(SdoHelper.getHearingLocationDrh(caseData).getValue().getCode()).isEqualTo("alt_location");
             }
         }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldCheckForSdoR2HearingTrialWindow(Boolean window) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().trialOnOptions(window ? TrialOnRadioOptions.HEARING_WINDOW : TrialOnRadioOptions.OPEN_DATE).build())
+                .build();
+
+            assertThat(SdoHelper.hasSdoR2HearingTrialWindow(caseData)).isEqualTo(window);
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = SmallClaimsSdoR2TimeEstimate.class)
+        void shouldReturnHearingTime(SmallClaimsSdoR2TimeEstimate selection) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().lengthList(selection).lengthListOther(
+                    SdoR2SmallClaimsHearingLengthOther.builder()
+                        .trialLengthDays(1).trialLengthHours(2).trialLengthMinutes(3).build()).build())
+                .build();
+
+            if (selection.getLabel() != SmallClaimsSdoR2TimeEstimate.OTHER.getLabel()) {
+                assertThat(SdoHelper.getSdoR2HearingTime(caseData)).isEqualTo(selection.getLabel());
+            } else {
+                assertThat(SdoHelper.getSdoR2HearingTime(caseData)).isEqualTo("1 days, 2 hours, 3 minutes");
+            }
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = SmallClaimsSdoR2HearingMethod.class)
+        void shouldReturnHearingMethodsForDrh(SmallClaimsSdoR2HearingMethod method) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().methodOfHearing(method).build())
+                .build();
+
+            if (method == SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING) {
+                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by telephone");
+            } else if (method == SmallClaimsSdoR2HearingMethod.VIDEO_CONFERENCE) {
+                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("by video");
+            } else if (method == SmallClaimsSdoR2HearingMethod.IN_PERSON) {
+                assertThat(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData)).isEqualTo("in person");
+            }
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = SmallClaimsSdoR2PhysicalTrialBundleOptions.class)
+        void shouldReturnPhysicalTrialBundleTxt(SmallClaimsSdoR2PhysicalTrialBundleOptions option) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().physicalBundleOptions(option).sdoR2SmallClaimsBundleOfDocs(
+                    SdoR2SmallClaimsBundleOfDocs.builder().physicalBundlePartyTxt("test_text").build()).build())
+                .build();
+
+            if (option == SmallClaimsSdoR2PhysicalTrialBundleOptions.NO) {
+                assertThat(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData)).isEqualTo("None");
+            } else {
+                assertThat(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData)).isEqualTo("test_text");
+            }
+        }
     }
+
 }
