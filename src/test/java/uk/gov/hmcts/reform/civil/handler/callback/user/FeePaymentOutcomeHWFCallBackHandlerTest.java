@@ -65,7 +65,7 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
     class AboutToSubmitCallback {
 
         @Test
-        void shouldUpdateTheDataBaseWithHWFRefNumber_WhenFeeTye_ClaimIssue() {
+        void shouldUpdateTheDataBaseWithHWFRefNumber_WhenFeeType_ClaimIssue() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .caseDataLip(CaseDataLiP.builder()
@@ -74,9 +74,9 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
                                               .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
                                               .hwfFullRemissionGrantedForClaimIssue(YesOrNo.YES).build())
+                .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
 
-            caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
