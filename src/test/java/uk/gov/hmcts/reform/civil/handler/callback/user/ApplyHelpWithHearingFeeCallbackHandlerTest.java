@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +29,6 @@ class ApplyHelpWithHearingFeeCallbackHandlerTest extends BaseCallbackHandlerTest
 
     @MockBean
     private HelpWithFeesForTabService hwfForTabService;
-
 
     @Nested
     class AboutToSubmit {

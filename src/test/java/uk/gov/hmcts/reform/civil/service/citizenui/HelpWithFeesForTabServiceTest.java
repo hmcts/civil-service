@@ -74,7 +74,8 @@ public class HelpWithFeesForTabServiceTest {
             .hearingFee(Fee.builder()
                 .calculatedAmountInPence(new BigDecimal("1000"))
                 .code("CODE").build())
-            .build().toBuilder();
+            .build().toBuilder()
+            .hearingHelpFeesReferenceNumber("HWF-REF");
 
         // When
         helpWithFeesForTabService.setUpHelpWithFeeTab(builder);
