@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -22,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 
 @Service
 @RequiredArgsConstructor
-public class ClaimantAfterPayFeeHandler extends CallbackHandler {
+public class CreateClaimIssueNotificationsHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1);
     public static final String TASK_ID = "GenerateDashboardNotificationClaimFeeRequiredCUI";
@@ -35,6 +36,7 @@ public class ClaimantAfterPayFeeHandler extends CallbackHandler {
             callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForClaimSubmission
         );
     }
+
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;

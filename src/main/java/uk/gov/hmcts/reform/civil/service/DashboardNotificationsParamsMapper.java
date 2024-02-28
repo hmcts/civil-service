@@ -14,7 +14,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
-    public Map<String, Object> mapCaseDataToParams(CaseData caseData){
+    public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
         // TODO Check for notification variables
         LocalDate currentDate = LocalDate.now();
         long daysDifference = ChronoUnit.DAYS.between(caseData.getClaimDismissedDeadline(), currentDate);
@@ -24,7 +24,10 @@ public class DashboardNotificationsParamsMapper {
         // TODO: find the correct data
         params.put("date", caseData.getClaimDismissedDeadline());
         params.put("daysLeftToRespond", daysDifference);
-        params.put("claimFee", "£" + MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence()));
+        params.put(
+            "claimFee",
+            "£" + MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
+        );
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("claimantName", caseData.getApplicant1().getPartyName());
 

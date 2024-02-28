@@ -60,6 +60,12 @@ public abstract class BaseIntegrationTest {
         + "k02vLJDY9fLCsFYy5iWGCjb8lD1aX1NTv7jz2ttNNv7-smqp6L3LSSD_LCZMpf0h_3n5RXiv-N3vNpWe4ZC9u0AWQdHEE9QlKTZlsqwKSog"
         + "3yJWhyxAamdMepgW7Z8jQ";
 
+    protected static final String DASHBOARD_CREATE_SCENARIO_URL
+        = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
+    protected static final String GET_NOTIFICATIONS_URL
+        = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
+    protected static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
+
     protected static final UserInfo USER_INFO = UserInfo.builder()
         .sub("solicitor@example.com")
         .roles(of("caseworker-civil-solicitor"))

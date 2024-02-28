@@ -362,6 +362,7 @@ public enum CaseEvent {
     public boolean isCamundaEvent() {
         return this.getUserType() == CAMUNDA;
     }
+
     public static CaseEvent fromString(String text) {
         for (CaseEvent event : CaseEvent.values()) {
             if (event.name().equalsIgnoreCase(text)) {

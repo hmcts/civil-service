@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.ClaimantAfterPayFeeHandler;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -31,17 +30,17 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1;
 
 @SpringBootTest(classes = {
-    ClaimantAfterPayFeeHandler.class,
+    CreateClaimIssueNotificationsHandler.class,
     JacksonAutoConfiguration.class
 })
-public class ClaimantAfterPayFeeHandlerTest extends BaseCallbackHandlerTest {
+public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private DashboardApiClient dashboardApiClient;
     @MockBean
     private DashboardNotificationsParamsMapper mapper;
     @Autowired
-    private ClaimantAfterPayFeeHandler handler;
+    private CreateClaimIssueNotificationsHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
