@@ -52,7 +52,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         @BeforeEach
         void setup() {
             when(notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate()).thenReturn("template-id");
-            when(organisationDetailsService.getApplicantLegalOrganizationName(any())).thenReturn(ORGANISATION_NAME);
+            when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
         }
 
         @Test
@@ -79,7 +79,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
-                CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganizationName(caseData),
+                CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
                 DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
             );
         }
