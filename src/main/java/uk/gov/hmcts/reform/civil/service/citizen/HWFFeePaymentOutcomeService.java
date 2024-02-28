@@ -52,10 +52,10 @@ public class HWFFeePaymentOutcomeService {
 
     public CaseData updateOutstandingFee(CaseData caseData, String caseEventId) {
         var updatedData = caseData.toBuilder();
-        BigDecimal claimIssuedRemissionAmount = NO_REMISSION_HWF.equals(CaseEvent.valueOf(caseEventId))
+        BigDecimal claimIssuedRemissionAmount = NO_REMISSION_HWF == CaseEvent.valueOf(caseEventId)
             ? BigDecimal.ZERO
             : caseData.getClaimIssueRemissionAmount();
-        BigDecimal hearingRemissionAmount = NO_REMISSION_HWF.equals(CaseEvent.valueOf(caseEventId))
+        BigDecimal hearingRemissionAmount = NO_REMISSION_HWF == CaseEvent.valueOf(caseEventId)
             ? BigDecimal.ZERO
             : caseData.getHearingRemissionAmount();
         BigDecimal claimFeeAmount = caseData.getCalculatedClaimFeeInPence();
