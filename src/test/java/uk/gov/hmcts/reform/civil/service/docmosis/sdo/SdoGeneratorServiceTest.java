@@ -177,7 +177,7 @@ public class SdoGeneratorServiceTest {
     }
 
     @Test
-    public void sdoSmallFlightDelay() {
+    void sdoSmallFlightDelay() {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_FLIGHT_DELAY)))
             .thenReturn(new DocmosisDocument(SDO_SMALL_FLIGHT_DELAY.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
