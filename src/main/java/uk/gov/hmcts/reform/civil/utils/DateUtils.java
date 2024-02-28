@@ -6,11 +6,17 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class DateUtils {
 
     private DateUtils() {
         //No op
+    }
+
+    public static String formatDate(LocalDateTime date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
+        return date.format(formatter);
     }
 
     public static LocalDateTime convertFromUTC(LocalDateTime utcDate) {
