@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 public class DraftClaimScenarioTest extends BaseIntegrationTest {
-    
+
     public static final String SCENARIO_DRAFT_CLAIM = "Scenario.AAA7.ClaimIssue.ClaimSubmit.Required";
     private static final String DASHBOARD_CREATE_SCENARIO_URL
         = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
@@ -74,7 +74,7 @@ public class DraftClaimScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("This claim has not been submitted"),
-                jsonPath("$[0].descriptionEn").value("Your claim is saved as a draft. <a href=\"/claim/task-list\">Continue with claim</a>.")
+                jsonPath("$[0].descriptionEn").value("Your claim is saved as a draft. <a href=\"{DRAFT_CLAIM_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Continue with claim</a>.")
             );
     }
 
