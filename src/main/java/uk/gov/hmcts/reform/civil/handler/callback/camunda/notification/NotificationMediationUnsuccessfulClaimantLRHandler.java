@@ -91,7 +91,7 @@ public class NotificationMediationUnsuccessfulClaimantLRHandler extends Callback
     }
 
     private void sendEmail(final CaseData caseData) {
-        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
             sendMailAccordingToReason(caseData);
         } else {
             notificationService.sendMail(
