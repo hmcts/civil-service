@@ -47,7 +47,6 @@ public class SdoDocumentFormSmallDrh implements MappableObject {
     private final boolean hasWitnessStatements;
     private final boolean hasNewDirections;
     private final boolean hasSdoR2HearingTrialWindow;
-    private final boolean hasSdoR2SmallClaimsPhysicalTrialBundle;
 
     private final List<Element<SdoR2SmallClaimsAddNewDirection>> sdoR2SmallClaimsAddNewDirection;
     private final SdoR2SmallClaimsJudgesRecital sdoR2SmallClaimsJudgesRecital;

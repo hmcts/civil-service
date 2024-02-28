@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.civil.helpers.sdo;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingBundleType;
@@ -19,6 +21,8 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHeari
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
@@ -29,6 +33,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -1554,6 +1559,61 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingAddNewDirections")).isFalse();
 
             assertThat(SdoHelper.hasDisposalVariable(caseData, "invalid input")).isFalse();
+        }
+    }
+
+    @Nested
+    class SmallClaimsDrhTests {
+        @Test
+        void shouldReturnTrue_whenSmallClaimsDrhCase_Path1() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .build();
+
+            assertThat(SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)).isTrue();
+        }
+
+        @Test
+        void shouldReturnTrue_whenSmallClaimsDrhCase_Path2() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(YES)
+                .drawDirectionsOrderSmallClaimsAdditionalDirections(
+                    List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .build();
+
+            assertThat(SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)).isTrue();
+        }
+
+        @ParameterizedTest
+        @CsvSource({"hearing_location", "OTHER_LOCATION"})
+        void shouldReturnHearingLocationsForDrh(String location) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .drawDirectionsOrderRequired(NO)
+                .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+                .sdoR2SmallClaimsHearing(SdoR2SmallClaimsHearing.builder().hearingCourtLocationList(DynamicList.builder().value(
+                    DynamicListElement.builder().code(location).build()
+                    ).build()).altHearingCourtLocationList(DynamicList.builder().value(
+                    DynamicListElement.builder().code("alt_location").build()
+                ).build()).build())
+                .build();
+            if (location.equals("hearing_location")) {
+                assertThat(SdoHelper.getHearingLocationDrh(caseData).getValue().getCode()).isEqualTo(location);
+            } else {
+                assertThat(SdoHelper.getHearingLocationDrh(caseData).getValue().getCode()).isEqualTo("alt_location");
+            }
         }
     }
 }

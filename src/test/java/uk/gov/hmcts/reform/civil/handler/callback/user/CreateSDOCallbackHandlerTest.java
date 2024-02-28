@@ -2348,7 +2348,6 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldGenerateAndSaveSdoOrder_whenDrhIsSelected() {
-
             when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssued()
@@ -2365,8 +2364,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            //TODO Uncomment below line when doc is generated
-            //assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
+            assertThat(response.getData()).extracting("sdoOrderDocument").isNotNull();
         }
     }
 

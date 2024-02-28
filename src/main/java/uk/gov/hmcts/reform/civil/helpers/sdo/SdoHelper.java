@@ -102,7 +102,7 @@ public class SdoHelper {
     public static boolean hasSdoR2HearingTrialWindow(CaseData caseData) {
 
         if (caseData.getSdoR2SmallClaimsHearing() != null
-            && TrialOnRadioOptions.TRIAL_WINDOW.equals(caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions())) {
+            && TrialOnRadioOptions.HEARING_WINDOW.equals(caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions())) {
             return true;
         }
         return false;
@@ -152,7 +152,7 @@ public class SdoHelper {
                 return "None";
             } else if (SmallClaimsSdoR2PhysicalTrialBundleOptions.PARTY
                 .equals(caseData.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions())) {
-                return caseData.getSdoR2SmallClaimsHearing().getPhysicalBundlePartyTxt();
+                return caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsBundleOfDocs().getPhysicalBundlePartyTxt();
             }
         }
         return "";

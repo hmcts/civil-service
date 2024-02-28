@@ -410,7 +410,6 @@ public class SdoGeneratorService {
             .hasWitnessStatement(caseData.getSdoR2SmallClaimsWitnessStatements() != null)
             .hasUploadDocToggle(caseData.getSdoR2SmallClaimsUploadDocToggle() != null)
             .hasSdoR2HearingTrialWindow(SdoHelper.hasSdoR2HearingTrialWindow(caseData))
-            .hasSdoR2SmallClaimsPhysicalTrialBundle(caseData.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions() == SmallClaimsSdoR2PhysicalTrialBundleOptions.PARTY)
             .hasNewDirections(caseData.getSdoR2SmallClaimsAddNewDirection() != null)
             .sdoR2SmallClaimsPhysicalTrialBundleTxt(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData))
             .sdoR2SmallClaimsJudgesRecital(caseData.getSdoR2SmallClaimsJudgesRecital())
@@ -421,6 +420,7 @@ public class SdoGeneratorService {
             .smallClaimsMethod(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData))
             .hearingTime(SdoHelper.getSdoR2HearingTime(caseData))
             .sdoR2SmallClaimsImpNotes(caseData.getSdoR2SmallClaimsImpNotes())
+            .sdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
             .caseManagementLocation(
                 locationHelper.getHearingLocation(null, caseData, authorisation));
 
