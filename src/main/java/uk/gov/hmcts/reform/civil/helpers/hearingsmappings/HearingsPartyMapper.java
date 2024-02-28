@@ -80,17 +80,17 @@ public class HearingsPartyMapper {
     private static void addSolicitorOrgIndividuals(CaseData caseData, List<PartyDetailsModel> parties) {
 
         // applicant 1 solicitor firm individuals
-        if (caseData.getApplicant1LRIndividuals() != null){
+        if (caseData.getApplicant1LRIndividuals() != null) {
             parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant1LRIndividuals()));
         }
 
         // respondent 1 solicitor firm individuals
-        if (caseData.getRespondent1LRIndividuals() != null){
+        if (caseData.getRespondent1LRIndividuals() != null) {
             parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent1LRIndividuals()));
         }
 
         // respondent 2 solicitor firm individuals
-        if (caseData.getRespondent2LRIndividuals() != null){
+        if (caseData.getRespondent2LRIndividuals() != null) {
             parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent2LRIndividuals()));
         }
     }
@@ -103,8 +103,8 @@ public class HearingsPartyMapper {
             parties.add(getDetailsForPartyObject(caseData.getRespondent2(), DEFENDANT_ROLE.getPartyRoleValue()));
 
             // respondent 2 org individuals for COMPANY/ORG PartyType
-            if (caseData.getRespondent2().isCompanyOROrganisation()){
-                if(caseData.getRespondent2OrgIndividuals() != null){
+            if (caseData.getRespondent2().isCompanyOROrganisation()) {
+                if (caseData.getRespondent2OrgIndividuals() != null) {
                     parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent2OrgIndividuals()));
                 }
             }
@@ -153,8 +153,8 @@ public class HearingsPartyMapper {
         parties.add(getDetailsForPartyObject(caseData.getRespondent1(), DEFENDANT_ROLE.getPartyRoleValue()));
 
         // respondent 1 org individuals for COMPANY/ORG PartyType
-        if (caseData.getRespondent1().isCompanyOROrganisation()){
-            if(caseData.getRespondent1OrgIndividuals() != null){
+        if (caseData.getRespondent1().isCompanyOROrganisation()) {
+            if (caseData.getRespondent1OrgIndividuals() != null) {
                 parties.addAll(getDetailsFor(DEFENDANT_ROLE, caseData.getRespondent1OrgIndividuals()));
             }
         }
@@ -192,8 +192,8 @@ public class HearingsPartyMapper {
             parties.add(getDetailsForPartyObject(caseData.getApplicant2(), CLAIMANT_ROLE.getPartyRoleValue()));
 
             // applicant 2 org individuals for COMPANY/ORG PartyType
-            if (caseData.getApplicant2().isCompanyOROrganisation()){
-                if(caseData.getApplicant2OrgIndividuals() != null){
+            if (caseData.getApplicant2().isCompanyOROrganisation()) {
+                if (caseData.getApplicant2OrgIndividuals() != null) {
                     parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant2OrgIndividuals()));
                 }
             }
@@ -227,8 +227,8 @@ public class HearingsPartyMapper {
         parties.add(getDetailsForPartyObject(caseData.getApplicant1(), CLAIMANT_ROLE.getPartyRoleValue()));
 
         // applicant 1 org individuals for COMPANY/ORG PartyType
-        if (caseData.getApplicant1().isCompanyOROrganisation()){
-            if(caseData.getApplicant1OrgIndividuals() != null){
+        if (caseData.getApplicant1().isCompanyOROrganisation()) {
+            if (caseData.getApplicant1OrgIndividuals() != null) {
                 parties.addAll(getDetailsFor(CLAIMANT_ROLE, caseData.getApplicant1OrgIndividuals()));
             }
         }
