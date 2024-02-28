@@ -65,13 +65,17 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
                                 getHwFNewReferenceNumber(caseData.getClaimIssuedHwfDetails()))
                                 .build()).build());
                     });
-            updatedData.claimIssuedHwfDetails(caseData.getClaimIssuedHwfDetails().toBuilder().hwfReferenceNumber(null).build());
+            if (caseData.getClaimIssuedHwfDetails() != null) {
+                updatedData.claimIssuedHwfDetails(caseData.getClaimIssuedHwfDetails().toBuilder().hwfReferenceNumber(null).build());
+            }
             helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
             return updatedData.build();
         }
         if (caseData.isHWFTypeHearing()) {
             updatedData.hearingHelpFeesReferenceNumber(getHwFNewReferenceNumber(caseData.getHearingHwfDetails()));
-            updatedData.hearingHwfDetails(caseData.getHearingHwfDetails().toBuilder().hwfReferenceNumber(null).build());
+            if (caseData.getHearingHwfDetails() != null) {
+                updatedData.hearingHwfDetails(caseData.getHearingHwfDetails().toBuilder().hwfReferenceNumber(null).build());
+            }
             helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
             return updatedData.build();
         }
