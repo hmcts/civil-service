@@ -39,7 +39,7 @@ public class HelpWithFeesForTabService {
             .claimFee(MonetaryConversions.penniesToPounds(caseData.getCalculatedHearingFeeInPence()))
             .feeCode(caseData.getHearingFee().getCode())
             .hwfType(hearingFee)
-            .hwfReferenceNumber(caseData.getHelpWithFeesReferenceNumber())
+            .hwfReferenceNumber(caseData.getHearingHelpFeesReferenceNumber())
             .build();
     }
 
