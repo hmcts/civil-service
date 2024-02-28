@@ -240,7 +240,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF,
-                getNotificationDataMapMoreInfoClaimIssued(),
+                getNotificationDataMapMoreInfoClaimIssued(false),
                 REFERENCE_NUMBER
             );
         }
@@ -431,7 +431,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL,
-                getNotificationDataMapMoreInfoClaimIssued(),
+                getNotificationDataMapMoreInfoClaimIssued(true),
                 REFERENCE_NUMBER
             );
         }
@@ -580,14 +580,14 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             );
         }
 
-        private Map<String, String> getNotificationDataMapMoreInfoClaimIssued() {
+        private Map<String, String> getNotificationDataMapMoreInfoClaimIssued(boolean isBilingual) {
             return Map.of(
                 HWF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
                 CLAIMANT_NAME, CLAIMANT,
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.CLAIMISSUED.getLabelInWelsh(),
-                HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
+                HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(isBilingual),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
             );
         }
@@ -599,7 +599,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 TYPE_OF_FEE, FeeType.HEARING.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.HEARING.getLabelInWelsh(),
-                HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
+                HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(false),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
             );
         }
@@ -652,11 +652,23 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             return Collections.singletonList(HwFMoreInfoRequiredDocuments.CHILD_MAINTENANCE);
         }
 
-        private String getMoreInformationDocumentListString() {
+        private String getMoreInformationDocumentListString(boolean isBilingual) {
             List<HwFMoreInfoRequiredDocuments> list = getMoreInformationDocumentList();
             StringBuilder documentList = new StringBuilder();
             for (HwFMoreInfoRequiredDocuments doc : list) {
-                documentList.append(doc.name());
+                if (isBilingual) {
+                    documentList.append(doc.getNameBilingual());
+                    if (!doc.getDescriptionBilingual().isEmpty()) {
+                        documentList.append(" - ");
+                        documentList.append(doc.getDescriptionBilingual());
+                    }
+                } else {
+                    documentList.append(doc.getName());
+                    if (!doc.getDescription().isEmpty()) {
+                        documentList.append(" - ");
+                        documentList.append(doc.getDescription());
+                    }
+                }
                 documentList.append("\n");
             }
             return documentList.toString();
