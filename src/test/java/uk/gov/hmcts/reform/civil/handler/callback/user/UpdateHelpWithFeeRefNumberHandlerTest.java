@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -27,6 +28,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_
 class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
 
     private UpdateHelpWithFeeRefNumberHandler handler;
+    @Mock
     private HelpWithFeesForTabService hwfForTabService;
 
     private ObjectMapper objectMapper;
@@ -34,7 +36,6 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        hwfForTabService = new HelpWithFeesForTabService();
         handler = new UpdateHelpWithFeeRefNumberHandler(objectMapper, hwfForTabService);
     }
 

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.citizenui;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -24,11 +25,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF
 public class HWFFeePaymentOutcomeServiceTest {
 
     private HWFFeePaymentOutcomeService feePaymentOutcomeService;
+    @Mock
     private HelpWithFeesForTabService helpWithFeesForTabService;
 
     @BeforeEach
     void setUp() {
-        helpWithFeesForTabService = new HelpWithFeesForTabService();
         feePaymentOutcomeService = new HWFFeePaymentOutcomeService(helpWithFeesForTabService);
     }
 
