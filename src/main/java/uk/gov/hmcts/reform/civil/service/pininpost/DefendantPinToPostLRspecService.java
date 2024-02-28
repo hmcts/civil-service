@@ -43,8 +43,10 @@ public class DefendantPinToPostLRspecService {
         }
     }
 
-    public void removePinInPostData(Long caseId, DefendantPinToPostLRspec pinInPostData) {
+    public void removePinInPostData(Long caseId, CaseDetails caseDetails) {
         try {
+            CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+            DefendantPinToPostLRspec pinInPostData = caseData.getRespondent1PinToPostLRspec();
             DefendantPinToPostLRspec updatePinInPostData = DefendantPinToPostLRspec.builder()
                 .citizenCaseRole(pinInPostData.getCitizenCaseRole())
                 .respondentCaseRole(pinInPostData.getRespondentCaseRole())

@@ -84,15 +84,16 @@ class DefendantPinToPostLRspecServiceTest {
                                                    .build())
                 .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
                 .build();
+            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
+            when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
             DefendantPinToPostLRspec pinInPostData = DefendantPinToPostLRspec.builder()
                 .expiryDate(LocalDate.now().plusDays(180))
                 .build();
 
             Map<String, Object> data = new HashMap<>();
             data.put("respondent1PinToPostLRspec", pinInPostData);
-
-            defendantPinToPostLRspecService.removePinInPostData(caseData.getCcdCaseReference(), pinInPostData);
+            defendantPinToPostLRspecService.removePinInPostData(caseData.getCcdCaseReference(), caseDetails);
 
             verify(coreCaseDataService).triggerEvent(caseData.getCcdCaseReference(), UPDATE_CASE_DATA, data);
         }
