@@ -380,8 +380,14 @@ public class FlowPredicate {
     public static final Predicate<CaseData> fullDefenceProceed = caseData ->
         getPredicateForClaimantIntentionProceed(caseData);
 
+    public static final Predicate<CaseData> lipFullDefenceProceed = caseData ->
+        getPredicateForLipClaimantIntentionProceed(caseData);
+
     public static final Predicate<CaseData> fullAdmitPayImmediately = caseData ->
         getPredicateForPayImmediately(caseData);
+
+    public static final Predicate<CaseData> isCarmApplicableLipCase = caseData ->
+        getPredicateIfLipCaseCarmApplicable(caseData);
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawn = caseData ->
         caseData.getReasonNotSuitableSDO() != null
@@ -390,9 +396,26 @@ public class FlowPredicate {
             && caseData.getTakenOfflineByStaffDate() == null;
 
     public static final Predicate<CaseData> specSmallClaimCarm = caseData ->
-        SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
-            && caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 5, 1));
+        isSpecSmallClaim(caseData) && getCarmEnabledForDate(caseData);
+
+    private static boolean getPredicateIfLipCaseCarmApplicable(CaseData caseData) {
+        boolean basePredicate = getCarmEnabledForDate(caseData) && isSpecSmallClaim(caseData)
+            && caseData.getRespondent2() == null;
+        if (basePredicate) {
+            basePredicate = NO.equals(caseData.getApplicant1Represented())
+                || NO.equals(caseData.getRespondent1Represented());
+        }
+        return basePredicate;
+    }
+
+    private static boolean isSpecSmallClaim(CaseData caseData) {
+        return SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack());
+    }
+
+    private static boolean getCarmEnabledForDate(CaseData caseData) {
+        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 5, 1));
+    }
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension =
         FlowPredicate::getPredicateTakenOfflineSDONotDrawnAfterNotificationAckTimeExt;
@@ -919,6 +942,14 @@ public class FlowPredicate {
                 default:
                     break;
             }
+        }
+        return predicate;
+    }
+
+    private static boolean getPredicateForLipClaimantIntentionProceed(CaseData caseData) {
+        boolean predicate = false;
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            predicate = NO.equals(caseData.getCaseDataLiP().getApplicant1SettleClaim());
         }
         return predicate;
     }
