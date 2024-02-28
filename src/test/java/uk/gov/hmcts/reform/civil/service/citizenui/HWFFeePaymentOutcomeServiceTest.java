@@ -42,7 +42,7 @@ public class HWFFeePaymentOutcomeServiceTest {
             .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
                                           .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
                                           .hwfFullRemissionGrantedForClaimIssue(YesOrNo.YES).build())
-            .claimFee(Fee.builder().code("CODE").build())
+            .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
         caseData = feePaymentOutcomeService.updateHwfReferenceNumber(caseData);
