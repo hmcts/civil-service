@@ -4673,7 +4673,7 @@ class StateFlowEngineTest {
         void shouldContinueOnline_1v1Spec_HwF_whenDefendantIsUnrepresented() {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                    .atStateClaimSubmittedSpec()
+                    .atStateClaimIssued1v1UnrepresentedDefendant()
                     .applicant1Represented(NO)
                     .build().toBuilder()
                     .takenOfflineDate(null)
