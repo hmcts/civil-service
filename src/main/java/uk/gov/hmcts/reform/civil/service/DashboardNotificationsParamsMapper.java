@@ -12,7 +12,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
-    public Map<String, Object> mapCaseDataToParams(CaseData caseData){
+    public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
 
         Map<String, Object> params = new HashMap<>();
         params.put("ccdCaseReference", caseData.getCcdCaseReference());

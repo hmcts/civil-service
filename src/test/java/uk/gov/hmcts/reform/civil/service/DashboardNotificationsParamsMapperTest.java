@@ -9,13 +9,16 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+
 @SpringBootTest(classes = {
     DashboardNotificationsParamsMapper.class,
     JacksonAutoConfiguration.class
@@ -29,7 +32,7 @@ public class DashboardNotificationsParamsMapperTest {
     private DashboardNotificationsParamsMapper mapper;
 
     @BeforeEach
-    void setup(){
+    void setup() {
 
         when(feesService.getFeeDataByTotalClaimAmount(any())).thenReturn(Fee.builder().calculatedAmountInPence(
             BigDecimal.valueOf(70)).build());
@@ -37,7 +40,7 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
-    public void shouldMapAllParameters_WhenIsRequested(){
+    public void shouldMapAllParameters_WhenIsRequested() {
 
         CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
 
@@ -50,7 +53,7 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo("4pm");
 
         assertThat(result).extracting("responseDeadline")
-            .isEqualTo("12 March 2024");
+            .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(14L)));
 
     }
 }

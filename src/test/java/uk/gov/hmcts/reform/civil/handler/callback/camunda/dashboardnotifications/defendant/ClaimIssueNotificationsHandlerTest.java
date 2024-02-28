@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
+
     @InjectMocks
     private ClaimIssueNotificationsHandler handler;
 
@@ -63,13 +63,13 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
     @Test
     public void createDashboardNotifications() {
 
-        LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
-
         params.put("ccdCaseReference", "123");
         params.put("defaultRespondTime", "4pm");
         params.put("responseDeadline", "11 March 2024");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        LocalDateTime dateTime = LocalDate.of(2020, Month.JANUARY, 18).atStartOfDay();
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
