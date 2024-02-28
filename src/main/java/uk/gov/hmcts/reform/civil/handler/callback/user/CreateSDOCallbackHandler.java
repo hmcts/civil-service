@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
-import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
@@ -72,8 +71,17 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurtherDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfPagesDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictNoOfWitnessDetails;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
@@ -83,18 +91,9 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Settlement;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialWindow;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2VariationOfDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurther;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ApplicationToRelyOnFurtherDetails;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2EvidenceAcousticEngineer;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ExpertEvidence;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FurtherAudiogram;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2PermissionToRelyOnExpert;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsClaimantExpert;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2QuestionsToEntExpert;
-import uk.gov.hmcts.reform.civil.model.sdo.SdoR2UploadOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
@@ -993,7 +992,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.setSmallClaimsFlag(YES).build();
         } else if (SdoHelper.isFastTrack(caseData)) {
             updatedData.setFastTrackFlag(YES).build();
-            if (featureToggleService.isSdoR2Enabled() && isSDOR2Screen(caseData)) {
+            if (featureToggleService.isSdoR2Enabled() && SdoHelper.isNihlFastTrack(caseData)) {
                 updatedData.isSdoR2NewScreen(YES).build();
             }
         }
@@ -1132,17 +1131,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         return Optional.empty();
     }
 
-    private static boolean isSDOR2Screen(CaseData caseData) {
-        return  ((caseData.getDrawDirectionsOrderRequired() == NO
-            && caseData.getFastClaims() != null
-            && caseData.getFastClaims().contains(
-            FastTrack.fastClaimNoiseInducedHearingLoss))
-            || (caseData.getDrawDirectionsOrderRequired() == YES
-            && caseData.getTrialAdditionalDirectionsForFastTrack() != null
-            && caseData.getTrialAdditionalDirectionsForFastTrack()
-            .contains(FastTrack.fastClaimNoiseInducedHearingLoss)));
-    }
-
     private CallbackResponse generateSdoOrder(CallbackParams callbackParams) {
         CaseData caseData = V_1.equals(callbackParams.getVersion())
             ? mapHearingMethodFields(callbackParams.getCaseData())
@@ -1166,6 +1154,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             }
         }
 
+        if (featureToggleService.isSdoR2Enabled() && SdoHelper.isNihlFastTrack(caseData)) {
+            List<String> errorsNihl;
+            errorsNihl = validateFieldsNihl(caseData);
+            if (!errorsNihl.isEmpty()) {
+                errors.addAll(errorsNihl);
+            }
+        }
+
         if (errors.isEmpty()) {
             CaseDocument document = sdoGeneratorService.generate(
                 caseData,
@@ -1176,14 +1172,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                 updatedData.sdoOrderDocument(document);
             }
             assignCategoryId.assignCategoryIdToCaseDocument(document, "caseManagementOrders");
-        }
-
-        if (featureToggleService.isSdoR2Enabled() && isSDOR2Screen(caseData)) {
-            List<String> errorsNihl;
-            errorsNihl = validateFieldsNihl(caseData);
-            if (!errorsNihl.isEmpty()) {
-                errors.addAll(errorsNihl);
-            }
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -1332,10 +1320,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         if (DISPOSAL.equals(caseData.getOrderType())) {
             toUseList = Optional.ofNullable(caseData.getDisposalHearingMethodInPerson());
         } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
-            && !isSDOR2Screen(caseData)) {
+            && !SdoHelper.isNihlFastTrack(caseData)) {
             toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
         } else if (featureToggleService.isSdoR2Enabled() && SdoHelper.isFastTrack(caseData)
-            && isSDOR2Screen(caseData)) {
+            && SdoHelper.isNihlFastTrack(caseData)) {
             toUseList = caseData.getSdoR2Trial().getHearingCourtLocationList() != null
                 ? Optional.ofNullable(caseData.getSdoR2Trial().getHearingCourtLocationList())
                 : Optional.ofNullable(caseData.getSdoR2Trial().getAltHearingCourtLocationList());
