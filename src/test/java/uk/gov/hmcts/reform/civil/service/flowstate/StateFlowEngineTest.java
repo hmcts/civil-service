@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
@@ -4708,7 +4709,46 @@ class StateFlowEngineTest {
     }
 
     @Nested
-    class FromPartAdmitRepaymentAgreed {
+    class LRvLiPCase {
+        @Test
+        void shouldContinueOnline_1v1Spec_whenNOCSubmittedForLipClaimant() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued1v1UnrepresentedDefendant()
+                .applicant1Represented(YES)
+                .respondent1Represented(NO)
+                .build().toBuilder()
+                .takenOfflineDate(null)
+                .paymentSuccessfulDate(null)
+                .claimIssuedPaymentDetails(null)
+                .caseDataLiP(CaseDataLiP.builder()
+                                 .helpWithFees(HelpWithFees.builder()
+                                                   .helpWithFeesReferenceNumber("Test")
+                                                   .build())
+                                 .build())
+                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
+                                              .hwfFullRemissionGrantedForClaimIssue(YES)
+                                              .build())
+                .caseAccessCategory(SPEC_CLAIM).build();
+
+            // When
+            when(featureToggleService.isPinInPostEnabled()).thenReturn(true);
+            StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
+
+            // Then
+            assertThat(stateFlow.getState())
+                .extracting(State::getName)
+                .isNotNull()
+                .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
+
+            assertThat(stateFlow.getFlags()).contains(
+                entry(FlowFlag.LIP_CASE.name(), false)
+            );
+        }
+    }
+
+    @Nested
+        class FromPartAdmitRepaymentAgreed {
         @Test
         void partAdmitRepaymentAgreedSpec() {
             CaseData caseData = CaseData.builder()
