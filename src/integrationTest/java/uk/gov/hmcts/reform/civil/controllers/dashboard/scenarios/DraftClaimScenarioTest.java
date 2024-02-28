@@ -26,7 +26,7 @@ public class DraftClaimScenarioTest extends BaseIntegrationTest {
                ScenarioRequestParams.builder()
                    .params(Map.of())
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_SUBMIT_REQUIRED, caseId
+               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_SUBMIT_REQUIRED.getScenario(), caseId
         )
             .andExpect(status().isOk());
 
