@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesForTab;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
