@@ -12,12 +12,11 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_SUBMIT_REQUIRED;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 public class DraftClaimScenarioTest extends BaseIntegrationTest {
-
-    public static final String SCENARIO_DRAFT_CLAIM = "Scenario.AAA7.ClaimIssue.ClaimSubmit.Required";
 
     @Test
     void should_create_draft_claim_scenario() throws Exception {
@@ -27,7 +26,7 @@ public class DraftClaimScenarioTest extends BaseIntegrationTest {
                ScenarioRequestParams.builder()
                    .params(Map.of())
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_DRAFT_CLAIM, caseId
+               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_SUBMIT_REQUIRED, caseId
         )
             .andExpect(status().isOk());
 
@@ -69,7 +68,8 @@ public class DraftClaimScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("This claim has not been submitted"),
-                jsonPath("$[0].descriptionEn").value("Your claim is saved as a draft. <a href=\"/claim/task-list\">Continue with claim</a>.")
+                jsonPath("$[0].descriptionEn").value(
+                    "Your claim is saved as a draft. <a href=\"/claim/task-list\">Continue with claim</a>.")
             );
     }
 

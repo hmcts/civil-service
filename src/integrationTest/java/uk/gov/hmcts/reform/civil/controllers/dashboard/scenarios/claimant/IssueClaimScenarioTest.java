@@ -5,6 +5,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.http.HttpStatus;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 
@@ -18,8 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 public class IssueClaimScenarioTest extends BaseIntegrationTest {
 
-    public static final String SCENARIO_DRAFT_CLAIM = "Scenario.AAA7.ClaimIssue.Response.Await";
-
     @Test
     void should_create_claimIssue_response_await_scenario() throws Exception {
 
@@ -28,7 +27,7 @@ public class IssueClaimScenarioTest extends BaseIntegrationTest {
                ScenarioRequestParams.builder()
                    .params(Map.of())
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_DRAFT_CLAIM, caseId
+               DASHBOARD_CREATE_SCENARIO_URL, DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT, caseId
         )
             .andExpect(status().isOk());
 
