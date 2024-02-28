@@ -31,7 +31,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "caseworker",
         "caseworker-caa",
         "caseworker-approver",
-        "citizen"
+        "citizen",
+        "next-hearing-date-admin"
     };
 
     private static final String[] AUTH_WHITELIST = {
@@ -51,7 +52,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         "/assignment/**",
         "/service-request-update",
         "/service-request-update-claim-issued",
-        "/case/document/downloadDocument/**"
+        "/case/document/downloadDocument/**",
+        "/testing-support/flowstate"
     };
 
     @Value("${spring.security.oauth2.client.provider.oidc.issuer-uri}")

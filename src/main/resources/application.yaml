@@ -264,11 +264,11 @@ notifications:
   respondentHearingFeeUnpaid: "39c3f921-00e7-47ea-b297-6632643e438d"
   respondentLipResponseSubmissionTemplate: "1f6f1053-02f5-4b44-a1f8-90e78930c10a"
   respondentLipResponseSubmissionBilingualTemplate: "37da53f4-2453-4d45-9910-b33d28274aa5"
-  hearingListedFeeClaimantLrTemplate: "193b245b-63fd-4a02-93b6-1acfb6e99fe5"
-  hearingListedNoFeeClaimantLrTemplate: "03763ce1-de17-4a9a-b1c6-d2e9ccffe9d7"
+  hearingListedFeeClaimantLrTemplate: "30ca6b92-4bf8-4bdc-b403-8c8b4d29c44c"
+  hearingListedNoFeeClaimantLrTemplate: "6b4e83be-3ae7-4d83-b777-6bfd0223643d"
   hearingListedFeeClaimantLrTemplateHMC: "2c7862fb-230f-4e8e-912c-07d265c8dd86"
   hearingListedNoFeeClaimantLrTemplateHMC: "b68825c4-fcca-48eb-85ce-2f5d7c2e6428"
-  hearingListedNoFeeDefendantLrTemplate: "81216268-36e6-4e0e-b510-24067ad32f24"
+  hearingListedNoFeeDefendantLrTemplate: "259229e7-3f28-42a7-ae6d-2ebd54a7b2f1"
   hearingListedNoFeeDefendantLrTemplateHMC: "aecaafde-fdf0-471f-8eca-a75534ac36aa"
   solicitorTrialReady: "2502bb5e-8d04-4669-8fca-6a2154e91f9a"
   otherPartyTrialReady: "a44c9235-c009-4d1c-9e0e-36e1769dc0e6"
@@ -299,13 +299,18 @@ notifications:
   respondent1DefaultJudgmentRequestedTemplate: "d4cf381f-a2b3-4a81-a442-eb2aa5deb210"
   respondent1LipClaimUpdatedTemplate: "9c44f3fb-a340-49e5-bf64-32a3187d7dcd"
   claimantLipClaimUpdatedTemplate: "0abdcb29-edd3-418a-aeab-a102da4ad441"
+  claimantLipClaimUpdatedBilingualTemplate: "e880dc43-dc4e-440d-8c34-d0feec70e196"
   applicantLiPDefaultJudgmentRequested: "668d4703-e97f-4e2f-8d07-1a697aac6d0b"
+  applicantLiPDefaultJudgmentRequestedBilingualTemplate: "cad66be4-ee96-4114-b2a7-489690cd6ebf"
 
   hearingFeeUnpaidNoc: "cb4e6c4f-bb4a-4b1b-a7ed-dad68af4f0a1"
 
   mediationUnsuccessfulClaimantLRTemplate: "86f00ab5-152d-47f3-a1f4-33b6ea7e494d"
   mediationUnsuccessfulDefendantLIPTemplate: "14543b94-cab2-43dc-b061-8a9671bff178"
   mediationUnsuccessfulDefendantLIPBilingualTemplate: "f8841cc4-0357-446d-bbb6-a8c0ff6b53c4"
+
+  mediationUnsuccessfulLRTemplate: "0b0f7846-6238-4ece-87b1-597e22ed518b"
+  mediationUnsuccessfulLIPTemplate: "a986a00b-83f6-459e-a2cb-5bc76ba39164"
 
   respondentLipPartAdmitSettleClaimBilingualTemplate: "59ea18ee-1b30-4e80-9a7e-89ae7e940aed"
   notifyClaimantTranslatedDocumentUploaded: "a4b1051f-9f66-4f35-9674-e70b413a598a"
@@ -340,14 +345,21 @@ notifications:
   notifyApplicantForSignedSettlementAgreement: "65459efd-a351-4a1b-814a-435aabe3beb5"
   notifyApplicantForNotAgreedSignSettlement: "b775583b-7964-41f8-8b3b-d767557cffb2"
 
+  notifyApplicantLipForSignedSettlementAgreementInBilingual: "cac93c5f-599d-417b-af0c-74a249bd2681"
+  notifyApplicantLipForNotAgreedSignSettlementInBilingual: "da141be5-ba22-43c1-8fe3-ba36cc3fbb47"
+
   notifyRespondentForSignedSettlementAgreement: "aeb3951e-4956-4542-a73b-e2e3abec8867"
   notifyRespondentForNotAgreedSignSettlement: "1742841b-d915-43a9-9d76-b6d17a189ba5"
 
   notifyRespondentLipForClaimantRepresentedTemplate: "54dcfaca-41df-4588-bf3d-bf63f8d34570"
   notifyClaimantLipForNoLongerAccessTemplate: "8bf1b6c6-2ee7-442d-8b72-550d2aca9bdf"
+  notifyClaimantLipForNoLongerAccessWelshTemplate: "4186a193-3135-41dc-b4d3-a0f31911e46f"
+  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInBilingual: "e880dc43-dc4e-440d-8c34-d0feec70e196"
+  notifyClaimantLiPTranslatedDocumentUploadedWhenClaimIssuedInEnglish: "f372a4df-4577-402a-a2cd-142fd8ff9028"
   notifyClaimantLipForClaimSubmissionTemplate: "16bb1a39-96f8-4091-8d11-8375a2cc5905"
   notifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate: "f2080ac4-2585-47fd-ac18-5f94148adc07"
   notifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate: "1f6006bb-6726-48c4-ac5f-a456d043f1b7"
+  bilingualClaimantClaimContinuingOnlineForSpec: "461b4ce6-3783-409d-be47-ea1230170833"
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 

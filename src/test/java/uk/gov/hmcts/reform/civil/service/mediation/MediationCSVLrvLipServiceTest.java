@@ -40,6 +40,7 @@ public class MediationCSVLrvLipServiceTest {
     private static final String TOTAL_AMOUNT = "9000";
     private static final String ID = "123456789";
     private static final String RESPONDENT = "2";
+    private static final boolean r2FlagEnabled = false;
 
     @Mock
     private uk.gov.hmcts.reform.civil.prd.model.Organisation organisation;
@@ -62,7 +63,7 @@ public class MediationCSVLrvLipServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.COMPANY);
         //When
-        String result = service.generateCSVContent(caseData);
+        String result = service.generateCSVContent(caseData, r2FlagEnabled);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(RESPONDENT);
@@ -77,7 +78,7 @@ public class MediationCSVLrvLipServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.ORGANISATION);
         //When
-        String result = service.generateCSVContent(caseData);
+        String result = service.generateCSVContent(caseData, r2FlagEnabled);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(RESPONDENT);
@@ -92,7 +93,7 @@ public class MediationCSVLrvLipServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.INDIVIDUAL);
         //When
-        String result = service.generateCSVContent(caseData);
+        String result = service.generateCSVContent(caseData, r2FlagEnabled);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(RESPONDENT);
@@ -107,7 +108,7 @@ public class MediationCSVLrvLipServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.SOLE_TRADER);
         //When
-        String result = service.generateCSVContent(caseData);
+        String result = service.generateCSVContent(caseData, r2FlagEnabled);
         //Then
         assertThat(result).contains(ID);
         assertThat(result).contains(RESPONDENT);
@@ -122,7 +123,7 @@ public class MediationCSVLrvLipServiceTest {
         //Given
         CaseData caseData = getCaseData(Party.Type.SOLE_TRADER);
         //When
-        String result = service.generateCSVContent(caseData);
+        String result = service.generateCSVContent(caseData, r2FlagEnabled);
         //Then
         assertThat(result).contains(LR_COMPANY_NAME);
         assertThat(result).contains(LR_COMPANY_EMAIL);

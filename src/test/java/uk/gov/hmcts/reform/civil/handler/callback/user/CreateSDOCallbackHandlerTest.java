@@ -324,6 +324,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(responseCaseData.getFastTrackHearingNotes()).isNull();
             assertThat(responseCaseData.getDisposalHearingHearingNotes()).isNull();
         }
+
     }
 
     @Nested
@@ -1109,8 +1110,28 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             Arguments.of(
                 CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
                     .caseAccessCategory(SPEC_CLAIM)
+                    .responseClaimTrack("SMALL_CLAIM")
+                    .drawDirectionsOrderRequired(YES)
+                    .drawDirectionsOrderSmallClaims(NO)
+                    .orderType(OrderType.DECIDE_DAMAGES)
+                    .build(),
+                "FAST_CLAIM"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                    .caseAccessCategory(SPEC_CLAIM)
                     .responseClaimTrack("FAST_CLAIM")
                     .disposalHearingMethodInPerson(options.toBuilder().value(selectedCourt).build())
+                    .drawDirectionsOrderRequired(YES)
+                    .drawDirectionsOrderSmallClaims(NO)
+                    .orderType(OrderType.DISPOSAL)
+                    .build(),
+                "FAST_CLAIM"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                    .caseAccessCategory(SPEC_CLAIM)
+                    .responseClaimTrack("FAST_CLAIM")
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(NO)
                     .orderType(OrderType.DISPOSAL)
@@ -1132,6 +1153,16 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .caseAccessCategory(SPEC_CLAIM)
                     .responseClaimTrack("FAST_CLAIM")
                     .smallClaimsMethodInPerson(options.toBuilder().value(selectedCourt).build())
+                    .drawDirectionsOrderRequired(YES)
+                    .drawDirectionsOrderSmallClaims(YES)
+                    .orderType(OrderType.DECIDE_DAMAGES)
+                    .build(),
+                "SMALL_CLAIM"
+            ),
+            Arguments.of(
+                CaseDataBuilder.builder().atStateClaimDraft().build().toBuilder()
+                    .caseAccessCategory(SPEC_CLAIM)
+                    .responseClaimTrack("FAST_CLAIM")
                     .drawDirectionsOrderRequired(YES)
                     .drawDirectionsOrderSmallClaims(YES)
                     .orderType(OrderType.DECIDE_DAMAGES)
@@ -1576,6 +1607,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + " attend the hearing. If they do not attend, it will be for the court to decide how"
                                + " much reliance, if any, to place on their evidence.");
 
+            assertThat(response.getData()).doesNotHaveToString("smallClaimsFlightDelay");
+
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input1")
                 .isEqualTo("If impecuniosity is alleged by the claimant and not admitted by the defendant, the "
                                + "claimant's disclosure as ordered earlier in this Order must include:\n"
@@ -1659,6 +1692,41 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                              + "received by the Court (together with the appropriate fee) by 4pm "
                                              + "on %s.",
                                          date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
+        }
+
+        @Test
+        void shouldPrePopulateOrderDetailsPagesWithSmallClaimFlightDelay() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateClaimDraft()
+                .totalClaimAmount(BigDecimal.valueOf(15000))
+                .applicant1DQWithLocation().build();
+            given(locationRefDataService.getHearingCourtLocations(any()))
+                .willReturn(getSampleCourLocationsRefObjectToSort());
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+
+            when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("smallClaimsFlightDelay").extracting("relatedClaimsInput")
+                .isEqualTo("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
+                               + "claims relating to the same flight they must notify the court \n"
+                               + "where the claim is being managed within 14 days of receipt of \n"
+                               + "this Order providing all relevant details of those claims including \n"
+                               + "case number(s), hearing date(s) and copy final substantive order(s) \n"
+                               + "if any, to assist the Court with ongoing case management which may \n"
+                               + "include the cases being heard together.");
+            assertThat(response.getData()).extracting("smallClaimsFlightDelay").extracting("legalDocumentsInput")
+                .isEqualTo("Any arguments as to the law to be applied to this claim, together with \n"
+                               + "copies of legal authorities or precedents relied on, shall be uploaded \n"
+                               + "to the Digital Portal not later than 3 full working days before the \n"
+                               + "final hearing date.");
+
         }
 
         @Test
@@ -1988,7 +2056,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
-            assertThat(updatedData.getSdoOrderDocument().getDocumentLink().getCategoryID()).isEqualTo("sdo");
+            assertThat(updatedData.getSdoOrderDocument().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
         }
 
     }

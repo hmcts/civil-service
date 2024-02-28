@@ -73,15 +73,18 @@ public class SdoGeneratorService {
         return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
-                getFileName(docmosisTemplate, caseData),
+                getFileName(judgeName),
                 docmosisDocument.getBytes(),
                 DocumentType.SDO_ORDER
             )
         );
     }
 
-    private String getFileName(DocmosisTemplates docmosisTemplate, CaseData caseData) {
-        return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
+    private String getFileName(String judgeName) {
+        StringBuilder updatedFileName = new StringBuilder();
+        updatedFileName.append(LocalDate.now()).append("_").append(judgeName).append(".pdf");
+
+        return updatedFileName.toString();
     }
 
     private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
@@ -148,7 +151,8 @@ public class SdoGeneratorService {
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingFinalDisposalHearingToggle")
             )
             .disposalHearingMethodToggle(
-                SdoHelper.hasDisposalVariable(caseData, "disposalHearingMethodToggle")
+                // SNI-5142
+                true
             )
             .disposalHearingBundleToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingBundleToggle")
@@ -276,9 +280,8 @@ public class SdoGeneratorService {
             .fastTrackTrialToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")
             )
-            .fastTrackMethodToggle(
-                SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")
-            )
+            // SNI-5142
+            .fastTrackMethodToggle(true)
             .fastTrackAllocation(getFastTrackAllocation(caseData, featureToggleService.isFastTrackUpliftsEnabled()));
 
         sdoDocumentFormBuilder
@@ -353,9 +356,8 @@ public class SdoGeneratorService {
             .smallClaimsHearingToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")
             )
-            .smallClaimsMethodToggle(
-                SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsMethodToggle")
-            )
+            // SNI-5142
+            .smallClaimsMethodToggle(true)
             .smallClaimsDocumentsToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")
             )

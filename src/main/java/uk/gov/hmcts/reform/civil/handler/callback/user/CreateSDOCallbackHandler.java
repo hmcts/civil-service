@@ -69,6 +69,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
@@ -604,6 +605,25 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
 
+        if (featureToggleService.isSdoR2Enabled()) {
+            SmallClaimsFlightDelay tempSmallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
+                .smallClaimsFlightDelayToggle(checkList)
+                .relatedClaimsInput("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
+                            + "claims relating to the same flight they must notify the court \n"
+                            + "where the claim is being managed within 14 days of receipt of \n"
+                            + "this Order providing all relevant details of those claims including \n"
+                            + "case number(s), hearing date(s) and copy final substantive order(s) \n"
+                            + "if any, to assist the Court with ongoing case management which may \n"
+                            + "include the cases being heard together.")
+                .legalDocumentsInput("Any arguments as to the law to be applied to this claim, together with \n"
+                            + "copies of legal authorities or precedents relied on, shall be uploaded \n"
+                            + "to the Digital Portal not later than 3 full working days before the \n"
+                            + "final hearing date.")
+                .build();
+
+            updatedData.smallClaimsFlightDelay(tempSmallClaimsFlightDelay).build();
+        }
+
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
@@ -808,7 +828,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             if (document != null) {
                 updatedData.sdoOrderDocument(document);
             }
-            assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
+            assignCategoryId.assignCategoryIdToCaseDocument(document, "caseManagementOrders");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -853,24 +873,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         }
 
         return updatedData.build();
-    }
-
-    private String getHearingInPersonSmall(CaseData caseData) {
-        if (caseData.getSmallClaimsMethod() == SmallClaimsMethod.smallClaimsMethodInPerson
-            && Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            return caseData.getSmallClaimsMethodInPerson().getValue().getLabel();
-        }
-        return null;
-    }
-
-    private String getHearingInPersonFast(CaseData caseData) {
-        if (caseData.getFastTrackMethod() == FastTrackMethod.fastTrackMethodInPerson
-            && Optional.ofNullable(caseData.getFastTrackMethodInPerson())
-            .map(DynamicList::getValue).isPresent()) {
-            return caseData.getFastTrackMethodInPerson().getValue().getLabel();
-        }
-        return null;
     }
 
     private CallbackResponse submitSDO(CallbackParams callbackParams) {
@@ -957,16 +959,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
     private String getEpimmsId(CaseData caseData) {
 
-        if (caseData.getOrderType() != null && caseData.getOrderType().equals(DISPOSAL)) {
-            return caseData.getDisposalHearingMethodInPerson().getValue().getCode();
+        Optional<DynamicList> toUseList;
+        if (DISPOSAL.equals(caseData.getOrderType())) {
+            toUseList = Optional.ofNullable(caseData.getDisposalHearingMethodInPerson());
+        } else if (SdoHelper.isFastTrack(caseData)) {
+            toUseList = Optional.ofNullable(caseData.getFastTrackMethodInPerson());
+        } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
+            toUseList = Optional.ofNullable(caseData.getSmallClaimsMethodInPerson());
+        } else {
+            throw new IllegalArgumentException("Could not determine claim track");
         }
-        if (SdoHelper.isFastTrack(caseData)) {
-            return caseData.getFastTrackMethodInPerson().getValue().getCode();
-        }
-        if (SdoHelper.isSmallClaimsTrack(caseData)) {
-            return caseData.getSmallClaimsMethodInPerson().getValue().getCode();
-        }
-        throw new IllegalArgumentException("Could not determine claim track");
+        return toUseList.map(DynamicList::getValue).map(DynamicListElement::getCode).orElse(null);
     }
 
     private boolean nonNull(Object object) {
@@ -1072,6 +1075,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
+        if (featureToggleService.isSdoR2Enabled()) {
+            updatedData.smallClaimsFlightDelayToggle(checkList);
+        }
     }
 
 }

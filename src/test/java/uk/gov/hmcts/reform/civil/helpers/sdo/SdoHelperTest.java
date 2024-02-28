@@ -132,6 +132,8 @@ public class SdoHelperTest {
                 .isEqualTo(SmallTrack.smallClaimRoadTrafficAccident);
             assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimDisputeResolutionHearing"))
                 .isEqualTo(SmallTrack.smallClaimDisputeResolutionHearing);
+            assertThat(SdoHelper.getSmallClaimsAdditionalDirectionEnum("smallClaimFlightDelay"))
+                .isEqualTo(SmallTrack.smallClaimFlightDelay);
         }
 
         @Test
@@ -202,6 +204,22 @@ public class SdoHelperTest {
 
             assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident"))
                 .isFalse();
+        }
+
+        @Test
+        void shouldReturnTrue_ifHasFlightDelay() {
+            List<SmallTrack> directions = List.of(SmallTrack.smallClaimFlightDelay);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .drawDirectionsOrderRequired(NO)
+                .claimsTrack(ClaimsTrack.smallClaimsTrack)
+                .smallClaims(directions)
+                .build();
+
+            assertThat(SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimFlightDelay"))
+                .isTrue();
         }
     }
 
@@ -541,12 +559,15 @@ public class SdoHelperTest {
                 .smallClaimsMethodToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .smallClaimsDocumentsToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .smallClaimsWitnessStatementToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
+                .smallClaimsFlightDelayToggle(List.of(OrderDetailsPagesSectionsToggle.SHOW))
                 .build();
 
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")).isTrue();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsMethodToggle")).isTrue();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")).isTrue();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
+                .isTrue();
+            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
                 .isTrue();
         }
 
@@ -578,7 +599,6 @@ public class SdoHelperTest {
                 .build();
 
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")).isFalse();
-            assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsMethodToggle")).isFalse();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")).isFalse();
             assertThat(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle"))
                 .isFalse();
@@ -841,7 +861,6 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackSchedulesOfLossToggle")).isFalse();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")).isFalse();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")).isFalse();
-            assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackMethodToggle")).isFalse();
 
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")).isFalse();
             assertThat(SdoHelper.hasFastTrackVariable(caseData, "invalid input")).isFalse();
@@ -1527,7 +1546,6 @@ public class SdoHelperTest {
             assertThat(SdoHelper.hasDisposalVariable(caseData, "fastTrackSchedulesOfLossToggle")).isFalse();
             assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingFinalDisposalHearingToggle"))
                 .isFalse();
-            assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingMethodToggle")).isFalse();
             assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingBundleToggle")).isFalse();
             assertThat(SdoHelper.hasDisposalVariable(caseData, "disposalHearingClaimSettlingToggle"))
                 .isFalse();

@@ -9,24 +9,28 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.config.ToggleConfiguration;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AFTER_TRANSLATED_DOCUMENT_UPLOADED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AFTER_DOC_UPLOADED;
 
 @Service
 @RequiredArgsConstructor
 public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = Collections.singletonList(UPDATE_CLAIM_STATE_AFTER_TRANSLATED_DOCUMENT_UPLOADED);
+    private static final List<CaseEvent> EVENTS = Collections.singletonList(UPDATE_CLAIM_STATE_AFTER_DOC_UPLOADED);
     private Map<String, Callback> callbackMap = Map.of(callbackKey(ABOUT_TO_SUBMIT), this::updateClaimState);
     private static final String TASK_ID = "updateClaimStateAfterTranslateDocumentUploadedID";
     private final ObjectMapper objectMapper;
+    private final UpdateClaimStateService updateClaimStateService;
+    private final ToggleConfiguration toggleConfiguration;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -36,6 +40,7 @@ public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackH
     private CallbackResponse updateClaimState(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        caseData.setFeatureToggleWA(toggleConfiguration.getFeatureToggle());
         String changeToState = setClaimState(caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -48,6 +53,8 @@ public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackH
             return CaseState.AWAITING_APPLICANT_INTENTION.name();
         } else if (CaseState.CASE_ISSUED == caseData.getCcdState()) {
             return CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
+        } else if (CaseState.AWAITING_APPLICANT_INTENTION == caseData.getCcdState()) {
+            return updateClaimStateService.setUpCaseState(caseData);
         }
         return caseData.getCcdState().name();
     }

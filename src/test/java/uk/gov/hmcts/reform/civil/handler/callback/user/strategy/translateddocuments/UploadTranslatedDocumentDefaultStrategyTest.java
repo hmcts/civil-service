@@ -46,8 +46,9 @@ class UploadTranslatedDocumentDefaultStrategyTest {
 
     @MockBean
     private SystemGeneratedDocumentService systemGeneratedDocumentService;
+
     @MockBean
-    private  FeatureToggleService featureToggleService;
+    private FeatureToggleService featureToggleService;
 
     @Test
     void shouldReturnDocumentListWithTranslatedDocument() {
