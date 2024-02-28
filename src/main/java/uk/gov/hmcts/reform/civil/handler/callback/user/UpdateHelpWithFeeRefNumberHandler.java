@@ -86,10 +86,4 @@ public class UpdateHelpWithFeeRefNumberHandler extends CallbackHandler {
         return ofNullable(helpWithFeesDetails)
                 .map(HelpWithFeesDetails::getHwfReferenceNumber).orElse(null);
     }
-
-    private void clearHwFReferenceNumber(HelpWithFeesDetails helpWithFeesDetails) {
-        if (helpWithFeesDetails != null && helpWithFeesDetails.getHwfReferenceNumber() != null) {
-            helpWithFeesDetails.setHwfReferenceNumber(null);
-        }
-    }
 }
