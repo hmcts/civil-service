@@ -181,8 +181,6 @@ public class SdoGeneratorServiceTest {
             .thenReturn(new DocmosisDocument(SDO_SMALL_FLIGHT_DELAY.getDocumentTitle(), bytes));
         when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
             .thenReturn(CASE_DOCUMENT_SMALL);
-        when(idamClient.getUserDetails(any()))
-            .thenReturn(new UserDetails("1", "test@email.com", "Test", "User", null));
         when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
 
         LocationRefData locationRefData = LocationRefData.builder().build();
