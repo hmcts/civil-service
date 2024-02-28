@@ -18,7 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-@Sql("/scripts/dashboardNotifications/create_dashboard_scenarios.sql")
 public class CreateDashboardScenarioTest extends BaseIntegrationTest {
 
     public static final String SCENARIO_HEARING_FEE_PAYMENT_REQUIRED = "scenario.hearing.fee.payment.required";
@@ -29,6 +28,7 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
     private static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
 
     @Test
+    @Sql("/scripts/dashboardNotifications/create_dashboard_scenarios.sql")
     void should_create_scenario() throws Exception {
 
         UUID caseId = UUID.randomUUID();
