@@ -185,7 +185,6 @@ public class SdoGeneratorServiceTest {
 
         LocationRefData locationRefData = LocationRefData.builder().build();
         String locationLabel = "String 1";
-
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
             .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
