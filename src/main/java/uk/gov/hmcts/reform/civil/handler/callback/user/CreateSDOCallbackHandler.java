@@ -74,6 +74,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
+import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgesRecital;
@@ -90,6 +91,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingWindow;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearingFirstOpenDateAfter;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsImpNotes;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsBundleOfDocs;
 import uk.gov.hmcts.reform.civil.referencedata.LocationRefDataService;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
@@ -626,6 +628,25 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
 
+        if (featureToggleService.isSdoR2Enabled()) {
+            SmallClaimsFlightDelay tempSmallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
+                .smallClaimsFlightDelayToggle(checkList)
+                .relatedClaimsInput("In the event that the Claimant(s) or Defendant(s) are aware if other \n"
+                            + "claims relating to the same flight they must notify the court \n"
+                            + "where the claim is being managed within 14 days of receipt of \n"
+                            + "this Order providing all relevant details of those claims including \n"
+                            + "case number(s), hearing date(s) and copy final substantive order(s) \n"
+                            + "if any, to assist the Court with ongoing case management which may \n"
+                            + "include the cases being heard together.")
+                .legalDocumentsInput("Any arguments as to the law to be applied to this claim, together with \n"
+                            + "copies of legal authorities or precedents relied on, shall be uploaded \n"
+                            + "to the Digital Portal not later than 3 full working days before the \n"
+                            + "final hearing date.")
+                .build();
+
+            updatedData.smallClaimsFlightDelay(tempSmallClaimsFlightDelay).build();
+        }
+
         SmallClaimsHearing tempSmallClaimsHearing = SmallClaimsHearing.builder()
             .input1("The hearing of the claim will be on a date to be notified to you by a separate notification. "
                         + "The hearing will have a time estimate of")
@@ -688,9 +709,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsRoadTrafficAccident(tempSmallClaimsRoadTrafficAccident).build();
 
-        if (featureToggleService.isSdoR2Enabled()) {
-            populateDRHFields(callbackParams, updatedData, preferredCourt);
-        }
         //This the flowafter request for reconsideration
         if (featureToggleService.isSdoR2Enabled() && CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
@@ -709,6 +727,19 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             updatedData.sdoHearingNotes(SDOHearingNotes.builder().input("").build());
             updatedData.fastTrackHearingNotes(FastTrackHearingNotes.builder().input("").build());
             updatedData.disposalHearingHearingNotes(null);
+            updatedData.sdoR2SmallClaimsHearing(null);
+            updatedData.sdoR2SmallClaimsUploadDoc(null);
+            updatedData.sdoR2SmallClaimsPPI(null);
+            updatedData.sdoR2SmallClaimsImpNotes(null);
+            updatedData.sdoR2SmallClaimsWitnessStatements(null);
+            updatedData.sdoR2SmallClaimsHearingToggle(null);
+            updatedData.sdoR2SmallClaimsJudgesRecital(null);
+            updatedData.sdoR2SmallClaimsWitnessStatementsToggle(null);
+            updatedData.sdoR2SmallClaimsPPIToggle(null);
+            updatedData.sdoR2SmallClaimsUploadDocToggle(null);
+        }
+        if (featureToggleService.isSdoR2Enabled()) {
+            populateDRHFields(callbackParams, updatedData, preferredCourt);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -751,7 +782,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                 .altHearingCourtLocationList(getLocationList(callbackParams,
                                                                                              updatedData,
                                                                                              preferredCourt.orElse(null), true))
-                                                .physicalBundlePartyTxt(SdoR2UiConstantSmallClaim.BUNDLE_TEXT).build());
+                                                .sdoR2SmallClaimsBundleOfDocs(SdoR2SmallClaimsBundleOfDocs.builder()
+                                                                                  .physicalBundlePartyTxt(SdoR2UiConstantSmallClaim.BUNDLE_TEXT).build()).build());
         updatedData.sdoR2SmallClaimsImpNotes(SdoR2SmallClaimsImpNotes.builder()
                                                  .text(SdoR2UiConstantSmallClaim.IMP_NOTES_TEXT)
                                                  .date(LocalDate.now().plusDays(7)).build());
@@ -908,7 +940,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             if (document != null) {
                 updatedData.sdoOrderDocument(document);
             }
-            assignCategoryId.assignCategoryIdToCaseDocument(document, "sdo");
+            assignCategoryId.assignCategoryIdToCaseDocument(document, "caseManagementOrders");
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -935,11 +967,11 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             validateFutureDate(caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingFirstOpenDateAfter().getListFrom(),
                                today).ifPresent(errors::add);
         }
-        if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing()) && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == TrialOnRadioOptions.TRIAL_WINDOW) {
+        if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing()) && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == TrialOnRadioOptions.HEARING_WINDOW) {
             validateFutureDate(caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getDateTo(),
                                today).ifPresent(errors::add);
         }
-        if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing()) && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == TrialOnRadioOptions.TRIAL_WINDOW) {
+        if (Objects.nonNull(caseData.getSdoR2SmallClaimsHearing()) && caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions() == TrialOnRadioOptions.HEARING_WINDOW) {
             validateFutureDate(caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsHearingWindow().getListFrom(),
                                today).ifPresent(errors::add);
         }
@@ -1222,6 +1254,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsMethodToggle(checkList);
         updatedData.smallClaimsDocumentsToggle(checkList);
         updatedData.smallClaimsWitnessStatementToggle(checkList);
+        if (featureToggleService.isSdoR2Enabled()) {
+            updatedData.smallClaimsFlightDelayToggle(checkList);
+        }
     }
 
 }

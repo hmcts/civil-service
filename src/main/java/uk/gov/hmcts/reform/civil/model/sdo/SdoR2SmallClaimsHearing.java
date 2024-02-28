@@ -25,6 +25,6 @@ public class SdoR2SmallClaimsHearing {
     private DynamicList altHearingCourtLocationList;
     private SmallClaimsSdoR2HearingMethod methodOfHearing;
     private SmallClaimsSdoR2PhysicalTrialBundleOptions physicalBundleOptions;
-    private String physicalBundlePartyTxt;
+    private SdoR2SmallClaimsBundleOfDocs sdoR2SmallClaimsBundleOfDocs;
     private String hearingNotesTxt;
 }
