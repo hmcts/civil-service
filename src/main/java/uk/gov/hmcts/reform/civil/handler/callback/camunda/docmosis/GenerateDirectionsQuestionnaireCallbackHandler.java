@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -35,6 +36,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHandler {
 
@@ -220,7 +222,10 @@ public class GenerateDirectionsQuestionnaireCallbackHandler extends CallbackHand
 
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(directionsQuestionnaire));
+        log.info("DQ FileName %s created at %d ", directionsQuestionnaire.getDocumentName(),
+                 directionsQuestionnaire.getCreatedDatetime());
         if (Objects.nonNull(copy)) {
+            log.info("DQ Copy FileName %s created at %d ", copy.getDocumentName(), copy.getCreatedDatetime());
             systemGeneratedCaseDocuments.add(element(copy));
         }
         caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
