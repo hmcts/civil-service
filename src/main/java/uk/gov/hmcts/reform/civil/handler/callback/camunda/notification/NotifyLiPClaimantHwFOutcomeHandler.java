@@ -147,27 +147,33 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         return Map.of(
             HWF_MORE_INFO_DATE, formatLocalDate(moreInformation.getHwFMoreInfoDocumentDate(), DATE),
             HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentList(
-                moreInformation.getHwFMoreInfoRequiredDocuments(),
-                caseData.isBilingual()
-            )
+                moreInformation.getHwFMoreInfoRequiredDocuments()
+            ),
+            HWF_MORE_INFO_DOCUMENTS_WELSH, getMoreInformationDocumentListWelsh(
+                moreInformation.getHwFMoreInfoRequiredDocuments())
         );
     }
 
-    private String getMoreInformationDocumentList(List<HwFMoreInfoRequiredDocuments> list, boolean isBilingual) {
+    private String getMoreInformationDocumentList(List<HwFMoreInfoRequiredDocuments> list) {
         StringBuilder documentList = new StringBuilder();
         for (HwFMoreInfoRequiredDocuments doc : list) {
-            if (isBilingual) {
-                documentList.append(doc.getNameBilingual());
-                if (!doc.getDescriptionBilingual().isEmpty()) {
-                    documentList.append(" - ");
-                    documentList.append(doc.getDescriptionBilingual());
-                }
-            } else {
-                documentList.append(doc.getName());
-                if (!doc.getDescription().isEmpty()) {
-                    documentList.append(" - ");
-                    documentList.append(doc.getDescription());
-                }
+            documentList.append(doc.getName());
+            if (!doc.getDescription().isEmpty()) {
+                documentList.append(" - ");
+                documentList.append(doc.getDescription());
+            }
+            documentList.append("\n");
+        }
+        return documentList.toString();
+    }
+
+    private String getMoreInformationDocumentListWelsh(List<HwFMoreInfoRequiredDocuments> list) {
+        StringBuilder documentList = new StringBuilder();
+        for (HwFMoreInfoRequiredDocuments doc : list) {
+            documentList.append(doc.getNameBilingual());
+            if (!doc.getDescriptionBilingual().isEmpty()) {
+                documentList.append(" - ");
+                documentList.append(doc.getDescriptionBilingual());
             }
             documentList.append("\n");
         }

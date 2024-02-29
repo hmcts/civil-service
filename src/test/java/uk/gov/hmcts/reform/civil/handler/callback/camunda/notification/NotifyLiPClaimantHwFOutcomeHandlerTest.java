@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DATE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_MORE_INFO_DOCUMENTS_WELSH;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.HWF_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PART_AMOUNT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.REASONS;
@@ -240,7 +241,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF,
-                getNotificationDataMapMoreInfoClaimIssued(false),
+                getNotificationDataMapMoreInfoClaimIssued(),
                 REFERENCE_NUMBER
             );
         }
@@ -431,7 +432,7 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             verify(notificationService, times(1)).sendMail(
                 EMAIL,
                 EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL,
-                getNotificationDataMapMoreInfoClaimIssued(true),
+                getNotificationDataMapMoreInfoClaimIssued(),
                 REFERENCE_NUMBER
             );
         }
@@ -580,14 +581,15 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             );
         }
 
-        private Map<String, String> getNotificationDataMapMoreInfoClaimIssued(boolean isBilingual) {
+        private Map<String, String> getNotificationDataMapMoreInfoClaimIssued() {
             return Map.of(
                 HWF_MORE_INFO_DATE, formatLocalDate(NOW, DATE),
                 CLAIMANT_NAME, CLAIMANT,
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 TYPE_OF_FEE, FeeType.CLAIMISSUED.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.CLAIMISSUED.getLabelInWelsh(),
-                HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(isBilingual),
+                HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
+                HWF_MORE_INFO_DOCUMENTS_WELSH, getMoreInformationDocumentListStringWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
             );
         }
@@ -599,7 +601,8 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
                 CLAIM_REFERENCE_NUMBER, CLAIM_REFERENCE,
                 TYPE_OF_FEE, FeeType.HEARING.getLabel(),
                 TYPE_OF_FEE_WELSH, FeeType.HEARING.getLabelInWelsh(),
-                HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(false),
+                HWF_MORE_INFO_DOCUMENTS, getMoreInformationDocumentListString(),
+                HWF_MORE_INFO_DOCUMENTS_WELSH, getMoreInformationDocumentListStringWelsh(),
                 HWF_REFERENCE_NUMBER, HWF_REFERENCE
             );
         }
@@ -652,22 +655,28 @@ public class NotifyLiPClaimantHwFOutcomeHandlerTest extends BaseCallbackHandlerT
             return Collections.singletonList(HwFMoreInfoRequiredDocuments.CHILD_MAINTENANCE);
         }
 
-        private String getMoreInformationDocumentListString(boolean isBilingual) {
+        private String getMoreInformationDocumentListStringWelsh() {
             List<HwFMoreInfoRequiredDocuments> list = getMoreInformationDocumentList();
             StringBuilder documentList = new StringBuilder();
             for (HwFMoreInfoRequiredDocuments doc : list) {
-                if (isBilingual) {
-                    documentList.append(doc.getNameBilingual());
-                    if (!doc.getDescriptionBilingual().isEmpty()) {
-                        documentList.append(" - ");
-                        documentList.append(doc.getDescriptionBilingual());
-                    }
-                } else {
-                    documentList.append(doc.getName());
-                    if (!doc.getDescription().isEmpty()) {
-                        documentList.append(" - ");
-                        documentList.append(doc.getDescription());
-                    }
+                documentList.append(doc.getNameBilingual());
+                if (!doc.getDescriptionBilingual().isEmpty()) {
+                    documentList.append(" - ");
+                    documentList.append(doc.getDescriptionBilingual());
+                }
+                documentList.append("\n");
+            }
+            return documentList.toString();
+        }
+
+        private String getMoreInformationDocumentListString() {
+            List<HwFMoreInfoRequiredDocuments> list = getMoreInformationDocumentList();
+            StringBuilder documentList = new StringBuilder();
+            for (HwFMoreInfoRequiredDocuments doc : list) {
+                documentList.append(doc.getName());
+                if (!doc.getDescription().isEmpty()) {
+                    documentList.append(" - ");
+                    documentList.append(doc.getDescription());
                 }
                 documentList.append("\n");
             }
