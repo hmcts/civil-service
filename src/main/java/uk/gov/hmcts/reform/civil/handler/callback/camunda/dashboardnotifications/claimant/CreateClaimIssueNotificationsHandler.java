@@ -26,7 +26,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTI
 public class CreateClaimIssueNotificationsHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1);
-    public static final String TASK_ID = "GenerateDashboardNotificationClaimFeeRequiredCUI";
+    public static final String TASK_ID = "CreateIssueClaimDashboardNotificationsForApplicant1";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
 
