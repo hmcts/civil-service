@@ -27,4 +27,6 @@ public class FlowLipPredicate {
     public static final Predicate<CaseData> isRespondentSignSettlementAgreement =
         CaseData::isRespondentRespondedToSettlementAgreement;
 
+    public static final Predicate<CaseData> isClaimantNotSettleFullDefenceClaim =
+            CaseData::isClaimantIntentionNotSettlePartAdmit;
 }
