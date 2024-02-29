@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@FeignClient(name = "dashboard-api", url = "${dashboard.api.url}", configuration =
+@FeignClient(name = "dashboard-api", url = "${dashboard.api.url}/dashboard", configuration =
     FeignClientProperties.FeignClientConfiguration.class)
 public interface DashboardApiClient {
 
