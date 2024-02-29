@@ -31,7 +31,7 @@ public class DashboardNotificationsParamsMapperTest {
     @BeforeEach
     void setup() {
         when(feesService.getFeeDataByTotalClaimAmount(any())).thenReturn(Fee.builder().calculatedAmountInPence(
-            BigDecimal.valueOf(70)).build());
+            BigDecimal.valueOf(70000)).build());
 
     }
 
@@ -43,7 +43,7 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimFee")
-            .isEqualTo("£0.70");
+            .isEqualTo("£700");
 
     }
 }

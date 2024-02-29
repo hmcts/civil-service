@@ -34,7 +34,7 @@ public class DashboardNotificationsParamsMapper {
 
         Fee fee = feesService
             .getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
-        params.put("claimFee", "£" + fee.toPounds());
+        params.put("claimFee", "£" + fee.toPounds().stripTrailingZeros().toPlainString());
 
         return params;
     }
