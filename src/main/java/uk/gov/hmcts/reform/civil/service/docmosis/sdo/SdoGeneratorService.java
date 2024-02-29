@@ -53,7 +53,7 @@ public class SdoGeneratorService {
                 .anyMatch(s -> s != null && s.toLowerCase().contains("judge"));
         }
 
-        if (SdoHelper.isSmallClaimsTrack(caseData) && SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimFlightDelay")) {
+        if (SdoHelper.isSmallClaimsTrack(caseData) && featureToggleService.isSdoR2Enabled()) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
             templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation, true);
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
