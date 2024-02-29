@@ -367,13 +367,4 @@ public enum CaseEvent {
     public boolean isCamundaEvent() {
         return this.getUserType() == CAMUNDA;
     }
-
-    public static CaseEvent fromString(String text) {
-        for (CaseEvent event : CaseEvent.values()) {
-            if (event.name().equalsIgnoreCase(text)) {
-                return event;
-            }
-        }
-        throw new IllegalArgumentException("No constant with name " + text + " found in CaseEvent enum");
-    }
 }
