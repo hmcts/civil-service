@@ -407,7 +407,7 @@ public class CaseDataTest {
     void isFastTrackClaim_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-                .responseClaimTrack(FAST_CLAIM.name())
+                .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
                 .build();
         //When
         //Then
