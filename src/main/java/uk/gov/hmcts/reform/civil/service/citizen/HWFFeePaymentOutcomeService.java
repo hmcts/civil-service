@@ -46,8 +46,9 @@ public class HWFFeePaymentOutcomeService {
 
     private void clearHwfReferenceProperties(CaseData.CaseDataBuilder caseDataBuilder) {
         CaseData caseData = caseDataBuilder.build();
-        caseDataBuilder.feePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().toBuilder().hwfNumberAvailable(null).build());
-        caseDataBuilder.feePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().toBuilder().hwfNumberForFeePaymentOutcome(null).build());
+        caseDataBuilder.feePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().toBuilder()
+                                                     .hwfNumberAvailable(null)
+                                                     .hwfNumberForFeePaymentOutcome(null).build());
     }
 
     public CaseData updateOutstandingFee(CaseData caseData, String caseEventId) {

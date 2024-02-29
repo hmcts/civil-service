@@ -46,7 +46,9 @@ public class ApplyHelpWithHearingFeeCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        setUpHelpWithFees(caseDataBuilder);
+        if (caseData.getHearingHelpFeesReferenceNumber() != null) {
+            setUpHelpWithFees(caseDataBuilder);
+        }
         caseDataBuilder.businessProcess(BusinessProcess.ready(APPLY_HELP_WITH_HEARING_FEE));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
