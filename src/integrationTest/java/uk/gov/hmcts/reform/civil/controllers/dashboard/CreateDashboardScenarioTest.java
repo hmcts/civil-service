@@ -18,7 +18,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-@Sql("/scripts/dashboardNotifications/create_dashboard_scenarios.sql")
 public class CreateDashboardScenarioTest extends BaseIntegrationTest {
 
     public static final String SCENARIO_HEARING_FEE_PAYMENT_REQUIRED = "scenario.hearing.fee.payment.required";
@@ -29,6 +28,7 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
     private static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
 
     @Test
+    @Sql("/scripts/dashboardNotifications/create_dashboard_scenarios.sql")
     void should_create_scenario() throws Exception {
 
         UUID caseId = UUID.randomUUID();
@@ -67,4 +67,29 @@ public class CreateDashboardScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].descriptionEn").value("Pay the hearing fee. <a href=#>Click here</a>")
             );
     }
+
+    @Test
+    void should_create_scenario_for_claim_fee_required() throws Exception {
+
+        UUID caseId = UUID.randomUUID();
+        doPost(BEARER_TOKEN,
+               ScenarioRequestParams.builder()
+                   .params(Map.of("claimFee", "£70"
+                   ))
+                   .build(),
+               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimIssue.ClaimFee.Required.Test", caseId
+        )
+            .andExpect(status().isOk());
+
+        //Verify Notification is created
+        doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT")
+            .andExpect(status().isOk())
+            .andExpectAll(
+                status().is(HttpStatus.OK.value()),
+                jsonPath("$[0].titleEn").value("You need to pay your claim fee"),
+                jsonPath("$[0].descriptionEn")
+                    .value("Your claim has not yet been issued, in order to proceed you must pay the claim fee of £70. <a href={CLAIM_FEE_URL}>Pay the claim fee</a>.")
+            );
+    }
+
 }

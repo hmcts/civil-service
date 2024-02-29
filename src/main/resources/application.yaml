@@ -50,7 +50,6 @@ spring:
   flyway:
     enabled: ${REFERENCE_DATABASE_MIGRATION:true}
     placeholder-replacement: false
-
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
