@@ -201,6 +201,8 @@ public class HearingsPartyMapper {
     private static PartyDetailsModel getDetailsForPartyObject(Party party, String partyRole) {
         if (INDIVIDUAL.equals(party.getType())
             || SOLE_TRADER.equals(party.getType())) {
+            String title = party.getIndividualTitle() == null
+                ?  party.getSoleTraderTitle() : party.getIndividualTitle();
             String firstName = party.getIndividualFirstName() == null
                 ? party.getSoleTraderFirstName() : party.getIndividualFirstName();
             String lastName = party.getIndividualLastName() == null
@@ -208,6 +210,7 @@ public class HearingsPartyMapper {
 
             return buildIndividualPartyObject(
                 party.getPartyID(),
+                title,
                 firstName,
                 lastName,
                 party.getPartyName(),
@@ -225,6 +228,7 @@ public class HearingsPartyMapper {
 
     private static PartyDetailsModel getDetailsForLitigationFriendObject(LitigationFriend litigationFriend) {
         return buildIndividualPartyObject(litigationFriend.getPartyID(),
+                                          null,
                                           litigationFriend.getFirstName(),
                                           litigationFriend.getLastName(),
                                           String.format(FULL_NAME, litigationFriend.getFirstName(),
@@ -243,6 +247,7 @@ public class HearingsPartyMapper {
             for (PartyFlagStructure partyFlagStructure : filteredList) {
                 partyDetails.add(buildIndividualPartyObject(
                     partyFlagStructure.getPartyID(),
+                    null,
                     partyFlagStructure.getFirstName(),
                     partyFlagStructure.getLastName(),
                     String.format(FULL_NAME, partyFlagStructure.getFirstName(),
@@ -270,7 +275,7 @@ public class HearingsPartyMapper {
             null);
     }
 
-    public static PartyDetailsModel buildIndividualPartyObject(String partyId, String firstName, String lastName,
+    public static PartyDetailsModel buildIndividualPartyObject(String partyId, String title, String firstName, String lastName,
                                                                String partyName, String partyRole,
                                                                String email, String phone,
                                                                Flags flags, List<Element<UnavailableDate>> unavailableDates) {
@@ -280,6 +285,7 @@ public class HearingsPartyMapper {
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         List<String> hearingChannelPhone = phone == null ? emptyList() : List.of(phone);
         IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
+            .title(title)
             .firstName(firstName)
             .lastName(lastName)
             .interpreterLanguage(getInterpreterLanguage(flagDetails))
