@@ -89,6 +89,7 @@ public interface NotificationData {
     String UPLOADED_DOCUMENTS = "uploaded documents";
     String HWF_MORE_INFO_DATE = "date";
     String HWF_MORE_INFO_DOCUMENTS = "documents";
+    String HWF_MORE_INFO_DOCUMENTS_WELSH  = "documentsWelsh";
 
     // hwf outcome
     String REASONS = "reasons";
