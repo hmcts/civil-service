@@ -33,8 +33,8 @@ public class TaskListService {
         );
 
         return taskListEntityList.stream()
+            .sorted(Comparator.comparingInt(t -> t.getTaskItemTemplate().getTaskOrder()))
             .map(TaskList::from)
-            .sorted(Comparator.comparing(TaskList::getTaskOrder))
             .collect(Collectors.toList());
     }
 
