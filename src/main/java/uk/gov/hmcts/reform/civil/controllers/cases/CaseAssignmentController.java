@@ -82,16 +82,17 @@ public class CaseAssignmentController {
                                       @PathVariable("caseRole") Optional<CaseRole> caseRole,
                                       @RequestBody Optional<PinDto> pinDto) {
         log.info("assigning case with id: {}", caseId);
+        Optional<CaseDetails> caseDetails = Optional.empty();
         if (caseRole.isPresent() && CaseRole.DEFENDANT == caseRole.get()) {
-            CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(caseId));
-            defendantPinToPostLRspecService.validatePin(caseDetails, pinDto.get().getPin());
-            assignCaseService.assignCase(authorisation, caseId, caseRole);
-            lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(authorisation, caseId);
-            defendantPinToPostLRspecService.removePinInPostData(Long.valueOf(caseId), caseDetails);
-        } else {
-            assignCaseService.assignCase(authorisation, caseId, caseRole);
-            lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(authorisation, caseId);
+            caseDetails = Optional.of(coreCaseDataService.getCase(Long.valueOf(caseId)));
+            defendantPinToPostLRspecService.validatePin(caseDetails.get(), pinDto.get().getPin());
         }
+        assignCaseService.assignCase(authorisation, caseId, caseRole);
+        lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
+            authorisation,
+            caseId,
+            caseRole,
+            caseDetails
+        );
     }
-
 }

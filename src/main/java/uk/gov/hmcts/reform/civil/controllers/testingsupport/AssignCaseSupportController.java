@@ -49,7 +49,12 @@ public class AssignCaseSupportController {
         assignCaseService.assignCase(authorisation, caseId, caseRole);
         boolean isCitizen = !caseRole.map(CaseRole::isProfessionalRole).orElse(false);
         if (isCitizen) {
-            lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(authorisation, caseId);
+            lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
+                authorisation,
+                caseId,
+                caseRole,
+                Optional.empty()
+            );
         }
     }
 

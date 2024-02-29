@@ -34,9 +34,7 @@ import uk.gov.hmcts.reform.civil.service.pininpost.exception.PinNotMatchExceptio
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
 @SpringBootTest(classes = {
     DefendantPinToPostLRspecService.class,
@@ -93,9 +91,8 @@ class DefendantPinToPostLRspecServiceTest {
 
             Map<String, Object> data = new HashMap<>();
             data.put("respondent1PinToPostLRspec", pinInPostData);
-            defendantPinToPostLRspecService.removePinInPostData(caseData.getCcdCaseReference(), caseDetails);
-
-            verify(coreCaseDataService).triggerEvent(caseData.getCcdCaseReference(), UPDATE_CASE_DATA, data);
+            var updatedData = defendantPinToPostLRspecService.removePinInPostData(caseDetails);
+            assertThat(updatedData).isEqualTo(data);
         }
 
         @Test

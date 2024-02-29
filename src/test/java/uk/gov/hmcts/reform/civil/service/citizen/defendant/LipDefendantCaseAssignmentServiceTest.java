@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.refEq;
@@ -55,7 +56,12 @@ class LipDefendantCaseAssignmentServiceTest {
             .updates(data)
             .build();
         //When
-        lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(AUTHORIZATION, CASE_ID);
+        lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
+            AUTHORIZATION,
+            CASE_ID,
+            Optional.empty(),
+            Optional.empty()
+        );
         //Then
         verify(idamClient).getUserDetails(AUTHORIZATION);
         verify(caseEventService).submitEventForClaim(refEq(params));
