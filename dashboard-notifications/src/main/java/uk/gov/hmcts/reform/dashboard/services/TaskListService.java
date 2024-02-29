@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 import uk.gov.hmcts.reform.dashboard.repositories.TaskListRepository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,6 +34,7 @@ public class TaskListService {
 
         return taskListEntityList.stream()
             .map(TaskList::from)
+            .sorted(Comparator.comparing(TaskList::getTaskOrder))
             .collect(Collectors.toList());
     }
 
