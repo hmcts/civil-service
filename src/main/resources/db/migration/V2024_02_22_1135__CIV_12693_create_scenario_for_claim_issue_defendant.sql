@@ -10,8 +10,8 @@ VALUES ('Scenario.AAA7.ClaimIssue.Response.Required', '{}', '{"Notice.AAA7.Claim
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA7.ClaimIssue.Response.Required', 'You haven´t responded to the claim', 'You haven´t responded to the claim (CY)',
-        'You need to respond before ${defaultRespondTime} on ${responseDeadline}. There are {daysLeftToRespond} days remaining. <a href="{RESPONSE_TASK_LIST_URL}"  rel="noopener noreferrer" class="govuk-link">Respond to the claim.</a>.',
-        'You need to respond before ${defaultRespondTime} on ${responseDeadline}. There are {daysLeftToRespond} days remaining. <a href="{RESPONSE_TASK_LIST_URL}"  rel="noopener noreferrer" class="govuk-link">Respond to the claim.</a>.',
+        'You need to respond before ${defaultRespondTime} on ${responseDeadline}. There are {daysLeftToRespond} days remaining. <a href="{RESPONSE_TASK_LIST_URL}"  rel="noopener noreferrer" class="govuk-link">Respond to the claim</a>.',
+        'You need to respond before ${defaultRespondTime} on ${responseDeadline}. There are {daysLeftToRespond} days remaining. <a href="{RESPONSE_TASK_LIST_URL}"  rel="noopener noreferrer" class="govuk-link">Respond to the claim</a>.',
         'DEFENDANT');
 
 /**
