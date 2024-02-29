@@ -85,6 +85,8 @@ public enum CaseEvent {
     ADD_UNAVAILABLE_DATES(USER),
 
     REVIEW_HEARING_EXCEPTION(USER),
+    UpdateNextHearingInfo(USER),
+
     ASSIGN_LIP_DEFENDANT(USER),
 
     MANAGE_CONTACT_INFORMATION(USER),
@@ -300,6 +302,8 @@ public enum CaseEvent {
     NOTIFY_CLAIMANT_TRANSLATED_DOCUMENT_UPLOADED(CAMUNDA),
     NOTIFY_DEFENDANT_TRANSLATED_DOCUMENT_UPLOADED(CAMUNDA),
     NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR(CAMUNDA),
+    NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR(CAMUNDA),
+    NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR(CAMUNDA),
     NOTIFY_MEDIATION_UNSUCCESSFUL_DEFENDANT_LIP(CAMUNDA),
 
     SEND_SDO_ORDER_TO_LIP_DEFENDANT(CAMUNDA),
@@ -351,7 +355,9 @@ public enum CaseEvent {
     SET_SETTLEMENT_AGREEMENT_DEADLINE(CAMUNDA),
     GENERATE_LIP_CLAIMANT_CLAIM_FORM_SPEC(CAMUNDA),
     GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC(CAMUNDA),
-    NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION(CAMUNDA);
+    NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION(CAMUNDA),
+    INVALID_HWF_REFERENCE(USER),
+    FEE_PAYMENT_OUTCOME(USER);
 
     private final UserType userType;
 
@@ -359,12 +365,4 @@ public enum CaseEvent {
         return this.getUserType() == CAMUNDA;
     }
 
-    public static CaseEvent fromString(String text) {
-        for (CaseEvent event : CaseEvent.values()) {
-            if (event.name().equalsIgnoreCase(text)) {
-                return event;
-            }
-        }
-        throw new IllegalArgumentException("No constant with name " + text + " found in CaseEvent enum");
-    }
 }
