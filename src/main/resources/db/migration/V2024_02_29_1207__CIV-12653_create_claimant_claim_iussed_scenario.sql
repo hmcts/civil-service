@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA7.ClaimIssue.Response.Await', '{"Notice.AAA7.ClaimIssue.ClaimFee.Required"}', '{"Notice.AAA7.ClaimIssue.Response.Await":[]}');
+VALUES ('Scenario.AAA7.ClaimIssue.Response.Await', '{"Notice.AAA7.ClaimIssue.ClaimFee.Required"}', '{"Notice.AAA7.ClaimIssue.Response.Await":["responseDeadline", "defendantName"]}');
 
 /**
  * Add notification template

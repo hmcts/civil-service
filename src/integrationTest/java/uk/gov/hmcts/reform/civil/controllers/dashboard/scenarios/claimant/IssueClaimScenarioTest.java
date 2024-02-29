@@ -25,13 +25,13 @@ public class IssueClaimScenarioTest extends BaseIntegrationTest {
     void should_create_claimIssue_response_await_scenario() throws Exception {
 
         UUID caseId = UUID.randomUUID();
-        LocalDate hearingFeeByDate = OffsetDateTime.now().toLocalDate();
+        LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
         String defendantName = "Dave Indent";
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
                    .params(
                        Map.of(
-                       "responseDeadline", hearingFeeByDate,
+                       "responseDeadline", responseDeadline,
                        "defendantName", defendantName
                        )
                    )
@@ -47,7 +47,7 @@ public class IssueClaimScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Wait for defendant to respond"),
                 jsonPath("$[0].descriptionEn").value(
-                    defendantName + " has until " + hearingFeeByDate + " to respond. They can request an extra 28 days if they need it.")
+                    defendantName + " has until " + responseDeadline + " to respond. They can request an extra 28 days if they need it.")
             );
 
         //Verify task Item is created
