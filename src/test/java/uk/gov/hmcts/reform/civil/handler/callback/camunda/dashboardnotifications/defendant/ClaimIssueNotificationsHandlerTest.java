@@ -40,7 +40,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
-    public static final String TASK_ID = "CUIDashboardDefendantNotification";
+    public static final String TASK_ID = "CreateIssueClaimDashboardNotificationsForDefendant1";
 
     Map<String, Object> params = new HashMap<>();
 
