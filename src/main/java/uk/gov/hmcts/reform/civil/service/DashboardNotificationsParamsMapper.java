@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -35,7 +36,9 @@ public class DashboardNotificationsParamsMapper {
         Fee fee = feesService
             .getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
         params.put("claimFee", "£" + fee.toPounds().stripTrailingZeros().toPlainString());
-
+        params.put("remissionAmount", caseData.getClaimIssueRemissionAmount());
+        params.put("outStandingAmount", caseData.getOutstandingFeeInPounds());
+        params.put("paymentDueDate", LocalDate.now());
         return params;
     }
 }
