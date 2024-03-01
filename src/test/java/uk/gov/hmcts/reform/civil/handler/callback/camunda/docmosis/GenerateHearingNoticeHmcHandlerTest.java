@@ -119,7 +119,7 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
 
         List<LocationRefData> locations = List.of(LocationRefData.builder()
                                                       .epimmsId(EPIMS).build());
-        when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString()))
+        when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
@@ -187,7 +187,7 @@ public class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest
 
         List<LocationRefData> locations = List.of(LocationRefData.builder()
                                                       .epimmsId(EPIMS).build());
-        when(locationRefDataService.getCourtLocationsForDefaultJudgments(anyString()))
+        when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
