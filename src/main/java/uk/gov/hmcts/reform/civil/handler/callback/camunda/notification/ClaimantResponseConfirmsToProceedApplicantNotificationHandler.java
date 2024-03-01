@@ -59,7 +59,7 @@ public class ClaimantResponseConfirmsToProceedApplicantNotificationHandler exten
 
         if (caseData.getApplicant1Email() != null) {
             notificationService.sendMail(
-                "leonardo.palmeiro@hmcts.net",
+                caseData.getApplicant1Email(),
                 getEmailTemplate(caseData),
                 addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
