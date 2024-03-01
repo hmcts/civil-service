@@ -43,5 +43,20 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("defendantName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
     }
+
+    @Test
+    public void shouldMapParameters_WhenResponseDeadlineIsNull() {
+
+        caseData = caseData.toBuilder().respondent1ResponseDeadline(null).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("ccdCaseReference").isEqualTo(1594901956117591L);
+
+        assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
+
+        assertThat(result).extracting("responseDeadline").isNull();
+
+    }
 }
 
