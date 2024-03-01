@@ -360,6 +360,9 @@ notifications:
   notifyLiPClaimantClaimSubmittedAndHelpWithFeeBilingualTemplate: "f2080ac4-2585-47fd-ac18-5f94148adc07"
   notifyLiPClaimantClaimSubmittedAndPayClaimFeeBilingualTemplate: "1f6006bb-6726-48c4-ac5f-a456d043f1b7"
   bilingualClaimantClaimContinuingOnlineForSpec: "461b4ce6-3783-409d-be47-ea1230170833"
+  notifyApplicantLRMediationTemplate: "55fd5423-e044-42d0-8296-e9755a002480"
+  notifyApplicantForHwFMoreInformationNeeded: "1111"
+  mediationUnsuccessfulNoAttendanceLRTemplate: "1111"
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
