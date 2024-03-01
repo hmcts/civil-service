@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SdoR2FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
@@ -43,6 +44,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2RestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2ScheduleOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2Trial;
+import uk.gov.hmcts.reform.civil.model.sdo.SdoR2TrialHearingLengthOther;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
@@ -286,6 +288,33 @@ public class SdoHelperTest {
                                          .build())
                 .build();
             assertThat(SdoHelper.isClaimForPecuniaryLossNihl(caseData)).isEqualTo(isClaim);
+        }
+
+        @Test
+        void shouldReturn_method_of_hearing() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder()
+                                .methodOfHearing(SdoR2FastTrackMethod.fastTrackMethodInPerson).build())
+                .build();
+            assertThat(SdoHelper.getSdoTrialMethodOfHearing(caseData)).isNotEmpty();
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = {true, false})
+        void shouldReturn_getSdoTrialHearingTimeAllocated(boolean isOther) {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDraft()
+                .build()
+                .toBuilder()
+                .sdoR2Trial(SdoR2Trial.builder()
+                                .lengthList(isOther ? FastTrackHearingTimeEstimate.OTHER : FastTrackHearingTimeEstimate.FOUR_HOURS)
+                                .lengthListOther(isOther ? SdoR2TrialHearingLengthOther.builder().trialLengthDays(4).trialLengthHours(4).trialLengthMinutes(4).build() : null)
+                                .build())
+                .build();
+            assertThat(SdoHelper.getSdoTrialHearingTimeAllocated(caseData)).isEqualTo(isOther ? "4 days, 4 hours and 4 minutes" : "4 hours");
         }
     }
 
