@@ -65,11 +65,10 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
                                            .build())
                 .hwfFeeType(FeeType.CLAIMISSUED)
                 .build();
-            when(hwfFeePaymentOutcomeService.updateOutstandingFee(any(CaseData.class))).thenReturn(caseData);
-            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             //When
-            when(hwfService.updateOutstandingFee(any(), any())).thenReturn(caseData);
+            when(hwfFeePaymentOutcomeService.updateOutstandingFee(any(), any())).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then
@@ -89,11 +88,10 @@ public class PartialRemissionHWFCallbackHandlerTest extends BaseCallbackHandlerT
                                        .build())
                 .hwfFeeType(FeeType.HEARING)
                 .build();
-            when(hwfFeePaymentOutcomeService.updateOutstandingFee(any(CaseData.class))).thenReturn(caseData);
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
             //When
-            when(hwfService.updateOutstandingFee(any(), any())).thenReturn(caseData);
+            when(hwfFeePaymentOutcomeService.updateOutstandingFee(any(), any())).thenReturn(caseData);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             //Then

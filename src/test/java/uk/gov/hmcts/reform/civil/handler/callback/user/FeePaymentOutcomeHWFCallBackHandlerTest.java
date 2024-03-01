@@ -88,7 +88,8 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
             verify(hwfService, times(1)).updateHwfReferenceNumber(any());
             assertThat(updatedData.getCaseDataLiP().getHelpWithFees().getHelpWithFeesReferenceNumber()).isEqualTo("HWF-1C4-E34");
@@ -111,7 +112,8 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            handler.handle(params);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
             verify(hwfService, times(1)).updateHwfReferenceNumber(any());
             assertThat(updatedData.getHearingHelpFeesReferenceNumber()).isEqualTo("HWF-1C4-E34");
