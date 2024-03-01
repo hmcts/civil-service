@@ -287,7 +287,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldCalculateFee_whenPaymentStatusIsNull_allocatedTrackIfDefined() {
+        void shouldCalculateFee_whenPaymentStatusIsNull_allocatedTrackIsDefined() {
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus()
                 .toBuilder().businessProcess(BusinessProcess.builder().processInstanceId("").build()).build();
             when(paymentsService.createServiceRequest(any(), any()))
