@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM_SPEC_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_HWF_OUTCOME;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.FeePaymentOutcomeHWFCallBackHandler.WRONG_REMISSION_TYPE_SELECTED;
 
 @ExtendWith(MockitoExtension.class)
@@ -90,6 +91,8 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
             handler.handle(params);
 
             verify(hwfService, times(1)).updateHwfReferenceNumber(any());
+            assertThat(updatedData.getCaseDataLiP().getHelpWithFees().getHelpWithFeesReferenceNumber()).isEqualTo("HWF-1C4-E34");
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(CREATE_CLAIM_SPEC_AFTER_PAYMENT.toString());
         }
 
         @Test
@@ -98,6 +101,9 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
                 .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
                                               .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
                                               .hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build())
+                .hearingHwfDetails(HelpWithFeesDetails.builder()
+                                       .hwfCaseEvent(FEE_PAYMENT_OUTCOME)
+                                       .build())
                 .hwfFeeType(FeeType.HEARING)
                 .build();
             when(hwfService.updateHwfReferenceNumber(any(CaseData.class)))
@@ -108,6 +114,9 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
             handler.handle(params);
 
             verify(hwfService, times(1)).updateHwfReferenceNumber(any());
+            assertThat(updatedData.getHearingHelpFeesReferenceNumber()).isEqualTo("HWF-1C4-E34");
+            assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
+            assertThat(updatedData.getHearingHwfDetails().getHwfCaseEvent()).isEqualTo(FEE_PAYMENT_OUTCOME);
         }
 
         @Test
