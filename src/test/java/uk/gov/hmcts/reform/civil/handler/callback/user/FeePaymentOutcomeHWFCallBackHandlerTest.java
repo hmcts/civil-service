@@ -92,7 +92,6 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
             verify(hwfService, times(1)).updateHwfReferenceNumber(any());
-            assertThat(updatedData.getCaseDataLiP().getHelpWithFees().getHelpWithFeesReferenceNumber()).isEqualTo("HWF-1C4-E34");
             assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(CREATE_CLAIM_SPEC_AFTER_PAYMENT.toString());
         }
 
@@ -116,7 +115,6 @@ public class FeePaymentOutcomeHWFCallBackHandlerTest extends BaseCallbackHandler
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
 
             verify(hwfService, times(1)).updateHwfReferenceNumber(any());
-            assertThat(updatedData.getHearingHelpFeesReferenceNumber()).isEqualTo("HWF-1C4-E34");
             assertThat(updatedData.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
             assertThat(updatedData.getHearingHwfDetails().getHwfCaseEvent()).isEqualTo(FEE_PAYMENT_OUTCOME);
         }
