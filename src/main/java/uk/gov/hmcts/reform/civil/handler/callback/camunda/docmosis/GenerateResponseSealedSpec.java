@@ -97,13 +97,18 @@ public class GenerateResponseSealedSpec extends CallbackHandler {
                 assignCategoryId.assignCategoryIdToCaseDocument(stitchedDocumentCopy, DocCategory.DQ_DEF2.getValue());
             }
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocument));
+            log.info("Response sealed Form FileName %s created at %d ", stitchedDocument.getDocumentName(), stitchedDocument.getCreatedDatetime());
             if (Objects.nonNull(stitchedDocumentCopy)) {
                 caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(stitchedDocumentCopy));
+                log.info("Response sealed Form Copy FileName %s created at %d ", stitchedDocumentCopy.getDocumentName(), stitchedDocumentCopy.getCreatedDatetime());
+
             }
         } else {
             caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(sealedForm));
+            log.info("Response sealed Form FileName %s created at %d ", sealedForm.getDocumentName(), sealedForm.getCreatedDatetime());
             if (Objects.nonNull(copy)) {
                 caseData.getSystemGeneratedCaseDocuments().add(ElementUtils.element(copy));
+                log.info("Response sealed Form Copy FileName %s created at %d ", copy.getDocumentName(), copy.getCreatedDatetime());
             }
         }
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
