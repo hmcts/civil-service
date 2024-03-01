@@ -135,6 +135,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
     private Map<String, String> getNoRemissionProperties(CaseData caseData) {
         return Map.of(
             REASONS, getHwFNoRemissionReason(caseData),
+            REASONS_WELSH, getHwFNoRemissionReasonWelsh(caseData),
             AMOUNT, caseData.getHwFFeeAmount().toString()
         );
     }
@@ -203,6 +204,16 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
         }
         if (caseData.isHWFTypeClaimIssued()) {
             return caseData.getClaimIssuedHwfDetails().getNoRemissionDetailsSummary().getLabel();
+        }
+        return "";
+    }
+
+    private String getHwFNoRemissionReasonWelsh(CaseData caseData) {
+        if (caseData.isHWFTypeHearing()) {
+            return caseData.getHearingHwfDetails().getNoRemissionDetailsSummary().getLabelWelsh();
+        }
+        if (caseData.isHWFTypeClaimIssued()) {
+            return caseData.getClaimIssuedHwfDetails().getNoRemissionDetailsSummary().getLabelWelsh();
         }
         return "";
     }

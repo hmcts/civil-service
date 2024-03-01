@@ -93,6 +93,7 @@ public interface NotificationData {
 
     // hwf outcome
     String REASONS = "reasons";
+    String REASONS_WELSH = "reasonsWelsh";
     String TYPE_OF_FEE = "typeOfFee";
     String TYPE_OF_FEE_WELSH = "typeOfFeeWelsh";
     String HWF_REFERENCE_NUMBER = "hwFReferenceNumber";
