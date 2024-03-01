@@ -6037,6 +6037,24 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder addApplicant1OrgIndividuals() {
+        this.applicant1OrgIndividuals = wrapElements(PartyFlagStructure.builder()
+                                                         .partyID("app-1-individual-party-id")
+                                                         .firstName("Applicant")
+                                                         .lastName("Hearing Attendee")
+                                                         .build());
+        return this;
+    }
+
+    public CaseDataBuilder addRespondent1OrgIndividuals() {
+        this.respondent1OrgIndividuals = wrapElements(PartyFlagStructure.builder()
+                                                         .partyID("resp-1-individual-party-id")
+                                                         .firstName("Respondent")
+                                                         .lastName("Hearing Attendee")
+                                                         .build());
+        return this;
+    }
+
     public CaseDataBuilder withApplicant1Flags() {
         return withApplicant1Flags(flagDetails());
     }

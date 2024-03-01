@@ -303,10 +303,12 @@ public class HearingsPartyMapperTest {
     }
 
     @Test
-    void shouldBuildOrganisationDetails_whenClaimantIsCompanyRespondentOrganisation() {
+    void shouldBuildDetails_whenClaimantIsCompanyAndRespondentIsOrganisationWithIndividualAttendeesAddedForHearing() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
             .respondent1DQWithUnavailableDateRange()
+            .addApplicant1OrgIndividuals()
+            .addRespondent1OrgIndividuals()
             .build()
             .toBuilder()
             .applicant1(Party.builder()
@@ -350,17 +352,39 @@ public class HearingsPartyMapperTest {
             RESPONDENT_ONE_ORG_ID
         );
 
+        PartyDetailsModel applicant1HearingAttendees = buildExpectedIndividualPartyDetails(
+            "app-1-individual-party-id",
+            "Applicant",
+            "Hearing Attendee",
+            "Applicant Hearing Attendee",
+            CLAIMANT_ROLE,
+            null,
+            null
+        );
+
+        PartyDetailsModel respondent1HearingAttendees = buildExpectedIndividualPartyDetails(
+            "resp-1-individual-party-id",
+            "Respondent",
+            "Hearing Attendee",
+            "Respondent Hearing Attendee",
+            DEFENDANT_ROLE,
+            null,
+            null
+        );
+
         List<PartyDetailsModel> expected = new ArrayList<>();
         expected.add(applicantPartyDetails);
         expected.add(applicantSolicitorParty);
+        expected.add(applicant1HearingAttendees);
         expected.add(respondentPartyDetails);
         expected.add(respondentSolicitorParty);
+        expected.add(respondent1HearingAttendees);
 
         List<PartyDetailsModel> actualPartyDetailsModel = buildPartyObjectForHearingPayload(
             caseData,
             organisationService
         );
-        assertThat(actualPartyDetailsModel).isEqualTo(expected);
+        assertThat(actualPartyDetailsModel).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @Test
