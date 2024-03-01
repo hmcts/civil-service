@@ -77,7 +77,7 @@ public class ClaimantDefendantAgreedMediationApplicantNotificationHandler extend
     }
 
     private String addEmail(CaseData caseData) {
-        return "leonardo.palmeiro@hmcts.net";
+        return caseData.getApplicantSolicitor1UserDetails().getEmail();
     }
 
     private String getApplicantLegalOrganizationName(CaseData caseData) {
