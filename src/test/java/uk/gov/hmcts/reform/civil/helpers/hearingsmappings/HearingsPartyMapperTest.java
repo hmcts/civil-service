@@ -49,9 +49,12 @@ public class HearingsPartyMapperTest {
 
     private static final String APPLICANT_PARTY_ID = "app1-party-id";
     private static final String APPLICANT_COMPANY_NAME = "Applicant Company";
+    private static final String APPLICANT_TWO_PARTY_ID = "app2-party-id";
+    private static final String APPLICANT_TWO_COMPANY_NAME = "Applicant 2 Company";
     private static final String RESPONDENT_ONE_PARTY_ID = "res1-party-id";
     private static final String RESPONDENT_ONE_ORG_NAME = "Respondent 1 Organisation";
-
+    private static final String RESPONDENT_TWO_PARTY_ID = "res2-party-id";
+    private static final String RESPONDENT_TWO_ORG_NAME = "Respondent 2 Organisation";
     private static final String APPLICANT_LR_ORG_NAME = "Applicant LR Org name";
     private static final String RESPONDENT_ONE_LR_ORG_NAME = "Respondent 1 LR Org name";
     private static final String RESPONDENT_TWO_LR_ORG_NAME = "Respondent LR 2 Org name";
@@ -307,8 +310,8 @@ public class HearingsPartyMapperTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
             .respondent1DQWithUnavailableDateRange()
-            .addApplicant1OrgIndividuals()
-            .addRespondent1OrgIndividuals()
+            .addApplicant1OrgIndividual("Applicant One", "Hearing Attendee")
+            .addRespondent1OrgIndividual("Respondent One", "Hearing Attendee")
             .build()
             .toBuilder()
             .applicant1(Party.builder()
@@ -353,23 +356,23 @@ public class HearingsPartyMapperTest {
         );
 
         PartyDetailsModel applicant1HearingAttendees = buildExpectedIndividualPartyDetails(
-            "app-1-individual-party-id",
-            "Applicant",
+            "app-1-org-ind-party-id",
+            "Applicant One",
             "Hearing Attendee",
-            "Applicant Hearing Attendee",
+            "Applicant One Hearing Attendee",
             CLAIMANT_ROLE,
-            null,
-            null
+            "abc@def.ghi",
+            "07777777777"
         );
 
         PartyDetailsModel respondent1HearingAttendees = buildExpectedIndividualPartyDetails(
-            "resp-1-individual-party-id",
-            "Respondent",
+            "res-1-org-ind-party-id",
+            "Respondent One",
             "Hearing Attendee",
-            "Respondent Hearing Attendee",
+            "Respondent One Hearing Attendee",
             DEFENDANT_ROLE,
-            null,
-            null
+            "abc@def.ghi",
+            "07777777777"
         );
 
         List<PartyDetailsModel> expected = new ArrayList<>();
@@ -518,6 +521,12 @@ public class HearingsPartyMapperTest {
             .addRespondent1LitigationFriend()
             .addApplicant2ExpertsAndWitnesses()
             .addRespondent1ExpertsAndWitnesses()
+            .applicant2(Party.builder()
+                            .partyID(APPLICANT_TWO_PARTY_ID)
+                            .companyName(APPLICANT_TWO_COMPANY_NAME)
+                            .type(COMPANY)
+                            .build())
+            .addApplicant2OrgIndividual("Applicant Two", "Hearing Attendee")
             .build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
@@ -536,14 +545,21 @@ public class HearingsPartyMapperTest {
             APPLICANT_ORG_ID
         );
 
-        PartyDetailsModel applicant2PartyDetails = buildExpectedIndividualPartyDetails(
-            "app-2-party-id",
-            "Jason",
-            "Rambo",
-            "Mr. Jason Rambo",
+        PartyDetailsModel applicant2PartyDetails = buildExpectedOrganisationPartyObject(
+            APPLICANT_TWO_PARTY_ID,
+            APPLICANT_TWO_COMPANY_NAME,
             CLAIMANT_ROLE,
-            "rambo@email.com",
-            "0123456789"
+            null
+        );
+
+        PartyDetailsModel applicant2HearingAttendees = buildExpectedIndividualPartyDetails(
+            "app-2-org-ind-party-id",
+            "Applicant Two",
+            "Hearing Attendee",
+            "Applicant Two Hearing Attendee",
+            CLAIMANT_ROLE,
+            "abc@def.ghi",
+            "07777777777"
         );
 
         PartyDetailsModel applicantExpert = buildExpectedIndividualPartyDetails(
@@ -645,12 +661,13 @@ public class HearingsPartyMapperTest {
         expected.add(respondent1Expert);
         expected.add(respondent1Witness);
         expected.add(respondent1LitFriend);
+        expected.add(applicant2HearingAttendees);
 
         List<PartyDetailsModel> actualPartyDetailsModel = buildPartyObjectForHearingPayload(
             caseData,
             organisationService
         );
-        assertThat(actualPartyDetailsModel).isEqualTo(expected);
+        assertThat(actualPartyDetailsModel).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @Test
@@ -664,6 +681,12 @@ public class HearingsPartyMapperTest {
             .addApplicant1ExpertsAndWitnesses()
             .addRespondent1ExpertsAndWitnesses()
             .addRespondent2ExpertsAndWitnesses()
+            .addRespondent2OrgIndividual("Respondent Two", "Hearing Attendee")
+            .respondent2(Party.builder()
+                             .partyID(RESPONDENT_TWO_PARTY_ID)
+                             .organisationName(RESPONDENT_TWO_ORG_NAME)
+                             .type(ORGANISATION)
+                             .build())
             .build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
@@ -758,14 +781,11 @@ public class HearingsPartyMapperTest {
             null
         );
 
-        PartyDetailsModel respondent2PartyDetails = buildExpectedIndividualPartyDetails(
-            "res-2-party-id",
-            "John",
-            "Rambo",
-            "Mr. John Rambo",
+        PartyDetailsModel respondent2PartyDetails = buildExpectedOrganisationPartyObject(
+            RESPONDENT_TWO_PARTY_ID,
+            RESPONDENT_TWO_ORG_NAME,
             DEFENDANT_ROLE,
-            "rambo@email.com",
-            "0123456789"
+            null
         );
 
         PartyDetailsModel respondent2SolicitorParty = buildExpectedOrganisationPartyObject(
@@ -804,6 +824,16 @@ public class HearingsPartyMapperTest {
             null
         );
 
+        PartyDetailsModel respondent2HearingAttendees = buildExpectedIndividualPartyDetails(
+            "res-2-org-ind-party-id",
+            "Respondent Two",
+            "Hearing Attendee",
+            "Respondent Two Hearing Attendee",
+            DEFENDANT_ROLE,
+            "abc@def.ghi",
+            "07777777777"
+        );
+
         List<PartyDetailsModel> expected = new ArrayList<>();
         expected.add(applicantPartyDetails);
         expected.add(applicantSolicitorParty);
@@ -820,12 +850,13 @@ public class HearingsPartyMapperTest {
         expected.add(respondent2Expert);
         expected.add(respondent2Witness);
         expected.add(respondent2LitFriend);
+        expected.add(respondent2HearingAttendees);
 
         List<PartyDetailsModel> actualPartyDetailsModel = buildPartyObjectForHearingPayload(
             caseData,
             organisationService
         );
-        assertThat(actualPartyDetailsModel).isEqualTo(expected);
+        assertThat(actualPartyDetailsModel).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     @Test
