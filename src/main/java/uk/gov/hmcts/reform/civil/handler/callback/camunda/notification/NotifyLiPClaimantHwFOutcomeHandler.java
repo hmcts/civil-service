@@ -163,6 +163,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
                 documentList.append(doc.getDescription());
             }
             documentList.append("\n");
+            documentList.append("\n");
         }
         return documentList.toString();
     }
@@ -175,6 +176,7 @@ public class NotifyLiPClaimantHwFOutcomeHandler extends CallbackHandler implemen
                 documentList.append(" - ");
                 documentList.append(doc.getDescriptionBilingual());
             }
+            documentList.append("\n");
             documentList.append("\n");
         }
         return documentList.toString();
