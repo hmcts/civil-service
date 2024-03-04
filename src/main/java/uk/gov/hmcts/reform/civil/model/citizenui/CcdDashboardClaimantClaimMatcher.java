@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
@@ -308,5 +309,42 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         return ((caseData.isPartAdmitClaimSpec() || caseData.isFullAdmitClaimSpec())
             && (caseData.isPayBySetDate() || caseData.isPayByInstallment())
             && caseData.hasApplicantRejectedRepaymentPlan());
+    }
+
+    @Override
+    public boolean isHwFClaimSubmit() {
+        return caseData.isHWFTypeClaimIssued()
+            && caseData.getCcdState() == CaseState.PENDING_CASE_ISSUED
+            && null == caseData.getHwFEvent();
+    }
+
+    @Override
+    public boolean isHwFMoreInformationNeeded() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.MORE_INFORMATION_HWF;
+    }
+
+    @Override
+    public boolean isHwfNoRemission() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.NO_REMISSION_HWF;
+    }
+
+    @Override
+    public boolean isHwfPartialRemission() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
+    }
+
+    @Override
+    public boolean isHwfUpdatedRefNumber() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
+    }
+
+    @Override
+    public boolean isHwfInvalidRefNumber() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.INVALID_HWF_REFERENCE;
+    }
+
+    @Override
+    public boolean isHwfPaymentOutcome() {
+        return caseData.isHWFOutcomeReady() && caseData.getHwFEvent() == CaseEvent.FEE_PAYMENT_OUTCOME;
     }
 }
