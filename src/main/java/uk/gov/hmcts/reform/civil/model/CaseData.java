@@ -11,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.jackson.Jacksonized;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -21,8 +22,10 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ClaimType;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.enums.EmploymentTypeCheckboxFixedListLRspec;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyResponseTypeFlags;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.PersonalInjuryType;
@@ -44,10 +47,13 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.caseprogression.FreeFormOrderValues;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
+import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -675,6 +681,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private DecisionOnRequestReconsiderationOptions decisionOnRequestReconsiderationOptions;
     private UpholdingPreviousOrderReason upholdingPreviousOrderReason;
 
+    @JsonUnwrapped
+    private FeePaymentOutcomeDetails feePaymentOutcomeDetails;
+
     /**
      * There are several fields that can hold the I2P of applicant1 depending
      * on multiparty scenario, which complicates all conditions depending on it.
@@ -1050,6 +1059,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public String getRespondent2OrganisationId() {
+        return getOrganisationId(Optional.ofNullable(getRespondent2OrganisationPolicy()));
+    }
+
+    @JsonIgnore
     private String getOrganisationId(Optional<OrganisationPolicy> policy) {
         return policy
             .map(OrganisationPolicy::getOrganisation)
@@ -1255,6 +1269,67 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public CaseEvent getHwFEvent() {
+        if (this.isHWFTypeHearing() && this.getHearingHwfDetails() != null) {
+            return this.getHearingHwfDetails().getHwfCaseEvent();
+        }
+        if (this.isHWFTypeClaimIssued() && this.getClaimIssuedHwfDetails() != null) {
+            return this.getClaimIssuedHwfDetails().getHwfCaseEvent();
+        }
+        return null;
+    }
+
+    @JsonIgnore
+    public boolean isHWFOutcomeReady() {
+        return (this.getCcdState() == CaseState.PENDING_CASE_ISSUED && this.isHWFTypeClaimIssued())
+            || (this.getCcdState() == CaseState.HEARING_READINESS && this.isHWFTypeHearing());
+    }
+
+    @JsonIgnore
+    public String getHwFReferenceNumber() {
+        if (this.isHWFTypeHearing()) {
+            return this.getHearingHelpFeesReferenceNumber();
+        }
+        if (this.isHWFTypeClaimIssued()) {
+            return this.getHelpWithFeesReferenceNumber();
+        }
+        return null;
+    }
+
+    @JsonIgnore
+    public BigDecimal getHwFFeeAmount() {
+        if (this.isHWFTypeHearing()) {
+            return MonetaryConversions.penniesToPounds(this.getCalculatedHearingFeeInPence());
+        }
+        if (this.isHWFTypeClaimIssued()) {
+            return MonetaryConversions.penniesToPounds(this.getCalculatedClaimFeeInPence());
+        }
+        return null;
+    }
+
+    @JsonIgnore
+    public BigDecimal getRemissionAmount() {
+        if (this.isHWFTypeHearing()) {
+            return MonetaryConversions.penniesToPounds(this.getHearingRemissionAmount());
+        }
+        if (this.isHWFTypeClaimIssued()) {
+            return MonetaryConversions.penniesToPounds(this.getClaimIssueRemissionAmount());
+        }
+        return null;
+    }
+
+    @JsonIgnore
+    public BigDecimal getOutstandingFeeInPounds() {
+        if (this.isHWFTypeHearing() && this.getHearingHwfDetails() != null) {
+            return this.getHearingHwfDetails().getOutstandingFeeInPounds();
+        }
+        if (this.isHWFTypeClaimIssued() && this.getClaimIssuedHwfDetails() != null) {
+            return this.getClaimIssuedHwfDetails().getOutstandingFeeInPounds();
+        }
+        return null;
+    }
+
+    @JsonIgnore
     public boolean isSettlementAgreementDeadlineExpired() {
         return nonNull(respondent1RespondToSettlementAgreementDeadline)
             && LocalDateTime.now().isAfter(respondent1RespondToSettlementAgreementDeadline);
@@ -1271,6 +1346,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private boolean isDateAfterToday(LocalDate date) {
         return nonNull(date)
             && date.atTime(DeadlinesCalculator.END_OF_BUSINESS_DAY).isAfter(LocalDateTime.now());
+    }
+
+    @JsonIgnore
+    public boolean hearingFeePaymentDoneWithHWF() {
+        return isLipvLipOneVOne()
+            && Objects.nonNull(getHearingHelpFeesReferenceNumber())
+            && Objects.nonNull(getFeePaymentOutcomeDetails())
+            && Objects.nonNull(getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForHearingFee());
     }
 
     @JsonIgnore

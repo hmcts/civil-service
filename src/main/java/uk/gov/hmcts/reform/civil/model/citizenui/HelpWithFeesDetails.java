@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.NoRemissionDetailsSummary;
 
 import java.math.BigDecimal;
@@ -15,9 +16,13 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class HelpWithFeesDetails {
 
-    private String noRemissionDetails;
-    private NoRemissionDetailsSummary noRemissionDetailsSummary;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal remissionAmount;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private BigDecimal outstandingFeeInPounds;
+    private String noRemissionDetails;
+    private NoRemissionDetailsSummary noRemissionDetailsSummary;
     private String hwfReferenceNumber;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private CaseEvent hwfCaseEvent;
 }

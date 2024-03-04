@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -33,20 +34,67 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
     private ObjectMapper mapper;
 
     @Nested
-    class AboutToSubmit {
+    class AboutToStart {
+
+        @Nested
+        class UpdateNextHearingDetails {
+            @Test
+            void shouldSetNextHearingDetails() {
+                CaseData caseData = CaseDataBuilder.builder().build();
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseEvent.UpdateNextHearingInfo,
+                    ABOUT_TO_START
+                );
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+                NextHearingDetails expected = NextHearingDetails.builder()
+                    .hearingID("HER12345")
+                    .hearingDateTime(LocalDateTime.of(2025, 1, 1, 0, 0, 0)).build();
+                assertEquals(expected, updatedData.getNextHearingDetails());
+            }
+        }
+
+        @Nested
+        class UpdateNextHearingInfo {
+            @Test
+            void shouldSetNextHearingDetails() {
+                CaseData caseData = CaseDataBuilder.builder().build();
+                CallbackParams params = callbackParamsOf(
+                    caseData,
+                    CaseEvent.UpdateNextHearingInfo,
+                    ABOUT_TO_START
+                );
+
+                AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                    .handle(params);
+
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+                NextHearingDetails expected = NextHearingDetails.builder()
+                    .hearingID("HER12345")
+                    .hearingDateTime(LocalDateTime.of(2025, 1, 1, 0, 0, 0)).build();
+                assertEquals(expected, updatedData.getNextHearingDetails());
+            }
+        }
+
         @Test
         void shouldSetNextHearingDetails() {
             CaseData caseData = CaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                    .handle(params);
+                .handle(params);
 
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
             NextHearingDetails expected = NextHearingDetails.builder()
-                    .hearingID("HER12345")
-                    .hearingDateTime(LocalDateTime.of(2025, 1, 1, 0, 0, 0)).build();
+                .hearingID("HER12345")
+                .hearingDateTime(LocalDateTime.of(2025, 1, 1, 0, 0, 0)).build();
             assertEquals(expected, updatedData.getNextHearingDetails());
         }
     }

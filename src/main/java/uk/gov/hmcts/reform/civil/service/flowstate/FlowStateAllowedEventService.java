@@ -15,7 +15,10 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_NEXT_HEARING_DETAILS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
@@ -64,6 +67,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.HEARING_SCHEDULED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INFORM_AGREED_EXTENSION_DATE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDGMENT_PAID_IN_FULL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIP_CLAIM_SETTLED;
@@ -171,6 +175,7 @@ public class FlowStateAllowedEventService {
         NOTIFY_HEARING_PARTIES,
         MANAGE_CONTACT_INFORMATION,
         CASE_PROCEEDS_IN_CASEMAN,
+        UpdateNextHearingInfo,
         UPDATE_NEXT_HEARING_DETAILS
     );
 
@@ -246,12 +251,13 @@ public class FlowStateAllowedEventService {
                 CREATE_SDO,
                 NotSuitable_SDO,
                 EVIDENCE_UPLOAD_JUDGE,
-                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                 CREATE_CLAIM_AFTER_PAYMENT,
+                CREATE_CLAIM_SPEC_AFTER_PAYMENT,
                 EVIDENCE_UPLOAD_APPLICANT,
                 migrateCase,
                 EVIDENCE_UPLOAD_RESPONDENT,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                INVALID_HWF_REFERENCE
             )
         ),
 
@@ -370,10 +376,10 @@ public class FlowStateAllowedEventService {
                 ADD_CASE_NOTE,
                 CHANGE_SOLICITOR_EMAIL,
                 INITIATE_GENERAL_APPLICATION,
-                DEFAULT_JUDGEMENT,
-                STANDARD_DIRECTION_ORDER_DJ,
                 CREATE_SDO,
                 NotSuitable_SDO,
+                DEFAULT_JUDGEMENT,
+                STANDARD_DIRECTION_ORDER_DJ,
                 migrateCase,
                 TAKE_CASE_OFFLINE,
                 EVIDENCE_UPLOAD_JUDGE,
@@ -838,7 +844,8 @@ public class FlowStateAllowedEventService {
                 BUNDLE_CREATION_NOTIFICATION,
                 ADD_UNAVAILABLE_DATES,
                 asyncStitchingComplete,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                INVALID_HWF_REFERENCE
             )
         ),
         entry(
@@ -947,7 +954,8 @@ public class FlowStateAllowedEventService {
                 CHANGE_SOLICITOR_EMAIL,
                 LIP_CLAIM_SETTLED,
                 asyncStitchingComplete,
-                TRANSFER_ONLINE_CASE
+                TRANSFER_ONLINE_CASE,
+                INVALID_HWF_REFERENCE
             )
         ),
         entry(
@@ -1387,11 +1395,14 @@ public class FlowStateAllowedEventService {
                 asyncStitchingComplete,
                 UPLOAD_MEDIATION_DOCUMENTS,
                 MORE_INFORMATION_HWF,
+                FEE_PAYMENT_OUTCOME,
+                NO_REMISSION_HWF,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
                 PARTIAL_REMISSION_HWF_GRANTED,
                 FULL_REMISSION_HWF,
-                UPDATE_HELP_WITH_FEE_NUMBER
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE
             )
         ),
         entry(
@@ -1589,8 +1600,11 @@ public class FlowStateAllowedEventService {
                 UPLOAD_TRANSLATED_DOCUMENT,
                 MORE_INFORMATION_HWF,
                 PARTIAL_REMISSION_HWF_GRANTED,
+                FEE_PAYMENT_OUTCOME,
                 FULL_REMISSION_HWF,
-                UPDATE_HELP_WITH_FEE_NUMBER
+                UPDATE_HELP_WITH_FEE_NUMBER,
+                INVALID_HWF_REFERENCE,
+                NO_REMISSION_HWF
             )
         ),
         entry(
