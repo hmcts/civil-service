@@ -460,6 +460,41 @@ public class CmcClaim implements Claim {
             && (response.getPaymentIntention().isPayByDate() || response.getPaymentIntention().isPayByInstallments()));
     }
 
+    @Override
+    public boolean isHwFClaimSubmit() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfNoRemission() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwFMoreInformationNeeded() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfPartialRemission() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfUpdatedRefNumber() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfInvalidRefNumber() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfPaymentOutcome() {
+        return false;
+    }
+
     private boolean isThroughAdmissions(Settlement settlement) {
         List<PartyStatement> partyStatements = new ArrayList<>(settlement.getPartyStatements());
         if (CollectionUtils.isEmpty(partyStatements) || !settlement.hasOffer()) {
