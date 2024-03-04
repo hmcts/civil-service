@@ -178,7 +178,7 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
             verify(notificationService).sendMail(
                 "respondentsolicitor@example.com",
                 "template-mediation-id",
-                getNotificationDataMapSpec(caseData),
+                getNotificationDataMapCarm(caseData),
                 "mediation-agreement-respondent-notification-000DC001"
             );
         }
@@ -210,7 +210,7 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
             verify(notificationService).sendMail(
                 "respondentsolicitor2@example.com",
                 "template-mediation-id",
-                getNotificationDataMapRespondent2(caseData),
+                getNotificationDataMapRespondent2Carm(caseData),
                 "mediation-agreement-respondent-notification-000DC001"
             );
         }
@@ -233,9 +233,18 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
         }
 
         @NotNull
-        public Map<String, String> getNotificationDataMapRespondent2(CaseData caseData) {
+        public Map<String, String> getNotificationDataMapCarm(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            );
+        }
+
+        @NotNull
+        public Map<String, String> getNotificationDataMapRespondent2Carm(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
             );
         }

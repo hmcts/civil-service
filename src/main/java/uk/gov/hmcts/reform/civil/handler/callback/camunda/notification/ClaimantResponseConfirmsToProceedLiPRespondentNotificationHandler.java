@@ -54,7 +54,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
                 shouldSendEmailToDefendantLR ? caseData.getRespondentSolicitor1EmailAddress() : caseData.getRespondent1().getPartyEmail(),
                 shouldSendEmailToDefendantLR ? notificationsProperties.getNotifyDefendantLRForMediation()
                     : notificationsProperties.getRespondent1LipClaimUpdatedTemplate(),
-                addProperties(caseData),
+                shouldSendEmailToDefendantLR ? addPropertiesCarm(caseData) : addProperties(caseData),
                 String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
@@ -92,6 +92,13 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
         }
         return Map.of(
             CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+        );
+    }
+
+    public Map<String, String> addPropertiesCarm(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
         );
     }

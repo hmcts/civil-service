@@ -56,26 +56,26 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
 
     private CallbackResponse notifyDefendantMediationAgreement(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate());
         if (CaseEvent.valueOf(callbackParams.getRequest().getEventId())
             .equals(NOTIFY_RESPONDENT2_MEDIATION_AGREEMENT)) {
-            boolean shouldNotifyRespondent2LR = shouldSendMediationNotificationDefendant2LRCarm(
-                caseData,
-                featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())
-            );
-            if (shouldNotifyRespondent2LR) {
+            boolean shouldNotifyRespondent2LRCarm = shouldSendMediationNotificationDefendant2LRCarm(
+                caseData, carmEnabled);
+            if (shouldNotifyRespondent2LRCarm) {
                 notificationService.sendMail(
                     addEmailRespondent2(caseData),
                     notificationsProperties.getNotifyDefendantLRForMediation(),
-                    addPropertiesRespondent2(caseData),
+                    addPropertiesRespondent2Carm(caseData),
                     String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
                 );
             }
         } else {
             if (caseData.getRespondent1().getPartyEmail() != null || caseData.getRespondentSolicitor1EmailAddress() != null) {
+                boolean shouldNotifyRespondent1LRCarm = shouldSendMediationNotificationDefendant1LRCarm(caseData, carmEnabled);
                 notificationService.sendMail(
                     addEmail(caseData),
                     addTemplate(caseData),
-                    addProperties(caseData),
+                    shouldNotifyRespondent1LRCarm ? addPropertiesRespondent1Carm(caseData) : addProperties(caseData),
                     String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
                 );
             }
@@ -108,9 +108,18 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
         }
     }
 
-    public Map<String, String> addPropertiesRespondent2(CaseData caseData) {
+    public Map<String, String> addPropertiesRespondent1Carm(CaseData caseData) {
         return Map.of(
-            CLAIM_REFERENCE_NUMBER, caseData.getLegacyCaseReference(),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            CLAIM_LEGAL_ORG_NAME_SPEC,
+            getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService),
+            CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+        );
+    }
+
+    public Map<String, String> addPropertiesRespondent2Carm(CaseData caseData) {
+        return Map.of(
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIM_LEGAL_ORG_NAME_SPEC,
             getRespondentLegalOrganizationName(caseData.getRespondent2OrganisationPolicy(), organisationService)
         );

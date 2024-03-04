@@ -168,7 +168,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandlerTe
 
         private Map<String, String> getNotificationDataMapCarm(CaseData caseData) {
             return Map.of(
-                CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
+                CLAIM_REFERENCE_NUMBER, CASE_ID.toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, "org name"
             );
         }
