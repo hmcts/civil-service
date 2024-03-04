@@ -361,7 +361,7 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:v1.0.61_CIV-12292_claimant_mediation_notification'
+  implementation 'com.github.hmcts:civil-commons:v1.0.62-CIV-12292-2'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
