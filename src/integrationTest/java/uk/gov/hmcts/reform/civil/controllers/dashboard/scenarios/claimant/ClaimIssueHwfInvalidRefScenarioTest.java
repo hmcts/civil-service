@@ -24,7 +24,7 @@ public class ClaimIssueHwfInvalidRefScenarioTest extends BaseIntegrationTest {
         UUID caseId = UUID.randomUUID();
         doPost(
             BEARER_TOKEN,
-            ScenarioRequestParams.builder().params(Map.of("typeOfFee","claim")).build(),
+            ScenarioRequestParams.builder().params(Map.of("typeOfFee", "claim")).build(),
             DASHBOARD_CREATE_SCENARIO_URL,
             SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF.getScenario(),
             caseId
@@ -35,10 +35,12 @@ public class ClaimIssueHwfInvalidRefScenarioTest extends BaseIntegrationTest {
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("You've provided an invalid help with fees reference number"),
             jsonPath("$[0].descriptionEn").value(
-                "You've applied for help with the claim fee, but the reference number is invalid.<br> You've been sent an email with instructions on what to do next. If you've already read the email and taken action, disregard this message.<br> You can pay by phone by calling 0300 123 7050."),
+                "You've applied for help with the claim fee, but the reference number is invalid.<br>You've been sent an email with instructions on what to do next." +
+                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling 0300 123 7050."),
             jsonPath("$[0].titleCy").value("You've provided an invalid help with fees reference number"),
             jsonPath("$[0].descriptionCy").value(
-                "You've applied for help with the claim fee, but the reference number is invalid.<br> You've been sent an email with instructions on what to do next. If you've already read the email and taken action, disregard this message.<br> You can pay by phone by calling 0300 123 7050.")
+                "You've applied for help with the claim fee, but the reference number is invalid.<br>You've been sent an email with instructions on what to do next." +
+                    " If you've already read the email and taken action, disregard this message.<br>You can pay by phone by calling 0300 123 7050.")
 
         );
     }
