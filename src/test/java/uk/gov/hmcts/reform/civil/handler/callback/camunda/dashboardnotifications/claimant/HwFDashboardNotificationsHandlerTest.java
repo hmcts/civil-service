@@ -58,7 +58,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
 
         @ParameterizedTest
         @MethodSource("provideHwfEventsForConfigureScenario")
-        void shouldConfigureScenariosForHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenarios) {
+        void shouldConfigureScenariosForHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
             CaseData caseData = CaseDataBuilder.builder()
                 .buildClaimIssuedPaymentCaseData();
             caseData = caseData.toBuilder()
@@ -79,7 +79,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             handler.handle(params);
             verify(dashboardApiClient, times(1)).recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                dashboardScenarios.getScenario(),
+                dashboardScenario.getScenario(),
                 "BEARER_TOKEN",
                 ScenarioRequestParams.builder().params(scenarioParams).build()
             );
