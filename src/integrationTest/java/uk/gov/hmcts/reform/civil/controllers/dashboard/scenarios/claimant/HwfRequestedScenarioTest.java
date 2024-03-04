@@ -47,7 +47,7 @@ public class HwfRequestedScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[1].currentStatusEn").value("Available"),
                 jsonPath("$[2].taskNameEn").value("<a>View the response to the claim</a>"),
                 jsonPath("$[2].currentStatusEn").value("Not available yet"),
-                jsonPath("$[3].taskNameEn").value("<a href={VIEW_INFO_ABOUT_DEFENDANT_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\"></a>"),
+                jsonPath("$[3].taskNameEn").value("<a href={VIEW_INFO_ABOUT_DEFENDANT_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the defendant</a>"),
                 jsonPath("$[3].currentStatusEn").value("Available"),
                 jsonPath("$[4].taskNameEn").value("<a>View hearings</a>"),
                 jsonPath("$[4].currentStatusEn").value("Not available yet"),
