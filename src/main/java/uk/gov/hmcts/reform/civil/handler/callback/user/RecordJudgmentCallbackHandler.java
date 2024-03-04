@@ -108,6 +108,9 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
             .lastUpdatedDate(LocalDateTime.now()).build();
         if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
             judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED));
+            caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
+        } else {
+            caseData.setJoIssuedDate(null);
         }
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);

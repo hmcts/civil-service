@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentInstalmentDetails;
@@ -105,6 +106,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
             assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
             assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData()).containsEntry("joIssuedDate", "2022-12-12");
             assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
         }
 
@@ -130,6 +132,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
             assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
             assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData()).containsEntry("joIssuedDate", "2022-12-12");
             assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
         }
 
@@ -155,8 +158,22 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).containsEntry("joAmountOrdered", "1200");
             assertThat(response.getData()).containsEntry("joAmountCostOrdered", "1100");
             assertThat(response.getData()).containsEntry("joOrderMadeDate", "2022-12-12");
+            assertThat(response.getData()).containsEntry("joIssuedDate", "2022-12-12");
             assertThat(response.getData()).containsEntry("joPaymentToBeMadeByDate", "2023-12-12");
             assertThat(response.getData().get("joJudgmentPaidInFull")).isNull();
+        }
+
+        @Test
+        void whenAboutToSubmit_andRTLNo_thenSetIssuedDateToNull() {
+            //Given : Casedata in All_FINAL_ORDERS_ISSUED State
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+            caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            //When: handler is called with ABOUT_TO_SUBMIT event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData().get("joIssuedDate")).isNull();
         }
     }
 
@@ -214,5 +231,4 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             Assertions.assertTrue(response.getConfirmationBody().contains("The judgment has been recorded"));
         }
     }
-
 }
