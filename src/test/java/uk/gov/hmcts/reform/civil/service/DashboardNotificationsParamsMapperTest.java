@@ -42,12 +42,15 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
+
+        assertThat(result).extracting("typeOfFee").isEqualTo("claim fee");
     }
 
     @Test
-    public void shouldMapParameters_WhenResponseDeadlineIsNull() {
+    public void shouldMapParameters_WhenResponseDeadlineAndClaimFeeIsNull() {
 
-        caseData = caseData.toBuilder().respondent1ResponseDeadline(null).build();
+        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
+            .claimFee(null).build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -56,6 +59,8 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
 
         assertThat(result).extracting("responseDeadline").isNull();
+
+        assertThat(result).extracting("claimFee").isNull();
 
     }
 }
