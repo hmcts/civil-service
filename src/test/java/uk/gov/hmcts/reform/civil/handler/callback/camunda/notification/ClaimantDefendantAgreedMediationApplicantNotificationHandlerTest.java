@@ -76,7 +76,6 @@ class ClaimantDefendantAgreedMediationApplicantNotificationHandlerTest extends B
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_MEDIATION_AGREEMENT")
                     .build()).build();
 
-
             handler.handle(params);
 
             verify(notificationService).sendMail(
@@ -100,7 +99,6 @@ class ClaimantDefendantAgreedMediationApplicantNotificationHandlerTest extends B
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_APPLICANT_MEDIATION_AGREEMENT")
                     .build()).build();
-
 
             handler.handle(params);
 
