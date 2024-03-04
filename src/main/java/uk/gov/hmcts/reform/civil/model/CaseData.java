@@ -1381,16 +1381,4 @@ public class CaseData extends CaseDataParent implements MappableObject {
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfClaimant).isPresent();
     }
-
-    @JsonIgnore
-    public BigDecimal getOutstandingFeeInPounds() {
-        if (this.isHWFTypeHearing() && this.getHearingHwfDetails() != null) {
-            return this.getHearingHwfDetails().getOutstandingFeeInPounds();
-        }
-        if (this.isHWFTypeClaimIssued() && this.getClaimIssuedHwfDetails() != null) {
-            return this.getClaimIssuedHwfDetails().getOutstandingFeeInPounds();
-        }
-        return null;
-    }
-
 }
