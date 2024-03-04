@@ -280,7 +280,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder caseDataBuilder = caseData.toBuilder();
         BigDecimal interest = interestCalculator.calculateInterest(caseData);
-        var claimWithInterest = caseData.getTotalClaimAmount().add(interest);
+        var claimWithInterest = caseData.getTotalClaimAmount().add(caseData.getTotalInterest());
         var claimfee = feesService.getFeeDataByTotalClaimAmount(claimWithInterest);
         var claimFeePounds = MonetaryConversions.penniesToPounds(claimfee.getCalculatedAmountInPence());
         BigDecimal fixedCost = calculateFixedCosts(caseData);
