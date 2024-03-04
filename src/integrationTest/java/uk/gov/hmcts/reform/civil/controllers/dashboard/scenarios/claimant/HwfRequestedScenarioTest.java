@@ -30,8 +30,7 @@ public class HwfRequestedScenarioTest extends BaseIntegrationTest {
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("typeOfFee", "claim fee"
-                   )).build(),
+                   .params(Map.of()).build(),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_HWF_REQUESTED, caseId
         )
             .andExpect(status().isOk());

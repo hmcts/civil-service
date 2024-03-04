@@ -42,8 +42,6 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
-
-        assertThat(result).extracting("typeOfFee").isEqualTo("claim fee");
     }
 
     @Test
