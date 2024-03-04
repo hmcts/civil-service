@@ -85,7 +85,7 @@ class ClaimantDefendantAgreedMediationApplicantNotificationHandlerTest extends B
                 "mediation-agreement-applicant-notification-000DC001"
             );
         }
-
+        @Test
         void shouldSendMediationNotifyApplicantParty_whenCarmIsON() {
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             Party respondent1 = PartyBuilder.builder().soleTrader()
