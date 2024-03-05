@@ -915,6 +915,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isRespondent1Represented() {
+        return YES.equals(getRespondent1Represented());
+    }
+
+    @JsonIgnore
     public boolean isApplicant1NotRepresented() {
         return NO.equals(getApplicant1Represented());
     }
@@ -929,6 +934,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @JsonIgnore
     public boolean isLipvLipOneVOne() {
         return isRespondent1NotRepresented()
+            && isApplicant1NotRepresented()
+            && isOneVOne(this);
+    }
+
+    @JsonIgnore
+    public boolean isLipvLROneVOne() {
+        return isRespondent1Represented()
             && isApplicant1NotRepresented()
             && isOneVOne(this);
     }

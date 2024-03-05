@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag.GENERAL_APPLI
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.agreedToMediation;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.ccjRequestJudgmentByAdmission;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.declinedMediation;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLiPvLRCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isLipCase;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isRespondentSignSettlementAgreement;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isTranslatedDocumentUploaded;
@@ -281,6 +282,11 @@ public class StateFlowEngine {
                 .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(nocSubmittedForLiPApplicant)
                     .set(flags -> {
                         flags.put(FlowFlag.LIP_CASE.name(), false);
+                    })
+                .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLiPvLRCase)
+                    .set(flags -> {
+                        flags.put(FlowFlag.LIP_CASE.name(), true);
+                        flags.put(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false);
                     })
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
