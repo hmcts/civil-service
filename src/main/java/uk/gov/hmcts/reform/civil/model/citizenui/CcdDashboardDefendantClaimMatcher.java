@@ -298,4 +298,38 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         return false;
     }
 
+    @Override
+    public boolean isHwFClaimSubmit() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwFMoreInformationNeeded() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfNoRemission() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfPartialRemission() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfUpdatedRefNumber() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfInvalidRefNumber() {
+        return false;
+    }
+
+    @Override
+    public boolean isHwfPaymentOutcome() {
+        return false;
+    }
 }
