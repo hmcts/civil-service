@@ -13,7 +13,7 @@ public class FlowLipPredicate {
     public static final Predicate<CaseData> isLipCase = CaseData::isLipvLipOneVOne;
 
     public static final Predicate<CaseData> nocSubmittedForLiPApplicant = caseData ->
-        caseData.isLRvLipOneVOne() && (caseData.claimIssueFeePaymentDoneWithHWF() || caseData.getChangeOfRepresentation() != null);
+        caseData.isLRvLipOneVOne() && caseData.claimIssueFeePaymentDoneWithHWF();
 
     public static final Predicate<CaseData> isLiPvLRCase = CaseData::isLipvLROneVOne;
 
