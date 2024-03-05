@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios;
+package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -12,17 +12,11 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_SUBMIT_REQUIRED;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 public class DraftClaimScenarioTest extends BaseIntegrationTest {
-
-    public static final String SCENARIO_DRAFT_CLAIM = "Scenario.AAA7.ClaimIssue.ClaimSubmit.Required";
-    private static final String DASHBOARD_CREATE_SCENARIO_URL
-        = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
-    private static final String GET_NOTIFICATIONS_URL
-        = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
-    private static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
 
     @Test
     void should_create_draft_claim_scenario() throws Exception {
@@ -32,7 +26,7 @@ public class DraftClaimScenarioTest extends BaseIntegrationTest {
                ScenarioRequestParams.builder()
                    .params(Map.of())
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_DRAFT_CLAIM, caseId
+               DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_SUBMIT_REQUIRED.getScenario(), caseId
         )
             .andExpect(status().isOk());
 
@@ -74,7 +68,9 @@ public class DraftClaimScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("This claim has not been submitted"),
-                jsonPath("$[0].descriptionEn").value("Your claim is saved as a draft. <a href=\"{DRAFT_CLAIM_TASK_LIST}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Continue with claim</a>.")
+                jsonPath("$[0].descriptionEn")
+                    .value("Your claim is saved as a draft. <a href=\"{DRAFT_CLAIM_TASK_LIST}\" "
+                               + "rel=\"noopener noreferrer\" class=\"govuk-link\">Continue with claim</a>.")
             );
     }
 
