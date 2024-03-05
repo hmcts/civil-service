@@ -12,8 +12,8 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA7.ClaimIssue.HWF.Rejected', 'Your help with fees application has been rejected',
         'Your help with fees application has been rejected',
-        'We''ve rejected your application for help with the claim fee. See the email for further details. You''ll need to pay the full fee of ${claimFee} by ${paymentDueDate}. You can pay by phone by {civilMoneyClaimsTelephone}.',
-        'We''ve rejected your application for help with the claim fee. See the email for further details. You''ll need to pay the full fee of ${claimFee} by ${paymentDueDate}. You can pay by phone by {civilMoneyClaimsTelephone}.',
+        'We''ve rejected your application for help with the claim fee. See the email for further details. You''ll need to pay the full fee of ${claimFee} by ${paymentDueDate}. You can pay by phone by calling {civilMoneyClaimsTelephone}.',
+        'We''ve rejected your application for help with the claim fee. See the email for further details. You''ll need to pay the full fee of ${claimFee} by ${paymentDueDate}. You can pay by phone by calling {civilMoneyClaimsTelephone}.',
         'CLAIMANT');
 
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
