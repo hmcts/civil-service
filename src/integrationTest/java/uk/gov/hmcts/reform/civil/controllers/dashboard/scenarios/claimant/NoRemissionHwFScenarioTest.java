@@ -49,7 +49,7 @@ public class NoRemissionHwFScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].descriptionEn").value(
                     "We've rejected your application for help with the claim fee. See the email for "
                         + "further details. You'll need to pay the full fee of "
-                        + claimFee + " by " + paymentDueDate + " . You can pay by phone by calling 0300 123 7050")
+                        + claimFee + " by " + paymentDueDate + ". You can pay by phone by calling 0300 123 7050")
             );
 
         //Verify task Item is created
