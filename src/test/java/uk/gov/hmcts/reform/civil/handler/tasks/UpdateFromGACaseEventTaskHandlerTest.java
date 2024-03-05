@@ -684,6 +684,36 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         assertThat(handler.checkIfDocumentExists(civilCaseDocumentList, gaDocumentList)).isEqualTo(1);
     }
 
+    @Test
+    void shouldMergeBundle() {
+        String uid = "f000aa01-0451-4000-b000-000000000000";
+        CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft().build()
+                .toBuilder()
+                .gaAddlDocBundle(singletonList(Element.<CaseDocument>builder()
+                        .id(UUID.fromString(uid))
+                        .value(pdfDocument).build())).build();
+        gaCaseData = handler.mergeBundle(gaCaseData);
+        assertThat(gaCaseData.getGaAddlDoc().size()).isEqualTo(1);
+
+        List<Element<CaseDocument>> addlDoc = new ArrayList<Element<CaseDocument>>() {{
+                add(Element.<CaseDocument>builder()
+                    .id(UUID.fromString(uid))
+                    .value(pdfDocument).build());
+            }};
+        List<Element<CaseDocument>> addlDocBundle = new ArrayList<Element<CaseDocument>>() {{
+                add(Element.<CaseDocument>builder()
+                    .id(UUID.fromString(uid))
+                    .value(pdfDocument).build());
+            }};
+
+        gaCaseData = new CaseDataBuilder().atStateClaimDraft().build()
+                .toBuilder()
+                .gaAddlDoc(addlDoc)
+                .gaAddlDocBundle(addlDocBundle).build();
+        gaCaseData = handler.mergeBundle(gaCaseData);
+        assertThat(gaCaseData.getGaAddlDoc().size()).isEqualTo(2);
+    }
+
     public final CaseDocument pdfDocument = CaseDocument.builder()
         .createdBy("John")
         .documentName("documentName")

@@ -114,14 +114,14 @@ public class UpdateFromGACaseEventTaskHandler implements BaseExternalTaskHandler
         return output;
     }
 
-    private CaseData mergeBundle(CaseData generalAppCaseData) {
+    protected CaseData mergeBundle(CaseData generalAppCaseData) {
         if (Objects.nonNull(generalAppCaseData.getGaAddlDocBundle())) {
             List<Element<CaseDocument>> newGaAddlDoc = generalAppCaseData.getGaAddlDoc();
             if (Objects.isNull(newGaAddlDoc)) {
                 newGaAddlDoc = new ArrayList<>();
             }
             newGaAddlDoc.addAll(generalAppCaseData.getGaAddlDocBundle());
-            generalAppCaseData.toBuilder().gaAddlDoc(newGaAddlDoc).build();
+            return generalAppCaseData.toBuilder().gaAddlDoc(newGaAddlDoc).build();
         }
         return generalAppCaseData;
     }
