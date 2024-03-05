@@ -80,14 +80,18 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
 
     private CallbackResponse clearAllFields(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        caseData.setJoOrderMadeDate(null);
-        caseData.setJoJudgmentStatusDetails(null);
-        caseData.setJoPaymentPlanSelection(null);
-        caseData.setJoJudgmentInstalmentDetails(null);
-        caseData.setJoJudgmentRecordReason(null);
-        caseData.setJoAmountOrdered(null);
-        caseData.setJoAmountCostOrdered(null);
-        caseData.setJoIsRegisteredWithRTL(null);
+        // If first time (IsLiveJudgmentExists = null) do not clear them
+        if (caseData.getJoIsLiveJudgmentExists() != null) {
+            caseData.setJoOrderMadeDate(null);
+            caseData.setJoJudgmentStatusDetails(null);
+            caseData.setJoPaymentPlanSelection(null);
+            caseData.setJoJudgmentInstalmentDetails(null);
+            caseData.setJoJudgmentRecordReason(null);
+            caseData.setJoAmountOrdered(null);
+            caseData.setJoAmountCostOrdered(null);
+            caseData.setJoIsRegisteredWithRTL(null);
+            caseData.setJoIssuedDate(null);
+        }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
@@ -109,8 +113,6 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
         if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
             judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED));
             caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
-        } else {
-            caseData.setJoIssuedDate(null);
         }
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
