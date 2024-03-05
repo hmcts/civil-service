@@ -91,11 +91,12 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
             caseData.setJoAmountCostOrdered(null);
             caseData.setJoIsRegisteredWithRTL(null);
             caseData.setJoIssuedDate(null);
-        }
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        return AboutToStartOrSubmitCallbackResponse.builder()
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
