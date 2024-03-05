@@ -22,10 +22,9 @@ public class ClaimIssueHwfNumUpdatedScenarioTest extends BaseIntegrationTest {
     void should_create_claimIssue_hwf_num_updated_scenario() throws Exception {
 
         UUID caseId = UUID.randomUUID();
-        String feeType = "claim";
         doPost(BEARER_TOKEN,
                 ScenarioRequestParams.builder()
-                        .params(Map.of("typeOfFee", feeType))
+                        .params(Map.of("typeOfFee", "claim"))
                         .build(),
                 DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED.getScenario(), caseId
         )
@@ -38,8 +37,9 @@ public class ClaimIssueHwfNumUpdatedScenarioTest extends BaseIntegrationTest {
                         status().is(HttpStatus.OK.value()),
                         jsonPath("$[0].titleEn").value("Your help with fees application has been updated"),
                         jsonPath("$[0].descriptionEn")
-                                .value("You've applied for help with the " + feeType + " fee. You'll receive an update from us within 5 to 10 working days.")
-                );
-
+                                .value("You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days."),
+                        jsonPath("$[0].titleCy").value("Your help with fees application has been updated"),
+                        jsonPath("$[0].descriptionCy")
+                                .value("You've applied for help with the claim fee. You'll receive an update from us within 5 to 10 working days."));
     }
 }

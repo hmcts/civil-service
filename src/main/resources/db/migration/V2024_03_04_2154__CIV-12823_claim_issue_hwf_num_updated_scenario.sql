@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA7.Notice.ClaimIssue.HWF.Updated', '{"Notice.AAA7.ClaimIssue.HWF.InvalidRef"}', '{"Notice.AAA7.ClaimIssue.HWF.Updated": ["typeOfFee"]}');
+VALUES ('Scenario.AAA7.ClaimIssue.HWF.Updated', '{"Notice.AAA7.ClaimIssue.HWF.InvalidRef"}', '{"Notice.AAA7.ClaimIssue.HWF.Updated": ["typeOfFee"]}');
 
 /**
  * Add notification template

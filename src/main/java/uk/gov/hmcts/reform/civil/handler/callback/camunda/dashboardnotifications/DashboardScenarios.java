@@ -8,7 +8,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT("Scenario.AAA7.ClaimIssue.Response.Await"),
     SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_REQUIRED("Scenario.AAA7.ClaimIssue.Response.Required"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF("Scenario.AAA7.ClaimIssue.HWF.InvalidRef"),
-    SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED("Scenario.AAA7.Notice.ClaimIssue.HWF.Updated");
+    SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED("Scenario.AAA7.ClaimIssue.HWF.Updated");
 
     private final String scenario;
 
