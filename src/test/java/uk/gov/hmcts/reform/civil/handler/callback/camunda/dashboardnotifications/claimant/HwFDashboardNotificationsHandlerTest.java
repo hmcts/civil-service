@@ -64,7 +64,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
 
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
-            
+
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("typeOfFee", "claim");
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -74,6 +74,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             ).build();
 
             handler.handle(params);
+
             verify(dashboardApiClient, times(1)).recordScenario(
                 caseData.getCcdCaseReference().toString(),
                 dashboardScenario.getScenario(),
