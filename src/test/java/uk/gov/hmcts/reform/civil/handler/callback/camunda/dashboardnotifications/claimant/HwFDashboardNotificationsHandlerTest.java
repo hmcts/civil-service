@@ -66,12 +66,12 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
                 CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
             ).build();
 
-            Map<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("typeOfFee", "claim");
-
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+
+            Map<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("typeOfFee", "claim");
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             handler.handle(params);
             verify(dashboardApiClient, times(1)).recordScenario(
