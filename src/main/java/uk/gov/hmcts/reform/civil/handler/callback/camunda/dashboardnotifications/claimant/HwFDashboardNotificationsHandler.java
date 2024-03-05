@@ -66,6 +66,5 @@ public class HwFDashboardNotificationsHandler extends CallbackHandler {
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-
     }
 }
