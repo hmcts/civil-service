@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,11 @@ public class DashboardNotificationsParamsMapper {
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("defendantName", caseData.getRespondent1().getPartyName());
+        params.put("defendantAdmittedAmount", getDefendantAdmittedAmount(caseData));
+
+        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
+            params.put("whenWillThisAmountBePaid", caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
+        }
 
         params.put(
             "claimFee",
