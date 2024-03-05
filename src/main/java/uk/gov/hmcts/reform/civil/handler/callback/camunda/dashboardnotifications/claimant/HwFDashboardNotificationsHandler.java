@@ -31,7 +31,7 @@ public class HwFDashboardNotificationsHandler extends CallbackHandler {
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
     private final Map<CaseEvent, String> dashboardScenarios = Map.of(
-       UPDATE_HELP_WITH_FEE_NUMBER, SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED.getScenario()
+        UPDATE_HELP_WITH_FEE_NUMBER, SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED.getScenario()
     );
 
     @Override
