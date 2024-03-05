@@ -94,17 +94,4 @@ public interface Claim {
 
     boolean isPaymentPlanRejected();
 
-    boolean isHwFClaimSubmit();
-
-    boolean isHwFMoreInformationNeeded();
-
-    boolean isHwfNoRemission();
-
-    boolean isHwfPartialRemission();
-
-    boolean isHwfUpdatedRefNumber();
-
-    boolean isHwfInvalidRefNumber();
-
-    boolean isHwfPaymentOutcome();
 }

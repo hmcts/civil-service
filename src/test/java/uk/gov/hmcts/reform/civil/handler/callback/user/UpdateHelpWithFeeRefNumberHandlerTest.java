@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_LIP_CLAIMANT_HWF_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +31,6 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
-        objectMapper.findAndRegisterModules();
         handler = new UpdateHelpWithFeeRefNumberHandler(objectMapper);
     }
 
@@ -57,10 +56,8 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             CaseData data = getCaseData(response);
-            assertThat(data.getCaseDataLiP().getHelpWithFees().getHelpWithFeesReferenceNumber()).isEqualTo("7890");
-            assertThat(data.getClaimIssuedHwfDetails().getHwfReferenceNumber()).isNull();
-            assertThat(data.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
-            assertThat(data.getClaimIssuedHwfDetails().getHwfCaseEvent()).isEqualTo(UPDATE_HELP_WITH_FEE_NUMBER);
+            Assertions.assertThat(data.getCaseDataLiP().getHelpWithFees().getHelpWithFeesReferenceNumber()).isEqualTo("7890");
+            Assertions.assertThat(data.getClaimIssuedHwfDetails().getHwfReferenceNumber()).isNull();
         }
 
         @Test
@@ -78,10 +75,8 @@ class UpdateHelpWithFeeRefNumberHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then
             CaseData data = getCaseData(response);
-            assertThat(data.getHearingHelpFeesReferenceNumber()).isEqualTo("78905185430");
-            assertThat(data.getHearingHwfDetails().getHwfReferenceNumber()).isNull();
-            assertThat(data.getBusinessProcess().getCamundaEvent()).isEqualTo(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME.toString());
-            assertThat(data.getHearingHwfDetails().getHwfCaseEvent()).isEqualTo(UPDATE_HELP_WITH_FEE_NUMBER);
+            Assertions.assertThat(data.getHearingHelpFeesReferenceNumber()).isEqualTo("78905185430");
+            Assertions.assertThat(data.getHearingHwfDetails().getHwfReferenceNumber()).isNull();
         }
     }
 
