@@ -31,11 +31,13 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             params.put("responseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
         }
-        params.put(
-            "claimIssueRemissionAmount",
-            MonetaryConversions.penniesToPounds(caseData.getClaimIssueRemissionAmount()).stripTrailingZeros()
-                .toPlainString()
-        );
+        if (caseData.getClaimIssueRemissionAmount() != null) {
+            params.put(
+                "claimIssueRemissionAmount",
+                MonetaryConversions.penniesToPounds(caseData.getClaimIssueRemissionAmount()).stripTrailingZeros()
+                    .toPlainString()
+            );
+        }
         if (caseData.getOutstandingFeeInPounds() != null) {
             params.put(
                 "claimIssueOutStandingAmount",
