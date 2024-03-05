@@ -185,7 +185,6 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
     public Optional<CaseDocument> generateDQFor1v2DiffSol(CaseData caseData,
                                                           String authorisation,
                                                           String respondent) {
-        // TODO check if this is the correct template, I just copy-pasted from generateDQFor1v2SingleSolDiffResponse
         DocmosisTemplates templateId = featureToggleService.isFastTrackUpliftsEnabled()
             ? DQ_RESPONSE_1V1_FAST_TRACK_INT : DQ_RESPONSE_1V1;
         String fileName = getFileName(caseData, templateId);
@@ -200,14 +199,14 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         if (responseDate == null) {
             throw new NullPointerException("Response date should not be null");
         }
-        if (caseData.getSystemGeneratedCaseDocuments().stream()
-            .anyMatch(element ->
-                          Objects.equals(element.getValue().getCreatedDatetime(), responseDate)
-                              && fileName.equals(element.getValue().getDocumentName()))) {
-            // this DQ is already generated
+
+        // Check if the DQ is already generated for this response date and file name
+        if (isDQAlreadyGenerated(caseData, responseDate, fileName)) {
+            // DQ is already generated, return empty optional
             return Optional.empty();
         }
 
+        // Generate DQ based on respondent and template data
         DirectionsQuestionnaireForm templateData;
         if (respondent.equals("ONE")) {
             templateData = getRespondent1TemplateData(caseData, "ONE", authorisation);
@@ -216,6 +215,7 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
             templateData = getRespondent2TemplateData(caseData, "TWO", authorisation);
         }
 
+        // Generate docmosis document and upload it
         DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
             templateData, templateId);
         CaseDocument document = documentManagementService.uploadDocument(
@@ -224,8 +224,17 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
                     DocumentType.DIRECTIONS_QUESTIONNAIRE
             )
         );
+
         // set the create date time equal to the response date time, so we can check it afterwards
         return Optional.of(document.toBuilder().createdDatetime(responseDate).build());
+    }
+
+    // Method to check if DQ is already generated for the given response date and file name
+    private boolean isDQAlreadyGenerated(CaseData caseData, LocalDateTime responseDate, String fileName) {
+        return caseData.getSystemGeneratedCaseDocuments().stream()
+            .anyMatch(element ->
+                          Objects.equals(element.getValue().getCreatedDatetime(), responseDate)
+                              && fileName.equals(element.getValue().getDocumentName()));
     }
 
     private String getFileName(CaseData caseData, DocmosisTemplates templateId) {
@@ -1010,10 +1019,10 @@ public class DirectionsQuestionnaireGenerator implements TemplateDataGeneratorWi
         }
 
         return Experts.builder()
-            .expertRequired(expertRequired)
+            .expertRequired(caseData.isRespondent1NotRepresented() ? YesOrNo.NO : expertRequired)
             .expertReportsSent(null)
             .jointExpertSuitable(null)
-            .details(List.of(expertDetails))
+            .details(caseData.isRespondent1NotRepresented() && dq.getExperts() != null ? getExpertsDetails(dq) : List.of(expertDetails))
             .build();
     }
 
