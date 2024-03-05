@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,12 +28,21 @@ public class DashboardNotificationsParamsMapper {
             "£" + MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
                 .stripTrailingZeros().toPlainString()
         );
-        params.put("remissionAmount", caseData.getClaimIssueRemissionAmount());
-        params.put("outStandingAmount", caseData.getOutstandingFeeInPounds());
-        params.put("paymentDueDate", LocalDate.now());
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             params.put("responseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
         }
+        params.put(
+            "claimIssueRemissionAmount",
+            MonetaryConversions.penniesToPounds(caseData.getClaimIssueRemissionAmount()).stripTrailingZeros()
+                .toPlainString()
+        );
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            params.put(
+                "claimIssueOutStandingAmount",
+                caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
+            );
+        }
+        params.put("claimIssuePaymentDueDate", DateUtils.formatDate(LocalDateTime.now()));
         return params;
     }
 }
