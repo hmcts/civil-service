@@ -19,7 +19,9 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT1_HWF_DASHBOARD_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_NOTICE_CLAIM_ISSUE_HWF_NO_REMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_NOTICE_CLAIM_ISSUE_HWF_PART_REMISSION;
 
 @Service
@@ -32,7 +34,9 @@ public class HwFDashboardNotificationsHandler extends CallbackHandler {
     private final DashboardNotificationsParamsMapper mapper;
     private final Map<CaseEvent, String> dashboardScenarios = Map.of(
         PARTIAL_REMISSION_HWF_GRANTED,
-        SCENARIO_AAA7_NOTICE_CLAIM_ISSUE_HWF_PART_REMISSION.getScenario()
+        SCENARIO_AAA7_NOTICE_CLAIM_ISSUE_HWF_PART_REMISSION.getScenario(),
+        NO_REMISSION_HWF,
+        SCENARIO_AAA7_NOTICE_CLAIM_ISSUE_HWF_NO_REMISSION.getScenario()
     );
 
     @Override
