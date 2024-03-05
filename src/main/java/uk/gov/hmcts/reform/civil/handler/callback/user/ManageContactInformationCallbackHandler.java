@@ -614,13 +614,13 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private boolean shouldCopyToRespondent2 (CaseData caseData) {
+    private boolean shouldCopyToRespondent2(CaseData caseData) {
         return caseData.getRespondent2() != null
             && YES.equals(caseData.getRespondent2SameLegalRepresentative())
             && YES.equals(caseData.getRespondentResponseIsSame());
     }
 
-    private boolean shouldCopyToApplicant2 (CaseData caseData) {
+    private boolean shouldCopyToApplicant2(CaseData caseData) {
         return caseData.getApplicant2() != null
             && ((YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
             && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()))
