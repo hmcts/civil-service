@@ -304,6 +304,7 @@ public class SdoGeneratorService {
     }
 
     private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
+        boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         SdoDocumentFormSmall.SdoDocumentFormSmallBuilder sdoDocumentFormBuilder = SdoDocumentFormSmall.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -358,6 +359,7 @@ public class SdoGeneratorService {
             )
             // SNI-5142
             .smallClaimsMethodToggle(true)
+            .smallClaimMediationSectionInput(SdoHelper.getSmallClaimsMediationText(caseData))
             .smallClaimsDocumentsToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")
             )
@@ -366,7 +368,11 @@ public class SdoGeneratorService {
             )
             .smallClaimsNumberOfWitnessesToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsNumberOfWitnessesToggle")
-            );
+            )
+            .smallClaimsMediationSectionToggle(
+                SdoHelper.showCarmMediationSection(caseData, carmEnabled)
+            )
+            .carmEnabled(carmEnabled);
 
         sdoDocumentFormBuilder.hearingLocation(
                 locationHelper.getHearingLocation(
