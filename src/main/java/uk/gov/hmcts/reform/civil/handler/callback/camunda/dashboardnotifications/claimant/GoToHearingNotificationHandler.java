@@ -49,7 +49,7 @@ public class GoToHearingNotificationHandler extends CallbackHandler {
 
     private CallbackResponse configureScenarioForGoToHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if (callbackParams.getCaseData().getCcdState() == CaseState.JUDICIAL_REFERRAL) {
+        if (caseData.getCcdState() == CaseState.JUDICIAL_REFERRAL) {
             String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
