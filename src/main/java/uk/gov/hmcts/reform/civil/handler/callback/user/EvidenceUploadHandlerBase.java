@@ -432,13 +432,13 @@ abstract class EvidenceUploadHandlerBase extends CallbackHandler {
         if (documentUpload == null || documentUpload.isEmpty()) {
             return;
         }
-        LocalDateTime midnight = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT);
+        LocalDateTime halfFivePmYesterday = LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(17, 30));
         renameDocuments(documentUpload, theID);
         documentUpload.forEach(document -> {
             Document documentToAddId = documentExtractor.apply(document);
             documentToAddId.setCategoryID(theID);
             LocalDateTime dateTime = documentDateTimeExtractor.apply(document);
-            if (dateTime.isAfter(midnight)) {
+            if (dateTime.isAfter(halfFivePmYesterday)) {
                 String updateNotificationText = format(docNotificationText, claimantDefendantString);
                 if (!notificationString.toString().contains(updateNotificationText)) {
                     notificationString.append("\n").append(updateNotificationText);
