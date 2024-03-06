@@ -37,7 +37,13 @@ public class GoToHearingScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].titleEn").value("Wait for the court to review the case"),
                 jsonPath("$[0].descriptionEn")
                     .value("You have rejected ${defendantName}'s response and want to proceed to court." +
-                               " If the case goes to a hearing we will contact you with further details. " +
+                               " If the case goes to a hearing we will contact you with further details.<br><br>" +
+                               "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  " +
+                               "rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>."),
+                jsonPath("$[0].titleCy").value("Wait for the court to review the case"),
+                jsonPath("$[0].descriptionCy")
+                    .value("You have rejected ${defendantName}'s response and want to proceed to court." +
+                               " If the case goes to a hearing we will contact you with further details.<br><br>" +
                                "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  " +
                                "rel=\"noopener noreferrer\" class=\"govuk-link\">View the defendant's response</a>.")
             );
