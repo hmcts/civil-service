@@ -7004,4 +7004,10 @@ public class CaseDataBuilder {
             .res1MediationDocumentsReferred(res1MediationDocumentsReferred)
             .build();
     }
+
+    public CaseDataBuilder atStateLipClaimSettled() {
+        atStateRespondentRespondToClaimSpec(RespondentResponseTypeSpec.PART_ADMISSION);
+        ccdState = CaseState.CASE_SETTLED;
+        return this;
+    }
 }
