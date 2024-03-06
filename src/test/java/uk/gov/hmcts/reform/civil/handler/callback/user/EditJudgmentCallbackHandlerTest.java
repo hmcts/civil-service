@@ -213,6 +213,19 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).contains("Date judge made the order must be in the past");
         }
+
+        @Test
+        void shouldNotThrowErrorWhenAllDatesAreValid() {
+
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            caseData.setJoOrderMadeDate(LocalDate.now().minusDays(2));
+            caseData.setJoPaymentToBeMadeByDate(LocalDate.now().plusDays(2));
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
+            //When: handler is called with MID event
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getErrors()).isEmpty();
+        }
     }
 
     @Nested
