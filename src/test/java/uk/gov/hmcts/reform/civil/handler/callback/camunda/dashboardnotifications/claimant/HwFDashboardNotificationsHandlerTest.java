@@ -34,8 +34,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT1_HWF_DASHBOARD_NOTIFICATION;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.*;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF;
 
 @ExtendWith(MockitoExtension.class)
@@ -107,7 +107,8 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
 
         private static Stream<Arguments> provideHwfEventsForConfigureScenario() {
             return Stream.of(
-                Arguments.of(INVALID_HWF_REFERENCE, SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF)
+                Arguments.of(INVALID_HWF_REFERENCE, SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF),
+                Arguments.of(MORE_INFORMATION_HWF, SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED)
             );
         }
     }
