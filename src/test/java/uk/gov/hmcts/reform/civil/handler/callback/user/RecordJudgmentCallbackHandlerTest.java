@@ -63,7 +63,8 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().toBuilder()
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .joIsLiveJudgmentExists(yesOrNo)
-                .joJudgmentStatusDetails(JudgmentStatusDetails.builder().judgmentStatusTypes(JudgmentStatusType.REQUESTED).lastUpdatedDate(LocalDateTime.now()).joRtlState("test").build())
+                .joJudgmentStatusDetails(JudgmentStatusDetails.builder().judgmentStatusTypes(JudgmentStatusType.REQUESTED)
+                                             .lastUpdatedDate(LocalDateTime.now()).joRtlState("test").build())
                 .joIssuedDate(LocalDate.now())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -90,7 +91,8 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().toBuilder()
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .joIsLiveJudgmentExists(null)
-                .joJudgmentStatusDetails(JudgmentStatusDetails.builder().judgmentStatusTypes(JudgmentStatusType.REQUESTED).lastUpdatedDate(LocalDateTime.now()).joRtlState("test").build())
+                .joJudgmentStatusDetails(JudgmentStatusDetails.builder().judgmentStatusTypes(JudgmentStatusType.REQUESTED)
+                                             .lastUpdatedDate(LocalDateTime.now()).joRtlState("test").build())
                 .joIssuedDate(LocalDate.now())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
