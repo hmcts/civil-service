@@ -70,9 +70,9 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             //Then: all showRTL field should be set correctly
             if (value == YesOrNo.NO) {
-                assertThat(response.getData()).containsEntry("joShowRegisteredWithRTLOption","Yes");
+                assertThat(response.getData()).containsEntry("joShowRegisteredWithRTLOption", "Yes");
             } else {
-                assertThat(response.getData()).containsEntry("joShowRegisteredWithRTLOption","No");
+                assertThat(response.getData()).containsEntry("joShowRegisteredWithRTLOption", "No");
             }
         }
     }
