@@ -5,7 +5,7 @@ name: cft-lib-camunda
 
 services:
   camunda:
-    container_name: camunda
+    container_name: cftlib
     image: camunda/camunda-bpm-platform:7.20.0-alpha1
     ports:
       - 9404:8080
