@@ -19,7 +19,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_PAY_IMMEDIATELY_ACCEPTED_FOR_RESPONDENT1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_PAY_IMMEDIATELY_ACCEPTED_FOR_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
 
 @Service
@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @RequiredArgsConstructor
 public class PayImmediatelyAcceptedHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_PAY_IMMEDIATELY_ACCEPTED_FOR_RESPONDENT1);
+    private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_PAY_IMMEDIATELY_ACCEPTED_FOR_RESPONDENT1);
     public static final String TASK_ID = "PayImmediatelyAcceptedDashboardNotificationForDefendant1";
 
     private final DashboardApiClient dashboardApiClient;

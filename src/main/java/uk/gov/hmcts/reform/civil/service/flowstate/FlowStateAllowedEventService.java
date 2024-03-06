@@ -1178,7 +1178,11 @@ public class FlowStateAllowedEventService {
         entry(PART_ADMIT_NOT_PROCEED.fullName(),
               List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
         entry(PART_ADMIT_PAY_IMMEDIATELY.fullName(),
-              List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
+              List.of(
+                  DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                  CLAIMANT_RESPONSE_CUI
+              )
+        ),
         entry(PART_ADMIT_AGREE_SETTLE.fullName(),
               List.of(DEFENDANT_SIGN_SETTLEMENT_AGREEMENT)),
         entry(FULL_ADMIT_PAY_IMMEDIATELY.fullName(),
