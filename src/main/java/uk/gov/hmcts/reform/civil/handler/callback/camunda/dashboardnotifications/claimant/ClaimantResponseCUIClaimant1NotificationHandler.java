@@ -35,7 +35,7 @@ public class ClaimantResponseCUIClaimant1NotificationHandler extends CallbackHan
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForGoToHearing
+            callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForClaimantResponse
         );
     }
 
@@ -49,7 +49,7 @@ public class ClaimantResponseCUIClaimant1NotificationHandler extends CallbackHan
         return EVENTS;
     }
 
-    private CallbackResponse configureScenarioForGoToHearing(CallbackParams callbackParams) {
+    private CallbackResponse configureScenarioForClaimantResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         if (caseData.getCcdState() == CaseState.JUDICIAL_REFERRAL) {
