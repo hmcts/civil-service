@@ -100,6 +100,8 @@ public interface NotificationData {
     String AMOUNT = "amount";
     String PART_AMOUNT = "partAmount";
     String REMAINING_AMOUNT = "remainingAmount";
+    String DEFENDANT_NAME_ONE = "defendantName1";
+    String DEFENDANT_NAME_TWO = "defendantName2";
 
     Map<String, String> addProperties(CaseData caseData);
 
