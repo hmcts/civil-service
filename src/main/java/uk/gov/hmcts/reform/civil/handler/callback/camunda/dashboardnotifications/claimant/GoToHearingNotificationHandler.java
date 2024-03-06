@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -25,7 +26,7 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 public class GoToHearingNotificationHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_GO_TO_HEARING_FOR_APPLICANT1);
-    public static final String TASK_ID = "GenerateDashboardNotificationGoToHearing1";
+    public static final String TASK_ID = "GenerateDashboardNotificationGoToHearing";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
 
@@ -48,12 +49,14 @@ public class GoToHearingNotificationHandler extends CallbackHandler {
 
     private CallbackResponse configureScenarioForGoToHearing(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        if (callbackParams.getCaseData().getCcdState() == CaseState.JUDICIAL_REFERRAL) {
+            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-        dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                          SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING.getScenario(), authToken,
-                                          ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
-        );
+            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                              SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING.getScenario(), authToken,
+                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+            );
+        }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }
