@@ -31,6 +31,10 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             params.put("responseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
         }
+
+        if (nonNull(caseData.getRespondent1RespondToSettlementAgreementDeadline())) {
+            params.put("responseSettlementAgreementDeadline", DateUtils.formatDate(caseData.getRespondent1RespondToSettlementAgreementDeadline()));
+        }
         return params;
     }
 }
