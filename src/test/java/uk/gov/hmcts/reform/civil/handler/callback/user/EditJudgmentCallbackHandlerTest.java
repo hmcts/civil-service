@@ -217,7 +217,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotThrowErrorWhenAllDatesAreValid() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByDate();
             caseData.setJoOrderMadeDate(LocalDate.now().minusDays(2));
             caseData.setJoPaymentToBeMadeByDate(LocalDate.now().plusDays(2));
 
