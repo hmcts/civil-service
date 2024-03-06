@@ -19,7 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.*;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -54,13 +58,13 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         if (isCarmEnabled) {
             String claimId = caseData.getCcdCaseReference().toString();
             String referenceTemplate = String.format(REFERENCE_TEMPLATE, claimId);
-            String Application1Email = "leonardo.palmeiro@hmcts.net";//caseData.getApplicantSolicitor1UserDetails().getEmail();
+            String application1Email = caseData.getApplicantSolicitor1UserDetails().getEmail();
             MultiPartyScenario scenario = getMultiPartyScenario(caseData);
             //LR v LR
             if (scenario.equals(ONE_V_ONE) && !(caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne())) {
                 //send notification to the claimant
                 sendEmail(
-                    Application1Email,
+                    application1Email,
                     notificationsProperties.getNotifyLrVLrClaimantSuccessfulMediation(),
                     lrVLrClaimantProperties(caseData),
                     referenceTemplate);
@@ -69,16 +73,16 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
                     //send notification to the claimant
                     sendEmail(
-                        Application1Email,
+                        application1Email,
                         notificationsProperties.getNotifyLrVLrOneVTwoSameSolicitorClaimantSuccessfulMediation(),
                         lrVLrSameSolicitorProperties(caseData),
                         referenceTemplate);
                     return AboutToStartOrSubmitCallbackResponse.builder().build();
                 } else
                     // LR v LR -> 1V2 -> different solicitor
-                    if (scenario.equals(ONE_V_TWO_TWO_LEGAL_REP)){
+                    if (scenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                         sendEmail(
-                            Application1Email,
+                            application1Email,
                             notificationsProperties.getNotifyLrVLrOneVTwoDifferentSolicitorsClaimantSuccessfulMediation(),
                             lrVLrDifferentSolicitorProperties(caseData),
                             referenceTemplate);
@@ -86,7 +90,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                         // LR v LR -> 2V1
                         if (scenario.equals(TWO_V_ONE)) {
                             sendEmail(
-                                Application1Email,
+                                application1Email,
                                 notificationsProperties.getNotifyLrVLrTwoVOneClaimantSuccessfulMediation(),
                                 twoVOneClaimantProperties(caseData),
                                 referenceTemplate);
@@ -94,7 +98,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                             // LR v LIP
                             if (caseData.isLRvLipOneVOne()) {
                                 sendEmail(
-                                    Application1Email,
+                                    application1Email,
                                     notificationsProperties.getNotifyLrVLipClaimantSuccessfulMediation(),
                                     lrVLipClaimantProperties(caseData),
                                     referenceTemplate);
@@ -102,7 +106,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                                 // LIP v LIP
                                 if (caseData.isLipvLipOneVOne()) {
                                     sendEmail(
-                                        Application1Email,
+                                        application1Email,
                                         notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation(),
                                         lipVLipClaimantProperties(caseData),
                                         referenceTemplate);
@@ -159,6 +163,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
             DEFENDANT_NAME_TWO, getPartyNameBasedOnType(caseData.getRespondent2())
         );
     }
+
     public Map<String, String> lrVLrDifferentSolicitorProperties(CaseData caseData) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
