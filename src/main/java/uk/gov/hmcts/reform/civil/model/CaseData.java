@@ -924,14 +924,14 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isLRvLipOneVOne() {
-        return isRespondent1NotRepresented()
+        return isRespondent1LiP()
             && !isApplicant1NotRepresented()
             && isOneVOne(this);
     }
 
     @JsonIgnore
     public boolean isLipvLipOneVOne() {
-        return isRespondent1NotRepresented()
+        return isRespondent1LiP()
             && isApplicant1NotRepresented()
             && isOneVOne(this);
     }
@@ -1387,5 +1387,13 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return !isRespondent1LiP()
             && isApplicant1NotRepresented()
             && isOneVOne(this);
+    }
+
+    @JsonIgnore
+    public boolean nocApplyForLiPClaimant() {
+        return isLRvLipOneVOne()
+            && (getClaimIssuedPaymentDetails() == null
+            && (claimIssueFeePaymentDoneWithHWF()
+            || getChangeOfRepresentation() != null));
     }
 }

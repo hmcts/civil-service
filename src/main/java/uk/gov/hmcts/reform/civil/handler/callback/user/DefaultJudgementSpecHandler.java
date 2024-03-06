@@ -242,7 +242,7 @@ public class DefaultJudgementSpecHandler extends CallbackHandler {
         var caseData = callbackParams.getCaseData();
 
         var totalIncludeInterest = caseData.getTotalClaimAmount().doubleValue()
-            +  Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO).doubleValue();;
+            +  Optional.ofNullable(caseData.getTotalInterest()).orElse(BigDecimal.ZERO).doubleValue();
         List<String> errors = new ArrayList<>();
 
         if (caseData.getPartialPayment() == YesOrNo.YES) {
