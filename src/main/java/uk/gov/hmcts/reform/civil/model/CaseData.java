@@ -1384,7 +1384,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     @JsonIgnore
     public boolean isLipvLROneVOne() {
-        return !isRespondent1NotRepresented()
+        return !isRespondent1LiP()
             && isApplicant1NotRepresented()
             && isOneVOne(this);
     }
