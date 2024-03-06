@@ -55,10 +55,10 @@ public class SdoGeneratorService {
 
         if (SdoHelper.isSmallClaimsTrack(caseData) && featureToggleService.isSdoR2Enabled()) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL_FLIGHT_DELAY;
-            templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation, true);
+            templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isSmallClaimsTrack(caseData)) {
             docmosisTemplate = DocmosisTemplates.SDO_SMALL;
-            templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation, false);
+            templateData = getTemplateDataSmall(caseData, judgeName, isJudge, authorisation);
         } else if (SdoHelper.isFastTrack(caseData)) {
             docmosisTemplate = featureToggleService.isFastTrackUpliftsEnabled()
                 ? DocmosisTemplates.SDO_FAST_FAST_TRACK_INT : DocmosisTemplates.SDO_FAST;
@@ -306,8 +306,7 @@ public class SdoGeneratorService {
         return sdoDocumentFormBuilder.build();
     }
 
-    private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, boolean isJudge, String authorisation,
-                                                      boolean hasFlightDelayData) {
+    private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         SdoDocumentFormSmall.SdoDocumentFormSmallBuilder sdoDocumentFormBuilder = SdoDocumentFormSmall.builder()
             .writtenByJudge(isJudge)
             .currentDate(LocalDate.now())
@@ -372,7 +371,7 @@ public class SdoGeneratorService {
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsNumberOfWitnessesToggle")
             );
 
-        if (hasFlightDelayData && featureToggleService.isSdoR2Enabled()) {
+        if (featureToggleService.isSdoR2Enabled()) {
             sdoDocumentFormBuilder.smallClaimsFlightDelayToggle(
                     SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle")
                 )
