@@ -12,7 +12,7 @@ public class FlowLipPredicate {
 
     public static final Predicate<CaseData> isLipCase = CaseData::isLipvLipOneVOne;
 
-      public static final Predicate<CaseData> nocSubmittedForLiPApplicant = caseData ->
+    public static final Predicate<CaseData> nocSubmittedForLiPApplicant = caseData ->
         caseData.isLRvLipOneVOne()
             && (caseData.getClaimIssuedPaymentDetails() == null
             && (caseData.claimIssueFeePaymentDoneWithHWF()
