@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
-
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,30 +23,70 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_CLAIM_SETTLED_CLAIMANT1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_CLAIMANT_RESPONSE_CUI_APPLICANT1;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimSettledClaimant1NotificationHandlerTest extends BaseCallbackHandlerTest {
+public class ClaimantResponseCUIClaimant1NotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @Mock
     private DashboardApiClient dashboardApiClient;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
     @InjectMocks
-    private ClaimSettledClaimant1NotificationHandler handler;
+    private ClaimantResponseCUIClaimant1NotificationHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
         @Test
+        void shouldRecordScenario_whenInvokedInJudicialReferralState() {
+            // Given
+            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
+                Optional.empty()));
+            CaseData caseData = CaseDataBuilder.builder().atStateBeforeTakenOfflineSDONotDrawn().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_CLAIMANT_RESPONSE_CUI_APPLICANT1.name()).build()
+            ).build();
+            Map<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("defendantName", "Defendant Name");
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                "Scenario.AAA7.ClaimantIntent.GoToHearing.Claimant",
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
+        }
+
+        @Test
+        void shouldNotRecordScenario_whenInvokedNotInJudicialReferralState() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_CLAIMANT_RESPONSE_CUI_APPLICANT1.name()).build()
+            ).build();
+
+            // When
+            handler.handle(params);
+
+            // Then
+            verifyNoInteractions(dashboardApiClient);
+        }
+
+        @Test
         void shouldRecordScenario_whenInvokedWhenCaseStateIsClaimSettled() {
             CaseData caseData = CaseDataBuilder.builder().atStateLipClaimSettled().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_CLAIM_SETTLED_CLAIMANT1.name()).build()
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_CLAIMANT_RESPONSE_CUI_APPLICANT1.name()).build()
             ).build();
 
             Map<String, Object> scenarioParams = new HashMap<>();
@@ -72,7 +111,7 @@ public class ClaimSettledClaimant1NotificationHandlerTest extends BaseCallbackHa
         void shouldNotRecordScenario_whenInvokedWhenCaseStateIsNotClaimSettled() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_CLAIM_SETTLED_CLAIMANT1.name()).build()
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_CLAIMANT_RESPONSE_CUI_APPLICANT1.name()).build()
             ).build();
 
             Map<String, Object> scenarioParams = new HashMap<>();
@@ -81,12 +120,7 @@ public class ClaimSettledClaimant1NotificationHandlerTest extends BaseCallbackHa
 
             handler.handle(params);
 
-            verify(dashboardApiClient, never()).recordScenario(
-                caseData.getCcdCaseReference().toString(),
-                "Scenario.AAA7.ClaimantIntent.ClaimSettled.Claimant",
-                "BEARER_TOKEN",
-                ScenarioRequestParams.builder().params(scenarioParams).build()
-            );
+            verifyNoInteractions(dashboardApiClient);
         }
     }
 }
