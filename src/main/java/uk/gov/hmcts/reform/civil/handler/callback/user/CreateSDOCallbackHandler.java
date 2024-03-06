@@ -621,7 +621,8 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                                             + "with any supporting documents, at least 14 days before the hearing. "
                                                                             + "Any other party who wishes to comment on the failure to attend the mediation appointment should "
                                                                             + "deliver their comments,"
-                                                                            + " with any supporting documents, to all parties and to the court at least 14 days before the hearing.")
+                                                                            + " with any supporting documents, to all parties and to the court at least "
+                                                                            + "14 days before the hearing.")
                                                                  .build());
         }
 
