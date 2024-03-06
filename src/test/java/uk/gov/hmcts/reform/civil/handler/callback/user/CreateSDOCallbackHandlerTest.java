@@ -1611,7 +1611,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + " attend the hearing. If they do not attend, it will be for the court to decide how"
                                + " much reliance, if any, to place on their evidence.");
 
-            assertThat(response.getData()).extracting("smallClaimsMediationSectionStatement")
+            assertThat(response.getData()).extracting("smallClaimsMediationSectionStatement").extracting("input")
                 .isEqualTo("If you failed to attend a mediation appointment,"
                                + " then the judge at the hearing may impose a sanction. "
                                + "This could require you to pay costs, or could result in your claim or defence being dismissed. "

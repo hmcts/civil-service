@@ -769,7 +769,7 @@ public class CaseDataParent implements MappableObject {
     private List<Element<MediationNonAttendanceStatement>> res2MediationNonAttendanceDocs;
     private List<Element<MediationDocumentsReferredInStatement>> res2MediationDocumentsReferred;
 
-    private String smallClaimsMediationSectionStatement;
+    private SmallClaimsMediation smallClaimsMediationSectionStatement;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
