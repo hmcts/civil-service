@@ -106,7 +106,6 @@ public class DashboardNotificationServiceTest {
         @Test
         void shouldReturnOkWhenRecordingNotificationClick() {
             String authToken = "Auth-token";
-
             when(idamApi.retrieveUserDetails(authToken))
                 .thenReturn(UserDetails.builder().forename("Claimant").surname("user").build());
 
@@ -118,7 +117,6 @@ public class DashboardNotificationServiceTest {
                 .dashboardNotificationsId(notification.getId())
                 .actionPerformed("Click")
                 .createdBy(idamApi.retrieveUserDetails(authToken).getFullName())
-                .createdAt(any())
                 .build();
 
             when(notificationActionRepository.save(notificationAction)).thenReturn(notificationAction);

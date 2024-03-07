@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -40,7 +39,7 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().respondToClaimAdmitPartLRspec(
             new RespondToClaimAdmitPartLRspec(date)
         ).build();
-        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED).build();
+
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimFee").isEqualTo("£1");
@@ -58,18 +57,14 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
-        assertThat(result).extracting("typeOfFee")
-            .isEqualTo("claim");
     }
 
     @Test
-    public void shouldMapParameters_WhenResponseDeadlineAndClaimFeeIsNull() {
+    public void shouldMapParameters_WhenResponseDeadlineIsNull() {
 
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null).build();
         caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(null).build();
         caseData = caseData.toBuilder().respondToClaimAdmitPartLRspec(null).build();
-        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
-            .claimFee(null).build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -82,8 +77,6 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("defendantAdmittedAmount").isNull();
 
         assertThat(result).extracting("whenWillThisAmountBePaid").isNull();
-
-        assertThat(result).extracting("claimFee").isNull();
 
     }
 }
