@@ -5,13 +5,13 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
-import uk.gov.hmcts.reform.civil.utils.AmountFormatter;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.math.BigDecimal;
 
 import static java.util.Objects.nonNull;
 
@@ -37,18 +37,31 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             params.put("responseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
         }
-        setClaimSettledAmountAndDate(params, caseData);
+        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
+        params.put("claimSettledDate", getClaimSettleDate(caseData));
         return params;
     }
 
-    private void setClaimSettledAmountAndDate(Map<String, Object> params, CaseData caseData) {
+    private String getClaimSettledAmount(CaseData caseData) {
+        return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
+            MonetaryConversions::penniesToPounds).map(
+            BigDecimal::stripTrailingZeros).map(amount -> amount.setScale(2)).map(BigDecimal::toPlainString).map(amount -> "£" + amount).orElse(
+            null);
+    }
+
+    private String getClaimSettleDate(CaseData caseData) {
+        return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getWhenWasThisAmountPaid).map(
+            DateUtils::formatDate).orElse(null);
+    }
+
+    private RespondToClaim getRespondToClaim(CaseData caseData) {
         RespondToClaim respondToClaim = null;
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() ==  RespondentResponseTypeSpec.FULL_DEFENCE) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
             respondToClaim = caseData.getRespondToClaim();
-        } else if (caseData.getRespondent1ClaimResponseTypeForSpec() ==  RespondentResponseTypeSpec.PART_ADMISSION) {
+        } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
             respondToClaim = caseData.getRespondToAdmittedClaim();
         }
-        params.put("claimSettledAmount", Optional.ofNullable(respondToClaim).map(RespondToClaim::getHowMuchWasPaid).map(AmountFormatter::formatAmount).orElse(null));
-        params.put("claimSettledDate", Optional.ofNullable(respondToClaim).map(RespondToClaim::getWhenWasThisAmountPaid).map(DateUtils::formatDate).orElse(null));
+
+        return respondToClaim;
     }
 }
