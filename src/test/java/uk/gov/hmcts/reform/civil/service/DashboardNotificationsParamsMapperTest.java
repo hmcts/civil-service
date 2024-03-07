@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -28,7 +29,7 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
-
+        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED).build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimFee").isEqualTo("£1");
@@ -37,11 +38,13 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
 
-        assertThat(result).extracting("responseDeadline")
+        assertThat(result).extracting("respondent1ResponseDeadline")
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(14L)));
 
-        assertThat(result).extracting("defendantName")
+        assertThat(result).extracting("respondent1PartyName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
+        assertThat(result).extracting("typeOfFee")
+            .isEqualTo("claim");
     }
 
     @Test

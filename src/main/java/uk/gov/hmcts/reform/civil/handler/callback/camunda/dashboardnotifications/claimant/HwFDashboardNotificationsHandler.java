@@ -18,22 +18,28 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT1_HWF_DASHBOARD_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF;
 
 @Service
 @RequiredArgsConstructor
-public class CCJRequestedDashboardNotificationHandler extends CallbackHandler {
+public class HwFDashboardNotificationsHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1);
-    public static final String TASK_ID = "GenerateDashboardNotificationClaimantIntentCCJRequestedForApplicant1";
+    private static final List<CaseEvent> EVENTS = List.of(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION);
+    public static final String TASK_ID = "Claimant1HwFDashboardNotification";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
+    private final Map<CaseEvent, String> dashboardScenarios = Map.of(
+        INVALID_HWF_REFERENCE,
+        SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF.getScenario()
+    );
 
     @Override
+
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForClaimSubmission
+            callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHwfEvents
         );
     }
 
@@ -47,15 +53,19 @@ public class CCJRequestedDashboardNotificationHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private CallbackResponse configureScenarioForClaimSubmission(CallbackParams callbackParams) {
+    private CallbackResponse configureScenarioForHwfEvents(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        if (caseData.isHWFTypeClaimIssued() && caseData.getHwFEvent() != null) {
+            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                              dashboardScenarios.get(caseData.getHwFEvent()), authToken,
+                                              ScenarioRequestParams.builder()
+                                                  .params(mapper.mapCaseDataToParams(caseData))
+                                                  .build()
+            );
+        }
 
-        dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                          SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
-                                          authToken,
-                                          ScenarioRequestParams.builder()
-                                              .params(mapper.mapCaseDataToParams(caseData)).build());
         return AboutToStartOrSubmitCallbackResponse.builder().build();
+
     }
 }
