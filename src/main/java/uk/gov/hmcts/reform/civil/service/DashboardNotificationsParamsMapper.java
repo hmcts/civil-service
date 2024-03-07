@@ -37,8 +37,14 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             params.put("responseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
         }
+
         params.put("claimSettledAmount", getClaimSettledAmount(caseData));
         params.put("claimSettledDate", getClaimSettleDate(caseData));
+
+        if (caseData.getHwfFeeType() != null) {
+            params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
+        }
+
         return params;
     }
 
