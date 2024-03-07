@@ -52,7 +52,6 @@ public class DefendantSignSettlementAgreementCallbackHandler extends CallbackHan
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataUpdated.toMap(objectMapper))
-            .state(All_FINAL_ORDERS_ISSUED.name())
             .build();
     }
 }

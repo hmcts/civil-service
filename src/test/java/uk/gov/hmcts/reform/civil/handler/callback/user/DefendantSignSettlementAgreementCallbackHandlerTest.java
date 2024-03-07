@@ -75,7 +75,6 @@ public class DefendantSignSettlementAgreementCallbackHandlerTest extends BaseCal
                 .extracting("businessProcess")
                 .extracting("status")
                 .isEqualTo("READY");
-            assertThat(response.getState()).isEqualTo(All_FINAL_ORDERS_ISSUED.name());
         }
     }
 
