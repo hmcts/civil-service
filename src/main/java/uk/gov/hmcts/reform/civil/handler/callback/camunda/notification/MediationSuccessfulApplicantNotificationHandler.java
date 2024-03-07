@@ -106,7 +106,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                                 // LIP v LIP
                                 if (caseData.isLipvLipOneVOne()) {
                                     sendEmail(
-                                        application1Email,
+                                        caseData.getApplicant1().getPartyEmail(),
                                         notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation(),
                                         lipVLipClaimantProperties(caseData),
                                         referenceTemplate);

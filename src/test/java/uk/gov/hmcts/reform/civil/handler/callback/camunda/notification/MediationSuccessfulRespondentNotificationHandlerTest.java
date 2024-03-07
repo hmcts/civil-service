@@ -60,7 +60,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
     private MediationSuccessfulRespondentNotificationHandler handler;
 
     public static final String TEMPLATE_ID = "template-id";
-    public static final String RESPONDENT_MAIL = "sole.trader@email.com";
+    public static final String RESPONDENT_MAIL = "respondentsolicitor@example.com";
     public static final String MEDIATION_SUCCESSFUL_RESPONDENT_NOTIFICATION_1594901956117591 = "mediation-successful-respondent-notification-1594901956117591";
     public static final String NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL = "NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL";
 
@@ -315,7 +315,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
-                RESPONDENT_MAIL,
+                "sole.trader@email.com",
                 TEMPLATE_ID,
                 lipVLipDefendantProperties(caseData),
                 MEDIATION_SUCCESSFUL_RESPONDENT_NOTIFICATION_1594901956117591

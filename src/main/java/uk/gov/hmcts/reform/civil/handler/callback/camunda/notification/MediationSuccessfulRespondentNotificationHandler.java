@@ -58,7 +58,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
         if (isCarmEnabled) {
             String claimId = caseData.getCcdCaseReference().toString();
             String referenceTemplate = String.format(REFERENCE_TEMPLATE, claimId);
-            String defendantEmail = caseData.getRespondent1().getPartyEmail();
+            String defendantEmail =  caseData.getRespondentSolicitor1EmailAddress();
             MultiPartyScenario scenario = getMultiPartyScenario(caseData);
             //LR v LR
             if (scenario.equals(ONE_V_ONE) && !(caseData.isLipvLipOneVOne()  || caseData.isLRvLipOneVOne())) {
@@ -87,7 +87,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
                             lrVLrDifferentSolicitorRespondent1Properties(caseData),
                             referenceTemplate);
                         sendEmail(
-                            caseData.getRespondent2().getPartyEmail(),
+                            caseData.getRespondentSolicitor2EmailAddress(),
                             notificationsProperties.getNotifyLrVLrOneVTwoDifferentSolicitorsDefendantSuccessfulMediation(),
                             lrVLrDifferentSolicitorRespondent2Properties(caseData),
                             referenceTemplate);
@@ -111,7 +111,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
                                 // LIP v LIP
                                 if (caseData.isLipvLipOneVOne()) {
                                     sendEmail(
-                                        defendantEmail,
+                                        caseData.getRespondent1().getPartyEmail(),
                                         notificationsProperties.getNotifyLipVLipDefendantSuccessfulMediation(),
                                         lipVLipDefendantProperties(caseData),
                                         referenceTemplate);
