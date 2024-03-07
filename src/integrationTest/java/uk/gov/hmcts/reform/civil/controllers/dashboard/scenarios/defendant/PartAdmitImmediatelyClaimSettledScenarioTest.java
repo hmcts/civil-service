@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-public class ClaimSettledScenarioTest extends BaseIntegrationTest {
+public class PartAdmitImmediatelyClaimSettledScenarioTest extends BaseIntegrationTest {
 
     @Test
     void should_create_scenario_for_claim_settled() throws Exception {

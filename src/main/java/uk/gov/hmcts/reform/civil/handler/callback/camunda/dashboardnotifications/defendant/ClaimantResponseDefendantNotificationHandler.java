@@ -61,7 +61,7 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
             }
         }
 
-        return "";
+        return null;
     }
 
     private CallbackResponse configureScenarioForClaimantResponse(CallbackParams callbackParams) {
