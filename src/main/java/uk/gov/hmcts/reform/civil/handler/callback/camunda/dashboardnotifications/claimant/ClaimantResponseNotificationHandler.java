@@ -19,16 +19,16 @@ import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_CLAIMANT_RESPONSE_CUI_APPLICANT1;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING;
 
 @Service
 @RequiredArgsConstructor
-public class ClaimantResponseCUIClaimant1NotificationHandler extends CallbackHandler {
+public class ClaimantResponseNotificationHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_CLAIMANT_RESPONSE_CUI_APPLICANT1);
-    public static final String TASK_ID = "GenerateDashboardNotificationClaimantResponseCUI";
+    private static final List<CaseEvent> EVENTS = List.of(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE);
+    public static final String TASK_ID = "GenerateClaimantDashboardNotificationClaimantResponse";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
 
@@ -52,12 +52,16 @@ public class ClaimantResponseCUIClaimant1NotificationHandler extends CallbackHan
     private CallbackResponse configureScenarioForClaimantResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+
+
         if (caseData.getCcdState() == CaseState.JUDICIAL_REFERRAL) {
+
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                               SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING.getScenario(), authToken,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
             );
-        } else if (caseData.getCcdState().equals(CaseState.CASE_SETTLED)) {
+        } else if (caseData.getCcdState() == CaseState.CASE_SETTLED) {
+
             dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
                                               SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT.getScenario(), authToken,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()

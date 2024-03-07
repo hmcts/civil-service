@@ -2,12 +2,16 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.utils.AmountFormatter;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 
@@ -31,8 +35,18 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             params.put("responseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
         }
-        params.put("claimSettledAmount", "500");
-        params.put("claimSettledDate", "12/01/2024");
+        setClaimSettledAmountAndDate(params, caseData);
         return params;
+    }
+
+    private void setClaimSettledAmountAndDate(Map<String, Object> params, CaseData caseData) {
+        RespondToClaim respondToClaim = null;
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() ==  RespondentResponseTypeSpec.FULL_DEFENCE) {
+            respondToClaim = caseData.getRespondToClaim();
+        } else if(caseData.getRespondent1ClaimResponseTypeForSpec() ==  RespondentResponseTypeSpec.PART_ADMISSION) {
+            respondToClaim = caseData.getRespondToAdmittedClaim();
+        }
+        params.put("claimSettledAmount", Optional.ofNullable(respondToClaim).map(RespondToClaim::getHowMuchWasPaid).map(AmountFormatter::formatAmount).orElse(null));
+        params.put("claimSettledDate", Optional.ofNullable(respondToClaim).map(RespondToClaim::getWhenWasThisAmountPaid).map(DateUtils::formatDate).orElse(null));
     }
 }
