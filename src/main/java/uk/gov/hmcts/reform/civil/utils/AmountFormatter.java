@@ -5,6 +5,10 @@ import java.text.DecimalFormat;
 
 public class AmountFormatter {
 
+    private AmountFormatter() {
+        //no op
+    }
+
     public static String formatAmount(BigDecimal amount) {
         DecimalFormat df = new DecimalFormat("#.##");
         df.setMaximumFractionDigits(2);
