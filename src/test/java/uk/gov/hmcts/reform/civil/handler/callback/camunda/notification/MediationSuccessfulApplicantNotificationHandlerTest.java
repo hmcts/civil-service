@@ -216,7 +216,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
-                APPLICANT_MAIL,
+                "rambo@email.com",
                 TEMPLATE_ID,
                 lipVLipClaimantProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
