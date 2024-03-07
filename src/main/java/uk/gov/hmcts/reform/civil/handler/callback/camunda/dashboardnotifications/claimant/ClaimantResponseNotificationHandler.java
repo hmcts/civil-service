@@ -50,9 +50,9 @@ public class ClaimantResponseNotificationHandler extends CallbackHandler {
     }
 
     private CallbackResponse configureScenarioForClaimantResponse(CallbackParams callbackParams) {
+
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
 
         if (caseData.getCcdState() == CaseState.JUDICIAL_REFERRAL) {
 

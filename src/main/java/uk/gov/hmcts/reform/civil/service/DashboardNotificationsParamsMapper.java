@@ -45,7 +45,7 @@ public class DashboardNotificationsParamsMapper {
         RespondToClaim respondToClaim = null;
         if (caseData.getRespondent1ClaimResponseTypeForSpec() ==  RespondentResponseTypeSpec.FULL_DEFENCE) {
             respondToClaim = caseData.getRespondToClaim();
-        } else if(caseData.getRespondent1ClaimResponseTypeForSpec() ==  RespondentResponseTypeSpec.PART_ADMISSION) {
+        } else if (caseData.getRespondent1ClaimResponseTypeForSpec() ==  RespondentResponseTypeSpec.PART_ADMISSION) {
             respondToClaim = caseData.getRespondToAdmittedClaim();
         }
         params.put("claimSettledAmount", Optional.ofNullable(respondToClaim).map(RespondToClaim::getHowMuchWasPaid).map(AmountFormatter::formatAmount).orElse(null));
