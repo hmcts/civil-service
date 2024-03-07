@@ -35,11 +35,12 @@ public class ClaimIssueNotificationsHandler extends CallbackHandler {
     private final DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
     private final FeatureToggleService toggleService;
 
+
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::createDashboardNotifications
-        );
+        return toggleService.isDashboardServiceEnabled()
+            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::createDashboardNotifications)
+            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
 
     @Override

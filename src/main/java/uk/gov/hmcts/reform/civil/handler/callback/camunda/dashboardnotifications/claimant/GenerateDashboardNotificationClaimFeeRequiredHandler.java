@@ -34,11 +34,10 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandler extends Callba
 
     @Override
     protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForClaimSubmission
-        );
+        return toggleService.isDashboardServiceEnabled()
+            ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForClaimSubmission)
+            : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
-
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
