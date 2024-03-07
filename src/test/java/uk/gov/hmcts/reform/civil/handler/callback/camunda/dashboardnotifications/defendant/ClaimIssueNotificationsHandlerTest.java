@@ -5,7 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
@@ -71,6 +70,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
         params.put("ccdCaseReference", "123");
         params.put("defaultRespondTime", "4pm");
         params.put("responseDeadline", "11 March 2024");
+
         when(toggleService.isDashboardServiceEnabled())
             .thenReturn(true);
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
