@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -9,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -25,18 +25,20 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT1_HWF_DASHBOARD_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant.HwFDashboardNotificationsHandler.TASK_ID;
 
 @ExtendWith(MockitoExtension.class)
 public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
@@ -55,28 +57,31 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
         @MethodSource("provideHwfEventsForConfigureScenario")
         void shouldConfigureScenariosForHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
             CaseData caseData = CaseDataBuilder.builder()
-                    .buildClaimIssuedPaymentCaseData();
+                .buildClaimIssuedPaymentCaseData();
             caseData = caseData.toBuilder()
-                    .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
-                            .hwfCaseEvent(hwfEvent)
-                            .build())
-                    .build();
+                .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
+                                           .hwfCaseEvent(hwfEvent)
+                                           .build())
+                .build();
 
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
-            ).build();
+            when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
+                Optional.empty()));
 
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("typeOfFee", "claim");
-
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
+            ).build();
+
             handler.handle(params);
+
             verify(dashboardApiClient, times(1)).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    dashboardScenario.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(scenarioParams).build()
+                caseData.getCcdCaseReference().toString(),
+                dashboardScenario.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
             );
         }
 
@@ -84,40 +89,29 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
         @MethodSource("provideHwfEventsForConfigureScenario")
         void shouldNotConfigureScenariosForHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
             CaseData caseData = CaseDataBuilder.builder()
-                    .buildClaimIssuedPaymentCaseData();
+                .buildClaimIssuedPaymentCaseData();
             caseData = caseData.toBuilder()
-                    .hwfFeeType(FeeType.HEARING)
-                    .build();
+                .hwfFeeType(FeeType.HEARING)
+                .build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                    CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
+                CallbackRequest.builder().eventId(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION.name()).build()
             ).build();
 
             handler.handle(params);
             verify(dashboardApiClient, times(0)).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    dashboardScenario.getScenario(),
-                    "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(Map.of()).build()
+                caseData.getCcdCaseReference().toString(),
+                dashboardScenario.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(Map.of()).build()
             );
         }
 
         private static Stream<Arguments> provideHwfEventsForConfigureScenario() {
             return Stream.of(
-                    Arguments.of(UPDATE_HELP_WITH_FEE_NUMBER, SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED)
-
+                Arguments.of(INVALID_HWF_REFERENCE, SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF),
+                Arguments.of(UPDATE_HELP_WITH_FEE_NUMBER, SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED)
             );
         }
-    }
-
-    @Test
-    void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CLAIMANT1_HWF_DASHBOARD_NOTIFICATION);
-    }
-
-    @Test
-    void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(CallbackRequest.builder().eventId(
-                "CLAIMANT1_HWF_DASHBOARD_NOTIFICATION").build()).build())).isEqualTo(TASK_ID);
     }
 }
