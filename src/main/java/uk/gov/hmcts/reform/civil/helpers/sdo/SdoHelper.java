@@ -14,9 +14,14 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackTrialBundleType;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodTelephoneHearing;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethodVideoConferenceHearing;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2HearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2PhysicalTrialBundleOptions;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsSdoR2TimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsTimeEstimate;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingBundle;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingFinalDisposalHearing;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime;
@@ -68,6 +73,89 @@ public class SdoHelper {
             && (drawDirectionsOrderSmallClaims == NO) && (orderType == OrderType.DECIDE_DAMAGES);
 
         return fastTrackPath1 || fastTrackPath2;
+    }
+
+    public static  boolean isSDOR2ScreenForDRHSmallClaim(CaseData caseData) {
+        return ((caseData.getDrawDirectionsOrderRequired() == NO
+            && caseData.getSmallClaims() != null
+            && caseData.getSmallClaims().contains(
+            SmallTrack.smallClaimDisputeResolutionHearing))
+            || (caseData.getDrawDirectionsOrderRequired() == YES
+            && caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections() != null
+            && caseData.getDrawDirectionsOrderSmallClaimsAdditionalDirections()
+            .contains(SmallTrack.smallClaimDisputeResolutionHearing)));
+    }
+
+    public static DynamicList getHearingLocationDrh(CaseData caseData) {
+        if (caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList() != null
+            && caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList().getValue() != null
+            && !caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList().getValue().getCode()
+            .equals("OTHER_LOCATION")) {
+            return caseData.getSdoR2SmallClaimsHearing().getHearingCourtLocationList();
+        } else if (caseData.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList() != null
+            && caseData.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList().getValue() != null) {
+            return caseData.getSdoR2SmallClaimsHearing().getAltHearingCourtLocationList();
+        }
+        return null;
+    }
+
+    public static boolean hasSdoR2HearingTrialWindow(CaseData caseData) {
+
+        if (caseData.getSdoR2SmallClaimsHearing() != null
+            && TrialOnRadioOptions.HEARING_WINDOW.equals(caseData.getSdoR2SmallClaimsHearing().getTrialOnOptions())) {
+            return true;
+        }
+        return false;
+    }
+
+    public static String getSdoR2HearingTime(CaseData caseData) {
+
+        if (caseData.getSdoR2SmallClaimsHearing() != null) {
+            switch (caseData.getSdoR2SmallClaimsHearing().getLengthList()) {
+                case FIFTEEN_MINUTES:
+                    return SmallClaimsSdoR2TimeEstimate.FIFTEEN_MINUTES.getLabel();
+                case THIRTY_MINUTES:
+                    return SmallClaimsSdoR2TimeEstimate.THIRTY_MINUTES.getLabel();
+                case ONE_HOUR:
+                    return SmallClaimsSdoR2TimeEstimate.ONE_HOUR.getLabel();
+                case OTHER:
+                    return caseData.getSdoR2SmallClaimsHearing().getLengthListOther().getTrialLengthDays() + " days, "
+                        + caseData.getSdoR2SmallClaimsHearing().getLengthListOther().getTrialLengthHours() + " hours, "
+                        + caseData.getSdoR2SmallClaimsHearing().getLengthListOther().getTrialLengthMinutes() + " minutes";
+                default: return "";
+            }
+        }
+        return "";
+    }
+
+    public static String getSdoR2SmallClaimsHearingMethod(CaseData caseData) {
+        if (caseData.getSdoR2SmallClaimsHearing() != null) {
+            if (SmallClaimsSdoR2HearingMethod.TELEPHONE_HEARING
+                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
+                return "by telephone";
+            } else if (SmallClaimsSdoR2HearingMethod.VIDEO_CONFERENCE
+                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
+                return "by video";
+            } else if (SmallClaimsSdoR2HearingMethod.IN_PERSON
+                .equals(caseData.getSdoR2SmallClaimsHearing().getMethodOfHearing())) {
+                return "in person";
+            }
+        }
+        return "";
+    }
+
+    public static String getSdoR2SmallClaimsPhysicalTrialBundleTxt(CaseData caseData) {
+
+        if (caseData.getSdoR2SmallClaimsHearing() != null) {
+            if (SmallClaimsSdoR2PhysicalTrialBundleOptions.NO
+                .equals(caseData.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions())) {
+                return "None";
+            } else if (SmallClaimsSdoR2PhysicalTrialBundleOptions.PARTY
+                .equals(caseData.getSdoR2SmallClaimsHearing().getPhysicalBundleOptions())) {
+                return caseData.getSdoR2SmallClaimsHearing().getSdoR2SmallClaimsBundleOfDocs().getPhysicalBundlePartyTxt();
+            }
+        }
+        return "";
     }
 
     public static boolean hasSharedVariable(CaseData caseData, String variableName) {

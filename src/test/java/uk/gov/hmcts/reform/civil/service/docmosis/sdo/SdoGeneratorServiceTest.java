@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -37,6 +38,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,9 +49,11 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_DISPOSAL;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_FAST;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.SDO_SMALL_DRH;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -63,6 +67,7 @@ public class SdoGeneratorServiceTest {
     private static String fileNameSmall = null;
     private static String fileNameFast = null;
     private static String fileNameDisposal = null;
+    private static String fileNameSmallDrh = null;
     private static final CaseDocument CASE_DOCUMENT_SMALL = CaseDocumentBuilder.builder()
         .documentName(fileNameSmall)
         .documentType(SDO_ORDER)
@@ -73,6 +78,11 @@ public class SdoGeneratorServiceTest {
         .build();
     private static final CaseDocument CASE_DOCUMENT_DISPOSAL = CaseDocumentBuilder.builder()
         .documentName(fileNameDisposal)
+        .documentType(SDO_ORDER)
+        .build();
+
+    private static final CaseDocument CASE_DOCUMENT_SMALL_DRH = CaseDocumentBuilder.builder()
+        .documentName(fileNameSmallDrh)
         .documentType(SDO_ORDER)
         .build();
 
@@ -99,6 +109,7 @@ public class SdoGeneratorServiceTest {
         fileNameDisposal = LocalDate.now() + "_Judgey McJudge" + ".pdf";
         fileNameFast = LocalDate.now() + "_Judgey McJudge" + ".pdf";
         fileNameSmall = LocalDate.now() + "_Judgey McJudge" + ".pdf";
+        fileNameSmallDrh = LocalDate.now() + "_Judgey McJudge" + ".pdf";
 
         when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                     .forename("Judgey")
@@ -317,5 +328,30 @@ public class SdoGeneratorServiceTest {
             ),
             any(DocmosisTemplates.class)
         );
+    }
+
+    @Test
+    public void shouldGenerateSdoSmallDrhDocument() {
+        when(featureToggleService.isSdoR2Enabled()).thenReturn(true);
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL_DRH)))
+            .thenReturn(new DocmosisDocument(SDO_SMALL_DRH.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_SMALL_DRH);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .build()
+            .toBuilder()
+            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .drawDirectionsOrderRequired(NO)
+            .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
+            .build();
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameSmallDrh, bytes, SDO_ORDER));
     }
 }

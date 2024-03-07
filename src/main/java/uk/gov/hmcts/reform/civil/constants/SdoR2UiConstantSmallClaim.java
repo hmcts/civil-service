@@ -6,7 +6,7 @@ public final class SdoR2UiConstantSmallClaim {
         //To satisfy sonarQube
     }
 
-    public static final String JUDGE_RECITAL = "Upon considering the statements of case and the information provided by the parties,";
+    public static final String JUDGE_RECITAL = "Upon considering the statements of case and the information provided by the parties.";
     public static final String PPI_DESCRIPTION = """
         send to the Claimant(s):
         a) A schedule of the following amounts itemised by date;
