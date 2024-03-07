@@ -19,8 +19,12 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.UpdateClaimStateService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CLAIM_STATE_AFTER_DOC_UPLOADED;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,6 +84,24 @@ public class UpdateClaimStateAfterUploadingTranslatedDocumentTest extends BaseCa
         // then
         assertThat(response.getErrors()).isNull();
         assertThat(response.getState()).isEqualTo(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
+    }
+
+    @Test
+    void shouldUpdateClaimState_WhenAwaitingApplicantIntentionClaimState() {
+        // given
+        CaseData caseData = CaseDataBuilder.builder()
+            .build().toBuilder()
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .build();
+        when(updateClaimStateService.setUpCaseState(caseData)).thenReturn(JUDICIAL_REFERRAL.name());
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        // when
+        var response = (AboutToStartOrSubmitCallbackResponse)handler.handle(params);
+
+        // then
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isEqualTo(CaseState.JUDICIAL_REFERRAL.name());
+        verify(updateClaimStateService, times(1)).setUpCaseState(caseData);
     }
 
     @Test
