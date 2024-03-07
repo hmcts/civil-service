@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
@@ -29,18 +30,17 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DASHBOARD_NOTIFICATION_CLAIM_ISSUE_HWF_CLAIMANT1;
 
-@SpringBootTest(classes = {
-    GenerateDashboardNotificationHwfHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
-    private DashboardApiClient dashboardApiClient;
-    @MockBean
-    private DashboardNotificationsParamsMapper mapper;
-    @Autowired
+    @InjectMocks
     private GenerateDashboardNotificationHwfHandler handler;
+    @Mock
+    private DashboardApiClient dashboardApiClient;
+    @Mock
+    private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService toggleService;
 
     @Nested
     class AboutToSubmitCallback {
@@ -59,7 +59,8 @@ public class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHan
 
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("typeOfFee", "claimFee");
-
+            when(toggleService.isDashboardServiceEnabled())
+                .thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             handler.handle(params);
