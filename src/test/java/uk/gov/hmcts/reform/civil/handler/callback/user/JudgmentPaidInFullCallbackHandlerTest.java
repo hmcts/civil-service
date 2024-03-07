@@ -51,12 +51,8 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then: judgmentOnline fields should be set correctly
-            var judgmentPaid = JudgmentPaidInFull.builder()
-                .dateOfFullPaymentMade(LocalDate.of(2023, 9, 15))
-                .confirmFullPaymentMade(List.of("CONFIRMED"))
-                .build();
 
-            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo("2023-09-15");
+            assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo("2023-04-02");
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
         }
 
@@ -69,10 +65,6 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then: judgmentOnline fields should be set correctly
-            var judgmentPaid = JudgmentPaidInFull.builder()
-                .dateOfFullPaymentMade(LocalDate.of(2023, 4, 2))
-                .confirmFullPaymentMade(List.of("CONFIRMED"))
-                .build();
 
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo("2023-04-02");
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
@@ -92,10 +84,6 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             //When: handler is called with ABOUT_TO_SUBMIT event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             //Then: judgmentOnline fields should be set correctly
-            var judgmentPaid = JudgmentPaidInFull.builder()
-                .dateOfFullPaymentMade(LocalDate.of(2023, 4, 1))
-                .confirmFullPaymentMade(List.of("CONFIRMED"))
-                .build();
 
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("dateOfFullPaymentMade").isEqualTo("2023-04-01");
             assertThat(response.getData().get("joJudgmentPaidInFull")).extracting("confirmFullPaymentMade").isEqualTo(List.of("CONFIRMED"));
