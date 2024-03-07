@@ -127,7 +127,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
             targetEmail,
             emailTemplate,
             properties,
-            String.format(REFERENCE_TEMPLATE, referenceTemplate)
+            referenceTemplate
         );
     }
 
