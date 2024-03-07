@@ -10,13 +10,13 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
-import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -27,12 +27,9 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 
 @Service
 @RequiredArgsConstructor
-public class ClaimantResponseNotificationHandler extends CallbackHandler {
+public class ClaimantResponseDefendantNotificationHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(
-        CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE,
-        CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE
-    );
+    private static final List<CaseEvent> EVENTS = List.of(CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE);
     public static final String TASK_ID = "GenerateDefendantDashboardNotificationClaimantResponse";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
@@ -58,8 +55,10 @@ public class ClaimantResponseNotificationHandler extends CallbackHandler {
         if (caseData.getCcdState() == CASE_SETTLED) {
             if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
+            } else if (Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
+                && caseData.isClaimantIntentionSettlePartAdmit()) {
+                return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
             }
-            return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
         }
 
         return "";
