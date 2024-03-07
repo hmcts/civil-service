@@ -75,14 +75,14 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(new BigDecimal("100000"))
+                                .howMuchWasPaid(new BigDecimal("100050"))
                                 .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
                                 .build())
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
-        assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000");
+        assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.50");
         assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
     }
 
@@ -92,14 +92,14 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .respondToAdmittedClaim(RespondToClaim.builder()
-                                        .howMuchWasPaid(new BigDecimal("100000"))
+                                        .howMuchWasPaid(new BigDecimal("100055"))
                                         .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
                                         .build())
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
-        assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000");
+        assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.55");
         assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
 
     }

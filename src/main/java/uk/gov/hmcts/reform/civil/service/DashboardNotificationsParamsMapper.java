@@ -50,7 +50,8 @@ public class DashboardNotificationsParamsMapper {
     private String getClaimSettledAmount(CaseData caseData) {
         return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
             MonetaryConversions::penniesToPounds).map(
-            BigDecimal::stripTrailingZeros).map(BigDecimal::toPlainString).map(amount -> "£" + amount).orElse(null);
+            BigDecimal::stripTrailingZeros).map(
+            amount-> amount.setScale(2)).map(BigDecimal::toPlainString).map(amount -> "£" + amount).orElse(null);
     }
 
     private String getClaimSettleDate(CaseData caseData) {
