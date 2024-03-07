@@ -26,18 +26,24 @@ public class DashboardNotificationsParamsMapper {
         params.put("defaultRespondTime", "4pm");
         params.put("defendantName", caseData.getRespondent1().getPartyName());
 
-        params.put(
-            "claimFee",
-            "£" + MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
-                .stripTrailingZeros().toPlainString()
-        );
+        if (nonNull(caseData.getClaimFee())) {
+            params.put(
+                "claimFee",
+                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
+                    .stripTrailingZeros().toPlainString()
+            );
+        }
 
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             params.put("responseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
         }
+
+        if (caseData.getHwfFeeType() != null) {
+            params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
+        }
+
         params.put("claimSettledAmount", getClaimSettledAmount(caseData));
         params.put("claimSettledDate", getClaimSettleDate(caseData));
-
         return params;
     }
 

@@ -44,7 +44,7 @@ public class TaskListEntity implements Serializable {
     private UUID id;
 
     @NotNull
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn
     @Schema(name = "task_item_template_id")
     private TaskItemTemplateEntity taskItemTemplate;
