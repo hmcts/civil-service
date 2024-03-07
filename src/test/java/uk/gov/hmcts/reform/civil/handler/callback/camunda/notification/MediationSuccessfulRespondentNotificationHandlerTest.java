@@ -67,6 +67,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
     @Nested
     class AboutToSubmitCallback {
         private static final String ORGANISATION_NAME = "Org Name";
+
         @BeforeEach
         void setup() {
             given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate()).willReturn(TEMPLATE_ID);
@@ -321,7 +322,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
             );
         }
 
-
         @NotNull
         public Map<String, String> getNotificationDataMapSpec(CaseData caseData) {
             return Map.of(
@@ -332,7 +332,6 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
         }
 
     }
-
 
     public Map<String, String> lrVLrDefendantProperties(CaseData caseData) {
 
