@@ -2,16 +2,23 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA7.ClaimIssue.Response.Await', '{"Notice.AAA7.ClaimIssue.ClaimFee.Required"}', '{"Notice.AAA7.ClaimIssue.Response.Await":["responseDeadline", "respondent1PartyName"]}');
+VALUES ('Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant', '{"Notice.AAA7.DefResponse.ResponseTimeElapsed.Claimant", "Notice.AAA7.ClaimantIntent.FullAdmit.Claimant", "Notice.AAA7.ClaimIssue.Response.Await"}',
+        '{"Notice.AAA7.ClaimantIntent.CCJ.Requested.Claimant" : ["respondent1PartyName"]}');
 
 /**
  * Add notification template
  */
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
-VALUES ('Notice.AAA7.ClaimIssue.Response.Await', 'Wait for defendant to respond', 'Wait for defendant to respond',
-        '${respondent1PartyName} has until ${responseDeadline} to respond. They can request an extra 28 days if they need it.',
-        '${respondent1PartyName} has until ${responseDeadline} to respond. They can request an extra 28 days if they need it.',
+VALUES ('Notice.AAA7.ClaimantIntent.CCJ.Requested.Claimant', 'County Court Judgment (CCJ) requested', 'County Court Judgment (CCJ) requested',
+        'We’ll process your request and post a copy of the judgment to you and ${respondent1PartyName}. We aim to do this as soon as possible.<br><br>'
+        'Your online account will not be updated, and ${respondent1PartyName} will no longer be able to respond to your claim online. Any further updates will be by post.<br><br>'
+        'If a postal response is received before the judgment is issued, your request will be rejected.<br><br>'
+        '<a href="{enforceJudgementUrl}" rel="noopener noreferrer" class="govuk-link">Find out about actions you can take once a CCJ is issued (opens in a new tab).</a>.',
+        'We’ll process your request and post a copy of the judgment to you and ${respondent1PartyName}. We aim to do this as soon as possible.<br><br>'
+        'Your online account will not be updated, and ${respondent1PartyName} will no longer be able to respond to your claim online. Any further updates will be by post.<br><br>'
+        'If a postal response is received before the judgment is issued, your request will be rejected.<br><br>'
+        '<a href="{enforceJudgementUrl}" rel="noopener noreferrer" class="govuk-link">Find out about actions you can take once a CCJ is issued (opens in a new tab).</a>.',
         'CLAIMANT');
 
 /**
