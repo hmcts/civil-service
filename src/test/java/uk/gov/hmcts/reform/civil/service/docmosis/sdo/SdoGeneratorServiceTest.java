@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderType;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
@@ -100,6 +101,8 @@ public class SdoGeneratorServiceTest {
         fileNameFast = LocalDate.now() + "_Judgey McJudge" + ".pdf";
         fileNameSmall = LocalDate.now() + "_Judgey McJudge" + ".pdf";
 
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+
         when(idamClient.getUserDetails(anyString())).thenReturn(UserDetails.builder()
                                                                     .forename("Judgey")
                                                                     .surname("McJudge")
@@ -166,6 +169,53 @@ public class SdoGeneratorServiceTest {
             argThat((MappableObject templateData) ->
                         templateData instanceof SdoDocumentFormSmall
                             && locationRefData.equals(((SdoDocumentFormSmall) templateData).getHearingLocation())),
+            any(DocmosisTemplates.class)
+        );
+    }
+
+    @Test
+    public void sdoSmallInPersonCarm() {
+        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(SDO_SMALL)))
+            .thenReturn(new DocmosisDocument(SDO_SMALL.getDocumentTitle(), bytes));
+        when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER)))
+            .thenReturn(CASE_DOCUMENT_SMALL);
+        when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+        LocationRefData locationRefData = LocationRefData.builder().build();
+        String locationLabel = "String 1";
+        DynamicList formValue = DynamicList.fromList(
+            Collections.singletonList(locationLabel),
+            Object::toString,
+            locationLabel,
+            false
+        );
+        CaseData caseData = CaseDataBuilder.builder()
+            .atStateNotificationAcknowledged()
+            .atStateClaimIssued1v2AndOneDefendantDefaultJudgment()
+            .build()
+            .toBuilder()
+            .drawDirectionsOrderRequired(YesOrNo.NO)
+            .claimsTrack(ClaimsTrack.smallClaimsTrack)
+            .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
+            .smallClaimsMethodInPerson(formValue)
+            .build().toBuilder()
+            .smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
+                                                      .input("mediation representation")
+                                                      .build())
+            .build();
+        when(documentHearingLocationHelper.getHearingLocation(locationLabel, caseData, BEARER_TOKEN))
+            .thenReturn(locationRefData);
+
+        CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
+
+        assertThat(caseDocument).isNotNull();
+        verify(documentManagementService)
+            .uploadDocument(BEARER_TOKEN, new PDF(fileNameSmall, bytes, SDO_ORDER));
+        verify(documentGeneratorService).generateDocmosisDocument(
+            argThat((MappableObject templateData) ->
+                        templateData instanceof SdoDocumentFormSmall
+                            && ((SdoDocumentFormSmall) templateData).getSmallClaimMediationSectionInput()
+                            .equals("mediation representation")),
             any(DocmosisTemplates.class)
         );
     }
