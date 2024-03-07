@@ -64,14 +64,14 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLrVLrClaimantSuccessfulMediation()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLrVLrTwoVOneClaimantSuccessfulMediation()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLrVLrOneVTwoSameSolicitorClaimantSuccessfulMediation()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLrVLrOneVTwoDifferentSolicitorsClaimantSuccessfulMediation()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLrVLipClaimantSuccessfulMediation()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation()).thenReturn("template-id");
-            when(notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLrVLrClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLrVLrTwoVOneClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLrVLrOneVTwoSameSolicitorClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLrVLrOneVTwoDifferentSolicitorsClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLrVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
         }
 
@@ -89,7 +89,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             //Then
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
-                "template-id",
+                TEMPLATE_ID,
                 getNotificationDataMapSpec(caseData),
                 "mediation-successful-applicant-notification-000DC001"
             );

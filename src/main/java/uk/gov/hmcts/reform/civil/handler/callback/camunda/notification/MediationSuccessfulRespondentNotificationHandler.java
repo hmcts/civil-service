@@ -62,16 +62,16 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
             MultiPartyScenario scenario = getMultiPartyScenario(caseData);
             //LR v LR
             if (scenario.equals(ONE_V_ONE) && !(caseData.isLipvLipOneVOne()  || caseData.isLRvLipOneVOne())) {
-                //send notification to the claimant
+                //send notification to the defendant
                 sendEmail(
                     defendantEmail,
                     notificationsProperties.getNotifyLrVLrDefendantSuccessfulMediation(),
                     lrVLrDefendantProperties(caseData),
                     referenceTemplate);
             } else
-                // LR v LR -> 1V2 -> same solicitor
+                // LR v LR -> 1V2 -> same defendant
                 if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP)) {
-                    //send notification to the claimant
+                    //send notification to the defendant
                     sendEmail(
                         defendantEmail,
                         notificationsProperties.getNotifyLrVLrOneVTwoSameSolicitorDefendantSuccessfulMediation(),
@@ -79,7 +79,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
                         referenceTemplate);
                     return AboutToStartOrSubmitCallbackResponse.builder().build();
                 } else
-                    // LR v LR -> 1V2 -> different solicitor
+                    // LR v LR -> 1V2 -> different defendant
                     if (scenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                         sendEmail(
                             defendantEmail,
@@ -135,7 +135,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
             targetEmail,
             emailTemplate,
             properties,
-            String.format(REFERENCE_TEMPLATE, referenceTemplate)
+            referenceTemplate
         );
     }
 
