@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 
