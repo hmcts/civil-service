@@ -50,14 +50,12 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandler extends Callba
 
     private CallbackResponse configureScenarioForClaimSubmission(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        if(toggleService.isDashboardServiceEnabled()) {
-            String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
+        String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
-            dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
-                                              SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_FEE_REQUIRED.getScenario(), authToken,
-                                              ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
-            );
-        }
+        dashboardApiClient.recordScenario(caseData.getCcdCaseReference().toString(),
+                                          SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_FEE_REQUIRED.getScenario(), authToken,
+                                          ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
+        );
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 }
