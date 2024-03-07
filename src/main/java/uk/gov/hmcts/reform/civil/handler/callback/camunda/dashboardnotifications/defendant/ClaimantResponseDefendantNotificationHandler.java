@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
 
+import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -9,12 +10,14 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -48,14 +51,24 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
         return EVENTS;
     }
 
+    private String getScenario(CaseData caseData) {
+        if (caseData.getCcdState() == CASE_SETTLED) {
+            if (Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
+                && caseData.isClaimantIntentionSettlePartAdmit()) {
+                return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
+            }
+        }
+        return null;
+    }
+
     private CallbackResponse configureScenarioForClaimantResponse(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-
-        if (caseData.getCcdState() == CASE_SETTLED && caseData.isRespondent1NotRepresented()) {
+        String scenario = getScenario(caseData);
+        if (!Strings.isNullOrEmpty(scenario) && caseData.isRespondent1NotRepresented()) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario(),
+                scenario,
                 authToken,
                 ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
                     caseData)).build()
