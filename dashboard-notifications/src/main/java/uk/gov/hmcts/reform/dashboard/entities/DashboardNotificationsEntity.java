@@ -32,7 +32,7 @@ public class DashboardNotificationsEntity implements Serializable {
     @Schema(name = "id")
     private UUID id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn
     @Schema(name = "dashboard_notifications_templates_id")
     private NotificationTemplateEntity dashboardNotificationsTemplates;
