@@ -1117,6 +1117,7 @@ public class FlowStateAllowedEventService {
         entry(
             PART_ADMISSION.fullName(),
             List.of(
+                DEFENDANT_RESPONSE_CUI,
                 CLAIMANT_RESPONSE_SPEC,
                 CLAIMANT_RESPONSE_CUI,
                 ENTER_BREATHING_SPACE_SPEC,
