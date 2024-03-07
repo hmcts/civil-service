@@ -4739,7 +4739,8 @@ class StateFlowEngineTest {
                 .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
 
             assertThat(stateFlow.getFlags()).contains(
-                entry(FlowFlag.LIP_CASE.name(), false)
+                entry(FlowFlag.LIP_CASE.name(), false),
+                entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true)
             );
         }
 
@@ -4775,7 +4776,8 @@ class StateFlowEngineTest {
                 .isEqualTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC.fullName());
 
             assertThat(stateFlow.getFlags()).contains(
-                entry(FlowFlag.LIP_CASE.name(), true)
+                entry(FlowFlag.LIP_CASE.name(), true),
+                entry(FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true)
             );
         }
     }

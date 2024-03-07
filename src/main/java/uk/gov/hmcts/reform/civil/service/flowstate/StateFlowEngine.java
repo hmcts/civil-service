@@ -282,13 +282,17 @@ public class StateFlowEngine {
                         flags.put(FlowFlag.LIP_CASE.name(), true);
                     })
                 .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(nocSubmittedForLiPApplicant)
-                    .set(flags ->
-                        flags.put(FlowFlag.LIP_CASE.name(), false)
-                    )
+                    .set(flags -> flags.putAll(
+                        Map.of(
+                            FlowFlag.LIP_CASE.name(), false,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), true
+                        )))
                 .transitionTo(PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC).onlyIf(isLiPvLRCase)
-                    .set(flags ->
-                        flags.put(FlowFlag.LIP_CASE.name(), true)
-                    )
+                    .set(flags -> flags.putAll(
+                        Map.of(
+                            FlowFlag.LIP_CASE.name(), true,
+                            FlowFlag.UNREPRESENTED_DEFENDANT_ONE.name(), false
+                        )))
             .state(CLAIM_ISSUED_PAYMENT_FAILED)
                 .transitionTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL).onlyIf(paymentSuccessful)
             .state(CLAIM_ISSUED_PAYMENT_SUCCESSFUL)
