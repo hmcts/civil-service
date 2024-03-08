@@ -44,7 +44,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED;
 
-
 @ExtendWith(MockitoExtension.class)
 public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
 
