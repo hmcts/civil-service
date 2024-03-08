@@ -86,6 +86,7 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapU
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapWitnessesToUpdatePartyDetailsForm;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQWitnesses;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populatePartyIndividuals;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForLitigationFriendParties;
 import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
@@ -448,6 +449,10 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         }
 
         YesOrNo submittedByCaseworker = isAdmin(callbackParams.getParams().get(BEARER_TOKEN).toString()) ? YES : NO;
+
+        //Populate individuals with partyID if they do not exist
+        populatePartyIndividuals(builder);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder
                         .businessProcess(BusinessProcess.ready(MANAGE_CONTACT_INFORMATION))
