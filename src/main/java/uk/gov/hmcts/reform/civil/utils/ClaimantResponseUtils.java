@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.docmosis.utils;
+package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTim
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -92,7 +91,7 @@ public class ClaimantResponseUtils {
         return totalAmount.divide(paymentAmount, 0, RoundingMode.CEILING).longValue() - 1;
     }
 
-    private static BigDecimal getDefendantAdmittedAmount(CaseData caseData) {
+    public static BigDecimal getDefendantAdmittedAmount(CaseData caseData) {
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
             return caseData.getTotalClaimAmount();
         } else {

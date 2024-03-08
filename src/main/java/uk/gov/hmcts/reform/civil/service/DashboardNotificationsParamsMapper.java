@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
+import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 
 @Service
 @RequiredArgsConstructor
@@ -37,8 +39,15 @@ public class DashboardNotificationsParamsMapper {
         if (caseData.getHwfFeeType() != null) {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
-        params.put("claimSettledAmount", "500");
-        params.put("claimSettledDate", "12/01/2024");
+
+        if (nonNull(getDefendantAdmittedAmount(caseData))) {
+            params.put("defendantAdmittedAmount", formatAmount(getDefendantAdmittedAmount(caseData)));
+        }
+
+        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
+            params.put("defendantAdmittedAmountPaymentDeadline",
+                       DateUtils.formatOrdinalDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()));
+        }
         return params;
     }
 }
