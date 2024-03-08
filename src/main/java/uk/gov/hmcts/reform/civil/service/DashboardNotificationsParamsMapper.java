@@ -29,7 +29,7 @@ public class DashboardNotificationsParamsMapper {
         }
 
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
-            params.put("whenWillThisAmountBePaid", caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
+            params.put("defendantAdmittedAmountPaymentDeadline", caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
         }
 
         if (nonNull(caseData.getClaimFee())) {
