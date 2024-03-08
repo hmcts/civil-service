@@ -17,6 +17,8 @@ import static java.util.Map.entry;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
@@ -166,6 +168,14 @@ public class FlowStateAllowedEventService {
 
     private final StateFlowEngine stateFlowEngine;
     private final CaseDetailsConverter caseDetailsConverter;
+
+    private static final List<CaseEvent> EVENT_WHITELIST = List.of(
+        migrateCase,
+        NOTIFY_HEARING_PARTIES,
+        MANAGE_CONTACT_INFORMATION,
+        CASE_PROCEEDS_IN_CASEMAN,
+        UpdateNextHearingInfo
+    );
 
     private static final Map<String, List<CaseEvent>> ALLOWED_EVENTS_ON_FLOW_STATE = Map.ofEntries(
         entry(
@@ -1384,6 +1394,7 @@ public class FlowStateAllowedEventService {
                 UPLOAD_MEDIATION_DOCUMENTS,
                 MORE_INFORMATION_HWF,
                 FEE_PAYMENT_OUTCOME,
+                NO_REMISSION_HWF,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
                 PARTIAL_REMISSION_HWF_GRANTED,
@@ -1590,7 +1601,8 @@ public class FlowStateAllowedEventService {
                 FEE_PAYMENT_OUTCOME,
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
+                NO_REMISSION_HWF
             )
         ),
         entry(
@@ -1631,19 +1643,7 @@ public class FlowStateAllowedEventService {
     }
 
     public boolean isAllowed(CaseDetails caseDetails, CaseEvent caseEvent) {
-        if (caseEvent.equals(migrateCase)) {
-            return true;
-        }
-
-        if (caseEvent.equals(NOTIFY_HEARING_PARTIES)) {
-            return true;
-        }
-
-        if (caseEvent.equals(MANAGE_CONTACT_INFORMATION)) {
-            return true;
-        }
-
-        if (caseEvent.equals(CASE_PROCEEDS_IN_CASEMAN)) {
+        if (EVENT_WHITELIST.contains(caseEvent)) {
             return true;
         }
 
