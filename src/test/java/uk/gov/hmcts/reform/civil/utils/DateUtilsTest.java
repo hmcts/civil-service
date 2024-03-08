@@ -12,7 +12,7 @@ public class DateUtilsTest {
     @Test
     public void testFormatDate() {
         LocalDateTime date = LocalDateTime.of(2022, 7, 28, 9, 00, 00);
-        String dateFormatted = DateUtils.formatDate(date);
+        String dateFormatted = DateUtils.formatDate(date.toLocalDate());
 
         Assertions.assertEquals("28 July 2022", dateFormatted);
     }

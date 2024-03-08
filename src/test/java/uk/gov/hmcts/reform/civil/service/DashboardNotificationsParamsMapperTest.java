@@ -39,7 +39,7 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
 
         assertThat(result).extracting("responseDeadline")
-            .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(14L)));
+            .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(14L).toLocalDate()));
 
         assertThat(result).extracting("defendantName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
