@@ -35,7 +35,6 @@ public class ClaimIssueNotificationsHandler extends CallbackHandler {
     private final DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
     private final FeatureToggleService toggleService;
 
-
     @Override
     protected Map<String, Callback> callbacks() {
         return toggleService.isDashboardServiceEnabled()
