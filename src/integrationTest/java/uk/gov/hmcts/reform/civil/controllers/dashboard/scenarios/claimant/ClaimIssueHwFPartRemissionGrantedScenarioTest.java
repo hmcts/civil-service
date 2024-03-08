@@ -5,10 +5,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.http.HttpStatus;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
-import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -23,11 +21,9 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends BaseIntegrati
 
     @Test
     void should_create_claim_issue_hwf_part_remission_scenario() throws Exception {
-        String dueDate = DateUtils.formatDate(LocalDateTime.now());
         Map<String, Object> map = new HashMap<>();
         map.put("claimIssueRemissionAmount", "1000");
         map.put("claimIssueOutStandingAmount", "25");
-        map.put("claimIssuePaymentDueDate", dueDate);
         UUID caseId = UUID.randomUUID();
 
         doPost(
@@ -44,13 +40,10 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends BaseIntegrati
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionEn").value(
-                "You'll get help with the claim fee. You'll receive 1000 towards it. <br> You must still pay the remaining fee of 25 by " +
-                    dueDate + ".You can pay by phone by calling {civilMoneyClaimsTelephone}."),
+                "You'll get help with the claim fee. You'll receive 1000 towards it. <br> You must still pay the remaining fee of 25.You can pay by phone by calling {civilMoneyClaimsTelephone}."),
             jsonPath("$[0].titleCy").value("Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionCy").value(
-                "You'll get help with the claim fee. You'll receive 1000 towards it. <br> You must still pay the remaining fee of 25 by "
-                    + dueDate +
-                    ".You can pay by phone by calling {civilMoneyClaimsTelephone}.")
+                "You'll get help with the claim fee. You'll receive 1000 towards it. <br> You must still pay the remaining fee of 25.You can pay by phone by calling {civilMoneyClaimsTelephone}.")
 
         );
     }

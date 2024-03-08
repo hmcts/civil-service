@@ -76,7 +76,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             scenarioParams.put("typeOfFee", "claim");
             scenarioParams.put("claimIssueRemissionAmount", "1000");
             scenarioParams.put("claimIssueOutStandingAmount", "25");
-          
+
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -120,7 +120,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
                 Arguments.of(
                     PARTIAL_REMISSION_HWF_GRANTED,
                     SCENARIO_AAA7_CLAIM_ISSUE_HWF_PART_REMISSION
-                )
+                ),
                 Arguments.of(INVALID_HWF_REFERENCE, SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF),
                 Arguments.of(MORE_INFORMATION_HWF, SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED),
                 Arguments.of(UPDATE_HELP_WITH_FEE_NUMBER, SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED)
