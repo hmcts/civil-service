@@ -32,6 +32,7 @@ public class HwFDashboardNotificationsHandler extends CallbackHandler {
     public static final String TASK_ID = "Claimant1HwFDashboardNotification";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
+
     private final Map<CaseEvent, String> dashboardScenarios = Map.of(
         INVALID_HWF_REFERENCE, SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF.getScenario(),
         MORE_INFORMATION_HWF, SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED.getScenario()
