@@ -34,9 +34,6 @@ public class CourtFavoursDefendantSettlementAgreementScenarioTest extends BaseIn
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "DEFENDANT")
             .andExpect(status().isOk())
-            .andDo(result -> {
-                System.out.println(result.getResponse().getContentAsString());
-            })
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Settlement agreement"),
