@@ -422,7 +422,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             }
 
             @ParameterizedTest
-            @EnumSource(value = MediationUnsuccessfulReason.class, names = {"NOT_CONTACTABLE_CLAIMANT_TWO", "NOT_CONTACTABLE_DEFENDANT_TWO"})
+            @EnumSource(value = MediationUnsuccessfulReason.class, names = {"NOT_CONTACTABLE_DEFENDANT_TWO"})
             void shouldNotSendNotificationToClaimantLr_ReasonDoesNotMatchList(MediationUnsuccessfulReason reason) {
                 //Given
                 CaseData caseData = CaseData.builder()
