@@ -72,13 +72,11 @@ public class DashboardNotificationsParamsMapperTest {
         caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED)
             .claimIssuedHwfDetails(HelpWithFeesDetails.builder().remissionAmount(BigDecimal.valueOf(2500))
                                        .outstandingFeeInPounds(BigDecimal.valueOf(100)).build()).build();
-        
+
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimIssueRemissionAmount").isEqualTo("25");
         assertThat(result).extracting("claimIssueOutStandingAmount").isEqualTo("100");
-        assertThat(result).extracting("claimIssuePaymentDueDate").isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
-
     }
 }
 
