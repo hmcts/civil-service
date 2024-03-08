@@ -40,10 +40,12 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends BaseIntegrati
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionEn").value(
-                "You'll get help with the claim fee. You'll receive 1000 towards it. <br> You must still pay the remaining fee of 25.You can pay by phone by calling {civilMoneyClaimsTelephone}."),
+                "You'll get help with the claim fee. You'll receive 1000 towards it. <br>" +
+                    " You must still pay the remaining fee of 25.You can pay by phone by calling {civilMoneyClaimsTelephone}."),
             jsonPath("$[0].titleCy").value("Your help with fees application has been reviewed"),
             jsonPath("$[0].descriptionCy").value(
-                "You'll get help with the claim fee. You'll receive 1000 towards it. <br> You must still pay the remaining fee of 25.You can pay by phone by calling {civilMoneyClaimsTelephone}.")
+                "You'll get help with the claim fee. You'll receive 1000 towards it. <br>" +
+                    " You must still pay the remaining fee of 25.You can pay by phone by calling {civilMoneyClaimsTelephone}.")
 
         );
     }
