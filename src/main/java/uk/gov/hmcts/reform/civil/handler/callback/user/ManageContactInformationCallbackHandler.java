@@ -441,6 +441,8 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
         CaseData current = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
         ContactDetailsUpdatedEvent changesEvent = partyDetailsChangedUtil.buildChangesEvent(current, builder.build());
+        //Populate individuals with partyID if they do not exist
+        populatePartyIndividuals(builder);
 
         if (changesEvent == null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -449,9 +451,6 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         }
 
         YesOrNo submittedByCaseworker = isAdmin(callbackParams.getParams().get(BEARER_TOKEN).toString()) ? YES : NO;
-
-        //Populate individuals with partyID if they do not exist
-        populatePartyIndividuals(builder);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(builder
