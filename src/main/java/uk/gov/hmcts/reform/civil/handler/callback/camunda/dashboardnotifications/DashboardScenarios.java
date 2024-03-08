@@ -11,7 +11,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF("Scenario.AAA7.ClaimIssue.HWF.InvalidRef"),
     SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING("Scenario.AAA7.ClaimantIntent.GoToHearing.Claimant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT("Scenario.AAA7.ClaimantIntent.ClaimSettled.Claimant"),
-    SCENARIO_AAA7_CLAIMANT_MEDIATION("Scenario.AAA7.ClaimantIntent.Mediation.Claimant");
+    SCENARIO_AAA7_CLAIMANT_MEDIATION("Scenario.AAA7.ClaimantIntent.Mediation.Claimant"),
+    SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED("Scenario.AAA7.ClaimIssue.HWF.InfoRequired");
 
     private final String scenario;
 
