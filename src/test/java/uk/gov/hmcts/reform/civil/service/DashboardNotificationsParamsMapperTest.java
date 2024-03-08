@@ -4,10 +4,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -28,7 +33,7 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
-
+        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED).build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimFee").isEqualTo("£1");
@@ -42,12 +47,15 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
+        assertThat(result).extracting("typeOfFee")
+            .isEqualTo("claim");
     }
 
     @Test
-    public void shouldMapParameters_WhenResponseDeadlineIsNull() {
+    public void shouldMapParameters_WhenResponseDeadlineAndClaimFeeIsNull() {
 
-        caseData = caseData.toBuilder().respondent1ResponseDeadline(null).build();
+        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
+            .claimFee(null).build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -56,6 +64,43 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
 
         assertThat(result).extracting("responseDeadline").isNull();
+
+        assertThat(result).extracting("claimFee").isNull();
+
+    }
+
+    @Test
+    public void shouldMapCaseSettleAmountAndCaseSettledDateWheResponseTypeIsFullDefence() {
+
+        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondToClaim(RespondToClaim.builder()
+                                .howMuchWasPaid(new BigDecimal("100050"))
+                                .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
+                                .build())
+            .build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.50");
+        assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
+    }
+
+    @Test
+    public void shouldMapCaseSettleAmountAndCaseSettledDateWhenResponseTypeIsPartAdmit() {
+
+        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondToAdmittedClaim(RespondToClaim.builder()
+                                        .howMuchWasPaid(new BigDecimal("100055"))
+                                        .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
+                                        .build())
+            .build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.55");
+        assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
 
     }
 }

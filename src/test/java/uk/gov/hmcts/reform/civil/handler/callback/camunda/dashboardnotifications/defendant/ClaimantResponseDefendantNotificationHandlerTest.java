@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASH
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimSettledDefendantNotificationsHandlerTest extends BaseCallbackHandlerTest {
+public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
     private ClaimantResponseDefendantNotificationHandler handler;
@@ -59,7 +59,7 @@ public class ClaimSettledDefendantNotificationsHandlerTest extends BaseCallbackH
     }
 
     @Test
-    public void createDashboardNotifications() {
+    public void configureDashboardNotificationsForClaimantResponse() {
 
         Map<String, Object> params = new HashMap<>();
 
@@ -69,6 +69,7 @@ public class ClaimSettledDefendantNotificationsHandlerTest extends BaseCallbackH
             .legacyCaseReference("reference")
             .ccdCaseReference(1234L)
             .ccdState(CaseState.CASE_SETTLED)
+            .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .specRespondent1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .build();
