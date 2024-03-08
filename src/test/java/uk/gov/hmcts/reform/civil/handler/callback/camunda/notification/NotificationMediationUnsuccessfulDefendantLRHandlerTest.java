@@ -162,7 +162,8 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     }
 
     @ParameterizedTest
-    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
+    @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS", "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED",
+        "NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
     void shouldSendNotificationToDefendantLR_2v1(MediationUnsuccessfulReason reason) {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
