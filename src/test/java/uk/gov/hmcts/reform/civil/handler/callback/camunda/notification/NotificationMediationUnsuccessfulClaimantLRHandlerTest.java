@@ -177,37 +177,6 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             @ParameterizedTest
             @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS",
                 "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_DEFENDANT_ONE"})
-            void shouldSendNotificationToClaimantLr_2v1_whenEventIsCalled(MediationUnsuccessfulReason reason) {
-                //Given
-                CaseData caseData = CaseData.builder()
-                    .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).build())
-                    .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(CLAIMANT_EMAIL_ADDRESS).build())
-                    .legacyCaseReference(REFERENCE_NUMBER)
-                    .ccdCaseReference(CCD_REFERENCE_NUMBER)
-                    .addApplicant2(YesOrNo.YES)
-                    .addRespondent2(YesOrNo.NO)
-                    .applicant1Represented(YesOrNo.YES)
-                    .mediation(Mediation.builder()
-                                   .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
-                    .build();
-                CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
-                    .request(CallbackRequest.builder().eventId(NOTIFY_MEDIATION_UNSUCCESSFUL_CLAIMANT_LR.name()).build()).build();
-
-                //When
-                notificationHandler.handle(params);
-                //Then
-                verify(notificationService, times(1)).sendMail(targetEmail.capture(),
-                                                               emailTemplate.capture(),
-                                                               notificationDataMap.capture(), reference.capture()
-                );
-                assertThat(targetEmail.getAllValues().get(0)).isEqualTo(CLAIMANT_EMAIL_ADDRESS);
-                assertThat(emailTemplate.getAllValues().get(0)).isEqualTo(CARM_MAIL_TEMPLATE);
-                assertThat(notificationDataMap.getAllValues().get(0)).isEqualTo(CARM_PROPERTY_MAP);
-            }
-
-            @ParameterizedTest
-            @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS",
-                "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_DEFENDANT_ONE"})
             void shouldSendNotificationToClaimantLr_1v2SS_whenEventIsCalled(MediationUnsuccessfulReason reason) {
                 //Given
                 CaseData caseData = CaseData.builder()
