@@ -18,17 +18,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PartAdmitImmediatelyClaimSettledScenarioTest extends BaseIntegrationTest {
 
     @Test
-    void should_create_scenario_for_claim_settled() throws Exception {
+    void should_create_scenario_for_part_admit_immediate_accepted() throws Exception {
 
         UUID caseId = UUID.randomUUID();
 
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("claimSettledAmount", "£3000",
-                                  "claimSettledDate", "16th March 2024"
+                   .params(Map.of("defendantAdmittedAmount", "100",
+                                  "whenWillThisAmountBePaid", "1 January 2024"
                    ))
                    .build(),
-               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimantIntent.ClaimSettled.Defendant", caseId
+               DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimantIntent.PartAdmit.Defendant", caseId
         )
             .andExpect(status().isOk());
 
@@ -37,9 +37,9 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends BaseIntegratio
             .andExpect(status().isOk())
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].titleEn").value("The claim is settled"),
+                jsonPath("$[0].titleEn").value("Immediate payment"),
                 jsonPath("$[0].descriptionEn")
-                    .value("The claimant has confirmed that you paid £3000 on 16th March 2024.")
+                    .value("The claimant has accepted your plan to pay £100 immediately. Funds must clear <a href={CLAIMANT_DETAILS_URL} class=\"govuk-link\">their account</a> by 1 January 2024. If they don´t receive the money by then, they can request a County Court Judgment.")
             );
     }
 }
