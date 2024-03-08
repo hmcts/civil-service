@@ -2,7 +2,7 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
   devcpuRequests: 500m
-  devmemoryRequests: 3840Mi
+  devmemoryRequests: 2048Mi
   devmemoryLimits: 5120Mi
   environment:
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
