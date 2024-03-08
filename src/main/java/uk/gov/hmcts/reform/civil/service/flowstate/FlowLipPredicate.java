@@ -10,7 +10,6 @@ public class FlowLipPredicate {
 
     }
 
-
     public static final Predicate<CaseData> isLipCase = CaseData::isLipvLipOneVOne;
 
     public static final Predicate<CaseData> nocSubmittedForLiPApplicant = CaseData::nocApplyForLiPClaimant;
