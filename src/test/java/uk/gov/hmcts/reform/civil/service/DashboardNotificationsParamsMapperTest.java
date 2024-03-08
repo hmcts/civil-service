@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -43,12 +42,12 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
 
         assertThat(result).extracting("responseDeadline")
-            .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(14L)));
+                .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(14L)));
 
         assertThat(result).extracting("defendantName")
-            .isEqualTo(caseData.getRespondent1().getPartyName());
+                .isEqualTo(caseData.getRespondent1().getPartyName());
         assertThat(result).extracting("typeOfFee")
-            .isEqualTo("claim");
+                .isEqualTo("claim");
 
         assertThat(result).extracting("respondent1SettlementAgreementDeadline")
                 .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(7)));
@@ -60,7 +59,7 @@ public class DashboardNotificationsParamsMapperTest {
     public void shouldMapParameters_WhenResponseDeadlineAndClaimFeeIsNull() {
 
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
-            .claimFee(null).build();
+                .claimFee(null).build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 

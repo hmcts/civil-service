@@ -44,10 +44,14 @@ public class ClaimantSettlementAgreementScenarioTest extends BaseIntegrationTest
                 .andExpectAll(
                         status().is(HttpStatus.OK.value()),
                         jsonPath("$[0].titleEn").value("Settlement agreement"),
-                        jsonPath("$[0].descriptionEn")
-                                .value("You have accepted the defendant's plan and asked them to sign a settlement agreement.<br><br> The defendant must respond by "+respondent1ResponseDeadline+".<br><br> If they do not respond by then, or reject the agreement, you can request a County Court Judgment."),
+                        jsonPath("$[0].descriptionEn").value(
+                                "You have accepted the defendant's plan and asked them to sign a settlement agreement." +
+                                        "<br><br> The defendant must respond by " + respondent1ResponseDeadline + ".<br><br> If they do not respond by then, " +
+                                        "or reject the agreement, you can request a County Court Judgment."),
                         jsonPath("$[0].titleCy").value("Settlement agreement"),
-                        jsonPath("$[0].descriptionCy")
-                                .value("You have accepted the defendant's plan and asked them to sign a settlement agreement.<br><br> The defendant must respond by "+respondent1ResponseDeadline+".<br><br> If they do not respond by then, or reject the agreement, you can request a County Court Judgment."));
+                        jsonPath("$[0].descriptionCy").value(
+                                "You have accepted the defendant's plan and asked them to sign a settlement agreement." +
+                                        "<br><br> The defendant must respond by " + respondent1ResponseDeadline + ".<br><br> If they do not respond by then, " +
+                                        "or reject the agreement, you can request a County Court Judgment."));
     }
 }

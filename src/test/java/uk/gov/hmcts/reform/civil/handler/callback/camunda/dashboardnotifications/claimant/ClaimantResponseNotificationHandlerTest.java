@@ -44,12 +44,19 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
 
     @Nested
     class AboutToSubmitCallback {
+
         @Test
-        void shouldCreateDashboardNotificationsForSignSettlementAgreement(){
-            //Given
+        void shouldCreateDashboardNotificationsForSignSettlementAgreement() {
+            // Given
+            Map<String, Object> scenarioParams  = new HashMap<>();
+            scenarioParams.put("claimantSettlementAgreement", "accepted");
+            scenarioParams.put("respondent1SettlementAgreementDeadline", LocalDateTime.now().plusDays(7));
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
             CaseData caseData = CaseDataBuilder.builder()
                     .build().toBuilder()
-                    .ccdCaseReference(1594154327617591L)
+                    .ccdCaseReference(1234L)
                     .caseDataLiP(CaseDataLiP.builder()
                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
                                     .applicant1SignedSettlementAgreement(YesOrNo.YES).build()
@@ -57,15 +64,9 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
                             .build())
                     .build();
 
-            Map<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("claimantSettlementAgreement", "accepted");
-            scenarioParams.put("respondent1SettlementAgreementDeadline", LocalDateTime.now().plusDays(7));
-            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
                     .build();
-
             // When
             handler.handle(callbackParams);
 
