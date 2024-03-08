@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -29,7 +30,10 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
-        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED).build();
+        caseData = caseData.toBuilder()
+                .hwfFeeType(FeeType.CLAIMISSUED)
+                .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().plusDays(7))
+                .build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimFee").isEqualTo("£1");
@@ -45,6 +49,11 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(caseData.getRespondent1().getPartyName());
         assertThat(result).extracting("typeOfFee")
             .isEqualTo("claim");
+
+        assertThat(result).extracting("respondent1SettlementAgreementDeadline")
+                .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(7)));
+
+        assertThat(result).extracting("claimantSettlementAgreement").isEqualTo("accepted");
     }
 
     @Test
