@@ -8,6 +8,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
+import uk.gov.hmcts.reform.dashboard.data.NotificationAction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,8 @@ public class GetNotificationControllerTest extends BaseIntegrationTest {
                                  .titleEn("title_en")
                                  .titleCy("title_cy")
                                  .descriptionEn("description_en")
-                                 .descriptionCy("description_cy").build());
+                                 .descriptionCy("description_cy")
+                                 .timeToLive("Click").build());
 
         return notificationList;
     }
