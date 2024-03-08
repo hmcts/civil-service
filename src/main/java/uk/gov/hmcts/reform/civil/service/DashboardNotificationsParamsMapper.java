@@ -35,7 +35,8 @@ public class DashboardNotificationsParamsMapper {
                        DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate()));
         }
 
-        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())) {
+        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())
+            && nonNull(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())) {
             params.put("responseToClaimAdmitPartPaymentDeadline",
                        DateUtils.formatDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()));
         }

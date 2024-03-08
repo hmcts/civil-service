@@ -6,9 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -29,7 +31,11 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
-        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED).build();
+        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED)
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                               .whenWillThisAmountBePaid(LocalDate.now().plusDays(5))
+                                               .build())
+            .build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimFee").isEqualTo("£1");
@@ -41,6 +47,9 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("responseDeadline")
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(14L).toLocalDate()));
 
+        assertThat(result).extracting("responseToClaimAdmitPartPaymentDeadline")
+            .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(5L).toLocalDate()));
+
         assertThat(result).extracting("defendantName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
         assertThat(result).extracting("typeOfFee")
@@ -51,6 +60,7 @@ public class DashboardNotificationsParamsMapperTest {
     public void shouldMapParameters_WhenResponseDeadlineAndClaimFeeIsNull() {
 
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
+            .respondToClaimAdmitPartLRspec(null)
             .claimFee(null).build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);

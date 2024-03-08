@@ -28,7 +28,9 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandlerTest {
@@ -65,7 +67,8 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandlerTest {
         CaseData updated = caseData.toBuilder()
             .ccdCaseReference(CASE_ID)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(whenWillThisAmountBePaid).build())
+                                               .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
+                                               .build())
             .build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(updated).build();
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
