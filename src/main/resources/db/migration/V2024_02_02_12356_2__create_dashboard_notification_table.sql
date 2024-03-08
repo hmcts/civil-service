@@ -23,14 +23,8 @@ CREATE TABLE IF NOT EXISTS dbs.dashboard_notifications (
  citizen_role VARCHAR(256),
  title_en VARCHAR(256),
  title_cy VARCHAR(256),
-  description_en VARCHAR
-(
-  512
-),
-  description_cy VARCHAR
-(
-  512
-),
+ description_en VARCHAR(512),
+ description_cy VARCHAR(512),
  message_params jsonb,
  created_by VARCHAR(256),
  created_at TIMESTAMP default CURRENT_TIMESTAMP,

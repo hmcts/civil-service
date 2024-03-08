@@ -31,7 +31,7 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
-
+        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED).build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimFee").isEqualTo("£1");
@@ -45,6 +45,8 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
+        assertThat(result).extracting("typeOfFee")
+            .isEqualTo("claim");
     }
 
     @Test

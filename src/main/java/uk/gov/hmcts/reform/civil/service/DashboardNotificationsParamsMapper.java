@@ -45,7 +45,9 @@ public class DashboardNotificationsParamsMapper {
                 caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
             );
         }
-        params.put("claimIssuePaymentDueDate", DateUtils.formatDate(LocalDateTime.now()));
+        if (caseData.getHwfFeeType() != null) {
+            params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
+        }
         return params;
     }
 }
