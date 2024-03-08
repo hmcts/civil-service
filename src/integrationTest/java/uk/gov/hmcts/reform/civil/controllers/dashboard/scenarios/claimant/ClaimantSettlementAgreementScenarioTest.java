@@ -24,13 +24,13 @@ public class ClaimantSettlementAgreementScenarioTest extends BaseIntegrationTest
     void should_create_claimant_settlement_agreement_scenario() throws Exception {
 
         UUID caseId = UUID.randomUUID();
-        LocalDate respondent1ResponseDeadline = OffsetDateTime.now().toLocalDate();
+        LocalDate respondent1SettlementDeadline = OffsetDateTime.now().toLocalDate();
         doPost(BEARER_TOKEN,
                 ScenarioRequestParams.builder()
                         .params(
                                 Map.of(
                                         "claimantSettlementAgreement", "accepted",
-                                        "respondent1SettlementAgreementDeadline", respondent1ResponseDeadline
+                                        "respondent1SettlementAgreementDeadline", respondent1SettlementDeadline
                                 )
                         )
                         .build(),
@@ -46,12 +46,12 @@ public class ClaimantSettlementAgreementScenarioTest extends BaseIntegrationTest
                         jsonPath("$[0].titleEn").value("Settlement agreement"),
                         jsonPath("$[0].descriptionEn").value(
                                 "You have accepted the defendant's plan and asked them to sign a settlement agreement." +
-                                        "<br><br>The defendant must respond by " + respondent1ResponseDeadline + ".<br><br>If they do not respond by then, " +
+                                        "<br><br>The defendant must respond by " + respondent1SettlementDeadline + ".<br><br>If they do not respond by then, " +
                                         "or reject the agreement, you can request a County Court Judgment."),
                         jsonPath("$[0].titleCy").value("Settlement agreement"),
                         jsonPath("$[0].descriptionCy").value(
                                 "You have accepted the defendant's plan and asked them to sign a settlement agreement." +
-                                        "<br><br>The defendant must respond by " + respondent1ResponseDeadline + ".<br><br>If they do not respond by then, " +
+                                        "<br><br>The defendant must respond by " + respondent1SettlementDeadline + ".<br><br>If they do not respond by then, " +
                                         "or reject the agreement, you can request a County Court Judgment."));
     }
 }
