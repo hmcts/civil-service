@@ -48,6 +48,7 @@ public class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHan
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
         }
 
         @Test
@@ -56,13 +57,9 @@ public class GenerateDashboardNotificationHwfHandlerTest extends BaseCallbackHan
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(GENERATE_DASHBOARD_NOTIFICATION_CLAIM_ISSUE_HWF_CLAIMANT1.name()).build()
             ).build();
-
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("typeOfFee", "claimFee");
-            when(toggleService.isDashboardServiceEnabled())
-                .thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
-
             handler.handle(params);
 
             verify(dashboardApiClient).recordScenario(

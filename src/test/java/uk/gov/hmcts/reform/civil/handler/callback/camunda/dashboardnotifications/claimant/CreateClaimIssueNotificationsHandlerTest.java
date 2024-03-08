@@ -48,12 +48,11 @@ public class CreateClaimIssueNotificationsHandlerTest extends BaseCallbackHandle
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
         }
 
         @Test
         void shouldRecordScenario_whenInvoked() {
-            when(toggleService.isDashboardServiceEnabled())
-                .thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1.name()).build()

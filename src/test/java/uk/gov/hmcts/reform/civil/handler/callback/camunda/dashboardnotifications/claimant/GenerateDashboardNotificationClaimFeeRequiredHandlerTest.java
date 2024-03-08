@@ -47,12 +47,11 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandlerTest extends Ba
         void setup() {
             when(dashboardApiClient.recordScenario(any(), any(), anyString(), any())).thenReturn(ResponseEntity.of(
                 Optional.empty()));
+            when(toggleService.isDashboardServiceEnabled()).thenReturn(true);
         }
 
         @Test
         void shouldRecordScenario_whenInvoked() {
-            when(toggleService.isDashboardServiceEnabled())
-                .thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(GENERATE_DASHBOARD_NOTIFICATION_CLAIM_FEE_REQUIRED_CLAIMANT1.name()).build()
@@ -60,7 +59,6 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandlerTest extends Ba
 
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("claimFee", "1.00");
-
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             handler.handle(params);
