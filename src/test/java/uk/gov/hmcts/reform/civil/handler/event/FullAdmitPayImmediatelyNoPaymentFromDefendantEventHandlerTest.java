@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,6 +67,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandlerTest {
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
         CaseData updated = caseData.toBuilder()
             .ccdCaseReference(CASE_ID)
+            .totalClaimAmount(BigDecimal.valueOf(124.67))
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
                                                .build())
@@ -76,6 +78,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantEventHandlerTest {
 
         Map<String, Object> scenarioParams = new HashMap<>();
         scenarioParams.put("ccdCaseReference", CASE_ID);
+        scenarioParams.put("fullAdmitPayImmediatelyPaymentAmount", "£124.67");
         scenarioParams.put("responseToClaimAdmitPartPaymentDeadline", DateUtils.formatDate(whenWillThisAmountBePaid));
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

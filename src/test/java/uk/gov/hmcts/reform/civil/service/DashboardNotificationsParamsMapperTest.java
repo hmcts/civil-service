@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
         caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED)
+            .totalClaimAmount(BigDecimal.valueOf(124.67))
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                                                .whenWillThisAmountBePaid(LocalDate.now().plusDays(5))
                                                .build())
@@ -49,6 +51,9 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("responseToClaimAdmitPartPaymentDeadline")
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(5L).toLocalDate()));
+
+        assertThat(result).extracting("fullAdmitPayImmediatelyPaymentAmount")
+            .isEqualTo("£124.67");
 
         assertThat(result).extracting("defendantName")
             .isEqualTo(caseData.getRespondent1().getPartyName());

@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
-import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,8 +24,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
-                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
-                    .stripTrailingZeros().toPlainString()
+                "£" + caseData.getClaimFee().toPounds().stripTrailingZeros().toPlainString()
             );
         }
 
@@ -39,6 +37,13 @@ public class DashboardNotificationsParamsMapper {
             && nonNull(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())) {
             params.put("responseToClaimAdmitPartPaymentDeadline",
                        DateUtils.formatDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()));
+        }
+
+        if (nonNull(caseData.getTotalClaimAmount())) {
+            params.put(
+                "fullAdmitPayImmediatelyPaymentAmount",
+                "£" + caseData.getTotalClaimAmount().stripTrailingZeros().toPlainString()
+            );
         }
 
         if (caseData.getHwfFeeType() != null) {
