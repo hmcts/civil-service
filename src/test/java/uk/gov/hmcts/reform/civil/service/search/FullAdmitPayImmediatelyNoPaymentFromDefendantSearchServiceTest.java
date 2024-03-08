@@ -26,12 +26,14 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchServiceTest extends Ela
     @Override
     protected Query buildQuery(int fromValue) {
         String expectedDate = DateUtils.addDaysSkippingWeekends(
-            LocalDate.now(), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY).format(DateTimeFormatter.ISO_DATE);
+            LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY)
+            .format(DateTimeFormatter.ISO_DATE);
 
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
-                        .must(matchQuery("data.respondent1RespondToSettlementAgreementDeadline", expectedDate))
+                        .must(matchQuery("data.respondToClaimAdmitPartLRspec.whenWillThisAmountBePaid",
+                                         expectedDate))
                         .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION"))));
         return new Query(query, List.of("reference"), fromValue);
     }

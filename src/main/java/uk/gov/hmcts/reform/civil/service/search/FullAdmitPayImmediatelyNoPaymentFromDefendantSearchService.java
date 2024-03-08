@@ -29,13 +29,13 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService extends 
     public Query query(int startIndex) {
 
         String targetDateString = DateUtils.addDaysSkippingWeekends(
-            LocalDate.now(), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY).format(DateTimeFormatter.ISO_DATE);
+            LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY).format(DateTimeFormatter.ISO_DATE);
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)
                 .should(boolQuery()
                             .must(matchQuery(
-                                "data.respondent1RespondToSettlementAgreementDeadline",
+                                "data.respondToClaimAdmitPartLRspec.whenWillThisAmountBePaid",
                                 targetDateString
                             ))
                             .must(beState(AWAITING_APPLICANT_INTENTION))
