@@ -70,7 +70,9 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
             Optional.ofNullable(caseData.getHearingHwfDetails())
                 .ifPresentOrElse(
                     hearingHwfDetails -> updatedData.hearingHwfDetails(
-                        hearingHwfDetails.toBuilder().remissionAmount(hearingFeeAmount).build()
+                        HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount)
+                            .outstandingFeeInPounds(BigDecimal.ZERO)
+                            .build()
                     ),
                     () -> updatedData.hearingHwfDetails(
                         HelpWithFeesDetails.builder().remissionAmount(hearingFeeAmount).build()
