@@ -38,6 +38,7 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandler extends Callba
             ? Map.of(callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForClaimSubmission)
             : Map.of(callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse);
     }
+
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
         return TASK_ID;
