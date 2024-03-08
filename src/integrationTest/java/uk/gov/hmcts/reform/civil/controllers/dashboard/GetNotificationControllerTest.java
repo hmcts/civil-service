@@ -8,7 +8,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.Notification;
-import uk.gov.hmcts.reform.dashboard.data.NotificationAction;
 
 import java.util.ArrayList;
 import java.util.List;
