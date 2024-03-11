@@ -123,6 +123,7 @@ public class ResponseRepaymentDetailsForm {
             .paymentHow(respondToClaim.getExplanationOnHowTheAmountWasPaid());
     }
 
+    //TODO
     private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder) {
         Optional<CaseDataLiP> caseDataLiPOptional = Optional.ofNullable(caseData.getCaseDataLiP());
         builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())

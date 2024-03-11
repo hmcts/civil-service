@@ -165,7 +165,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
     }
 
     @Test
-    public void contentCheckMultiparty() {
+    public void contentCheckMultipartyRespondent2Answering() {
         SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
             CASE_DATA_WITH_MULTI_PARTY, BEARER_TOKEN);
 
@@ -175,11 +175,34 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
             templateData.getWhyDisputeTheClaim()
         );
         Assertions.assertEquals(
-            CASE_DATA_WITH_MULTI_PARTY.getRespondent1DQ().getRespondent1DQStatementOfTruth().getName(),
+            CASE_DATA_WITH_MULTI_PARTY.getRespondent2DQ().getRespondent2DQStatementOfTruth().getName(),
             templateData.getStatementOfTruth().getName()
         );
         Assertions.assertEquals(
-            CASE_DATA_WITH_MULTI_PARTY.getRespondent1DQ().getRespondent1DQStatementOfTruth().getRole(),
+            CASE_DATA_WITH_MULTI_PARTY.getRespondent2DQ().getRespondent2DQStatementOfTruth().getRole(),
+            templateData.getStatementOfTruth().getRole()
+        );
+    }
+
+    @Test
+    public void contentCheckMultipartyRespondent1Answering() {
+        final CaseData.CaseDataBuilder<?, ?> builder = getCaseDataWithMultiParty().toBuilder();
+        builder.respondent2ResponseDate(LocalDateTime.now().minusDays(3));
+        final CaseData caseData = builder.build();
+        SealedClaimResponseFormForSpec templateData = generator.getTemplateData(
+            caseData, BEARER_TOKEN);
+
+        Assertions.assertEquals(caseData.getLegacyCaseReference(), templateData.getReferenceNumber());
+        Assertions.assertEquals(
+            caseData.getDetailsOfWhyDoesYouDisputeTheClaim(),
+            templateData.getWhyDisputeTheClaim()
+        );
+        Assertions.assertEquals(
+            caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getName(),
+            templateData.getStatementOfTruth().getName()
+        );
+        Assertions.assertEquals(
+            caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getRole(),
             templateData.getStatementOfTruth().getRole()
         );
     }

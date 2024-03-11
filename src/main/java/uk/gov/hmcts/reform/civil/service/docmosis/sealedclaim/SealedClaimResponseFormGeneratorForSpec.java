@@ -62,7 +62,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
     public SealedClaimResponseFormForSpec getTemplateData(CaseData caseData, String authorisation) {
         String requestedCourt = null;
         StatementOfTruth statementOfTruth = null;
-        if (caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() != null) {
+        if (caseData.getRespondent1DQ().getRespondent1DQRequestedCourt() != null && !isRespondent2(caseData)) {
             requestedCourt = caseData.getRespondent1DQ().getRespondent1DQRequestedCourt().getCaseLocation().getBaseLocation();
             statementOfTruth = caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth();
         } else if (caseData.getRespondent2DQ().getRespondent2DQRequestedCourt() != null) {
@@ -84,7 +84,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             = SealedClaimResponseFormForSpec.builder()
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .whyDisputeTheClaim(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
+            .whyDisputeTheClaim(caseData.getDetailsOfWhyDoesYouDisputeTheClaim()) //TODO
             .hearingCourtLocation(hearingCourtLocation)
             .statementOfTruth(statementOfTruth)
             .allocatedTrack(caseData.getResponseClaimTrack())
