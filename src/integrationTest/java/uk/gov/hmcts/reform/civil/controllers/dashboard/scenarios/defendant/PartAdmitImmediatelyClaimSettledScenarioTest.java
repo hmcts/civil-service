@@ -39,7 +39,7 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends BaseIntegratio
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Immediate payment"),
                 jsonPath("$[0].descriptionEn")
-                    .value("The claimant has accepted your plan to pay £100 immediately. Funds must clear <a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">their account</a> by 1 January 2024. If they don´t receive the money by then, they can request a County Court Judgment.")
+                    .value("<p class=\"govuk-body\">The claimant has accepted your plan to pay £100 immediately. Funds must clear <a href={VIEW_INFO_ABOUT_CLAIMANT} class=\"govuk-link\">their account</a> by 1 January 2024. If they don´t receive the money by then, they can request a County Court Judgment.</p>")
             );
     }
 }
