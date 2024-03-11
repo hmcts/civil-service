@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASH
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT;
 
 @Service
 @RequiredArgsConstructor
@@ -58,9 +59,10 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
             } else if (Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
                 && caseData.isClaimantIntentionSettlePartAdmit()) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
+            } else if (caseData.hasApplicant1CourtDecisionInFavourOfDefendant()) {
+                return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario();
             }
         }
-
         return null;
     }
 
