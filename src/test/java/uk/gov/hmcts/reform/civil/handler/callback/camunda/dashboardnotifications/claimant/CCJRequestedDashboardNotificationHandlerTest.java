@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendant;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,19 +20,19 @@ import java.time.Month;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_REQUIRED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
-public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest {
+class CCJRequestedDashboardNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @InjectMocks
-    private ClaimIssueNotificationsHandler handler;
+    private CCJRequestedDashboardNotificationHandler handler;
 
     @Mock
     private DashboardApiClient dashboardApiClient;
@@ -40,13 +40,13 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
     @Mock
     private DashboardNotificationsParamsMapper dashboardNotificationsParamsMapper;
 
-    public static final String TASK_ID = "CreateIssueClaimDashboardNotificationsForDefendant1";
+    public static final String TASK_ID = "GenerateDashboardNotificationClaimantIntentCCJRequestedForApplicant1";
 
     Map<String, Object> params = new HashMap<>();
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
-        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1);
+        assertThat(handler.handledEvents()).contains(CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1);
     }
 
     @Test
@@ -54,7 +54,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
         assertThat(handler.camundaActivityId(
             CallbackParamsBuilder.builder()
                 .request(CallbackRequest.builder()
-                             .eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1.name())
+                             .eventId(CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1.name())
                              .build())
                 .build()))
             .isEqualTo(TASK_ID);
@@ -65,7 +65,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
 
         params.put("ccdCaseReference", "123");
         params.put("defaultRespondTime", "4pm");
-        params.put("respondent1ResponseDeadline", "11 March 2024");
+        params.put("responseDeadline", "11 March 2024");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
@@ -84,9 +84,10 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
         handler.handle(callbackParams);
         verify(dashboardApiClient).recordScenario(
             caseData.getCcdCaseReference().toString(),
-            SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
+            SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
         );
     }
+
 }
