@@ -33,13 +33,14 @@ public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends Base
 
         UUID caseId = UUID.randomUUID();
 
-        doPost(BEARER_TOKEN,
-               ScenarioRequestParams.builder()
-                   .params(Map.of("respondent1SettlementAgreementDeadline", "16 March 2024"))
-                   .build(),
-               DASHBOARD_CREATE_SCENARIO_URL,
-               "Scenario.AAA7.ClaimantIntent.SettlementAgreement.ClaimantAcceptsPlan.Defendant",
-               caseId
+        doPost(
+            BEARER_TOKEN,
+            ScenarioRequestParams.builder()
+                .params(Map.of("respondent1SettlementAgreementDeadline", "16 March 2024"))
+                .build(),
+            DASHBOARD_CREATE_SCENARIO_URL,
+            "Scenario.AAA7.ClaimantIntent.SettlementAgreement.ClaimantAcceptsPlan.Defendant",
+            caseId
         )
             .andExpect(status().isOk());
 
@@ -51,15 +52,19 @@ public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends Base
                 jsonPath("$[0].titleEn").value("Settlement agreement"),
                 jsonPath("$[0].titleCy").value("Settlement agreement"),
                 jsonPath("$[0].descriptionEn")
-                    .value("<p class=\"govuk-body\">The claimant has accepted your plan and asked you to sign a settlement agreement.</p>"
-                               + "<p class=\"govuk-body\">You must respond by 16 March 2024. If you do not respond by then, or reject the agreement, they can request a County Court Judgment.</p>"
-                               + "<p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a></p>"
-                               + "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>"),
+                    .value(
+                        "<p class=\"govuk-body\">The claimant has accepted your plan and asked you to sign a settlement agreement.</p>"
+                            + "<p class=\"govuk-body\">You must respond by 16 March 2024. If you do not respond by then, or reject the agreement," +
+                            " they can request a County Court Judgment.</p>"
+                            + "<p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a></p>"
+                            + "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>"),
                 jsonPath("$[0].descriptionCy")
-                    .value("<p class=\"govuk-body\">The claimant has accepted your plan and asked you to sign a settlement agreement.</p>"
-                               + "<p class=\"govuk-body\">You must respond by 16 March 2024. If you do not respond by then, or reject the agreement, they can request a County Court Judgment.</p>"
-                               + "<p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a></p>"
-                               + "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>")
+                    .value(
+                        "<p class=\"govuk-body\">The claimant has accepted your plan and asked you to sign a settlement agreement.</p>"
+                            + "<p class=\"govuk-body\">You must respond by 16 March 2024. If you do not respond by then, or reject the agreement," +
+                            " they can request a County Court Judgment.</p>"
+                            + "<p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a></p>"
+                            + "<p class=\"govuk-body\"><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>")
             );
     }
 }
