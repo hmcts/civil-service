@@ -7,8 +7,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,13 +22,11 @@ public class NoRemissionHwFScenarioTest extends BaseIntegrationTest {
     void should_create_no_remission_scenario() throws Exception {
 
         UUID caseId = UUID.randomUUID();
-        LocalDate paymentDueDate = OffsetDateTime.now().toLocalDate();
         String claimFee = "100";
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
                    .params(
                        Map.of(
-                           "paymentDueDate", paymentDueDate,
                            "claimFee", claimFee
                        )
                    )
@@ -49,7 +45,7 @@ public class NoRemissionHwFScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].descriptionEn").value(
                     "We've rejected your application for help with the claim fee. See the email for "
                         + "further details. You'll need to pay the full fee of "
-                        + claimFee + " by " + paymentDueDate + ". You can pay by phone by calling {civilMoneyClaimsTelephone}.")
+                        + claimFee + " . You can pay by phone by calling {civilMoneyClaimsTelephone}.")
             );
 
     }

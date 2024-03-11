@@ -40,6 +40,10 @@ public class DashboardNotificationsParamsMapper {
             params.put("responseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
         }
 
+        if (caseData.getHwfFeeType() != null) {
+            params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
+        }
+
         Fee fee = feesService
             .getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
         params.put("claimFee", "£" + fee.toPounds().stripTrailingZeros().toPlainString());

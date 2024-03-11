@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA7.Notice.ClaimIssue.HWF.Rejected', '{"Notice.AAA7.ClaimIssue.HWF.Requested","Notice.AAA7.ClaimIssue.HWF.Updated","Notice.AAA7.ClaimIssue.HWF.InvalidRef","Notice.AAA7.ClaimIssue.HWF.InfoRequired"}',
-        '{"Notice.AAA7.ClaimIssue.HWF.Rejected" : ["claimFee","paymentDueDate"]}');
+        '{"Notice.AAA7.ClaimIssue.HWF.Rejected" : ["claimFee"]}');
 
 /**
  * Add notification template
@@ -12,6 +12,6 @@ INSERT INTO dbs.dashboard_notifications_templates ( template_name, title_En, tit
                                                   , notification_role)
 VALUES ('Notice.AAA7.ClaimIssue.HWF.Rejected', 'Your help with fees application has been rejected',
         'Your help with fees application has been rejected',
-        'We''ve rejected your application for help with the claim fee. See the email for further details. You''ll need to pay the full fee of ${claimFee} by ${paymentDueDate}. You can pay by phone by calling {civilMoneyClaimsTelephone}.',
-        'We''ve rejected your application for help with the claim fee. See the email for further details. You''ll need to pay the full fee of ${claimFee} by ${paymentDueDate}. You can pay by phone by calling {civilMoneyClaimsTelephone}.',
+        'We''ve rejected your application for help with the claim fee. See the email for further details. You''ll need to pay the full fee of ${claimFee} . You can pay by phone by calling {civilMoneyClaimsTelephone}.',
+        'We''ve rejected your application for help with the claim fee. See the email for further details. You''ll need to pay the full fee of ${claimFee} . You can pay by phone by calling {civilMoneyClaimsTelephone}.',
         'CLAIMANT');
