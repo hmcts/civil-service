@@ -56,7 +56,7 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
 
     private CallbackResponse notifyDefendantMediationAgreement(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate());
+        boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         if (CaseEvent.valueOf(callbackParams.getRequest().getEventId())
             .equals(NOTIFY_RESPONDENT2_MEDIATION_AGREEMENT)) {
             boolean shouldNotifyRespondent2LRCarm = shouldSendMediationNotificationDefendant2LRCarm(
