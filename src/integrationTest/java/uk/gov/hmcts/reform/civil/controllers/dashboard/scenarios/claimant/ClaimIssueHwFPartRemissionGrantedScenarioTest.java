@@ -38,14 +38,16 @@ public class ClaimIssueHwFPartRemissionGrantedScenarioTest extends BaseIntegrati
         //Verify Notification is created
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
             status().is(HttpStatus.OK.value()),
-            jsonPath("$[0].titleEn").value("Your help with fees application has been reviewed"),
+            jsonPath("$[0].titleEn").value(
+                "<h2 class=\"govuk-notification-banner__title\" id=\"govuk-notification-banner-title\">Your help with fees application has been reviewed</h2>"),
             jsonPath("$[0].descriptionEn").value(
-                "You'll get help with the claim fee. You'll receive £1000 towards it. <br>" +
-                    " You must still pay the remaining fee of £25.You can pay by phone by calling {civilMoneyClaimsTelephone}."),
-            jsonPath("$[0].titleCy").value("Your help with fees application has been reviewed"),
+                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.</p> " +
+                    "<p class=\"govuk-body\">You must still pay the remaining fee of £25.You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
+            jsonPath("$[0].titleCy").value(
+                "<h2 class=\"govuk-notification-banner__title\" id=\"govuk-notification-banner-title\">Your help with fees application has been reviewed</h2>"),
             jsonPath("$[0].descriptionCy").value(
-                "You'll get help with the claim fee. You'll receive £1000 towards it. <br>" +
-                    " You must still pay the remaining fee of £25.You can pay by phone by calling {civilMoneyClaimsTelephone}.")
+                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.</p> " +
+                    "<p class=\"govuk-body\">You must still pay the remaining fee of £25.You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
 
         );
     }
