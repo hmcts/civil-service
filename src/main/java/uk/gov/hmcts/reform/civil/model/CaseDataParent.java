@@ -343,6 +343,7 @@ public class CaseDataParent implements MappableObject {
     private List<OrderDetailsPagesSectionsToggle> smallClaimsDocumentsToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsFlightDelayToggle;
+    private List<OrderDetailsPagesSectionsToggle> smallClaimsMediationSectionToggle;
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
@@ -819,6 +820,8 @@ public class CaseDataParent implements MappableObject {
 
     private List<Element<MediationNonAttendanceStatement>> res2MediationNonAttendanceDocs;
     private List<Element<MediationDocumentsReferredInStatement>> res2MediationDocumentsReferred;
+
+    private SmallClaimsMediation smallClaimsMediationSectionStatement;
 
     @JsonIgnore
     public boolean isResponseAcceptedByClaimant() {
