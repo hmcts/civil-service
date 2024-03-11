@@ -38,6 +38,8 @@ public class DashboardNotificationsParamsMapper {
             params.put("defendantAdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
             params.put("defendantAdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
         }
+        params.put("defendantName", caseData.getRespondent1().getPartyName());
+        params.put("claimantName", caseData.getApplicant1().getPartyName());
 
         if (nonNull(caseData.getClaimFee())) {
             params.put(
@@ -56,13 +58,15 @@ public class DashboardNotificationsParamsMapper {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
 
-        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
+        String paidAmount = getAlreadyPaidAmount(caseData);
+        params.put("admissionPaidAmount", paidAmount);
+        params.put("claimSettledAmount", paidAmount);
         params.put("claimSettledDate", getClaimSettleDate(caseData));
         params.put("respondSettlementAgreementDeadline", getRespondToSettlementAgreementDeadline(caseData));
         return params;
     }
 
-    private String getClaimSettledAmount(CaseData caseData) {
+    private String getAlreadyPaidAmount(CaseData caseData) {
         return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
             MonetaryConversions::penniesToPounds).map(
             BigDecimal::stripTrailingZeros).map(amount -> amount.setScale(2)).map(BigDecimal::toPlainString).map(amount -> "£" + amount).orElse(
