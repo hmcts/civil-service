@@ -48,7 +48,11 @@ public class DashboardNotificationsParamsMapper {
 
         params.put("claimSettledAmount", getClaimSettledAmount(caseData));
         params.put("claimSettledDate", getClaimSettleDate(caseData));
-        params.put("respondent1SettlementAgreementDeadline", getRespondToSettlementAgreementDeadline(caseData));
+        if (nonNull(caseData.getRespondent1RespondToSettlementAgreementDeadline())) {
+            params.put("respondent1SettlementAgreementDeadline_En", DateUtils.formatDate(caseData.getRespondent1RespondToSettlementAgreementDeadline()));
+            params.put("respondent1SettlementAgreementDeadline_Cy", DateUtils.formatDate(caseData.getRespondent1RespondToSettlementAgreementDeadline()));
+            params.put("claimantSettlementAgreement", "accepted");
+        }
         return params;
     }
 
