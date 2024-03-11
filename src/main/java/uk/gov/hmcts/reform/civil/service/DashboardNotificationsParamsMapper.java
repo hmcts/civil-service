@@ -43,7 +43,12 @@ public class DashboardNotificationsParamsMapper {
         }
 
         getClaimSettledAmount(caseData).map(amount -> params.put("claimSettledAmount", amount));
-        getClaimSettleDate(caseData).map(date -> params.put("claimSettledDate", date));
+
+        getClaimSettleDate(caseData).map(date -> {
+            params.put("claimSettledDateEn", date);
+            params.put("claimSettledDateCy", date);
+            return Optional.of(date);
+        });
         return params;
     }
 

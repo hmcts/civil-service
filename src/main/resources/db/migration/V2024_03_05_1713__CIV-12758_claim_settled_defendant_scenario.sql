@@ -3,7 +3,7 @@
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
 VALUES ('Scenario.AAA7.ClaimantIntent.ClaimSettled.Defendant', '{"Notice.AAA7.DefResponse.Full DefenceOrPartAdmin.AlreadyPaid.Defendant"}',
-        '{"Notice.AAA7.ClaimantIntent.ClaimSettled.Defendant" : ["claimSettledAmount","claimSettledDate"]}');
+        '{"Notice.AAA7.ClaimantIntent.ClaimSettled.Defendant" : ["claimSettledAmount","claimSettledDateEn","claimSettledDateCy"]}');
 
 /**
  * Add notification template
@@ -11,6 +11,6 @@ VALUES ('Scenario.AAA7.ClaimantIntent.ClaimSettled.Defendant', '{"Notice.AAA7.De
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA7.ClaimantIntent.ClaimSettled.Defendant', 'The claim is settled', 'The claim is settled',
-        '<p class="govuk-body">The claimant has confirmed that you paid ${claimSettledAmount} on ${claimSettledDate}.</p>',
-        '<p class="govuk-body">The claimant has confirmed that you paid ${claimSettledAmount} on ${claimSettledDate}.</p>',
+        '<p class="govuk-body">The claimant has confirmed that you paid ${claimSettledAmount} on ${claimSettledDateEn}.</p>',
+        '<p class="govuk-body">The claimant has confirmed that you paid ${claimSettledAmount} on ${claimSettledDateCy}.</p>',
         'DEFENDANT');
