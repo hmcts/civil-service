@@ -54,8 +54,6 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("fullAdmitPayImmediatelyPaymentAmount")
             .isEqualTo("£124.67");
-
-
         assertThat(result).extracting("respondent1PartyName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
         assertThat(result).extracting("typeOfFee")
