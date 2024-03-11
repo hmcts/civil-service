@@ -38,7 +38,7 @@ public class ClaimIssuedScenarioTest extends BaseIntegrationTest {
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
                    .params(Map.of("defaultRespondTime", hearingFeeByTime,
-                                  "respondent1ResponseDeadline", hearingFeeByDate,
+                                  "respondent1ResponseDeadlineEn", hearingFeeByDate,
                                   "daysLeftToRespond", 28,
                                   "ccdCaseReference", caseId
                    ))
