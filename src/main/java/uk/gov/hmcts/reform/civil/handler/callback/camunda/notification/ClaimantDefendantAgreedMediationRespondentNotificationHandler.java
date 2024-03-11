@@ -143,7 +143,7 @@ public class ClaimantDefendantAgreedMediationRespondentNotificationHandler exten
 
     private String addTemplate(CaseData caseData) {
         if (shouldSendMediationNotificationDefendant1LRCarm(caseData,
-                                                featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))) {
+                                                featureToggleService.isCarmEnabledForCase(caseData))) {
             return notificationsProperties.getNotifyDefendantLRForMediation();
         }
         if (caseData.isRespondent1NotRepresented()) {

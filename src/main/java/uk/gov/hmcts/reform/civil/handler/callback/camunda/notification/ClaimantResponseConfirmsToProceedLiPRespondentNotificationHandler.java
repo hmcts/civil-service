@@ -47,7 +47,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     private CallbackResponse notifyRespondentForClaimantConfirmsToProceed(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate());
+        boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         boolean shouldSendEmailToDefendantLR = shouldSendMediationNotificationDefendant1LRCarm(caseData, carmEnabled);
         if (shouldSendNotification(caseData, callbackParams.getRequest().getEventId())) {
             notificationService.sendMail(
@@ -84,7 +84,7 @@ public class ClaimantResponseConfirmsToProceedLiPRespondentNotificationHandler e
 
     @Override
     public Map<String, String> addProperties(CaseData caseData) {
-        if (shouldSendMediationNotificationDefendant1LRCarm(caseData, featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))) {
+        if (shouldSendMediationNotificationDefendant1LRCarm(caseData, featureToggleService.isCarmEnabledForCase(caseData))) {
             return Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData.getRespondent1OrganisationPolicy(), organisationService)
