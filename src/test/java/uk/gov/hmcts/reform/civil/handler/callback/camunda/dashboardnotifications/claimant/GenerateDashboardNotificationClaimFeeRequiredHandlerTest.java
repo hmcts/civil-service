@@ -59,6 +59,7 @@ public class GenerateDashboardNotificationClaimFeeRequiredHandlerTest extends Ba
 
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("claimFee", "1.00");
+
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             handler.handle(params);
