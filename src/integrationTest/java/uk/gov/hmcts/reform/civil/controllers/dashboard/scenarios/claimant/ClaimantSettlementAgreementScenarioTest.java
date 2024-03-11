@@ -30,7 +30,8 @@ public class ClaimantSettlementAgreementScenarioTest extends BaseIntegrationTest
                         .params(
                                 Map.of(
                                         "claimantSettlementAgreement", "accepted",
-                                        "respondent1SettlementAgreementDeadline", respondent1SettlementDeadline
+                                        "respondent1SettlementAgreementDeadline_En", respondent1SettlementDeadline,
+                                        "respondent1SettlementAgreementDeadline_Cy", respondent1SettlementDeadline
                                 )
                         )
                         .build(),
@@ -45,13 +46,15 @@ public class ClaimantSettlementAgreementScenarioTest extends BaseIntegrationTest
                         status().is(HttpStatus.OK.value()),
                         jsonPath("$[0].titleEn").value("Settlement agreement"),
                         jsonPath("$[0].descriptionEn").value(
-                                "You have accepted the defendant's plan and asked them to sign a settlement agreement." +
-                                        "<br><br>The defendant must respond by " + respondent1SettlementDeadline + ".<br><br>If they do not respond by then, " +
-                                        "or reject the agreement, you can request a County Court Judgment."),
+                                "<p class=\"govuk-body\">You have accepted the defendant's plan and asked them to sign a settlement agreement.</p>" +
+                                        "<p class=\"govuk-body\">The defendant must respond by " + respondent1SettlementDeadline + ".</p>" +
+                                        "<p class=\"govuk-body\">If they do not respond by then, " +
+                                        "or reject the agreement, you can request a County Court Judgment.</p>"),
                         jsonPath("$[0].titleCy").value("Settlement agreement"),
                         jsonPath("$[0].descriptionCy").value(
-                                "You have accepted the defendant's plan and asked them to sign a settlement agreement." +
-                                        "<br><br>The defendant must respond by " + respondent1SettlementDeadline + ".<br><br>If they do not respond by then, " +
-                                        "or reject the agreement, you can request a County Court Judgment."));
+                                "<p class=\"govuk-body\">You have accepted the defendant's plan and asked them to sign a settlement agreement.</p>" +
+                                        "<p class=\"govuk-body\">The defendant must respond by " + respondent1SettlementDeadline + ".</p>" +
+                                        "<p class=\"govuk-body\">If they do not respond by then, " +
+                                        "or reject the agreement, you can request a County Court Judgment.</p>"));
     }
 }

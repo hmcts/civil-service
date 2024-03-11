@@ -20,6 +20,11 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_PART_ADMIT_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
 
 @Service
@@ -67,7 +72,14 @@ public class ClaimantResponseNotificationHandler extends CallbackHandler {
     }
 
     private String getScenario(CaseData caseData) {
-        if (caseData.hasApplicant1SignedSettlementAgreement()) {
+        if (caseData.getCcdState() == CASE_SETTLED) {
+            if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
+                return SCENARIO_AAA7_CLAIM_PART_ADMIT_CLAIMANT.getScenario();
+            }
+            return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT.getScenario();
+        } else if (caseData.getCcdState() == JUDICIAL_REFERRAL) {
+            return SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING.getScenario();
+        } else if (caseData.hasApplicant1SignedSettlementAgreement()) {
             return SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario();
         }
         return null;
