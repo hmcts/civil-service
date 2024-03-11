@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-public class CourtFavoursDefendantSettlementAgreementScenarioTest extends BaseIntegrationTest {
+public class CourtFavoursClaimantSettlementAgreementScenarioTest extends BaseIntegrationTest {
 
     @Test
     void should_create_scenario_for_court_favours_defendant_sign_settlement_agreement() throws Exception {
@@ -39,17 +39,17 @@ public class CourtFavoursDefendantSettlementAgreementScenarioTest extends BaseIn
                 jsonPath("$[0].titleEn").value("Settlement agreement"),
                 jsonPath("$[0].titleCy").value("Settlement agreement"),
                 jsonPath("$[0].descriptionEn")
-                    .value("The claimant has rejected your plan and asked you to sign a settlement agreement.<br><br>"
-                               + "The claimant has proposed a new repayment plan and the court has agreed with it, based on the financial details you provided.<br><br>"
-                               + "You must respond by 16 March 2024. If you do not respond by then, or reject the agreement, they can request a County Court Judgment.<br><br>"
-                               + "<a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a><br>"
-                               + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a>"),
+                    .value("<p class=\"govuk-body\">The claimant has rejected your plan and asked you to sign a settlement agreement.</p>"
+                               + "<p class=\"govuk-body\">The claimant has proposed a new repayment plan and the court has agreed with it, based on the financial details you provided.</p>"
+                               + "<p class=\"govuk-body\">You must respond by 16 March 2024. If you do not respond by then, or reject the agreement, they can request a County Court Judgment.</p>"
+                               + "<p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a><br>"
+                               + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>"),
                 jsonPath("$[0].descriptionCy")
-                    .value("The claimant has rejected your plan and asked you to sign a settlement agreement.<br><br>"
-                               + "The claimant has proposed a new repayment plan and the court has agreed with it, based on the financial details you provided.<br><br>"
-                               + "You must respond by 16 March 2024. If you do not respond by then, or reject the agreement, they can request a County Court Judgment.<br><br>"
-                               + "<a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a><br>"
-                               + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a>")
+                    .value("<p class=\"govuk-body\">The claimant has rejected your plan and asked you to sign a settlement agreement.</p>"
+                               + "<p class=\"govuk-body\">The claimant has proposed a new repayment plan and the court has agreed with it, based on the financial details you provided.</p>"
+                               + "<p class=\"govuk-body\">You must respond by 16 March 2024. If you do not respond by then, or reject the agreement, they can request a County Court Judgment.</p>"
+                               + "<p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a><br>"
+                               + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>")y
             );
     }
 }
