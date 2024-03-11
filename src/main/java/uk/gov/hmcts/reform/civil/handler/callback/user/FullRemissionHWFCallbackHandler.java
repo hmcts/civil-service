@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,6 +34,7 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
         this::fullRemissionHWF,
         callbackKey(SUBMITTED), this::emptySubmittedCallbackResponse
     );
+    private final HelpWithFeesForTabService helpWithFeesForTabService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -59,7 +61,9 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                             .build()
                     ),
                     () -> updatedData.claimIssuedHwfDetails(
-                        HelpWithFeesDetails.builder().remissionAmount(claimFeeAmount).build()
+                        HelpWithFeesDetails.builder().remissionAmount(claimFeeAmount)
+                            .outstandingFeeInPounds(BigDecimal.ZERO)
+                            .build()
                     )
                 );
         } else if (caseData.isHWFTypeHearing() && hearingFeeAmount.compareTo(BigDecimal.ZERO) != 0) {
@@ -75,6 +79,7 @@ public class FullRemissionHWFCallbackHandler extends CallbackHandler {
                     )
                 );
         }
+        helpWithFeesForTabService.setUpHelpWithFeeTab(updatedData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
