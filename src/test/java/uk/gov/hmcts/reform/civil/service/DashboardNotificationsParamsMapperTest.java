@@ -49,8 +49,11 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("typeOfFee")
             .isEqualTo("claim");
 
-        assertThat(result).extracting("respondent1SettlementAgreementDeadline")
+        assertThat(result).extracting("respondent1SettlementAgreementDeadline_En")
             .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(7)));
+        
+        assertThat(result).extracting("respondent1SettlementAgreementDeadline_Cy")
+                .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(7)));
 
         assertThat(result).extracting("claimantSettlementAgreement").isEqualTo("accepted");
     }
