@@ -73,8 +73,8 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
 
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("typeOfFee", "claim");
-            scenarioParams.put("claimIssueRemissionAmount", "1000");
-            scenarioParams.put("claimIssueOutStandingAmount", "25");
+            scenarioParams.put("claimIssueRemissionAmount", "£1000");
+            scenarioParams.put("claimIssueOutStandingAmount", "£25");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 

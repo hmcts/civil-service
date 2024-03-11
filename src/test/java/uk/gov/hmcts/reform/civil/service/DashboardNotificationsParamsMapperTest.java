@@ -75,8 +75,8 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
-        assertThat(result).extracting("claimIssueRemissionAmount").isEqualTo("25");
-        assertThat(result).extracting("claimIssueOutStandingAmount").isEqualTo("100");
+        assertThat(result).extracting("claimIssueRemissionAmount").isEqualTo("£25");
+        assertThat(result).extracting("claimIssueOutStandingAmount").isEqualTo("£100");
     }
 }
 

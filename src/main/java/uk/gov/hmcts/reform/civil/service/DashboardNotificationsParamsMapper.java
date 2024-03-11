@@ -34,14 +34,14 @@ public class DashboardNotificationsParamsMapper {
         if (caseData.getClaimIssueRemissionAmount() != null) {
             params.put(
                 "claimIssueRemissionAmount",
-                MonetaryConversions.penniesToPounds(caseData.getClaimIssueRemissionAmount()).stripTrailingZeros()
+                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimIssueRemissionAmount()).stripTrailingZeros()
                     .toPlainString()
             );
         }
         if (caseData.getOutstandingFeeInPounds() != null) {
             params.put(
                 "claimIssueOutStandingAmount",
-                caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
+                "£" + caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
             );
         }
         if (caseData.getHwfFeeType() != null) {
