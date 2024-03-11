@@ -11,15 +11,19 @@ VALUES ('Scenario.AAA7.ClaimantIntent.CCJ.Requested.Defendant', '{"Notice.AAA7.D
 INSERT INTO dbs.dashboard_notifications_templates (template_name, title_En, title_Cy, description_En, description_Cy
                                                   ,notification_role)
 VALUES ('Notice.AAA7.ClaimantIntent.CCJ.Requested.Defendant', 'County Court Judgment (CCJ) requested', 'County Court Judgment (CCJ) requested',
-        'We’ll process your request and post a copy of the judgment to you and ${applicant1PartyName}. We aim to do this as soon as possible.<br><br>'
-          'Your online account will not be updated, and ${applicant1PartyName} will no longer be able to respond to your claim online. Any further updates will be by post.<br><br>'
-          'If a postal response is received before the judgment is issued, your request will be rejected.<br><br>'
-          '<a href="{enforceJudgementUrl}" rel="noopener noreferrer" class="govuk-link">Find out about actions you can take once a CCJ is issued (opens in a new tab).</a>.',
-        'We’ll process your request and post a copy of the judgment to you and ${applicant1PartyName}. We aim to do this as soon as possible.<br><br>'
-          'Your online account will not be updated, and ${applicant1PartyName} will no longer be able to respond to your claim online. Any further updates will be by post.<br><br>'
-          'If a postal response is received before the judgment is issued, your request will be rejected.<br><br>'
-          '<a href="{enforceJudgementUrl}" rel="noopener noreferrer" class="govuk-link">Find out about actions you can take once a CCJ is issued (opens in a new tab).</a>.',
-        'CLAIMANT');
+        '{applicant1PartyName} has requested CCJ against you, because the response deadline has passed.<br><br>'
+          'Your online account will not be updated with the progress of the claim, and any further updates will be by post.<br><br>'
+          'If your deadline has passed, but the CCJ has not been issued, you can still respond. Get in touch with HMCTS on {civilMoneyClaimsTelephone} if you are in England and Wales, or 0300 790 6234 if you are in Scotland. ' ||
+          'You can call from Monday to Friday, between 8.30am to 5pm.'||
+          '<a href="{callChargesUrl}" rel="noopener noreferrer" class="govuk-link">Find out about call charges (opens in new tab).</a><br><br>'||
+          'If you do not get in touch, we will post a CCJ to you and <Name> and explain what to do next.',
+          '{applicant1PartyName} has requested CCJ against you, because the response deadline has passed.<br><br>'
+          'Your online account will not be updated with the progress of the claim, and any further updates will be by post.<br><br>'
+          'If your deadline has passed, but the CCJ has not been issued, you can still respond. Get in touch with HMCTS on {civilMoneyClaimsTelephone} if you are in England and Wales, or 0300 790 6234 if you are in Scotland. ' ||
+          'You can call from Monday to Friday, between 8.30am to 5pm.'||
+          '<a href="{callChargesUrl}" rel="noopener noreferrer" class="govuk-link">Find out about call charges (opens in new tab).</a><br><br>'||
+          'If you do not get in touch, we will post a CCJ to you and {applicant1PartyName} and explain what to do next.',
+'DEFENDANT');
 
 /**
  * Add task list items
@@ -27,10 +31,10 @@ VALUES ('Notice.AAA7.ClaimantIntent.CCJ.Requested.Defendant', 'County Court Judg
 INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
                                     scenario_name, task_status_sequence, role, task_order)
 values ('<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">View the claim</a>', 'The claim','<a href={VIEW_CLAIM_URL}>View the claim</a>',
-        'The claim', 'Claim.View', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant', '{3, 3}', 'CLAIMANT', 1),
+        'The claim', 'Claim.View', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Defendant', '{3, 3}', 'DEFENDANT', 1),
        ('<a href={VIEW_INFO_ABOUT_CLAIMANT} rel="noopener noreferrer" class="govuk-link">View information about the claimant</a>', 'The claim','<a href={VIEW_INFO_ABOUT_CLAIMANT_URL}>View information about the claimant</a>',
-        'The claim', 'Claim.Claimant.Info', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant', '{3, 3}', 'CLAIMANT', 2),
+        'The claim', 'Claim.Claimant.Info', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Defendant', '{3, 3}', 'DEFENDANT', 2),
        ('<a href={VIEW_INFO_ABOUT_DEFENDANT} rel="noopener noreferrer" class="govuk-link">View information about the defendant</a>', 'The response','<a href={VIEW_INFO_ABOUT_DEFENDANT_URL}>View information about the defendant</a>',
-        'The response', 'Response.Defendant.Info', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant', '{3, 3}', 'CLAIMANT', 4),
+        'The response', 'Response.Defendant.Info', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Defendant', '{3, 3}', 'DEFENDANT', 4),
        ('<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,'<a href={VIEW_ORDERS_AND_NOTICES_URL}>View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant', '{3, 3}', 'CLAIMANT', 10);
+        'Orders and notices from the court', 'Order.View', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Defendant', '{3, 3}', 'DEFENDANT', 10);
