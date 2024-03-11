@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ public class ApplyHelpWithHearingFeeCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(APPLY_HELP_WITH_HEARING_FEE);
 
     private final ObjectMapper mapper;
+    private final HelpWithFeesForTabService helpWithFeesForTabService;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -44,10 +46,17 @@ public class ApplyHelpWithHearingFeeCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
+        if (caseData.getHearingHelpFeesReferenceNumber() != null) {
+            setUpHelpWithFees(caseDataBuilder);
+        }
         caseDataBuilder.businessProcess(BusinessProcess.ready(APPLY_HELP_WITH_HEARING_FEE));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(mapper))
             .build();
+    }
+
+    private void setUpHelpWithFees(CaseData.CaseDataBuilder caseDataBuilder) {
+        helpWithFeesForTabService.setUpHelpWithFeeTab(caseDataBuilder);
     }
 }
