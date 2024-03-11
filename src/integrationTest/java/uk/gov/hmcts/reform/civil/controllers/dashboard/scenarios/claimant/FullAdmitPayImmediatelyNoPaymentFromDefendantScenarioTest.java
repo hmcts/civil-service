@@ -29,7 +29,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends B
         doPost(
             BEARER_TOKEN,
             ScenarioRequestParams.builder().params(Map.of(
-                "defendantName", defendantName,
+                "respondent1PartyName", defendantName,
                 "fullAdmitPayImmediatelyPaymentAmount", "£123.78",
                 "responseToClaimAdmitPartPaymentDeadline", responseDeadline
                 )).build(),
