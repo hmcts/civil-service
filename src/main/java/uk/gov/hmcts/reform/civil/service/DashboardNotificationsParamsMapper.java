@@ -20,7 +20,7 @@ public class DashboardNotificationsParamsMapper {
         Map<String, Object> params = new HashMap<>();
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
-        params.put("defendantName", caseData.getRespondent1().getPartyName());
+        params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
@@ -29,7 +29,7 @@ public class DashboardNotificationsParamsMapper {
             );
         }
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
-            params.put("responseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
+            params.put("respondent1ResponseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
         }
         if (caseData.getClaimIssueRemissionAmount() != null) {
             params.put(
