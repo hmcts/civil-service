@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.service.citizenui;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -18,15 +19,18 @@ import uk.gov.hmcts.reform.civil.service.citizen.HWFFeePaymentOutcomeService;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 
 @ExtendWith(MockitoExtension.class)
 public class HWFFeePaymentOutcomeServiceTest {
 
     private HWFFeePaymentOutcomeService feePaymentOutcomeService;
+    @Mock
+    private HelpWithFeesForTabService helpWithFeesForTabService;
 
     @BeforeEach
     void setUp() {
-        feePaymentOutcomeService = new HWFFeePaymentOutcomeService();
+        feePaymentOutcomeService = new HWFFeePaymentOutcomeService(helpWithFeesForTabService);
     }
 
     @Test
@@ -38,6 +42,7 @@ public class HWFFeePaymentOutcomeServiceTest {
             .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder().hwfNumberAvailable(YesOrNo.YES)
                                           .hwfNumberForFeePaymentOutcome("HWF-1C4-E34")
                                           .hwfFullRemissionGrantedForClaimIssue(YesOrNo.YES).build())
+            .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
         caseData = feePaymentOutcomeService.updateHwfReferenceNumber(caseData);
@@ -68,7 +73,7 @@ public class HWFFeePaymentOutcomeServiceTest {
             .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
-        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData);
+        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData, PARTIAL_REMISSION_HWF_GRANTED.name());
         assertThat(caseData.getClaimIssuedHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(90).setScale(2));
     }
 
@@ -83,7 +88,7 @@ public class HWFFeePaymentOutcomeServiceTest {
             .hwfFeeType(FeeType.HEARING)
             .build();
 
-        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData);
+        caseData = feePaymentOutcomeService.updateOutstandingFee(caseData, PARTIAL_REMISSION_HWF_GRANTED.name());
         assertThat(caseData.getHearingHwfDetails().getOutstandingFeeInPounds()).isEqualTo(BigDecimal.valueOf(290).setScale(2));
 
     }
