@@ -44,10 +44,7 @@ public class DashboardNotificationsParamsMapper {
 
         params.put("claimSettledAmount", getClaimSettledAmount(caseData));
         params.put("claimSettledDate", getClaimSettleDate(caseData));
-
-        if (nonNull(caseData.getRespondent1RespondToSettlementAgreementDeadline())) {
-            params.put("responseSettlementAgreementDeadline", DateUtils.formatDate(caseData.getRespondent1RespondToSettlementAgreementDeadline()));
-        }
+        params.put("respondent1SettlementAgreementDeadline", getRespondToSettlementAgreementDeadline(caseData));
         return params;
     }
 
@@ -72,5 +69,10 @@ public class DashboardNotificationsParamsMapper {
         }
 
         return respondToClaim;
+    }
+
+    private String getRespondToSettlementAgreementDeadline(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
+            .map(DateUtils::formatDate).orElse(null);
     }
 }
