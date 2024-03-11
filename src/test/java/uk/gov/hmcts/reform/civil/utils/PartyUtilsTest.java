@@ -998,7 +998,7 @@ class PartyUtilsTest {
             CaseData.CaseDataBuilder builder = CaseData.builder()
                 .applicant1LRIndividuals(wrapElements(PartyFlagStructure.builder().partyID("app1-lr-ind-id").firstName("app1").lastName("lrindividual").build()))
                 .respondent1LRIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res1-lr-ind-id").firstName("res1").lastName("lrindividual").build()))
-                .respondent2LRIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res1-lr-ind-id").firstName("res2").lastName("lrindividual").build()))
+                .respondent2LRIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res2-lr-ind-id").firstName("res2").lastName("lrindividual").build()))
                 .applicant1OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("app1-org-ind-id").firstName("app1").lastName("orgindividual").build()))
                 .applicant2OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("app2-org-ind-id").firstName("app2").lastName("orgindividual").build()))
                 .respondent1OrgIndividuals(wrapElements(PartyFlagStructure.builder().partyID("res1-org-ind-id").firstName("res1").lastName("orgindividual").build()))
