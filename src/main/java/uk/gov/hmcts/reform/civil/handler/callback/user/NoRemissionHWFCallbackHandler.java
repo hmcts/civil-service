@@ -50,7 +50,7 @@ public class NoRemissionHWFCallbackHandler extends CallbackHandler {
 
     private CallbackResponse noRemissionHWF(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData);
+        caseData = hwfFeePaymentOutcomeService.updateOutstandingFee(caseData, callbackParams.getRequest().getEventId());
         CaseData.CaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
             .businessProcess(BusinessProcess.ready(NOTIFY_LIP_CLAIMANT_HWF_OUTCOME));
 
