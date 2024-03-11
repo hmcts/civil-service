@@ -2,7 +2,6 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-
 VALUES ('Scenario.AAA7.ClaimIssue.Response.Required', '{}', '{"Notice.AAA7.ClaimIssue.Response.Required" : ["ccdCaseReference", "defaultRespondTime", "respondent1ResponseDeadlineEn", "respondent1ResponseDeadlineCy", "daysLeftToRespond"]}');
 
 /**
