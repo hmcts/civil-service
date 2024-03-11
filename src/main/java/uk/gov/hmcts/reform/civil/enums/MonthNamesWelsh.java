@@ -2,8 +2,8 @@ package uk.gov.hmcts.reform.civil.enums;
 
 public enum MonthNamesWelsh {
 
-    JANUARY( "Ionawr", 1),
-    FEBRUARY( "Chwefror", 2),
+    JANUARY("Ionawr", 1),
+    FEBRUARY("Chwefror", 2),
     MARCH("Mawrth", 3),
     APRIL("Ebrill", 4),
     MAY("Mai", 5),
@@ -14,7 +14,6 @@ public enum MonthNamesWelsh {
     OCTOBER("Hydref", 10),
     NOVEMBER("Tachwedd", 11),
     DECEMBER("Rhagfyr", 12);
-
 
     private String welshName;
     private int value;
