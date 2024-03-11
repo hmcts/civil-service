@@ -986,6 +986,8 @@ class DirectionsQuestionnaireGeneratorTest {
                     .build();
                 caseData = caseData.toBuilder()
                     .responseClaimExpertSpecRequired(YES)
+                    .respondent1Represented(YES)
+                    .specRespondent1Represented(YES)
                     .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
                                        .respondToClaimExperts(ExpertDetails.builder()
                                                                   .expertName("Mr Expert Defendant")
@@ -1006,6 +1008,41 @@ class DirectionsQuestionnaireGeneratorTest {
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
                 assertThat(templateData.getWitnessesIncludingDefendants()).isNull();
+                assertThat(!caseData.isRespondent1NotRepresented()).isTrue();
+            }
+
+            @Test
+            void whenSmallClaimSpecFullAdmissionNotRepresentedDefendant() {
+                int witnessesIncludingDefendant = 2;
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence()
+                    .atStateRespondent1v1FullAdmissionSpec()
+                    .setClaimTypeToSpecClaim()
+                    .build();
+                caseData = caseData.toBuilder()
+                    .responseClaimExpertSpecRequired(YES)
+                    .respondent1Represented(NO)
+                    .specRespondent1Represented(NO)
+                    .respondent1DQ(caseData.getRespondent1DQ().toBuilder()
+                                       .respondToClaimExperts(ExpertDetails.builder()
+                                                                  .expertName("Mr Expert Defendant")
+                                                                  .firstName("Expert")
+                                                                  .lastName("Defendant")
+                                                                  .phoneNumber("07123456789")
+                                                                  .emailAddress("test@email.com")
+                                                                  .fieldofExpertise("Roofing")
+                                                                  .estimatedCost(new BigDecimal(434))
+                                                                  .build())
+                                       .respondent1DQWitnesses(null)
+                                       .respondent1DQHearing(null)
+                                       .build())
+                    .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
+                    .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
+                    .responseClaimWitnesses(Integer.toString(witnessesIncludingDefendant))
+                    .build();
+                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+
+                assertThat(!caseData.isRespondent1NotRepresented()).isFalse();
             }
 
             private void assertThatDqFieldsAreCorrect2v1(DirectionsQuestionnaireForm templateData, DQ dq,
