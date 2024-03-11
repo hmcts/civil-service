@@ -42,21 +42,21 @@ public class DashboardNotificationsParamsMapper {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
 
-        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
-        params.put("claimSettledDate", getClaimSettleDate(caseData));
+        getClaimSettledAmount(caseData).map(amount -> params.put("claimSettledAmount", amount));
+        getClaimSettleDate(caseData).map(date -> params.put("claimSettledDate", date));
         return params;
     }
 
-    private String getClaimSettledAmount(CaseData caseData) {
+    private Optional<String> getClaimSettledAmount(CaseData caseData) {
         return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
-            MonetaryConversions::penniesToPounds).map(
-            BigDecimal::stripTrailingZeros).map(amount -> amount.setScale(2)).map(BigDecimal::toPlainString).map(amount -> "£" + amount).orElse(
-            null);
+                MonetaryConversions::penniesToPounds).map(
+                BigDecimal::stripTrailingZeros)
+            .map(amount -> amount.setScale(2)).map(BigDecimal::toPlainString).map(amount -> "£" + amount);
     }
 
-    private String getClaimSettleDate(CaseData caseData) {
+    private Optional<String> getClaimSettleDate(CaseData caseData) {
         return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getWhenWasThisAmountPaid).map(
-            DateUtils::formatDate).orElse(null);
+            DateUtils::formatDate);
     }
 
     private RespondToClaim getRespondToClaim(CaseData caseData) {
