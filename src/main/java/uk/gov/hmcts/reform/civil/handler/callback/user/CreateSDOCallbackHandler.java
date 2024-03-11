@@ -988,7 +988,10 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.setSmallClaimsFlag(YesOrNo.NO).build();
         updatedData.setFastTrackFlag(YesOrNo.NO).build();
-        updatedData.isSdoR2NewScreen(YesOrNo.NO).build();
+
+        if (featureToggleService.isSdoR2Enabled()) {
+            updatedData.isSdoR2NewScreen(YesOrNo.NO).build();
+        }
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             updatedData.setSmallClaimsFlag(YES).build();
