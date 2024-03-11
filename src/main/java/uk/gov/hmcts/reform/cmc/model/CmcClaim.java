@@ -402,7 +402,7 @@ public class CmcClaim implements Claim {
         return (Objects.nonNull(response)
             && response.isFullDefence()
             && Objects.nonNull(claimantResponse)
-            && claimantResponse.getType().equals(ClaimantResponseType.REJECTION))
+            && claimantResponse.getType().equals(ClaimantResponseType.ACCEPTATION))
             || isApplicant1ResponseDeadlineEnded();
     }
 

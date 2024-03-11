@@ -316,10 +316,10 @@ public class CmcClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_respondentFullDefenceAndClaimantReject_whenGetStatus_thenReturnClaimEnded() {
+    void given_respondentFullDefenceAndClaimantAccept_whenGetStatus_thenReturnClaimEnded() {
         CmcClaim claim = CmcClaim.builder()
             .response(Response.builder().responseType(RespondentResponseType.FULL_DEFENCE).build())
-            .claimantResponse(ClaimantResponse.builder().type(ClaimantResponseType.REJECTION).build())
+            .claimantResponse(ClaimantResponse.builder().type(ClaimantResponseType.ACCEPTATION).build())
             .build();
 
         DashboardClaimStatus status = cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
