@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
-import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
 import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -860,7 +859,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
                                                      .sdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL)
                                                      .sdoApplicationToRelyOnFurther(
                                                          SdoR2ApplicationToRelyOnFurther.builder()
-                                                             .doRequireApplicationToRely(YesOrNo.NO)
+                                                             .doRequireApplicationToRely(NO)
                                                              .applicationToRelyOnFurtherDetails(
                                                                  SdoR2ApplicationToRelyOnFurtherDetails.builder()
                                                                      .applicationToRelyDetailsTxt(SdoR2UiConstantFastTrack.APPLICATION_TO_RELY_DETAILS)
@@ -1011,7 +1010,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.setFastTrackFlag(NO).build();
 
         if (featureToggleService.isSdoR2Enabled()) {
-            updatedData.isSdoR2NewScreen(YesOrNo.NO).build();
+            updatedData.isSdoR2NewScreen(NO).build();
         }
 
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
