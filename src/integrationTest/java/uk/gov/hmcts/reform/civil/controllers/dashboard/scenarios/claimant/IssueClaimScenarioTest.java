@@ -31,7 +31,7 @@ public class IssueClaimScenarioTest extends BaseIntegrationTest {
                ScenarioRequestParams.builder()
                    .params(
                        Map.of(
-                       "responseDeadline", responseDeadline,
+                       "responseDeadlineEn", responseDeadline,
                        "defendantName", defendantName
                        )
                    )
