@@ -65,6 +65,7 @@ import uk.gov.hmcts.reform.civil.model.caseprogression.UploadEvidenceWitness;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantMediationLip;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesMoreInformation;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesForTab;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.model.citizenui.TranslatedDocument;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -447,6 +448,8 @@ public class CaseDataParent implements MappableObject {
     private final CaseDataLiP caseDataLiP;
     private final HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue;
     private final HelpWithFeesMoreInformation helpWithFeesMoreInformationHearing;
+    private final HelpWithFeesForTab claimIssuedHwfForTab;
+    private final HelpWithFeesForTab hearingHwfForTab;
     private final YesOrNo applicantDefenceResponseDocumentAndDQFlag;
     private final String migrationId;
 
