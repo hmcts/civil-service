@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
-
 import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,7 +40,6 @@ public class ClaimantResponseNotificationHandler extends CallbackHandler {
         CaseState.JUDICIAL_REFERRAL, SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING.getScenario()
     );
 
-
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
@@ -76,7 +74,6 @@ public class ClaimantResponseNotificationHandler extends CallbackHandler {
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
-
 
     private String getScenario(CaseData caseData) {
         if (caseData.getCcdState() == CASE_SETTLED) {

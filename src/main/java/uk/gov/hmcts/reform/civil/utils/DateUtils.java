@@ -13,6 +13,7 @@ public class DateUtils {
     private DateUtils() {
         //No op
     }
+
     public static String formatDate(LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
         return date.format(formatter);
