@@ -14,13 +14,14 @@ import static uk.gov.hmcts.reform.civil.utils.CaseStateUtils.shouldMoveToInMedia
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("java:S2583")
 public class UpdateClaimStateService {
 
     private final FeatureToggleService featureToggleService;
 
     public String setUpCaseState(CaseData updatedData) {
         if (shouldMoveToInMediationState(updatedData,
-                                         featureToggleService.isCarmEnabledForCase(updatedData.getSubmittedDate()))) {
+                                         featureToggleService.isCarmEnabledForCase(updatedData))) {
             return CaseState.IN_MEDIATION.name();
         } else if (isJudicialReferralAllowed(updatedData)) {
             return CaseState.JUDICIAL_REFERRAL.name();
