@@ -71,11 +71,12 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapParameters_WhenResponseDeadlineAndClaimFeeIsNull() {
 
-        caseData = caseData.toBuilder().respondent1ResponseDeadline(null).build();
-        caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(null).build();
-        caseData = caseData.toBuilder().respondToClaimAdmitPartLRspec(null).build();
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
-            .claimFee(null).build();
+            .respondToAdmittedClaimOwingAmountPounds(null)
+            .respondToClaimAdmitPartLRspec(null)
+            .respondent1ResponseDeadline(null)
+            .claimFee(null)
+            .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
