@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.model.search.Query;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -16,7 +15,6 @@ import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchServiceTest extends ElasticSearchServiceTest {
 
     private static final int BUSINESS_DAYS_FROM_NOW = 0;
-    public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0, 0);
 
     @BeforeEach
     void setup() {
@@ -26,7 +24,7 @@ class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchServiceTest extends Ela
     @Override
     protected Query buildQuery(int fromValue) {
         String expectedDate = DateUtils.addDaysSkippingWeekends(
-                LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY)
+                LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW)
             .format(DateTimeFormatter.ISO_DATE);
 
         BoolQueryBuilder query = boolQuery()

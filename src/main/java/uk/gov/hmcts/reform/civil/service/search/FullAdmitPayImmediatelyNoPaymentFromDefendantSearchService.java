@@ -29,7 +29,7 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantSearchService extends 
     public Query query(int startIndex) {
 
         String targetDateString = DateUtils.addDaysSkippingWeekends(
-            LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY).format(DateTimeFormatter.ISO_DATE);
+            LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW).format(DateTimeFormatter.ISO_DATE);
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)

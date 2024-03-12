@@ -43,10 +43,10 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends B
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("Immediate payment"),
             jsonPath("$[0].descriptionEn").value(
-                "You have accepted Dave Indent's plan to pay £123.78 immediately. Funds must clear your account by " + responseDeadline + ".<br>If you don't receive the money by then, you can request a <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a>."),
+                "You have accepted Dave Indent's plan to pay £123.78 immediately. Funds must clear your account by " + responseDeadline + ".<br>If you don't receive the money by then, you can <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>."),
             jsonPath("$[0].titleCy").value("Immediate payment"),
             jsonPath("$[0].descriptionCy").value(
-                "You have accepted Dave Indent's plan to pay £123.78 immediately. Funds must clear your account by " + responseDeadline + ".<br>If you don't receive the money by then, you can request a <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">Respond to the claim</a>.")
+                "You have accepted Dave Indent's plan to pay £123.78 immediately. Funds must clear your account by " + responseDeadline + ".<br>If you don't receive the money by then, you can <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>.")
 
         );
     }
