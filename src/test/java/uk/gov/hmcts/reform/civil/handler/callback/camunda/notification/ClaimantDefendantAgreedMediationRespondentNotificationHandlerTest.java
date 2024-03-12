@@ -22,15 +22,18 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
@@ -49,6 +52,8 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
     private NotificationsProperties notificationsProperties;
     @MockBean
     private OrganisationService organisationService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Autowired
     private ClaimantDefendantAgreedMediationRespondentNotificationHandler  handler;
 
@@ -60,6 +65,8 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
             when(notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplate()).thenReturn("template-id");
             when(notificationsProperties.getNotifyRespondentLiPMediationAgreementTemplateWelsh()).thenReturn("template-id-welsh");
             when(notificationsProperties.getNotifyRespondentLRMediationAgreementTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn("template-mediation-id");
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         }
 
         @Test
@@ -128,8 +135,8 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1(respondent1)
                 .setClaimTypeToSpecClaim()
-                .specRespondent1Represented(YesOrNo.YES)
-                .respondent1Represented(YesOrNo.YES)
+                .specRespondent1Represented(YES)
+                .respondent1Represented(YES)
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_MEDIATION_AGREEMENT")
@@ -141,6 +148,69 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
                 "respondentsolicitor@example.com",
                 "template-id",
                 getNotificationDataMapSpec(caseData),
+                "mediation-agreement-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondent1LR_whenInvokedCarm() {
+            when(organisationService.findOrganisationById(
+                anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor org").build()));
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .setClaimTypeToSpecClaim()
+                .specRespondent1Represented(YES)
+                .respondent1Represented(YES)
+                .applicant1ProceedWithClaim(YES)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT_MEDIATION_AGREEMENT")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor@example.com",
+                "template-mediation-id",
+                getNotificationDataMapCarm(caseData),
+                "mediation-agreement-respondent-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondent2LR_whenInvokedCarm() {
+            when(organisationService.findOrganisationById(
+                anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor 2 org").build()));
+
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
+                .build();
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .multiPartyClaimTwoDefendantSolicitorsSpec()
+                .setClaimTypeToSpecClaim()
+                .specRespondent1Represented(YES)
+                .respondent1Represented(YES)
+                .applicant1ProceedWithClaim(YES)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_RESPONDENT2_MEDIATION_AGREEMENT")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentsolicitor2@example.com",
+                "template-mediation-id",
+                getNotificationDataMapRespondent2Carm(caseData),
                 "mediation-agreement-respondent-notification-000DC001"
             );
         }
@@ -160,6 +230,23 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
                     CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
                 );
             }
+        }
+
+        @NotNull
+        public Map<String, String> getNotificationDataMapCarm(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData),
+                CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1())
+            );
+        }
+
+        @NotNull
+        public Map<String, String> getNotificationDataMapRespondent2Carm(CaseData caseData) {
+            return Map.of(
+                CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+                CLAIM_LEGAL_ORG_NAME_SPEC, getRespondentLegalOrganizationName(caseData)
+            );
         }
 
         public String getRespondentLegalOrganizationName(CaseData caseData) {

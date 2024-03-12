@@ -607,6 +607,8 @@ public class CaseDataParent implements MappableObject {
     private final HearingNotes hearingNotes;
     private final List<Element<UploadEvidenceDocumentType>> applicantDocsUploadedAfterBundle;
     private final List<Element<UploadEvidenceDocumentType>> respondentDocsUploadedAfterBundle;
+
+    //Top level structure objects used for Hearings + Case Flags
     private final Flags caseFlags;
     private final List<Element<PartyFlagStructure>> applicantExperts;
     private final List<Element<PartyFlagStructure>> respondent1Experts;
@@ -614,13 +616,15 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<PartyFlagStructure>> applicantWitnesses;
     private final List<Element<PartyFlagStructure>> respondent1Witnesses;
     private final List<Element<PartyFlagStructure>> respondent2Witnesses;
-    private final List<Element<PartyFlagStructure>> applicant1LRIndividuals;
-    private final List<Element<PartyFlagStructure>> respondent1LRIndividuals;
-    private final List<Element<PartyFlagStructure>> respondent2LRIndividuals;
+    //Individuals attending from parties that are Org/Company
     private final List<Element<PartyFlagStructure>> applicant1OrgIndividuals;
     private final List<Element<PartyFlagStructure>> applicant2OrgIndividuals;
     private final List<Element<PartyFlagStructure>> respondent1OrgIndividuals;
     private final List<Element<PartyFlagStructure>> respondent2OrgIndividuals;
+    //Individuals attending from Legal Representative Firms
+    private final List<Element<PartyFlagStructure>> applicant1LRIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent1LRIndividuals;
+    private final List<Element<PartyFlagStructure>> respondent2LRIndividuals;
 
     private List<DisposalAndTrialHearingDJToggle> disposalHearingDisclosureOfDocumentsDJToggle;
     private List<DisposalAndTrialHearingDJToggle> disposalHearingWitnessOfFactDJToggle;
@@ -703,7 +707,6 @@ public class CaseDataParent implements MappableObject {
     private final List<Element<CaseDocument>> gaDraftDocRespondentSolTwo;
 
     /* Final Orders */
-
     private YesOrNo finalOrderMadeSelection;
     private OrderMade finalOrderDateHeardComplex;
     private List<FinalOrdersJudgePapers> finalOrderJudgePapers;
@@ -792,7 +795,7 @@ public class CaseDataParent implements MappableObject {
     private List<Element<UnavailableDate>> respondent2UnavailableDatesForTab;
     private String pcqId;
 
-    // TOC
+    // Transfer a Case Online
     private String reasonForTransfer;
     private DynamicList transferCourtLocationList;
     private NotSuitableSdoOptions notSuitableSdoOptions;
