@@ -86,7 +86,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         }
 
         @Test
-        void shouldNotRecordScenario_whenInvokedNotInJudicialReferralStatey() {
+        void shouldNotRecordScenario_whenInvokedNotInJudicialReferralState() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
