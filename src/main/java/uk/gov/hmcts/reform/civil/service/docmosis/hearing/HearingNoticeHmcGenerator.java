@@ -65,9 +65,9 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
                                                          String hearingLocation, String hearingId) {
         var paymentFailed = caseData.getHearingFeePaymentDetails() == null
             || caseData.getHearingFeePaymentDetails().getStatus().equals(PaymentStatus.FAILED);
-        var feeAmount = paymentFailed
-            ? HearingUtils.formatHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAllocatedTrack().name())) : null;
-        var hearingDueDate = paymentFailed ? HearingFeeUtils
+        var feeAmount = paymentFailed && !isDisposalHearing(hearing)
+            ? HearingUtils.formatHearingFee(HearingFeeUtils.calculateAndApplyFee(hearingFeesService, caseData, caseData.getAssignedTrack())) : null;
+        var hearingDueDate = paymentFailed && !isDisposalHearing(hearing) ? HearingFeeUtils
             .calculateHearingDueDate(LocalDate.now(), HmcDataUtils.getHearingStartDay(hearing)
                 .getHearingStartDateTime().toLocalDate()) : null;
 
@@ -115,5 +115,8 @@ public class HearingNoticeHmcGenerator implements TemplateDataGenerator<HearingN
         return null;
     }
 
+    private boolean isDisposalHearing(HearingGetResponse hearing) {
+        return hearing.getHearingDetails().getHearingType().contains("DIS");
+    }
 }
 

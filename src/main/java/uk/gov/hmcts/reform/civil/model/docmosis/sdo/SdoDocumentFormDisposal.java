@@ -90,4 +90,10 @@ public class SdoDocumentFormDisposal implements MappableObject {
     private final boolean disposalHearingClaimSettlingToggle;
     private final boolean disposalHearingCostsToggle;
     private final boolean writtenByJudge;
+
+    @SuppressWarnings("unused")
+    public boolean getDisposalHearingMethodToggle() {
+        // SNI-5142
+        return true;
+    }
 }

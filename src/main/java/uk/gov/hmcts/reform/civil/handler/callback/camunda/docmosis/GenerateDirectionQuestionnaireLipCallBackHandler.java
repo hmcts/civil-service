@@ -11,9 +11,11 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.enums.DocCategory;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.SystemGeneratedDocumentService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dq.DirectionQuestionnaireLipGeneratorFactory;
+import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +36,7 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
     private final ObjectMapper objectMapper;
     private final DirectionQuestionnaireLipGeneratorFactory directionQuestionnaireLipGeneratorFactory;
     private final SystemGeneratedDocumentService systemGeneratedDocumentService;
+    private final AssignCategoryId assignCategoryId;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -58,7 +61,11 @@ public class GenerateDirectionQuestionnaireLipCallBackHandler extends CallbackHa
         caseDataBuilder
             .systemGeneratedCaseDocuments(systemGeneratedDocumentService
                                               .getSystemGeneratedDocumentsWithAddedDocument(sealedDQForm, caseData));
-
+        if (sealedDQForm.getDocumentName().contains("defendant")) {
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.DEF1_DEFENSE_DQ.getValue());
+        } else {
+            assignCategoryId.assignCategoryIdToCaseDocument(sealedDQForm, DocCategory.APP1_DQ.getValue());
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();

@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.DJPaymentTypeSelection;
+import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpecPaidStatus;
@@ -34,6 +35,11 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,6 +65,18 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
         assertThat(status).isEqualTo(DashboardClaimStatus.NO_RESPONSE);
+    }
+
+    @Test
+    void given_hwf_claim_submit_whenGetStatus_thenReturnNoResponse() {
+        CaseData claim = CaseData.builder()
+            .hwfFeeType(FeeType.CLAIMISSUED)
+            .ccdState(CaseState.PENDING_CASE_ISSUED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            claim, featureToggleService));
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_SUBMIT_HWF);
     }
 
     @Test
@@ -411,8 +429,7 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void givenClaimStatusInProcessHeritageSystem_WhenGetStatus_thenReturnResponseByPost() {
-        given(featureToggleService.isLipVLipEnabled()).willReturn(true);
+    void givenClaimStatusInProcessHeritageSystem_WhenGetStatus_thenReturnDefendantPartAdmit() {
 
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
@@ -424,6 +441,159 @@ class CcdClaimStatusDashboardFactoryTest {
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService));
 
-        assertThat(status).isEqualTo(DashboardClaimStatus.RESPONSE_BY_POST);
+        assertThat(status).isEqualTo(DashboardClaimStatus.DEFENDANT_PART_ADMIT);
+    }
+
+    @Test
+    void givenClaimStatusInPendingCaseIssuedAndHWFNoRemission_WhenGetStatus_thenReturnHwfNoRemission() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(NO_REMISSION_HWF).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.PENDING_CASE_ISSUED)
+            .claimIssuedHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.CLAIMISSUED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION);
+    }
+
+    @Test
+    void givenClaimStatusInHearingReadinessAndHWFNoRemission_WhenGetStatus_thenReturnHwfNoRemission() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(NO_REMISSION_HWF).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.HEARING)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_NO_REMISSION);
+    }
+
+    @Test
+    void givenClaimStatusInPendingCaseIssuedAndHWFPartialRemission_WhenGetStatus_thenReturnHwfPartialRemission() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.PENDING_CASE_ISSUED)
+            .claimIssuedHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.CLAIMISSUED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_PARTIAL_REMISSION);
+    }
+
+    @Test
+    void givenClaimStatusInHearingReadinessAndHWFNoRemission_WhenGetStatus_thenReturnHwfPartialRemission() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(PARTIAL_REMISSION_HWF_GRANTED).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.HEARING)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_PARTIAL_REMISSION);
+    }
+
+    @Test
+    void givenClaimStatusInPendingCaseIssuedAndHWFUpdateRefNumber_WhenGetStatus_thenReturnHwfUpdateRefNumber() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.PENDING_CASE_ISSUED)
+            .claimIssuedHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.CLAIMISSUED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER);
+    }
+
+    @Test
+    void givenClaimStatusInHearingReadinessAndHWFUpdateRefNumber_WhenGetStatus_thenReturnHwfUpdateRefNumber() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.HEARING)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_UPDATED_REF_NUMBER);
+    }
+
+    @Test
+    void givenClaimStatusInPendingCaseIssuedAndHWFInvalidRefNumber_WhenGetStatus_thenReturnHwfInvalidRefNumber() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(INVALID_HWF_REFERENCE).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.PENDING_CASE_ISSUED)
+            .claimIssuedHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.CLAIMISSUED)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER);
+    }
+
+    @Test
+    void givenClaimStatusInHearingReadinessAndHWFInvalidRefNumber_WhenGetStatus_thenReturnHwfInvalidRefNumber() {
+        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(INVALID_HWF_REFERENCE).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingHwfDetails(hwfeeDetails)
+            .hwfFeeType(
+                FeeType.HEARING)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_INVALID_REF_NUMBER);
+    }
+
+    @Test
+    void givenClaimStatusInHearingReadinessAndHWFFeePaymentOutcome_WhenGetStatus_thenReturnHearingFeePaidStatus() {
+        HelpWithFeesDetails hwfDetails = HelpWithFeesDetails.builder()
+            .hwfCaseEvent(FEE_PAYMENT_OUTCOME).build();
+        CaseData caseData = CaseData.builder()
+            .ccdState(CaseState.HEARING_READINESS)
+            .hearingHwfDetails(hwfDetails)
+            .hwfFeeType(
+                FeeType.HEARING)
+            .build();
+
+        DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
+            caseData, featureToggleService));
+
+        assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME);
     }
 }

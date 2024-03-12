@@ -149,7 +149,7 @@ public class InitiateGeneralApplicationService {
 
         if (caseData.getGeneralAppRespondentAgreement() != null) {
             if (YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
-                    && !caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)) {
+                    && !caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)) {
 
                 GAStatementOfTruth gaStatementOfTruth = ofNullable(caseData.getGeneralAppStatementOfTruth())
                     .map(GAStatementOfTruth::toBuilder)
@@ -178,6 +178,10 @@ public class InitiateGeneralApplicationService {
             GACaseManagementCategory.builder().value(civil).list_items(itemList).build());
 
         Pair<CaseLocationCivil, Boolean> caseLocation = getWorkAllocationLocation(caseData, authToken);
+        if (Objects.isNull(caseLocation.getLeft().getBaseLocation()) && !caseLocation.getRight()) {
+            caseLocation.getLeft().setBaseLocation(caseData.getCaseManagementLocation().getBaseLocation());
+            caseLocation.getLeft().setRegion(caseData.getCaseManagementLocation().getRegion());
+        }
         //Setting Work Allocation location and location name
         if (Objects.isNull(caseLocation.getLeft().getSiteName())
             && Objects.nonNull(caseLocation.getLeft().getBaseLocation())) {
@@ -195,7 +199,7 @@ public class InitiateGeneralApplicationService {
             .calculateApplicantResponseDeadline(
                 LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
 
-        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_JUDGEMENT)
+        if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)
             && ! Objects.isNull(caseData.getGeneralAppN245FormUpload())) {
             if (Objects.isNull(caseData.getGeneralAppN245FormUpload().getCategoryID())) {
                 caseData.getGeneralAppN245FormUpload().setCategoryID(GA_DOC_CATEGORY_ID);

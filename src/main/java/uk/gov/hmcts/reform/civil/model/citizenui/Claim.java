@@ -42,6 +42,14 @@ public interface Claim {
 
     boolean hasClaimantAskedToSignSettlementAgreement();
 
+    boolean hasClaimantAndDefendantSignedSettlementAgreement();
+
+    boolean hasDefendantRejectedSettlementAgreement();
+
+    boolean hasClaimantSignedSettlementAgreement();
+
+    boolean hasClaimantSignedSettlementAgreementAndDeadlineExpired();
+
     boolean hasClaimantAcceptedPartialAdmissionAmount();
 
     boolean haveBothPartiesSignedSettlementAgreement();
@@ -82,4 +90,21 @@ public interface Claim {
 
     boolean isClaimantDefaultJudgement();
 
+    boolean isPartialAdmissionAccepted();
+
+    boolean isPaymentPlanRejected();
+
+    boolean isHwFClaimSubmit();
+
+    boolean isHwFMoreInformationNeeded();
+
+    boolean isHwfNoRemission();
+
+    boolean isHwfPartialRemission();
+
+    boolean isHwfUpdatedRefNumber();
+
+    boolean isHwfInvalidRefNumber();
+
+    boolean isHwfPaymentOutcome();
 }

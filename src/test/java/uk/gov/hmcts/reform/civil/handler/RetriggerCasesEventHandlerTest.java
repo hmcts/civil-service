@@ -1,86 +1,92 @@
 package uk.gov.hmcts.reform.civil.handler;
 
-import feign.FeignException;
-import org.junit.jupiter.api.BeforeEach;
+import org.camunda.bpm.client.task.ExternalTask;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class RetriggerCasesEventHandlerTest {
 
     @Mock
     private CoreCaseDataService coreCaseDataService;
 
     @InjectMocks
-    private RetriggerCasesEventHandler retriggerCasesEventHandler;
+    private RetriggerCasesEventHandler handler;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @Test
+    void testHandleTask_RetriggerClaimantResponse() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CLAIMANT_RESPONSE");
+        when(externalTask.getVariable("caseIds")).thenReturn("1,2");
+
+        handler.handleTask(externalTask);
+
+        verify(coreCaseDataService).triggerEvent(1L, CaseEvent.RETRIGGER_CLAIMANT_RESPONSE);
+        verify(coreCaseDataService).triggerEvent(2L, CaseEvent.RETRIGGER_CLAIMANT_RESPONSE);
     }
 
     @Test
-    void testUpdateCaseByEvent() {
-        List<String> caseIdList = Arrays.asList("1", "2", "3");
+    void testHandleTask_RetriggerClaimantResponseSpecific() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CLAIMANT_RESPONSE_SPEC");
+        when(externalTask.getVariable("caseIds")).thenReturn("1,2");
 
-        retriggerCasesEventHandler.updateCaseByEvent(caseIdList, CaseEvent.RETRIGGER_CASES);
+        handler.handleTask(externalTask);
 
-        // Assertions
-        verify(coreCaseDataService, times(caseIdList.size())).triggerEvent(anyLong(), eq(CaseEvent.RETRIGGER_CASES));
+        verify(coreCaseDataService).triggerEvent(1L, CaseEvent.RETRIGGER_CLAIMANT_RESPONSE_SPEC);
+        verify(coreCaseDataService).triggerEvent(2L, CaseEvent.RETRIGGER_CLAIMANT_RESPONSE_SPEC);
     }
 
     @Test
-    void testUpdateCaseByEventWithFeignException() {
-        List<String> caseIdList = Arrays.asList("1", "2", "3");
+    void testHandleTask_RetriggerCases() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CASES");
+        when(externalTask.getVariable("caseIds")).thenReturn("1,2");
 
-        // Simulate FeignException
-        doThrow(FeignException.class).when(coreCaseDataService).triggerEvent(anyLong(), eq(CaseEvent.RETRIGGER_CASES));
+        handler.handleTask(externalTask);
 
-        // Assertions
-        FeignException exception = assertThrows(FeignException.class, () ->
-            retriggerCasesEventHandler.updateCaseByEvent(caseIdList, CaseEvent.RETRIGGER_CASES)
-        );
+        verify(coreCaseDataService).triggerEvent(1L, CaseEvent.RETRIGGER_CASES);
+        verify(coreCaseDataService).triggerEvent(2L, CaseEvent.RETRIGGER_CASES);
     }
 
     @Test
-    void testUpdateCaseByEventWithGenericException() {
-        List<String> caseIdList = Arrays.asList("1", "2", "3");
+    void testHandleTask_RetriggerCasesWithMissingCaseEvent() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("caseEvent")).thenReturn(null);
 
-        doThrow(new RuntimeException("Simulated RuntimeException")).when(coreCaseDataService)
-            .triggerEvent(anyLong(), eq(CaseEvent.RETRIGGER_CASES));
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
-            retriggerCasesEventHandler.updateCaseByEvent(caseIdList, CaseEvent.RETRIGGER_CASES)
-        );
-
-        assertEquals("Simulated RuntimeException", exception.getMessage());
+        assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
     }
 
     @Test
-    void testUpdateCaseByEventWithEmptyList() {
-        List<String> emptyCaseIdList = Collections.emptyList();
+    void testHandleTask_RetriggerCasesWithMissingCaseIds() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("caseEvent")).thenReturn("CASE_EVENT");
+        when(externalTask.getVariable("caseIds")).thenReturn(null);
 
-        retriggerCasesEventHandler.updateCaseByEvent(emptyCaseIdList, CaseEvent.RETRIGGER_CASES);
-
-        // Assertions
-        verify(coreCaseDataService, never()).triggerEvent(anyLong(), eq(CaseEvent.RETRIGGER_CASES));
+        assertThrows(AssertionError.class, () -> handler.handleTask(externalTask));
     }
+
+    @Test
+    void testHandleTask_RetriggerCasesThrowsExceptionAndCarriesOn() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("caseEvent")).thenReturn("RETRIGGER_CASES");
+        when(externalTask.getVariable("caseIds")).thenReturn("1,2");
+        doThrow(new RuntimeException()).when(coreCaseDataService).triggerEvent(1L, CaseEvent.RETRIGGER_CASES);
+
+        handler.handleTask(externalTask);
+
+        verify(coreCaseDataService).triggerEvent(2L, CaseEvent.RETRIGGER_CASES);
+    }
+
 }
-
-

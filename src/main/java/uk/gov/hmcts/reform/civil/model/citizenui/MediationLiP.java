@@ -22,3 +22,4 @@ public class MediationLiP {
     private String companyTelephoneContactPersonMediationLiP;
     private String companyTelephonePhoneNumberMediationLiP;
 }
+

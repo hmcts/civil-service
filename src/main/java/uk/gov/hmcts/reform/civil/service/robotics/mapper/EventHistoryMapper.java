@@ -24,11 +24,14 @@ import uk.gov.hmcts.reform.civil.model.PartyData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 import uk.gov.hmcts.reform.civil.model.dq.FileDirectionsQuestionnaire;
 import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent2DQ;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
@@ -55,6 +58,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.lang.String.format;
+import static java.math.BigDecimal.ZERO;
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
@@ -72,13 +76,17 @@ import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenari
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.getDefendantNames;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.CONSENT_EXTENSION_FILING_DEFENCE;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFAULT_JUDGMENT_GRANTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_STRUCK_OUT;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DIRECTIONS_QUESTIONNAIRE_FILED;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.GENERAL_FORM_OF_APPLICATION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.INTERLOCUTORY_JUDGMENT_GRANTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.JUDGEMENT_BY_ADMISSION;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED;
@@ -189,6 +197,7 @@ public class EventHistoryMapper {
                         break;
                     case TAKEN_OFFLINE_BY_STAFF:
                         buildTakenOfflineByStaff(builder, caseData);
+                        buildGeneralFormApplicationEventsStrikeOutOrder(builder, caseData);
                         break;
                     case CLAIM_DISMISSED_PAST_CLAIM_DISMISSED_DEADLINE:
                         buildClaimDismissedPastDeadline(builder, caseData,
@@ -326,7 +335,7 @@ public class EventHistoryMapper {
                                          String litigiousPartyID) {
 
         BigDecimal claimInterest = caseData.getTotalInterest() != null
-            ? caseData.getTotalInterest() : BigDecimal.ZERO;
+            ? caseData.getTotalInterest() : ZERO;
         BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
         var partialPaymentPennies = isNotEmpty(caseData.getPartialPaymentAmount())
             ? new BigDecimal(caseData.getPartialPaymentAmount()) : null;
@@ -342,7 +351,7 @@ public class EventHistoryMapper {
                               .amountOfJudgment(amountClaimedWithInterest.setScale(2))
                               .amountOfCosts(getCostOfJudgment(caseData))
                               .amountPaidBeforeJudgment((caseData.getPartialPayment() == YesOrNo.YES)
-                                                            ? partialPaymentPounds : BigDecimal.ZERO)
+                                                            ? partialPaymentPounds : ZERO)
                               .isJudgmentForthwith((caseData.getPaymentTypeSelection()
                                   .equals(DJPaymentTypeSelection.IMMEDIATELY)) ? true : false)
                               .paymentInFullDate((caseData.getPaymentTypeSelection()
@@ -355,7 +364,7 @@ public class EventHistoryMapper {
                                   .equals(DJPaymentTypeSelection.REPAYMENT_PLAN))
                                                      ? getInstallmentAmount(caseData.getRepaymentSuggestion())
                                   .setScale(2)
-                                                     : BigDecimal.ZERO)
+                                                     : ZERO)
                               .installmentPeriod(getInstallmentPeriod(caseData))
                               .firstInstallmentDate(caseData.getRepaymentDate())
                               .dateOfJudgment(LocalDateTime.now())
@@ -375,7 +384,7 @@ public class EventHistoryMapper {
     private BigDecimal getInstallmentAmount(boolean isResponsePayByInstallment, Optional<RepaymentPlanLRspec> repaymentPlan) {
         return isResponsePayByInstallment
             ? MonetaryConversions.penniesToPounds(
-            repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).map(amount -> amount.setScale(2)).orElse(BigDecimal.ZERO))
+            repaymentPlan.map(RepaymentPlanLRspec::getPaymentAmount).map(amount -> amount.setScale(2)).orElse(ZERO))
             : null;
     }
 
@@ -505,7 +514,7 @@ public class EventHistoryMapper {
             .amountOfJudgment(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimAmount()
                                   .add(caseData.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
                                            ? caseData.getCcjPaymentDetails().getCcjJudgmentLipInterest() :
-                                           caseData.getTotalInterest())
+                                           Optional.ofNullable(caseData.getTotalInterest()).orElse(ZERO))
                                   .setScale(2))
             .amountOfCosts(caseData.getCcjPaymentDetails().getCcjJudgmentFixedCostAmount()
                                .add(caseData.getCcjPaymentDetails().getCcjJudgmentAmountClaimFee()).setScale(2))
@@ -974,6 +983,96 @@ public class EventHistoryMapper {
                 .build());
     }
 
+    private void buildGeneralFormApplicationEventsStrikeOutOrder(EventHistory.EventHistoryBuilder builder,
+                                                                 CaseData caseData) {
+        if (caseData.getGeneralApplications() != null) {
+            var generalApplications = caseData
+                    .getGeneralApplications()
+                    .stream()
+                    .filter(application -> application.getValue().getGeneralAppType().getTypes().contains(STRIKE_OUT)
+                            && getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
+                            application.getValue()
+                                    .getCaseLink()
+                                    .getCaseReference(),
+                            caseData
+                    )
+                            != null)
+                    .collect(Collectors.toList());
+
+            if (!generalApplications.isEmpty()) {
+                buildGeneralFormOfApplicationStrikeOut(builder, generalApplications);
+                buildDefenceStruckOutJudgmentEvent(builder, generalApplications);
+            }
+        }
+
+    }
+
+    private void buildGeneralFormOfApplicationStrikeOut(EventHistory.EventHistoryBuilder builder,
+                                                        List<Element<GeneralApplication>> generalApplicationsStrikeOut) {
+
+        List<Event> generalApplicationsEvents = IntStream.range(0, generalApplicationsStrikeOut.size())
+                .mapToObj(index -> {
+                    String miscText = "APPLICATION TO Strike Out";
+                    return Event.builder()
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
+                            .dateReceived(generalApplicationsStrikeOut
+                                    .get(index)
+                                    .getValue()
+                                    .getGeneralAppSubmittedDateGAspec())
+                            .litigiousPartyID(generalApplicationsStrikeOut
+                                    .get(index)
+                                    .getValue()
+                                    .getLitigiousPartyID())
+                            .eventDetailsText(miscText)
+                            .eventDetails(EventDetails.builder()
+                                    .miscText(miscText)
+                                    .build())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        builder.generalFormOfApplication(generalApplicationsEvents);
+    }
+
+    private void buildDefenceStruckOutJudgmentEvent(EventHistory.EventHistoryBuilder builder,
+                                                    List<Element<GeneralApplication>> generalApplicationsStrikeOut) {
+
+        List<Event> generalApplicationsEvents = IntStream.range(0, generalApplicationsStrikeOut.size())
+                .mapToObj(index -> {
+                    return Event.builder()
+                            .eventSequence(prepareEventSequence(builder.build()))
+                            .eventCode(DEFENCE_STRUCK_OUT.getCode())
+                            .dateReceived(generalApplicationsStrikeOut
+                                    .get(index)
+                                    .getValue()
+                                    .getGeneralAppSubmittedDateGAspec())
+                            .litigiousPartyID(generalApplicationsStrikeOut
+                                    .get(index)
+                                    .getValue()
+                                    .getLitigiousPartyID())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        builder.defenceStruckOut(generalApplicationsEvents);
+    }
+
+    private Element<GeneralApplicationsDetails> getGeneralApplicationDetailsJudgeDecisionWithStruckOutDefence(
+            String caseLinkId, CaseData caseData) {
+        return caseData.getGaDetailsMasterCollection().stream()
+                .filter(generalApplicationsDetailsElement ->
+                        generalApplicationsDetailsElement
+                                .getValue()
+                                .getCaseLink()
+                                .getCaseReference()
+                                .equals(caseLinkId)
+                                && generalApplicationsDetailsElement.getValue().getCaseState()
+                                .equals(PROCEEDS_IN_HERITAGE.getDisplayedValue()))
+                .findFirst()
+                .orElse(null);
+    }
+
     private int prepareEventSequence(EventHistory history) {
         int currentSequence = 0;
         currentSequence = getCurrentSequence(history.getMiscellaneous(), currentSequence);
@@ -991,6 +1090,8 @@ public class EventHistoryMapper {
         currentSequence = getCurrentSequence(history.getStatesPaid(), currentSequence);
         currentSequence = getCurrentSequence(history.getDirectionsQuestionnaireFiled(), currentSequence);
         currentSequence = getCurrentSequence(history.getJudgmentByAdmission(), currentSequence);
+        currentSequence = getCurrentSequence(history.getGeneralFormOfApplication(), currentSequence);
+        currentSequence = getCurrentSequence(history.getDefenceStruckOut(), currentSequence);
         return currentSequence + 1;
     }
 
@@ -2181,6 +2282,10 @@ public class EventHistoryMapper {
 
     private BigDecimal getCostOfJudgment(CaseData data) {
 
+        if (data.getOutstandingFeeInPounds() != null) {
+            return data.getOutstandingFeeInPounds();
+        }
+
         String repaymentSummary = data.getRepaymentSummaryObject();
         BigDecimal fixedCost = null;
         BigDecimal claimCost = null;
@@ -2197,7 +2302,7 @@ public class EventHistoryMapper {
         }
 
         return fixedCost != null && claimCost != null ? fixedCost.add(claimCost).setScale(2)
-            : claimCost != null ? claimCost.setScale(2) : BigDecimal.ZERO;
+            : claimCost != null ? claimCost.setScale(2) : ZERO;
 
     }
 

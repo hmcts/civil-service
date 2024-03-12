@@ -15,7 +15,9 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ContactDetailsUpdatedEvent;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
@@ -31,6 +33,8 @@ import uk.gov.hmcts.reform.civil.model.dq.Witnesses;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.utils.CaseNameUtils;
+import uk.gov.hmcts.reform.civil.utils.PartyDetailsChangedUtil;
 import uk.gov.hmcts.reform.civil.validation.PostcodeValidator;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
@@ -54,8 +58,7 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_L
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNameInternal;
-import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseNamePublic;
+import static uk.gov.hmcts.reform.civil.utils.CaseNameUtils.buildCaseName;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_EXPERTS_ID;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.CLAIMANT_ONE_ID;
@@ -83,6 +86,8 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapU
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.mapWitnessesToUpdatePartyDetailsForm;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQExperts;
 import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.updatePartyDQWitnesses;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForLitigationFriendParties;
+import static uk.gov.hmcts.reform.civil.utils.PersistDataUtils.persistFlagsForParties;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
@@ -91,13 +96,13 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicito
 @RequiredArgsConstructor
 public class ManageContactInformationCallbackHandler extends CallbackHandler {
 
-    private static final String INVALID_CASE_STATE_ERROR = "You will be able run the manage contact information " +
+    private static final String INVALID_CASE_STATE_ERROR = "You will be able to run the manage contact information " +
         "event once the claimant has responded.";
     private static final String CHECK_LITIGATION_FRIEND_ERROR_TITLE = "Check the litigation friend's details";
     private static final String CHECK_LITIGATION_FRIEND_ERROR = "After making these changes, please ensure that the "
         + "litigation friend's contact information is also up to date.";
-    private static final String CREATE_ORDER_ERROR_EXPERTS = "Please create an order to add more experts.";
-    private static final String CREATE_ORDER_ERROR_WITNESSES = "Please create an order to add more witnesses.";
+    private static final String CREATE_ORDER_ERROR_EXPERTS = "Adding a new expert is not permitted in this screen. Please delete any new experts.";
+    private static final String CREATE_ORDER_ERROR_WITNESSES = "Adding a new witness is not permitted in this screen. Please delete any new witnesses.";
     private static final List<String> ADMIN_ROLES = List.of(
         "caseworker-civil-admin");
     private static final List<CaseEvent> EVENTS = List.of(
@@ -110,6 +115,7 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private final CaseDetailsConverter caseDetailsConverter;
     private final CaseFlagsInitialiser caseFlagsInitialiser;
     private final PostcodeValidator postcodeValidator;
+    private final PartyDetailsChangedUtil partyDetailsChangedUtil;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -322,8 +328,10 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
         ArrayList<String> warnings = new ArrayList<>();
         List<String> errors = new ArrayList<>();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
-        if (partyHasLitigationFriend(partyChosen, caseData)) {
+        // oldCaseData needed because Litigation friend gets nullified in mid event
+        if (partyHasLitigationFriend(partyChosen, oldCaseData)) {
             warnings.add(CHECK_LITIGATION_FRIEND_ERROR_TITLE);
             warnings.add(CHECK_LITIGATION_FRIEND_ERROR);
         }
@@ -404,15 +412,21 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
     private CallbackResponse submitChanges(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder builder = caseData.toBuilder();
-        String partyChosen = caseData.getUpdateDetailsForm().getPartyChosen().getValue().getCode();
+        CaseData oldCaseData = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
 
-        updateExperts(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
-        updateWitnesses(caseData.getUpdateDetailsForm().getPartyChosenId(), caseData, builder);
+        // persist party flags (ccd issue)
+        persistFlagsForParties(oldCaseData, caseData, builder);
+        persistFlagsForLitigationFriendParties(oldCaseData, caseData, builder);
 
-        if (isParty(partyChosen) || isLitigationFriend(partyChosen)) {
+        String partyChosenId = caseData.getUpdateDetailsForm().getPartyChosenId();
+
+        updateExperts(partyChosenId, caseData, builder);
+        updateWitnesses(partyChosenId, caseData, builder);
+
+        if (isParty(partyChosenId) || isLitigationFriend(partyChosenId)) {
             // update case name for hmc if applicant/respondent/litigation friend was updated
-            builder.caseNameHmctsInternal(buildCaseNameInternal(caseData));
-            builder.caseNamePublic(buildCaseNamePublic(caseData));
+            builder.caseNameHmctsInternal(CaseNameUtils.buildCaseName(caseData));
+            builder.caseNamePublic(buildCaseName(caseData));
         }
 
         // last step before clearing update details form
@@ -424,9 +438,25 @@ public class ManageContactInformationCallbackHandler extends CallbackHandler {
         // update claim details tab
         updateClaimDetailsTab(caseData, builder);
 
+        CaseData current = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetailsBefore());
+        ContactDetailsUpdatedEvent changesEvent = partyDetailsChangedUtil.buildChangesEvent(current, builder.build());
+
+        if (changesEvent == null) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                    .data(builder.build().toMap(objectMapper))
+                    .build();
+        }
+
+        YesOrNo submittedByCaseworker = isAdmin(callbackParams.getParams().get(BEARER_TOKEN).toString()) ? YES : NO;
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(builder.build().toMap(objectMapper))
-            .build();
+                .data(builder
+                        .businessProcess(BusinessProcess.ready(MANAGE_CONTACT_INFORMATION))
+                        .contactDetailsUpdatedEvent(
+                                changesEvent.toBuilder()
+                                        .submittedByCaseworker(submittedByCaseworker)
+                                        .build())
+                        .build().toMap(objectMapper))
+                .build();
     }
 
     private void updateClaimDetailsTab(CaseData caseData, CaseData.CaseDataBuilder<?, ?> builder) {
