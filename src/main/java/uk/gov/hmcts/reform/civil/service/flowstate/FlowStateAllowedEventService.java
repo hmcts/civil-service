@@ -1581,7 +1581,8 @@ public class FlowStateAllowedEventService {
         entry(
             FULL_ADMIT_REJECT_REPAYMENT.fullName(),
             List.of(
-                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT
+                DEFENDANT_SIGN_SETTLEMENT_AGREEMENT,
+                REQUEST_JUDGEMENT_ADMISSION_SPEC
             )
         ),
         entry(
