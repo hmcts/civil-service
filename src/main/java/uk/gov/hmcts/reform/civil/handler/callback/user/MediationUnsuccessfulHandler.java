@@ -48,7 +48,7 @@ public class MediationUnsuccessfulHandler extends CallbackHandler {
     private CallbackResponse populateShowConditionFlags(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         CaseData.CaseDataBuilder<?, ?> builder = caseData.toBuilder();
-        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
             builder.showCarmFields(YES);
         } else {
             builder.showCarmFields(NO);
