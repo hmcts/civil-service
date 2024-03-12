@@ -19,7 +19,10 @@ import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,6 +30,7 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
@@ -34,7 +38,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CU
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     RespondToClaimCuiCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    JacksonAutoConfiguration.class,
+    CaseFlagsInitialiser.class
 })
 class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
@@ -42,9 +47,14 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     private Time time;
     @MockBean
     private DeadlinesCalculator deadlinesCalculator;
+    @MockBean
+    FeatureToggleService featureToggleService;
+    @MockBean
+    OrganisationService organisationService;
     @Autowired
     private RespondToClaimCuiCallbackHandler handler;
-
+    @Autowired
+    CaseFlagsInitialiser caseFlagsInitialiser;
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -78,6 +88,7 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             now = LocalDateTime.now();
             given(time.now()).willReturn(now);
             given(deadlinesCalculator.calculateApplicantResponseDeadline(any(), any())).willReturn(respondToDeadline);
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
         }
 
         @Test
