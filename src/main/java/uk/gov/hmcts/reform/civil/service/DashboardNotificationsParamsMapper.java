@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,9 +29,10 @@ public class DashboardNotificationsParamsMapper {
         }
 
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
-            LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
-            params.put("defendantAdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
-            params.put("defendantAdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put("defendantAdmittedAmountPaymentDeadlineEn",
+                       DateUtils.formatOrdinalDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()));
+            params.put("defendantAdmittedAmountPaymentDeadlineCy",
+                       DateUtils.formatOrdinalDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()));
         }
 
         if (nonNull(caseData.getClaimFee())) {
@@ -52,14 +52,6 @@ public class DashboardNotificationsParamsMapper {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
 
-        if (nonNull(getDefendantAdmittedAmount(caseData))) {
-            params.put("defendantAdmittedAmount", formatAmount(getDefendantAdmittedAmount(caseData)));
-        }
-
-        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
-            params.put("defendantAdmittedAmountPaymentDeadline",
-                       DateUtils.formatOrdinalDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()));
-        }
         return params;
     }
 }
