@@ -543,7 +543,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             .claimantResponseScenarioFlag(getMultiPartyScenario(caseData))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM);
 
-        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
             updatedCaseData.showCarmFields(YES);
         } else {
             updatedCaseData.showCarmFields(NO);
