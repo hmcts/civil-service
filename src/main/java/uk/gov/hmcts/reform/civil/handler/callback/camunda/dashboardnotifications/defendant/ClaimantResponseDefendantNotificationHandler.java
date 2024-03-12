@@ -72,7 +72,9 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
             return SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT
                 .getScenario();
         } else if (caseData.getCcdState() == JUDICIAL_REFERRAL) {
-            if (Objects.nonNull(getRespondToClaim(caseData).getHowMuchWasPaid())
+            RespondToClaim respondToClaim = getRespondToClaim(caseData);
+            if (Objects.nonNull(respondToClaim)
+                && Objects.nonNull(respondToClaim.getHowMuchWasPaid())
                 && caseData.getApplicant1PartAdmitConfirmAmountPaidSpec() == YesOrNo.YES) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT
                     .getScenario();
