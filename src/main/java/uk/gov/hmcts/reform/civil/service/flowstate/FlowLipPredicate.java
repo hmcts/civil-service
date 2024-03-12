@@ -9,9 +9,12 @@ public class FlowLipPredicate {
     private FlowLipPredicate() {
 
     }
+  
+    public static final Predicate<CaseData> isLipCase = CaseData::isLipvLipOneVOne;
 
-    public static final Predicate<CaseData> isLipCase = caseData ->
-        caseData.isLipvLipOneVOne();
+    public static final Predicate<CaseData> nocSubmittedForLiPApplicant = CaseData::nocApplyForLiPClaimant;
+
+    public static final Predicate<CaseData> isLiPvLRCase = CaseData::isLipvLROneVOne;
 
     public static final Predicate<CaseData> agreedToMediation = CaseData::hasClaimantAgreedToFreeMediation;
 
