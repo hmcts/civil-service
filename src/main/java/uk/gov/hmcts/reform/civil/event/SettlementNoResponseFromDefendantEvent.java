@@ -1,4 +1,9 @@
 package uk.gov.hmcts.reform.civil.event;
 
-public record SettlementNoResponseFromDefendantEvent(Long caseId) {
+import lombok.Value;
+
+@Value
+public class SettlementNoResponseFromDefendantEvent {
+    
+    Long caseId;
 }

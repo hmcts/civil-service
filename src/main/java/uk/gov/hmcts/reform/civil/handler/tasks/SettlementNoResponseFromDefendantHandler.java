@@ -6,9 +6,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.civil.event.EvidenceUploadNotificationEvent;
 import uk.gov.hmcts.reform.civil.event.SettlementNoResponseFromDefendantEvent;
-import uk.gov.hmcts.reform.civil.service.search.EvidenceUploadNotificationSearchService;
 import uk.gov.hmcts.reform.civil.service.search.SettlementNoResponseFromDefendantSearchService;
 
 import java.util.List;

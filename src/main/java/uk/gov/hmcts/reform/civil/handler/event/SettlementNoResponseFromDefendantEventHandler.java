@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.event;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -16,7 +15,7 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-@Slf4j
+
 @Service
 @RequiredArgsConstructor
 public class SettlementNoResponseFromDefendantEventHandler {
@@ -30,7 +29,7 @@ public class SettlementNoResponseFromDefendantEventHandler {
 
     @EventListener
     public void createClaimantDashboardScenario(SettlementNoResponseFromDefendantEvent event) {
-        CaseDetails caseDetails = coreCaseDataService.getCase(event.caseId());
+        CaseDetails caseDetails = coreCaseDataService.getCase(event.getCaseId());
         CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
         dashboardApiClient.recordScenario(
             caseData.getCcdCaseReference().toString(),

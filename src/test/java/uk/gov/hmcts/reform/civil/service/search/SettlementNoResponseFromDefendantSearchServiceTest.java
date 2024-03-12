@@ -26,7 +26,8 @@ class SettlementNoResponseFromDefendantSearchServiceTest extends ElasticSearchSe
     @Override
     protected Query buildQuery(int fromValue) {
         String expectedDate = DateUtils.addDaysSkippingWeekends(
-            LocalDate.now(), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY).format(DateTimeFormatter.ISO_DATE);
+                LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY)
+            .format(DateTimeFormatter.ISO_DATE);
 
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)

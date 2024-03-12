@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.search;
 
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -13,8 +12,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.*;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 
 @Service
 public class SettlementNoResponseFromDefendantSearchService extends ElasticSearchService {
@@ -29,7 +29,8 @@ public class SettlementNoResponseFromDefendantSearchService extends ElasticSearc
     public Query query(int startIndex) {
 
         String targetDateString = DateUtils.addDaysSkippingWeekends(
-            LocalDate.now(), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY).format(DateTimeFormatter.ISO_DATE);
+                LocalDate.now().minusDays(1), BUSINESS_DAYS_FROM_NOW).atTime(END_OF_BUSINESS_DAY)
+            .format(DateTimeFormatter.ISO_DATE);
         return new Query(
             boolQuery()
                 .minimumShouldMatch(1)

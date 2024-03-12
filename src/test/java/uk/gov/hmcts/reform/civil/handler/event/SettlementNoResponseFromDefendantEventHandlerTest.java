@@ -47,7 +47,7 @@ class SettlementNoResponseFromDefendantEventHandlerTest {
     @InjectMocks
     private SettlementNoResponseFromDefendantEventHandler handler;
 
-    static final Long CASE_ID = 1111111111111111L;
+    static final Long CASE_ID = 1594901956117591L;
     static final String AUTH_TOKEN = "mock_token";
 
     @BeforeEach
@@ -59,7 +59,7 @@ class SettlementNoResponseFromDefendantEventHandlerTest {
 
     @Test
     void shouldCreateClaimantDashboardNotifications() {
-        CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build();
+        CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted().build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         when(coreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails)).thenReturn(caseData);
