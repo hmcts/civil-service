@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_DEFENDANT_DASH
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT;
 
 @Service
@@ -54,7 +55,9 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
 
     private String getScenario(CaseData caseData) {
         if (caseData.getCcdState() == CASE_SETTLED) {
-            if (Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
+            if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
+                return SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
+            } else if (Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
                 && caseData.isClaimantIntentionSettlePartAdmit()) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
             }
@@ -65,6 +68,7 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
                 return SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT.getScenario();
             }
         }
+
         return null;
     }
 
@@ -84,4 +88,5 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
 
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
+
 }

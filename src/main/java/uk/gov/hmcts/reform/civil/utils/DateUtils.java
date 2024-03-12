@@ -14,6 +14,11 @@ public class DateUtils {
         //No op
     }
 
+    public static String formatDate(LocalDate date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
+        return date.format(formatter);
+    }
+
     public static LocalDateTime convertFromUTC(LocalDateTime utcDate) {
         ZonedDateTime utcZonedDateTime = utcDate.atZone(ZoneId.of("UTC"));
         ZonedDateTime ukZonedDateTime = utcZonedDateTime.withZoneSameInstant(ZoneId.of("Europe/London"));
