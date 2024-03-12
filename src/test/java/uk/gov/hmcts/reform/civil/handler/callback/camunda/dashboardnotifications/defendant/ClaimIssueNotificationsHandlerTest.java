@@ -65,7 +65,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
 
         params.put("ccdCaseReference", "123");
         params.put("defaultRespondTime", "4pm");
-        params.put("responseDeadline", "11 March 2024");
+        params.put("respondent1ResponseDeadline", "11 March 2024");
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
@@ -81,7 +81,7 @@ public class ClaimIssueNotificationsHandlerTest extends BaseCallbackHandlerTest 
             .of(ABOUT_TO_SUBMIT, caseData)
             .build();
 
-        handler.createDashboardNotifications(callbackParams);
+        handler.handle(callbackParams);
         verify(dashboardApiClient).recordScenario(
             caseData.getCcdCaseReference().toString(),
             SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
