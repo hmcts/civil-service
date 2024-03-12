@@ -43,10 +43,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
-    MediationSuccessfulRespondentNotificationHandler.class,
+    MediationSuccessfulRespondentNotificationLRHandler.class,
     JacksonAutoConfiguration.class
 })
-class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
+class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
@@ -57,7 +57,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
     @MockBean
     private FeatureToggleService featureToggleService;
     @Autowired
-    private MediationSuccessfulRespondentNotificationHandler handler;
+    private MediationSuccessfulRespondentNotificationLRHandler handler;
 
     public static final String TEMPLATE_ID = "template-id";
     public static final String RESPONDENT_MAIL = "respondentsolicitor@example.com";

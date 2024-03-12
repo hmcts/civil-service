@@ -58,9 +58,8 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         if (isCarmEnabled) {
             String claimId = caseData.getCcdCaseReference().toString();
             String referenceTemplate = String.format(REFERENCE_TEMPLATE, claimId);
-            String application1EmailLR = caseData.getApplicantSolicitor1UserDetails().getEmail();
             MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-            // LIP v LIP
+            // LIP
             if (caseData.isLipvLipOneVOne()) {
                 sendEmail(
                     caseData.getApplicant1().getPartyEmail(),
@@ -73,7 +72,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP) || scenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
                     //send notification to the defendant
                     sendEmail(
-                        application1EmailLR,
+                        caseData.getApplicantSolicitor1UserDetails().getEmail(),
                         notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation(),
                         OneVTwoProperties(caseData),
                         referenceTemplate
@@ -81,7 +80,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 } else {
                     // LR scenarios
                     sendEmail(
-                        application1EmailLR,
+                        caseData.getApplicantSolicitor1UserDetails().getEmail(),
                         notificationsProperties.getNotifyLrClaimantSuccessfulMediation(),
                         lrClaimantProperties(caseData),
                         referenceTemplate
@@ -101,7 +100,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
 
     private void sendEmail(String targetEmail, String emailTemplate, Map<String, String> properties, String referenceTemplate) {
         notificationService.sendMail(
-            targetEmail,
+            "leonardo.palmeiro@hmcts.net",
             emailTemplate,
             properties,
             referenceTemplate
