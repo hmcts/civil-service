@@ -116,8 +116,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
     private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
-    private LocalDate nextWorkingDayDate;
-
 
     @MockBean
     private LocationRefDataService locationRefDataService;
@@ -152,8 +150,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                     .forename("Judge")
                                                                     .surname("Judy")
                                                                     .roles(Collections.emptyList()).build());
-//        nextWorkingDayDate = LocalDate.of(2023, 12, 15);
-
     }
 
     @Nested
@@ -262,7 +258,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .thenReturn(LocalDate.now().plusDays(21))//appealChoiceSecondDropdownA
                 .thenReturn(LocalDate.now().plusDays(21))//appealChoiceSecondDropdownB
                 .thenReturn(LocalDate.now().plusDays(21))//appealChoiceSecondDropdownA and refused
-                .thenReturn(LocalDate.now().plusDays(21));//appealChoiceSecondDropdownB and refused
+                .thenReturn(LocalDate.now().plusDays(21)); //appealChoiceSecondDropdownB and refused
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(YES)
