@@ -385,10 +385,12 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
         }
 
         caseFlagsInitialiser.initialiseCaseFlags(CLAIMANT_RESPONSE_SPEC, builder);
-        if (V_2.equals(callbackParams.getVersion())
+        if ((V_2.equals(callbackParams.getVersion())
             && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)
-            && caseData.hasClaimantAgreedToFreeMediation()) {
+            && caseData.hasClaimantAgreedToFreeMediation())
+            || (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()))) {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
 

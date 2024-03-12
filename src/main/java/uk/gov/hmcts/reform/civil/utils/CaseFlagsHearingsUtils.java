@@ -2,14 +2,18 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PartyFlagStructure;
+import uk.gov.hmcts.reform.civil.model.caseflags.FlagDetail;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.caseflags.PartyFlags;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 
 public class CaseFlagsHearingsUtils {
 
@@ -33,6 +37,16 @@ public class CaseFlagsHearingsUtils {
         findActiveFlags(nonEmptyFlags);
 
         return nonEmptyFlags;
+    }
+
+    public static List<FlagDetail> getAllActiveCaseLevelFlags(CaseData caseData) {
+        Flags caseFlags = caseData.getCaseFlags();
+        List<FlagDetail> flagDetails = unwrapElements(caseFlags.getDetails());
+
+        if (!flagDetails.isEmpty()) {
+            return flagDetails.stream().filter(f -> ("Active").equals(f.getStatus())).toList();
+        }
+        return emptyList();
     }
 
     private static void getNonEmptyExpertAndWitnessFlags(CaseData caseData, List<PartyFlags> nonEmptyFlags) {
