@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -86,6 +87,18 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("claimFee").isNull();
 
+    }
+
+    @Test
+    public void shouldMapParameters_whenHwFPartRemissionGranted() {
+        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED)
+            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().remissionAmount(BigDecimal.valueOf(2500))
+                                       .outstandingFeeInPounds(BigDecimal.valueOf(100)).build()).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("claimIssueRemissionAmount").isEqualTo("£25");
+        assertThat(result).extracting("claimIssueOutStandingAmount").isEqualTo("£100");
     }
 }
 

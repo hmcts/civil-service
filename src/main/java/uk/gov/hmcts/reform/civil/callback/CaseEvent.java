@@ -1,14 +1,9 @@
 package uk.gov.hmcts.reform.civil.callback;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import static uk.gov.hmcts.reform.civil.callback.UserType.CAMUNDA;
 import static uk.gov.hmcts.reform.civil.callback.UserType.TESTING_SUPPORT;
 import static uk.gov.hmcts.reform.civil.callback.UserType.USER;
 
-@Getter
-@RequiredArgsConstructor
 public enum CaseEvent {
     CREATE_CLAIM(USER),
     CREATE_CLAIM_SPEC(USER),
@@ -372,7 +367,16 @@ public enum CaseEvent {
 
     private final UserType userType;
 
+    CaseEvent(UserType userType) {
+        this.userType = userType;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
     public boolean isCamundaEvent() {
         return this.getUserType() == CAMUNDA;
     }
+
 }
