@@ -25,17 +25,15 @@ public class DashboardNotificationsParamsMapper {
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
-
+      
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
             params.put("defendantAdmittedAmount", formatAmount(getDefendantAdmittedAmount(caseData)));
         }
-
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
             params.put("defendantAdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
             params.put("defendantAdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
         }
-
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
@@ -43,19 +41,29 @@ public class DashboardNotificationsParamsMapper {
                     .stripTrailingZeros().toPlainString()
             );
         }
-
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             params.put("respondent1ResponseDeadline",
                        DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate()));
         }
-
         if (nonNull(caseData.getRespondent1RespondToSettlementAgreementDeadline())) {
             LocalDateTime respondent1SettlementAgreementDeadline = caseData.getRespondent1RespondToSettlementAgreementDeadline();
             params.put("respondent1SettlementAgreementDeadline_En", DateUtils.formatDate(respondent1SettlementAgreementDeadline));
             params.put("respondent1SettlementAgreementDeadline_Cy", DateUtils.formatDate(respondent1SettlementAgreementDeadline));
             params.put("claimantSettlementAgreement", "accepted");
         }
-
+        if (caseData.getClaimIssueRemissionAmount() != null) {
+            params.put(
+                "claimIssueRemissionAmount",
+                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimIssueRemissionAmount()).stripTrailingZeros()
+                    .toPlainString()
+            );
+        }
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            params.put(
+                "claimIssueOutStandingAmount",
+                "£" + caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
+            );
+        }
         if (caseData.getHwfFeeType() != null) {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
