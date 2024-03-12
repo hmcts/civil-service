@@ -1,17 +1,18 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
+import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 
 @Service
-@RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
     public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
@@ -21,6 +22,16 @@ public class DashboardNotificationsParamsMapper {
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
 
+        if (nonNull(getDefendantAdmittedAmount(caseData))) {
+            params.put("defendantAdmittedAmount", formatAmount(getDefendantAdmittedAmount(caseData)));
+        }
+
+        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
+            LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            params.put("defendantAdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put("defendantAdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
+        }
+
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
@@ -29,20 +40,9 @@ public class DashboardNotificationsParamsMapper {
         }
 
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
-            params.put("respondent1ResponseDeadline",
-                       DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate()));
-        }
-
-        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())
-            && nonNull(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid())) {
-            params.put("responseToClaimAdmitPartPaymentDeadline",
-                       DateUtils.formatDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()));
-        }
-
-        if (nonNull(caseData.getTotalClaimAmount())) {
             params.put(
-                "fullAdmitPayImmediatelyPaymentAmount",
-                "£" + caseData.getTotalClaimAmount().stripTrailingZeros().toPlainString()
+                "respondent1ResponseDeadline",
+                DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate())
             );
         }
 

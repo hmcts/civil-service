@@ -86,6 +86,9 @@ public class SdoDocumentFormSmall implements MappableObject {
     private final boolean smallClaimsWitnessStatementToggle;
     private final boolean smallClaimsNumberOfWitnessesToggle;
     private final boolean smallClaimsFlightDelayToggle;
+    private final boolean smallClaimsMediationSectionToggle;
+    private final boolean carmEnabled;
+    private final String smallClaimMediationSectionInput;
 
     @SuppressWarnings("unused")
     public boolean getSmallClaimsMethodToggle() {
