@@ -32,7 +32,7 @@ public class ClaimISettledCourtDecisionInFavorOfDefendantScenarioTest extends Ba
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
                    .params(Map.of(
-                                  "respondSettlementAgreementDeadline", responseDeadline
+                       "respondSettlementAgreementDeadline", responseDeadline
                    ))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL,
@@ -49,11 +49,13 @@ public class ClaimISettledCourtDecisionInFavorOfDefendantScenarioTest extends Ba
                 jsonPath("$[0].descriptionEn")
                     .value("<p class=\"govuk-body\">The claimant has rejected your plan and asked you to "
                                + "sign a settlement agreement.The claimant proposed a repayment plan, and the court "
-                               +"then responded with an alternative plan that was accepted.</p><p class=\"govuk-body\">"
-                               + " You must respond by "+responseDeadline+". If you do not respond by then, or reject "
-                               + "the agreement, they can request a County Court Judgment.</p><p class=\"govuk-body\">"
-                               + "<a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">"
-                               + "View the repayment plan</a><br><a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener "
+                               + "then responded with an alternative plan that was accepted."
+                               + "</p><p class=\"govuk-body\">"
+                               + " You must respond by " + responseDeadline + ". If you do not respond by then, "
+                               + "or reject the agreement, they can request a County Court Judgment.</p><p"
+                               + " class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" "
+                               + "class=\"govuk-link\">View the repayment plan</a><br><a "
+                               + "href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener "
                                + "noreferrer\" class=\"govuk-link\">View your response</a></p>")
             );
     }
