@@ -34,12 +34,6 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
 
-        LocalDate date = LocalDate.of(2024, Month.JANUARY, 11);
-
-        caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100)).build();
-        caseData = caseData.toBuilder().respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date)).build();
-        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED).build();
-
         LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
 
         caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100))
@@ -57,14 +51,10 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantAdmittedAmount").isEqualTo("100");
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn")
-            .isEqualTo(DateUtils.formatDate(date));
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy")
-            .isEqualTo(DateUtils.formatDate(date));
-
         assertThat(result).extracting("defendantAdmittedAmount").isEqualTo("100");
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadline").isEqualTo("22nd February 2024");
+        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn").isEqualTo("22nd February 2024");
+        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy").isEqualTo("22nd February 2024");
 
         assertThat(result).extracting("respondent1ResponseDeadline")
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
@@ -78,9 +68,6 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapParameters_WhenResponseDeadlineAndClaimFeeIsNull() {
 
-        caseData = caseData.toBuilder().respondent1ResponseDeadline(null).build();
-        caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(null).build();
-        caseData = caseData.toBuilder().respondToClaimAdmitPartLRspec(null).build();
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
             .respondToAdmittedClaimOwingAmountPounds(null)
             .respondToClaimAdmitPartLRspec(null)
@@ -101,7 +88,7 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("defendantAdmittedAmount").isNull();
 
         assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn").isNull();
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEnCy").isNull();
+        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy").isNull();
 
         assertThat(result).extracting("claimFee").isNull();
 
