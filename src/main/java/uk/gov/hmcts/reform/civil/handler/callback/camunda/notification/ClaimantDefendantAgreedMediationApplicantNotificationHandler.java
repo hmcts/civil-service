@@ -48,7 +48,7 @@ public class ClaimantDefendantAgreedMediationApplicantNotificationHandler extend
 
     private CallbackResponse notifyApplicantLR(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String emailTemplate =  featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())
+        String emailTemplate =  featureToggleService.isCarmEnabledForCase(caseData)
             ? notificationsProperties.getNotifyApplicantLRMediationTemplate()
             : notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate();
 
