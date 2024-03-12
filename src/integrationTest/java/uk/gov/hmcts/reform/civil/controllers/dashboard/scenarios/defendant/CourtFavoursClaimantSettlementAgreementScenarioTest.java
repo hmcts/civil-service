@@ -49,7 +49,7 @@ public class CourtFavoursClaimantSettlementAgreementScenarioTest extends BaseInt
                                + "<p class=\"govuk-body\">The claimant has proposed a new repayment plan and the court has agreed with it, based on the financial details you provided.</p>"
                                + "<p class=\"govuk-body\">You must respond by 16 March 2024. If you do not respond by then, or reject the agreement, they can request a County Court Judgment.</p>"
                                + "<p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a><br>"
-                               + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>")y
+                               + "<a href=\"{VIEW_RESPONSE_TO_CLAIM}\"  rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>")
             );
     }
 }
