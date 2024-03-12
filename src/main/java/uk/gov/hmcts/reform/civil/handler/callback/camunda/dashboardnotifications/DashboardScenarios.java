@@ -11,6 +11,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF("Scenario.AAA7.ClaimIssue.HWF.InvalidRef"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED("Scenario.AAA7.ClaimIssue.HWF.InfoRequired"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED("Scenario.AAA7.ClaimIssue.HWF.Updated"),
+    SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT("Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT("Scenario.AAA7.ClaimantIntent.ClaimSettled.Defendant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT("Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant");
 
