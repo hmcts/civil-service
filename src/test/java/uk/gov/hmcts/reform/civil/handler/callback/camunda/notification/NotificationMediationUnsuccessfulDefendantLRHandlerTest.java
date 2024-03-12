@@ -77,7 +77,7 @@ class NotificationMediationUnsuccessfulDefendantLRHandlerTest extends BaseCallba
     private static final String APPLICANT_PARTY_NAME = "Alice";
     private static final String APPLICANT_2_PARTY_NAME = "Portia";
     private static final String DEFENDANT_1_PARTY_NAME = "Lycia";
-    private static final String DEFENDANT_2_PARTY_NAME = "Portia";
+    private static final String DEFENDANT_2_PARTY_NAME = "Alicia";
     private static final Long CCD_REFERENCE_NUMBER = 123456789L;
     private static final String CLAIMANT_EMAIL_ADDRESS = "applicantemail@hmcts.net";
     private static final String DEFENDANT_1_EMAIL_ADDRESS = "defendant1email@hmcts.net";
