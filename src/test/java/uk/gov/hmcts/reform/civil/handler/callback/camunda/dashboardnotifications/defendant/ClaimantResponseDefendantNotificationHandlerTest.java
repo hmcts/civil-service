@@ -126,39 +126,39 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
         );
     }
 
-        @Test
-        public void configureDashboardNotifications_courtFavoursClaimantSignedSettlementAgreement() {
+    @Test
+    public void configureDashboardNotifications_courtFavoursClaimantSignedSettlementAgreement() {
 
-                Map<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
 
-                when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
 
-                CaseData caseData = CaseData.builder()
-                    .legacyCaseReference("reference")
-                    .ccdCaseReference(1234L)
-                    .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-                    .caseDataLiP(CaseDataLiP.builder()
-                                     .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                .applicant1SignedSettlementAgreement(YesOrNo.YES)
-                                                                .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                                                                .build())
-                                     .build())
-                    .specRespondent1Represented(YesOrNo.NO)
-                    .respondent1Represented(YesOrNo.NO)
-                    .build();
+        CaseData caseData = CaseData.builder()
+            .legacyCaseReference("reference")
+            .ccdCaseReference(1234L)
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .caseDataLiP(CaseDataLiP.builder()
+                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
+                                                        .applicant1SignedSettlementAgreement(YesOrNo.YES)
+                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                                                        .build())
+                             .build())
+            .specRespondent1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
 
-                CallbackParams callbackParams = CallbackParamsBuilder.builder()
-                    .of(ABOUT_TO_SUBMIT, caseData)
-                    .build();
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
 
-                handler.handle(callbackParams);
+        handler.handle(callbackParams);
 
-                verify(dashboardApiClient, times(1)).recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT
-                .getScenario(),
-                "BEARER_TOKEN",
-                    ScenarioRequestParams.builder().params(params).build()
+        verify(dashboardApiClient, times(1)).recordScenario(
+            caseData.getCcdCaseReference().toString(),
+            SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT
+            .getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(params).build()
         );
-            }
+    }
 }
