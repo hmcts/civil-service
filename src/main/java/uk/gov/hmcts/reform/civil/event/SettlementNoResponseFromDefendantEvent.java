@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class SettlementNoResponseFromDefendantEvent {
-    
+
     Long caseId;
 }
