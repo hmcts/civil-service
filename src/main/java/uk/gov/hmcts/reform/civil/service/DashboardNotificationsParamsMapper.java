@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,8 +50,9 @@ public class DashboardNotificationsParamsMapper {
         }
 
         if (nonNull(caseData.getRespondent1RespondToSettlementAgreementDeadline())) {
-            params.put("respondent1SettlementAgreementDeadline_En", DateUtils.formatDate(caseData.getRespondent1RespondToSettlementAgreementDeadline()));
-            params.put("respondent1SettlementAgreementDeadline_Cy", DateUtils.formatDate(caseData.getRespondent1RespondToSettlementAgreementDeadline()));
+            LocalDateTime respondent1SettlementAgreementDeadline = caseData.getRespondent1RespondToSettlementAgreementDeadline();
+            params.put("respondent1SettlementAgreementDeadline_En", DateUtils.formatDate(respondent1SettlementAgreementDeadline));
+            params.put("respondent1SettlementAgreementDeadline_Cy", DateUtils.formatDate(respondent1SettlementAgreementDeadline));
             params.put("claimantSettlementAgreement", "accepted");
         }
 
