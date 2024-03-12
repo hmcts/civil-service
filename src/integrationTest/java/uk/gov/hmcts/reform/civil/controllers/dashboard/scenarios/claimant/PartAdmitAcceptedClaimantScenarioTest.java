@@ -29,9 +29,9 @@ public class PartAdmitAcceptedClaimantScenarioTest extends BaseIntegrationTest {
         UUID caseId = UUID.randomUUID();
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("defendantName", "John Doe",
-                                  "defendantAdmittedAmount", "£500",
-                                  "defendantAdmittedAmountPaymentDeadline", "20/05/2024"
+                   .params(Map.of("respondent1PartyName", "John Doe",
+                                  "defendantAdmittedAmount", "500",
+                                  "defendantAdmittedAmountPaymentDeadline", "19th March 2024"
                    )).build(),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_PART_ADMIT_ACCEPTED_CLAIMANT, caseId
         )
@@ -43,7 +43,7 @@ public class PartAdmitAcceptedClaimantScenarioTest extends BaseIntegrationTest {
             .andExpectAll(
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("Immediate payment"),
-                jsonPath("$[0].descriptionEn").value("John Doe said they will pay you £500 immediately. Funds must clear your account by 20/05/2024. If you don´t receive the money by then, you can <a href={COUNTY_COURT_JUDGEMENT_URL}  rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>.")
+                jsonPath("$[0].descriptionEn").value("<p class=\"govuk-body\">John Doe said they will pay you £500 immediately. Funds must clear your account by 19th March 2024.</p> <p class=\"govuk-body\">If you don´t receive the money by then, you can <a href={COUNTY_COURT_JUDGEMENT_URL} class=\"govuk-link\">request a County Court Judgment</a>.</p>")
             );
     }
 }
