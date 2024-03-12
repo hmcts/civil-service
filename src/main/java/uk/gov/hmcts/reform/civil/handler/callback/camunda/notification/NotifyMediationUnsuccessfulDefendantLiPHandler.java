@@ -75,7 +75,7 @@ public class NotifyMediationUnsuccessfulDefendantLiPHandler extends CallbackHand
             && caseData.getRespondentSolicitor1EmailAddress() == null) {
             String recipient = caseData.getRespondent1().getPartyEmail();
 
-            if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+            if (featureToggleService.isCarmEnabledForCase(caseData)) {
                 notificationService.sendMail(
                     caseData.getRespondent1().getPartyEmail(),
                     notificationsProperties.getMediationUnsuccessfulLIPTemplate(),
