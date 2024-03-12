@@ -1370,6 +1370,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
             CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -1392,6 +1393,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(shouldBeSelected.isPresent()).isTrue();
             assertThat(dynamicList.getValue()).isNotNull()
                 .extracting("label").isEqualTo(LocationRefDataService.getDisplayEntry(shouldBeSelected.get()));
+
+            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("Yes");
 
             assertThat(response.getData()).extracting("fastTrackAltDisputeResolutionToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackVariationOfDirectionsToggle").isNotNull();
@@ -1416,6 +1419,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("smallClaimsMethodToggle").isNotNull();
             assertThat(response.getData()).extracting("smallClaimsDocumentsToggle").isNotNull();
             assertThat(response.getData()).extracting("smallClaimsWitnessStatementToggle").isNotNull();
+            assertThat(response.getData()).extracting("smallClaimsMediationSectionToggle").isNotNull();
             assertThat(response.getData()).extracting("caseManagementLocation").isNotNull();
 
             assertThat(response.getData()).extracting("disposalHearingJudgesRecital").extracting("input")
@@ -1766,6 +1770,16 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + " attend the hearing. If they do not attend, it will be for the court to decide how"
                                + " much reliance, if any, to place on their evidence.");
 
+            assertThat(response.getData()).extracting("smallClaimsMediationSectionStatement").extracting("input")
+                .isEqualTo("If you failed to attend a mediation appointment,"
+                               + " then the judge at the hearing may impose a sanction. "
+                               + "This could require you to pay costs, or could result in your claim or defence being dismissed. "
+                               + "You should deliver to every other party, and to the court, your explanation for non-attendance, "
+                               + "with any supporting documents, at least 14 days before the hearing. "
+                               + "Any other party who wishes to comment on the failure to attend the mediation appointment should "
+                               + "deliver their comments,"
+                               + " with any supporting documents, to all parties and to the court at least 14 days before the hearing.");
+
             assertThat(response.getData()).doesNotHaveToString("smallClaimsFlightDelay");
 
             assertThat(response.getData()).extracting("smallClaimsCreditHire").extracting("input1")
@@ -1851,6 +1865,33 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                              + "received by the Court (together with the appropriate fee) by 4pm "
                                              + "on %s.",
                                          date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))));
+        }
+
+        @Test
+        void shouldPrePopulateOrderDetailsPagesCarmNotEnabled() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .setClaimTypeToSpecClaim()
+                .atStateClaimDraft()
+                .totalClaimAmount(BigDecimal.valueOf(15000))
+                .applicant1DQWithLocation().build();
+            given(locationRefDataService.getHearingCourtLocations(any()))
+                .willReturn(getSampleCourLocationsRefObjectToSort());
+            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
+            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(categorySearchResult));
+            given(featureToggleService.isCarmEnabledForCase(any())).willReturn(false);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(response.getData()).extracting("smallClaimsMediationSectionToggle").isNull();
+
+            assertThat(response.getData()).doesNotHaveToString("smallClaimsMediationSectionStatement");
+
+            assertThat(response.getData()).extracting("showCarmFields").isEqualTo("No");
         }
 
         @Test

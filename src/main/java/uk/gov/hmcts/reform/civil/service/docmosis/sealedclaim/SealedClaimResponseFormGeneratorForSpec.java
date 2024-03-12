@@ -90,7 +90,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             .statementOfTruth(statementOfTruth)
             .allocatedTrack(caseData.getResponseClaimTrack())
             .responseType(caseData.getRespondentClaimResponseTypeForSpecGeneric())
-            .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))
+            .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
             .mediation(caseData.getResponseClaimMediationSpecRequired());
         addCarmMediationDetails(builder, caseData);
         addRepaymentPlanDetails(builder, caseData);

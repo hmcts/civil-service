@@ -308,6 +308,19 @@ public class SdoHelper {
         return "";
     }
 
+    public static boolean showCarmMediationSection(CaseData caseData, boolean carmEnabled) {
+        return caseData.getSmallClaimsMediationSectionStatement() != null
+            && caseData.getSmallClaimsMediationSectionStatement().getInput() != null
+            && carmEnabled;
+    }
+
+    public static String getSmallClaimsMediationText(CaseData caseData) {
+        if (caseData.getSmallClaimsMediationSectionStatement() != null) {
+            return caseData.getSmallClaimsMediationSectionStatement().getInput();
+        }
+        return null;
+    }
+
     public static boolean hasSmallClaimsVariable(CaseData caseData, String variableName) {
         switch (variableName) {
             case "smallClaimsHearingToggle":
@@ -326,6 +339,8 @@ public class SdoHelper {
                     && caseData.getSmallClaimsWitnessStatement().getSmallClaimsNumberOfWitnessesToggle() != null;
             case "smallClaimsAddNewDirections":
                 return caseData.getSmallClaimsAddNewDirections() != null;
+            case "smallClaimsMediationSectionToggle":
+                return caseData.getSmallClaimsMediationSectionStatement() != null;
             default:
                 return false;
         }

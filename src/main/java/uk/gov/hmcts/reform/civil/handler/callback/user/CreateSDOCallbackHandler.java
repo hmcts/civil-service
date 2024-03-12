@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SDOHearingNotes;
+import uk.gov.hmcts.reform.civil.model.SmallClaimsMediation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -223,6 +224,12 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
+
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
+            updatedData.showCarmFields(YES);
+        } else {
+            updatedData.showCarmFields(NO);
+        }
 
         Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
         preferredCourt.map(RequestedCourt::getCaseLocation)
@@ -630,6 +637,20 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
 
         updatedData.smallClaimsWitnessStatement(tempSmallClaimsWitnessStatement).build();
 
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
+            updatedData.smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
+                                                                 .input("If you failed to attend a mediation appointment,"
+                                                                            + " then the judge at the hearing may impose a sanction. "
+                                                                            + "This could require you to pay costs, or could result in your claim or defence being dismissed. "
+                                                                            + "You should deliver to every other party, and to the court, your explanation for non-attendance, "
+                                                                            + "with any supporting documents, at least 14 days before the hearing. "
+                                                                            + "Any other party who wishes to comment on the failure to attend the mediation appointment should "
+                                                                            + "deliver their comments,"
+                                                                            + " with any supporting documents, to all parties and to the court at least "
+                                                                            + "14 days before the hearing.")
+                                                                 .build());
+        }
+
         if (featureToggleService.isSdoR2Enabled()) {
             SmallClaimsFlightDelay tempSmallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
                 .smallClaimsFlightDelayToggle(checkList)
@@ -894,6 +915,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.setSmallClaimsFlag(NO).build();
         updatedData.setFastTrackFlag(NO).build();
         updatedData.isSdoR2NewScreen(NO).build();
+
         if (SdoHelper.isSmallClaimsTrack(caseData)) {
             updatedData.setSmallClaimsFlag(YES).build();
             if (featureToggleService.isSdoR2Enabled() && SdoHelper.isSDOR2ScreenForDRHSmallClaim(caseData)) {
@@ -1258,6 +1280,9 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.smallClaimsWitnessStatementToggle(checkList);
         if (featureToggleService.isSdoR2Enabled()) {
             updatedData.smallClaimsFlightDelayToggle(checkList);
+        }
+        if (featureToggleService.isCarmEnabledForCase(updatedData.build())) {
+            updatedData.smallClaimsMediationSectionToggle(checkList);
         }
     }
 
