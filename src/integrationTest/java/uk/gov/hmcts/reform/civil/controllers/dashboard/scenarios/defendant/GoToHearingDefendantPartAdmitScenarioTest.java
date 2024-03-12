@@ -52,7 +52,6 @@ public class GoToHearingDefendantPartAdmitScenarioTest extends BaseIntegrationTe
                                         "<p class=\"govuk-body\">If the case goes to a hearing we will contact you with further details.</p>" +
                                         "<p class=\"govuk-body\"><a href={VIEW_RESPONSE_TO_CLAIM} class=\"govuk-link\">View your response</a></p>" +
                                         "<p class=\"govuk-body\"><a href={VIEW_CLAIMANT_HEARING_REQS} class=\"govuk-link\">" +
-                                        "View the claimant's hearing requirements</a></p>")
-        );
+                                        "View the claimant's hearing requirements</a></p>"));
     }
 }
