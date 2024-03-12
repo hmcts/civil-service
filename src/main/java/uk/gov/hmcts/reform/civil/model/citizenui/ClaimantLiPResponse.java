@@ -39,7 +39,7 @@ public class ClaimantLiPResponse {
     }
 
     @JsonIgnore
-    public boolean hasCourtDecisionInFavourOfCDefendant() {
+    public boolean hasCourtDecisionInFavourOfDefendant() {
         return RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT == claimantCourtDecision;
     }
 
