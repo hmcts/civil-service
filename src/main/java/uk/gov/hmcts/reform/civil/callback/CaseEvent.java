@@ -1,14 +1,9 @@
 package uk.gov.hmcts.reform.civil.callback;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import static uk.gov.hmcts.reform.civil.callback.UserType.CAMUNDA;
 import static uk.gov.hmcts.reform.civil.callback.UserType.TESTING_SUPPORT;
 import static uk.gov.hmcts.reform.civil.callback.UserType.USER;
 
-@Getter
-@RequiredArgsConstructor
 public enum CaseEvent {
     CREATE_CLAIM(USER),
     CREATE_CLAIM_SPEC(USER),
@@ -365,12 +360,23 @@ public enum CaseEvent {
     GENERATE_DASHBOARD_NOTIFICATION_CUI(CAMUNDA),
     CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1(CAMUNDA),
     CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1(CAMUNDA),
-    CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE(CAMUNDA),
+    CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE(CAMUNDA),
     GENERATE_DASHBOARD_NOTIFICATION_CLAIM_ISSUE_HWF_CLAIMANT1(CAMUNDA),
-    CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1(CAMUNDA);
+    CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1(CAMUNDA),
+    CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE(CAMUNDA);
+
     private final UserType userType;
+
+    CaseEvent(UserType userType) {
+        this.userType = userType;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
 
     public boolean isCamundaEvent() {
         return this.getUserType() == CAMUNDA;
     }
+
 }
