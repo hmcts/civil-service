@@ -56,7 +56,7 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
     }
 
     private CallbackResponse notifyDefendantLRForMediationUnsuccessful(CallbackParams callbackParams) {
-        if (featureToggleService.isCarmEnabledForCase(callbackParams.getCaseData().getSubmittedDate())) {
+        if (featureToggleService.isCarmEnabledForCase(callbackParams.getCaseData())) {
             sendEmail(callbackParams);
         } else {
             log.info("Defendant LR is not notified because it is not a CARM case.");
