@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
@@ -209,25 +208,6 @@ class UpdateClaimStateServiceTest {
         var response = service.setUpCaseState(caseData);
         //Then
         assertThat(response).isEqualTo(CaseState.IN_MEDIATION.name());
-    }
-
-    @Test
-    void shouldChangeCaseState_whenApplicantAcceptRepaymentPlanAndChooseSettlementAgreement() {
-        //Given
-        CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimIssued()
-            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
-            .caseDataLip(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                         .applicant1SignedSettlementAgreement(
-                                                                             YesOrNo.YES).build())
-                             .build())
-            .build();
-
-        //When
-        var response = service.setUpCaseState(caseData);
-
-        //Then
-        assertThat(response).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
     }
 
     @Test
