@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+
 import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -23,6 +25,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIMANT_DASHB
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_SETTLED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT;
+
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING;
 
 @Service
@@ -33,6 +36,11 @@ public class ClaimantResponseNotificationHandler extends CallbackHandler {
     public static final String TASK_ID = "GenerateClaimantDashboardNotificationClaimantResponse";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
+
+    private final Map<CaseState, String> dashboardScenariosCaseStateMap = Map.of(
+        CaseState.JUDICIAL_REFERRAL, SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING.getScenario()
+    );
+
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -68,6 +76,7 @@ public class ClaimantResponseNotificationHandler extends CallbackHandler {
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
+
 
     private String getScenario(CaseData caseData) {
         if (caseData.getCcdState() == CASE_SETTLED) {

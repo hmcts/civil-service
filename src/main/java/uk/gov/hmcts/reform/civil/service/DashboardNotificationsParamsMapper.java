@@ -8,12 +8,15 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.math.BigDecimal;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
+import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,14 @@ public class DashboardNotificationsParamsMapper {
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
 
+        if (nonNull(getDefendantAdmittedAmount(caseData))) {
+            params.put("defendantAdmittedAmount", formatAmount(getDefendantAdmittedAmount(caseData)));
+        }
+        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
+            LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            params.put("defendantAdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put("defendantAdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
+        }
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
@@ -33,11 +44,23 @@ public class DashboardNotificationsParamsMapper {
                     .stripTrailingZeros().toPlainString()
             );
         }
-
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
-            params.put("respondent1ResponseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
+            params.put("respondent1ResponseDeadline",
+                       DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate()));
         }
-
+        if (caseData.getClaimIssueRemissionAmount() != null) {
+            params.put(
+                "claimIssueRemissionAmount",
+                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimIssueRemissionAmount()).stripTrailingZeros()
+                    .toPlainString()
+            );
+        }
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            params.put(
+                "claimIssueOutStandingAmount",
+                "£" + caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
+            );
+        }
         params.put("claimSettledAmount", getClaimSettledAmount(caseData));
         params.put("claimSettledDate", getClaimSettleDate(caseData));
 
