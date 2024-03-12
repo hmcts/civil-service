@@ -24,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_SUCC
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_1_LR;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
@@ -38,8 +39,8 @@ public class MediationSuccessfulRespondentNotificationLRHandler extends Callback
     private final FeatureToggleService featureToggleService;
 
     private static final List<CaseEvent> EVENTS = List.of(
+        NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL,
         NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP,
-        NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_1_LR,
         NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR
     );
 
@@ -179,7 +180,7 @@ public class MediationSuccessfulRespondentNotificationLRHandler extends Callback
 
     private boolean isRespondentSolicitor1Notification(CallbackParams callbackParams) {
         return callbackParams.getRequest().getEventId()
-            .equals(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_1_LR.name());
+            .equals(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name());
     }
 
 }

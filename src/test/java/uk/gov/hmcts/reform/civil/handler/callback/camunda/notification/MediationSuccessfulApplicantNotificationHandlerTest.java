@@ -65,13 +65,13 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         @BeforeEach
         void setup() {
             when(notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLrVLrClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLrVLrTwoVOneClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLrVLrOneVTwoSameSolicitorClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLrVLrOneVTwoDifferentSolicitorsClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLrVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            //when(notificationsProperties.getNotifyLrVLrClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            //when(notificationsProperties.getNotifyLrVLrTwoVOneClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            //when(notificationsProperties.getNotifyLrVLrOneVTwoSameSolicitorClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            //when(notificationsProperties.getNotifyLrVLrOneVTwoDifferentSolicitorsClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            //when(notificationsProperties.getNotifyLrVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            //when(notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            //when(notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
         }
 
