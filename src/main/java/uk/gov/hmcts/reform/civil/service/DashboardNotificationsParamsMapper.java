@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,16 @@ public class DashboardNotificationsParamsMapper {
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
 
+        if (nonNull(getDefendantAdmittedAmount(caseData))) {
+            params.put("defendantAdmittedAmount", formatAmount(getDefendantAdmittedAmount(caseData)));
+        }
+
+        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
+            LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            params.put("defendantAdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put("defendantAdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
+        }
+
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
@@ -33,7 +44,8 @@ public class DashboardNotificationsParamsMapper {
         }
 
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
-            params.put("respondent1ResponseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
+            params.put("respondent1ResponseDeadline",
+                       DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate()));
         }
 
         if (caseData.getHwfFeeType() != null) {
