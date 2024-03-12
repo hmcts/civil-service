@@ -66,6 +66,7 @@ public class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder()
                 .buildClaimIssuedPaymentCaseData();
             caseData = caseData.toBuilder()
+                .hwfFeeType(FeeType.CLAIMISSUED)
                 .claimIssuedHwfDetails(HelpWithFeesDetails.builder()
                                            .hwfCaseEvent(hwfEvent)
                                            .build())
