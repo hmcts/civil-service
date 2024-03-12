@@ -23,6 +23,8 @@ import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NOT_ASSIGNED;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
+import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.PARTY_WITHDRAWS;
 import static uk.gov.hmcts.reform.civil.utils.MediationUtils.findMediationUnsuccessfulReason;
 
@@ -53,7 +55,7 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
     }
 
     private CallbackResponse notifyDefendantLRForMediationUnsuccessful(CallbackParams callbackParams) {
-        if (featureToggleService.isCarmEnabledForCase(callbackParams.getCaseData().getSubmittedDate())) {
+        if (featureToggleService.isCarmEnabledForCase(callbackParams.getCaseData())) {
             sendEmail(callbackParams);
         } else {
             log.info("Defendant LR is not notified because it is not a CARM case.");
@@ -96,20 +98,42 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
         );
     }
 
+    public Map<String, String> addPropertiesNoAttendanceCARM(CaseData caseData, boolean isDefendant1) {
+        return Map.of(CLAIM_LEGAL_ORG_NAME_SPEC, isDefendant1 ? organisationDetailsService.getRespondent1LegalOrganisationName(caseData)
+                          : organisationDetailsService.getRespondent2LegalOrganisationName(caseData),
+                      CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
+        );
+    }
+
     private void sendEmail(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-
-        if (findMediationUnsuccessfulReason(caseData,
-                List.of(PARTY_WITHDRAWS, APPOINTMENT_NO_AGREEMENT, APPOINTMENT_NOT_ASSIGNED))) {
-            if (isRespondentSolicitor1Notification(callbackParams)) {
-                sendMailToDefendant1Solicitor(caseData);
-            } else {
-                sendMailToDefendant2Solicitor(caseData);
-            }
+        if (findMediationUnsuccessfulReason(caseData, List.of(NOT_CONTACTABLE_DEFENDANT_ONE))) {
+            sendNoAttendanceMailtoDefendant(callbackParams);
+        } else if (findMediationUnsuccessfulReason(caseData,
+                List.of(PARTY_WITHDRAWS, APPOINTMENT_NO_AGREEMENT, APPOINTMENT_NOT_ASSIGNED, NOT_CONTACTABLE_CLAIMANT_ONE))) {
+            sendGenericMailtoDefendant(callbackParams);
         }
     }
 
-    private void sendMailToDefendant1Solicitor(CaseData caseData) {
+    private void sendGenericMailtoDefendant(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (isRespondentSolicitor1Notification(callbackParams)) {
+            sendGenericMailToDefendant1Solicitor(caseData);
+        } else {
+            sendGenericMailToDefendant2Solicitor(caseData);
+        }
+    }
+
+    private void sendNoAttendanceMailtoDefendant(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        if (isRespondentSolicitor1Notification(callbackParams)) {
+            sendMailDefendant1NoAttendance(caseData);
+        } else {
+            sendMailDefendant2NoAttendance(caseData);
+        }
+    }
+
+    private void sendGenericMailToDefendant1Solicitor(CaseData caseData) {
         notificationService.sendMail(
             caseData.getRespondentSolicitor1EmailAddress(),
             notificationsProperties.getMediationUnsuccessfulLRTemplate(),
@@ -118,13 +142,29 @@ public class NotificationMediationUnsuccessfulDefendantLRHandler extends Callbac
         );
     }
 
-    private void sendMailToDefendant2Solicitor(CaseData caseData) {
+    private void sendGenericMailToDefendant2Solicitor(CaseData caseData) {
         notificationService.sendMail(
             caseData.getRespondentSolicitor2EmailAddress(),
             notificationsProperties.getMediationUnsuccessfulLRTemplate(),
             addPropertiesForDefendant2(caseData),
             String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR, caseData.getLegacyCaseReference())
         );
+    }
+
+    private void sendMailDefendant1NoAttendance(CaseData caseData) {
+        notificationService.sendMail(
+            caseData.getRespondentSolicitor1EmailAddress(),
+            notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate(),
+            addPropertiesNoAttendanceCARM(caseData, true),
+            String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_1_LR, caseData.getLegacyCaseReference()));
+    }
+
+    private void sendMailDefendant2NoAttendance(CaseData caseData) {
+        notificationService.sendMail(
+            caseData.getRespondentSolicitor2EmailAddress(),
+            notificationsProperties.getMediationUnsuccessfulNoAttendanceLRTemplate(),
+            addPropertiesNoAttendanceCARM(caseData, false),
+            String.format(LOG_MEDIATION_UNSUCCESSFUL_DEFENDANT_2_LR, caseData.getLegacyCaseReference()));
     }
 
     private boolean isRespondentSolicitor1Notification(CallbackParams callbackParams) {
