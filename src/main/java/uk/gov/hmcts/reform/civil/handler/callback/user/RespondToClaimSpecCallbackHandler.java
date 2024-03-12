@@ -1181,7 +1181,7 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
             .respondent1ClaimResponseTestForSpec(caseData.getRespondent1ClaimResponseTypeForSpec())
             .respondent2ClaimResponseTestForSpec(caseData.getRespondent2ClaimResponseTypeForSpec())
             .showConditionFlags(initialShowTags);
-        if (toggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+        if (toggleService.isCarmEnabledForCase(caseData)) {
             updatedCaseData.showCarmFields(YES);
         } else {
             updatedCaseData.showCarmFields(NO);
