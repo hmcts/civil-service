@@ -19,6 +19,8 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CLAIMANT1_HWF_DASHBOARD_NOTIFICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_ISSUE_HWF_PART_REMISSION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INVALID_HWF_REFERENCE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MORE_INFORMATION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
@@ -34,15 +36,14 @@ public class HwFDashboardNotificationsHandler extends CallbackHandler {
     public static final String TASK_ID = "Claimant1HwFDashboardNotification";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
-
     private final Map<CaseEvent, String> dashboardScenarios = Map.of(
         INVALID_HWF_REFERENCE, SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF.getScenario(),
         MORE_INFORMATION_HWF, SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED.getScenario(),
-        UPDATE_HELP_WITH_FEE_NUMBER, SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED.getScenario()
+        UPDATE_HELP_WITH_FEE_NUMBER, SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED.getScenario(),
+        PARTIAL_REMISSION_HWF_GRANTED, SCENARIO_AAA7_CLAIM_ISSUE_HWF_PART_REMISSION.getScenario()
     );
 
     @Override
-
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_SUBMIT), this::configureScenarioForHwfEvents
@@ -70,8 +71,6 @@ public class HwFDashboardNotificationsHandler extends CallbackHandler {
                                                   .build()
             );
         }
-
         return AboutToStartOrSubmitCallbackResponse.builder().build();
-
     }
 }
