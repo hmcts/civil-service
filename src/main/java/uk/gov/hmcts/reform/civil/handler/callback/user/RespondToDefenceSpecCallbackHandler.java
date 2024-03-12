@@ -471,7 +471,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
 
         // must always move to in mediation for small claims when claimant proceeds
         if (shouldMoveToInMediationState(
-            caseData, featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))) {
+            caseData, featureToggleService.isCarmEnabledForCase(caseData))) {
             response.state(CaseState.IN_MEDIATION.name());
         }
 
