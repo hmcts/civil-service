@@ -1,12 +1,16 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
-@lombok.Getter
+
+import lombok.Getter;
+
+@Getter
 public enum DashboardScenarios {
 
     SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_SUBMIT_REQUIRED("Scenario.AAA7.ClaimIssue.ClaimSubmit.Required"),
     SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_FEE_REQUIRED("Scenario.AAA7.ClaimIssue.ClaimFee.Required"),
     SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT("Scenario.AAA7.ClaimIssue.Response.Await"),
     SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_REQUIRED("Scenario.AAA7.ClaimIssue.Response.Required"),
+    SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING("Scenario.AAA7.ClaimantIntent.GoToHearing.Claimant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT("Scenario.AAA7.ClaimantIntent.PartAdmit.Defendant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT("Scenario.AAA7.ClaimantIntent.ClaimSettled.Defendant"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_REQUESTED("Scenario.AAA7.ClaimIssue.HWF.Requested"),
@@ -16,14 +20,19 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT(
         "Scenario.AAA7.ClaimantIntent.SettlementAgreement.ClaimantRejectsPlan.CourtAgreesWithClaimant.Defendant"
     ),
-    SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT("Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT(
         "Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.ClaimantConfirms.Defendant"
-    );
+    ),
+    SCENARIO_AAA7_CLAIM_ISSUE_HWF_PART_REMISSION("Scenario.AAA7.ClaimIssue.HWF.PartRemission"),
+    SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT("Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant");
 
     private final String scenario;
 
     DashboardScenarios(String scenario) {
         this.scenario = scenario;
+    }
+
+    public String getScenario() {
+        return scenario;
     }
 }
