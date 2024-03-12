@@ -918,20 +918,30 @@ public class CaseData extends CaseDataParent implements MappableObject {
     }
 
     @JsonIgnore
+    public boolean isRespondent2NotRepresented() {
+        return NO.equals(Stream.of(
+                respondent2Represented,
+                specRespondent2Represented
+            )
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null));
+    }
+
+    @JsonIgnore
     public boolean isApplicant1NotRepresented() {
         return NO.equals(getApplicant1Represented());
     }
 
     @JsonIgnore
     public boolean isLRvLipOneVOne() {
-        return isRespondent1NotRepresented()
+        return isRespondent1LiP()
             && !isApplicant1NotRepresented()
             && isOneVOne(this);
     }
 
     @JsonIgnore
     public boolean isLipvLipOneVOne() {
-        return isRespondent1NotRepresented()
+        return isRespondent1LiP()
             && isApplicant1NotRepresented()
             && isOneVOne(this);
     }
@@ -1373,5 +1383,27 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return Optional.ofNullable(getCaseDataLiP())
             .map(CaseDataLiP::getApplicant1LiPResponse)
             .filter(ClaimantLiPResponse::hasCourtDecisionInFavourOfClaimant).isPresent();
+    }
+
+    @JsonIgnore
+    public boolean claimIssueFeePaymentDoneWithHWF() {
+        return Objects.nonNull(getHelpWithFeesReferenceNumber())
+            && Objects.nonNull(getFeePaymentOutcomeDetails())
+            && Objects.nonNull(getFeePaymentOutcomeDetails().getHwfFullRemissionGrantedForClaimIssue());
+    }
+
+    @JsonIgnore
+    public boolean isLipvLROneVOne() {
+        return !isRespondent1LiP()
+            && isApplicant1NotRepresented()
+            && isOneVOne(this);
+    }
+
+    @JsonIgnore
+    public boolean nocApplyForLiPClaimant() {
+        return isLRvLipOneVOne()
+            && (getClaimIssuedPaymentDetails() == null
+            && (claimIssueFeePaymentDoneWithHWF()
+            || getChangeOfRepresentation() != null));
     }
 }
