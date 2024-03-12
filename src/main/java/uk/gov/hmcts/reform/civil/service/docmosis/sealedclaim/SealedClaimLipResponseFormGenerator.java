@@ -30,11 +30,11 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
 
     @Override
     public SealedClaimLipResponseForm getTemplateData(CaseData caseData) {
-        if (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())) {
+        if (featureToggleService.isCarmEnabledForCase(caseData)) {
             SealedClaimLipResponseForm.toTemplate(caseData);
             SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
                 SealedClaimLipResponseForm.toTemplate(caseData).toBuilder()
-                    .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate()))
+                    .checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
                     .defendant1MediationCompanyName(getDefendant1MediationCompanyName(caseData))
                     .defendant1MediationContactNumber(getDefendant1MediationContactNumber(caseData))
                     .defendant1MediationEmail(getDefendant1MediationEmail(caseData))
