@@ -92,7 +92,7 @@ public class ClaimantResponseUtils {
         return totalAmount.divide(paymentAmount, 0, RoundingMode.CEILING).longValue() - 1;
     }
 
-    public static BigDecimal getDefendantAdmittedAmount(CaseData caseData) {
+    private static BigDecimal getDefendantAdmittedAmount(CaseData caseData) {
         if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_ADMISSION) {
             return caseData.getTotalClaimAmount();
         } else {
