@@ -48,6 +48,7 @@ public class DashboardScenariosService {
     public void recordScenarios(String authorisation, String scenarioReference,
                                 String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams) {
 
+        Iterable<ScenarioEntity> scenarioBfyName = scenarioRepository.findAll();
         Optional<ScenarioEntity> scenarioByName = scenarioRepository.findByName(scenarioReference);
         scenarioByName.ifPresent(scenario -> {
 
