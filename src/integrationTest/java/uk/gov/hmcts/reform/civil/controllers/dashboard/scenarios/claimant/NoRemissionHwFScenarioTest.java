@@ -43,9 +43,9 @@ public class NoRemissionHwFScenarioTest extends BaseIntegrationTest {
                 jsonPath("$[0].titleEn")
                     .value("Your help with fees application has been rejected"),
                 jsonPath("$[0].descriptionEn").value(
-                    "We've rejected your application for help with the claim fee. See the email for "
-                        + "further details. You'll need to pay the full fee of "
-                        + claimFee + " . You can pay by phone by calling {civilMoneyClaimsTelephone}.")
+                    "<p class=\"govuk-body\">We've rejected your application for help with the claim fee. See the email for "
+                        + "further details.</p><p class=\"govuk-body\">You'll need to pay the full fee of "
+                        + claimFee + " . You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
             );
 
     }
