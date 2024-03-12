@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.service.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
-
 @Service
 @RequiredArgsConstructor
 public class SettlementNoResponseFromDefendantEventHandler {
