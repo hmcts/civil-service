@@ -77,22 +77,13 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
 
         private static Stream<Arguments> provideCaseStateAndScenarioArguments() {
             return Stream.of(
-<<<<<<< HEAD
                 Arguments.of(CaseState.JUDICIAL_REFERRAL, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING),
                 Arguments.of(CaseState.CASE_SETTLED, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT)
-=======
-                Arguments.of(CaseState.JUDICIAL_REFERRAL, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING)
->>>>>>> team2b
-
             );
         }
 
         @Test
-<<<<<<< HEAD
-        void shouldNotRecordScenario_whenInvokedNotInJudicialReferralStatey() {
-=======
         void shouldNotRecordScenario_whenInvokedNotInJudicialReferralState() {
->>>>>>> team2b
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -106,7 +97,6 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             verifyNoInteractions(dashboardApiClient);
         }
 
-<<<<<<< HEAD
         @Test
         void shouldNotRecordScenario_whenInvokedWhenCaseStateIsNotClaimSettled() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
@@ -125,8 +115,4 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
 
     }
 }
-=======
-    }
-}
 
->>>>>>> team2b
