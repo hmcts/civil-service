@@ -44,6 +44,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SD
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
@@ -783,6 +784,75 @@ public class CaseDataTest {
         BigDecimal fee = caseData.getCalculatedClaimFeeInPence();
         //Then
         assertThat(fee).isEqualTo(ZERO);
+    }
+
+    @Test
+    void shouldReturnTrue_whenRespondent2NotRespresentedUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(NO)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void shouldReturnTrue_whenRespondent2NotRespresentedSpec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .specRespondent2Represented(NO)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .respondent2Represented(YES)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedSpec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .specRespondent2Represented(YES)
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedNullUnspec() {
+        //Given
+        CaseData caseData = CaseData.builder()
+            .build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void shouldReturnFalse_whenRespondent2RespresentedNullSpec() {
+        //Given
+        CaseData caseData = CaseData.builder().build();
+        //When
+        boolean actual = caseData.isRespondent2NotRepresented();
+        //Then
+        assertThat(actual).isFalse();
     }
 
     @Nested

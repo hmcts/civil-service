@@ -375,6 +375,8 @@ notifications:
   notifyApplicantForHwfFeePaymentOutcome: "0abdcb29-edd3-418a-aeab-a102da4ad441"
   notifyApplicantForHwfFeePaymentOutcomeInBilingual: "ca84e76e-f178-4c63-9eca-96b491cc538c"
 
+  notifyDefendantLRForMediation: "feec8506-6d60-4715-8f48-43ded5d24d97"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
