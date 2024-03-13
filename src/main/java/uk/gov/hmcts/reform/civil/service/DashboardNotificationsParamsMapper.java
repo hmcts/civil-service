@@ -45,8 +45,10 @@ public class DashboardNotificationsParamsMapper {
             );
         }
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
-            params.put("respondent1ResponseDeadline",
-                       DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate()));
+            params.put(
+                "respondent1ResponseDeadline",
+                DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            );
         }
         if (caseData.getClaimIssueRemissionAmount() != null) {
             params.put(
@@ -75,8 +77,11 @@ public class DashboardNotificationsParamsMapper {
     }
 
     private String getRespondToSettlementAgreementDeadline(CaseData caseData) {
-        return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline().toLocalDate())
-            .map(DateUtils::formatDate).orElse(null);
+        if (nonNull(caseData.getRespondent1RespondToSettlementAgreementDeadline())) {
+            return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline().toLocalDate())
+                .map(DateUtils::formatDate).orElse(null);
+        }
+        return null;
     }
 
     private String getClaimSettledAmount(CaseData caseData) {
