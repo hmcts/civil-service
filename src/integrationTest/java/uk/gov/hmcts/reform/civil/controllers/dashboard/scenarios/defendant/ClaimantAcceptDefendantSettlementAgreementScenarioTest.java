@@ -1,18 +1,23 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.defendant;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
+
 import java.util.Map;
 import java.util.UUID;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT;
+
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends BaseIntegrationTest {
+
     @Test
     void should_create_scenario_for_claimant_accept_defendant_plan_settlement_agreement() throws Exception {
         UUID caseId = UUID.randomUUID();
@@ -20,7 +25,8 @@ public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends Base
             BEARER_TOKEN,
             ScenarioRequestParams.builder()
                 .params(Map.of("respondent1SettlementAgreementDeadline_En", "16 March 2024",
-                               "respondent1SettlementAgreementDeadline_Cy", "16 March 2024"))
+                               "respondent1SettlementAgreementDeadline_Cy", "16 March 2024"
+                ))
                 .build(),
             DASHBOARD_CREATE_SCENARIO_URL,
             SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT.getScenario(),
