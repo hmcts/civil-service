@@ -76,11 +76,8 @@ public class DashboardNotificationsParamsMapper {
     }
 
     private String getRespondToSettlementAgreementDeadline(CaseData caseData) {
-        if (nonNull(caseData.getRespondent1RespondToSettlementAgreementDeadline())) {
-            return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline().toLocalDate())
-                .map(DateUtils::formatDate).orElse(null);
-        }
-        return null;
+        return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
+            .map(DateUtils::formatDate).orElse(null);
     }
 
     private String getClaimSettledAmount(CaseData caseData) {
