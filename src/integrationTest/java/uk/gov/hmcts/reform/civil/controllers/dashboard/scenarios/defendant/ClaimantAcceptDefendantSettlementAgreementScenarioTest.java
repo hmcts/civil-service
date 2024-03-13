@@ -14,19 +14,11 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends BaseIntegrationTest {
-
-    private static final String DASHBOARD_CREATE_SCENARIO_URL
-        = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
-    private static final String GET_NOTIFICATIONS_URL
-        = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
-    private static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
-
-    @MockBean
-    private OffsetDateTime time;
 
     @Test
     void should_create_scenario_for_claimant_accept_defendant_plan_settlement_agreement() throws Exception {
@@ -36,11 +28,11 @@ public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends Base
         doPost(
             BEARER_TOKEN,
             ScenarioRequestParams.builder()
-                .params(Map.of("respondent1SettlementAgreementDeadline_En", "16 March 2024"))
-                .params(Map.of("respondent1SettlementAgreementDeadline_Cy", "16 March 2024"))
+                .params(Map.of("respondent1SettlementAgreementDeadline_En", "16 March 2024",
+                               "respondent1SettlementAgreementDeadline_Cy", "16 March 2024"))
                 .build(),
             DASHBOARD_CREATE_SCENARIO_URL,
-            "Scenario.AAA7.ClaimantIntent.SettlementAgreement.ClaimantAcceptsPlan.Defendant",
+            SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_ACCEPTS_DEFENDANT.getScenario(),
             caseId
         )
             .andExpect(status().isOk());
