@@ -145,7 +145,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
             @ParameterizedTest
             @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS",
-                "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_DEFENDANT_ONE"})
+                "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_DEFENDANT_ONE",
+                "NOT_CONTACTABLE_DEFENDANT_TWO"})
             void shouldSendNotificationToClaimantLr_whenEventIsCalled(MediationUnsuccessfulReason reason) {
                 //Given
                 CaseData caseData = CaseData.builder()
@@ -176,7 +177,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
             @ParameterizedTest
             @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS",
-                "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_DEFENDANT_ONE"})
+                "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_DEFENDANT_ONE",
+                "NOT_CONTACTABLE_DEFENDANT_TWO"})
             void shouldSendNotificationToClaimantLr_1v2SS_whenEventIsCalled(MediationUnsuccessfulReason reason) {
                 //Given
                 CaseData caseData = CaseData.builder()
@@ -209,7 +211,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
             @ParameterizedTest
             @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS",
-                "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_DEFENDANT_ONE"})
+                "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_DEFENDANT_ONE",
+                "NOT_CONTACTABLE_DEFENDANT_TWO"})
             void shouldSendNotificationToClaimantLr_1v2DS_whenEventIsCalled(MediationUnsuccessfulReason reason) {
                 //Given
                 CaseData caseData = CaseData.builder()
@@ -242,7 +245,8 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
 
             @ParameterizedTest
             @EnumSource(value = MediationUnsuccessfulReason.class, names = {"PARTY_WITHDRAWS",
-                "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_DEFENDANT_ONE"})
+                "APPOINTMENT_NO_AGREEMENT", "APPOINTMENT_NOT_ASSIGNED", "NOT_CONTACTABLE_DEFENDANT_ONE",
+                "NOT_CONTACTABLE_DEFENDANT_TWO"})
             void shouldSendNotificationToClaimantLIP_1v1_whenEventIsCalled(MediationUnsuccessfulReason reason) {
                 //Given
                 CaseData caseData = CaseData.builder()
@@ -273,7 +277,7 @@ class NotificationMediationUnsuccessfulClaimantLRHandlerTest extends BaseCallbac
             }
 
             @ParameterizedTest
-            @EnumSource(value = MediationUnsuccessfulReason.class, names = {"NOT_CONTACTABLE_CLAIMANT_ONE"})
+            @EnumSource(value = MediationUnsuccessfulReason.class, names = {"NOT_CONTACTABLE_CLAIMANT_ONE", "NOT_CONTACTABLE_CLAIMANT_TWO"})
             void shouldSendNotificationToClaimantLR_NoAttendance_whenEventIsCalled(MediationUnsuccessfulReason reason) {
                 //Given
                 CaseData caseData = CaseData.builder()
