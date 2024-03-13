@@ -107,10 +107,6 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
 
-            Map<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("claimSettledAmount", "500");
-            scenarioParams.put("claimSettledDate", "12/01/2024");
-
             handler.handle(params);
 
             verifyNoInteractions(dashboardApiClient);
