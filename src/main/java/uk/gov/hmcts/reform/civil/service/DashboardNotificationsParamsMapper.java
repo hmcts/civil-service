@@ -66,6 +66,9 @@ public class DashboardNotificationsParamsMapper {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
 
+        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
+        params.put("claimSettledDate", getClaimSettleDate(caseData));
+        params.put("respondSettlementAgreementDeadline", getRespondToSettlementAgreementDeadline(caseData));
         return params;
     }
 
@@ -90,5 +93,10 @@ public class DashboardNotificationsParamsMapper {
         }
 
         return respondToClaim;
+    }
+
+    private String getRespondToSettlementAgreementDeadline(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
+            .map(DateUtils::formatDate).orElse(null);
     }
 }
