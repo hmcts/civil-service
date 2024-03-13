@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
-import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Map;
