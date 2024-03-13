@@ -21,7 +21,7 @@ public class DateUtils {
         return date.format(formatter);
     }
 
-    public static String formatDateInWelsh(LocalDateTime date) {
+    public static String formatDateInWelsh(LocalDate date) {
         String month = MonthNamesWelsh.getWelshNameByValue(date.getMonth().getValue());
         String welshDate = date.getDayOfMonth() + " " + month + " " + date.getYear();
 

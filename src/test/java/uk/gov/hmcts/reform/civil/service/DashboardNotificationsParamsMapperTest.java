@@ -57,12 +57,12 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn")
             .isEqualTo(DateUtils.formatDate(date));
         assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy")
-            .isEqualTo(DateUtils.formatDate(date));
+            .isEqualTo(DateUtils.formatDateInWelsh(date));
 
         assertThat(result).extracting("respondent1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1ResponseDeadlineCy")
-            .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
+            .isEqualTo(DateUtils.formatDateInWelsh(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1PartyName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
         assertThat(result).extracting("typeOfFee")

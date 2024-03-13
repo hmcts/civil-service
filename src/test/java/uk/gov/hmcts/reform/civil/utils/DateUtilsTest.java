@@ -19,7 +19,7 @@ public class DateUtilsTest {
 
     @Test
     public void testFormatDateInWelsh() {
-        LocalDateTime date = LocalDateTime.of(2022, 7, 28, 9, 00, 00);
+        LocalDate date = LocalDate.of(2022, 7, 28);
         String dateFormatted = DateUtils.formatDateInWelsh(date);
 
         Assertions.assertEquals("28 Gorffennaf 2022", dateFormatted);

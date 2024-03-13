@@ -35,7 +35,8 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
             params.put("defendantAdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
-            params.put("defendantAdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put("defendantAdmittedAmountPaymentDeadlineCy",
+                       DateUtils.formatDateInWelsh(whenWillThisAmountBePaid));
         }
         if (nonNull(caseData.getClaimFee())) {
             params.put(
@@ -47,7 +48,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             LocalDate responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
             params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(responseDeadline));
-            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
+            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDateInWelsh(responseDeadline));
         }
         if (caseData.getClaimIssueRemissionAmount() != null) {
             params.put(
