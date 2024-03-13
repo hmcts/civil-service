@@ -57,18 +57,23 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
 
     private CallbackResponse clearAllFields(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        caseData.setJoOrderMadeDate(null);
-        caseData.setJoJudgmentStatusDetails(null);
-        caseData.setJoPaymentPlanSelection(null);
-        caseData.setJoJudgmentInstalmentDetails(null);
-        caseData.setJoJudgmentRecordReason(null);
-        caseData.setJoAmountOrdered(null);
-        caseData.setJoAmountCostOrdered(null);
-        caseData.setJoIsRegisteredWithRTL(null);
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        return AboutToStartOrSubmitCallbackResponse.builder()
+        // If first time (IsLiveJudgmentExists = null) do not clear them
+        if (caseData.getJoIsLiveJudgmentExists() != null) {
+            caseData.setJoOrderMadeDate(null);
+            caseData.setJoJudgmentStatusDetails(null);
+            caseData.setJoPaymentPlanSelection(null);
+            caseData.setJoJudgmentInstalmentDetails(null);
+            caseData.setJoJudgmentRecordReason(null);
+            caseData.setJoAmountOrdered(null);
+            caseData.setJoAmountCostOrdered(null);
+            caseData.setJoIsRegisteredWithRTL(null);
+            caseData.setJoIssuedDate(null);
+            CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
+        }
+        return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
@@ -85,6 +90,7 @@ public class RecordJudgmentCallbackHandler extends CallbackHandler {
             .lastUpdatedDate(LocalDateTime.now()).build();
         if (caseData.getJoIsRegisteredWithRTL() == YesOrNo.YES) {
             judgmentStatusDetails.setJoRtlState(JudgmentsOnlineHelper.getRTLStatusBasedOnJudgementStatus(JudgmentStatusType.ISSUED));
+            caseData.setJoIssuedDate(caseData.getJoOrderMadeDate());
         }
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         caseData.setJoIsLiveJudgmentExists(YesOrNo.YES);
