@@ -28,7 +28,8 @@ public class DashboardNotificationsParamsMapper {
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
-            params.put("defendantAdmittedAmount", formatAmount(getDefendantAdmittedAmount(caseData)));
+            params.put("defendantAdmittedAmount",
+                       this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData))));
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
@@ -38,7 +39,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
-                "£" + caseData.getClaimFee().toPounds().stripTrailingZeros().toPlainString()
+                "£" + this.removeDoubleZeros(caseData.getClaimFee().toPounds().toPlainString())
             );
         }
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
@@ -47,16 +48,15 @@ public class DashboardNotificationsParamsMapper {
             params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
         }
         if (caseData.getClaimIssueRemissionAmount() != null) {
-            params.put(
-                "claimIssueRemissionAmount",
-                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimIssueRemissionAmount()).stripTrailingZeros()
-                    .toPlainString()
+            params.put("claimIssueRemissionAmount",
+                "£" + this.removeDoubleZeros(MonetaryConversions
+                                                 .penniesToPounds(caseData.getClaimIssueRemissionAmount()).toPlainString())
             );
         }
         if (caseData.getOutstandingFeeInPounds() != null) {
             params.put(
                 "claimIssueOutStandingAmount",
-                "£" + caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
+                "£" + this.removeDoubleZeros(caseData.getOutstandingFeeInPounds().toPlainString())
             );
         }
 
@@ -79,9 +79,13 @@ public class DashboardNotificationsParamsMapper {
             .map(RespondToClaim::getHowMuchWasPaid)
             .map(MonetaryConversions::penniesToPounds)
             .map(amount -> amount.setScale(2))
-            .map(BigDecimal::stripTrailingZeros)
             .map(BigDecimal::toPlainString)
+            .map(this::removeDoubleZeros)
             .map(amount -> "£" + amount);
+    }
+
+    private String removeDoubleZeros(String input) {
+        return input.replace(".00", "");
     }
 
     private Optional<String> getClaimSettleDate(CaseData caseData) {

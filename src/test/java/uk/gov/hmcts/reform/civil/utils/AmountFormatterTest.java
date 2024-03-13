@@ -19,10 +19,4 @@ public class AmountFormatterTest {
         String amount = AmountFormatter.formatAmount(BigDecimal.valueOf(100.5));
         assertEquals("100.50", amount);
     }
-
-    @Test
-    public void testFormatAmountWithTwoZerosDecimals() {
-        String amount = AmountFormatter.formatAmount(BigDecimal.valueOf(100.00));
-        assertEquals("100", amount);
-    }
 }
