@@ -101,10 +101,6 @@ public class FeatureToggleService {
     }
 
     public boolean isCarmEnabledForCase(CaseData caseData) {
-        ZoneId zoneId = ZoneId.systemDefault();
-        long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
-        boolean isSpecClaim = SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
-        return isSpecClaim && false
-                     && false;
+        return false;
     }
 }
