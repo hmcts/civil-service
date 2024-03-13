@@ -45,10 +45,9 @@ public class DashboardNotificationsParamsMapper {
             );
         }
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
-            params.put(
-                "respondent1ResponseDeadline",
-                DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            );
+            LocalDate responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
+            params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(responseDeadline));
+            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
         }
         if (caseData.getClaimIssueRemissionAmount() != null) {
             params.put(
