@@ -50,17 +50,17 @@ public class PaymentRequestUpdateCallbackService {
             CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(serviceRequestUpdateDto
                                                                                    .getCcdCaseNumber()));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
-            log.info("Fee Type :::::::::" + feeType);
             if (feeType.equals(FeeType.HEARING.name()) || feeType.equals(FeeType.CLAIMISSUED.name())) {
                 if (caseData.isLipvLipOneVOne()) {
                     if ((feeType.equals(FeeType.HEARING.name()) && caseData.getHearingFeePaymentDetails() == null)
                         || (feeType.equals(FeeType.CLAIMISSUED.name()) && caseData.getClaimIssuedPaymentDetails() == null)) {
-                        updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
+                        caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                         CardPaymentStatusResponse cardPaymentStatusResponse = getCardPaymentStatusResponse(serviceRequestUpdateDto);
                         updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType), serviceRequestUpdateDto.getCcdCaseNumber(), cardPaymentStatusResponse);
                     }
                 } else {
-                    updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
+                    caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
+                    log.info("PaymentStatus : "+caseData.getClaimIssuedPaymentDetails().getStatus().name());
                     createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
 
                 }
