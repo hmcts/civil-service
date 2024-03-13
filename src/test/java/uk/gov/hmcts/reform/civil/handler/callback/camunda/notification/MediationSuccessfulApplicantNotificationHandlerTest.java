@@ -65,13 +65,9 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         @BeforeEach
         void setup() {
             when(notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate()).thenReturn(TEMPLATE_ID);
-            //when(notificationsProperties.getNotifyLrVLrClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            //when(notificationsProperties.getNotifyLrVLrTwoVOneClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            //when(notificationsProperties.getNotifyLrVLrOneVTwoSameSolicitorClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            //when(notificationsProperties.getNotifyLrVLrOneVTwoDifferentSolicitorsClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            //when(notificationsProperties.getNotifyLrVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            //when(notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            //when(notificationsProperties.getNotifyLipVLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLrClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
         }
 
@@ -111,7 +107,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                lrVLrClaimantProperties(caseData),
+                lrClaimantProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
             );
         }
@@ -132,7 +128,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                lrVLrSameSolicitorProperties(caseData),
+                OneVTwoProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
             );
         }
@@ -153,7 +149,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                lrVLrDifferentSolicitorProperties(caseData),
+                OneVTwoProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
             );
         }
@@ -175,7 +171,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                twoVOneClaimantProperties(caseData),
+                lrClaimantProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
             );
         }
@@ -196,7 +192,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                lrVLipClaimantProperties(caseData),
+                lrClaimantProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
             );
         }
@@ -218,7 +214,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 TEMPLATE_ID,
-                lipVLipClaimantProperties(caseData),
+                lipClaimantProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
             );
         }
@@ -234,7 +230,16 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
 
     }
 
-    public Map<String, String> lrVLrSameSolicitorProperties(CaseData caseData) {
+    public Map<String, String> lrClaimantProperties(CaseData caseData) {
+
+        return Map.of(
+            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
+            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
+            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
+        );
+    }
+
+    public Map<String, String> OneVTwoProperties(CaseData caseData) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
@@ -243,41 +248,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         );
     }
 
-    public Map<String, String> lrVLrClaimantProperties(CaseData caseData) {
-
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-        );
-    }
-
-    public Map<String, String> lrVLrDifferentSolicitorProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            DEFENDANT_NAME_ONE, getPartyNameBasedOnType(caseData.getRespondent1()),
-            DEFENDANT_NAME_TWO, getPartyNameBasedOnType(caseData.getRespondent2())
-        );
-    }
-
-    public Map<String, String> twoVOneClaimantProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-        );
-    }
-
-    public Map<String, String> lrVLipClaimantProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, caseData.getApplicant1().getPartyName(),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1())
-        );
-    }
-
-    public Map<String, String> lipVLipClaimantProperties(CaseData caseData) {
+    public Map<String, String> lipClaimantProperties(CaseData caseData) {
         return Map.of(
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()

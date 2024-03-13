@@ -28,7 +28,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 
 @Service
 @RequiredArgsConstructor
-public class MediationSuccessfulRespondentNotificationLRHandler extends CallbackHandler implements NotificationData {
+public class MediationSuccessfulRespondentNotificationHandler extends CallbackHandler implements NotificationData {
 
     private final OrganisationDetailsService organisationDetailsService;
     private final NotificationService notificationService;
@@ -42,9 +42,9 @@ public class MediationSuccessfulRespondentNotificationLRHandler extends Callback
     );
 
     private static final String REFERENCE_TEMPLATE = "mediation-successful-respondent-notification-%s";
-    private static final String LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LIP = "notification-mediation-unsuccessful-defendant-LIP-%s";
-    private static final String LOG_MEDIATION_SUCCESSFUL_DEFENDANT_1_LR = "notification-mediation-unsuccessful-defendant-1-LR-%s";
-    private static final String LOG_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR = "notification-mediation-unsuccessful-defendant-2-LR-%s";
+    private static final String LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LIP = "notification-mediation-successful-defendant-LIP-%s";
+    private static final String LOG_MEDIATION_SUCCESSFUL_DEFENDANT_TWO_V_ONE_LR = "notification-mediation-successful-defendant-2v1-LR-%s";
+    private static final String LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LR = "notification-mediation-successful-defendant-LR-%s";
     private static final String TASK_ID_MEDIATION_SUCCESSFUL_DEFENDANT_LIP = "SendMediationSuccessfulDefendantLip";
     private static final String TASK_ID_MEDIATION_SUCCESSFUL_DEFENDANT_1_LR = "SendMediationSuccessfulDefendant1LR";
     private static final String TASK_ID_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR = "SendMediationSuccessfulDefendant2LR";
@@ -70,11 +70,10 @@ public class MediationSuccessfulRespondentNotificationLRHandler extends Callback
 
     private CallbackResponse notifyRespondent(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Boolean isCarmEnabled = featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate());
-        String claimId = caseData.getCcdCaseReference().toString();
+        Boolean isCarmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         if (isCarmEnabled) {
-            String defendantEmailLR =  caseData.getRespondent1Email();
             MultiPartyScenario scenario = getMultiPartyScenario(caseData);
+            String claimId = caseData.getCcdCaseReference().toString();
             // LIP
             if (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()) {
                 String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LIP, claimId);
@@ -86,24 +85,26 @@ public class MediationSuccessfulRespondentNotificationLRHandler extends Callback
             } else
                 // 2V1
                 if (scenario.equals(TWO_V_ONE)) {
-                    String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_1_LR, claimId);
+                    String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_TWO_V_ONE_LR, claimId);
                     sendEmail(
-                        defendantEmailLR,
+                        caseData.getRespondentSolicitor1EmailAddress(),
                         notificationsProperties.getNotifyTwoVOneDefendantSuccessfulMediation(),
                         twoVOneDefendantProperties(caseData),
                         referenceTemplate);
                 } else {
                     // LR scenarios
-                    String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR, claimId);
+                    String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LR, claimId);
                     sendEmail(
-                        defendantEmailLR,
+                        isRespondentSolicitor1Notification(callbackParams)?
+                            caseData.getRespondentSolicitor1EmailAddress() :
+                            caseData.getRespondentSolicitor2EmailAddress(),
                         notificationsProperties.getNotifyLrDefendantSuccessfulMediation(),
                         lrDefendantProperties(caseData),
                         referenceTemplate);
                 }
         } else {
             if (caseData.isRespondent1NotRepresented() && caseData.getRespondent1().getPartyEmail() != null) {
-                String referenceTemplate = String.format(REFERENCE_TEMPLATE, claimId);
+                String referenceTemplate = String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
                 notificationService.sendMail(
                     caseData.getRespondent1().getPartyEmail(),
                     addTemplate(caseData),
@@ -118,7 +119,7 @@ public class MediationSuccessfulRespondentNotificationLRHandler extends Callback
 
     private void sendEmail(String targetEmail, String emailTemplate, Map<String, String> properties, String referenceTemplate) {
         notificationService.sendMail(
-            "leonardo.palmeiro@hmcts.net",
+            targetEmail,
             emailTemplate,
             properties,
             referenceTemplate

@@ -54,7 +54,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
 
     private CallbackResponse notifyApplicant(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        Boolean isCarmEnabled = featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate());
+        Boolean isCarmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         if (isCarmEnabled) {
             String claimId = caseData.getCcdCaseReference().toString();
             String referenceTemplate = String.format(REFERENCE_TEMPLATE, claimId);
@@ -100,7 +100,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
 
     private void sendEmail(String targetEmail, String emailTemplate, Map<String, String> properties, String referenceTemplate) {
         notificationService.sendMail(
-            "leonardo.palmeiro@hmcts.net",
+            targetEmail,
             emailTemplate,
             properties,
             referenceTemplate

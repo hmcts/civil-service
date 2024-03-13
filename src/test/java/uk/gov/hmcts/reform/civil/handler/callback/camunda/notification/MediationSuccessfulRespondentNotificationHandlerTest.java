@@ -33,6 +33,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
@@ -43,10 +46,10 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
-    MediationSuccessfulRespondentNotificationLRHandler.class,
+    MediationSuccessfulRespondentNotificationHandler.class,
     JacksonAutoConfiguration.class
 })
-class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbackHandlerTest {
+class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private NotificationService notificationService;
@@ -57,11 +60,13 @@ class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbac
     @MockBean
     private FeatureToggleService featureToggleService;
     @Autowired
-    private MediationSuccessfulRespondentNotificationLRHandler handler;
+    private MediationSuccessfulRespondentNotificationHandler handler;
 
     public static final String TEMPLATE_ID = "template-id";
     public static final String RESPONDENT_MAIL = "respondentsolicitor@example.com";
-    public static final String MEDIATION_SUCCESSFUL_RESPONDENT_NOTIFICATION_1594901956117591 = "mediation-successful-respondent-notification-1594901956117591";
+    public static final String MEDIATION_SUCCESSFUL_RESPONDENT_LIP_NOTIFICATION_1594901956117591 = "notification-mediation-successful-defendant-LIP-1594901956117591";
+    public static final String MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION_1594901956117591 = "notification-mediation-successful-defendant-LR-1594901956117591";
+    public static final String MEDIATION_SUCCESSFUL_RESPONDENT_2V1_NOTIFICATION_1594901956117591 = "notification-mediation-successful-defendant-2v1-LR-1594901956117591";
     public static final String NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL = "NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL";
 
     @Nested
@@ -72,12 +77,9 @@ class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbac
         void setup() {
             given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplate()).willReturn(TEMPLATE_ID);
             given(notificationsProperties.getNotifyRespondentLiPMediationSuccessfulTemplateWelsh()).willReturn("template-id-welsh");
-            when(notificationsProperties.getNotifyLrVLrDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLrVLrOneVTwoSameSolicitorDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLrVLrOneVTwoDifferentSolicitorsDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLrVLrTwoVOneDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLrVLipDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLipVLipDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyTwoVOneDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLrDefendantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(organisationDetailsService.getRespondent1LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
             when(organisationDetailsService.getRespondent2LegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
         }
@@ -195,29 +197,33 @@ class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbac
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_ONE)
                 .setClaimTypeToSpecClaim()
                 .build();
-            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL)
-                    .build()).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(
+                    CallbackRequest
+                        .builder()
+                        .eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
+                    .build())
+                .build();
             //When
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
                 RESPONDENT_MAIL,
                 TEMPLATE_ID,
-                lrVLrDefendantProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_NOTIFICATION_1594901956117591
+                lrDefendantProperties(caseData),
+                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION_1594901956117591
             );
         }
 
         @Test
-        void shouldNotifyClaimantCarmLRvLRSameSolicitorNotifyApplicant_whenInvoked() {
+        void shouldNotifyClaimantCarm1V2SameSolicitorNotifyApplicant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL)
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
                     .build()).build();
             //When
             handler.handle(params);
@@ -225,20 +231,20 @@ class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbac
             verify(notificationService).sendMail(
                 RESPONDENT_MAIL,
                 TEMPLATE_ID,
-                lrVLrSameSolicitorProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_NOTIFICATION_1594901956117591
+                lrDefendantProperties(caseData),
+                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION_1594901956117591
             );
         }
 
         @Test
-        void shouldNotifyClaimantCarmLRvLRdifferentSolicitorNotifyApplicant_whenInvoked() {
+        void shouldNotifyClaimantCarm1V2DifferentSolicitorNotifyApplicant_whenInvoked() {
             //Given
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL)
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_MEDIATION_SUCCESSFUL.name())
                     .build()).build();
             //When
             handler.handle(params);
@@ -246,14 +252,28 @@ class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbac
             verify(notificationService).sendMail(
                 RESPONDENT_MAIL,
                 TEMPLATE_ID,
-                lrVLrDifferentSolicitorRespondent1Properties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_NOTIFICATION_1594901956117591
+                lrDefendantProperties(caseData),
+                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION_1594901956117591
             );
+        }
+        @Test
+        void shouldNotifyClaimantCarm1V2DifferentSolicitorNotifyApplicantEmailSecondDefendant_whenInvoked() {
+            //Given
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP)
+                .setClaimTypeToSpecClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR.name())
+                    .build()).build();
+            //When
+            handler.handle(params);
+            //Then
             verify(notificationService).sendMail(
-                RESPONDENT_MAIL,
+                "respondentsolicitor2@example.com",
                 TEMPLATE_ID,
-                lrVLrDifferentSolicitorRespondent2Properties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_NOTIFICATION_1594901956117591
+                lrDefendantProperties(caseData),
+                MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION_1594901956117591
             );
         }
 
@@ -275,7 +295,7 @@ class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbac
                 RESPONDENT_MAIL,
                 TEMPLATE_ID,
                 twoVOneDefendantProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_NOTIFICATION_1594901956117591
+                MEDIATION_SUCCESSFUL_RESPONDENT_2V1_NOTIFICATION_1594901956117591
             );
         }
 
@@ -287,16 +307,16 @@ class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbac
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL)
+                CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_2_LR.name())
                     .build()).build();
             //When
             handler.handle(params);
             //Then
             verify(notificationService).sendMail(
-                RESPONDENT_MAIL,
+                "sole.trader@email.com",
                 TEMPLATE_ID,
-                lrVLipDefendantProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_NOTIFICATION_1594901956117591
+                lipDefendantProperties(caseData),
+                MEDIATION_SUCCESSFUL_RESPONDENT_LIP_NOTIFICATION_1594901956117591
             );
         }
 
@@ -309,7 +329,7 @@ class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbac
                 .setClaimTypeToSpecClaim()
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
-                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_MEDIATION_SUCCESSFUL)
+                CallbackRequest.builder().eventId(NOTIFY_MEDIATION_SUCCESSFUL_DEFENDANT_LIP.name())
                     .build()).build();
             //When
             handler.handle(params);
@@ -317,8 +337,8 @@ class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbac
             verify(notificationService).sendMail(
                 "sole.trader@email.com",
                 TEMPLATE_ID,
-                lipVLipDefendantProperties(caseData),
-                MEDIATION_SUCCESSFUL_RESPONDENT_NOTIFICATION_1594901956117591
+                lipDefendantProperties(caseData),
+                MEDIATION_SUCCESSFUL_RESPONDENT_LIP_NOTIFICATION_1594901956117591
             );
         }
 
@@ -333,34 +353,10 @@ class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbac
 
     }
 
-    public Map<String, String> lrVLrDefendantProperties(CaseData caseData) {
+    public Map<String, String> lrDefendantProperties(CaseData caseData) {
 
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
-        );
-    }
-
-    public Map<String, String> lrVLrSameSolicitorProperties(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
-        );
-    }
-
-    public Map<String, String> lrVLrDifferentSolicitorRespondent1Properties(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent1LegalOrganisationName(caseData),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
-        );
-    }
-
-    public Map<String, String> lrVLrDifferentSolicitorRespondent2Properties(CaseData caseData) {
-        return Map.of(
-            CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getRespondent2LegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
             CLAIMANT_NAME, caseData.getApplicant1().getPartyName()
         );
@@ -375,14 +371,7 @@ class MediationSuccessfulRespondentNotificationLRHandlerTest extends BaseCallbac
         );
     }
 
-    public Map<String, String> lrVLipDefendantProperties(CaseData caseData) {
-        return Map.of(
-            DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
-            CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
-        );
-    }
-
-    public Map<String, String> lipVLipDefendantProperties(CaseData caseData) {
+    public Map<String, String> lipDefendantProperties(CaseData caseData) {
         return Map.of(
             DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
