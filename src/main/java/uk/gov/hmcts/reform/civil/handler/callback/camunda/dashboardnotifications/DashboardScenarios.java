@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
-
-
 import lombok.Getter;
-
 
 public enum DashboardScenarios {
 
@@ -11,6 +8,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_AWAIT("Scenario.AAA7.ClaimIssue.Response.Await"),
     SCENARIO_AAA7_CLAIM_ISSUE_RESPONSE_REQUIRED("Scenario.AAA7.ClaimIssue.Response.Required"),
     SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING("Scenario.AAA7.ClaimantIntent.GoToHearing.Claimant"),
+    SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT("Scenario.AAA7.ClaimantIntent.ClaimSettled.Claimant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT("Scenario.AAA7.ClaimantIntent.PartAdmit.Defendant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT("Scenario.AAA7.ClaimantIntent.ClaimSettled.Defendant"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_REQUESTED("Scenario.AAA7.ClaimIssue.HWF.Requested"),
@@ -19,6 +17,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED("Scenario.AAA7.ClaimIssue.HWF.Updated"),
     SCENARIO_AAA7_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT("Scenario.AAA7.ClaimantIntent.FullAdmit.Claimant"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_PART_REMISSION("Scenario.AAA7.ClaimIssue.HWF.PartRemission"),
+    SCENARIO_AAA7_CLAIM_ISSUE_HWF_NO_REMISSION("Scenario.AAA7.ClaimIssue.HWF.Rejected"),
     SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT("Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant");
 
     private final String scenario;
