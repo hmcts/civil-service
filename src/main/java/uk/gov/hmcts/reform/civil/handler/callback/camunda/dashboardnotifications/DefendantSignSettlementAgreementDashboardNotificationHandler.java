@@ -70,17 +70,14 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandler extend
     private String[] getScenario(Optional<CaseDataLiP> caseDataLiP) {
 
         boolean isNotAgreed = caseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementNotAgreed).orElse(false);
-        boolean isAgreed = caseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementAgreement).orElse(false);
         if (isNotAgreed) {
             return new String[] {
                 SCENARIO_AAA7_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_CLAIMANT.getScenario(),
             };
         }
-        if (isAgreed) {
             return new String[] {
             };
-        }
-        return new String[0];
+
     }
 }
 
