@@ -60,7 +60,7 @@ public class PaymentRequestUpdateCallbackService {
                     }
                 } else {
                     caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
-                    log.info("PaymentStatus : "+caseData.getClaimIssuedPaymentDetails().getStatus().name());
+                    log.info("PaymentStatus : " + caseData.getClaimIssuedPaymentDetails().getStatus().name());
                     createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
 
                 }
