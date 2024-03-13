@@ -53,10 +53,15 @@ public class UpdateClaimStateAfterUploadingTranslatedDocuments extends CallbackH
             return CaseState.AWAITING_APPLICANT_INTENTION.name();
         } else if (CaseState.CASE_ISSUED == caseData.getCcdState()) {
             return CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name();
-        } else if (CaseState.AWAITING_APPLICANT_INTENTION == caseData.getCcdState()) {
+        } else if (isAwaitingApplicantIntentionAndNotSignedSettlementAgreement(caseData)) {
             return updateClaimStateService.setUpCaseState(caseData);
         }
         return caseData.getCcdState().name();
+    }
+
+    private boolean isAwaitingApplicantIntentionAndNotSignedSettlementAgreement(CaseData caseData) {
+        return CaseState.AWAITING_APPLICANT_INTENTION == caseData.getCcdState()
+            && !caseData.hasApplicant1SignedSettlementAgreement();
     }
 
     @Override
