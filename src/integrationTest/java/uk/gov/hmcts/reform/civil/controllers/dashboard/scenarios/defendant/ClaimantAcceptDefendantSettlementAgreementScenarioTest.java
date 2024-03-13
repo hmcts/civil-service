@@ -65,7 +65,7 @@ public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends Base
                             + "<p class=\"govuk-body\">You must respond by 16 March 2024. If you do not respond by then, or reject the agreement," +
                             " they can request a County Court Judgment.</p>"
                             + "<p class=\"govuk-body\"><a href=\"{VIEW_REPAYMENT_PLAN}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the repayment plan</a>"
-                            + "<br>><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>")
+                            + "<br><a href=\"{VIEW_RESPONSE_TO_CLAIM}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View your response</a></p>")
             );
     }
 }
