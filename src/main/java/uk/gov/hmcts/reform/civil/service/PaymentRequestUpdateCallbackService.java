@@ -50,6 +50,7 @@ public class PaymentRequestUpdateCallbackService {
             CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(serviceRequestUpdateDto
                                                                                    .getCcdCaseNumber()));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
+            log.info("Fee Type :::::::::" + feeType);
             if (feeType.equals(FeeType.HEARING.name()) || feeType.equals(FeeType.CLAIMISSUED.name())) {
                 if (caseData.isLipvLipOneVOne()) {
                     if ((feeType.equals(FeeType.HEARING.name()) && caseData.getHearingFeePaymentDetails() == null)
