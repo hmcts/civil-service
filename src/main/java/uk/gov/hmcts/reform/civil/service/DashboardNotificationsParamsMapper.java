@@ -32,17 +32,11 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
             params.put("defendantAdmittedAmount", formatAmount(getDefendantAdmittedAmount(caseData)));
         }
-
-        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
-            params.put("defendantAdmittedAmountPaymentDeadline", caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid());
-        }
-
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
             params.put("defendantAdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
             params.put("defendantAdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
         }
-
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
@@ -50,7 +44,6 @@ public class DashboardNotificationsParamsMapper {
                     .stripTrailingZeros().toPlainString()
             );
         }
-
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
             params.put("respondent1ResponseDeadline",
                        DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate()));
@@ -83,7 +76,7 @@ public class DashboardNotificationsParamsMapper {
 
 
     private String getRespondToSettlementAgreementDeadline(CaseData caseData) {
-        return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
+        return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline().toLocalDate())
             .map(DateUtils::formatDate).orElse(null);
     }
 
