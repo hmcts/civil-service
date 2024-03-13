@@ -14,7 +14,6 @@ import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
 
 @Service
 public class SettlementNoResponseFromDefendantSearchService extends ElasticSearchService {
@@ -39,7 +38,7 @@ public class SettlementNoResponseFromDefendantSearchService extends ElasticSearc
                                 "data.respondent1RespondToSettlementAgreementDeadline",
                                 targetDateString
                             ))
-                            .must(beState(All_FINAL_ORDERS_ISSUED))
+                            .must(beState(CaseState.All_FINAL_ORDERS_ISSUED))
                 ),
             List.of("reference"),
             startIndex
