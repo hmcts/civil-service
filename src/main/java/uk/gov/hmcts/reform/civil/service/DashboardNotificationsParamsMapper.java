@@ -2,54 +2,97 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.Fee;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
+import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
+import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 
 @Service
 @RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
-    private final FeesService feesService;
-
     public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
-        // TODO Check for notification variables
-        LocalDateTime currentDate = LocalDateTime.now();
 
         Map<String, Object> params = new HashMap<>();
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
 
-        // TODO: find the correct data
-        params.put("date", caseData.getClaimDismissedDeadline());
-
-        if (nonNull(caseData.getClaimDismissedDeadline())) {
-            long daysDifference = ChronoUnit.DAYS.between(caseData.getClaimDismissedDeadline(), currentDate);
-            params.put("daysLeftToRespond", daysDifference);
+        if (nonNull(getDefendantAdmittedAmount(caseData))) {
+            params.put("defendantAdmittedAmount", formatAmount(getDefendantAdmittedAmount(caseData)));
+        }
+        if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
+            LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            params.put("defendantAdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put("defendantAdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
+        }
+        if (nonNull(caseData.getClaimFee())) {
+            params.put(
+                "claimFee",
+                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
+                    .stripTrailingZeros().toPlainString()
+            );
         }
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
-            params.put("respondent1ResponseDeadline", DateUtils.formatDate(caseData.getRespondent1ResponseDeadline()));
+            params.put(
+                "respondent1ResponseDeadline",
+                DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate())
+            );
         }
+        if (caseData.getClaimIssueRemissionAmount() != null) {
+            params.put(
+                "claimIssueRemissionAmount",
+                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimIssueRemissionAmount()).stripTrailingZeros()
+                    .toPlainString()
+            );
+        }
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            params.put(
+                "claimIssueOutStandingAmount",
+                "£" + caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
+            );
+        }
+        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
+        params.put("claimSettledDate", getClaimSettleDate(caseData));
 
         if (caseData.getHwfFeeType() != null) {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
 
-        Fee fee = feesService
-            .getFeeDataByTotalClaimAmount(caseData.getTotalClaimAmount());
-        params.put("claimFee", "£" + fee.toPounds().stripTrailingZeros().toPlainString());
-        params.put("remissionAmount", caseData.getClaimIssueRemissionAmount());
-        params.put("outStandingAmount", caseData.getOutstandingFeeInPounds());
-        params.put("paymentDueDate", LocalDate.now());
         return params;
+    }
+
+    private String getClaimSettledAmount(CaseData caseData) {
+        return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
+            MonetaryConversions::penniesToPounds).map(
+            BigDecimal::stripTrailingZeros).map(amount -> amount.setScale(2)).map(BigDecimal::toPlainString).map(amount -> "£" + amount).orElse(
+            null);
+    }
+
+    private String getClaimSettleDate(CaseData caseData) {
+        return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getWhenWasThisAmountPaid).map(
+            DateUtils::formatDate).orElse(null);
+    }
+
+    private RespondToClaim getRespondToClaim(CaseData caseData) {
+        RespondToClaim respondToClaim = null;
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+            respondToClaim = caseData.getRespondToClaim();
+        } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+            respondToClaim = caseData.getRespondToAdmittedClaim();
+        }
+
+        return respondToClaim;
     }
 }

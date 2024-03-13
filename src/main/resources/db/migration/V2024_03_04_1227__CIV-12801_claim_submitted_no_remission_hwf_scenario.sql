@@ -2,7 +2,7 @@
  * Add scenario
  */
 INSERT INTO dbs.scenario (name, notifications_to_delete, notifications_to_create)
-VALUES ('Scenario.AAA7.Notice.ClaimIssue.HWF.Rejected', '{"Notice.AAA7.ClaimIssue.HWF.Requested","Notice.AAA7.ClaimIssue.HWF.Updated","Notice.AAA7.ClaimIssue.HWF.InvalidRef","Notice.AAA7.ClaimIssue.HWF.InfoRequired"}',
+VALUES ('Scenario.AAA7.ClaimIssue.HWF.Rejected', '{"Notice.AAA7.ClaimIssue.HWF.Requested","Notice.AAA7.ClaimIssue.HWF.Updated","Notice.AAA7.ClaimIssue.HWF.InvalidRef","Notice.AAA7.ClaimIssue.HWF.InfoRequired"}',
         '{"Notice.AAA7.ClaimIssue.HWF.Rejected" : ["claimFee"]}');
 
 /**
