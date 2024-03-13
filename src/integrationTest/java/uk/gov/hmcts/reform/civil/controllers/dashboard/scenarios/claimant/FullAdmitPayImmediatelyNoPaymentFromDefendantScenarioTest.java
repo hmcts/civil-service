@@ -24,14 +24,14 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends B
     void should_create_full_admit_pay_immediately_no_payment_scenario() throws Exception {
 
         UUID caseId = UUID.randomUUID();
-        LocalDate responseDeadline = OffsetDateTime.now().toLocalDate();
+        LocalDate defendantAdmittedAmountPaymentDeadline = OffsetDateTime.now().toLocalDate();
         String defendantName = "Dave Indent";
         doPost(
             BEARER_TOKEN,
             ScenarioRequestParams.builder().params(Map.of(
                 "respondent1PartyName", defendantName,
-                "responseToClaimAdmitPartPaymentDeadlineEn", responseDeadline,
-                "responseToClaimAdmitPartPaymentDeadlineCy", responseDeadline
+                "defendantAdmittedAmountPaymentDeadlineEn", defendantAdmittedAmountPaymentDeadline,
+                "defendantAdmittedAmountPaymentDeadlineCy", defendantAdmittedAmountPaymentDeadline
                 )).build(),
             DASHBOARD_CREATE_SCENARIO_URL,
             SCENARIO_AAA7_CLAIMANT_INTENT_FULL_ADMIT_CLAIMANT.getScenario(),
@@ -43,16 +43,16 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends B
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value("Immediate payment"),
             jsonPath("$[0].descriptionEn").value(
-                "You have accepted Dave Indent's plan to pay {fullAdmitPayImmediatelyPaymentAmount} "
-                    + "immediately. Funds must clear your account by " + responseDeadline + ".<br>If you don't receive"
+                "<p class=\"govuk-body\">You have accepted Dave Indent's plan to pay £{fullAdmitPayImmediatelyPaymentAmount} "
+                    + "immediately. Funds must clear your account by " + defendantAdmittedAmountPaymentDeadline + ".</p><p class=\"govuk-body\">If you don't receive"
                     + " the money by then, you can <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\"  "
-                    + "rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>."),
+                    + "rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>.</p>"),
             jsonPath("$[0].titleCy").value("Immediate payment"),
             jsonPath("$[0].descriptionCy").value(
-                "You have accepted Dave Indent's plan to pay {fullAdmitPayImmediatelyPaymentAmount} "
-                    + "immediately. Funds must clear your account by " + responseDeadline + ".<br>If you don't receive "
+                "<p class=\"govuk-body\">You have accepted Dave Indent's plan to pay £{fullAdmitPayImmediatelyPaymentAmount} "
+                    + "immediately. Funds must clear your account by " + defendantAdmittedAmountPaymentDeadline + ".</p><p class=\"govuk-body\">If you don't receive "
                     + "the money by then, you can <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" "
-                    + " rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>.")
+                    + " rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>.</p>")
 
         );
     }
