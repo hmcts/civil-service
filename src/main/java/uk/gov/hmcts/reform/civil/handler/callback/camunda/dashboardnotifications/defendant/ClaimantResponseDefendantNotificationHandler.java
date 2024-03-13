@@ -75,7 +75,9 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
             RespondToClaim respondToClaim = getRespondToClaim(caseData);
             if (Objects.nonNull(respondToClaim)
                 && Objects.nonNull(respondToClaim.getHowMuchWasPaid())
-                && caseData.getApplicant1PartAdmitConfirmAmountPaidSpec() == YesOrNo.YES) {
+                && caseData.getApplicant1PartAdmitConfirmAmountPaidSpec() == YesOrNo.YES
+                && (caseData.hasClaimantNotAgreedToFreeMediation()
+                || caseData.hasDefendantNotAgreedToFreeMediation())) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT
                     .getScenario();
             }

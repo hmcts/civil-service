@@ -179,6 +179,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .respondToClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal("3000")).build())
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .build();
@@ -212,6 +213,7 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal("3000")).build())
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
+            .responseClaimMediationSpecRequired(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .build();
