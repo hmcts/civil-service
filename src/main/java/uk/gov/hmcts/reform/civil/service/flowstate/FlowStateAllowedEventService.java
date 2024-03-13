@@ -83,6 +83,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
@@ -607,7 +608,8 @@ public class FlowStateAllowedEventService {
                 CLAIMANT_RESPONSE_CUI,
                 asyncStitchingComplete,
                 REQUEST_FOR_RECONSIDERATION,
-                DECISION_ON_RECONSIDERATION_REQUEST
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                EDIT_JUDGMENT
             )
         ),
 
@@ -1234,7 +1236,8 @@ public class FlowStateAllowedEventService {
                 UPLOAD_MEDIATION_DOCUMENTS,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 REQUEST_FOR_RECONSIDERATION,
-                DECISION_ON_RECONSIDERATION_REQUEST
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                EDIT_JUDGMENT
             )
         ),
 
