@@ -77,6 +77,8 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
 
         private static Stream<Arguments> provideCaseStateAndScenarioArguments() {
             return Stream.of(
+                Arguments.of(CaseState.JUDICIAL_REFERRAL, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING),
+                Arguments.of(CaseState.CASE_SETTLED, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT),
                 Arguments.of(
                     CaseState.JUDICIAL_REFERRAL,
                     DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING
@@ -94,7 +96,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         }
 
         @Test
-        void shouldNotRecordScenario_whenInvokedNotInJudicialReferralStatey() {
+        void shouldNotRecordScenario_whenInvokedNotInJudicialReferralState() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
