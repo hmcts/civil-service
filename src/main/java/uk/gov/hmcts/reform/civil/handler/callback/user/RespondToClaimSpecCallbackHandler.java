@@ -1690,16 +1690,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                         updatedCaseData.build().getRespondent1ResponseDate(),
                         DocumentType.DEFENDANT_DEFENCE
                 );
-                CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
                 assignCategoryId.assignCategoryIdToDocument(
                     respondent1ClaimDocument,
                     DocCategory.DEF1_DEFENSE_DQ.getValue()
                 );
                 defendantUploads.add(documentElement);
-                if (Objects.nonNull(copy)) {
-                    defendantUploads.add(ElementUtils.element(copy));
-                }
             }
         }
         Respondent1DQ respondent1DQ = caseData.getRespondent1DQ();
@@ -1714,14 +1709,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 );
                 assignCategoryId.assignCategoryIdToDocument(
                     respondent1DQDraftDirections,
-                    DocCategory.DEF1_DEFENSE_DQ.getValue()
+                    DocCategory.DQ_DEF1.getValue()
                 );
-                CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF1.getValue());
                 defendantUploads.add(documentElement);
-                if (Objects.nonNull(copy)) {
-                    defendantUploads.add(ElementUtils.element(copy));
-                }
             }
             ResponseDocument respondent2SpecDefenceResponseDocument = caseData.getRespondent2SpecDefenceResponseDocument();
             if (respondent2SpecDefenceResponseDocument != null) {
@@ -1732,16 +1722,11 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                             updatedCaseData.build().getRespondent2ResponseDate(),
                             DocumentType.DEFENDANT_DEFENCE
                     );
-                    CaseDocument copy = assignCategoryId
-                            .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                     assignCategoryId.assignCategoryIdToDocument(
                         respondent2ClaimDocument,
                         DocCategory.DEF2_DEFENSE_DQ.getValue()
                     );
                     defendantUploads.add(documentElement);
-                    if (Objects.nonNull(copy)) {
-                        defendantUploads.add(ElementUtils.element(copy));
-                    }
                 }
             }
         } else {
@@ -1779,14 +1764,9 @@ public class RespondToClaimSpecCallbackHandler extends CallbackHandler
                 );
                 assignCategoryId.assignCategoryIdToDocument(
                     respondent2DQDraftDirections,
-                    DocCategory.DEF2_DEFENSE_DQ.getValue()
+                    DocCategory.DQ_DEF2.getValue()
                 );
-                CaseDocument copy = assignCategoryId
-                        .copyCaseDocumentWithCategoryId(documentElement.getValue(), DocCategory.DQ_DEF2.getValue());
                 defendantUploads.add(documentElement);
-                if (Objects.nonNull(copy)) {
-                    defendantUploads.add(ElementUtils.element(copy));
-                }
             }
         }
         if (!defendantUploads.isEmpty()) {
