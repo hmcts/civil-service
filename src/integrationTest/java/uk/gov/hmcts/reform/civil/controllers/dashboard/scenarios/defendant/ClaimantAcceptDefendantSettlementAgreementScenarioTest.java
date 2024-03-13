@@ -36,7 +36,8 @@ public class ClaimantAcceptDefendantSettlementAgreementScenarioTest extends Base
         doPost(
             BEARER_TOKEN,
             ScenarioRequestParams.builder()
-                .params(Map.of("respondent1SettlementAgreementDeadline", "16 March 2024"))
+                .params(Map.of("respondent1SettlementAgreementDeadline_En", "16 March 2024"))
+                .params(Map.of("respondent1SettlementAgreementDeadline_Cy", "16 March 2024"))
                 .build(),
             DASHBOARD_CREATE_SCENARIO_URL,
             "Scenario.AAA7.ClaimantIntent.SettlementAgreement.ClaimantAcceptsPlan.Defendant",
