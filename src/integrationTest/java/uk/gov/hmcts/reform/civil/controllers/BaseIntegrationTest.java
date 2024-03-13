@@ -27,6 +27,8 @@ import uk.gov.hmcts.reform.civil.Application;
 import uk.gov.hmcts.reform.civil.TestIdamConfiguration;
 import uk.gov.hmcts.reform.civil.service.AuthorisationService;
 import uk.gov.hmcts.reform.civil.service.UserService;
+import uk.gov.hmcts.reform.idam.client.IdamApi;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.Instant;
@@ -58,6 +60,12 @@ public abstract class BaseIntegrationTest {
         + "k02vLJDY9fLCsFYy5iWGCjb8lD1aX1NTv7jz2ttNNv7-smqp6L3LSSD_LCZMpf0h_3n5RXiv-N3vNpWe4ZC9u0AWQdHEE9QlKTZlsqwKSog"
         + "3yJWhyxAamdMepgW7Z8jQ";
 
+    protected static final String DASHBOARD_CREATE_SCENARIO_URL
+        = "/dashboard/scenarios/{scenario_ref}/{unique_case_identifier}";
+    protected static final String GET_NOTIFICATIONS_URL
+        = "/dashboard/notifications/{ccd-case-identifier}/role/{role-type}";
+    protected static final String GET_TASKS_ITEMS_URL = "/dashboard/taskList/{ccd-case-identifier}/role/{role-type}";
+
     protected static final UserInfo USER_INFO = UserInfo.builder()
         .sub("solicitor@example.com")
         .roles(of("caseworker-civil-solicitor"))
@@ -76,6 +84,8 @@ public abstract class BaseIntegrationTest {
     protected JwtDecoder jwtDecoder;
     @MockBean
     public AuthorisationService authorisationService;
+    @MockBean
+    public IdamApi idamApi;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -93,6 +103,8 @@ public abstract class BaseIntegrationTest {
         setSecurityAuthorities(authentication);
         when(serviceAuthorisationApi.getServiceName(any())).thenReturn("payment_app");
         when(jwtDecoder.decode(anyString())).thenReturn(getJwt());
+        when(idamApi.retrieveUserDetails(anyString()))
+            .thenReturn(UserDetails.builder().forename("Claimant").surname("test").build());
     }
 
     protected void setSecurityAuthorities(Authentication authenticationMock, String... authorities) {
@@ -142,6 +154,23 @@ public abstract class BaseIntegrationTest {
             MockMvcRequestBuilders.get(urlTemplate, uriVars)
                 .header(HttpHeaders.AUTHORIZATION, auth)
                 .contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @SneakyThrows
+    protected <T> ResultActions doPut(String auth, T content, String urlTemplate, Object... uriVars) {
+        return mockMvc.perform(
+            MockMvcRequestBuilders.put(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, auth)
+                .contentType(MediaType.APPLICATION_JSON));
+    }
+
+    @SneakyThrows
+    protected <T> ResultActions doDelete(String auth, T content, String urlTemplate, Object... uriVars) {
+        return mockMvc.perform(
+            MockMvcRequestBuilders.delete(urlTemplate, uriVars)
+                .header(HttpHeaders.AUTHORIZATION, auth)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(content)));
     }
 
     protected String toJson(Object input) {

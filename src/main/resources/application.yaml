@@ -49,6 +49,8 @@ spring:
             client-secret: internal
   flyway:
     enabled: ${REFERENCE_DATABASE_MIGRATION:true}
+    placeholder-replacement: false
+
 oidc:
   issuer: ${OIDC_ISSUER:http://fr-am:8080/openam/oauth2/hmcts}
 
@@ -184,6 +186,11 @@ reference:
 aca:
   api:
     baseurl: ${ACA_SERVICE_API_BASEURL:http://localhost:4454}
+
+
+dashboard:
+  api:
+    url: http://localhost:4000
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:}
@@ -376,6 +383,7 @@ notifications:
   notifyApplicantForHwfFeePaymentOutcomeInBilingual: "ca84e76e-f178-4c63-9eca-96b491cc538c"
 
   notifyDefendantLRForMediation: "feec8506-6d60-4715-8f48-43ded5d24d97"
+  notifyApplicantLRMediationTemplate: "55fd5423-e044-42d0-8296-e9755a002480"
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
@@ -554,6 +562,29 @@ spring:
   config:
     activate:
       on-profile: integration-test
+  datasource:
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:11.4://localhost/cmc
+    jdbcUrl: jdbc:tc:postgresql:11.4://localhost/cmc
+    hikari:
+      minimum-idle: 1
+      connectionTimeout: 10000
+      idleTimeout: 30000
+      maxLifetime: 60000
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      naming:
+        physical-strategy: com.vladmihalcea.hibernate.type.util.CamelCaseToSnakeCaseNamingStrategy
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+  flyway:
+    enabled: true
+    baselineOnMigrate: true
+    placeholder-replacement: false
 
   main:
     lazy-initialization: true

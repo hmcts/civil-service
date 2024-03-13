@@ -1,0 +1,30 @@
+idam:
+  test:
+    username: ${TEST_WA_LAW_FIRM_USERNAME:some_user@hmcts.net}
+    password: ${TEST_WA_LAW_FIRM_PASSWORD:password}
+
+environment: ${ENVIRONMENT:local-arm-arch}
+
+role-assignment-service:
+  url: http://localhost:8888
+
+document_management:
+  url: ${DM_STORE_URL:http://local-dm-store}
+
+ccd_gateway:
+  url: ${CCD_GW_URL:http://ccd-api-gateway}
+
+logging:
+  level:
+    org.springframework:
+      dao: debug
+      transaction: debug
+      jdbc.core.JdbcTemplate: info
+    #    org.hibernate:
+    #      SQL: debug
+    #      type.descriptor.sql.BasicBinder: debug
+    #      engine: debug
+    uk.gov.hmcts.reform: debug
+config:
+  allowedJurisdictions: ${ALLOWED_JURISDICTIONS:wa,ia,sscs,civil,PUBLICLAW,PRIVATELAW,EMPLOYMENT}
+  allowedCaseTypes: ${ALLOWED_CASE_TYPES:asylum,wacasetype,sscs,civil,generalapplication,CARE_SUPERVISION_EPO,PRLAPPS,ET_EnglandWales,ET_EnglandWales_Listings,ET_EnglandWales_Multiple,ET_Scotland,ET_Scotland_Listings,ET_Scotland_Multiple,ET_Admin}

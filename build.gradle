@@ -233,6 +233,10 @@ test {
   failFast = true
 }
 
+tasks.withType(Copy) {
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 task integration(type: Test) {
   description = "Runs integration tests"
   group = "Verification"
@@ -341,7 +345,9 @@ def versions = [
   springStatemachine : '4.0.0',
   lombok             : '1.18.26',
   pact               : '3.5.24',
-  springSecurity     : '5.8.7'
+  springSecurity     : '5.8.7',
+  testcontainers     : '1.17.6'
+
 ]
 
 ext.libraries = [
@@ -364,7 +370,9 @@ configurations.all {
 }
 
 dependencies {
-  implementation 'com.github.hmcts:civil-commons:1.0.64'
+  implementation 'com.github.hmcts:civil-commons:1.0.65'
+  implementation project(':dashboard-notifications')
+  implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -379,6 +387,7 @@ dependencies {
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.7.0'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
+  implementation group: 'javax.persistence', name: 'javax.persistence-api'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.39.1'
   implementation group: 'org.jdbi', name: 'jdbi3-spring4', version: '3.19.0'
@@ -482,8 +491,17 @@ dependencies {
   contractTestImplementation group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
 
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.0')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.0')
   contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.10.0')
   contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.10.0')
+
+  // dashboard specific changes
+
+  testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+  testImplementation group: 'com.h2database', name: 'h2', version: '2.1.214'
+  // dashboard specific changes ends
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
