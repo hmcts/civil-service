@@ -154,7 +154,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
             caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(caseData.getLegacyCaseReference(), templateData.getReferenceNumber());
-        Assertions.assertEquals(caseData.getDetailsOfWhyDoesYouDisputeTheClaim(),
+        Assertions.assertEquals(caseData.getDetailsOfWhyDoesYouDisputeTheClaim2(),
                                 templateData.getWhyDisputeTheClaim());
         Assertions.assertEquals(caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth().getName(),
                                 templateData.getStatementOfTruth().getName());
@@ -171,7 +171,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
 
         Assertions.assertEquals(CASE_DATA_WITH_MULTI_PARTY.getLegacyCaseReference(), templateData.getReferenceNumber());
         Assertions.assertEquals(
-            CASE_DATA_WITH_MULTI_PARTY.getDetailsOfWhyDoesYouDisputeTheClaim(),
+            CASE_DATA_WITH_MULTI_PARTY.getDetailsOfWhyDoesYouDisputeTheClaim2(),
             templateData.getWhyDisputeTheClaim()
         );
         Assertions.assertEquals(
@@ -296,6 +296,7 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         return CaseData.builder()
             .legacyCaseReference("case reference")
             .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
+            .detailsOfWhyDoesYouDisputeTheClaim2("why dispute the claim 2")
             .respondent1DQ(Respondent1DQ.builder()
                                .respondent1DQStatementOfTruth(
                                    StatementOfTruth.builder()
