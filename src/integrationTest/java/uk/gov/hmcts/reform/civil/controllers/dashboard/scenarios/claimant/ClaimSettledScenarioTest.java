@@ -35,7 +35,7 @@ public class ClaimSettledScenarioTest extends BaseIntegrationTest {
                 status().is(HttpStatus.OK.value()),
                 jsonPath("$[0].titleEn").value("The claim is settled"),
                 jsonPath("$[0].descriptionEn")
-                    .value("You have confirmed that the defendant paid £3000 on 16th March 2024.")
+                    .value("<p class=\"govuk-body\">You have confirmed that the defendant paid £3000 on 16th March 2024.</p>")
             );
     }
 }
