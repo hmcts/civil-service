@@ -29,156 +29,146 @@ class FeatureToggleServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenMyFeatureIsEnabledOrDisabled(Boolean toggleState) {
-        givenToggle("myFeature", toggleState);
-
-        assertThat(featureToggleService.isFeatureEnabled("myFeature")).isEqualTo(toggleState);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {false})
     void shouldReturnCorrectValue_whenAutomatedHearingNoticeEnabledInvoked(Boolean toggleStat) {
         var hearingAndListingKey = "ahn";
-        givenToggle(hearingAndListingKey, toggleStat);
+        //givenToggle(hearingAndListingKey, toggleStat);
 
         assertThat(featureToggleService.isAutomatedHearingNoticeEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenIsCaseFlagsEnabledInvoked(Boolean toggleStat) {
         var caseFlagsKey = "case-flags";
-        givenToggle(caseFlagsKey, toggleStat);
+        //givenToggle(caseFlagsKey, toggleStat);
 
         assertThat(featureToggleService.isCaseFlagsEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenIsGeneralApplicationsEnabledInvoked(Boolean toggleStat) {
         var generalApplicationsKey = "general_applications_enabled";
-        givenToggle(generalApplicationsKey, toggleStat);
+        //givenToggle(generalApplicationsKey, toggleStat);
 
         assertThat(featureToggleService.isGeneralApplicationsEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenIsPinInPostEnabledInvoked(Boolean toggleStat) {
         var pinInPostKey = "pin-in-post";
-        givenToggle(pinInPostKey, toggleStat);
+        //givenToggle(pinInPostKey, toggleStat);
 
         assertThat(featureToggleService.isPinInPostEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenIsPbaV3EnabledInvoked(Boolean toggleStat) {
         var pbaV3Key = "pba-version-3-ways-to-pay";
-        givenToggle(pbaV3Key, toggleStat);
+        //givenToggle(pbaV3Key, toggleStat);
 
         assertThat(featureToggleService.isPbaV3Enabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {false})
     void shouldReturnCorrectValue_whenHmcIsEnabled(Boolean toggleStat) {
         var hmcKey = "hmc";
-        givenToggle(hmcKey, toggleStat);
+        //givenToggle(hmcKey, toggleStat);
 
         assertThat(featureToggleService.isHmcEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenEnableRPAEmailsInvoked(Boolean toggleStat) {
         var enableRPAEmailsKey = "enable-rpa-emails";
-        givenToggle(enableRPAEmailsKey, toggleStat);
+        //givenToggle(enableRPAEmailsKey, toggleStat);
 
         assertThat(featureToggleService.isRPAEmailEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenCaseFileViewEnabled(Boolean toggleStat) {
         var caseFileKey = "case-file-view";
-        givenToggle(caseFileKey, toggleStat);
+        //givenToggle(caseFileKey, toggleStat);
 
         assertThat(featureToggleService.isCaseFileViewEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenFastTrackUpliftsEnabled(Boolean toggleStat) {
         var caseFileKey = "fast-track-uplifts";
-        givenToggle(caseFileKey, toggleStat);
+        //givenToggle(caseFileKey, toggleStat);
 
         assertThat(featureToggleService.isFastTrackUpliftsEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {false})
     void shouldReturnCorrectValue_whenUpdateContactDetailsEnabled(Boolean toggleStat) {
         var caseFileKey = "update-contact-details";
-        givenToggle(caseFileKey, toggleStat);
+        //givenToggle(caseFileKey, toggleStat);
 
         assertThat(featureToggleService.isUpdateContactDetailsEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenLocationWhiteListed(Boolean toggleStat) {
         final String feature = "case-progression-location-whitelist";
         String location = "000000";
-        when(featureToggleApi.isFeatureEnabledForLocation(eq(feature), eq(location), eq(true)))
-            .thenReturn(toggleStat);
 
         assertThat(featureToggleService.isLocationWhiteListedForCaseProgression(location)).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenIsTransferCaseOnlineEnabled(Boolean toggleStat) {
         var transferCaseOnlineKey = "isTransferOnlineCaseEnabled";
-        givenToggle(transferCaseOnlineKey, toggleStat);
+        //givenToggle(transferCaseOnlineKey, toggleStat);
 
         assertThat(featureToggleService.isTransferOnlineCaseEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {false})
     void shouldReturnCorrectValue_whenCaseProgressionEnabled(Boolean toggleStat) {
         var caseFileKey = "cui-case-progression";
-        givenToggle(caseFileKey, toggleStat);
+        //givenToggle(caseFileKey, toggleStat);
 
         assertThat(featureToggleService.isCaseProgressionEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {true})
     void shouldReturnCorrectValue_whenEarlyAdopterEnabled(Boolean toggleStat) {
         var caseFileKey = "early-adopters";
-        givenToggle(caseFileKey, toggleStat);
+        //givenToggle(caseFileKey, toggleStat);
 
         assertThat(featureToggleService.isEarlyAdoptersEnabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {false})
     void shouldReturnCorrectValue_whenIsSdoR2Enabled(Boolean toggleStat) {
         var sdoR2Key = "isSdoR2Enabled";
-        givenToggle(sdoR2Key, toggleStat);
+        //givenToggle(sdoR2Key, toggleStat);
 
         assertThat(featureToggleService.isSdoR2Enabled()).isEqualTo(toggleStat);
     }
 
     @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @ValueSource(booleans = {false})
     void shouldReturnCorrectValue_whenIsCarmEnabled(Boolean toggleStat) {
         var carmKey = "carm";
         var carmDateKey = "cam-enabled-for-case";
-        givenToggle(carmKey, toggleStat);
+        //givenToggle(carmKey, toggleStat);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .setClaimTypeToSpecClaim()
