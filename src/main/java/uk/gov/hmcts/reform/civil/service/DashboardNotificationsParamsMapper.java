@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,7 +18,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseU
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 
 @Service
-@RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
     public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
@@ -40,13 +38,13 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
-                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
-                    .stripTrailingZeros().toPlainString()
+                "£" + caseData.getClaimFee().toPounds().stripTrailingZeros().toPlainString()
             );
         }
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
-            params.put("respondent1ResponseDeadline",
-                       DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate()));
+            LocalDate responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
+            params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(responseDeadline));
+            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
         }
         if (caseData.getClaimIssueRemissionAmount() != null) {
             params.put(
