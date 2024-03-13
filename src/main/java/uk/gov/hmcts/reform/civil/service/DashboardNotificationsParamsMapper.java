@@ -2,13 +2,17 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.math.BigDecimal;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
@@ -59,9 +63,36 @@ public class DashboardNotificationsParamsMapper {
                 "£" + caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
             );
         }
+        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
+        params.put("claimSettledDate", getClaimSettleDate(caseData));
+
         if (caseData.getHwfFeeType() != null) {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
+
         return params;
+    }
+
+    private String getClaimSettledAmount(CaseData caseData) {
+        return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
+            MonetaryConversions::penniesToPounds).map(
+            BigDecimal::stripTrailingZeros).map(amount -> amount.setScale(2)).map(BigDecimal::toPlainString).map(amount -> "£" + amount).orElse(
+            null);
+    }
+
+    private String getClaimSettleDate(CaseData caseData) {
+        return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getWhenWasThisAmountPaid).map(
+            DateUtils::formatDate).orElse(null);
+    }
+
+    private RespondToClaim getRespondToClaim(CaseData caseData) {
+        RespondToClaim respondToClaim = null;
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.FULL_DEFENCE) {
+            respondToClaim = caseData.getRespondToClaim();
+        } else if (caseData.getRespondent1ClaimResponseTypeForSpec() == RespondentResponseTypeSpec.PART_ADMISSION) {
+            respondToClaim = caseData.getRespondToAdmittedClaim();
+        }
+
+        return respondToClaim;
     }
 }

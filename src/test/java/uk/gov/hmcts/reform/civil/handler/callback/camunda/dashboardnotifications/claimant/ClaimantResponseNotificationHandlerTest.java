@@ -77,8 +77,8 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
 
         private static Stream<Arguments> provideCaseStateAndScenarioArguments() {
             return Stream.of(
-                Arguments.of(CaseState.JUDICIAL_REFERRAL, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING)
-
+                Arguments.of(CaseState.JUDICIAL_REFERRAL, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING),
+                Arguments.of(CaseState.CASE_SETTLED, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT)
             );
         }
 
@@ -94,6 +94,22 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             handler.handle(params);
 
             // Then
+            verifyNoInteractions(dashboardApiClient);
+        }
+
+        @Test
+        void shouldNotRecordScenario_whenInvokedWhenCaseStateIsNotClaimSettled() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
+            ).build();
+
+            Map<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("claimSettledAmount", "500");
+            scenarioParams.put("claimSettledDate", "12/01/2024");
+
+            handler.handle(params);
+
             verifyNoInteractions(dashboardApiClient);
         }
 
