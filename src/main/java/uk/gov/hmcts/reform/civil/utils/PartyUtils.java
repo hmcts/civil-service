@@ -465,4 +465,17 @@ public class PartyUtils {
             .respondent1LitigationFriend(appendWithNewPartyId(caseData.getRespondent1LitigationFriend()))
             .respondent2LitigationFriend(appendWithNewPartyId(caseData.getRespondent2LitigationFriend()));
     }
+
+    @SuppressWarnings("unchecked")
+    public static void populatePartyIndividuals(CaseData.CaseDataBuilder builder) {
+        CaseData caseData = builder.build();
+        builder
+            .applicant1LRIndividuals(appendWithNewPartyIds(caseData.getApplicant1LRIndividuals()))
+            .respondent1LRIndividuals(appendWithNewPartyIds(caseData.getRespondent1LRIndividuals()))
+            .respondent2LRIndividuals(appendWithNewPartyIds(caseData.getRespondent2LRIndividuals()))
+            .applicant1OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant1OrgIndividuals()))
+            .applicant2OrgIndividuals(appendWithNewPartyIds(caseData.getApplicant2OrgIndividuals()))
+            .respondent1OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent1OrgIndividuals()))
+            .respondent2OrgIndividuals(appendWithNewPartyIds(caseData.getRespondent2OrgIndividuals()));
+    }
 }
