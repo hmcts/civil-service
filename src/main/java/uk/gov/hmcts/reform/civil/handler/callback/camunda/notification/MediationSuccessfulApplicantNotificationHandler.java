@@ -19,10 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
@@ -74,7 +72,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                     sendEmail(
                         caseData.getApplicantSolicitor1UserDetails().getEmail(),
                         notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation(),
-                        OneVTwoProperties(caseData),
+                        oneVtwoProperties(caseData),
                         referenceTemplate
                     );
                 } else {
@@ -131,7 +129,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         );
     }
 
-    public Map<String, String> OneVTwoProperties(CaseData caseData) {
+    public Map<String, String> oneVtwoProperties(CaseData caseData) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),

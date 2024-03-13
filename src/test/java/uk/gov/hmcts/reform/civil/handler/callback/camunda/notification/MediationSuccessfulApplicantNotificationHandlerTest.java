@@ -128,7 +128,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                OneVTwoProperties(caseData),
+                oneVTwoProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
             );
         }
@@ -149,7 +149,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                OneVTwoProperties(caseData),
+                oneVTwoProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
             );
         }
@@ -239,7 +239,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         );
     }
 
-    public Map<String, String> OneVTwoProperties(CaseData caseData) {
+    public Map<String, String> oneVTwoProperties(CaseData caseData) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),

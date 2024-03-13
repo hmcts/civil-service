@@ -95,9 +95,9 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
                     // LR scenarios
                     String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LR, claimId);
                     sendEmail(
-                        isRespondentSolicitor1Notification(callbackParams)?
-                            caseData.getRespondentSolicitor1EmailAddress() :
-                            caseData.getRespondentSolicitor2EmailAddress(),
+                        isRespondentSolicitor1Notification(callbackParams)
+                            ? caseData.getRespondentSolicitor1EmailAddress()
+                            : caseData.getRespondentSolicitor2EmailAddress(),
                         notificationsProperties.getNotifyLrDefendantSuccessfulMediation(),
                         lrDefendantProperties(caseData),
                         referenceTemplate);

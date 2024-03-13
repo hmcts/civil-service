@@ -256,6 +256,7 @@ class MediationSuccessfulRespondentNotificationHandlerTest extends BaseCallbackH
                 MEDIATION_SUCCESSFUL_RESPONDENT_LR_NOTIFICATION_1594901956117591
             );
         }
+
         @Test
         void shouldNotifyClaimantCarm1V2DifferentSolicitorNotifyApplicantEmailSecondDefendant_whenInvoked() {
             //Given
