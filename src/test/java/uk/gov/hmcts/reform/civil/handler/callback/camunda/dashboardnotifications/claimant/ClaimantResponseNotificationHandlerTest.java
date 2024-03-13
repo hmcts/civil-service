@@ -60,7 +60,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
             Map<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("defendantName", "Defendant Name");
+            scenarioParams.put("respondent1PartyName", "Defendant Name");
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
             // When

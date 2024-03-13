@@ -23,7 +23,7 @@ public class JudicialReferralFullDefencePartAdmitPaidPartialScenarioTest extends
 
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
-                   .params(Map.of("claimantName", "Mr Claim Claimant",
+                   .params(Map.of("applicant1PartyName", "Mr Claim Claimant",
                                   "admissionPaidAmount", "£3000"))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL,
