@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +20,7 @@ public class DashboardNotificationsParamsMapper {
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
+        params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
 
         if (nonNull(caseData.getClaimFee())) {
             params.put(
