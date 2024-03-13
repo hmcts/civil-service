@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
 import uk.gov.hmcts.reform.civil.service.flowstate.StateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
@@ -70,6 +71,9 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @MockBean
     private DefendantPinToPostLRspecService defendantPinToPostLRspecService;
+
+    @MockBean
+    private HelpWithFeesForTabService hwfForTabService;
 
     @Autowired
     private CreateClaimLipCallBackHandler handler;

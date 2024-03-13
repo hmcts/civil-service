@@ -1,14 +1,9 @@
 package uk.gov.hmcts.reform.civil.callback;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import static uk.gov.hmcts.reform.civil.callback.UserType.CAMUNDA;
 import static uk.gov.hmcts.reform.civil.callback.UserType.TESTING_SUPPORT;
 import static uk.gov.hmcts.reform.civil.callback.UserType.USER;
 
-@Getter
-@RequiredArgsConstructor
 public enum CaseEvent {
     CREATE_CLAIM(USER),
     CREATE_CLAIM_SPEC(USER),
@@ -358,17 +353,30 @@ public enum CaseEvent {
     GENERATE_LIP_DEFENDANT_CLAIM_FORM_SPEC(CAMUNDA),
     NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION(CAMUNDA),
     GENERATE_DASHBOARD_NOTIFICATION_CLAIM_FEE_REQUIRED_CLAIMANT1(CAMUNDA),
+    CLAIMANT1_HWF_DASHBOARD_NOTIFICATION(CAMUNDA),
     INVALID_HWF_REFERENCE(USER),
     FEE_PAYMENT_OUTCOME(USER),
     NOTIFY_LIP_CLAIMANT_HWF_OUTCOME(CAMUNDA),
     GENERATE_DASHBOARD_NOTIFICATION_CUI(CAMUNDA),
     CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_APPLICANT1(CAMUNDA),
     CREATE_DASHBOARD_NOTIFICATION_FOR_CLAIM_ISSUE_FOR_RESPONDENT1(CAMUNDA),
-    GENERATE_DASHBOARD_NOTIFICATION_CLAIM_ISSUE_HWF_CLAIMANT1(CAMUNDA);
+    CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE(CAMUNDA),
+    GENERATE_DASHBOARD_NOTIFICATION_CLAIM_ISSUE_HWF_CLAIMANT1(CAMUNDA),
+    CREATE_DASHBOARD_NOTIFICATION_FOR_CCJ_REQUEST_FOR_APPLICANT1(CAMUNDA),
+    CREATE_DEFENDANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE(CAMUNDA);
 
     private final UserType userType;
+
+    CaseEvent(UserType userType) {
+        this.userType = userType;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
 
     public boolean isCamundaEvent() {
         return this.getUserType() == CAMUNDA;
     }
+
 }
