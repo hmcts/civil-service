@@ -68,7 +68,7 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
                 String generateCsvData = generateCSVRow(headers) + csvColContent;
                 Optional<EmailData> emailData = prepareEmail(generateCsvData);
 
-//                emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
+                emailData.ifPresent(data -> sendGridClient.sendEmail(mediationCSVEmailConfiguration.getSender(), data));
             }
         } catch (Exception e) {
             log.error(e.getMessage());

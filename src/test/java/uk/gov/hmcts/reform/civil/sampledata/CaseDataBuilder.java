@@ -574,6 +574,8 @@ public class CaseDataBuilder {
 
     private YesOrNo eaCourtLocation;
 
+    private Flags caseFlags;
+
     public CaseDataBuilder helpWithFeesMoreInformationClaimIssue(HelpWithFeesMoreInformation helpWithFeesMoreInformationClaimIssue) {
         this.helpWithFeesMoreInformationClaimIssue = helpWithFeesMoreInformationClaimIssue;
         return this;
@@ -6074,6 +6076,21 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withCaseLevelFlags() {
+        this.caseFlags = Flags.builder()
+            .details(wrapElements(List.of(
+                FlagDetail.builder()
+                    .flagCode("123")
+                    .status("Active")
+                    .build(),
+                FlagDetail.builder()
+                    .flagCode("456")
+                    .status("Inactive")
+                    .build())))
+            .build();
+        return this;
+    }
+
     public CaseDataBuilder withApplicant1Flags() {
         return withApplicant1Flags(flagDetails());
     }
@@ -7031,6 +7048,7 @@ public class CaseDataBuilder {
             .hwfFeeType(hwfFeeType)
             .claimIssuedHwfDetails(claimIssuedHwfDetails)
             .hearingHwfDetails(hearingHwfDetails)
+            .caseFlags(caseFlags)
             .build();
     }
 }

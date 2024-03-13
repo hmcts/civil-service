@@ -389,8 +389,10 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             && featureToggleService.isPinInPostEnabled()
             && isOneVOne(caseData)
             && caseData.hasClaimantAgreedToFreeMediation())
-            || (featureToggleService.isCarmEnabledForCase(caseData.getSubmittedDate())
-            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack()))) {
+            || (featureToggleService.isCarmEnabledForCase(caseData)
+            && SMALL_CLAIM.name().equals(caseData.getResponseClaimTrack())
+            && (YES.equals(caseData.getApplicant1ProceedWithClaim())
+            || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())))) {
             builder.claimMovedToMediationOn(LocalDate.now());
         }
 

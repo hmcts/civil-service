@@ -41,10 +41,12 @@ public class CaseFlagsHearingsUtils {
 
     public static List<FlagDetail> getAllActiveCaseLevelFlags(CaseData caseData) {
         Flags caseFlags = caseData.getCaseFlags();
-        List<FlagDetail> flagDetails = unwrapElements(caseFlags.getDetails());
+        if (caseFlags != null) {
+            List<FlagDetail> flagDetails = unwrapElements(caseFlags.getDetails());
 
-        if (!flagDetails.isEmpty()) {
-            return flagDetails.stream().filter(f -> ("Active").equals(f.getStatus())).toList();
+            if (!flagDetails.isEmpty()) {
+                return flagDetails.stream().filter(f -> ("Active").equals(f.getStatus())).toList();
+            }
         }
         return emptyList();
     }
