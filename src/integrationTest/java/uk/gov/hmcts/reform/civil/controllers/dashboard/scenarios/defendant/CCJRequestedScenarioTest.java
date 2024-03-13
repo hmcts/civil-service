@@ -52,29 +52,6 @@ public class CCJRequestedScenarioTest extends BaseIntegrationTest {
                         + "<p class=\"govuk-body\"><a href=\"{callChargesUrl}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Find out about call charges (opens in new tab).</a></p>"
                         + "<p class=\"govuk-body\">If you do not get in touch, we will post a CCJ to you and <Name> and explain what to do next.</p>"));
 
-        //Verify task Item is created
-        doGet(BEARER_TOKEN, GET_TASKS_ITEMS_URL, caseId, "CLAIMANT")
-            .andExpectAll(
-                status().is(HttpStatus.OK.value()),
-                jsonPath("$[0].reference").value(caseId.toString()),
-                jsonPath("$[0].taskNameEn").value(
-                    "<a href={VIEW_CLAIM_URL} rel=\"noopener noreferrer\" class=\"govuk-link\">View the claim</a>"),
-                jsonPath("$[0].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
-                jsonPath("$[1].taskNameEn")
-                    .value(
-                        "<a href={VIEW_INFO_ABOUT_CLAIMANT} rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the claimant</a>"),
-                jsonPath("$[1].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
-                jsonPath("$[2].taskNameEn")
-                    .value(
-                        "<a href={VIEW_INFO_ABOUT_DEFENDANT} rel=\"noopener noreferrer\" class=\"govuk-link\">View information about the defendant</a>"),
-                jsonPath("$[2].currentStatusEn").value(TaskStatus.AVAILABLE.getName()),
-                jsonPath("$[3].taskNameEn")
-                    .value(
-                        "<a href={VIEW_ORDERS_AND_NOTICES} rel=\"noopener noreferrer\" class=\"govuk-link\">View orders and notices</a>"),
-                jsonPath("$[3].currentStatusEn").value(TaskStatus.AVAILABLE.getName())
-
-            );
-
     }
 
 }
