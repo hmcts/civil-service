@@ -16,6 +16,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Map.entry;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_CLAIM_FORM_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
@@ -737,6 +739,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM,
                 migrateCase
             )
         ),
@@ -745,6 +748,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM,
                 migrateCase
             )
         ),
@@ -753,6 +757,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM,
                 migrateCase
             )
         ),
@@ -761,6 +766,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM,
                 migrateCase
             )
         ),
@@ -769,6 +775,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM,
                 migrateCase
             )
         ),
@@ -777,6 +784,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM,
                 migrateCase
             )
         ),
@@ -784,6 +792,7 @@ public class FlowStateAllowedEventService {
             TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(),
             List.of(
                 ADD_CASE_NOTE,
+                GENERATE_CLAIM_FORM,
                 migrateCase
             )
         ),
@@ -791,7 +800,8 @@ public class FlowStateAllowedEventService {
             TAKEN_OFFLINE_AFTER_SDO.fullName(),
             List.of(
                 ADD_CASE_NOTE,
-                AMEND_PARTY_DETAILS
+                AMEND_PARTY_DETAILS,
+                GENERATE_CLAIM_FORM
             )
         ),
         entry(
@@ -1508,6 +1518,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM_SPEC,
                 migrateCase
             )
         ),
@@ -1516,6 +1527,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM_SPEC,
                 migrateCase
             )
         ),
@@ -1524,6 +1536,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM_SPEC,
                 migrateCase
             )
         ),
@@ -1532,6 +1545,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM_SPEC,
                 migrateCase
             )
         ),
@@ -1540,6 +1554,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM_SPEC,
                 migrateCase
             )
         ),
@@ -1548,6 +1563,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM_SPEC,
                 migrateCase
             )
         ),
@@ -1556,6 +1572,7 @@ public class FlowStateAllowedEventService {
             List.of(
                 ADD_CASE_NOTE,
                 APPLICATION_OFFLINE_UPDATE_CLAIM,
+                GENERATE_CLAIM_FORM_SPEC,
                 migrateCase
             )
         ),
@@ -1563,6 +1580,7 @@ public class FlowStateAllowedEventService {
             TAKEN_OFFLINE_SDO_NOT_DRAWN.fullName(),
             List.of(
                 ADD_CASE_NOTE,
+                GENERATE_CLAIM_FORM_SPEC,
                 migrateCase
             )
         ),
@@ -1570,7 +1588,8 @@ public class FlowStateAllowedEventService {
             TAKEN_OFFLINE_AFTER_SDO.fullName(),
             List.of(
                 ADD_CASE_NOTE,
-                AMEND_PARTY_DETAILS
+                AMEND_PARTY_DETAILS,
+                GENERATE_CLAIM_FORM_SPEC
             )
         ),
         entry(
