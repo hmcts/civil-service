@@ -59,7 +59,8 @@ public class GenerateCsvAndTransferTaskHandler implements BaseExternalTaskHandle
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), inMediationCases.size());
         String[] headers = getCSVHeaders();
         StringBuilder csvColContent = new StringBuilder();
-        runtimeService.setVariable(externalTask.getProcessInstanceId(), "carmFeatureEnabled", true);
+        runtimeService.setVariable(externalTask.getProcessInstanceId(), "carmFeatureEnabled",
+                                   toggleService.isFeatureEnabled("carm"));
         try {
             if (!inMediationCases.isEmpty()) {
                 inMediationCases.forEach(caseData ->

@@ -205,6 +205,17 @@ public class CaseFlagsHearingsUtilsTest {
                                                 .status("Active")
                                                 .build());
         }
+
+        @Test
+        void shouldReturnEmptyList_whenNoActiveCaseLevelFlags() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimIssued()
+                .build();
+
+            List<FlagDetail> actual = CaseFlagsHearingsUtils.getAllActiveCaseLevelFlags(caseData);
+
+            assertThat(actual.size()).isEqualTo(0);
+        }
     }
 
     private PartyFlags getRespondent1Flags(CaseData caseData, List<Element<FlagDetail>> details) {

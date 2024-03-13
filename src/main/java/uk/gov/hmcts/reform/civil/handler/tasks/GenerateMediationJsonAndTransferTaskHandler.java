@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
 import uk.gov.hmcts.reform.civil.sendgrid.SendGridClient;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCase;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationCases;
 import uk.gov.hmcts.reform.civil.service.mediation.MediationDTO;
@@ -36,18 +37,22 @@ public class GenerateMediationJsonAndTransferTaskHandler implements BaseExternal
     private final MediationJsonService mediationJsonService;
     private final SendGridClient sendGridClient;
     private final MediationCSVEmailConfiguration mediationCSVEmailConfiguration;
+    private final FeatureToggleService featureToggleService;
     private static final String subject = "OCMC Mediation Data";
     private static final String filename = "ocmc_mediation_data.json";
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @Override
     public void handleTask(ExternalTask externalTask) {
+        if (!featureToggleService.isFeatureEnabled("carm")) {
+            return;
+        }
         List<CaseData> inMediationCases;
         LocalDate claimMovedDate;
         if (externalTask.getVariable("claimMovedDate") != null) {
             claimMovedDate = LocalDate.parse(externalTask.getVariable("claimMovedDate").toString(), DATE_FORMATTER);
         } else {
-            claimMovedDate = LocalDate.now();
+            claimMovedDate = LocalDate.now().minusDays(1);
         }
         List<CaseDetails> cases = caseSearchService.getInMediationCases(claimMovedDate, true);
         inMediationCases = cases.stream()
