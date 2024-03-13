@@ -24,17 +24,3 @@ VALUES ('Notice.AAA7.ClaimantIntent.CCJ.Requested.Defendant', 'Claimant has requ
         '<p class="govuk-body"><a href="https://www.gov.uk/call-charges" rel="noopener noreferrer" class="govuk-link">Find out about call charges (opens in new tab).</a></p>'
         '<p class="govuk-body">If you do not get in touch, we will post a CCJ to you and <Name> and explain what to do next.</p>',
 'DEFENDANT');
-
-/**
- * Add task list items
- */
-INSERT INTO dbs.task_item_template (task_name_en, category_en, task_name_cy, category_cy, template_name,
-                                    scenario_name, task_status_sequence, role, task_order)
-values ('<a href={VIEW_CLAIM_URL} rel="noopener noreferrer" class="govuk-link">View the claim</a>', 'The claim','<a href={VIEW_CLAIM_URL}>View the claim</a>',
-        'The claim', 'Claim.View', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Defendant', '{3, 3}', 'DEFENDANT', 1),
-       ('<a href={VIEW_INFO_ABOUT_CLAIMANT} rel="noopener noreferrer" class="govuk-link">View information about the claimant</a>', 'The claim','<a href={VIEW_INFO_ABOUT_CLAIMANT_URL}>View information about the claimant</a>',
-        'The claim', 'Claim.Claimant.Info', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Defendant', '{3, 3}', 'DEFENDANT', 2),
-       ('<a href={VIEW_INFO_ABOUT_DEFENDANT} rel="noopener noreferrer" class="govuk-link">View information about the defendant</a>', 'The response','<a href={VIEW_INFO_ABOUT_DEFENDANT_URL}>View information about the defendant</a>',
-        'The response', 'Response.Defendant.Info', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Defendant', '{3, 3}', 'DEFENDANT', 4),
-       ('<a href={VIEW_ORDERS_AND_NOTICES} rel="noopener noreferrer" class="govuk-link">View orders and notices</a>', 'Orders and notices from the court' ,'<a href={VIEW_ORDERS_AND_NOTICES_URL}>View orders and notices</a>',
-        'Orders and notices from the court', 'Order.View', 'Scenario.AAA7.ClaimantIntent.CCJ.Requested.Defendant', '{3, 3}', 'DEFENDANT', 10);
