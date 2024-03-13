@@ -55,6 +55,21 @@ public class DashboardNotificationsParamsMapper {
             params.put("respondent1ResponseDeadline",
                        DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate()));
         }
+        if (caseData.getClaimIssueRemissionAmount() != null) {
+            params.put(
+                "claimIssueRemissionAmount",
+                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimIssueRemissionAmount()).stripTrailingZeros()
+                    .toPlainString()
+            );
+        }
+        if (caseData.getOutstandingFeeInPounds() != null) {
+            params.put(
+                "claimIssueOutStandingAmount",
+                "£" + caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
+            );
+        }
+        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
+        params.put("claimSettledDate", getClaimSettleDate(caseData));
 
         if (caseData.getHwfFeeType() != null) {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
@@ -64,6 +79,12 @@ public class DashboardNotificationsParamsMapper {
         params.put("claimSettledDate", getClaimSettleDate(caseData));
         params.put("respondSettlementAgreementDeadline", getRespondToSettlementAgreementDeadline(caseData));
         return params;
+    }
+
+
+    private String getRespondToSettlementAgreementDeadline(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
+            .map(DateUtils::formatDate).orElse(null);
     }
 
     private String getClaimSettledAmount(CaseData caseData) {
@@ -87,10 +108,5 @@ public class DashboardNotificationsParamsMapper {
         }
 
         return respondToClaim;
-    }
-
-    private String getRespondToSettlementAgreementDeadline(CaseData caseData) {
-        return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
-            .map(DateUtils::formatDate).orElse(null);
     }
 }
