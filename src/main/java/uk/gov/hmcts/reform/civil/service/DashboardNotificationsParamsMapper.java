@@ -9,10 +9,10 @@ import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.time.LocalDate;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.math.BigDecimal;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
@@ -45,10 +45,9 @@ public class DashboardNotificationsParamsMapper {
             );
         }
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
-            params.put(
-                "respondent1ResponseDeadline",
-                DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            );
+            LocalDate responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
+            params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(responseDeadline));
+            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
         }
         if (caseData.getClaimIssueRemissionAmount() != null) {
             params.put(

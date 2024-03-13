@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications;
 
-import lombok.Getter;
-
-@Getter
 public enum DashboardScenarios {
 
     SCENARIO_AAA7_CLAIM_ISSUE_CLAIM_SUBMIT_REQUIRED("Scenario.AAA7.ClaimIssue.ClaimSubmit.Required"),
@@ -20,6 +17,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED("Scenario.AAA7.ClaimIssue.HWF.InfoRequired"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED("Scenario.AAA7.ClaimIssue.HWF.Updated"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_PART_REMISSION("Scenario.AAA7.ClaimIssue.HWF.PartRemission"),
+    SCENARIO_AAA7_CLAIM_ISSUE_HWF_NO_REMISSION("Scenario.AAA7.ClaimIssue.HWF.Rejected"),
     SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_CLAIMANT("Scenario.AAA7.ClaimantIntent.CCJ.Requested.Claimant");
 
     private final String scenario;
