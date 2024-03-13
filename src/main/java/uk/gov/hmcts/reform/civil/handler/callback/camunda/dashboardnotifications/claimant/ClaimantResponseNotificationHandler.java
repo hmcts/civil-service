@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
+import com.google.common.base.Strings;
 import lombok.RequiredArgsConstructor;
-import org.assertj.core.util.Strings;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -60,11 +60,11 @@ public class ClaimantResponseNotificationHandler extends CallbackHandler {
         String scenario = getScenario(caseData);
         if (!Strings.isNullOrEmpty(scenario)) {
             dashboardApiClient.recordScenario(
-                    caseData.getCcdCaseReference().toString(),
-                    scenario,
-                    authToken,
-                    ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
-                            caseData)).build()
+                caseData.getCcdCaseReference().toString(),
+                scenario,
+                authToken,
+                ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(
+                    caseData)).build()
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();

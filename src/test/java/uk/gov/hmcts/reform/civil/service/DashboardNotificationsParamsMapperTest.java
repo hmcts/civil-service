@@ -5,9 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
@@ -101,6 +103,40 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("claimFee").isNull();
 
+    }
+
+    @Test
+    public void shouldMapCaseSettleAmountAndCaseSettledDateWheResponseTypeIsFullDefence() {
+
+        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+            .respondToClaim(RespondToClaim.builder()
+                                .howMuchWasPaid(new BigDecimal("100050"))
+                                .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
+                                .build())
+            .build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.50");
+        assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
+    }
+
+    @Test
+    public void shouldMapCaseSettleAmountAndCaseSettledDateWhenResponseTypeIsPartAdmit() {
+
+        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
+            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+            .respondToAdmittedClaim(RespondToClaim.builder()
+                                        .howMuchWasPaid(new BigDecimal("100055"))
+                                        .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
+                                        .build())
+            .build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.55");
+        assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
     }
 
     @Test
