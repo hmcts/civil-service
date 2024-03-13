@@ -54,13 +54,12 @@ public class PaymentRequestUpdateCallbackService {
                 if (caseData.isLipvLipOneVOne()) {
                     if ((feeType.equals(FeeType.HEARING.name()) && caseData.getHearingFeePaymentDetails() == null)
                         || (feeType.equals(FeeType.CLAIMISSUED.name()) && caseData.getClaimIssuedPaymentDetails() == null)) {
-                        caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
+                        updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                         CardPaymentStatusResponse cardPaymentStatusResponse = getCardPaymentStatusResponse(serviceRequestUpdateDto);
                         updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType), serviceRequestUpdateDto.getCcdCaseNumber(), cardPaymentStatusResponse);
                     }
                 } else {
-                    caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
-                    log.info("PaymentStatus : " + caseData.getClaimIssuedPaymentDetails().getStatus().name());
+                    updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                     createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
 
                 }
