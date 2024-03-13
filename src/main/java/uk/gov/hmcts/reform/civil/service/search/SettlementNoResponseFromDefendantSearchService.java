@@ -39,7 +39,7 @@ public class SettlementNoResponseFromDefendantSearchService extends ElasticSearc
                                 "data.respondent1RespondToSettlementAgreementDeadline",
                                 targetDateString
                             ))
-                            .must(beState(AWAITING_APPLICANT_INTENTION))
+                            .must(beState(All_FINAL_ORDERS_ISSUED))
                 ),
             List.of("reference"),
             startIndex
