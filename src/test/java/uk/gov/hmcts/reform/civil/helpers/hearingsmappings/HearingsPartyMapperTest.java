@@ -172,7 +172,7 @@ public class HearingsPartyMapperTest {
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
                 "app-1-party-id",
-                null,
+                "Mr.",
                 "John",
                 "Rambo",
                 "Mr. John Rambo",
@@ -202,7 +202,7 @@ public class HearingsPartyMapperTest {
 
         PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
                 "res-1-party-id",
-                null,
+                "Mr.",
                 "Sole",
                 "Trader",
                 "Mr. Sole Trader",
@@ -243,7 +243,7 @@ public class HearingsPartyMapperTest {
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
                 "app-1-party-id",
-                null,
+                "Mr.",
                 "John",
                 "Rambo",
                 "Mr. John Rambo",
@@ -262,7 +262,7 @@ public class HearingsPartyMapperTest {
 
         PartyDetailsModel respondentPartyDetails = buildExpectedIndividualPartyDetails(
                 "res-1-party-id",
-                null,
+                "Mr.",
                 "Sole",
                 "Trader",
                 "Mr. Sole Trader",
