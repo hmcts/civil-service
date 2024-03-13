@@ -8,8 +8,8 @@ import uk.gov.hmcts.contino.GithubAPI
 def type = "java"
 def product = "civil"
 def component = "service"
-def ccdBranch = "master"
-def camundaBranch = "master"
+def ccdBranch = "feature/CIV-11927-Successful-Mediation"
+def camundaBranch = "feature/CIV-11927-Successful-Mediation-Email-Notifications"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 AppPipelineConfig pipelineConf
