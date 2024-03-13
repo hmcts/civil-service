@@ -27,7 +27,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @RequiredArgsConstructor
 public class DefendantSignSettlementAgreementDashboardNotificationHandler extends CallbackHandler {
 
-    private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_SETTLEMENT_DEFENDANT_RESPONSE);
+    private static final List<CaseEvent> EVENTS =
+        List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_SETTLEMENT_DEFENDANT_RESPONSE);
     public static final String TASK_ID = "GenerateDashboardNotificationSignSettlementAgreement";
     private final DashboardApiClient dashboardApiClient;
     private final DashboardNotificationsParamsMapper mapper;
@@ -53,11 +54,11 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandler extend
         CaseData caseData = callbackParams.getCaseData();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         Optional<CaseDataLiP> optionalCaseDataLiP = Optional.ofNullable(caseData.getCaseDataLiP());
-        boolean isNotAgreed = optionalCaseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementNotAgreed).orElse(false);
-        if(isNotAgreed) {
+        String[] scenarios = getScenario(optionalCaseDataLiP);
+        for (String scenario : scenarios) {
             dashboardApiClient.recordScenario(
                 caseData.getCcdCaseReference().toString(),
-                SCENARIO_AAA7_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_CLAIMANT.getScenario(),
+                scenario,
                 authToken,
                 ScenarioRequestParams.builder()
                     .params(mapper.mapCaseDataToParams(caseData)).build()
@@ -65,4 +66,21 @@ public class DefendantSignSettlementAgreementDashboardNotificationHandler extend
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
+
+    private String[] getScenario(Optional<CaseDataLiP> caseDataLiP) {
+
+        boolean isNotAgreed = caseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementNotAgreed).orElse(false);
+        boolean isAgreed = caseDataLiP.map(CaseDataLiP::isDefendantSignedSettlementAgreement).orElse(false);
+        if (isNotAgreed) {
+            return new String[] {
+                SCENARIO_AAA7_SETTLEMENT_AGREEMENT_DEFENDANT_REJECTED_CLAIMANT.getScenario(),
+            };
+        }
+        if (isAgreed) {
+            return new String[] {
+            };
+        }
+        return new String[0];
+    }
 }
+
