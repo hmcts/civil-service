@@ -150,16 +150,18 @@ public class FlowPredicate {
             && caseData.getRespondent2OrgRegistered() != YES;
 
     public static final Predicate<CaseData> paymentFailed = caseData ->
-        caseData.getPaymentSuccessfulDate() == null
+        !caseData.isApplicantNotRepresented()
+            && (caseData.getPaymentSuccessfulDate() == null
             && (caseData.getPaymentDetails() != null
             && caseData.getPaymentDetails().getStatus() == FAILED)
             || (caseData.getClaimIssuedPaymentDetails() != null
-            && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED);
+            && caseData.getClaimIssuedPaymentDetails().getStatus() == FAILED));
 
     public static final Predicate<CaseData> paymentSuccessful = caseData ->
-        caseData.getPaymentSuccessfulDate() != null
+        !caseData.isApplicantNotRepresented()
+            && (caseData.getPaymentSuccessfulDate() != null
             || (caseData.getClaimIssuedPaymentDetails() != null
-            && caseData.getClaimIssuedPaymentDetails().getStatus() == SUCCESS);
+            && caseData.getClaimIssuedPaymentDetails().getStatus() == SUCCESS));
 
     public static final Predicate<CaseData> pendingClaimIssued = caseData ->
         caseData.getIssueDate() != null
