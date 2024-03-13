@@ -28,7 +28,7 @@ public class DashboardNotificationsParamsMapper {
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
-      
+
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
             params.put("defendantAdmittedAmount", formatAmount(getDefendantAdmittedAmount(caseData)));
         }
@@ -61,12 +61,13 @@ public class DashboardNotificationsParamsMapper {
                 "£" + caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
             );
         }
+        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
+        params.put("claimSettledDate", getClaimSettleDate(caseData));
+
         if (caseData.getHwfFeeType() != null) {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
 
-        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
-        params.put("claimSettledDate", getClaimSettleDate(caseData));
         if (nonNull(caseData.getRespondent1RespondToSettlementAgreementDeadline())) {
             params.put("respondent1SettlementAgreementDeadline_En", DateUtils.formatDate(caseData.getRespondent1RespondToSettlementAgreementDeadline()));
             params.put("respondent1SettlementAgreementDeadline_Cy", DateUtils.formatDate(caseData.getRespondent1RespondToSettlementAgreementDeadline()));
