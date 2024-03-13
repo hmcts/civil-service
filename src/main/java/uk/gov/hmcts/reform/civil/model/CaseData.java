@@ -315,6 +315,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Evidence> specResponselistYourEvidenceList;
 
     private final String detailsOfWhyDoesYouDisputeTheClaim;
+    private final String detailsOfWhyDoesYouDisputeTheClaim2;
 
     private final ResponseDocument respondent1SpecDefenceResponseDocument;
     private final ResponseDocument respondent2SpecDefenceResponseDocument;

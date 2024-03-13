@@ -84,7 +84,7 @@ public class SealedClaimResponseFormGeneratorForSpec implements TemplateDataGene
             = SealedClaimResponseFormForSpec.builder()
             .referenceNumber(caseData.getLegacyCaseReference())
             .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .whyDisputeTheClaim(caseData.getDetailsOfWhyDoesYouDisputeTheClaim()) //TODO
+            .whyDisputeTheClaim(isRespondent2(caseData) ? caseData.getDetailsOfWhyDoesYouDisputeTheClaim2() : caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
             .hearingCourtLocation(hearingCourtLocation)
             .statementOfTruth(statementOfTruth)
             .allocatedTrack(caseData.getResponseClaimTrack())
