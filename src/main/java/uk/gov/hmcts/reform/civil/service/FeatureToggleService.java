@@ -6,10 +6,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
-import java.time.ZoneId;
-
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
