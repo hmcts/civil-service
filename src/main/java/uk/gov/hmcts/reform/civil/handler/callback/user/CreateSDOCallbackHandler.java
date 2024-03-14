@@ -202,7 +202,6 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
     private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
-    private final IdamClient idamClient;
 
     @Override
     protected Map<String, Callback> callbacks() {
