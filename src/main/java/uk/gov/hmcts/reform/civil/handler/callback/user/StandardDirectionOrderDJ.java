@@ -199,7 +199,7 @@ public class StandardDirectionOrderDJ extends CallbackHandler {
         }
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData, false);
         DynamicList locationsList = getLocationList(callbackParams, preferredCourt.orElse(null));
         caseDataBuilder.trialHearingMethodInPersonDJ(locationsList);
         caseDataBuilder.disposalHearingMethodInPersonDJ(locationsList);

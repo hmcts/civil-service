@@ -339,11 +339,11 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
     private void updateCaseManagementLocation(CallbackParams callbackParams,
                                               CaseData.CaseDataBuilder builder) {
         CaseData caseData = callbackParams.getCaseData();
-        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData, false);
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(builder::caseManagementLocation);
 
-        locationHelper.getCaseManagementLocation(caseData)
+        locationHelper.getCaseManagementLocation(caseData, false)
             .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                 builder,
                 requestedCourt,

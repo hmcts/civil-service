@@ -112,6 +112,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.docmosis.sdo.SdoGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -135,6 +137,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_SDO;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.FAST_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.SMALL_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle.SHOW;
@@ -199,6 +202,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private final AssignCategoryId assignCategoryId;
     private final CategoryService categoryService;
     private final  List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
+    private final IdamClient idamClient;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -233,13 +237,17 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .fastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
 
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            updateCaseManagementLocationForSdo(callbackParams, updatedData);
+        }
+
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             updatedData.showCarmFields(YES);
         } else {
             updatedData.showCarmFields(NO);
         }
 
-        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData, true);
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(updatedData::caseManagementLocation);
 
@@ -774,7 +782,7 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     private void prePopulateNihlFields(CallbackParams callbackParams, CaseData caseData,
                                        CaseData.CaseDataBuilder<?, ?> updatedData) {
 
-        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData, true);
         preferredCourt.map(RequestedCourt::getCaseLocation)
             .ifPresent(updatedData::caseManagementLocation);
         updatedData.sdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
@@ -1492,5 +1500,21 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
         updatedData.sdoR2ScheduleOfLossToggle(includeInOrderToggle);
         updatedData.sdoR2SeparatorUploadOfDocumentsToggle(includeInOrderToggle);
         updatedData.sdoR2TrialToggle(includeInOrderToggle);
+    }
+
+    private void updateCaseManagementLocationForSdo(CallbackParams callbackParams, CaseData.CaseDataBuilder updatedData) {
+        CaseData caseData = callbackParams.getCaseData();
+
+        locationHelper.getCaseManagementLocation(caseData, true)
+            .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
+                updatedData,
+                requestedCourt,
+                () -> locationRefDataService.getCourtLocationsForDefaultJudgments(callbackParams.getParams().get(
+                    CallbackParams.Params.BEARER_TOKEN).toString())
+            ));
+        if (log.isDebugEnabled()) {
+            log.debug("Case management location for " + caseData.getLegacyCaseReference()
+                          + " updated to, during SDO " + updatedData.build().getCaseManagementLocation());
+        }
     }
 }

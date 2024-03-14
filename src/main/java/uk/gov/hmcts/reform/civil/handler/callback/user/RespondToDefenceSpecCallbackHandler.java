@@ -291,7 +291,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             builder.caseManagementLocation(caseData.getFlightDelayDetails().getFlightCourtLocation());
         } else if (!isFlightDelayAndSmallClaim(caseData)) {
             // 1. It is a Fast_Claim 2. Small claim and not Flight Delay
-            locationHelper.getCaseManagementLocation(caseData)
+            locationHelper.getCaseManagementLocation(caseData, false)
                 .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                     builder,
                     requestedCourt,
@@ -434,7 +434,7 @@ public class RespondToDefenceSpecCallbackHandler extends CallbackHandler
             //This will be true only if its Small Claim & Flight Delay & Airline is OTHER
             newCourt = locationHelper.getClaimantRequestedCourt(builder.applicant1DQ(dq.build()).build());
         } else {
-            newCourt = locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build());
+            newCourt = locationHelper.getCaseManagementLocation(builder.applicant1DQ(dq.build()).build(), false);
         }
 
         newCourt.ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(

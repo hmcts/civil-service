@@ -76,7 +76,7 @@ public class LocationHelperTest {
                                .build())
             .build();
 
-        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData, false);
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get()).isEqualTo(caseData.getRespondent1DQ().getRespondent1DQRequestedCourt());
@@ -118,7 +118,7 @@ public class LocationHelperTest {
             .respondent2ResponseDate(LocalDateTime.now())
             .build();
 
-        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData, false);
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get()).isEqualTo(caseData.getRespondent2DQ().getRespondent2DQRequestedCourt());
@@ -156,7 +156,7 @@ public class LocationHelperTest {
                                .build())
             .build();
 
-        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData, false);
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.orElseThrow().getResponseCourtCode())
@@ -177,7 +177,7 @@ public class LocationHelperTest {
                              .build())
             .build();
 
-        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData, false);
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get().getCaseLocation())
@@ -211,7 +211,7 @@ public class LocationHelperTest {
                                .build())
             .build();
 
-        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData, false);
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.orElseThrow().getResponseCourtCode())
@@ -245,7 +245,7 @@ public class LocationHelperTest {
                                .build())
             .build();
 
-        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData, false);
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get())
@@ -277,7 +277,7 @@ public class LocationHelperTest {
                                .build())
             .build();
 
-        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData, false);
 
         Assertions.assertThat(court.isPresent()).isTrue();
         Assertions.assertThat(court.get().getResponseCourtCode())
@@ -322,7 +322,7 @@ public class LocationHelperTest {
             .respondent2ResponseDate(LocalDateTime.now())
             .build();
 
-        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> court = helper.getCaseManagementLocation(caseData, false);
 
         Assertions.assertThat(court.orElseThrow().getResponseCourtCode())
             .isEqualTo(caseData.getCourtLocation().getApplicantPreferredCourt());

@@ -40,7 +40,7 @@ public class UpdateCaseManagementDetailsService {
         updateRespondent1RequestedCourtDetails(caseData, builder, availableLocations);
 
         caseData = builder.build();
-        locationHelper.getCaseManagementLocation(caseData)
+        locationHelper.getCaseManagementLocation(caseData, false)
             .ifPresent(requestedCourt -> locationHelper.updateCaseManagementLocation(
                 builder,
                 requestedCourt,

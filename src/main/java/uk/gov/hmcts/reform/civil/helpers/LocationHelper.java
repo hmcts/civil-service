@@ -57,7 +57,7 @@ public class LocationHelper {
      * @param caseData case data
      * @return requested court to be used as case court
      */
-    public Optional<RequestedCourt> getCaseManagementLocation(CaseData caseData) {
+    public Optional<RequestedCourt> getCaseManagementLocation(CaseData caseData, Boolean duringCreateSdo) {
         List<RequestedCourt> prioritized = new ArrayList<>();
         boolean leadDefendantIs1 = leadDefendantIs1(caseData);
         Supplier<Party.Type> getDefendantType;
@@ -92,7 +92,7 @@ public class LocationHelper {
             });
 
             Optional<RequestedCourt> byParties = prioritized.stream().findFirst();
-            if (ccmccAmount.compareTo(getClaimValue(caseData)) >= 0) {
+            if (ccmccAmount.compareTo(getClaimValue(caseData)) >= 0 && !duringCreateSdo) {
                 return Optional.of(byParties.map(requestedCourt -> requestedCourt.toBuilder()
                         .caseLocation(getCcmccCaseLocation()).build())
                                        .orElseGet(() -> RequestedCourt.builder()
