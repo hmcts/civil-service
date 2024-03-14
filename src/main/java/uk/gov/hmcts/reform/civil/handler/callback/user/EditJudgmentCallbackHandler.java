@@ -93,7 +93,7 @@ public class EditJudgmentCallbackHandler extends CallbackHandler {
         caseData.setJoJudgmentStatusDetails(judgmentStatusDetails);
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
 
-        if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS){
+        if (caseData.getJoJudgmentRecordReason() == JudgmentRecordedReason.DETERMINATION_OF_MEANS){ //ToDo: Check if this is necessary
             caseDataBuilder.businessProcess(BusinessProcess.ready(EDIT_JUDGMENT));
         }
 
