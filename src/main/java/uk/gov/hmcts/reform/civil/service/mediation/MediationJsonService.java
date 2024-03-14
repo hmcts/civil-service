@@ -183,10 +183,10 @@ public class MediationJsonService {
         String orgId = organisationPolicy.getOrganisation().getOrganisationID();
         Optional<Organisation> organisation = organisationService.findOrganisationById(orgId);
         Organisation solicitorOrgDetails = organisation.orElse(null);
-
+        String partyRole = party.getFlags() != null ? party.getFlags().getRoleOnCase() : null;
         return MediationLitigant.builder()
             .partyID(party.getPartyID())
-            .partyRole(party.getFlags().getRoleOnCase())
+            .partyRole(partyRole)
             .partyType(party.getType())
             .partyName(party.getPartyName())
             .paperResponse(PAPER_RESPONSE)
@@ -202,10 +202,10 @@ public class MediationJsonService {
     }
 
     private MediationLitigant buildUnrepresentedLitigant(Party party) {
-
+        String partyRole = party.getFlags() != null ? party.getFlags().getRoleOnCase() : null;
         return MediationLitigant.builder()
             .partyID(party.getPartyID())
-            .partyRole(party.getFlags().getRoleOnCase())
+            .partyRole(partyRole)
             .partyType(party.getType())
             .partyName(party.getPartyName())
             .paperResponse(PAPER_RESPONSE)
