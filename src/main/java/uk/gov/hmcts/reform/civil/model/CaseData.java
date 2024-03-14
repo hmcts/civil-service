@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.civil.enums.TimelineUploadTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.FinalOrderSelection;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
+import uk.gov.hmcts.reform.civil.enums.ConfirmationToggle;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodTelephoneHearingDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.HearingMethodVideoConferenceDJ;
@@ -577,6 +578,10 @@ public class CaseData extends CaseDataParent implements MappableObject {
      * RTJ = Refer To Judge.
      */
     private final String additionalInformationRTJ;
+    /**
+     * Refer To Judge(Defence received in time).
+     */
+    private List<ConfirmationToggle> confirmReferToJudgeDefenceReceived;
 
     //general application order documents
     private final List<Element<CaseDocument>> generalOrderDocument;
@@ -597,6 +602,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private final List<Element<Document>> gaEvidenceDocClaimant;
     private final List<Element<Document>> gaEvidenceDocRespondentSol;
     private final List<Element<Document>> gaEvidenceDocRespondentSolTwo;
+    private final List<Element<CaseDocument>> gaAddlDoc;
+    private final List<Element<CaseDocument>> gaAddlDocStaff;
+    private final List<Element<CaseDocument>> gaAddlDocClaimant;
+    private final List<Element<CaseDocument>> gaAddlDocRespondentSol;
+    private final List<Element<CaseDocument>> gaAddlDocRespondentSolTwo;
 
     private final List<Element<CaseDocument>> gaRespondDoc;
 
