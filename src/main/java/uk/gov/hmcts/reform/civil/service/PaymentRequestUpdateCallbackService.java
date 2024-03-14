@@ -52,16 +52,16 @@ public class PaymentRequestUpdateCallbackService {
                                                                                    .getCcdCaseNumber()));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
             if (feeType.equals(FeeType.HEARING.name()) || feeType.equals(FeeType.CLAIMISSUED.name())) {
-                caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                 if (caseData.isLipvLipOneVOne()) {
                     if ((feeType.equals(FeeType.HEARING.name()) && caseData.getHearingFeePaymentDetails() == null)
                         || (feeType.equals(FeeType.CLAIMISSUED.name()) && caseData.getClaimIssuedPaymentDetails() == null)) {
+                        updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                         CardPaymentStatusResponse cardPaymentStatusResponse = getCardPaymentStatusResponse(serviceRequestUpdateDto);
                         updatePaymentStatusService.updatePaymentStatus(FeeType.valueOf(feeType), serviceRequestUpdateDto.getCcdCaseNumber(), cardPaymentStatusResponse);
                     }
                 } else {
+                    caseData = updateCaseDataWithStateAndPaymentDetails(serviceRequestUpdateDto, caseData, feeType);
                     createEvent(caseData, serviceRequestUpdateDto.getCcdCaseNumber(), feeType);
-
                 }
             }
         }
@@ -103,7 +103,6 @@ public class PaymentRequestUpdateCallbackService {
                                                               CaseData caseData, String feeType) {
 
         PaymentDetails pbaDetails = getPBADetailsFromFeeType(feeType, caseData);
-        log.info("PbaDetails: {}", pbaDetails);
         String customerReference = ofNullable(serviceRequestUpdateDto.getPayment())
             .map(PaymentDto::getCustomerReference)
             .orElse(ofNullable(pbaDetails).map(PaymentDetails::getCustomerReference).orElse(null));
@@ -118,9 +117,7 @@ public class PaymentRequestUpdateCallbackService {
             .errorMessage(null)
             .build();
 
-        log.info("PayMentDetails: {}", paymentDetails);
         caseData = getCaseDataFromFeeType(feeType, caseData, paymentDetails);
-        log.info("CaseDataAfter adding payment details : {}", caseData.getClaimIssuedPaymentDetails());
         return caseData;
     }
 
