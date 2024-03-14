@@ -55,10 +55,10 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantAdmittedAmount").isEqualTo("100");
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn")
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineEn")
             .isEqualTo(DateUtils.formatDate(date));
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy")
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineCy")
             .isEqualTo(DateUtils.formatDate(date));
 
         assertThat(result).extracting("respondent1ResponseDeadlineEn")
@@ -93,12 +93,10 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantAdmittedAmount").isNull();
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadline").isNull();
-
         assertThat(result).extracting("defendantAdmittedAmount").isNull();
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn").isNull();
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy").isNull();
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineEn").isNull();
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineCy").isNull();
 
         assertThat(result).extracting("claimFee").isNull();
 

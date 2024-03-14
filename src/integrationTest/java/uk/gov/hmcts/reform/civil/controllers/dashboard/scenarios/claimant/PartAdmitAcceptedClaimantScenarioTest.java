@@ -31,7 +31,8 @@ public class PartAdmitAcceptedClaimantScenarioTest extends BaseIntegrationTest {
                ScenarioRequestParams.builder()
                    .params(Map.of("respondent1PartyName", "John Doe",
                                   "defendantAdmittedAmount", "500",
-                                  "defendantAdmittedAmountPaymentDeadlineEn", "19th March 2024"
+                                  "respondent1AdmittedAmountPaymentDeadlineEn", "19th March 2024",
+                                  "respondent1AdmittedAmountPaymentDeadlineCy", "19th March 2024"
                    )).build(),
                DASHBOARD_CREATE_SCENARIO_URL, SCENARIO_PART_ADMIT_ACCEPTED_CLAIMANT, caseId
         )

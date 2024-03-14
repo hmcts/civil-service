@@ -35,10 +35,9 @@ public class DashboardNotificationsParamsMapper {
                        this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData))));
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
-            params.put("defendantAdmittedAmountPaymentDeadlineEn",
-                       DateUtils.formatDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()));
-            params.put("defendantAdmittedAmountPaymentDeadlineCy",
-                       DateUtils.formatDate(caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()));
+            LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
+            params.put("respondent1AdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put("respondent1AdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
         }
         if (nonNull(caseData.getClaimFee())) {
             params.put(

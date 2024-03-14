@@ -130,7 +130,7 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
             Map<String, Object> scenarioParams = new HashMap<>();
             scenarioParams.put("defendantName", "Defendant Name");
             scenarioParams.put("defendantAdmittedAmount", "£500");
-            scenarioParams.put("defendantAdmittedAmountPaymentDeadline", "12/01/2024");
+            scenarioParams.put("respondent1AdmittedAmountPaymentDeadline", "12/01/2024");
 
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
 
