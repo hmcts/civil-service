@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,7 +18,6 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseU
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 
 @Service
-@RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
     public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
@@ -40,8 +38,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
-                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
-                    .stripTrailingZeros().toPlainString()
+                "£" + caseData.getClaimFee().toPounds().stripTrailingZeros().toPlainString()
             );
         }
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
@@ -69,6 +66,9 @@ public class DashboardNotificationsParamsMapper {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
 
+        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
+        params.put("claimSettledDate", getClaimSettleDate(caseData));
+        params.put("respondSettlementAgreementDeadline", getRespondToSettlementAgreementDeadline(caseData));
         return params;
     }
 
@@ -93,5 +93,10 @@ public class DashboardNotificationsParamsMapper {
         }
 
         return respondToClaim;
+    }
+
+    private String getRespondToSettlementAgreementDeadline(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
+            .map(DateUtils::formatDate).orElse(null);
     }
 }
