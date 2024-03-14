@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 public class ClaimRejectedNotPaidScenarioTest extends BaseIntegrationTest {
+
     @Test
     void should_create_scenario_for_claimant_reject_for_not_paid_defendant_notification() throws Exception {
         UUID caseId = UUID.randomUUID();
