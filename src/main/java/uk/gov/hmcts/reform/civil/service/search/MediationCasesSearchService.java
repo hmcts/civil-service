@@ -16,7 +16,7 @@ import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 
 @Service
-public class MediationCasesSearchService extends ElasticSearchService{
+public class MediationCasesSearchService extends ElasticSearchService {
 
     private static final LocalDate CARM_DATE = LocalDate.of(2024, 5, 1);
 

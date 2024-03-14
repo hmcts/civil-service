@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
