@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -71,6 +72,13 @@ public class DashboardNotificationsParamsMapper {
             params.put("claimSettledDateCy", date);
             return Optional.of(date);
         });
+
+        getRespondToSettlementAgreementDeadline(caseData).map(date -> {
+            params.put("respondSettlementAgreementDeadlineEn", date);
+            params.put("respondSettlementAgreementDeadlineCy", date);
+            return Optional.of(date);
+        });
+
         return params;
     }
 
@@ -103,5 +111,11 @@ public class DashboardNotificationsParamsMapper {
         }
 
         return respondToClaim;
+    }
+
+    private Optional<String> getRespondToSettlementAgreementDeadline(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
+            .map(LocalDateTime::toLocalDate)
+            .map(DateUtils::formatDate);
     }
 }
