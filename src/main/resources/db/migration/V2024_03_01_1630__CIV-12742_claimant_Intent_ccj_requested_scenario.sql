@@ -17,7 +17,7 @@ VALUES ('Notice.AAA7.ClaimantIntent.CCJ.Requested.Claimant', 'County Court Judgm
         '<a href="{enforceJudgementUrl}" rel="noopener noreferrer" class="govuk-link">Find out about actions you can take once a CCJ is issued (opens in a new tab).</a>.</p>',
         '<p class="govuk-body">We’ll process your request and post a copy of the judgment to you and ${respondent1PartyName}. We aim to do this as soon as possible.<br><br>'
         'Your online account will not be updated, and ${respondent1PartyName} will no longer be able to respond to your claim online. Any further updates will be by post.<br><br>'
-        'If a postal response is received before the judgment is issued, your request will be rejected.<br><br></p>'
+        'If a postal response is received before the judgment is issued, your request will be rejected.<br><br>'
         '<a href="{enforceJudgementUrl}" rel="noopener noreferrer" class="govuk-link">Find out about actions you can take once a CCJ is issued (opens in a new tab).</a>.</p>',
         'CLAIMANT');
 
