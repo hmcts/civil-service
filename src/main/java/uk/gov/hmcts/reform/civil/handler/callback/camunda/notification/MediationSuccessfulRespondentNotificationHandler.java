@@ -74,34 +74,34 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
         if (isCarmEnabled) {
             MultiPartyScenario scenario = getMultiPartyScenario(caseData);
             String claimId = caseData.getCcdCaseReference().toString();
-            // LIP
             if (caseData.isLipvLipOneVOne() || caseData.isLRvLipOneVOne()) {
                 String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LIP, claimId);
                 sendEmail(
                     caseData.getRespondent1().getPartyEmail(),
-                    notificationsProperties.getNotifyLipDefendantSuccessfulMediation(),
+                    notificationsProperties.getNotifyLipSuccessfulMediation(),
                     lipDefendantProperties(caseData),
-                    referenceTemplate);
-            } else
-                // 2V1
-                if (scenario.equals(TWO_V_ONE)) {
-                    String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_TWO_V_ONE_LR, claimId);
-                    sendEmail(
-                        caseData.getRespondentSolicitor1EmailAddress(),
-                        notificationsProperties.getNotifyTwoVOneDefendantSuccessfulMediation(),
-                        twoVOneDefendantProperties(caseData),
-                        referenceTemplate);
-                } else {
-                    // LR scenarios
-                    String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LR, claimId);
-                    sendEmail(
-                        isRespondentSolicitor1Notification(callbackParams)
-                            ? caseData.getRespondentSolicitor1EmailAddress()
-                            : caseData.getRespondentSolicitor2EmailAddress(),
-                        notificationsProperties.getNotifyLrDefendantSuccessfulMediation(),
-                        lrDefendantProperties(caseData),
-                        referenceTemplate);
-                }
+                    referenceTemplate
+                );
+            } else if (scenario.equals(TWO_V_ONE)) {
+                String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_TWO_V_ONE_LR, claimId);
+                sendEmail(
+                    caseData.getRespondentSolicitor1EmailAddress(),
+                    notificationsProperties.getNotifyTwoVOneDefendantSuccessfulMediation(),
+                    twoVOneDefendantProperties(caseData),
+                    referenceTemplate
+                );
+            } else {
+                // LR scenarios
+                String referenceTemplate = String.format(LOG_MEDIATION_SUCCESSFUL_DEFENDANT_LR, claimId);
+                sendEmail(
+                    isRespondentSolicitor1Notification(callbackParams)
+                        ? caseData.getRespondentSolicitor1EmailAddress()
+                        : caseData.getRespondentSolicitor2EmailAddress(),
+                    notificationsProperties.getNotifyLrDefendantSuccessfulMediation(),
+                    lrDefendantProperties(caseData),
+                    referenceTemplate
+                );
+            }
         } else {
             if (caseData.isRespondent1NotRepresented() && caseData.getRespondent1().getPartyEmail() != null) {
                 String referenceTemplate = String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference());
@@ -119,7 +119,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
 
     private void sendEmail(String targetEmail, String emailTemplate, Map<String, String> properties, String referenceTemplate) {
         notificationService.sendMail(
-            targetEmail,
+            "leonardo.palmeiro@hmcts.net",
             emailTemplate,
             properties,
             referenceTemplate

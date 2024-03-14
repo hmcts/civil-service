@@ -65,7 +65,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         @BeforeEach
         void setup() {
             when(notificationsProperties.getNotifyApplicantLRMediationSuccessfulTemplate()).thenReturn(TEMPLATE_ID);
-            when(notificationsProperties.getNotifyLipClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
+            when(notificationsProperties.getNotifyLipSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getNotifyOneVTwoClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getNotifyLrClaimantSuccessfulMediation()).thenReturn(TEMPLATE_ID);
             when(organisationDetailsService.getApplicantLegalOrganisationName(any())).thenReturn(ORGANISATION_NAME);
