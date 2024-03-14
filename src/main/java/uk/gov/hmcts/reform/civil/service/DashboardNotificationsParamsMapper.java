@@ -21,6 +21,9 @@ import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 @Service
 public class DashboardNotificationsParamsMapper {
 
+    public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
+    public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
+
     public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
 
         Map<String, Object> params = new HashMap<>();
@@ -51,7 +54,7 @@ public class DashboardNotificationsParamsMapper {
             LocalDateTime respondent1SettlementAgreementDeadline = caseData.getRespondent1RespondToSettlementAgreementDeadline();
             params.put("respondent1SettlementAgreementDeadline_En", DateUtils.formatDate(respondent1SettlementAgreementDeadline));
             params.put("respondent1SettlementAgreementDeadline_Cy", DateUtils.formatDate(respondent1SettlementAgreementDeadline));
-            params.put("claimantSettlementAgreement", "accepted");
+            params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
         }
         if (caseData.getClaimIssueRemissionAmount() != null) {
             params.put(
@@ -105,5 +108,12 @@ public class DashboardNotificationsParamsMapper {
     private String getRespondToSettlementAgreementDeadline(CaseData caseData) {
         return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
             .map(DateUtils::formatDate).orElse(null);
+    }
+
+    private String getClaimantRepaymentPlanDecision(CaseData caseData) {
+        if (caseData.hasApplicantAcceptedRepaymentPlan()) {
+            return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN;
+        }
+        return CLAIMANT1_REJECTED_REPAYMENT_PLAN;
     }
 }

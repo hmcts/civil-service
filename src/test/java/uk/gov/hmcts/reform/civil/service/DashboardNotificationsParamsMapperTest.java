@@ -20,6 +20,7 @@ import java.time.Month;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
 public class DashboardNotificationsParamsMapperTest {
@@ -45,6 +46,7 @@ public class DashboardNotificationsParamsMapperTest {
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100))
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date))
             .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now())
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
