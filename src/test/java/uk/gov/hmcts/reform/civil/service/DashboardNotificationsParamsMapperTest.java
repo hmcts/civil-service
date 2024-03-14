@@ -39,9 +39,10 @@ public class DashboardNotificationsParamsMapperTest {
         LocalDate date = LocalDate.of(2024, Month.JANUARY, 11);
 
         caseData = caseData.toBuilder()
+            .hwfFeeType(FeeType.CLAIMISSUED)
+            .totalClaimAmount(BigDecimal.valueOf(124.67))
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100))
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date))
-            .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -56,6 +57,7 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn")
             .isEqualTo(DateUtils.formatDate(date));
+
         assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy")
             .isEqualTo(DateUtils.formatDate(date));
 
@@ -65,8 +67,8 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1PartyName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
-        assertThat(result).extracting("typeOfFee")
-            .isEqualTo("claim");
+
+        assertThat(result).extracting("typeOfFee").isEqualTo("claim");
     }
 
     @Test
