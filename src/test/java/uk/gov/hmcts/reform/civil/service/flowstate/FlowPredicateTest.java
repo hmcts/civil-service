@@ -1749,7 +1749,7 @@ class FlowPredicateTest {
                 .applicant1ProceedWithClaim(YES)
                 .responseClaimTrack(SMALL_CLAIM.name())
                 .build().toBuilder()
-                .submittedDate(LocalDateTime.of(2024, 6, 1, 1, 1))
+                .submittedDate(LocalDateTime.of(2028, 6, 1, 1, 1))
                 .build();
             assertTrue(specSmallClaimCarm.test(caseData));
         }

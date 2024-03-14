@@ -416,7 +416,7 @@ public class FlowPredicate {
     }
 
     private static boolean getCarmEnabledForDate(CaseData caseData) {
-        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 5, 1));
+        return caseData.getSubmittedDate().toLocalDate().isAfter(LocalDate.of(2024, 8, 1));
     }
 
     public static final Predicate<CaseData> takenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension =
