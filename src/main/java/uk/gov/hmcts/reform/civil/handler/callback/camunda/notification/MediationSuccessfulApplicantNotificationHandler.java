@@ -61,7 +61,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
                 sendEmail(
                     caseData.getApplicant1().getPartyEmail(),
                     notificationsProperties.getNotifyLipSuccessfulMediation(),
-                    lipClaimantProperties(caseData),
+                    lipProperties(caseData),
                     referenceTemplate
                 );
             } else if (scenario.equals(ONE_V_TWO_ONE_LEGAL_REP) || scenario.equals(ONE_V_TWO_TWO_LEGAL_REP)) {
@@ -94,7 +94,7 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
 
     private void sendEmail(String targetEmail, String emailTemplate, Map<String, String> properties, String referenceTemplate) {
         notificationService.sendMail(
-            "leonardo.palmeiro@hmcts.net",
+            targetEmail,
             emailTemplate,
             properties,
             referenceTemplate
@@ -134,9 +134,9 @@ public class MediationSuccessfulApplicantNotificationHandler extends CallbackHan
         );
     }
 
-    public Map<String, String> lipClaimantProperties(CaseData caseData) {
+    public Map<String, String> lipProperties(CaseData caseData) {
         return Map.of(
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            PARTY_NAME, caseData.getApplicant1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }

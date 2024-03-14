@@ -28,11 +28,11 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.ClaimantResponseConfirmsNotToProceedRespondentNotificationHandler.CLAIM_REFERENCE_NUMBER;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_ONE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_TWO;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @SpringBootTest(classes = {
@@ -128,7 +128,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                OneVTwoProperties(caseData),
+                oneVTwoProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
             );
         }
@@ -149,7 +149,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 APPLICANT_MAIL,
                 TEMPLATE_ID,
-                OneVTwoProperties(caseData),
+                oneVTwoProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
             );
         }
@@ -214,7 +214,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 TEMPLATE_ID,
-                lipClaimantProperties(caseData),
+                lipProperties(caseData),
                 MEDIATION_SUCCESSFUL_APPLICANT_NOTIFICATION_1594901956117591
             );
         }
@@ -239,7 +239,7 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         );
     }
 
-    public Map<String, String> OneVTwoProperties(CaseData caseData) {
+    public Map<String, String> oneVTwoProperties(CaseData caseData) {
         return Map.of(
             CLAIM_LEGAL_ORG_NAME_SPEC, organisationDetailsService.getApplicantLegalOrganisationName(caseData),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
@@ -248,9 +248,9 @@ class MediationSuccessfulApplicantNotificationHandlerTest extends BaseCallbackHa
         );
     }
 
-    public Map<String, String> lipClaimantProperties(CaseData caseData) {
+    public Map<String, String> lipProperties(CaseData caseData) {
         return Map.of(
-            CLAIMANT_NAME, caseData.getApplicant1().getPartyName(),
+            PARTY_NAME, caseData.getApplicant1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }

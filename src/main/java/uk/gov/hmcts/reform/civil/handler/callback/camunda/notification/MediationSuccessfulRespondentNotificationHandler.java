@@ -79,7 +79,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
                 sendEmail(
                     caseData.getRespondent1().getPartyEmail(),
                     notificationsProperties.getNotifyLipSuccessfulMediation(),
-                    lipDefendantProperties(caseData),
+                    lipProperties(caseData),
                     referenceTemplate
                 );
             } else if (scenario.equals(TWO_V_ONE)) {
@@ -119,7 +119,7 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
 
     private void sendEmail(String targetEmail, String emailTemplate, Map<String, String> properties, String referenceTemplate) {
         notificationService.sendMail(
-            "leonardo.palmeiro@hmcts.net",
+            targetEmail,
             emailTemplate,
             properties,
             referenceTemplate
@@ -164,9 +164,9 @@ public class MediationSuccessfulRespondentNotificationHandler extends CallbackHa
         );
     }
 
-    public Map<String, String> lipDefendantProperties(CaseData caseData) {
+    public Map<String, String> lipProperties(CaseData caseData) {
         return Map.of(
-            DEFENDANT_NAME, caseData.getRespondent1().getPartyName(),
+            PARTY_NAME, caseData.getRespondent1().getPartyName(),
             CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString()
         );
     }
