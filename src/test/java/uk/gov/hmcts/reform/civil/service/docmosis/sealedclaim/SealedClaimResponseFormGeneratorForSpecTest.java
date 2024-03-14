@@ -10,12 +10,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.UnavailableDateType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentMethod;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEventDetails;
 import uk.gov.hmcts.reform.civil.model.TimelineOfEvents;
@@ -182,6 +185,15 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
             CASE_DATA_WITH_MULTI_PARTY.getRespondent2DQ().getRespondent2DQStatementOfTruth().getRole(),
             templateData.getStatementOfTruth().getRole()
         );
+        Assertions.assertEquals(
+            CASE_DATA_WITH_MULTI_PARTY.getRespondent2SpecDefenceResponseDocument().getFile().getDocumentFileName(),
+            templateData.getRespondent1SpecDefenceResponseDocument()
+        );
+        Assertions.assertFalse(templateData.isTimelineUploaded());
+        Assertions.assertEquals(
+            CASE_DATA_WITH_MULTI_PARTY.getSpecResponseTimelineOfEvents2().get(0).getValue().getTimelineDescription(),
+            templateData.getTimeline().get(0).getTimelineDescription()
+        );
     }
 
     @Test
@@ -204,6 +216,10 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         Assertions.assertEquals(
             caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getRole(),
             templateData.getStatementOfTruth().getRole()
+        );
+        Assertions.assertEquals(
+            caseData.getRespondent1SpecDefenceResponseDocument().getFile().getDocumentFileName(),
+            templateData.getRespondent1SpecDefenceResponseDocument()
         );
     }
 
@@ -293,6 +309,10 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
         timelines.add(TimelineOfEvents.builder()
                           .value(TimelineOfEventDetails.builder()
                                      .timelineDate(LocalDate.now()).timelineDescription("test timeline").build()).build());
+        List<TimelineOfEvents> timelines2 = new ArrayList<>();
+        timelines2.add(TimelineOfEvents.builder()
+                          .value(TimelineOfEventDetails.builder()
+                                     .timelineDate(LocalDate.now()).timelineDescription("test timeline2").build()).build());
         return CaseData.builder()
             .legacyCaseReference("case reference")
             .detailsOfWhyDoesYouDisputeTheClaim("why dispute the claim")
@@ -353,6 +373,17 @@ public class SealedClaimResponseFormGeneratorForSpecTest {
                                         .howWasThisAmountPaid(PaymentMethod.CREDIT_CARD)
                                         .whenWasThisAmountPaid(LocalDate.now()).build())
             .specResponseTimelineOfEvents(timelines)
+            .specResponseTimelineOfEvents2(timelines2)
+            .respondent1SpecDefenceResponseDocument(ResponseDocument.builder()
+                                                        .file(Document.builder()
+                                                                  .documentFileName("defendant1 evidence")
+                                                                  .build())
+                                                        .build())
+            .respondent2SpecDefenceResponseDocument(ResponseDocument.builder()
+                                                        .file(Document.builder()
+                                                                  .documentFileName("defendant2 evidence")
+                                                                  .build())
+                                                        .build())
             .build();
     }
 
