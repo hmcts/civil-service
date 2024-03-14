@@ -47,6 +47,7 @@ public class CreateClaimSpecAfterPaymentCallbackHandler extends CallbackHandler 
     private CallbackResponse changeStateToCaseIssued(CallbackParams callbackParams) {
         Long caseId = callbackParams.getCaseData().getCcdCaseReference();
         CaseData caseData = callbackParams.getCaseData();
+        log.info("CaseData in CREATE_CLAIM_SPEC_AFTER_PAYMENT handler :  {}", caseData);
         CaseData.CaseDataBuilder dataBuilder = caseData.toBuilder();
         dataBuilder.businessProcess(BusinessProcess.ready(CREATE_CLAIM_SPEC_AFTER_PAYMENT));
 
