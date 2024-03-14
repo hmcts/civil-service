@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -55,28 +54,17 @@ public class GenerateAcknowledgementOfClaimCallbackHandler extends CallbackHandl
 
     private CallbackResponse prepareAcknowledgementOfClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-
         CaseDocument acknowledgementOfClaim = acknowledgementOfClaimGenerator.generate(
             caseData,
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
-        CaseDocument copy = assignCategoryId.copyCaseDocumentWithCategoryId(
-                acknowledgementOfClaim, "");
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = caseData.getSystemGeneratedCaseDocuments();
         systemGeneratedCaseDocuments.add(element(acknowledgementOfClaim));
-        if (Objects.nonNull(copy)) {
-            systemGeneratedCaseDocuments.add(element(copy));
-        }
-        caseDataBuilder.systemGeneratedCaseDocuments(systemGeneratedCaseDocuments);
-
         assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, DocCategory.DEF1_DEFENSE_DQ.getValue());
-        assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF1.getValue());
         if (nonNull(caseData.getRespondent2DocumentGeneration()) && caseData.getRespondent2DocumentGeneration().equals("userRespondent2")) {
             assignCategoryId.assignCategoryIdToCaseDocument(acknowledgementOfClaim, DocCategory.DEF2_DEFENSE_DQ.getValue());
-            assignCategoryId.assignCategoryIdToCaseDocument(copy, DocCategory.DQ_DEF2.getValue());
         }
-
+        CaseData.CaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseDataBuilder.build().toMap(objectMapper))
             .build();
