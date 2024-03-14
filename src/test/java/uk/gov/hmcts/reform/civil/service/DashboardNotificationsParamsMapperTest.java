@@ -73,11 +73,11 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(caseData.getRespondent1().getPartyName());
 
         assertThat(result).extracting("typeOfFee").isEqualTo("claim");
-        assertThat(result).extracting("respondent1SettlementAgreementDeadline_En")
-                .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
+        assertThat(result).extracting("respondent1SettlementAgreementDeadlineEn")
+            .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
 
-        assertThat(result).extracting("respondent1SettlementAgreementDeadline_Cy")
-                .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
+        assertThat(result).extracting("respondent1SettlementAgreementDeadlineCy")
+            .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
 
         assertThat(result).extracting("claimantSettlementAgreement").isEqualTo("accepted");
     }
@@ -108,8 +108,8 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn").isNull();
         assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEnCy").isNull();
 
-        assertThat(result).extracting("respondent1SettlementAgreementDeadline_En").isNull();
-        assertThat(result).extracting("respondent1SettlementAgreementDeadline_Cy").isNull();
+        assertThat(result).extracting("respondent1SettlementAgreementDeadlineEn").isNull();
+        assertThat(result).extracting("respondent1SettlementAgreementDeadlineCy").isNull();
 
         assertThat(result).extracting("claimFee").isNull();
 

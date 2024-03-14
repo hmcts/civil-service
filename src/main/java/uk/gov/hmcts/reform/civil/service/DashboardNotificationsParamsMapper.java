@@ -34,8 +34,10 @@ public class DashboardNotificationsParamsMapper {
         params.put("claimantName", getPartyNameBasedOnType(caseData.getApplicant1()));
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
-            params.put("defendantAdmittedAmount",
-                       this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData))));
+            params.put(
+                "defendantAdmittedAmount",
+                this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData)))
+            );
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
@@ -53,14 +55,10 @@ public class DashboardNotificationsParamsMapper {
             params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(responseDeadline));
             params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
         }
-        if (nonNull(caseData.getRespondent1RespondToSettlementAgreementDeadline())) {
-            LocalDateTime respondent1SettlementAgreementDeadline = caseData.getRespondent1RespondToSettlementAgreementDeadline();
-            params.put("respondent1SettlementAgreementDeadline_En", DateUtils.formatDate(respondent1SettlementAgreementDeadline));
-            params.put("respondent1SettlementAgreementDeadline_Cy", DateUtils.formatDate(respondent1SettlementAgreementDeadline));
-            params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
-        }
+
         if (caseData.getClaimIssueRemissionAmount() != null) {
-            params.put("claimIssueRemissionAmount",
+            params.put(
+                "claimIssueRemissionAmount",
                 "£" + this.removeDoubleZeros(MonetaryConversions
                                                  .penniesToPounds(caseData.getClaimIssueRemissionAmount()).toPlainString())
             );
@@ -87,7 +85,7 @@ public class DashboardNotificationsParamsMapper {
         getRespondToSettlementAgreementDeadline(caseData).map(date -> {
             params.put("respondent1SettlementAgreementDeadlineEn", date);
             params.put("respondent1SettlementAgreementDeadlineCy", date);
-            params.put("claimantSettlementAgreement", "accepted");
+            params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
             return Optional.of(date);
         });
 

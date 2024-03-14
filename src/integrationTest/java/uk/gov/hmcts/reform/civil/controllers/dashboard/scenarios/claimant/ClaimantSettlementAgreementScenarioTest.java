@@ -30,8 +30,8 @@ public class ClaimantSettlementAgreementScenarioTest extends BaseIntegrationTest
                         .params(
                                 Map.of(
                                         "claimantSettlementAgreement", "accepted",
-                                        "respondent1SettlementAgreementDeadline_En", respondent1SettlementDeadline,
-                                        "respondent1SettlementAgreementDeadline_Cy", respondent1SettlementDeadline
+                                        "respondent1SettlementAgreementDeadlineEn", respondent1SettlementDeadline,
+                                        "respondent1SettlementAgreementDeadlineCy", respondent1SettlementDeadline
                                 )
                         )
                         .build(),
