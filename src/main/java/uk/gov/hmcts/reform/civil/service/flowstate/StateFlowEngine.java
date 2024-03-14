@@ -29,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isTra
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.nocSubmittedForLiPApplicant;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.partAdmitPayImmediately;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isClaimantNotSettleFullDefenceClaim;
+import static uk.gov.hmcts.reform.civil.service.flowstate.FlowLipPredicate.isDefendantNotPaidFullDefenceClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.acceptRepaymentPlan;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.agreePartAdmitSettle;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.allAgreedToLrMediationSpec;
@@ -522,7 +523,7 @@ public class StateFlowEngine {
                          .or(declinedMediation).and(applicantOutOfTime.negate()).and(demageMultiClaim.negate()))
             .setDynamic(Map.of(FlowFlag.SDO_ENABLED.name(),
                                JudicialReferralUtils::shouldMoveToJudicialReferral))
-            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantNotSettleFullDefenceClaim.and(not(agreedToMediation)))
+            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantNotSettleFullDefenceClaim.or(isDefendantNotPaidFullDefenceClaim).and(not(agreedToMediation)))
                 .set((c, flags) -> {
                     flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
                     flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);

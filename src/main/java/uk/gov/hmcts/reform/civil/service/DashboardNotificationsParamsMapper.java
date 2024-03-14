@@ -28,6 +28,7 @@ public class DashboardNotificationsParamsMapper {
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
+        params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
         params.put("claimantName", getPartyNameBasedOnType(caseData.getApplicant1()));
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
