@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Map;
 
@@ -56,8 +55,8 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantAdmittedAmount").isEqualTo("100");
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn").isEqualTo("22nd February 2024");
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy").isEqualTo("22nd February 2024");
+        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn").isEqualTo("22 February 2024");
+        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy").isEqualTo("22 February 2024");
 
         assertThat(result).extracting("respondent1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
