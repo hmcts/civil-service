@@ -529,7 +529,6 @@ public class StateFlowEngine {
             .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantNotSettleFullDefenceClaim.or(isDefendantNotPaidFullDefenceClaim).and(not(agreedToMediation)))
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
-                flags.put(FlowFlag.SETTLE_THE_CLAIM.name(), false);
             })
             .state(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA)
                 .transitionTo(CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE).onlyIf(claimDismissedByCamunda)
