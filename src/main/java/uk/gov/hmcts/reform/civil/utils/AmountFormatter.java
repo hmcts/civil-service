@@ -6,7 +6,7 @@ import java.text.DecimalFormat;
 public class AmountFormatter {
 
     private AmountFormatter() {
-        //no op
+        //NO-OP
     }
 
     public static String formatAmount(BigDecimal amount) {
