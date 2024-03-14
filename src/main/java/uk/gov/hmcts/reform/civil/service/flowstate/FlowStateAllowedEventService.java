@@ -17,6 +17,7 @@ import static java.util.Map.entry;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_SIGN_SETTLEMENT_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.FEE_PAYMENT_OUTCOME;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LIFT_BREATHING_SPACE_LIP;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NO_REMISSION_HWF;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UpdateNextHearingInfo;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF_GRANTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.asyncStitchingComplete;
@@ -82,6 +83,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_DEFENDANT_OF_C
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_PARTIES;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NotSuitable_SDO;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RECORD_JUDGMENT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.EDIT_JUDGMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REFER_TO_JUDGE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_JUDGEMENT_ADMISSION_SPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDERATION;
@@ -606,7 +608,8 @@ public class FlowStateAllowedEventService {
                 CLAIMANT_RESPONSE_CUI,
                 asyncStitchingComplete,
                 REQUEST_FOR_RECONSIDERATION,
-                DECISION_ON_RECONSIDERATION_REQUEST
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                EDIT_JUDGMENT
             )
         ),
 
@@ -1233,7 +1236,8 @@ public class FlowStateAllowedEventService {
                 UPLOAD_MEDIATION_DOCUMENTS,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 REQUEST_FOR_RECONSIDERATION,
-                DECISION_ON_RECONSIDERATION_REQUEST
+                DECISION_ON_RECONSIDERATION_REQUEST,
+                EDIT_JUDGMENT
             )
         ),
 
@@ -1393,6 +1397,7 @@ public class FlowStateAllowedEventService {
                 UPLOAD_MEDIATION_DOCUMENTS,
                 MORE_INFORMATION_HWF,
                 FEE_PAYMENT_OUTCOME,
+                NO_REMISSION_HWF,
                 CUI_UPLOAD_MEDIATION_DOCUMENTS,
                 TRANSFER_ONLINE_CASE,
                 PARTIAL_REMISSION_HWF_GRANTED,
@@ -1599,7 +1604,8 @@ public class FlowStateAllowedEventService {
                 FEE_PAYMENT_OUTCOME,
                 FULL_REMISSION_HWF,
                 UPDATE_HELP_WITH_FEE_NUMBER,
-                INVALID_HWF_REFERENCE
+                INVALID_HWF_REFERENCE,
+                NO_REMISSION_HWF
             )
         ),
         entry(
