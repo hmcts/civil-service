@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
+import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
@@ -36,8 +36,8 @@ public class DashboardNotificationsParamsMapper {
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
-            params.put("defendantAdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
-            params.put("defendantAdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put("respondent1AdmittedAmountPaymentDeadlineEn", DateUtils.formatDate(whenWillThisAmountBePaid));
+            params.put("respondent1AdmittedAmountPaymentDeadlineCy", DateUtils.formatDate(whenWillThisAmountBePaid));
         }
         if (nonNull(caseData.getClaimFee())) {
             params.put(

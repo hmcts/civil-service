@@ -27,6 +27,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -117,13 +119,38 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
                 CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
             ).build();
 
-            Map<String, Object> scenarioParams = new HashMap<>();
-            scenarioParams.put("claimSettledAmount", "500");
-            scenarioParams.put("claimSettledDate", "12/01/2024");
-
             handler.handle(params);
 
             verifyNoInteractions(dashboardApiClient);
+        }
+
+        @Test
+        void shouldRecordScenario_whenInvokedWhenCaseStateIsSettledAndPartAdmit() {
+            // Given
+            Map<String, Object> scenarioParams = new HashMap<>();
+            scenarioParams.put("defendantName", "Defendant Name");
+            scenarioParams.put("defendantAdmittedAmount", "£500");
+            scenarioParams.put("respondent1AdmittedAmountPaymentDeadline", "12/01/2024");
+
+            when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
+                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.YES)
+                .applicant1AcceptPartAdmitPaymentPlanSpec(null)
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .build().toBuilder().ccdState(CaseState.CASE_SETTLED).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE.name()).build()
+            ).build();
+            // When
+            handler.handle(params);
+            // Then
+            verify(dashboardApiClient).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                DashboardScenarios.SCENARIO_AAA7_CLAIM_PART_ADMIT_CLAIMANT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(scenarioParams).build()
+            );
         }
 
     }
