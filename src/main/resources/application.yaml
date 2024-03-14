@@ -378,6 +378,9 @@ notifications:
   notifyDefendantLRForMediation: "feec8506-6d60-4715-8f48-43ded5d24d97"
   notifyApplicantLRMediationTemplate: "55fd5423-e044-42d0-8296-e9755a002480"
 
+  notifyClaimantJudgementVariedDeterminationOfMeansTemplate: "16711810-3629-4f8f-a55d-3a7dbab47ed9"
+  notifyDefendantJudgementVariedDeterminationOfMeansTemplate: "6e13b9af-2dbe-49dd-be89-71464ed551d2"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
