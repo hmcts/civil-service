@@ -7,13 +7,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
+import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +36,16 @@ public class DashboardNotificationsParamsMapperTest {
 
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
-        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED).build();
+
+        LocalDate date = LocalDate.of(2024, Month.JANUARY, 11);
+
+        caseData = caseData.toBuilder()
+            .hwfFeeType(FeeType.CLAIMISSUED)
+            .totalClaimAmount(BigDecimal.valueOf(124.67))
+            .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100))
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date))
+            .build();
+
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimFee").isEqualTo("£1");
@@ -42,20 +54,34 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
 
-        assertThat(result).extracting("respondent1ResponseDeadline")
-            .isEqualTo(DateUtils.formatDate(LocalDateTime.now().plusDays(14L)));
+        assertThat(result).extracting("defendantAdmittedAmount").isEqualTo("100");
 
+        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn")
+            .isEqualTo(DateUtils.formatDate(date));
+
+        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy")
+            .isEqualTo(DateUtils.formatDate(date));
+
+        assertThat(result).extracting("respondent1ResponseDeadlineEn")
+            .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
+        assertThat(result).extracting("respondent1ResponseDeadlineCy")
+            .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1PartyName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
-        assertThat(result).extracting("typeOfFee")
-            .isEqualTo("claim");
+
+        assertThat(result).extracting("typeOfFee").isEqualTo("claim");
     }
 
     @Test
     public void shouldMapParameters_WhenResponseDeadlineAndClaimFeeIsNull() {
 
-        caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
-            .claimFee(null).build();
+        caseData = caseData.toBuilder()
+            .respondent1ResponseDeadline(null)
+            .respondToAdmittedClaimOwingAmountPounds(null)
+            .respondToClaimAdmitPartLRspec(null)
+            .respondent1ResponseDeadline(null)
+            .claimFee(null)
+            .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -63,7 +89,13 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defaultRespondTime").isEqualTo("4pm");
 
-        assertThat(result).extracting("responseDeadline").isNull();
+        assertThat(result).extracting("respondent1ResponseDeadlineEn").isNull();
+        assertThat(result).extracting("respondent1ResponseDeadlineCy").isNull();
+
+        assertThat(result).extracting("defendantAdmittedAmount").isNull();
+
+        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn").isNull();
+        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEnCy").isNull();
 
         assertThat(result).extracting("claimFee").isNull();
 
@@ -103,7 +135,18 @@ public class DashboardNotificationsParamsMapperTest {
         assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.55");
         assertThat(result).extracting("claimSettledDateEn").isEqualTo("29 March 2023");
         assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 March 2023");
+    }
 
+    @Test
+    public void shouldMapParameters_whenHwFPartRemissionGranted() {
+        caseData = caseData.toBuilder().hwfFeeType(FeeType.CLAIMISSUED)
+            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().remissionAmount(BigDecimal.valueOf(2500))
+                                       .outstandingFeeInPounds(BigDecimal.valueOf(100)).build()).build();
+
+        Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
+
+        assertThat(result).extracting("claimIssueRemissionAmount").isEqualTo("£25");
+        assertThat(result).extracting("claimIssueOutStandingAmount").isEqualTo("£100");
     }
 }
 
