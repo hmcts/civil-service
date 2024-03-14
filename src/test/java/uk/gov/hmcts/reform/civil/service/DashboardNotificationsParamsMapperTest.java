@@ -38,10 +38,12 @@ public class DashboardNotificationsParamsMapperTest {
 
         LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
 
-        caseData = caseData.toBuilder().respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100))
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(date).build())
-            .hwfFeeType(FeeType.CLAIMISSUED).build();
+        caseData = caseData.toBuilder()
+            .hwfFeeType(FeeType.CLAIMISSUED)
+            .totalClaimAmount(BigDecimal.valueOf(124.67))
+            .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100))
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date))
+            .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -53,10 +55,11 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantAdmittedAmount").isEqualTo("100");
 
-        assertThat(result).extracting("defendantAdmittedAmount").isEqualTo("100");
+        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn")
+            .isEqualTo(DateUtils.formatDate(date));
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn").isEqualTo("22 February 2024");
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy").isEqualTo("22 February 2024");
+        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy")
+            .isEqualTo(DateUtils.formatDate(date));
 
         assertThat(result).extracting("respondent1ResponseDeadlineEn")
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
@@ -64,8 +67,8 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1PartyName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
-        assertThat(result).extracting("typeOfFee")
-            .isEqualTo("claim");
+
+        assertThat(result).extracting("typeOfFee").isEqualTo("claim");
     }
 
     @Test

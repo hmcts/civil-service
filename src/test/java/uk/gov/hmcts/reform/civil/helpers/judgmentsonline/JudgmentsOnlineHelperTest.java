@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentStatusType;
-
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentsOnlineHelper.checkIfDateDifferenceIsGreaterThan31Days;
 
 public class JudgmentsOnlineHelperTest {
 
@@ -28,4 +28,11 @@ public class JudgmentsOnlineHelperTest {
         assertThat(JudgmentsOnlineHelper.validateIfFutureDate(LocalDate.now().minusDays(3))).isFalse();
         assertThat(JudgmentsOnlineHelper.validateIfFutureDate(LocalDate.now().plusDays(3))).isTrue();
     }
+
+    @Test
+    void shouldCheckIfDateDifferenceIsGreaterThan31Days() {
+        assertThat(checkIfDateDifferenceIsGreaterThan31Days(LocalDate.now(), LocalDate.now().plusDays(31))).isFalse();
+        assertThat(checkIfDateDifferenceIsGreaterThan31Days(LocalDate.now(), LocalDate.now().plusDays(32))).isTrue();
+    }
+
 }
