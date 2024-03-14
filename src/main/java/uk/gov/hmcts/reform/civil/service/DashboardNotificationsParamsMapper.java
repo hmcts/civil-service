@@ -76,8 +76,9 @@ public class DashboardNotificationsParamsMapper {
         });
 
         getRespondToSettlementAgreementDeadline(caseData).map(date -> {
-            params.put("respondSettlementAgreementDeadlineEn", date);
-            params.put("respondSettlementAgreementDeadlineCy", date);
+            params.put("respondent1SettlementAgreementDeadlineEn", date);
+            params.put("respondent1SettlementAgreementDeadlineCy", date);
+            params.put("claimantSettlementAgreement", "accepted");
             return Optional.of(date);
         });
 
