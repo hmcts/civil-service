@@ -34,6 +34,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandlerTest {
@@ -193,6 +194,36 @@ public class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallba
             SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario(),
             "BEARER_TOKEN",
             ScenarioRequestParams.builder().params(params).build()
+        );
+    }
+
+    @Test
+    public void configureDashboardNotificationsForDefendantPartAdmitHearing() {
+
+        Map<String, Object> params = new HashMap<>();
+
+        when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
+
+        CaseData caseData = CaseData.builder()
+                .legacyCaseReference("reference")
+                .ccdCaseReference(1234L)
+                .ccdState(CaseState.JUDICIAL_REFERRAL)
+                .applicant1AcceptAdmitAmountPaidSpec(YesOrNo.NO)
+                .responseClaimMediationSpecRequired(YesOrNo.NO)
+                .respondent1Represented(YesOrNo.NO)
+                .build();
+
+        CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_SUBMIT, caseData)
+                .build();
+
+        handler.handle(callbackParams);
+
+        verify(dashboardApiClient, times(1)).recordScenario(
+                caseData.getCcdCaseReference().toString(),
+                SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT.getScenario(),
+                "BEARER_TOKEN",
+                ScenarioRequestParams.builder().params(params).build()
         );
     }
 }

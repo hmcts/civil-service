@@ -25,17 +25,22 @@ public class Notification {
 
     private String descriptionCy;
 
+    private String timeToLive;
+
     private NotificationAction notificationAction;
 
     public static Notification from(DashboardNotificationsEntity dashboardNotificationsEntity) {
+
         NotificationBuilder notification = Notification.builder()
             .id(dashboardNotificationsEntity.getId())
             .titleEn(dashboardNotificationsEntity.getTitleEn())
             .titleCy(dashboardNotificationsEntity.getTitleCy())
             .descriptionEn(dashboardNotificationsEntity.getDescriptionEn())
-            .descriptionCy(dashboardNotificationsEntity.getDescriptionCy());
+            .descriptionCy(dashboardNotificationsEntity.getDescriptionCy())
+            .timeToLive(dashboardNotificationsEntity.getDashboardNotificationsTemplates().getTimeToLive());
 
-        Optional.ofNullable(dashboardNotificationsEntity.getNotificationAction()).ifPresent(NotificationAction::from);
+        Optional.ofNullable(dashboardNotificationsEntity.getNotificationAction())
+            .ifPresent(action -> notification.notificationAction(NotificationAction.from(action)));
         return notification.build();
     }
 }
