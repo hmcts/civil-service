@@ -7,8 +7,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
+import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
@@ -36,12 +36,13 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
 
-        LocalDate date = LocalDate.of(2024, Month.JANUARY, 11);
+        LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
 
         caseData = caseData.toBuilder()
+            .hwfFeeType(FeeType.CLAIMISSUED)
+            .totalClaimAmount(BigDecimal.valueOf(124.67))
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100))
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date))
-            .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -54,9 +55,10 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantAdmittedAmount").isEqualTo("100");
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn")
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineEn")
             .isEqualTo(DateUtils.formatDate(date));
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy")
+
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineCy")
             .isEqualTo(DateUtils.formatDate(date));
 
         assertThat(result).extracting("respondent1ResponseDeadlineEn")
@@ -65,8 +67,8 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(DateUtils.formatDate(LocalDate.now().plusDays(14L)));
         assertThat(result).extracting("respondent1PartyName")
             .isEqualTo(caseData.getRespondent1().getPartyName());
-        assertThat(result).extracting("typeOfFee")
-            .isEqualTo("claim");
+
+        assertThat(result).extracting("typeOfFee").isEqualTo("claim");
     }
 
     @Test
@@ -91,8 +93,10 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantAdmittedAmount").isNull();
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn").isNull();
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEnCy").isNull();
+        assertThat(result).extracting("defendantAdmittedAmount").isNull();
+
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineEn").isNull();
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineCy").isNull();
 
         assertThat(result).extracting("claimFee").isNull();
 
@@ -112,7 +116,8 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.50");
-        assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateEn").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 March 2023");
     }
 
     @Test
@@ -129,7 +134,8 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.55");
-        assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateEn").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 March 2023");
     }
 
     @Test
