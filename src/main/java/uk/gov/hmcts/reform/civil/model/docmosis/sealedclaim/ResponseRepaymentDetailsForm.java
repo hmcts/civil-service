@@ -62,9 +62,20 @@ public class ResponseRepaymentDetailsForm {
     public static ResponseRepaymentDetailsForm toSealedClaimResponseCommonContent(CaseData caseData) {
         ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder = ResponseRepaymentDetailsForm.builder();
 
-        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null) {
+        if (caseData.getRespondent1ClaimResponseTypeForSpec() != null && !useRespondent2(caseData)) {
             builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            builder.responseType(caseData.getRespondent1ClaimResponseTypeForSpec());
             switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+                case FULL_ADMISSION -> addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmount());
+                case PART_ADMISSION -> partAdmissionData(caseData, builder);
+                case FULL_DEFENCE -> fullDefenceData(caseData, builder);
+                case COUNTER_CLAIM -> builder.whyReject(COUNTER_CLAIM.name());
+                default -> builder.whyReject(null);
+            }
+        } else if (caseData.getRespondent2ClaimResponseTypeForSpec() != null && useRespondent2(caseData)) {
+            builder.howToPay(caseData.getDefenceAdmitPartPaymentTimeRouteRequired());
+            builder.responseType(caseData.getRespondent2ClaimResponseTypeForSpec());
+            switch (caseData.getRespondent2ClaimResponseTypeForSpec()) {
                 case FULL_ADMISSION -> addRepaymentMethod(caseData, builder, caseData.getTotalClaimAmount());
                 case PART_ADMISSION -> partAdmissionData(caseData, builder);
                 case FULL_DEFENCE -> fullDefenceData(caseData, builder);
@@ -111,6 +122,16 @@ public class ResponseRepaymentDetailsForm {
                 .payBy(repaymentPlan.finalPaymentBy(totalClaimAmount))
                 .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
             builder.amountToPay(totalClaimAmount + "");
+        } else if (caseData.getRespondent2RepaymentPlan() != null) {
+            repaymentPlan = caseData.getRespondent2RepaymentPlan();
+            builder.repaymentPlan(RepaymentPlanTemplateData.builder()
+                                      .paymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay())
+                                      .firstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
+                                      .paymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount()))
+                                      .build())
+                .payBy(repaymentPlan.finalPaymentBy(totalClaimAmount))
+                .whyNotPayImmediately(caseData.getResponseToClaimAdmitPartWhyNotPayLRspec());
+            builder.amountToPay = (totalClaimAmount + "");
         }
     }
 
@@ -123,7 +144,6 @@ public class ResponseRepaymentDetailsForm {
             .paymentHow(respondToClaim.getExplanationOnHowTheAmountWasPaid());
     }
 
-    //TODO
     private static void addDetailsOnWhyClaimIsRejected(CaseData caseData, ResponseRepaymentDetailsForm.ResponseRepaymentDetailsFormBuilder builder) {
         Optional<CaseDataLiP> caseDataLiPOptional = Optional.ofNullable(caseData.getCaseDataLiP());
         builder.freeTextWhyReject(caseData.getDetailsOfWhyDoesYouDisputeTheClaim())
@@ -149,31 +169,16 @@ public class ResponseRepaymentDetailsForm {
         if (caseData.getSpecDefenceAdmittedRequired() == YesOrNo.YES) {
             alreadyPaid(caseData, builder);
         } else {
-            if (useRespondent2(caseData)) {
-                addRepaymentMethod(
-                    caseData,
-                    builder,
-                    MonetaryConversions.penniesToPounds(caseData.getRespondToAdmittedClaimOwingAmount2())
-                );
-            } else {
             BigDecimal amountInPennies =
                 useRespondent2(caseData) ? caseData.getRespondToAdmittedClaimOwingAmount2() :
                     caseData.getRespondToAdmittedClaimOwingAmount();
 
-                addRepaymentMethod(
-                    caseData,
-                    builder,
+            addRepaymentMethod(
+                caseData,
+                builder,
                 MonetaryConversions.penniesToPounds(amountInPennies)
-                );
-            }
+            );
         }
-
-    private static boolean useRespondent2(CaseData caseData) {
-        return MultiPartyScenario.getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
-            && caseData.getRespondent1ResponseDate() == null
-            || (caseData.getRespondent2ResponseDate() != null
-            && caseData.getRespondent2ResponseDate().isAfter(caseData.getRespondent1ResponseDate()));
-    }
     }
 
     private static boolean useRespondent2(CaseData caseData) {
