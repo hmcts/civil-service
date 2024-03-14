@@ -42,15 +42,13 @@ public class DefendantAcceptsSettlementClaimantNotificationTest extends BaseInte
         doGet(BEARER_TOKEN, GET_NOTIFICATIONS_URL, caseId, "CLAIMANT").andExpect(status().isOk()).andExpectAll(
             status().is(HttpStatus.OK.value()),
             jsonPath("$[0].titleEn").value(
-                "Your help with fees application has been reviewed"),
+                "Settlement agreement"),
             jsonPath("$[0].descriptionEn").value(
-                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br> " +
-                    "You must still pay the remaining fee of £25.You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>"),
+                "<p class=\"govuk-body\">Dave Indent has accepted the settlement agreement.</p> <p class=\"govuk-body\">You cannot <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>,  unless they break the terms of the agreement.</p> <p class=\"govuk-body\"> <a href=\"{VIEW_SETTLEMENT_AGREEMENT}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the settlement agreement</a> <br> <a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it''s settled</a></p>"),
             jsonPath("$[0].titleCy").value(
-                "Your help with fees application has been reviewed"),
+                "Settlement agreement"),
             jsonPath("$[0].descriptionCy").value(
-                "<p class=\"govuk-body\">You'll get help with the claim fee. You'll receive £1000 towards it.<br> " +
-                    "You must still pay the remaining fee of £25.You can pay by phone by calling {civilMoneyClaimsTelephone}.</p>")
+                "<p class=\"govuk-body\">Dave Indent has accepted the settlement agreement.</p> <p class=\"govuk-body\">You cannot <a href=\"{COUNTY_COURT_JUDGEMENT_URL}\" rel=\"noopener noreferrer\" class=\"govuk-link\">request a County Court Judgment</a>,  unless they break the terms of the agreement.</p> <p class=\"govuk-body\"> <a href=\"{VIEW_SETTLEMENT_AGREEMENT}\" rel=\"noopener noreferrer\" class=\"govuk-link\">View the settlement agreement</a> <br> <a href=\"{TELL_US_IT_IS_SETTLED}\" rel=\"noopener noreferrer\" class=\"govuk-link\">Tell us it''s settled</a></p>")
 
         );
     }
