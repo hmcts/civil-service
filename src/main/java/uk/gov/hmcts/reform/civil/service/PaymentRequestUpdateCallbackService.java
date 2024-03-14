@@ -47,6 +47,7 @@ public class PaymentRequestUpdateCallbackService {
         if (serviceRequestUpdateDto.getServiceRequestStatus().equalsIgnoreCase(PAID)) {
 
             log.info("Fetching the Case details based on caseId {}", serviceRequestUpdateDto.getCcdCaseNumber());
+            log.info("Service Req Update Dto: {}", serviceRequestUpdateDto);
             CaseDetails caseDetails = coreCaseDataService.getCase(Long.valueOf(serviceRequestUpdateDto
                                                                                    .getCcdCaseNumber()));
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails);
@@ -104,7 +105,7 @@ public class PaymentRequestUpdateCallbackService {
                                                               CaseData caseData, String feeType) {
 
         PaymentDetails pbaDetails = getPBADetailsFromFeeType(feeType, caseData);
-
+        log.info("PbaDetails: {}", pbaDetails);
         String customerReference = ofNullable(serviceRequestUpdateDto.getPayment())
             .map(PaymentDto::getCustomerReference)
             .orElse(ofNullable(pbaDetails).map(PaymentDetails::getCustomerReference).orElse(null));
@@ -119,7 +120,9 @@ public class PaymentRequestUpdateCallbackService {
             .errorMessage(null)
             .build();
 
+        log.info("PayMentDetails: {}", paymentDetails);
         caseData = getCaseDataFromFeeType(feeType, caseData, paymentDetails);
+        log.info("CaseDataAfter adding payment details : {}", caseData.getClaimIssuedPaymentDetails());
         return caseData;
     }
 
