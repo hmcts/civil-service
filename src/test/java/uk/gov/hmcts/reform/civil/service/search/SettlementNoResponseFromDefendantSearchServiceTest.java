@@ -33,7 +33,7 @@ class SettlementNoResponseFromDefendantSearchServiceTest extends ElasticSearchSe
             .minimumShouldMatch(1)
             .should(boolQuery()
                         .must(matchQuery("data.respondent1RespondToSettlementAgreementDeadline", expectedDate))
-                        .must(boolQuery().must(matchQuery("state", "All_FINAL_ORDERS_ISSUED"))));
+                        .must(boolQuery().must(matchQuery("state", "AWAITING_APPLICANT_INTENTION"))));
         return new Query(query, List.of("reference"), fromValue);
     }
 
