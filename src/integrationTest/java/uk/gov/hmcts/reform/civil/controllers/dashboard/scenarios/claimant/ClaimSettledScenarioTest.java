@@ -21,7 +21,8 @@ public class ClaimSettledScenarioTest extends BaseIntegrationTest {
         doPost(BEARER_TOKEN,
                ScenarioRequestParams.builder()
                    .params(Map.of("claimSettledAmount", "£3000",
-                                  "claimSettledDate", "16th March 2024"
+                                  "claimSettledDateEn", "16th March 2024",
+                                  "claimSettledDateCy", "16th March 2024"
                    ))
                    .build(),
                DASHBOARD_CREATE_SCENARIO_URL, "Scenario.AAA7.ClaimantIntent.ClaimSettled.Claimant", caseId

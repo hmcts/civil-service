@@ -114,7 +114,8 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.50");
-        assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateEn").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 March 2023");
     }
 
     @Test
@@ -131,7 +132,8 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.55");
-        assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateEn").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 March 2023");
     }
 
     @Test
