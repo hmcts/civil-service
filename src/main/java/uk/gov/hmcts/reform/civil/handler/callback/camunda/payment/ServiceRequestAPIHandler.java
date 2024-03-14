@@ -84,7 +84,7 @@ public class ServiceRequestAPIHandler extends CallbackHandler {
                         .fee(calculateAndApplyFee(
                             hearingFeesService,
                             caseData,
-                            caseData.getAllocatedTrack().name()));
+                            caseData.getAssignedTrack()));
                     caseDataBuilder.hearingFeePBADetails(paymentDetails.build());
                 } catch (FeignException e) {
                     log.error("Failed creating a payment service request for case {}. Http status: {}. Exception: {}",
