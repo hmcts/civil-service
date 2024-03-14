@@ -7,9 +7,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.model.RespondToClaimAdmitPartLRspec;
-import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
@@ -118,7 +118,8 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.50");
-        assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateEn").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 March 2023");
     }
 
     @Test
@@ -135,7 +136,8 @@ public class DashboardNotificationsParamsMapperTest {
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
         assertThat(result).extracting("claimSettledAmount").isEqualTo("£1000.55");
-        assertThat(result).extracting("claimSettledDate").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateEn").isEqualTo("29 March 2023");
+        assertThat(result).extracting("claimSettledDateCy").isEqualTo("29 March 2023");
     }
 
     @Test
