@@ -17,6 +17,7 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 import static uk.gov.hmcts.reform.civil.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 public class DashboardNotificationsParamsMapper {
@@ -27,6 +28,7 @@ public class DashboardNotificationsParamsMapper {
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
+        params.put("claimantName", getPartyNameBasedOnType(caseData.getApplicant1()));
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
             params.put("defendantAdmittedAmount",

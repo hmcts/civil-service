@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.dashboard.data.Notification;
 import uk.gov.hmcts.reform.dashboard.data.TaskList;
 import uk.gov.hmcts.reform.dashboard.data.TaskStatus;
 import uk.gov.hmcts.reform.dashboard.entities.DashboardNotificationsEntity;
+import uk.gov.hmcts.reform.dashboard.entities.NotificationTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskItemTemplateEntity;
 import uk.gov.hmcts.reform.dashboard.entities.TaskListEntity;
 
@@ -67,7 +68,9 @@ public class DashboardNotificationsTestUtils {
     public static DashboardNotificationsEntity getNotification(UUID notificationId) {
         return DashboardNotificationsEntity.builder().id(notificationId)
             .reference("ccd-case-reference")
-            .descriptionEn("desc").descriptionCy("descCy").build();
+            .descriptionEn("desc").descriptionCy("descCy")
+            .dashboardNotificationsTemplates(NotificationTemplateEntity.builder().id(123L).build())
+            .build();
     }
 
     public static List<Notification> getNotificationList() {
