@@ -59,11 +59,10 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
                 && caseData.isClaimantIntentionSettlePartAdmit()) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
             }
-        }
-
-        if(caseData.isRespondentResponseFullDefence()){
-            if(isNull(caseData.getResponseClaimMediationSpecRequired())
-                || caseData.hasDefendantNotAgreedToFreeMediation()) {
+        } else if (caseData.getCcdState() == JUDICIAL_REFERRAL) {
+            if (caseData.isRespondentResponseFullDefence()
+                && (isNull(caseData.getResponseClaimMediationSpecRequired())
+                || caseData.hasDefendantNotAgreedToFreeMediation())) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEF_FULL_DEFENCE_CLAIMANT_DISPUTES_DEFENDANT
                     .getScenario();
             }
