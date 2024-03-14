@@ -526,7 +526,7 @@ public class StateFlowEngine {
             .transitionTo(TAKEN_OFFLINE_BY_STAFF).onlyIf(takenOfflineByStaffAfterDefendantResponse)
             .transitionTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA)
                     .onlyIf(applicantOutOfTime)
-            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isClaimantNotSettleFullDefenceClaim.or(isDefendantNotPaidFullDefenceClaim).and(not(agreedToMediation)))
+            .transitionTo(FULL_DEFENCE_PROCEED).onlyIf(isDefendantNotPaidFullDefenceClaim.and(not(agreedToMediation)))
             .set((c, flags) -> {
                 flags.put(FlowFlag.AGREED_TO_MEDIATION.name(), false);
             })
