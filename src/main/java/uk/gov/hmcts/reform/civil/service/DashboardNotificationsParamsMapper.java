@@ -17,6 +17,7 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Service
 public class DashboardNotificationsParamsMapper {
@@ -30,9 +31,11 @@ public class DashboardNotificationsParamsMapper {
         params.put("ccdCaseReference", caseData.getCcdCaseReference());
         params.put("defaultRespondTime", "4pm");
         params.put("respondent1PartyName", caseData.getRespondent1().getPartyName());
+        params.put("claimantName", getPartyNameBasedOnType(caseData.getApplicant1()));
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
-            params.put("defendantAdmittedAmount", formatAmount(getDefendantAdmittedAmount(caseData)));
+            params.put("defendantAdmittedAmount",
+                       this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData))));
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
@@ -42,7 +45,7 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
-                "£" + caseData.getClaimFee().toPounds().stripTrailingZeros().toPlainString()
+                "£" + this.removeDoubleZeros(caseData.getClaimFee().toPounds().toPlainString())
             );
         }
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
@@ -57,41 +60,58 @@ public class DashboardNotificationsParamsMapper {
             params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
         }
         if (caseData.getClaimIssueRemissionAmount() != null) {
-            params.put(
-                "claimIssueRemissionAmount",
-                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimIssueRemissionAmount()).stripTrailingZeros()
-                    .toPlainString()
+            params.put("claimIssueRemissionAmount",
+                "£" + this.removeDoubleZeros(MonetaryConversions
+                                                 .penniesToPounds(caseData.getClaimIssueRemissionAmount()).toPlainString())
             );
         }
         if (caseData.getOutstandingFeeInPounds() != null) {
             params.put(
                 "claimIssueOutStandingAmount",
-                "£" + caseData.getOutstandingFeeInPounds().stripTrailingZeros().toPlainString()
+                "£" + this.removeDoubleZeros(caseData.getOutstandingFeeInPounds().toPlainString())
             );
         }
-        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
-        params.put("claimSettledDate", getClaimSettleDate(caseData));
 
         if (caseData.getHwfFeeType() != null) {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
 
-        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
-        params.put("claimSettledDate", getClaimSettleDate(caseData));
-        params.put("respondSettlementAgreementDeadline", getRespondToSettlementAgreementDeadline(caseData));
+        getClaimSettledAmount(caseData).map(amount -> params.put("claimSettledAmount", amount));
+
+        getClaimSettleDate(caseData).map(date -> {
+            params.put("claimSettledDateEn", date);
+            params.put("claimSettledDateCy", date);
+            return Optional.of(date);
+        });
+
+        getRespondToSettlementAgreementDeadline(caseData).map(date -> {
+            params.put("respondent1SettlementAgreementDeadlineEn", date);
+            params.put("respondent1SettlementAgreementDeadlineCy", date);
+            params.put("claimantSettlementAgreement", "accepted");
+            return Optional.of(date);
+        });
+
         return params;
     }
 
-    private String getClaimSettledAmount(CaseData caseData) {
-        return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
-            MonetaryConversions::penniesToPounds).map(
-            BigDecimal::stripTrailingZeros).map(amount -> amount.setScale(2)).map(BigDecimal::toPlainString).map(amount -> "£" + amount).orElse(
-            null);
+    private Optional<String> getClaimSettledAmount(CaseData caseData) {
+        return Optional.ofNullable(getRespondToClaim(caseData))
+            .map(RespondToClaim::getHowMuchWasPaid)
+            .map(MonetaryConversions::penniesToPounds)
+            .map(amount -> amount.setScale(2))
+            .map(BigDecimal::toPlainString)
+            .map(this::removeDoubleZeros)
+            .map(amount -> "£" + amount);
     }
 
-    private String getClaimSettleDate(CaseData caseData) {
-        return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getWhenWasThisAmountPaid).map(
-            DateUtils::formatDate).orElse(null);
+    private String removeDoubleZeros(String input) {
+        return input.replace(".00", "");
+    }
+
+    private Optional<String> getClaimSettleDate(CaseData caseData) {
+        return Optional.ofNullable(getRespondToClaim(caseData))
+            .map(RespondToClaim::getWhenWasThisAmountPaid)
+            .map(DateUtils::formatDate);
     }
 
     private RespondToClaim getRespondToClaim(CaseData caseData) {
@@ -105,9 +125,10 @@ public class DashboardNotificationsParamsMapper {
         return respondToClaim;
     }
 
-    private String getRespondToSettlementAgreementDeadline(CaseData caseData) {
+    private Optional<String> getRespondToSettlementAgreementDeadline(CaseData caseData) {
         return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
-            .map(DateUtils::formatDate).orElse(null);
+            .map(LocalDateTime::toLocalDate)
+            .map(DateUtils::formatDate);
     }
 
     private String getClaimantRepaymentPlanDecision(CaseData caseData) {
