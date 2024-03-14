@@ -61,11 +61,11 @@ public class ClaimantResponseDefendantNotificationHandler extends CallbackHandle
             if (Objects.nonNull(caseData.getApplicant1PartAdmitIntentionToSettleClaimSpec())
                 && caseData.isClaimantIntentionSettlePartAdmit()) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_DEFENDANT.getScenario();
-            } else if (caseData.hasApplicant1CourtDecisionInFavourOfDefendant()) {
-                return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario();
-            } else if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
+            }else if (caseData.isPartAdmitImmediatePaymentClaimSettled()) {
                 return SCENARIO_AAA7_CLAIMANT_INTENT_PART_ADMIT_DEFENDANT.getScenario();
             }
+        } else if (caseData.hasApplicant1CourtDecisionInFavourOfDefendant()) {
+            return SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_COURT_AGREE_DEFENDANT_DEFENDANT.getScenario();
         } else if (caseData.hasApplicant1SignedSettlementAgreement() && caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
             return SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT_CLAIMANT_REJECTS_COURT_AGREES_WITH_CLAIMANT_DEFENDANT
                 .getScenario();
