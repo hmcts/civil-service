@@ -19,11 +19,13 @@ import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -44,6 +46,8 @@ class ClaimantDefendantAgreedMediationApplicantNotificationHandlerTest extends B
     private NotificationsProperties notificationsProperties;
     @MockBean
     private OrganisationService organisationService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Autowired
     private ClaimantDefendantAgreedMediationApplicantNotificationHandler handler;
 
@@ -53,10 +57,13 @@ class ClaimantDefendantAgreedMediationApplicantNotificationHandlerTest extends B
         @BeforeEach
         void setup() {
             when(notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate()).thenReturn("template-id");
+            when(notificationsProperties.getNotifyApplicantLRMediationTemplate()).thenReturn("mediation-template");
+
         }
 
         @Test
         void shouldNotifyApplicantParty_whenInvoked() {
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
             Party respondent1 = PartyBuilder.builder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
@@ -74,6 +81,31 @@ class ClaimantDefendantAgreedMediationApplicantNotificationHandlerTest extends B
             verify(notificationService).sendMail(
                 "applicantsolicitor@example.com",
                 "template-id",
+                getNotificationDataMapSpec(caseData),
+                "mediation-agreement-applicant-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldSendMediationNotifyApplicantParty_whenCarmIsON() {
+            when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+            Party respondent1 = PartyBuilder.builder().soleTrader()
+                .partyEmail("respondent@example.com")
+                .build();
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .respondent1(respondent1)
+                .setClaimTypeToSpecClaim()
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId("NOTIFY_APPLICANT_MEDIATION_AGREEMENT")
+                    .build()).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "applicantsolicitor@example.com",
+                "mediation-template",
                 getNotificationDataMapSpec(caseData),
                 "mediation-agreement-applicant-notification-000DC001"
             );
