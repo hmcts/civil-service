@@ -36,7 +36,7 @@ public class DashboardNotificationsParamsMapperTest {
     @Test
     public void shouldMapAllParameters_WhenIsRequested() {
 
-        LocalDate date = LocalDate.of(2024, Month.JANUARY, 11);
+        LocalDate date = LocalDate.of(2024, Month.FEBRUARY, 22);
 
         caseData = caseData.toBuilder()
             .hwfFeeType(FeeType.CLAIMISSUED)
@@ -55,10 +55,10 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantAdmittedAmount").isEqualTo("100");
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn")
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineEn")
             .isEqualTo(DateUtils.formatDate(date));
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineCy")
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineCy")
             .isEqualTo(DateUtils.formatDate(date));
 
         assertThat(result).extracting("respondent1ResponseDeadlineEn")
@@ -93,8 +93,10 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("defendantAdmittedAmount").isNull();
 
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEn").isNull();
-        assertThat(result).extracting("defendantAdmittedAmountPaymentDeadlineEnCy").isNull();
+        assertThat(result).extracting("defendantAdmittedAmount").isNull();
+
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineEn").isNull();
+        assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineCy").isNull();
 
         assertThat(result).extracting("claimFee").isNull();
 
