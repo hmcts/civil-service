@@ -85,7 +85,20 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
         private static Stream<Arguments> provideCaseStateAndScenarioArguments() {
             return Stream.of(
                 Arguments.of(CaseState.JUDICIAL_REFERRAL, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING),
-                Arguments.of(CaseState.CASE_SETTLED, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT)
+                Arguments.of(CaseState.CASE_SETTLED, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT),
+                Arguments.of(
+                    CaseState.JUDICIAL_REFERRAL,
+                    DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING
+                ),
+                Arguments.of(
+                    CaseState.CASE_SETTLED,
+                    DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_CLAIM_SETTLED_CLAIMANT
+                ),
+                Arguments.of(
+                    CaseState.JUDICIAL_REFERRAL,
+                    DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING
+                ),
+                Arguments.of(CaseState.IN_MEDIATION, DashboardScenarios.SCENARIO_AAA7_CLAIMANT_MEDIATION)
             );
         }
 
@@ -166,4 +179,3 @@ public class ClaimantResponseNotificationHandlerTest extends BaseCallbackHandler
                 "CREATE_CLAIMANT_DASHBOARD_NOTIFICATION_FOR_CLAIMANT_RESPONSE").build()).build())).isEqualTo(TASK_ID);
     }
 }
-

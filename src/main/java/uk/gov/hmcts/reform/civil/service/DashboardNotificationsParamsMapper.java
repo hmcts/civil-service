@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -8,19 +7,18 @@ import uk.gov.hmcts.reform.civil.model.RespondToClaim;
 import uk.gov.hmcts.reform.civil.utils.DateUtils;
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.math.BigDecimal;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.service.docmosis.utils.ClaimantResponseUtils.getDefendantAdmittedAmount;
 import static uk.gov.hmcts.reform.civil.utils.AmountFormatter.formatAmount;
 
 @Service
-@RequiredArgsConstructor
 public class DashboardNotificationsParamsMapper {
 
     public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
@@ -41,13 +39,13 @@ public class DashboardNotificationsParamsMapper {
         if (nonNull(caseData.getClaimFee())) {
             params.put(
                 "claimFee",
-                "£" + MonetaryConversions.penniesToPounds(caseData.getClaimFee().getCalculatedAmountInPence())
-                    .stripTrailingZeros().toPlainString()
+                "£" + caseData.getClaimFee().toPounds().stripTrailingZeros().toPlainString()
             );
         }
         if (nonNull(caseData.getRespondent1ResponseDeadline())) {
-            params.put("respondent1ResponseDeadline",
-                       DateUtils.formatDate(caseData.getRespondent1ResponseDeadline().toLocalDate()));
+            LocalDate responseDeadline = caseData.getRespondent1ResponseDeadline().toLocalDate();
+            params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(responseDeadline));
+            params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
         }
         if (nonNull(caseData.getRespondent1RespondToSettlementAgreementDeadline())) {
             LocalDateTime respondent1SettlementAgreementDeadline = caseData.getRespondent1RespondToSettlementAgreementDeadline();
@@ -75,6 +73,9 @@ public class DashboardNotificationsParamsMapper {
             params.put("typeOfFee", caseData.getHwfFeeType().getLabel());
         }
 
+        params.put("claimSettledAmount", getClaimSettledAmount(caseData));
+        params.put("claimSettledDate", getClaimSettleDate(caseData));
+        params.put("respondSettlementAgreementDeadline", getRespondToSettlementAgreementDeadline(caseData));
         return params;
     }
 
@@ -99,5 +100,10 @@ public class DashboardNotificationsParamsMapper {
         }
 
         return respondToClaim;
+    }
+
+    private String getRespondToSettlementAgreementDeadline(CaseData caseData) {
+        return Optional.ofNullable(caseData.getRespondent1RespondToSettlementAgreementDeadline())
+            .map(DateUtils::formatDate).orElse(null);
     }
 }

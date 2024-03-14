@@ -117,17 +117,25 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
 
         // add document from defendant response documents, to placeholder field for preview during event.
         caseData.getDefendantResponseDocuments().forEach(document -> {
-            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)) {
+            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+                && document.getValue().getCreatedBy().equals("Defendant")) {
                 updatedData.respondent1ClaimResponseDocument(ResponseDocument.builder()
+                                                                 .file(document.getValue().getDocumentLink())
+                                                                 .build());
+            }
+            if (document.getValue().getDocumentType().equals(DocumentType.DEFENDANT_DEFENCE)
+                && document.getValue().getCreatedBy().equals("Defendant 2")) {
+                updatedData.respondent2ClaimResponseDocument(ResponseDocument.builder()
+                                                                 .file(document.getValue().getDocumentLink())
+                                                                 .build());
+            }
+            if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
+                updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
                                                                       .file(document.getValue().getDocumentLink())
                                                                       .build());
-                if ((getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP)) {
-                    updatedData.respondentSharedClaimResponseDocument(ResponseDocument.builder()
-                                                                     .file(document.getValue().getDocumentLink())
-                                                                     .build());
-                }
             }
-        });
+        }
+        );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(updatedData.build().toMap(objectMapper))
