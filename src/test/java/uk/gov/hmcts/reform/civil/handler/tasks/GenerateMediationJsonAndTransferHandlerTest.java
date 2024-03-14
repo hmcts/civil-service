@@ -108,6 +108,21 @@ class GenerateMediationJsonAndTransferHandlerTest {
     }
 
     @Test
+    void shouldNotGenerateJsonAndSendEmailCarmToggleOff() {
+        List<CaseDetails> cases = new ArrayList<>();
+        String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK))).toString();
+        when(externalTask.getVariable(any())).thenReturn(date);
+        when(searchService.getInMediationCases(any(), anyBoolean())).thenReturn(cases);
+        when(featureToggleService.isFeatureEnabled("carm")).thenReturn(false);
+        when(caseDetailsConverter.toCaseData(caseDetailsWithInMediationStateNotToProcess)).thenReturn(caseDataInMediationNotToProcess);
+
+        mediationJsonHandler.execute(externalTask, externalTaskService);
+        verify(searchService).getInMediationCases(claimNotToBeProcessed, true);
+        verify(sendGridClient, times(0)).sendEmail(anyString(), any());
+        verify(externalTaskService).complete(externalTask);
+    }
+
+    @Test
     void should_handle_task_from_external_variable() {
         String date = (claimNotToBeProcessed.format(DateTimeFormatter.ofPattern("dd-MM-yyyy", Locale.UK))).toString();
         when(externalTask.getVariable(any())).thenReturn(date);
