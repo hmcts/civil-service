@@ -22,6 +22,9 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 @Service
 public class DashboardNotificationsParamsMapper {
 
+    public static final String CLAIMANT1_ACCEPTED_REPAYMENT_PLAN = "accepted";
+    public static final String CLAIMANT1_REJECTED_REPAYMENT_PLAN = "rejected";
+
     public Map<String, Object> mapCaseDataToParams(CaseData caseData) {
 
         Map<String, Object> params = new HashMap<>();
@@ -32,8 +35,10 @@ public class DashboardNotificationsParamsMapper {
         params.put("applicant1PartyName", caseData.getApplicant1().getPartyName());
 
         if (nonNull(getDefendantAdmittedAmount(caseData))) {
-            params.put("defendantAdmittedAmount",
-                       this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData))));
+            params.put(
+                "defendantAdmittedAmount",
+                this.removeDoubleZeros(formatAmount(getDefendantAdmittedAmount(caseData)))
+            );
         }
         if (nonNull(caseData.getRespondToClaimAdmitPartLRspec())) {
             LocalDate whenWillThisAmountBePaid = caseData.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid();
@@ -51,8 +56,10 @@ public class DashboardNotificationsParamsMapper {
             params.put("respondent1ResponseDeadlineEn", DateUtils.formatDate(responseDeadline));
             params.put("respondent1ResponseDeadlineCy", DateUtils.formatDate(responseDeadline));
         }
+
         if (caseData.getClaimIssueRemissionAmount() != null) {
-            params.put("claimIssueRemissionAmount",
+            params.put(
+                "claimIssueRemissionAmount",
                 "£" + this.removeDoubleZeros(MonetaryConversions
                                                  .penniesToPounds(caseData.getClaimIssueRemissionAmount()).toPlainString())
             );
@@ -81,7 +88,7 @@ public class DashboardNotificationsParamsMapper {
         getRespondToSettlementAgreementDeadline(caseData).map(date -> {
             params.put("respondent1SettlementAgreementDeadlineEn", date);
             params.put("respondent1SettlementAgreementDeadlineCy", date);
-            params.put("claimantSettlementAgreement", "accepted");
+            params.put("claimantSettlementAgreement", getClaimantRepaymentPlanDecision(caseData));
             return Optional.of(date);
         });
 
@@ -127,8 +134,15 @@ public class DashboardNotificationsParamsMapper {
 
     private String getAlreadyPaidAmount(CaseData caseData) {
         return Optional.ofNullable(getRespondToClaim(caseData)).map(RespondToClaim::getHowMuchWasPaid).map(
-                MonetaryConversions::penniesToPounds).map(
-                BigDecimal::stripTrailingZeros).map(amount -> amount.setScale(2)).map(BigDecimal::toPlainString).map(amount -> "£" + amount).orElse(
-                null);
+            MonetaryConversions::penniesToPounds).map(
+            BigDecimal::stripTrailingZeros).map(amount -> amount.setScale(2)).map(BigDecimal::toPlainString).map(amount -> "£" + amount).orElse(
+            null);
+    }
+
+    private String getClaimantRepaymentPlanDecision(CaseData caseData) {
+        if (caseData.hasApplicantAcceptedRepaymentPlan()) {
+            return CLAIMANT1_ACCEPTED_REPAYMENT_PLAN;
+        }
+        return CLAIMANT1_REJECTED_REPAYMENT_PLAN;
     }
 }

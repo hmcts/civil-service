@@ -15,10 +15,12 @@ import uk.gov.hmcts.reform.civil.utils.DateUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
 public class DashboardNotificationsParamsMapperTest {
@@ -43,6 +45,8 @@ public class DashboardNotificationsParamsMapperTest {
             .totalClaimAmount(BigDecimal.valueOf(124.67))
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100))
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(date))
+            .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now())
+            .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -69,6 +73,13 @@ public class DashboardNotificationsParamsMapperTest {
             .isEqualTo(caseData.getRespondent1().getPartyName());
 
         assertThat(result).extracting("typeOfFee").isEqualTo("claim");
+        assertThat(result).extracting("respondent1SettlementAgreementDeadlineEn")
+            .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
+
+        assertThat(result).extracting("respondent1SettlementAgreementDeadlineCy")
+            .isEqualTo(DateUtils.formatDate(LocalDateTime.now()));
+
+        assertThat(result).extracting("claimantSettlementAgreement").isEqualTo("accepted");
     }
 
     @Test
@@ -80,6 +91,7 @@ public class DashboardNotificationsParamsMapperTest {
             .respondToClaimAdmitPartLRspec(null)
             .respondent1ResponseDeadline(null)
             .claimFee(null)
+            .respondent1RespondToSettlementAgreementDeadline(null)
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -97,6 +109,9 @@ public class DashboardNotificationsParamsMapperTest {
 
         assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineEn").isNull();
         assertThat(result).extracting("respondent1AdmittedAmountPaymentDeadlineCy").isNull();
+
+        assertThat(result).extracting("respondent1SettlementAgreementDeadlineEn").isNull();
+        assertThat(result).extracting("respondent1SettlementAgreementDeadlineCy").isNull();
 
         assertThat(result).extracting("claimFee").isNull();
 

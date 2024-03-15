@@ -16,6 +16,7 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_REQUESTED("Scenario.AAA7.ClaimIssue.HWF.Requested"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_INVALID_REF("Scenario.AAA7.ClaimIssue.HWF.InvalidRef"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_INFO_REQUIRED("Scenario.AAA7.ClaimIssue.HWF.InfoRequired"),
+    SCENARIO_AAA7_CLAIMANT_INTENT_CCJ_REQUESTED_DEFENDANT("Scenario.AAA7.ClaimantIntent.CCJ.Requested.Defendant"),
     SCENARIO_AAA7_CLAIM_PART_ADMIT_CLAIMANT("Scenario.AAA7.ClaimantIntent.PartAdmit.Claimant"),
     SCENARIO_AAA7_CLAIM_ISSUE_HWF_UPDATED("Scenario.AAA7.ClaimIssue.HWF.Updated"),
     SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_NO_RESPONSE_CLAIMANT("Scenario.AAA7.ClaimantIntent.SettlementNoResponse.Claimant"),
@@ -30,7 +31,8 @@ public enum DashboardScenarios {
     SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_DEFENDANT_PART_ADMIT("Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.Defendant"),
     SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING_PART_ADMIT_FULL_DEFENCE_STATES_PAID_CLAIMANT_CONFIRMS_DEFENDANT(
             "Scenario.AAA7.ClaimantIntent.GoToHearing.DefPartAdmit.FullDefence.StatesPaid.ClaimantConfirms.Defendant"
-    );
+    ),
+    SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT("Scenario.AAA7.ClaimantIntent.SettlementAgreement.AcceptOrRejectDefPlan.Claimant");
 
     private final String scenario;
 

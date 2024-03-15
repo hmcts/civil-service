@@ -27,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIM_PART_ADMIT_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_MEDIATION;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT;
 
 @Service
 @RequiredArgsConstructor
@@ -81,6 +82,8 @@ public class ClaimantResponseNotificationHandler extends CallbackHandler {
             return SCENARIO_AAA7_CLAIMANT_INTENT_GO_TO_HEARING.getScenario();
         } else if (caseData.getCcdState() == IN_MEDIATION) {
             return SCENARIO_AAA7_CLAIMANT_MEDIATION.getScenario();
+        } else if (caseData.hasApplicant1SignedSettlementAgreement()) {
+            return SCENARIO_AAA7_CLAIMANT_INTENT_SETTLEMENT_AGREEMENT.getScenario();
         }
         return null;
     }
